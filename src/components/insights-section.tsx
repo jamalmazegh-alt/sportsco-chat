@@ -116,10 +116,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
       const list = (data ?? []) as unknown as InsightRow[];
       return list
         .filter((i) => !(i.dismissed_by ?? []).includes(user!.id))
-        .sort(
-          (a, b) =>
-            (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99),
-        );
+        .sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99));
     },
   });
 
@@ -191,9 +188,8 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     const id = pendingDismiss;
     if (!id) return;
     setPendingDismiss(null);
-    qc.setQueryData<InsightRow[] | undefined>(
-      ["coach-insights", clubId, user?.id],
-      (old) => old?.filter((i) => i.id !== id),
+    qc.setQueryData<InsightRow[] | undefined>(["coach-insights", clubId, user?.id], (old) =>
+      old?.filter((i) => i.id !== id),
     );
     try {
       await dismissInsight({ data: { insightId: id } });
@@ -317,10 +313,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
         })}
       </div>
 
-      <AlertDialog
-        open={!!pendingDismiss}
-        onOpenChange={(o) => !o && setPendingDismiss(null)}
-      >
+      <AlertDialog open={!!pendingDismiss} onOpenChange={(o) => !o && setPendingDismiss(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("insights.dismissConfirmTitle")}</AlertDialogTitle>

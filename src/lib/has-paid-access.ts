@@ -24,19 +24,14 @@ export function isBillingExempt(
   return new Date(sub.exempt_until).getTime() > nowMs;
 }
 
-function isActiveStripeSubscription(
-  sub: SubscriptionAccessFields,
-  nowMs: number,
-): boolean {
+function isActiveStripeSubscription(sub: SubscriptionAccessFields, nowMs: number): boolean {
   const status = sub.status ?? "";
   if (status === "trialing") {
     const trialEnd = sub.trial_end ? new Date(sub.trial_end).getTime() : null;
     return trialEnd !== null && trialEnd > nowMs;
   }
   if (status === "active" || status === "past_due") {
-    const periodEnd = sub.current_period_end
-      ? new Date(sub.current_period_end).getTime()
-      : null;
+    const periodEnd = sub.current_period_end ? new Date(sub.current_period_end).getTime() : null;
     return periodEnd === null || periodEnd > nowMs;
   }
   return false;

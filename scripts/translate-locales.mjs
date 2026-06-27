@@ -9,7 +9,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const API_KEY = process.env.LOVABLE_API_KEY;
-if (!API_KEY) { console.error("Missing LOVABLE_API_KEY"); process.exit(1); }
+if (!API_KEY) {
+  console.error("Missing LOVABLE_API_KEY");
+  process.exit(1);
+}
 
 const MODEL = process.env.MODEL || "google/gemini-2.5-flash";
 const URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -27,48 +30,140 @@ const LANG_NAMES = {
 };
 
 const SPORTS_GLOSSARY = {
-  es: { Club:"Club", Team:"Equipo", Player:"Jugador", Coach:"Entrenador", "Assistant Coach":"Entrenador asistente", Parent:"Padre/Madre", Referee:"Árbitro", Tournament:"Torneo", "Group Stage":"Fase de grupos", "Knockout Stage":"Fase eliminatoria", Standings:"Clasificación", Lineup:"Alineación", Roster:"Convocatoria", Suspension:"Sanción", Availability:"Disponibilidad", Attendance:"Asistencia" },
-  pt: { Club:"Clube", Team:"Equipa", Player:"Jogador", Coach:"Treinador", "Assistant Coach":"Treinador adjunto", Parent:"Encarregado de educação", Referee:"Árbitro", Tournament:"Torneio", "Group Stage":"Fase de grupos", "Knockout Stage":"Fase a eliminar", Standings:"Classificação", Lineup:"Onze inicial", Roster:"Convocatória", Suspension:"Suspensão", Availability:"Disponibilidade", Attendance:"Presenças" },
-  it: { Club:"Club", Team:"Squadra", Player:"Giocatore", Coach:"Allenatore", "Assistant Coach":"Vice allenatore", Parent:"Genitore", Referee:"Arbitro", Tournament:"Torneo", "Group Stage":"Fase a gironi", "Knockout Stage":"Fase a eliminazione diretta", Standings:"Classifica", Lineup:"Formazione", Roster:"Convocati", Suspension:"Squalifica", Availability:"Disponibilità", Attendance:"Presenze" },
-  nl: { Club:"Club", Team:"Team", Player:"Speler", Coach:"Coach", "Assistant Coach":"Assistent-coach", Parent:"Ouder", Referee:"Scheidsrechter", Tournament:"Toernooi", "Group Stage":"Groepsfase", "Knockout Stage":"Knock-outfase", Standings:"Stand", Lineup:"Opstelling", Roster:"Selectie", Suspension:"Schorsing", Availability:"Beschikbaarheid", Attendance:"Aanwezigheid" },
+  es: {
+    Club: "Club",
+    Team: "Equipo",
+    Player: "Jugador",
+    Coach: "Entrenador",
+    "Assistant Coach": "Entrenador asistente",
+    Parent: "Padre/Madre",
+    Referee: "Árbitro",
+    Tournament: "Torneo",
+    "Group Stage": "Fase de grupos",
+    "Knockout Stage": "Fase eliminatoria",
+    Standings: "Clasificación",
+    Lineup: "Alineación",
+    Roster: "Convocatoria",
+    Suspension: "Sanción",
+    Availability: "Disponibilidad",
+    Attendance: "Asistencia",
+  },
+  pt: {
+    Club: "Clube",
+    Team: "Equipa",
+    Player: "Jogador",
+    Coach: "Treinador",
+    "Assistant Coach": "Treinador adjunto",
+    Parent: "Encarregado de educação",
+    Referee: "Árbitro",
+    Tournament: "Torneio",
+    "Group Stage": "Fase de grupos",
+    "Knockout Stage": "Fase a eliminar",
+    Standings: "Classificação",
+    Lineup: "Onze inicial",
+    Roster: "Convocatória",
+    Suspension: "Suspensão",
+    Availability: "Disponibilidade",
+    Attendance: "Presenças",
+  },
+  it: {
+    Club: "Club",
+    Team: "Squadra",
+    Player: "Giocatore",
+    Coach: "Allenatore",
+    "Assistant Coach": "Vice allenatore",
+    Parent: "Genitore",
+    Referee: "Arbitro",
+    Tournament: "Torneo",
+    "Group Stage": "Fase a gironi",
+    "Knockout Stage": "Fase a eliminazione diretta",
+    Standings: "Classifica",
+    Lineup: "Formazione",
+    Roster: "Convocati",
+    Suspension: "Squalifica",
+    Availability: "Disponibilità",
+    Attendance: "Presenze",
+  },
+  nl: {
+    Club: "Club",
+    Team: "Team",
+    Player: "Speler",
+    Coach: "Coach",
+    "Assistant Coach": "Assistent-coach",
+    Parent: "Ouder",
+    Referee: "Scheidsrechter",
+    Tournament: "Toernooi",
+    "Group Stage": "Groepsfase",
+    "Knockout Stage": "Knock-outfase",
+    Standings: "Stand",
+    Lineup: "Opstelling",
+    Roster: "Selectie",
+    Suspension: "Schorsing",
+    Availability: "Beschikbaarheid",
+    Attendance: "Aanwezigheid",
+  },
 };
 
 const PH_RE = /\{\{[^}]+\}\}|\{[a-zA-Z0-9_]+\}|%\{[^}]+\}|<\d+>|<\/?\d+>/g;
 
-function collectStrings(obj, out=[]) {
-  if (typeof obj === "string") { out.push(obj); return out; }
-  if (Array.isArray(obj)) { obj.forEach(v=>collectStrings(v,out)); return out; }
-  if (obj && typeof obj === "object") for (const v of Object.values(obj)) collectStrings(v,out);
+function collectStrings(obj, out = []) {
+  if (typeof obj === "string") {
+    out.push(obj);
+    return out;
+  }
+  if (Array.isArray(obj)) {
+    obj.forEach((v) => collectStrings(v, out));
+    return out;
+  }
+  if (obj && typeof obj === "object") for (const v of Object.values(obj)) collectStrings(v, out);
   return out;
 }
-function placeholders(s){ return (s.match(PH_RE)||[]).sort(); }
-function structurallyEqual(a,b){
-  if (typeof a==="string") return typeof b==="string";
-  if (Array.isArray(a)) return Array.isArray(b) && a.length===b.length && a.every((x,i)=>structurallyEqual(x,b[i]));
-  if (a && typeof a==="object") {
-    if (!b || typeof b!=="object" || Array.isArray(b)) return false;
-    const ka=Object.keys(a).sort(), kb=Object.keys(b).sort();
-    if (ka.length!==kb.length || ka.some((k,i)=>k!==kb[i])) return false;
-    return ka.every(k=>structurallyEqual(a[k],b[k]));
+function placeholders(s) {
+  return (s.match(PH_RE) || []).sort();
+}
+function structurallyEqual(a, b) {
+  if (typeof a === "string") return typeof b === "string";
+  if (Array.isArray(a))
+    return (
+      Array.isArray(b) && a.length === b.length && a.every((x, i) => structurallyEqual(x, b[i]))
+    );
+  if (a && typeof a === "object") {
+    if (!b || typeof b !== "object" || Array.isArray(b)) return false;
+    const ka = Object.keys(a).sort(),
+      kb = Object.keys(b).sort();
+    if (ka.length !== kb.length || ka.some((k, i) => k !== kb[i])) return false;
+    return ka.every((k) => structurallyEqual(a[k], b[k]));
   }
-  return a===b;
+  return a === b;
 }
 
-async function callAI(messages, retries=4) {
-  for (let i=0;i<retries;i++){
+async function callAI(messages, retries = 4) {
+  for (let i = 0; i < retries; i++) {
     try {
       const r = await fetch(URL, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json", Authorization:`Bearer ${API_KEY}` },
-        body: JSON.stringify({ model: MODEL, messages, response_format:{type:"json_object"}, temperature:0.2, max_tokens: 16000 }),
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_KEY}` },
+        body: JSON.stringify({
+          model: MODEL,
+          messages,
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+          max_tokens: 16000,
+        }),
       });
-      if (r.status===429 || r.status>=500) { await new Promise(r=>setTimeout(r, 3000*(i+1))); continue; }
+      if (r.status === 429 || r.status >= 500) {
+        await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
+        continue;
+      }
       if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
       const j = await r.json();
       const content = j.choices?.[0]?.message?.content;
       if (!content) throw new Error("empty content");
       return content;
-    } catch(e){ if (i===retries-1) throw e; await new Promise(r=>setTimeout(r, 3000*(i+1))); }
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
+    }
   }
 }
 
@@ -84,17 +179,25 @@ Rules:
 - Keep emojis and brand names: Clubero, Stripe, WhatsApp, Google. Use language-correct quotation marks where natural.
 - Sports terminology must follow this glossary: ${JSON.stringify(glossary)}
 - Output ONLY valid JSON, no commentary, no markdown fences. Top-level shape MUST be {"${sectionKey}": <translated value>}.`;
-  const user = `Namespace: ${ns}\nSection key: ${sectionKey}\nTranslate the values of this JSON to ${LANG_NAMES[lang]}:\n\n${JSON.stringify({[sectionKey]: sectionValue})}`;
-  const raw = await callAI([{role:"system",content:sys},{role:"user",content:user}]);
+  const user = `Namespace: ${ns}\nSection key: ${sectionKey}\nTranslate the values of this JSON to ${LANG_NAMES[lang]}:\n\n${JSON.stringify({ [sectionKey]: sectionValue })}`;
+  const raw = await callAI([
+    { role: "system", content: sys },
+    { role: "user", content: user },
+  ]);
   let parsed;
-  try { parsed = JSON.parse(raw); } catch { throw new Error("bad-json"); }
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error("bad-json");
+  }
   const out = parsed[sectionKey] ?? parsed;
   if (!structurallyEqual(sectionValue, out)) throw new Error("structure-mismatch");
   const srcStrs = collectStrings(sectionValue);
   const dstStrs = collectStrings(out);
-  for (let i=0;i<srcStrs.length;i++){
-    const a=placeholders(srcStrs[i]).join("|"), b=placeholders(dstStrs[i]).join("|");
-    if (a!==b) throw new Error(`placeholder-mismatch:${a} vs ${b}`);
+  for (let i = 0; i < srcStrs.length; i++) {
+    const a = placeholders(srcStrs[i]).join("|"),
+      b = placeholders(dstStrs[i]).join("|");
+    if (a !== b) throw new Error(`placeholder-mismatch:${a} vs ${b}`);
   }
   return out;
 }
@@ -103,16 +206,18 @@ async function translateSection(lang, ns, sectionKey, sectionValue) {
   // Try whole-section first; on failure recurse into subkeys.
   try {
     return await translateOne(lang, ns, sectionKey, sectionValue);
-  } catch(e) {
+  } catch (e) {
     if (sectionValue && typeof sectionValue === "object" && !Array.isArray(sectionValue)) {
       const out = {};
-      for (const [k,v] of Object.entries(sectionValue)) {
+      for (const [k, v] of Object.entries(sectionValue)) {
         if (typeof v === "string" || Array.isArray(v) || (v && typeof v === "object")) {
           try {
             out[k] = await translateOne(lang, ns, k, v);
-          } catch(e2) {
+          } catch (e2) {
             // last resort: leave DE value to avoid corrupting parity
-            console.error(`    WARN ${lang}/${ns}/${sectionKey}.${k} fallback to DE (${e2.message})`);
+            console.error(
+              `    WARN ${lang}/${ns}/${sectionKey}.${k} fallback to DE (${e2.message})`,
+            );
             out[k] = v;
           }
         } else out[k] = v;
@@ -127,28 +232,34 @@ async function processLangNs(lang, ns) {
   const srcPath = path.join(SRC_DIR, `${ns}.json`);
   const src = JSON.parse(fs.readFileSync(srcPath, "utf8"));
   const dstDir = `src/locales/${lang}`;
-  fs.mkdirSync(dstDir, {recursive:true});
+  fs.mkdirSync(dstDir, { recursive: true });
   const dstPath = path.join(dstDir, `${ns}.json`);
   let existing = {};
-  if (fs.existsSync(dstPath)) { try { existing = JSON.parse(fs.readFileSync(dstPath,"utf8")); } catch {} }
+  if (fs.existsSync(dstPath)) {
+    try {
+      existing = JSON.parse(fs.readFileSync(dstPath, "utf8"));
+    } catch {}
+  }
   const result = { ...existing };
   const sections = Object.keys(src);
   // Translate in small parallel batches to avoid rate limits
   const BATCH = 4;
-  for (let i=0;i<sections.length;i+=BATCH) {
-    const slice = sections.slice(i, i+BATCH);
-    const out = await Promise.all(slice.map(async key => {
-      if (!FORCE && key in existing && structurallyEqual(src[key], existing[key])) {
-        return [key, existing[key], "skip"];
-      }
-      const t = await translateSection(lang, ns, key, src[key]);
-      return [key, t, "ok"];
-    }));
-    for (const [k,v,status] of out) {
-      result[k]=v;
+  for (let i = 0; i < sections.length; i += BATCH) {
+    const slice = sections.slice(i, i + BATCH);
+    const out = await Promise.all(
+      slice.map(async (key) => {
+        if (!FORCE && key in existing && structurallyEqual(src[key], existing[key])) {
+          return [key, existing[key], "skip"];
+        }
+        const t = await translateSection(lang, ns, key, src[key]);
+        return [key, t, "ok"];
+      }),
+    );
+    for (const [k, v, status] of out) {
+      result[k] = v;
       process.stdout.write(`  ${lang}/${ns}/${k} ${status}\n`);
     }
-    fs.writeFileSync(dstPath, JSON.stringify(result, null, 2)+"\n");
+    fs.writeFileSync(dstPath, JSON.stringify(result, null, 2) + "\n");
   }
 }
 
@@ -161,4 +272,7 @@ async function processLangNs(lang, ns) {
     }
   }
   console.log("\nDone.");
-})().catch(e => { console.error(e); process.exit(1); });
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

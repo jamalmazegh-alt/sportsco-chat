@@ -3,11 +3,7 @@
  * Stocké dans `tournaments.settings` (jsonb), donc 100% rétro-compatible.
  */
 import type { Tiebreaker, PointsConfig, FairPlayConfig } from "./standings";
-import {
-  DEFAULT_POINTS,
-  DEFAULT_TIEBREAKERS,
-  DEFAULT_FAIR_PLAY,
-} from "./standings";
+import { DEFAULT_POINTS, DEFAULT_TIEBREAKERS, DEFAULT_FAIR_PLAY } from "./standings";
 import type { ScoringRules } from "./formats";
 import { DEFAULT_SETS_RULES, defaultScoringForSport } from "./formats";
 import { sportAllowsDraw } from "@/lib/sports";
@@ -38,11 +34,10 @@ export interface RosterRules {
   maxSubstitutes: number;
 }
 
-
 export interface RegistrationRules {
   enabled: boolean;
-  opensAt?: string | null;   // ISO datetime
-  closesAt?: string | null;  // ISO datetime
+  opensAt?: string | null; // ISO datetime
+  closesAt?: string | null; // ISO datetime
   maxTeams?: number | null;
   requiresApproval: boolean;
   collectPlayers: boolean;
@@ -215,10 +210,19 @@ export function mergeRules(settings: unknown): TournamentRules {
     overtime: { ...DEFAULT_RULES.overtime, ...(s.overtime ?? {}) },
     penaltyShootout: { ...DEFAULT_RULES.penaltyShootout, ...(s.penaltyShootout ?? {}) },
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
-    forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
+    forfeit: {
+      ...DEFAULT_RULES.forfeit,
+      ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}),
+    },
     roster: { ...DEFAULT_RULES.roster, ...((s.roster as Partial<RosterRules> | undefined) ?? {}) },
-    registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
-    regulations: { ...DEFAULT_RULES.regulations, ...((s.regulations as Partial<RegulationsConfig> | undefined) ?? {}) },
+    registration: {
+      ...DEFAULT_RULES.registration,
+      ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}),
+    },
+    regulations: {
+      ...DEFAULT_RULES.regulations,
+      ...((s.regulations as Partial<RegulationsConfig> | undefined) ?? {}),
+    },
     scoring: (s.scoring as ScoringRules | undefined) ?? undefined,
     language: (s.language as TournamentLanguage) ?? DEFAULT_RULES.language,
     branding: { ...DEFAULT_RULES.branding, ...(s.branding ?? {}) },

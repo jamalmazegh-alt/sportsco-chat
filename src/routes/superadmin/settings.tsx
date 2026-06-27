@@ -75,8 +75,8 @@ function SettingsPage() {
             <Bell className="h-4 w-4" /> Tester une push notification
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Envoie immédiatement une notification de test à toutes vos
-            subscriptions Web Push enregistrées (cet utilisateur).
+            Envoie immédiatement une notification de test à toutes vos subscriptions Web Push
+            enregistrées (cet utilisateur).
           </p>
         </div>
 
@@ -118,8 +118,8 @@ function SettingsPage() {
                 </span>
               ) : result.reason === "no_subscriptions" ? (
                 <span className="text-amber-600 font-medium">
-                  ⚠ Aucune push subscription enregistrée pour votre compte —
-                  activez les notifications dans l'app d'abord.
+                  ⚠ Aucune push subscription enregistrée pour votre compte — activez les
+                  notifications dans l'app d'abord.
                 </span>
               ) : (
                 <span className="text-destructive font-medium">
@@ -127,7 +127,10 @@ function SettingsPage() {
                 </span>
               )}
               {result.pruned > 0 && (
-                <span className="text-muted-foreground"> · {result.pruned} expirée(s) supprimée(s)</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {result.pruned} expirée(s) supprimée(s)
+                </span>
               )}
             </div>
             {result.subscriptions.length > 0 && (

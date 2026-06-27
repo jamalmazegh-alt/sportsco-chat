@@ -378,9 +378,7 @@ describe("normalizeGroupUrl", () => {
   });
 
   it("préfixe les raccourcis chat.whatsapp.com", () => {
-    expect(normalizeGroupUrl("chat.whatsapp.com/ABC123")).toBe(
-      "https://chat.whatsapp.com/ABC123"
-    );
+    expect(normalizeGroupUrl("chat.whatsapp.com/ABC123")).toBe("https://chat.whatsapp.com/ABC123");
   });
 
   it("laisse passer les autres valeurs telles quelles", () => {

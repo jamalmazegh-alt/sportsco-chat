@@ -66,30 +66,44 @@ test.describe("Carpool (covoiturage)", () => {
   test.afterAll(async () => {
     try {
       const { data: carpools } = await admin
-        .from("carpools").select("id")
+        .from("carpools")
+        .select("id")
         .in("event_id", [awayEventId, homeEventId]);
       if (carpools?.length) {
-        await admin.from("carpool_passengers").delete()
-          .in("carpool_id", carpools.map((c) => c.id));
+        await admin
+          .from("carpool_passengers")
+          .delete()
+          .in(
+            "carpool_id",
+            carpools.map((c) => c.id),
+          );
       }
       await admin.from("carpools").delete().in("event_id", [awayEventId, homeEventId]);
       await admin.from("carpool_needs").delete().in("event_id", [awayEventId, homeEventId]);
       await admin.from("convocations").delete().eq("event_id", awayEventId);
       await admin.from("events").delete().in("id", [awayEventId, homeEventId]);
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     await club.cleanup();
   });
 
   test("away event has carpool_enabled = true (trigger)", async () => {
     const { data, error } = await admin
-      .from("events").select("carpool_enabled").eq("id", awayEventId).single();
+      .from("events")
+      .select("carpool_enabled")
+      .eq("id", awayEventId)
+      .single();
     expect(error).toBeNull();
     expect(data?.carpool_enabled).toBe(true);
   });
 
   test("home event has carpool_enabled = false by default", async () => {
     const { data, error } = await admin
-      .from("events").select("carpool_enabled").eq("id", homeEventId).single();
+      .from("events")
+      .select("carpool_enabled")
+      .eq("id", homeEventId)
+      .single();
     expect(error).toBeNull();
     expect(data?.carpool_enabled).toBe(false);
   });
@@ -167,23 +181,23 @@ test.describe("Carpool (covoiturage)", () => {
 
   test("team members can read carpools", async () => {
     const c = await clientFor(club.coach);
-    const { data, error } = await c
-      .from("carpools").select("id").eq("event_id", awayEventId);
+    const { data, error } = await c.from("carpools").select("id").eq("event_id", awayEventId);
     expect(error).toBeNull();
-    expect((data?.length ?? 0)).toBeGreaterThan(0);
+    expect(data?.length ?? 0).toBeGreaterThan(0);
   });
 
   test("anonymous user cannot read carpools (RLS)", async () => {
     const anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: false },
     });
-    const { data } = await anonClient
-      .from("carpools").select("id").eq("event_id", awayEventId);
-    expect((data?.length ?? 0)).toBe(0);
+    const { data } = await anonClient.from("carpools").select("id").eq("event_id", awayEventId);
+    expect(data?.length ?? 0).toBe(0);
   });
 
   test("parent can declare a transport need", async () => {
-    await admin.from("carpool_passengers").delete()
+    await admin
+      .from("carpool_passengers")
+      .delete()
       .eq("passenger_user_id", club.player2WithParent.parent.userId);
 
     const c = await clientFor(club.player2WithParent.parent);
@@ -203,7 +217,8 @@ test.describe("Carpool (covoiturage)", () => {
 
   test("booking a seat auto-removes transport need (trigger)", async () => {
     const { data: needBefore } = await admin
-      .from("carpool_needs").select("id")
+      .from("carpool_needs")
+      .select("id")
       .eq("event_id", awayEventId)
       .eq("parent_user_id", club.player2WithParent.parent.userId)
       .maybeSingle();
@@ -218,7 +233,8 @@ test.describe("Carpool (covoiturage)", () => {
     expect(error).toBeNull();
 
     const { data: needAfter } = await admin
-      .from("carpool_needs").select("id")
+      .from("carpool_needs")
+      .select("id")
       .eq("event_id", awayEventId)
       .eq("parent_user_id", club.player2WithParent.parent.userId)
       .maybeSingle();
@@ -228,7 +244,8 @@ test.describe("Carpool (covoiturage)", () => {
   test("parent can cancel their booking", async () => {
     const c = await clientFor(club.player2WithParent.parent);
     const { data: booking } = await c
-      .from("carpool_passengers").select("id")
+      .from("carpool_passengers")
+      .select("id")
       .eq("passenger_user_id", club.player2WithParent.parent.userId)
       .maybeSingle();
     expect(booking).not.toBeNull();
@@ -261,7 +278,10 @@ test.describe("Carpool (covoiturage)", () => {
     expect(error).toBeNull();
 
     const { data: afterDelete } = await admin
-      .from("carpools").select("id").eq("id", adminCarpool!.id).maybeSingle();
+      .from("carpools")
+      .select("id")
+      .eq("id", adminCarpool!.id)
+      .maybeSingle();
     expect(afterDelete).toBeNull();
   });
 
@@ -294,8 +314,10 @@ test.describe("Carpool (covoiturage)", () => {
   test("driver cannot offer two carpools for same event", async () => {
     // Vérifier que le coach a encore son carpool
     const { data: existing } = await admin
-      .from("carpools").select("id")
-      .eq("id", coachCarpoolId).maybeSingle();
+      .from("carpools")
+      .select("id")
+      .eq("id", coachCarpoolId)
+      .maybeSingle();
 
     if (!existing) {
       // Le carpool a été supprimé dans un test précédent — skip proprement

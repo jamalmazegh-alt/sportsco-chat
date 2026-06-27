@@ -46,7 +46,8 @@ function PostMatchFeedback() {
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isActiveCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const fetchData = useServerFn(listEventPlayersForFeedback);
   const createFn = useServerFn(createPlayerFeedback);
@@ -93,9 +94,7 @@ function PostMatchFeedback() {
     for (const row of data.players) {
       const ex = (data as any).existing[row.player.id];
       if (ex) {
-        const merged = [ex.strengths, ex.improvements, ex.comment]
-          .filter(Boolean)
-          .join("\n\n");
+        const merged = [ex.strengths, ex.improvements, ex.comment].filter(Boolean).join("\n\n");
         v[row.player.id] = {
           rating: ex.rating ?? null,
           note: merged ?? "",
@@ -130,9 +129,7 @@ function PostMatchFeedback() {
   const toggleTag = useCallback((playerId: string, tag: string) => {
     setValues((prev) => {
       const cur = prev[playerId] ?? EMPTY;
-      const tags = cur.tags.includes(tag)
-        ? cur.tags.filter((x) => x !== tag)
-        : [...cur.tags, tag];
+      const tags = cur.tags.includes(tag) ? cur.tags.filter((x) => x !== tag) : [...cur.tags, tag];
       return { ...prev, [playerId]: { ...cur, tags } };
     });
     setDirty((prev) => {
@@ -177,7 +174,7 @@ function PostMatchFeedback() {
         } catch (e: any) {
           failed.push(playerId);
         }
-      })
+      }),
     );
     if (Object.keys(newIds).length) {
       setIds((prev) => ({ ...prev, ...newIds }));
@@ -203,7 +200,7 @@ function PostMatchFeedback() {
           defaultValue: "{{ok}} enregistré(s), {{ko}} en échec.",
           ok: okCount,
           ko: failed.length,
-        })
+        }),
       );
     }
   }
@@ -244,14 +241,14 @@ function PostMatchFeedback() {
         setSaving(false);
       }
     },
-    [ids, updateFn, createFn, eventId, qc, t]
+    [ids, updateFn, createFn, eventId, qc, t],
   );
 
   const openPlayer = useCallback(
     (playerId: string) => {
       navigate({ to: "/players/$playerId", params: { playerId } });
     },
-    [navigate]
+    [navigate],
   );
 
   const locale = i18n.language?.startsWith("fr") ? fr : undefined;
@@ -259,12 +256,9 @@ function PostMatchFeedback() {
   const sport = (data as any)?.sport ?? null;
   const tags = useMemo(() => getFeedbackTagsForSport(sport), [sport]);
 
-
-
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
       <BackLink to="/events/$eventId" params={{ eventId } as never} />
-
 
       <div>
         <h1 className="text-xl font-semibold">
@@ -279,8 +273,7 @@ function PostMatchFeedback() {
         )}
         <p className="text-xs text-muted-foreground mt-2">
           {t("feedback.bulkHint", {
-            defaultValue:
-              "Note rapide pour tous les joueurs. Tout est enregistré en une fois.",
+            defaultValue: "Note rapide pour tous les joueurs. Tout est enregistré en une fois.",
           })}
         </p>
       </div>
@@ -382,8 +375,8 @@ const PlayerRow = memo(function PlayerRow({
         isDirty
           ? "border-primary/60 ring-1 ring-primary/30"
           : saved
-          ? "border-primary/30"
-          : "border-border"
+            ? "border-primary/30"
+            : "border-border",
       )}
     >
       <div className="flex items-center gap-3">
@@ -424,7 +417,7 @@ const PlayerRow = memo(function PlayerRow({
                   "h-7 w-6 flex flex-col items-center justify-center transition-colors",
                   active
                     ? "text-amber-500"
-                    : "text-muted-foreground/40 hover:text-muted-foreground"
+                    : "text-muted-foreground/40 hover:text-muted-foreground",
                 )}
                 aria-label={`${n}/10`}
               >
@@ -471,7 +464,7 @@ const PlayerRow = memo(function PlayerRow({
                 "text-[11px] px-2 py-0.5 rounded-full border transition-colors",
                 active
                   ? "border-primary bg-primary/15 text-primary"
-                  : "border-border bg-muted/30 text-muted-foreground hover:bg-muted"
+                  : "border-border bg-muted/30 text-muted-foreground hover:bg-muted",
               )}
             >
               {t(`feedback.tag.${tag}`, { defaultValue: tag })}

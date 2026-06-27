@@ -66,9 +66,7 @@ let cached: Fixtures | null = null;
 export function getFixtures(): Fixtures {
   if (cached) return cached;
   if (!existsSync(FIXTURES_FILE)) {
-    throw new Error(
-      `RLS fixtures not found at ${FIXTURES_FILE}. Global setup probably failed.`,
-    );
+    throw new Error(`RLS fixtures not found at ${FIXTURES_FILE}. Global setup probably failed.`);
   }
   cached = JSON.parse(readFileSync(FIXTURES_FILE, "utf-8")) as Fixtures;
   return cached;

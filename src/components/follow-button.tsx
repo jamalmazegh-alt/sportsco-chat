@@ -25,7 +25,13 @@ const COL: Record<TargetType, "followed_player_id" | "followed_coach_id" | "foll
   club: "followed_club_id",
 };
 
-export function FollowButton({ targetType, targetId, size = "md", initialFollowersCount, className }: Props) {
+export function FollowButton({
+  targetType,
+  targetId,
+  size = "md",
+  initialFollowersCount,
+  className,
+}: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -119,7 +125,10 @@ export function FollowButton({ targetType, targetId, size = "md", initialFollowe
                   ? t("follow.following", { defaultValue: "Following" })
                   : t("follow.follow", { defaultValue: "Follow" })
               }
-              className={cn(isFollowing && "bg-teal-600 hover:bg-teal-700 text-white border-teal-600", className)}
+              className={cn(
+                isFollowing && "bg-teal-600 hover:bg-teal-700 text-white border-teal-600",
+                className,
+              )}
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
             </Button>
@@ -143,11 +152,7 @@ export function FollowButton({ targetType, targetId, size = "md", initialFollowe
         disabled={busy}
         className={cn(isFollowing && "bg-teal-600 hover:bg-teal-700 text-white border-teal-600")}
       >
-        {busy ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Icon className="h-4 w-4" />
-        )}
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
         {isFollowing
           ? t("follow.following", { defaultValue: "Following ✓" })
           : t("follow.follow", { defaultValue: "Follow" })}

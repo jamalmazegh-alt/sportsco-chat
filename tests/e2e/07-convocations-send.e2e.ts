@@ -6,13 +6,16 @@ import { admin } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 // Inlined to avoid pulling app i18n (with JSON imports) into Node test runtime.
-const waShareUrl = (message: string) =>
-  `https://wa.me/?text=${encodeURIComponent(message)}`;
+const waShareUrl = (message: string) => `https://wa.me/?text=${encodeURIComponent(message)}`;
 
 test.describe("Convocations — send", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("convsend"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("convsend");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("coach creates convocations for both players", async () => {
     const c = await clientFor(club.coach);

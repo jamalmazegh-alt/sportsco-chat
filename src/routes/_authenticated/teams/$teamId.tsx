@@ -9,18 +9,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
+import {
+  ChevronRight,
+  Plus,
+  UserCircle2,
+  Loader2,
+  Camera,
+  Pencil,
+  Send,
+  X,
+  CheckSquare,
+  Trash2,
+  Download,
+} from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { SwipeableRow } from "@/components/swipeable-row";
@@ -49,16 +63,18 @@ function TeamDetail() {
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
-  
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, age_group, championship, competitions, sport, season, image_url, club_id")
+        .select(
+          "id, name, age_group, championship, competitions, sport, season, image_url, club_id",
+        )
         .eq("id", teamId)
         .single();
       return data;
@@ -70,7 +86,9 @@ function TeamDetail() {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone)")
+        .select(
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone)",
+        )
         .eq("team_id", teamId)
         .eq("role", "player");
       const seen = new Set<string>();
@@ -179,7 +197,6 @@ function TeamDetail() {
     },
   });
 
-
   // Selection state for bulk invitations
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -244,7 +261,9 @@ function TeamDetail() {
   }
 
   function toggleEditCompetition(value: string, checked: boolean) {
-    setEditCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
+    setEditCompetitions((current) =>
+      checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value),
+    );
   }
 
   async function onSaveTeam(e: FormEvent) {
@@ -264,7 +283,10 @@ function TeamDetail() {
       } as any)
       .eq("id", teamId);
     setEditBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setEditOpen(false);
     qc.invalidateQueries({ queryKey: ["team", teamId] });
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
@@ -272,10 +294,20 @@ function TeamDetail() {
   }
 
   function reset() {
-    setFirst(""); setLast(""); setJersey(""); setLicense(""); setPosition("");
-    setPhone(""); setEmail(""); setBirthDate("");
-    setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
-    setRespondBy("both"); setPhotoFile(null);
+    setFirst("");
+    setLast("");
+    setJersey("");
+    setLicense("");
+    setPosition("");
+    setPhone("");
+    setEmail("");
+    setBirthDate("");
+    setParentFirst("");
+    setParentLast("");
+    setParentPhone("");
+    setParentEmail("");
+    setRespondBy("both");
+    setPhotoFile(null);
   }
 
   async function uploadPhoto(playerId: string, file: File): Promise<string | null> {
@@ -285,7 +317,9 @@ function TeamDetail() {
       return null;
     }
     if (!file.type.startsWith("image/")) {
-      toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      toast.error(
+        t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }),
+      );
       return null;
     }
     const ext = file.name.split(".").pop() || "jpg";
@@ -310,22 +344,43 @@ function TeamDetail() {
   };
 
   // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
-  async function sendInvitesForPlayer(playerId: string): Promise<{ sent: number; failed: number; skipped: number }> {
+  async function sendInvitesForPlayer(
+    playerId: string,
+  ): Promise<{ sent: number; failed: number; skipped: number }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1 };
 
     // Load player + parents
     const [{ data: pl }, { data: parents }] = await Promise.all([
-      supabase.from("players").select("id, first_name, email, phone, user_id").eq("id", playerId).maybeSingle(),
-      supabase.from("player_parents").select("id, full_name, email, phone, parent_user_id").eq("player_id", playerId),
+      supabase
+        .from("players")
+        .select("id, first_name, email, phone, user_id")
+        .eq("id", playerId)
+        .maybeSingle(),
+      supabase
+        .from("player_parents")
+        .select("id, full_name, email, phone, parent_user_id")
+        .eq("player_id", playerId),
     ]);
 
     const targets: InviteTarget[] = [];
     if (pl && !pl.user_id && (pl.email || pl.phone)) {
-      targets.push({ role: "player", firstName: pl.first_name ?? undefined, email: pl.email ?? undefined, phone: pl.phone ?? undefined, playerId });
+      targets.push({
+        role: "player",
+        firstName: pl.first_name ?? undefined,
+        email: pl.email ?? undefined,
+        phone: pl.phone ?? undefined,
+        playerId,
+      });
     }
     for (const p of parents ?? []) {
       if (!p.parent_user_id && (p.email || p.phone)) {
-        targets.push({ role: "parent", firstName: (p.full_name ?? "").split(" ")[0] || undefined, email: p.email ?? undefined, phone: p.phone ?? undefined, playerId });
+        targets.push({
+          role: "parent",
+          firstName: (p.full_name ?? "").split(" ")[0] || undefined,
+          email: p.email ?? undefined,
+          phone: p.phone ?? undefined,
+          playerId,
+        });
       }
     }
 
@@ -349,11 +404,16 @@ function TeamDetail() {
       return { sent: 0, failed: 0, skipped: skippedExisting || 1 };
     }
 
-    const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
+    const { data: clubRow } = await supabase
+      .from("clubs")
+      .select("name, logo_url")
+      .eq("id", activeClubId)
+      .maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
-    let sent = 0; let failed = 0;
+    let sent = 0;
+    let failed = 0;
     for (const target of filtered) {
       const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
       const { error: invErr } = await supabase.from("member_invites").insert({
@@ -367,7 +427,10 @@ function TeamDetail() {
         token,
         created_by: user.id,
       });
-      if (invErr) { failed += 1; continue; }
+      if (invErr) {
+        failed += 1;
+        continue;
+      }
       const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
       let dispatched = false;
       if (target.email) {
@@ -377,12 +440,21 @@ function TeamDetail() {
             recipientEmail: target.email,
             idempotencyKey: `member-invite-${token}`,
             fromName: `${clubLabel} via Clubero`,
-            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, clubLogoUrl, inviteUrl },
+            templateData: {
+              firstName: target.firstName,
+              teamName: team?.name,
+              clubName: clubLabel,
+              clubLogoUrl,
+              inviteUrl,
+            },
           });
           dispatched = true;
-        } catch { /* fallthrough to sms */ }
+        } catch {
+          /* fallthrough to sms */
+        }
       }
-      if (dispatched) sent += 1; else failed += 1;
+      if (dispatched) sent += 1;
+      else failed += 1;
     }
     return { sent, failed, skipped: 0 };
   }
@@ -394,19 +466,31 @@ function TeamDetail() {
     setInviting(false);
     if (r.skipped) toast.warning(t("players.inviteNoContact"));
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
-    else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
+    else if (r.failed)
+      toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
   async function removeFromTeam(playerId: string, fullName: string) {
-    if (!confirm(t("players.removeConfirm", { defaultValue: `Retirer ${fullName} de l'équipe ?`, name: fullName }))) return;
+    if (
+      !confirm(
+        t("players.removeConfirm", {
+          defaultValue: `Retirer ${fullName} de l'équipe ?`,
+          name: fullName,
+        }),
+      )
+    )
+      return;
     const { error } = await supabase
       .from("team_members")
       .delete()
       .eq("team_id", teamId)
       .eq("player_id", playerId);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(t("players.removed"));
     qc.invalidateQueries({ queryKey: ["team-players", teamId] });
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
@@ -415,16 +499,27 @@ function TeamDetail() {
   async function inviteSelected() {
     if (!user || selectedIds.size === 0) return;
     setInviting(true);
-    let totalSent = 0; let totalFailed = 0; let totalSkipped = 0;
+    let totalSent = 0;
+    let totalFailed = 0;
+    let totalSkipped = 0;
     for (const id of selectedIds) {
       const r = await sendInvitesForPlayer(id);
-      totalSent += r.sent; totalFailed += r.failed; totalSkipped += r.skipped;
+      totalSent += r.sent;
+      totalFailed += r.failed;
+      totalSkipped += r.skipped;
     }
     setInviting(false);
     setSelectMode(false);
     setSelectedIds(new Set());
     if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
-    else if (totalFailed) toast.warning(t("players.inviteBulkResult", { sent: totalSent, failed: totalFailed, skipped: totalSkipped }));
+    else if (totalFailed)
+      toast.warning(
+        t("players.inviteBulkResult", {
+          sent: totalSent,
+          failed: totalFailed,
+          skipped: totalSkipped,
+        }),
+      );
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
@@ -434,7 +529,8 @@ function TeamDetail() {
     if (!activeClubId || !user) return;
 
     // Validate: minor requires a parent with at least name + (email or phone)
-    const hasParentInfo = (parentFirst.trim() || parentLast.trim()) && (parentEmail.trim() || parentPhone.trim());
+    const hasParentInfo =
+      (parentFirst.trim() || parentLast.trim()) && (parentEmail.trim() || parentPhone.trim());
     if (minor && !hasParentInfo) {
       toast.error(t("players.parentRequiredForMinor"));
       return;
@@ -503,7 +599,9 @@ function TeamDetail() {
       if (r.sent > 0) {
         toast.success(minor ? t("players.autoInviteParentSent") : t("players.autoInviteSent"));
       }
-    } catch { /* non-blocking */ }
+    } catch {
+      /* non-blocking */
+    }
 
     setBusy(false);
     setOpen(false);
@@ -517,7 +615,6 @@ function TeamDetail() {
     <div className="px-5 pt-6 pb-6 space-y-5">
       <BackLink to="/teams" />
 
-
       <div className="flex items-start gap-4">
         <TeamImage
           team={team as any}
@@ -530,7 +627,9 @@ function TeamDetail() {
               <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
               {team && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
+                  {[team.age_group, team.championship, team.sport, team.season]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               )}
             </div>
@@ -566,8 +665,14 @@ function TeamDetail() {
                 <Label>{t("teams.competitions")}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["friendly", "championship", "cup"] as const).map((key) => (
-                    <label key={key} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm">
-                      <Checkbox checked={editCompetitions.includes(key)} onCheckedChange={(checked) => toggleEditCompetition(key, checked === true)} />
+                    <label
+                      key={key}
+                      className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                    >
+                      <Checkbox
+                        checked={editCompetitions.includes(key)}
+                        onCheckedChange={(checked) => toggleEditCompetition(key, checked === true)}
+                      />
                       {t(`events.competitionTypes.${key}`)}
                     </label>
                   ))}
@@ -589,23 +694,21 @@ function TeamDetail() {
                   value={editWhatsappUrl}
                   onChange={(e) => setEditWhatsappUrl(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t("teams.whatsappGroupHint")}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("teams.whatsappGroupHint")}</p>
               </div>
               <div className="space-y-2">
                 <Label>{t("teams.communicationMode")}</Label>
                 <Select value={editCommMode} onValueChange={(v) => setEditCommMode(v as any)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="app">{t("teams.commMode.app")}</SelectItem>
                     <SelectItem value="hybrid">{t("teams.commMode.hybrid")}</SelectItem>
                     <SelectItem value="whatsapp">{t("teams.commMode.whatsapp")}</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  {t("teams.commModeHint")}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("teams.commModeHint")}</p>
               </div>
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
                 {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
@@ -617,11 +720,13 @@ function TeamDetail() {
 
       {isCoach && <CollapsibleTeamStats teamId={teamId} defaultOpen={false} />}
 
-      {isCoach && team?.club_id && (
-        <UpcomingAbsencesWidget clubId={team.club_id} />
-      )}
+      {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
 
-      <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={roles.includes("admin")} />
+      <TeamCoaches
+        teamId={teamId}
+        clubId={(team as any)?.club_id}
+        isAdmin={roles.includes("admin")}
+      />
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -631,11 +736,28 @@ function TeamDetail() {
           <div className="flex items-center gap-2">
             {selectMode ? (
               <>
-                <Button size="sm" variant="outline" className="h-9" onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9"
+                  onClick={() => {
+                    setSelectMode(false);
+                    setSelectedIds(new Set());
+                  }}
+                >
                   <X className="h-4 w-4" />
                 </Button>
-                <Button size="sm" className="h-9" disabled={inviting || selectedIds.size === 0} onClick={inviteSelected}>
-                  {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                <Button
+                  size="sm"
+                  className="h-9"
+                  disabled={inviting || selectedIds.size === 0}
+                  onClick={inviteSelected}
+                >
+                  {inviting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                   {t("players.inviteSelected", { count: selectedIds.size })}
                 </Button>
               </>
@@ -659,14 +781,29 @@ function TeamDetail() {
                           account: p.user_id ? "active" : "inactive",
                         })),
                         [
-                          { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
-                          { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                          {
+                            key: "last_name",
+                            header: t("players.lastName", { defaultValue: "Last name" }),
+                          },
+                          {
+                            key: "first_name",
+                            header: t("players.firstName", { defaultValue: "First name" }),
+                          },
                           { key: "jersey_number", header: "#" },
-                          { key: "license_number", header: t("players.licenseNumber", { defaultValue: "License #" }) },
-                          { key: "position", header: t("players.position", { defaultValue: "Position" }) },
+                          {
+                            key: "license_number",
+                            header: t("players.licenseNumber", { defaultValue: "License #" }),
+                          },
+                          {
+                            key: "position",
+                            header: t("players.position", { defaultValue: "Position" }),
+                          },
                           { key: "email", header: "Email" },
                           { key: "phone", header: t("players.phone", { defaultValue: "Phone" }) },
-                          { key: "account", header: t("players.account", { defaultValue: "Account" }) },
+                          {
+                            key: "account",
+                            header: t("players.account", { defaultValue: "Account" }),
+                          },
                         ],
                       );
                       downloadCsv(`${team?.name ?? "team"}-players`, csv);
@@ -677,151 +814,205 @@ function TeamDetail() {
                   </Button>
                 )}
                 {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
-                  <Button size="sm" variant="outline" className="h-9" onClick={() => setSelectMode(true)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => setSelectMode(true)}
+                  >
                     <CheckSquare className="h-4 w-4" />
                     {t("players.invite")}
                   </Button>
                 )}
-                <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
+                <Sheet
+                  open={open}
+                  onOpenChange={(o) => {
+                    setOpen(o);
+                    if (!o) reset();
+                  }}
+                >
                   <SheetTrigger asChild>
                     <Button size="sm" className="h-9">
                       <Plus className="h-4 w-4" />
                       {t("teams.addPlayer")}
                     </Button>
                   </SheetTrigger>
-            <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={onAdd} className="space-y-4 mt-4 pb-8">
-                {/* Photo */}
-                <div className="space-y-1.5">
-                  <Label>{t("players.photo")}</Label>
-                  <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
-                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                      {photoFile ? (
-                        <img src={URL.createObjectURL(photoFile)} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <Camera className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </div>
-                    <span className="text-sm text-muted-foreground">{t("players.uploadPhoto")}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
-                    />
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>{t("players.firstName")}</Label>
-                    <Input required value={first} onChange={(e) => setFirst(e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("players.lastName")}</Label>
-                    <Input required value={last} onChange={(e) => setLast(e.target.value)} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>{t("players.jerseyNumber")}</Label>
-                    <Input type="number" value={jersey} onChange={(e) => setJersey(e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("players.preferredPosition")}</Label>
-                    <PositionCombobox
-                      value={position}
-                      onChange={setPosition}
-                      sport={team?.sport ?? null}
-                      placeholder="GK / DF / MF / FW"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("players.licenseNumber")}</Label>
-                  <Input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="FFF-2025-12345" />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("players.birthDate")}</Label>
-                  <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
-                </div>
-
-                <div className="pt-2">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                    {t("players.contact")}
-                  </p>
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label>{t("players.phone")}</Label>
-                      <PhoneInput value={phone} onChange={setPhone} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>{t("players.email")}</Label>
-                      <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      {t("players.parents")}
-                      {minor && <span className="text-destructive ml-1">*</span>}
-                    </p>
-                  </div>
-                  {minor && (
-                    <p className="text-xs text-muted-foreground bg-accent/40 rounded-lg px-3 py-2 mb-3">
-                      {t("players.minorParentNotice")}
-                    </p>
-                  )}
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                  <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
+                    <SheetHeader>
+                      <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
+                    </SheetHeader>
+                    <form onSubmit={onAdd} className="space-y-4 mt-4 pb-8">
+                      {/* Photo */}
                       <div className="space-y-1.5">
-                        <Label>{t("players.firstName")}</Label>
-                        <Input required={minor} value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
+                        <Label>{t("players.photo")}</Label>
+                        <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
+                          <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                            {photoFile ? (
+                              <img
+                                src={URL.createObjectURL(photoFile)}
+                                alt=""
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Camera className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {t("players.uploadPhoto")}
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+                          />
+                        </label>
                       </div>
-                      <div className="space-y-1.5">
-                        <Label>{t("players.lastName")}</Label>
-                        <Input required={minor} value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label>{t("players.phone")}</Label>
-                        <PhoneInput value={parentPhone} onChange={setParentPhone} />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>{t("players.email")}</Label>
-                        <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <Label>{t("players.canRespond")}</Label>
-                  <Select value={respondBy} onValueChange={(v) => setRespondBy(v as RespondBy)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="player">{t("players.respondPlayer")}</SelectItem>
-                      <SelectItem value="parent">{t("players.respondParent")}</SelectItem>
-                      <SelectItem value="both">{t("players.respondBoth")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label>{t("players.firstName")}</Label>
+                          <Input
+                            required
+                            value={first}
+                            onChange={(e) => setFirst(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label>{t("players.lastName")}</Label>
+                          <Input required value={last} onChange={(e) => setLast(e.target.value)} />
+                        </div>
+                      </div>
 
-                <Button type="submit" className="w-full h-11" disabled={busy}>
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.save")}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label>{t("players.jerseyNumber")}</Label>
+                          <Input
+                            type="number"
+                            value={jersey}
+                            onChange={(e) => setJersey(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label>{t("players.preferredPosition")}</Label>
+                          <PositionCombobox
+                            value={position}
+                            onChange={setPosition}
+                            sport={team?.sport ?? null}
+                            placeholder="GK / DF / MF / FW"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label>{t("players.licenseNumber")}</Label>
+                        <Input
+                          value={license}
+                          onChange={(e) => setLicense(e.target.value)}
+                          placeholder="FFF-2025-12345"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label>{t("players.birthDate")}</Label>
+                        <Input
+                          type="date"
+                          value={birthDate}
+                          onChange={(e) => setBirthDate(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                          {t("players.contact")}
+                        </p>
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <Label>{t("players.phone")}</Label>
+                            <PhoneInput value={phone} onChange={setPhone} />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label>{t("players.email")}</Label>
+                            <Input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {t("players.parents")}
+                            {minor && <span className="text-destructive ml-1">*</span>}
+                          </p>
+                        </div>
+                        {minor && (
+                          <p className="text-xs text-muted-foreground bg-accent/40 rounded-lg px-3 py-2 mb-3">
+                            {t("players.minorParentNotice")}
+                          </p>
+                        )}
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label>{t("players.firstName")}</Label>
+                              <Input
+                                required={minor}
+                                value={parentFirst}
+                                onChange={(e) => setParentFirst(e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label>{t("players.lastName")}</Label>
+                              <Input
+                                required={minor}
+                                value={parentLast}
+                                onChange={(e) => setParentLast(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label>{t("players.phone")}</Label>
+                              <PhoneInput value={parentPhone} onChange={setParentPhone} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label>{t("players.email")}</Label>
+                              <Input
+                                type="email"
+                                value={parentEmail}
+                                onChange={(e) => setParentEmail(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label>{t("players.canRespond")}</Label>
+                        <Select
+                          value={respondBy}
+                          onValueChange={(v) => setRespondBy(v as RespondBy)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="player">{t("players.respondPlayer")}</SelectItem>
+                            <SelectItem value="parent">{t("players.respondParent")}</SelectItem>
+                            <SelectItem value="both">{t("players.respondBoth")}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <Button type="submit" className="w-full h-11" disabled={busy}>
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.save")}
+                      </Button>
+                    </form>
+                  </SheetContent>
+                </Sheet>
               </>
             )}
           </div>
@@ -853,7 +1044,12 @@ function TeamDetail() {
             return list;
           })().map((p: any, idx: number) => {
             const isMine = !isCoach && myPlayerIds?.has(p.id);
-            const isFirstOther = !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && idx === myPlayerIds.size;
+            const isFirstOther =
+              !isCoach &&
+              myPlayerIds &&
+              myPlayerIds.size > 0 &&
+              !isMine &&
+              idx === myPlayerIds.size;
             const canInvite = !p.user_id && (p.email || p.phone);
             const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
             const linked = !!p.user_id;
@@ -861,9 +1057,7 @@ function TeamDetail() {
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
               "flex items-center gap-3 rounded-2xl border bg-card p-3",
-              isMine
-                ? "border-primary/40 ring-1 ring-primary/20 shadow-sm p-4"
-                : "border-border",
+              isMine ? "border-primary/40 ring-1 ring-primary/20 shadow-sm p-4" : "border-border",
               !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && "py-2 px-3 opacity-95",
             );
 
@@ -896,7 +1090,10 @@ function TeamDetail() {
                   <p className="font-medium truncate">
                     {p.first_name} {p.last_name}
                     {p.jersey_number ? (
-                      <span className="text-muted-foreground font-normal"> · #{p.jersey_number}</span>
+                      <span className="text-muted-foreground font-normal">
+                        {" "}
+                        · #{p.jersey_number}
+                      </span>
                     ) : null}
                   </p>
                   {susp && (
@@ -941,76 +1138,98 @@ function TeamDetail() {
             );
             return (
               <Fragment key={p.id}>
-
                 {isMine && idx === 0 && (
-                  <li key={`hdr-mine-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1">
+                  <li
+                    key={`hdr-mine-${p.id}`}
+                    className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1"
+                  >
                     {t("teams.myProfile", { defaultValue: "Mon profil" })}
                   </li>
                 )}
                 {isFirstOther && (
-                  <li key={`hdr-others-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-3">
+                  <li
+                    key={`hdr-others-${p.id}`}
+                    className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-3"
+                  >
                     {t("teams.myTeammates", { defaultValue: "Mes coéquipiers" })}
                   </li>
                 )}
-              <li key={p.id}>
-
-                {selectMode ? (
-                  <button
-                    type="button"
-                    disabled={!canInvite}
-                    onClick={() => canInvite && toggleSelected(p.id)}
-                    className={cn(rowClass, "w-full text-left", !canInvite && "opacity-50")}
-                  >
-                    <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
-                    {inner}
-                  </button>
-                ) : (() => {
-                  const rowContent = (
-                    <div className={rowClass}>
-                      <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
-                        {inner}
-                      </Link>
-                      {isCoach && canInvite && (
-                        <Button
-                          size="sm"
-                          variant={hasPendingInvite ? "outline" : "default"}
-                          className="h-8 px-3 shrink-0 text-xs"
-                          title={hasPendingInvite ? t("players.resendAction") : t("players.inviteSentAction")}
-                          disabled={inviting}
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); inviteOne(p.id); }}
-                        >
-                          <Send className="h-3.5 w-3.5" />
-                          {hasPendingInvite
-                            ? t("players.resendAction", { defaultValue: "Renvoyer" })
-                            : t("players.inviteSentAction", { defaultValue: "Inviter" })}
-                        </Button>
-                      )}
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                    </div>
-                  );
-                  if (!isCoach) return rowContent;
-                  const actions = [
-                    ...(canInvite
-                      ? [{
-                          label: t("players.invite"),
-                          icon: <Send className="h-4 w-4" />,
-                          onClick: () => inviteOne(p.id),
-                        }]
-                      : []),
-                    {
-                      label: t("common.remove", { defaultValue: "Retirer" }),
-                      icon: <Trash2 className="h-4 w-4" />,
-                      variant: "destructive" as const,
-                      onClick: () => removeFromTeam(p.id, `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()),
-                    },
-                  ];
-                  return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
-                })()}
-              </li>
+                <li key={p.id}>
+                  {selectMode ? (
+                    <button
+                      type="button"
+                      disabled={!canInvite}
+                      onClick={() => canInvite && toggleSelected(p.id)}
+                      className={cn(rowClass, "w-full text-left", !canInvite && "opacity-50")}
+                    >
+                      <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
+                      {inner}
+                    </button>
+                  ) : (
+                    (() => {
+                      const rowContent = (
+                        <div className={rowClass}>
+                          <Link
+                            to="/players/$playerId"
+                            params={{ playerId: p.id }}
+                            className="contents"
+                          >
+                            {inner}
+                          </Link>
+                          {isCoach && canInvite && (
+                            <Button
+                              size="sm"
+                              variant={hasPendingInvite ? "outline" : "default"}
+                              className="h-8 px-3 shrink-0 text-xs"
+                              title={
+                                hasPendingInvite
+                                  ? t("players.resendAction")
+                                  : t("players.inviteSentAction")
+                              }
+                              disabled={inviting}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                inviteOne(p.id);
+                              }}
+                            >
+                              <Send className="h-3.5 w-3.5" />
+                              {hasPendingInvite
+                                ? t("players.resendAction", { defaultValue: "Renvoyer" })
+                                : t("players.inviteSentAction", { defaultValue: "Inviter" })}
+                            </Button>
+                          )}
+                          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                        </div>
+                      );
+                      if (!isCoach) return rowContent;
+                      const actions = [
+                        ...(canInvite
+                          ? [
+                              {
+                                label: t("players.invite"),
+                                icon: <Send className="h-4 w-4" />,
+                                onClick: () => inviteOne(p.id),
+                              },
+                            ]
+                          : []),
+                        {
+                          label: t("common.remove", { defaultValue: "Retirer" }),
+                          icon: <Trash2 className="h-4 w-4" />,
+                          variant: "destructive" as const,
+                          onClick: () =>
+                            removeFromTeam(
+                              p.id,
+                              `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(),
+                            ),
+                        },
+                      ];
+                      return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
+                    })()
+                  )}
+                </li>
               </Fragment>
             );
-
-
           })}
         </ul>
       )}
@@ -1018,7 +1237,15 @@ function TeamDetail() {
   );
 }
 
-function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean; onUploaded: () => void }) {
+function TeamImage({
+  team,
+  isCoach,
+  onUploaded,
+}: {
+  team: any;
+  isCoach: boolean;
+  onUploaded: () => void;
+}) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
 
@@ -1038,11 +1265,21 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
     const { error: upErr } = await supabase.storage
       .from("team-images")
       .upload(path, file, { upsert: true, contentType: file.type });
-    if (upErr) { setBusy(false); toast.error(upErr.message); return; }
+    if (upErr) {
+      setBusy(false);
+      toast.error(upErr.message);
+      return;
+    }
     const { data: pub } = supabase.storage.from("team-images").getPublicUrl(path);
-    const { error: updErr } = await supabase.from("teams").update({ image_url: pub.publicUrl }).eq("id", team.id);
+    const { error: updErr } = await supabase
+      .from("teams")
+      .update({ image_url: pub.publicUrl })
+      .eq("id", team.id);
     setBusy(false);
-    if (updErr) { toast.error(updErr.message); return; }
+    if (updErr) {
+      toast.error(updErr.message);
+      return;
+    }
     onUploaded();
     toast.success(t("common.saved"));
   }
@@ -1056,18 +1293,40 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
   );
 
   if (!isCoach) {
-    return <div className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0">{inner}</div>;
+    return (
+      <div className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0">
+        {inner}
+      </div>
+    );
   }
 
   return (
-    <label className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0 cursor-pointer relative group" title={t("teams.uploadImage")}>
+    <label
+      className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0 cursor-pointer relative group"
+      title={t("teams.uploadImage")}
+    >
       {inner}
-      <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); }} />
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        disabled={busy}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onPick(f);
+        }}
+      />
     </label>
   );
 }
 
-function CollapsibleTeamStats({ teamId, defaultOpen = false }: { teamId: string; defaultOpen?: boolean }) {
+function CollapsibleTeamStats({
+  teamId,
+  defaultOpen = false,
+}: {
+  teamId: string;
+  defaultOpen?: boolean;
+}) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(defaultOpen);
 
@@ -1078,15 +1337,29 @@ function CollapsibleTeamStats({ teamId, defaultOpen = false }: { teamId: string;
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40"
       >
-        <span>{t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}</span>
+        <span>
+          {t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}
+        </span>
         <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />
       </button>
-      {open && <div className="px-3 pb-3"><TeamAttendanceStats teamId={teamId} /></div>}
+      {open && (
+        <div className="px-3 pb-3">
+          <TeamAttendanceStats teamId={teamId} />
+        </div>
+      )}
     </div>
   );
 }
 
-function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: string; isAdmin: boolean }) {
+function TeamCoaches({
+  teamId,
+  clubId,
+  isAdmin,
+}: {
+  teamId: string;
+  clubId?: string;
+  isAdmin: boolean;
+}) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -1164,21 +1437,25 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
     },
   });
 
-
   async function attach(uid: string) {
     setBusyUid(uid);
     const { error } = await supabase
       .from("team_members")
       .insert({ team_id: teamId, user_id: uid, role: "coach" });
     setBusyUid(null);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
 
     // Fire-and-forget email notification (in-app notification handled by DB trigger).
     notifyCoachAssignedFn({
       data: { teamId, coachUserId: uid, origin: window.location.origin },
-    }).catch(() => { /* non-blocking */ });
+    }).catch(() => {
+      /* non-blocking */
+    });
   }
 
   async function detach(uid: string) {
@@ -1191,7 +1468,10 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
       .eq("user_id", uid)
       .in("role", ["coach", "admin"]);
     setBusyUid(null);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(t("teams.coachDetached", { defaultValue: "Coach retiré" }));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
   }
@@ -1215,29 +1495,42 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
         {isAdmin && (
           <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
             <SheetTrigger asChild>
-              <Button size="sm" variant="outline" className="h-7 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10"
+              >
                 <Plus className="h-3.5 w-3.5" />
                 {t("teams.attachCoach", { defaultValue: "Attacher" })}
               </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-3xl">
               <SheetHeader>
-                <SheetTitle>{t("teams.attachCoachTitle", { defaultValue: "Attacher un coach" })}</SheetTitle>
+                <SheetTitle>
+                  {t("teams.attachCoachTitle", { defaultValue: "Attacher un coach" })}
+                </SheetTitle>
               </SheetHeader>
               <div className="mt-4 pb-6 space-y-2">
                 {(availableStaff ?? []).length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-6">
-                    {t("teams.noAvailableCoach", { defaultValue: "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs." })}
+                    {t("teams.noAvailableCoach", {
+                      defaultValue:
+                        "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs.",
+                    })}
                   </p>
                 ) : (
                   (availableStaff ?? []).map((s: any) => {
-                    const name = s.full_name ?? [s.first_name, s.last_name].filter(Boolean).join(" ") ?? "—";
+                    const name =
+                      s.full_name ?? [s.first_name, s.last_name].filter(Boolean).join(" ") ?? "—";
                     return (
                       <button
                         key={s.id}
                         type="button"
                         disabled={busyUid === s.id}
-                        onClick={async () => { await attach(s.id); setPickerOpen(false); }}
+                        onClick={async () => {
+                          await attach(s.id);
+                          setPickerOpen(false);
+                        }}
                         className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/40 transition disabled:opacity-50"
                       >
                         <div className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center text-xs font-semibold text-muted-foreground">
@@ -1247,7 +1540,9 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
                             (name?.[0] ?? "?").toUpperCase()
                           )}
                         </div>
-                        <span className="text-sm font-medium flex-1 text-left truncate">{name}</span>
+                        <span className="text-sm font-medium flex-1 text-left truncate">
+                          {name}
+                        </span>
                         {(s.roles ?? []).includes("admin") && (
                           <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary mr-1">
                             {t("roles.admin", { defaultValue: "Admin" })}
@@ -1267,9 +1562,8 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
       {hasCoaches ? (
         <ul className="flex flex-wrap gap-2">
           {(coaches ?? []).map((c: any) => {
-            const name = c.full_name
-              ?? [c.first_name, c.last_name].filter(Boolean).join(" ")
-              ?? "—";
+            const name =
+              c.full_name ?? [c.first_name, c.last_name].filter(Boolean).join(" ") ?? "—";
             return (
               <li
                 key={c.id}
@@ -1305,10 +1599,11 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
         </ul>
       ) : (
         <p className="text-xs text-muted-foreground">
-          {t("teams.noCoachYet", { defaultValue: "Aucun coach attaché. Cliquez sur Attacher pour en ajouter." })}
+          {t("teams.noCoachYet", {
+            defaultValue: "Aucun coach attaché. Cliquez sur Attacher pour en ajouter.",
+          })}
         </p>
       )}
     </section>
   );
 }
-

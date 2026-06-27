@@ -4,7 +4,15 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, HelpCircle, Loader2, ExternalLink, MapPin, Calendar } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  Loader2,
+  ExternalLink,
+  MapPin,
+  Calendar,
+} from "lucide-react";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
@@ -128,7 +136,9 @@ function RespondPage() {
 
   async function load() {
     setLoading(true);
-    const { data, error: rpcError } = await supabase.rpc("get_convocation_by_token", { _token: token });
+    const { data, error: rpcError } = await supabase.rpc("get_convocation_by_token", {
+      _token: token,
+    });
     if (rpcError || !data || data.length === 0) {
       setError(t("respond.invalidLink"));
       setLoading(false);
@@ -186,9 +196,7 @@ function RespondPage() {
         <div className="rounded-2xl border border-border bg-card p-8 max-w-md text-center space-y-3">
           <XCircle className="h-10 w-10 text-destructive mx-auto" />
           <h1 className="text-lg font-semibold">{t("respond.invalidTitle")}</h1>
-          <p className="text-sm text-muted-foreground">
-            {error ?? t("respond.invalidBody")}
-          </p>
+          <p className="text-sm text-muted-foreground">{error ?? t("respond.invalidBody")}</p>
           <Button asChild variant="outline" className="mt-2">
             <Link to="/">{t("respond.backHome")}</Link>
           </Button>
@@ -206,7 +214,9 @@ function RespondPage() {
     <div className="min-h-screen bg-background px-5 py-8">
       <div className="max-w-md mx-auto space-y-5">
         <header className="text-center space-y-1">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("respond.eyebrow")}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            {t("respond.eyebrow")}
+          </p>
           <h1 className="text-2xl font-bold">{info.event_title}</h1>
           {info.club_name && (
             <p className="text-sm text-muted-foreground">
@@ -228,7 +238,8 @@ function RespondPage() {
             </div>
           )}
           <p className="text-sm text-muted-foreground pt-1">
-            {t("respond.forPlayer")} <strong className="text-foreground">{playerName || t("respond.thePlayer")}</strong>
+            {t("respond.forPlayer")}{" "}
+            <strong className="text-foreground">{playerName || t("respond.thePlayer")}</strong>
           </p>
         </section>
 
@@ -251,11 +262,11 @@ function RespondPage() {
               <currentConfig.icon className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold">{t("respond.savedTitle")} {statusLabel(info.status as Status)}</p>
+              <p className="font-semibold">
+                {t("respond.savedTitle")} {statusLabel(info.status as Status)}
+              </p>
               {info.responded_at && (
-                <p className="text-xs opacity-80">
-                  {fmt(info.responded_at, "d MMM 'à' HH'h'mm")}
-                </p>
+                <p className="text-xs opacity-80">{fmt(info.responded_at, "d MMM 'à' HH'h'mm")}</p>
               )}
             </div>
           </section>
@@ -317,9 +328,7 @@ function RespondPage() {
           </Button>
         </div>
 
-        <p className="text-[11px] text-center text-muted-foreground pt-4">
-          {t("respond.footer")}
-        </p>
+        <p className="text-[11px] text-center text-muted-foreground pt-4">{t("respond.footer")}</p>
       </div>
     </div>
   );

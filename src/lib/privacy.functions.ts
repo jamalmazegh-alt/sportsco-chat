@@ -61,20 +61,21 @@ export const getConsentStatus = createServerFn({ method: "GET" })
 
 export const recordConsent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: {
-    kind: z.infer<typeof ConsentKind>;
-    version_id: string;
-    granted: boolean;
-    on_behalf_of_player_id?: string | null;
-  }) =>
-    z
-      .object({
-        kind: ConsentKind,
-        version_id: z.string().uuid(),
-        granted: z.boolean(),
-        on_behalf_of_player_id: z.string().uuid().nullable().optional(),
-      })
-      .parse(input)
+  .inputValidator(
+    (input: {
+      kind: z.infer<typeof ConsentKind>;
+      version_id: string;
+      granted: boolean;
+      on_behalf_of_player_id?: string | null;
+    }) =>
+      z
+        .object({
+          kind: ConsentKind,
+          version_id: z.string().uuid(),
+          granted: z.boolean(),
+          on_behalf_of_player_id: z.string().uuid().nullable().optional(),
+        })
+        .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -92,7 +93,7 @@ export const recordConsent = createServerFn({ method: "POST" })
 export const withdrawConsent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { consent_id: string }) =>
-    z.object({ consent_id: z.string().uuid() }).parse(input)
+    z.object({ consent_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -135,7 +136,7 @@ export const requestDataExport = createServerFn({ method: "POST" })
 export const requestAccountDeletion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { reason?: string }) =>
-    z.object({ reason: z.string().max(1000).optional() }).parse(input ?? {})
+    z.object({ reason: z.string().max(1000).optional() }).parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -150,9 +151,7 @@ export const requestAccountDeletion = createServerFn({ method: "POST" })
 
 export const cancelAccountDeletion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(input)
-  )
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
@@ -199,7 +198,7 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
         player_id: z.string().uuid(),
         status: z.enum(["pending", "granted", "denied"]),
       })
-      .parse(input)
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

@@ -63,18 +63,12 @@ async function buildExportBundle(userId: string): Promise<{ bytes: Uint8Array; f
     .eq("parent_user_id", userId);
   const childIds = (parentLinks ?? []).map((r: any) => r.player_id);
   if (childIds.length) {
-    const { data: children } = await supabaseAdmin
-      .from("players")
-      .select("*")
-      .in("id", childIds);
+    const { data: children } = await supabaseAdmin.from("players").select("*").in("id", childIds);
     bundle.children_players = children ?? [];
   }
 
   // Convocations + availabilities for the player ids
-  const allPlayerIds = [
-    ...(directPlayers ?? []).map((p: any) => p.id),
-    ...childIds,
-  ];
+  const allPlayerIds = [...(directPlayers ?? []).map((p: any) => p.id), ...childIds];
   if (allPlayerIds.length) {
     const [conv, avail, feedback, achievements] = await Promise.all([
       supabaseAdmin.from("convocations").select("*").in("player_id", allPlayerIds),
@@ -90,7 +84,10 @@ async function buildExportBundle(userId: string): Promise<{ bytes: Uint8Array; f
 
   // Generic per-user tables
   for (const { table, column } of USER_TABLES) {
-    const { data } = await supabaseAdmin.from(table as any).select("*").eq(column, userId);
+    const { data } = await supabaseAdmin
+      .from(table as any)
+      .select("*")
+      .eq(column, userId);
     bundle[table] = data ?? [];
   }
 

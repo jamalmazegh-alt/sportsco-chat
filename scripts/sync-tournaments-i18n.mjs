@@ -33,7 +33,11 @@ function mergeAiAssistant(ref, target = {}, override = {}) {
     const tgtVal = target[key];
     const ovrVal = override[key];
     if (isPlainObject(refVal)) {
-      out[key] = mergeAiAssistant(refVal, isPlainObject(tgtVal) ? tgtVal : {}, isPlainObject(ovrVal) ? ovrVal : {});
+      out[key] = mergeAiAssistant(
+        refVal,
+        isPlainObject(tgtVal) ? tgtVal : {},
+        isPlainObject(ovrVal) ? ovrVal : {},
+      );
     } else {
       out[key] = ovrVal ?? tgtVal ?? refVal;
     }
@@ -47,7 +51,9 @@ function loadOverrides(lang) {
   return JSON.parse(fs.readFileSync(p, "utf8"));
 }
 
-const refFile = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, REF, "tournaments.json"), "utf8"));
+const refFile = JSON.parse(
+  fs.readFileSync(path.join(LOCALES_DIR, REF, "tournaments.json"), "utf8"),
+);
 const refAi = refFile.aiAssistant;
 
 for (const lang of TARGETS) {

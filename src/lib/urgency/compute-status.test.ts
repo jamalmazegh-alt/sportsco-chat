@@ -27,9 +27,7 @@ describe("computeStatus — agrégation status à 2 dimensions", () => {
       phase: "settled",
       failedSources: ["convocation-silence"],
     });
-    expect(
-      computeStatus([conv({ failed: true }), abs({ failed: true })]),
-    ).toEqual({
+    expect(computeStatus([conv({ failed: true }), abs({ failed: true })])).toEqual({
       phase: "settled",
       failedSources: ["convocation-silence", "reduced-squad"],
     });
@@ -43,8 +41,9 @@ describe("computeStatus — agrégation status à 2 dimensions", () => {
   });
 
   it("pending domine error (1 pending + 1 error → pending, failedSources vide)", () => {
-    expect(
-      computeStatus([conv({ isPending: true }), abs({ failed: true })]),
-    ).toEqual({ phase: "pending", failedSources: [] });
+    expect(computeStatus([conv({ isPending: true }), abs({ failed: true })])).toEqual({
+      phase: "pending",
+      failedSources: [],
+    });
   });
 });

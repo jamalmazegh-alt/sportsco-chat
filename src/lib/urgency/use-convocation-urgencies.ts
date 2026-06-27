@@ -35,7 +35,15 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
   const nowIso = new Date().toISOString();
 
   const q = useQuery({
-    queryKey: ["urgency", "convocation-silence", activeClubId, user?.id, isCoach, isPlayer, isParent],
+    queryKey: [
+      "urgency",
+      "convocation-silence",
+      activeClubId,
+      user?.id,
+      isCoach,
+      isPlayer,
+      isParent,
+    ],
     enabled: !!activeClubId && !!user && (isCoach || isPlayer || isParent),
     staleTime: 30_000,
     queryFn: async (): Promise<UrgencyItem[]> => {
@@ -105,10 +113,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         // Player IDs concernés par l'utilisateur (lui-même + ses enfants)
         const myPlayerIds = new Set<string>();
         if (isPlayer) {
-          const { data: me } = await supabase
-            .from("players")
-            .select("id")
-            .eq("user_id", user!.id);
+          const { data: me } = await supabase.from("players").select("id").eq("user_id", user!.id);
           (me ?? []).forEach((p) => myPlayerIds.add(p.id));
         }
         if (isParent) {

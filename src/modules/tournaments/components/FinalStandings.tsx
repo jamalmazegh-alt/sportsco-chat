@@ -54,9 +54,7 @@ function computePodium(
   matches: MatchLike[],
   teamMap: Map<string, TeamLike>,
 ): Podium | null {
-  const scoped = matches.filter((m) =>
-    flightId ? m.flight_id === flightId : !m.flight_id,
-  );
+  const scoped = matches.filter((m) => (flightId ? m.flight_id === flightId : !m.flight_id));
   const finalMatch = scoped.find((m) => isFinal(m.round) && m.status === "completed");
   if (!finalMatch) return null;
   const a = finalMatch.team_a_id ? teamMap.get(finalMatch.team_a_id) : undefined;
@@ -103,9 +101,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
   const allFinalsDone =
     flights.length > 0
       ? flights.every((f) =>
-          matches.some(
-            (m) => m.flight_id === f.id && isFinal(m.round) && m.status === "completed",
-          ),
+          matches.some((m) => m.flight_id === f.id && isFinal(m.round) && m.status === "completed"),
         )
       : matches.some((m) => isFinal(m.round) && m.status === "completed");
 
@@ -130,9 +126,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
         await navigator.share({ title: tournamentName, text: lines });
       } else if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(lines);
-        toast.success(
-          t("finalStandings.copied", { defaultValue: "Classement copié" }),
-        );
+        toast.success(t("finalStandings.copied", { defaultValue: "Classement copié" }));
       }
     } catch {
       /* user cancelled */
@@ -271,7 +265,9 @@ function PodiumStep({
         <span
           className={cn(
             "text-center break-words leading-tight max-w-full px-1",
-            emphasis ? "text-[13px] font-extrabold text-foreground" : "text-[11px] font-semibold text-foreground/90",
+            emphasis
+              ? "text-[13px] font-extrabold text-foreground"
+              : "text-[11px] font-semibold text-foreground/90",
           )}
         >
           {team?.name ?? "—"}

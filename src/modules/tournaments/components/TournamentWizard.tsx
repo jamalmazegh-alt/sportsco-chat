@@ -11,7 +11,15 @@ import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
-import { Loader2, ChevronRight, ChevronLeft, Trophy, CalendarRange, LayoutGrid, ListChecks } from "lucide-react";
+import {
+  Loader2,
+  ChevronRight,
+  ChevronLeft,
+  Trophy,
+  CalendarRange,
+  LayoutGrid,
+  ListChecks,
+} from "lucide-react";
 import {
   WizardProgress,
   WizardStepHeading,
@@ -25,7 +33,6 @@ import {
   configToWizardFormat,
   type AssistantTournamentConfig,
 } from "../lib/assistant-config";
-
 
 type Format =
   | "group"
@@ -52,7 +59,13 @@ interface Props {
   assistantPrefill?: AssistantTournamentConfig;
 }
 
-export function TournamentWizard({ clubId, open, onOpenChange, initialValues, assistantPrefill }: Props) {
+export function TournamentWizard({
+  clubId,
+  open,
+  onOpenChange,
+  initialValues,
+  assistantPrefill,
+}: Props) {
   const { t } = useTranslation("tournaments");
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
@@ -162,7 +175,6 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
     setLogo([]);
   }
 
-
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     create.mutate();
@@ -175,9 +187,7 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
     (sport !== "custom" || customSportName.trim().length >= 2);
   const canNext1 = datesValid;
   const canNext2 =
-    !!format &&
-    numTeams >= 2 &&
-    (format !== "swiss" || (swissRounds >= 1 && swissRounds <= 20));
+    !!format && numTeams >= 2 && (format !== "swiss" || (swissRounds >= 1 && swissRounds <= 20));
 
   const formatOptions: { v: Format; label: string; desc: string }[] = [
     { v: "group", label: t("wizard.formatGroup"), desc: t("wizard.formatGroupDesc") },
@@ -239,10 +249,15 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
               />
             </div>
             <div className="space-y-1.5">
-            <div className="flex items-center gap-2 py-2">
-              <input type="checkbox" id="fairplay" checked={assistantPrefill?.useFairPlay ?? true} readOnly />
-              <Label htmlFor="fairplay">{t("tournament.fairPlay")}</Label>
-            </div>
+              <div className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="fairplay"
+                  checked={assistantPrefill?.useFairPlay ?? true}
+                  readOnly
+                />
+                <Label htmlFor="fairplay">{t("tournament.fairPlay")}</Label>
+              </div>
               <Label>{t("wizard.categoryOptional")}</Label>
               <Input
                 value={category}
@@ -262,7 +277,6 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
             </div>
           </WizardStepBody>
         )}
-
 
         {step === 1 && (
           <WizardStepBody key="step-1">
@@ -305,10 +319,7 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
                 onChange={setLocation}
                 placeholder={t("wizard.placePlaceholder")}
               />
-              <p className="text-[11px] text-muted-foreground">
-                {t("wizard.placeHint")}
-              </p>
-
+              <p className="text-[11px] text-muted-foreground">{t("wizard.placeHint")}</p>
             </div>
           </WizardStepBody>
         )}
@@ -372,9 +383,7 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
                     if (!isNaN(n)) setSwissRounds(Math.max(1, Math.min(20, n)));
                   }}
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  {t("wizard.swissRoundsHint")}
-                </p>
+                <p className="text-[11px] text-muted-foreground">{t("wizard.swissRoundsHint")}</p>
               </div>
             )}
           </WizardStepBody>
@@ -388,7 +397,10 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
               title={t("wizard.summary")}
             />
             <dl className="relative overflow-hidden rounded-xl border border-border bg-card divide-y divide-border text-sm">
-              <div aria-hidden className="absolute inset-0 bg-speed-lines opacity-40 pointer-events-none" />
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-speed-lines opacity-40 pointer-events-none"
+              />
               <div className="relative">
                 <Row label={t("wizard.rowName")} value={name} />
                 <Row label={t("wizard.rowSport")} value={sport} />
@@ -400,19 +412,13 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
                 {location && <Row label={t("wizard.rowPlace")} value={location} />}
               </div>
             </dl>
-            <p className="text-xs text-muted-foreground">
-              {t("wizard.summaryHint")}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("wizard.summaryHint")}</p>
           </WizardStepBody>
         )}
 
         <div className="flex items-center justify-between gap-2 pt-2">
           {step > 0 ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setStep((s) => s - 1)}
-            >
+            <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
               <ChevronLeft className="h-4 w-4" />
               {t("wizard.previous")}
             </Button>
@@ -424,9 +430,7 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
               type="button"
               onClick={() => setStep((s) => s + 1)}
               disabled={
-                (step === 0 && !canNext0) ||
-                (step === 1 && !canNext1) ||
-                (step === 2 && !canNext2)
+                (step === 0 && !canNext0) || (step === 1 && !canNext1) || (step === 2 && !canNext2)
               }
             >
               {t("wizard.next")}
@@ -434,11 +438,7 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
             </Button>
           ) : (
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("wizard.create")
-              )}
+              {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("wizard.create")}
             </Button>
           )}
         </div>
@@ -446,7 +446,6 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
     </ResponsiveFormDialog>
   );
 }
-
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

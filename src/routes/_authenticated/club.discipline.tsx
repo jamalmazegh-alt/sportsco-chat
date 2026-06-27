@@ -122,7 +122,9 @@ function DisciplinePage() {
     start.setMonth(start.getMonth() - 12);
     const inSeason = rows.filter((r) => new Date(r.created_at) >= start);
     const reds = inSeason.filter((r) => r.suspension_reason === "red_card").length;
-    const yellows = inSeason.filter((r) => r.suspension_reason === "accumulated_yellow_cards").length;
+    const yellows = inSeason.filter(
+      (r) => r.suspension_reason === "accumulated_yellow_cards",
+    ).length;
     const activeC = inSeason.filter((r) => r.status === "active").length;
     const completedC = inSeason.filter((r) => r.status === "completed").length;
     return { reds, yellows, activeC, completedC };
@@ -147,7 +149,9 @@ function DisciplinePage() {
             <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">{t("discipline.title", { defaultValue: "Discipline" })}</h1>
+            <h1 className="text-xl font-bold">
+              {t("discipline.title", { defaultValue: "Discipline" })}
+            </h1>
             <p className="text-xs text-muted-foreground">
               {t("discipline.subtitle", {
                 defaultValue: "Vue globale des suspensions du club.",
@@ -162,7 +166,9 @@ function DisciplinePage() {
       <div className="grid gap-2 sm:grid-cols-[1fr_180px_180px]">
         <Select value={teamFilter} onValueChange={setTeamFilter}>
           <SelectTrigger>
-            <SelectValue placeholder={t("discipline.allTeams", { defaultValue: "Toutes les équipes" })} />
+            <SelectValue
+              placeholder={t("discipline.allTeams", { defaultValue: "Toutes les équipes" })}
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">
@@ -189,7 +195,9 @@ function DisciplinePage() {
             <SelectValue placeholder={t("suspension.reason")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("discipline.allReasons", { defaultValue: "Toutes raisons" })}</SelectItem>
+            <SelectItem value="all">
+              {t("discipline.allReasons", { defaultValue: "Toutes raisons" })}
+            </SelectItem>
             {(
               [
                 "red_card",
@@ -251,10 +259,25 @@ function DisciplinePage() {
 
         <TabsContent value="stats" className="mt-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Kpi label={t("discipline.kpi.yellows", { defaultValue: "Cartons jaunes" })} value={stats.yellows} />
-            <Kpi label={t("discipline.kpi.reds", { defaultValue: "Cartons rouges" })} value={stats.reds} tone="destructive" />
-            <Kpi label={t("discipline.kpi.active", { defaultValue: "Actives" })} value={stats.activeC} tone="amber" />
-            <Kpi label={t("discipline.kpi.completed", { defaultValue: "Purgées" })} value={stats.completedC} tone="emerald" />
+            <Kpi
+              label={t("discipline.kpi.yellows", { defaultValue: "Cartons jaunes" })}
+              value={stats.yellows}
+            />
+            <Kpi
+              label={t("discipline.kpi.reds", { defaultValue: "Cartons rouges" })}
+              value={stats.reds}
+              tone="destructive"
+            />
+            <Kpi
+              label={t("discipline.kpi.active", { defaultValue: "Actives" })}
+              value={stats.activeC}
+              tone="amber"
+            />
+            <Kpi
+              label={t("discipline.kpi.completed", { defaultValue: "Purgées" })}
+              value={stats.completedC}
+              tone="emerald"
+            />
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
             {t("discipline.kpi.windowHint", { defaultValue: "Sur les 12 derniers mois." })}
@@ -262,11 +285,7 @@ function DisciplinePage() {
         </TabsContent>
       </Tabs>
 
-      <QuickSanctionDrawer
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        clubId={activeClubId}
-      />
+      <QuickSanctionDrawer open={drawerOpen} onOpenChange={setDrawerOpen} clubId={activeClubId} />
     </div>
   );
 }

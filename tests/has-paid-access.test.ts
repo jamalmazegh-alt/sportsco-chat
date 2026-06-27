@@ -6,10 +6,7 @@ const NOW = new Date("2026-06-22T12:00:00Z").getTime();
 describe("hasPaidAccessFromSubscription", () => {
   it("returns true when exempt_from_billing is true (canceled status)", () => {
     expect(
-      hasPaidAccessFromSubscription(
-        { status: "canceled", exempt_from_billing: true },
-        NOW,
-      ),
+      hasPaidAccessFromSubscription({ status: "canceled", exempt_from_billing: true }, NOW),
     ).toBe(true);
   });
 

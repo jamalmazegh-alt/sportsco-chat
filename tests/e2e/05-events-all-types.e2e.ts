@@ -11,8 +11,12 @@ const SPORTS = ["football", "basketball"] as const;
 
 test.describe("Events all types & sports", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("events"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("events");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   for (const sport of SPORTS) {
     test.describe(`sport=${sport}`, () => {

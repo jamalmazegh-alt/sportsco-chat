@@ -11,11 +11,7 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import {
-  Message,
-  MessageContent,
-  MessageResponse,
-} from "@/components/ai-elements/message";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
   PromptInput,
   PromptInputTextarea,
@@ -27,7 +23,6 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { VoiceInputButton } from "@/components/voice-input-button";
-
 
 export function MarketingChatWidget() {
   const { t, i18n } = useTranslation("marketing");
@@ -44,7 +39,7 @@ export function MarketingChatWidget() {
       prepareSendMessagesRequest: ({ messages, id, body }) => ({
         body: { messages, id, language: langRef.current, ...body },
       }),
-    })
+    }),
   ).current;
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
@@ -76,7 +71,7 @@ export function MarketingChatWidget() {
         className={cn(
           "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-xl shadow-primary/20 transition-all",
           "bg-[color:var(--brand-blue-deep,theme(colors.primary.DEFAULT))] text-white hover:scale-[1.03]",
-          open && "opacity-0 pointer-events-none"
+          open && "opacity-0 pointer-events-none",
         )}
       >
         <Sparkles className="h-4 w-4" />
@@ -88,7 +83,7 @@ export function MarketingChatWidget() {
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 sm:inset-auto sm:bottom-5 sm:right-5",
           "transition-all duration-200",
-          open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+          open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none",
         )}
         aria-hidden={!open}
       >
@@ -100,9 +95,7 @@ export function MarketingChatWidget() {
               </div>
               <div>
                 <p className="text-sm font-semibold leading-tight">{t("chatWidget.title")}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {t("chatWidget.subtitle")}
-                </p>
+                <p className="text-[11px] text-muted-foreground">{t("chatWidget.subtitle")}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -164,7 +157,12 @@ export function MarketingChatWidget() {
                           return m.role === "assistant" ? (
                             <div key={idx} className="space-y-2">
                               <MessageResponse>{part.text}</MessageResponse>
-                              <TtsButton text={part.text} speak={speak} stopSpeech={stopSpeech} isSpeaking={isSpeaking} />
+                              <TtsButton
+                                text={part.text}
+                                speak={speak}
+                                stopSpeech={stopSpeech}
+                                isSpeaking={isSpeaking}
+                              />
                             </div>
                           ) : (
                             <span key={idx} className="whitespace-pre-wrap">
@@ -191,17 +189,10 @@ export function MarketingChatWidget() {
 
           <div className="border-t border-border p-2">
             <PromptInput onSubmit={handleSubmit}>
-              <PromptInputTextarea
-                ref={textareaRef}
-                placeholder={t("chatWidget.placeholder")}
-              />
+              <PromptInputTextarea ref={textareaRef} placeholder={t("chatWidget.placeholder")} />
               <PromptInputFooter className="justify-end gap-1">
                 <VoiceInputButton textareaRef={textareaRef} />
-                <PromptInputSubmit
-                  status={status}
-                  onStop={stop}
-                  disabled={isLoading}
-                />
+                <PromptInputSubmit status={status} onStop={stop} disabled={isLoading} />
               </PromptInputFooter>
             </PromptInput>
           </div>
@@ -243,7 +234,7 @@ function TtsButton({
       onClick={handleClick}
       className={cn(
         "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+        active ? "text-primary" : "text-muted-foreground hover:text-foreground",
       )}
       aria-label={active ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
     >

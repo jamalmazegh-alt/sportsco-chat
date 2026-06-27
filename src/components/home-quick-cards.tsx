@@ -58,7 +58,10 @@ export function HomeQuickCards({ clubId, teams }: Props) {
 
   const count = tournaments.length;
   const teamsCount = teams?.length ?? 0;
-  const teamsSummary = (teams ?? []).slice(0, 3).map((x) => x.name).join(" · ");
+  const teamsSummary = (teams ?? [])
+    .slice(0, 3)
+    .map((x) => x.name)
+    .join(" · ");
 
   return (
     <div className="grid grid-cols-2 gap-2.5">
@@ -94,7 +97,10 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             </p>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
+        <ChevronRight
+          className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
+          strokeWidth={2.4}
+        />
       </Link>
 
       {/* Tournaments card */}
@@ -103,7 +109,8 @@ export function HomeQuickCards({ clubId, teams }: Props) {
         className={cn(
           "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all",
           state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
-          state === "planned" && "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
+          state === "planned" &&
+            "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
           state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
           state === "done" && "border-border opacity-90",
         )}
@@ -136,19 +143,16 @@ export function HomeQuickCards({ clubId, teams }: Props) {
               className="h-4 w-4"
               strokeWidth={2.4}
               style={{
-                color:
-                  state === "live"
-                    ? "#0f4a26"
-                    : state === "planned"
-                      ? "#92400e"
-                      : "#64748b",
+                color: state === "live" ? "#0f4a26" : state === "planned" ? "#92400e" : "#64748b",
               }}
             />
           </div>
 
           {state === "empty" ? (
             <>
-              <p className="text-[24px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">0</p>
+              <p className="text-[24px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">
+                0
+              </p>
               <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
                 {t("nav.tournaments")}
               </p>
@@ -177,25 +181,24 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                 {isLoading ? "…" : count}
               </p>
               <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
-                {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
+                {count > 1
+                  ? t("nav.tournaments")
+                  : t("nav.tournament", { defaultValue: "Tournoi" })}
               </p>
               <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
             </>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
+        <ChevronRight
+          className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
+          strokeWidth={2.4}
+        />
       </Link>
     </div>
   );
 }
 
-function StateBadge({
-  state,
-  startsOn,
-}: {
-  state: TournamentState;
-  startsOn: string | null;
-}) {
+function StateBadge({ state, startsOn }: { state: TournamentState; startsOn: string | null }) {
   const { t } = useTranslation();
   if (state === "live") {
     return (
@@ -212,7 +215,9 @@ function StateBadge({
     );
   }
   if (state === "planned") {
-    const label = startsOn ? fmt(new Date(startsOn), "d MMM") : t("dashboard.tournamentsCard.upcoming", { defaultValue: "À venir" });
+    const label = startsOn
+      ? fmt(new Date(startsOn), "d MMM")
+      : t("dashboard.tournamentsCard.upcoming", { defaultValue: "À venir" });
     return (
       <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#fef3c7] px-2 py-0.5 text-[9px] font-bold text-[#92400e]">
         <CalendarDays className="h-2.5 w-2.5" strokeWidth={2.6} />

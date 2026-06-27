@@ -51,23 +51,38 @@ function SuperAdminBilling() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
-                <Loader2 className="h-4 w-4 inline animate-spin mr-2" /> Loading…
-              </td></tr>
+              <tr>
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
+                  <Loader2 className="h-4 w-4 inline animate-spin mr-2" /> Loading…
+                </td>
+              </tr>
             )}
             {!loading && items.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">No subscriptions.</td></tr>
-            )}
-            {!loading && items.map((s) => (
-              <tr key={s.id} className="border-t border-border">
-                <td className="px-3 py-2">{s.club_name}</td>
-                <td className="px-3 py-2 text-xs">{s.status}</td>
-                <td className="px-3 py-2 hidden md:table-cell">{s.plan ?? "—"}</td>
-                <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">{s.trial_end ? new Date(s.trial_end).toLocaleDateString() : "—"}</td>
-                <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">{s.current_period_end ? new Date(s.current_period_end).toLocaleDateString() : "—"}</td>
-                <td className="px-3 py-2 hidden md:table-cell">{s.cancel_at_period_end ? "yes" : "—"}</td>
+              <tr>
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
+                  No subscriptions.
+                </td>
               </tr>
-            ))}
+            )}
+            {!loading &&
+              items.map((s) => (
+                <tr key={s.id} className="border-t border-border">
+                  <td className="px-3 py-2">{s.club_name}</td>
+                  <td className="px-3 py-2 text-xs">{s.status}</td>
+                  <td className="px-3 py-2 hidden md:table-cell">{s.plan ?? "—"}</td>
+                  <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">
+                    {s.trial_end ? new Date(s.trial_end).toLocaleDateString() : "—"}
+                  </td>
+                  <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">
+                    {s.current_period_end
+                      ? new Date(s.current_period_end).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="px-3 py-2 hidden md:table-cell">
+                    {s.cancel_at_period_end ? "yes" : "—"}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

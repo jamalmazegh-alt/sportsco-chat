@@ -17,7 +17,12 @@ export const Route = createFileRoute("/_authenticated/tournaments/pricing/succes
   }),
   head: () => ({
     meta: [
-      { title: i18n.t("pricing.successTitle", { ns: "tournaments", defaultValue: "Paiement confirmé" }) },
+      {
+        title: i18n.t("pricing.successTitle", {
+          ns: "tournaments",
+          defaultValue: "Paiement confirmé",
+        }),
+      },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -4,7 +4,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { slugify, uniqueTournamentSlug } from "./lib/slug";
 import { defaultRulesForSport } from "./lib/rules";
 
-
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
 }
@@ -24,11 +23,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       .object({
         email: z.string().email().max(255),
         quantity: z.number().int().min(1).max(20).optional(),
-        origin: z
-          .string()
-          .url()
-          .max(200)
-          .optional(),
+        origin: z.string().url().max(200).optional(),
         return_to: z
           .string()
           .max(200)
@@ -43,9 +38,11 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const stripe = getStripe();
     // Prefer the caller's origin so Stripe redirects back to the same host
     // (app subdomain vs marketing). Only accept trusted clubero.app hosts.
-    const safeOrigin = data.origin && /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(data.origin)
-      ? data.origin
-      : null;
+    const safeOrigin =
+      data.origin &&
+      /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(data.origin)
+        ? data.origin
+        : null;
     const origin = safeOrigin ?? getOrigin();
 
     const quantity = data.quantity ?? 1;
@@ -53,9 +50,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
 
     // Only allow safe in-app return paths
     const safeReturnTo =
-      data.return_to && data.return_to.startsWith("/tournaments/")
-        ? data.return_to
-        : null;
+      data.return_to && data.return_to.startsWith("/tournaments/") ? data.return_to : null;
     const successPath = safeReturnTo
       ? `${safeReturnTo}?pass=success&session_id={CHECKOUT_SESSION_ID}`
       : `/tournaments/pass-success?session_id={CHECKOUT_SESSION_ID}`;
@@ -104,9 +99,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
  * Stripe is slow or the webhook delivery failed.
  */
 export const confirmPassSession = createServerFn({ method: "POST" })
-  .inputValidator((input) =>
-    z.object({ session_id: z.string().min(8).max(255) }).parse(input),
-  )
+  .inputValidator((input) => z.object({ session_id: z.string().min(8).max(255) }).parse(input))
   .handler(async ({ data }) => {
     const { getStripe } = await import("@/lib/stripe.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -123,13 +116,10 @@ export const confirmPassSession = createServerFn({ method: "POST" })
     const paymentIntentId =
       typeof session.payment_intent === "string"
         ? session.payment_intent
-        : session.payment_intent?.id ?? null;
+        : (session.payment_intent?.id ?? null);
 
     const buyerEmail =
-      session.customer_details?.email ??
-      session.customer_email ??
-      session.metadata?.email ??
-      null;
+      session.customer_details?.email ?? session.customer_email ?? session.metadata?.email ?? null;
     const qty = readQuantity(session.metadata?.quantity);
     const totalCents = session.amount_total ?? 4000 * qty;
     const perPass = Math.round(totalCents / qty);
@@ -188,7 +178,6 @@ export const confirmPassSession = createServerFn({ method: "POST" })
       paymentStatus: session.payment_status,
     };
   });
-
 
 /**
  * List available (paid, unused) passes for the current user — matched by user_id or email.
@@ -289,10 +278,9 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
     // and admin settings. Falls back to null if creation fails for any reason.
     let personalClubId: string | null = null;
     try {
-      const { data: clubIdRow } = await supabaseAdmin.rpc(
-        "get_or_create_personal_club",
-        { _user_id: userId },
-      );
+      const { data: clubIdRow } = await supabaseAdmin.rpc("get_or_create_personal_club", {
+        _user_id: userId,
+      });
       if (typeof clubIdRow === "string") personalClubId = clubIdRow;
     } catch {
       personalClubId = null;
@@ -349,4 +337,3 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
 
     return { tournament };
   });
-

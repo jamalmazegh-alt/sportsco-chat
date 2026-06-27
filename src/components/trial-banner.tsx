@@ -12,9 +12,7 @@ const DISMISS_KEY = (clubId: string) => `clubero-trial-banner-dismissed:${clubId
 export function TrialBanner() {
   const { t } = useTranslation();
   const { memberships, activeClubId } = useAuth();
-  const isAdmin = !!memberships.find(
-    (m) => m.club_id === activeClubId && m.role === "admin",
-  );
+  const isAdmin = !!memberships.find((m) => m.club_id === activeClubId && m.role === "admin");
 
   const [dismissed, setDismissed] = useState(false);
   useEffect(() => {
@@ -40,9 +38,7 @@ export function TrialBanner() {
 
   const now = Date.now();
   const trialEnd = sub.trial_end ? new Date(sub.trial_end).getTime() : null;
-  const periodEnd = sub.current_period_end
-    ? new Date(sub.current_period_end).getTime()
-    : null;
+  const periodEnd = sub.current_period_end ? new Date(sub.current_period_end).getTime() : null;
 
   let kind: "trial" | "trial-ending" | "expired" | "canceling" | null = null;
   let daysLeft = 0;
@@ -55,7 +51,8 @@ export function TrialBanner() {
     daysLeft = Math.ceil((periodEnd - now) / 86_400_000);
     kind = "canceling";
   } else if (
-    (sub.status === "canceled" || sub.status === "incomplete_expired") ||
+    sub.status === "canceled" ||
+    sub.status === "incomplete_expired" ||
     (sub.status === "past_due" && periodEnd && periodEnd < now)
   ) {
     kind = "expired";
@@ -93,10 +90,7 @@ export function TrialBanner() {
     <div className={cn("px-3 py-2 text-xs flex items-center gap-2", tone)}>
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="flex-1 truncate">{message}</span>
-      <Link
-        to="/admin/billing"
-        className="font-semibold underline underline-offset-2 shrink-0"
-      >
+      <Link to="/admin/billing" className="font-semibold underline underline-offset-2 shrink-0">
         {kind === "expired" || kind === "trial-ending" ? t("trial.activate") : t("trial.manage")}
       </Link>
       {dismissable && (

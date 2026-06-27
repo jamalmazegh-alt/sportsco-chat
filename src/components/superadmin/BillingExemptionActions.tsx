@@ -21,10 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  grantBillingExemption,
-  revokeBillingExemption,
-} from "@/lib/billing-exemption.functions";
+import { grantBillingExemption, revokeBillingExemption } from "@/lib/billing-exemption.functions";
 import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
 
 export type BillingExemptionSub = {
@@ -107,7 +104,12 @@ export function BillingExemptionActions({
             </span>
           ) : null}
           {!isExempt ? (
-            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setGrantOpen(true)}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => setGrantOpen(true)}
+            >
               Exempter
             </Button>
           ) : (
@@ -133,7 +135,9 @@ export function BillingExemptionActions({
                 Stripe : <span className="font-mono">{stripeStatus}</span>
                 {" · "}
                 Exemption :{" "}
-                <span className={isExempt ? "text-emerald-600 font-medium" : "text-muted-foreground"}>
+                <span
+                  className={isExempt ? "text-emerald-600 font-medium" : "text-muted-foreground"}
+                >
                   {isExempt ? "active" : "inactive"}
                 </span>
               </p>

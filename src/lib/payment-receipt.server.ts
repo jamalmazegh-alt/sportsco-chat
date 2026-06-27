@@ -83,14 +83,20 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
   });
   const dateText = `Émis le ${fmtDate(r.issued_at)}`;
   page.drawText(dateText, {
-    x: 50, y, font, size: 10, color: muted,
+    x: 50,
+    y,
+    font,
+    size: 10,
+    color: muted,
   });
   y -= 14;
 
   y -= 18;
   page.drawLine({
-    start: { x: 50, y }, end: { x: width - 50, y },
-    thickness: 0.7, color: rgb(0.85, 0.87, 0.91),
+    start: { x: 50, y },
+    end: { x: width - 50, y },
+    thickness: 0.7,
+    color: rgb(0.85, 0.87, 0.91),
   });
   y -= 28;
 
@@ -113,49 +119,77 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
   // Amount card
   const cardY = y - 80;
   page.drawRectangle({
-    x: 50, y: cardY, width: width - 100, height: 80,
+    x: 50,
+    y: cardY,
+    width: width - 100,
+    height: 80,
     color: rgb(0.97, 0.98, 0.99),
-    borderColor: rgb(0.86, 0.88, 0.92), borderWidth: 1,
+    borderColor: rgb(0.86, 0.88, 0.92),
+    borderWidth: 1,
   });
   page.drawText("Montant payé", { x: 70, y: cardY + 52, font, size: 10, color: muted });
   page.drawText(fmtAmount(r.amount_gross_cents, r.currency), {
-    x: 70, y: cardY + 26, font: bold, size: 22, color: ink,
+    x: 70,
+    y: cardY + 26,
+    font: bold,
+    size: 22,
+    color: ink,
   });
   const method = METHOD_LABEL[r.method] ?? r.method;
   page.drawText(`Mode : ${method}`, {
     x: width - 70 - font.widthOfTextAtSize(`Mode : ${method}`, 10),
-    y: cardY + 52, font, size: 10, color: muted,
+    y: cardY + 52,
+    font,
+    size: 10,
+    color: muted,
   });
   if (tx?.paid_at) {
     const paid = `Réglé le ${fmtDate(tx.paid_at)}`;
     page.drawText(paid, {
       x: width - 70 - font.widthOfTextAtSize(paid, 10),
-      y: cardY + 36, font, size: 10, color: muted,
+      y: cardY + 36,
+      font,
+      size: 10,
+      color: muted,
     });
   }
   if (tx?.stripe_payment_intent_id || tx?.external_reference) {
     const ref = `Réf. : ${tx.stripe_payment_intent_id ?? tx.external_reference ?? ""}`;
     page.drawText(ref, {
       x: width - 70 - font.widthOfTextAtSize(ref, 8),
-      y: cardY + 20, font, size: 8, color: muted,
+      y: cardY + 20,
+      font,
+      size: 8,
+      color: muted,
     });
   }
   y = cardY - 30;
 
   if (r.method === "helloasso") {
     page.drawText("Paiement traité hors de Clubero via HelloAsso.", {
-      x: 50, y, font, size: 10, color: muted,
+      x: 50,
+      y,
+      font,
+      size: 10,
+      color: muted,
     });
     y -= 18;
   }
 
   // Footer
-  page.drawText(
-    "Ce reçu atteste du paiement effectué. Il ne tient pas lieu de facture.",
-    { x: 50, y: 60, font, size: 9, color: muted },
-  );
+  page.drawText("Ce reçu atteste du paiement effectué. Il ne tient pas lieu de facture.", {
+    x: 50,
+    y: 60,
+    font,
+    size: 9,
+    color: muted,
+  });
   page.drawText("Généré par Clubero — clubero.app", {
-    x: 50, y: 46, font, size: 9, color: muted,
+    x: 50,
+    y: 46,
+    font,
+    size: 9,
+    color: muted,
   });
 
   const bytes = await doc.save();
@@ -172,10 +206,7 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
     return null;
   }
 
-  await supabaseAdmin
-    .from("payment_receipts")
-    .update({ pdf_url: path })
-    .eq("id", r.id);
+  await supabaseAdmin.from("payment_receipts").update({ pdf_url: path }).eq("id", r.id);
 
   return path;
 }

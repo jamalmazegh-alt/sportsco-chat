@@ -85,7 +85,8 @@ function CookiesPage() {
           to="/"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ChevronLeft className="h-4 w-4" /> {t("common.home", { defaultValue: isFr ? "Accueil" : "Home" })}
+          <ChevronLeft className="h-4 w-4" />{" "}
+          {t("common.home", { defaultValue: isFr ? "Accueil" : "Home" })}
         </Link>
 
         <article className="mt-6 space-y-6">
@@ -124,11 +125,15 @@ function CookiesPage() {
                     <th className="px-3 py-2 text-left font-semibold hidden md:table-cell">
                       {isFr ? "Émetteur" : "Provider"}
                     </th>
-                    <th className="px-3 py-2 text-left font-semibold">{isFr ? "Finalité" : "Purpose"}</th>
+                    <th className="px-3 py-2 text-left font-semibold">
+                      {isFr ? "Finalité" : "Purpose"}
+                    </th>
                     <th className="px-3 py-2 text-left font-semibold hidden sm:table-cell">
                       {isFr ? "Durée" : "Lifetime"}
                     </th>
-                    <th className="px-3 py-2 text-left font-semibold">{isFr ? "Catégorie" : "Category"}</th>
+                    <th className="px-3 py-2 text-left font-semibold">
+                      {isFr ? "Catégorie" : "Category"}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -172,11 +177,19 @@ function CookiesPage() {
               })}
             </p>
             <div className="flex flex-wrap gap-3 pt-2 text-sm">
-              <Link to="/legal/$kind" params={{ kind: "privacy" }} className="text-primary hover:underline">
+              <Link
+                to="/legal/$kind"
+                params={{ kind: "privacy" }}
+                className="text-primary hover:underline"
+              >
                 {isFr ? "Politique de confidentialité" : "Privacy policy"}
               </Link>
               <span className="text-muted-foreground">·</span>
-              <Link to="/legal/$kind" params={{ kind: "terms" }} className="text-primary hover:underline">
+              <Link
+                to="/legal/$kind"
+                params={{ kind: "terms" }}
+                className="text-primary hover:underline"
+              >
                 {isFr ? "Conditions générales" : "Terms of service"}
               </Link>
             </div>

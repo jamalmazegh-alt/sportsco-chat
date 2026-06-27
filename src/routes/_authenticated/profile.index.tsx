@@ -15,9 +15,27 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/phone-input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail, LifeBuoy, Users } from "lucide-react";
+import {
+  LogOut,
+  Camera,
+  Loader2,
+  ShieldCheck,
+  ChevronRight,
+  Sun,
+  Moon,
+  Monitor,
+  ExternalLink,
+  KeyRound,
+  Mail,
+  LifeBuoy,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
@@ -49,7 +67,8 @@ function inferImageContentType(file: File) {
 
 function ProfilePage() {
   const { t, i18n } = useTranslation();
-  const { user, signOut, memberships, activeClubId, setActiveClubId, refreshMemberships } = useAuth();
+  const { user, signOut, memberships, activeClubId, setActiveClubId, refreshMemberships } =
+    useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
@@ -94,9 +113,15 @@ function ProfilePage() {
   async function onSavePhone() {
     if (!user) return;
     setPhoneBusy(true);
-    const { error } = await supabase.from("profiles").update({ phone: phone || null }).eq("id", user.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ phone: phone || null })
+      .eq("id", user.id);
     setPhoneBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     refetch();
     toast.success(t("profile.phoneSaved", { defaultValue: "Phone saved" }));
   }
@@ -116,11 +141,13 @@ function ProfilePage() {
       })
       .eq("id", user.id);
     setNameBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     refetch();
     toast.success(t("profile.nameSaved", { defaultValue: "Name saved" }));
   }
-
 
   async function setLang(lang: string) {
     if (!user) return;
@@ -140,9 +167,7 @@ function ProfilePage() {
   async function onUploadClubLogo(file: File) {
     if (!activeClubId) return;
     if (file.size > MAX_LOGO_SIZE) {
-      toast.error(
-        t("club.logoTooLarge", { defaultValue: "Fichier trop volumineux (max 5 MB)" }),
-      );
+      toast.error(t("club.logoTooLarge", { defaultValue: "Fichier trop volumineux (max 5 MB)" }));
       return;
     }
     setUploadingLogo(true);
@@ -182,16 +207,24 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center text-center gap-3">
         <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center overflow-hidden ring-1 ring-border">
           {club?.logo_url ? (
-            <img src={club.logo_url} alt={club?.name ?? ""} className="h-full w-full object-cover bg-white" />
+            <img
+              src={club.logo_url}
+              alt={club?.name ?? ""}
+              className="h-full w-full object-cover bg-white"
+            />
           ) : (
             <Camera className="h-8 w-8 text-muted-foreground" />
           )}
         </div>
         {club?.name && (
-          <p className="text-sm font-medium text-muted-foreground truncate max-w-full">{club.name}</p>
+          <p className="text-sm font-medium text-muted-foreground truncate max-w-full">
+            {club.name}
+          </p>
         )}
         {displayName && (
-          <h1 className="text-2xl font-semibold leading-tight truncate max-w-full">{displayName}</h1>
+          <h1 className="text-2xl font-semibold leading-tight truncate max-w-full">
+            {displayName}
+          </h1>
         )}
         {role && (
           <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
@@ -200,7 +233,11 @@ function ProfilePage() {
         )}
         {club && canManageLogo && (
           <label className="mt-1 flex items-center justify-center gap-2 w-full h-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-sm text-primary font-medium cursor-pointer hover:bg-primary/10 transition-colors">
-            {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+            {uploadingLogo ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Camera className="h-4 w-4" />
+            )}
             {uploadingLogo
               ? t("common.loading", { defaultValue: "Chargement..." })
               : club.logo_url
@@ -260,7 +297,6 @@ function ProfilePage() {
       )}
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
           <LanguageSwitcher
@@ -276,9 +312,21 @@ function ProfilePage() {
           <div role="radiogroup" className="grid grid-cols-3 gap-2">
             {(
               [
-                { value: "light", icon: Sun, label: t("profile.themeLight", { defaultValue: "Clair" }) },
-                { value: "dark", icon: Moon, label: t("profile.themeDark", { defaultValue: "Sombre" }) },
-                { value: "system", icon: Monitor, label: t("profile.themeSystem", { defaultValue: "Auto" }) },
+                {
+                  value: "light",
+                  icon: Sun,
+                  label: t("profile.themeLight", { defaultValue: "Clair" }),
+                },
+                {
+                  value: "dark",
+                  icon: Moon,
+                  label: t("profile.themeDark", { defaultValue: "Sombre" }),
+                },
+                {
+                  value: "system",
+                  icon: Monitor,
+                  label: t("profile.themeSystem", { defaultValue: "Auto" }),
+                },
               ] as { value: ThemeMode; icon: typeof Sun; label: string }[]
             ).map((opt) => {
               const Icon = opt.icon;
@@ -309,7 +357,9 @@ function ProfilePage() {
           <div className="space-y-1.5">
             <Label>{t("profile.club")}</Label>
             <Select value={activeClubId ?? undefined} onValueChange={setActiveClubId}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {memberships.map((m) => (
                   <SelectItem key={m.club_id} value={m.club_id}>
@@ -358,7 +408,11 @@ function ProfilePage() {
           }
           onClick={onSaveName}
         >
-          {nameBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
+          {nameBusy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            t("common.save", { defaultValue: "Save" })
+          )}
         </Button>
       </div>
 
@@ -371,7 +425,11 @@ function ProfilePage() {
           disabled={phoneBusy || phone === (profile?.phone ?? "")}
           onClick={onSavePhone}
         >
-          {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
+          {phoneBusy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            t("common.save", { defaultValue: "Save" })
+          )}
         </Button>
       </div>
 
@@ -383,9 +441,13 @@ function ProfilePage() {
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-primary" />
             <div>
-              <div className="text-sm font-medium">{t("following.title", { defaultValue: "Mes abonnements" })}</div>
+              <div className="text-sm font-medium">
+                {t("following.title", { defaultValue: "Mes abonnements" })}
+              </div>
               <p className="text-xs text-muted-foreground">
-                {t("following.menuSubtitle", { defaultValue: "Joueurs, coachs et clubs que tu suis" })}
+                {t("following.menuSubtitle", {
+                  defaultValue: "Joueurs, coachs et clubs que tu suis",
+                })}
               </p>
             </div>
           </div>
@@ -434,9 +496,13 @@ function ProfilePage() {
         <div className="flex items-center gap-3">
           <LifeBuoy className="h-5 w-5 text-primary" />
           <div>
-            <div className="text-sm font-medium">{t("support.menu", { defaultValue: "Support" })}</div>
+            <div className="text-sm font-medium">
+              {t("support.menu", { defaultValue: "Support" })}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {t("support.menuSubtitle", { defaultValue: "Signaler un problème ou suivre vos demandes" })}
+              {t("support.menuSubtitle", {
+                defaultValue: "Signaler un problème ou suivre vos demandes",
+              })}
             </p>
           </div>
         </div>

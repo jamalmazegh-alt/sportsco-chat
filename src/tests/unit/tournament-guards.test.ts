@@ -45,10 +45,7 @@ vi.mock("@/integrations/supabase/client.server", () => {
   return { supabaseAdmin: { from } };
 });
 
-import {
-  assertTournamentMutable,
-  assertCanEditMatchScore,
-} from "@/lib/tournament-guards.server";
+import { assertTournamentMutable, assertCanEditMatchScore } from "@/lib/tournament-guards.server";
 
 // ---------- fake context.supabase with controllable RPC -------------------
 function makeCtx(rpcResult: boolean | null) {
@@ -70,16 +67,12 @@ beforeEach(() => {
 describe("assertTournamentMutable", () => {
   it("allows structural changes on a draft tournament", async () => {
     tournamentRow.value = { status: "draft" };
-    await expect(
-      assertTournamentMutable("t-1", "structure"),
-    ).resolves.toBeUndefined();
+    await expect(assertTournamentMutable("t-1", "structure")).resolves.toBeUndefined();
   });
 
   it("allows structural changes on a published (not yet started) tournament", async () => {
     tournamentRow.value = { status: "published" };
-    await expect(
-      assertTournamentMutable("t-1", "structure"),
-    ).resolves.toBeUndefined();
+    await expect(assertTournamentMutable("t-1", "structure")).resolves.toBeUndefined();
   });
 
   it("blocks structural changes once tournament is in_progress (409)", async () => {
@@ -94,16 +87,12 @@ describe("assertTournamentMutable", () => {
 
   it("allows score updates even when tournament is in_progress", async () => {
     tournamentRow.value = { status: "in_progress" };
-    await expect(
-      assertTournamentMutable("t-1", "scores"),
-    ).resolves.toBeUndefined();
+    await expect(assertTournamentMutable("t-1", "scores")).resolves.toBeUndefined();
   });
 
   it("allows logistics updates even when tournament is in_progress", async () => {
     tournamentRow.value = { status: "in_progress" };
-    await expect(
-      assertTournamentMutable("t-1", "logistics"),
-    ).resolves.toBeUndefined();
+    await expect(assertTournamentMutable("t-1", "logistics")).resolves.toBeUndefined();
   });
 
   it("returns 404 when the tournament does not exist", async () => {

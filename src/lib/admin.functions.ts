@@ -10,7 +10,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const listClubUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { club_id: string }) =>
-    z.object({ club_id: z.string().uuid() }).parse(input)
+    z.object({ club_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -62,13 +62,12 @@ export const listClubUsers = createServerFn({ method: "POST" })
     >();
     for (const m of members ?? []) {
       const rolesArr: string[] = m.role ? [m.role] : [];
-      const g =
-        grouped.get(m.user_id) ?? {
-          user_id: m.user_id,
-          roles: [],
-          profile: profById.get(m.user_id) ?? null,
-          email: emailById.get(m.user_id) ?? null,
-        };
+      const g = grouped.get(m.user_id) ?? {
+        user_id: m.user_id,
+        roles: [],
+        profile: profById.get(m.user_id) ?? null,
+        email: emailById.get(m.user_id) ?? null,
+      };
       for (const r of rolesArr) if (!g.roles.includes(r)) g.roles.push(r);
       grouped.set(m.user_id, g);
     }
@@ -76,8 +75,8 @@ export const listClubUsers = createServerFn({ method: "POST" })
     return {
       users: Array.from(grouped.values()).sort((a, b) =>
         (a.profile?.full_name ?? a.email ?? "").localeCompare(
-          b.profile?.full_name ?? b.email ?? ""
-        )
+          b.profile?.full_name ?? b.email ?? "",
+        ),
       ),
     };
   });
@@ -88,9 +87,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
 export const getClubUserDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { club_id: string; user_id: string }) =>
-    z
-      .object({ club_id: z.string().uuid(), user_id: z.string().uuid() })
-      .parse(input)
+    z.object({ club_id: z.string().uuid(), user_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -116,27 +113,34 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       throw new Response("Not found", { status: 404 });
     }
 
-    const [{ data: profile }, { data: memberships }, { data: linkedPlayers }, { data: parentLinks }, authUser] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("id, full_name, first_name, last_name, phone, created_at, avatar_url, phone_verified_at")
-          .eq("id", data.user_id)
-          .maybeSingle(),
-        supabase
-          .from("club_members")
-          .select("club_id, role, created_at, clubs:club_id(name)")
-          .eq("user_id", data.user_id),
-        supabaseAdmin
-          .from("players")
-          .select("id, first_name, last_name, club_id")
-          .eq("user_id", data.user_id),
-        supabaseAdmin
-          .from("player_parents")
-          .select("id, player_id, players:player_id(id, first_name, last_name, club_id)")
-          .eq("parent_user_id", data.user_id),
-        supabaseAdmin.auth.admin.getUserById(data.user_id),
-      ]);
+    const [
+      { data: profile },
+      { data: memberships },
+      { data: linkedPlayers },
+      { data: parentLinks },
+      authUser,
+    ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select(
+          "id, full_name, first_name, last_name, phone, created_at, avatar_url, phone_verified_at",
+        )
+        .eq("id", data.user_id)
+        .maybeSingle(),
+      supabase
+        .from("club_members")
+        .select("club_id, role, created_at, clubs:club_id(name)")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("players")
+        .select("id, first_name, last_name, club_id")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("player_parents")
+        .select("id, player_id, players:player_id(id, first_name, last_name, club_id)")
+        .eq("parent_user_id", data.user_id),
+      supabaseAdmin.auth.admin.getUserById(data.user_id),
+    ]);
 
     const u = authUser.data.user as any;
     const bannedUntil: string | null = u?.banned_until ?? null;
@@ -160,11 +164,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
 /**
  * Helper: enforce caller is admin of the given club.
  */
-async function assertCallerAdmin(
-  supabase: any,
-  clubId: string,
-  callerId: string
-) {
+async function assertCallerAdmin(supabase: any, clubId: string, callerId: string) {
   const { data } = await supabase
     .from("club_members")
     .select("role")
@@ -182,15 +182,14 @@ async function assertCallerAdmin(
  */
 export const setUserDisabled = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { club_id: string; user_id: string; disabled: boolean }) =>
-      z
-        .object({
-          club_id: z.string().uuid(),
-          user_id: z.string().uuid(),
-          disabled: z.boolean(),
-        })
-        .parse(input)
+  .inputValidator((input: { club_id: string; user_id: string; disabled: boolean }) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        user_id: z.string().uuid(),
+        disabled: z.boolean(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -210,10 +209,9 @@ export const setUserDisabled = createServerFn({ method: "POST" })
       throw new Response("Not found", { status: 404 });
     }
 
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
-      data.user_id,
-      { ban_duration: data.disabled ? "876000h" : "none" } as any
-    );
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      ban_duration: data.disabled ? "876000h" : "none",
+    } as any);
     if (error) throw new Response(error.message, { status: 500 });
     return { ok: true, disabled: data.disabled };
   });
@@ -225,9 +223,7 @@ export const setUserDisabled = createServerFn({ method: "POST" })
 export const removeUserFromClub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { club_id: string; user_id: string }) =>
-    z
-      .object({ club_id: z.string().uuid(), user_id: z.string().uuid() })
-      .parse(input)
+    z.object({ club_id: z.string().uuid(), user_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -250,9 +246,7 @@ export const removeUserFromClub = createServerFn({ method: "POST" })
 export const sendUserPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { club_id: string; user_id: string }) =>
-    z
-      .object({ club_id: z.string().uuid(), user_id: z.string().uuid() })
-      .parse(input)
+    z.object({ club_id: z.string().uuid(), user_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -285,7 +279,7 @@ export const setUserClubStaffRoles = createServerFn({ method: "POST" })
           is_admin: z.boolean(),
           is_coach: z.boolean(),
         })
-        .parse(input)
+        .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -327,4 +321,3 @@ export const setUserClubStaffRoles = createServerFn({ method: "POST" })
     }
     return { ok: true, roles: desired };
   });
-

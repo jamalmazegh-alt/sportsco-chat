@@ -22,9 +22,7 @@ export async function loadLineupForConvocationEmailServer(
 ): Promise<LineupEmailData | undefined> {
   const { data: lineup } = await supabaseAdmin
     .from("event_lineups")
-    .select(
-      "formation, slots, bench, captain_player_id, gk_player_id, published_at",
-    )
+    .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
     .eq("event_id", eventId)
     .not("published_at", "is", null)
     .maybeSingle();

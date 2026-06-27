@@ -52,12 +52,7 @@ function redact(value: unknown, depth = 0): unknown {
   return value;
 }
 
-function emit(
-  level: LogLevel,
-  scope: string,
-  msg: string,
-  ctx?: Record<string, unknown>,
-) {
+function emit(level: LogLevel, scope: string, msg: string, ctx?: Record<string, unknown>) {
   const line = {
     ts: new Date().toISOString(),
     level,
@@ -73,13 +68,9 @@ function emit(
 
 export function createLogger(scope: string) {
   return {
-    debug: (msg: string, ctx?: Record<string, unknown>) =>
-      emit("debug", scope, msg, ctx),
-    info: (msg: string, ctx?: Record<string, unknown>) =>
-      emit("info", scope, msg, ctx),
-    warn: (msg: string, ctx?: Record<string, unknown>) =>
-      emit("warn", scope, msg, ctx),
-    error: (msg: string, ctx?: Record<string, unknown>) =>
-      emit("error", scope, msg, ctx),
+    debug: (msg: string, ctx?: Record<string, unknown>) => emit("debug", scope, msg, ctx),
+    info: (msg: string, ctx?: Record<string, unknown>) => emit("info", scope, msg, ctx),
+    warn: (msg: string, ctx?: Record<string, unknown>) => emit("warn", scope, msg, ctx),
+    error: (msg: string, ctx?: Record<string, unknown>) => emit("error", scope, msg, ctx),
   };
 }

@@ -17,20 +17,14 @@ describe("RLS: club_members", () => {
     expect(ids).toContain(fx.users.playerA.userId);
     expect(ids).not.toContain(fx.users.adminB.userId);
 
-    const { data: dataB } = await c
-      .from("club_members")
-      .select("user_id")
-      .eq("club_id", fx.clubB);
+    const { data: dataB } = await c.from("club_members").select("user_id").eq("club_id", fx.clubB);
     expect(dataB ?? []).toHaveLength(0);
   });
 
   it("playerA sees clubA members only", async () => {
     const fx = getFixtures();
     const c = await signInAs("playerA");
-    const { data } = await c
-      .from("club_members")
-      .select("user_id")
-      .eq("club_id", fx.clubB);
+    const { data } = await c.from("club_members").select("user_id").eq("club_id", fx.clubB);
     expect(data ?? []).toHaveLength(0);
   });
 

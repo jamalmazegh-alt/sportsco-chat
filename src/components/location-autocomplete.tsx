@@ -22,7 +22,9 @@ let cachedMapsKeyPromise: Promise<string | null> | null = null;
 
 function fetchGoogleMapsKey(): Promise<string | null> {
   if (!cachedMapsKeyPromise) {
-    cachedMapsKeyPromise = getGoogleMapsKey().then((res) => res.key).catch(() => null);
+    cachedMapsKeyPromise = getGoogleMapsKey()
+      .then((res) => res.key)
+      .catch(() => null);
   }
   return cachedMapsKeyPromise;
 }
@@ -32,10 +34,14 @@ function loadGoogleMapsPlaces(key: string | null | undefined): Promise<void> | n
   if ((window as any).google?.maps?.places) return Promise.resolve();
   if (!window.__cluberoGoogleMapsPromise) {
     window.__cluberoGoogleMapsPromise = new Promise((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>("script[data-clubero-google-maps]");
+      const existing = document.querySelector<HTMLScriptElement>(
+        "script[data-clubero-google-maps]",
+      );
       if (existing) {
         existing.addEventListener("load", () => resolve(), { once: true });
-        existing.addEventListener("error", () => reject(new Error("Google Maps load failed")), { once: true });
+        existing.addEventListener("error", () => reject(new Error("Google Maps load failed")), {
+          once: true,
+        });
         return;
       }
       const script = document.createElement("script");
@@ -86,12 +92,14 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
     let cancelled = false;
     fetchGoogleMapsKey().then((key) => {
       const loader = loadGoogleMapsPlaces(key);
-      loader?.then(() => {
-        const googlePlaces = (window as any).google?.maps?.places;
-        if (!cancelled && googlePlaces) {
-          googleServiceRef.current = new googlePlaces.AutocompleteService();
-        }
-      }).catch(() => undefined);
+      loader
+        ?.then(() => {
+          const googlePlaces = (window as any).google?.maps?.places;
+          if (!cancelled && googlePlaces) {
+            googleServiceRef.current = new googlePlaces.AutocompleteService();
+          }
+        })
+        .catch(() => undefined);
     });
     return () => {
       cancelled = true;
@@ -134,7 +142,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         }
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=${encodeURIComponent(v)}`,
-          { headers: { "Accept-Language": navigator.language || "fr" } }
+          { headers: { "Accept-Language": navigator.language || "fr" } },
         );
         const data: Suggestion[] = await res.json();
         setSuggestions(data.map((item) => ({ ...item, source: "osm" })));

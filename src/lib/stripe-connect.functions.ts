@@ -23,9 +23,7 @@ async function assertClubAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data &&
-    ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (!isAdmin) throw new Error("Only club admins can manage payments");
 }
 
@@ -52,9 +50,7 @@ async function logEvent(
  */
 export const getStripeConnectStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
     const { data: club } = await supabaseAdmin
@@ -73,17 +69,16 @@ export const getStripeConnectStatus = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
     const now = Date.now();
-    const hasActiveSubscription = !!sub && (
-      (sub.status === "trialing" && sub.trial_end && new Date(sub.trial_end).getTime() > now) ||
-      ((sub.status === "active" || sub.status === "past_due") &&
-        (!sub.current_period_end || new Date(sub.current_period_end).getTime() > now))
-    );
+    const hasActiveSubscription =
+      !!sub &&
+      ((sub.status === "trialing" && sub.trial_end && new Date(sub.trial_end).getTime() > now) ||
+        ((sub.status === "active" || sub.status === "past_due") &&
+          (!sub.current_period_end || new Date(sub.current_period_end).getTime() > now)));
 
     return {
       clubId: club.id,
       stripeAccountId: club.stripe_account_id,
-      status: club.stripe_account_status as
-        | "pending" | "active" | "restricted" | "disabled" | null,
+      status: club.stripe_account_status as "pending" | "active" | "restricted" | "disabled" | null,
       createdAt: club.stripe_account_created_at,
       chargesEnabled: !!club.stripe_charges_enabled,
       payoutsEnabled: !!club.stripe_payouts_enabled,
@@ -102,9 +97,7 @@ export const getStripeConnectStatus = createServerFn({ method: "POST" })
  */
 export const createStripeConnectAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
 
@@ -165,9 +158,7 @@ export const createStripeConnectAccount = createServerFn({ method: "POST" })
  */
 export const createStripeConnectOnboardingLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
 
@@ -215,7 +206,6 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
     return { url: link.url, expiresAt: link.expires_at };
   });
 
-
 /**
  * Pull the latest account state from Stripe and persist it locally.
  * Useful when the user just returned from onboarding and the webhook may
@@ -223,9 +213,7 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
  */
 export const refreshStripeConnectStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
 
@@ -244,12 +232,13 @@ export const refreshStripeConnectStatus = createServerFn({ method: "POST" })
     const chargesEnabled = !!account.charges_enabled;
     const payoutsEnabled = !!account.payouts_enabled;
     const disabledReason = account.requirements?.disabled_reason ?? null;
-    const status: "pending" | "active" | "restricted" | "disabled" =
-      disabledReason
-        ? (disabledReason.startsWith("rejected") ? "disabled" : "restricted")
-        : chargesEnabled && payoutsEnabled
-          ? "active"
-          : "pending";
+    const status: "pending" | "active" | "restricted" | "disabled" = disabledReason
+      ? disabledReason.startsWith("rejected")
+        ? "disabled"
+        : "restricted"
+      : chargesEnabled && payoutsEnabled
+        ? "active"
+        : "pending";
 
     await supabaseAdmin
       .from("clubs")

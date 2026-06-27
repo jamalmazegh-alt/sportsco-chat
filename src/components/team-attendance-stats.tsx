@@ -116,7 +116,7 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
               "text-xs rounded-full px-3 py-1 border transition-colors",
               period === p
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border hover:bg-muted"
+                : "bg-card text-muted-foreground border-border hover:bg-muted",
             )}
           >
             {t(`stats.period.${p}`)}
@@ -131,7 +131,7 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
               "text-xs rounded-full px-3 py-1 border transition-colors",
               typeFilter === p
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border hover:bg-muted"
+                : "bg-card text-muted-foreground border-border hover:bg-muted",
             )}
           >
             {t(`stats.type.${p}`)}
@@ -161,8 +161,12 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
                 return (
                   <tr key={r.player_id} className="bg-muted/30">
                     <td className="rounded-l-lg py-2 pl-2 pr-1 truncate max-w-[140px]">
-                      <span className="font-medium">{r.first_name} {r.last_name}</span>
-                      {r.jersey_number ? <span className="text-muted-foreground"> · #{r.jersey_number}</span> : null}
+                      <span className="font-medium">
+                        {r.first_name} {r.last_name}
+                      </span>
+                      {r.jersey_number ? (
+                        <span className="text-muted-foreground"> · #{r.jersey_number}</span>
+                      ) : null}
                     </td>
                     <td className="px-2 text-right tabular-nums">
                       <span
@@ -171,18 +175,22 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
                           r.total === 0
                             ? "bg-muted text-muted-foreground"
                             : ratio >= 75
-                            ? "bg-present/20 text-present-foreground"
-                            : ratio >= 50
-                            ? "bg-uncertain/20 text-uncertain-foreground"
-                            : "bg-absent/15 text-absent"
+                              ? "bg-present/20 text-present-foreground"
+                              : ratio >= 50
+                                ? "bg-uncertain/20 text-uncertain-foreground"
+                                : "bg-absent/15 text-absent",
                         )}
                       >
                         {r.total === 0 ? "—" : `${ratio}%`}
                       </span>
                     </td>
-                    <td className="px-2 text-right tabular-nums text-present-foreground">{r.present}</td>
+                    <td className="px-2 text-right tabular-nums text-present-foreground">
+                      {r.present}
+                    </td>
                     <td className="px-2 text-right tabular-nums text-absent">{r.absent}</td>
-                    <td className="rounded-r-lg px-2 text-right tabular-nums text-uncertain-foreground">{r.uncertain}</td>
+                    <td className="rounded-r-lg px-2 text-right tabular-nums text-uncertain-foreground">
+                      {r.uncertain}
+                    </td>
                   </tr>
                 );
               })}

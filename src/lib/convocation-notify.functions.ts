@@ -23,7 +23,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id,teams:team_id(clubs:club_id(default_language)))"
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id,teams:team_id(clubs:club_id(default_language)))",
       )
       .eq("id", convocationId)
       .single();
@@ -35,8 +35,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const ev: any = conv.events;
     const clubDefaultLang = ev?.teams?.clubs?.default_language as string | null | undefined;
     const player: any = conv.players ?? {};
-    const playerName =
-      `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
+    const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
 
     // Permission check: caller must be related to the player (parent or the player themselves)
     const { data: canRespond } = await supabaseAdmin.rpc("can_respond_for_player", {
@@ -65,7 +64,8 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
           .maybeSingle();
         declaredByName =
           (declarer as any)?.first_name ||
-          (((declarer as any)?.full_name ?? "").split(" ")[0] || null);
+          ((declarer as any)?.full_name ?? "").split(" ")[0] ||
+          null;
       }
     } catch {
       // best-effort
@@ -79,10 +79,9 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       .in("role", ["coach", "admin"]);
 
     const coachIds = Array.from(
-      new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
+      new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean)),
     );
     if (coachIds.length === 0) return { sent: 0 };
-
 
     // Fetch coach profiles + emails (auth.users via admin)
     const { data: profs } = await supabaseAdmin
@@ -90,9 +89,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       .select("id, first_name, notifications_email, preferred_language")
       .in("id", coachIds);
 
-    const baseUrl =
-      process.env.SITE_URL ||
-      "https://app.clubero.app";
+    const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
 
     let sent = 0;
     for (const p of profs ?? []) {

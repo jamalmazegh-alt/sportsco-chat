@@ -52,9 +52,7 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
         .from("tournament-documents")
         .upload(path, file, { cacheControl: "3600", upsert: false });
       if (error) throw error;
-      const { data: pub } = supabase.storage
-        .from("tournament-documents")
-        .getPublicUrl(path);
+      const { data: pub } = supabase.storage.from("tournament-documents").getPublicUrl(path);
       const newSponsor: Sponsor = {
         id: crypto.randomUUID(),
         name: file.name.replace(/\.[^.]+$/, ""),
@@ -87,7 +85,10 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
       const idx = target.logo_url.indexOf(marker);
       if (idx >= 0) {
         const path = target.logo_url.slice(idx + marker.length);
-        supabase.storage.from("tournament-documents").remove([path]).catch(() => {});
+        supabase.storage
+          .from("tournament-documents")
+          .remove([path])
+          .catch(() => {});
       }
     }
   };
@@ -97,13 +98,9 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          {t("sponsorsEditor.hint")}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("sponsorsEditor.hint")}</p>
         <div className="flex items-center gap-2">
-          {persist.isPending && (
-            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-          )}
+          {persist.isPending && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
           <input
             ref={fileRef}
             type="file"
@@ -168,9 +165,7 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
 
               <Select
                 value={s.tier}
-                onValueChange={(v) =>
-                  updateSponsor(s.id, { tier: v as SponsorTier })
-                }
+                onValueChange={(v) => updateSponsor(s.id, { tier: v as SponsorTier })}
               >
                 <SelectTrigger className="col-span-2">
                   <SelectValue />

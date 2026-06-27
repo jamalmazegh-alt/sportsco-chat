@@ -8,13 +8,62 @@ const InputSchema = z.object({
 });
 
 const REASON_LABELS: Record<string, Record<string, string>> = {
-  fr: { vacation: "Vacances", injury: "Blessure", school: "École", family: "Famille", work: "Travail", other: "Autre" },
-  en: { vacation: "Vacation", injury: "Injury", school: "School", family: "Family", work: "Work", other: "Other" },
-  es: { vacation: "Vacaciones", injury: "Lesión", school: "Escuela", family: "Familia", work: "Trabajo", other: "Otro" },
-  de: { vacation: "Urlaub", injury: "Verletzung", school: "Schule", family: "Familie", work: "Arbeit", other: "Andere" },
-  it: { vacation: "Vacanze", injury: "Infortunio", school: "Scuola", family: "Famiglia", work: "Lavoro", other: "Altro" },
-  nl: { vacation: "Vakantie", injury: "Blessure", school: "School", family: "Familie", work: "Werk", other: "Overig" },
-  pt: { vacation: "Férias", injury: "Lesão", school: "Escola", family: "Família", work: "Trabalho", other: "Outro" },
+  fr: {
+    vacation: "Vacances",
+    injury: "Blessure",
+    school: "École",
+    family: "Famille",
+    work: "Travail",
+    other: "Autre",
+  },
+  en: {
+    vacation: "Vacation",
+    injury: "Injury",
+    school: "School",
+    family: "Family",
+    work: "Work",
+    other: "Other",
+  },
+  es: {
+    vacation: "Vacaciones",
+    injury: "Lesión",
+    school: "Escuela",
+    family: "Familia",
+    work: "Trabajo",
+    other: "Otro",
+  },
+  de: {
+    vacation: "Urlaub",
+    injury: "Verletzung",
+    school: "Schule",
+    family: "Familie",
+    work: "Arbeit",
+    other: "Andere",
+  },
+  it: {
+    vacation: "Vacanze",
+    injury: "Infortunio",
+    school: "Scuola",
+    family: "Famiglia",
+    work: "Lavoro",
+    other: "Altro",
+  },
+  nl: {
+    vacation: "Vakantie",
+    injury: "Blessure",
+    school: "School",
+    family: "Familie",
+    work: "Werk",
+    other: "Overig",
+  },
+  pt: {
+    vacation: "Férias",
+    injury: "Lesão",
+    school: "Escola",
+    family: "Família",
+    work: "Trabalho",
+    other: "Outro",
+  },
 };
 
 const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
@@ -48,8 +97,7 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
     if (!avail) return { sent: 0 };
 
     const player: any = avail.players ?? {};
-    const playerName =
-      `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
+    const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
 
     // Permission/relationship sanity-check: caller must be linked to the player
     const { data: canDeclare } = await supabaseAdmin.rpc("can_respond_for_player", {
@@ -88,9 +136,7 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
       .in("role", ["coach", "assistant_coach", "admin"] as any);
     const coachIds = Array.from(
       new Set(
-        (coaches ?? [])
-          .map((c: any) => c.user_id)
-          .filter((u: string | null) => u && u !== userId),
+        (coaches ?? []).map((c: any) => c.user_id).filter((u: string | null) => u && u !== userId),
       ),
     );
     if (coachIds.length === 0) return { sent: 0 };

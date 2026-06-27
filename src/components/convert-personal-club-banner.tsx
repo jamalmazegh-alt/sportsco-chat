@@ -48,8 +48,8 @@ export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Tu utilises Clubero en mode organisateur libre</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Convertis cette organisation en vrai club Clubero pour inviter ton équipe, gérer
-            tes joueurs et souscrire à un abonnement.
+            Convertis cette organisation en vrai club Clubero pour inviter ton équipe, gérer tes
+            joueurs et souscrire à un abonnement.
           </p>
         </div>
       </div>

@@ -93,9 +93,13 @@ function RosterPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center space-y-2 max-w-md">
           <ShieldAlert className="h-10 w-10 mx-auto text-muted-foreground" />
-          <p className="text-lg font-medium">{t("roster.invalidTitle", { defaultValue: "Lien invalide" })}</p>
+          <p className="text-lg font-medium">
+            {t("roster.invalidTitle", { defaultValue: "Lien invalide" })}
+          </p>
           <p className="text-sm text-muted-foreground">
-            {t("roster.invalidBody", { defaultValue: "Ce lien d'effectif est invalide ou a expiré." })}
+            {t("roster.invalidBody", {
+              defaultValue: "Ce lien d'effectif est invalide ou a expiré.",
+            })}
           </p>
         </div>
       </div>
@@ -168,7 +172,12 @@ function RosterPage() {
       ) : (
         <form onSubmit={onSave} className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label>{t("roster.playersLabel", { defaultValue: "Joueurs ({{count}})", count: players.length })}</Label>
+            <Label>
+              {t("roster.playersLabel", {
+                defaultValue: "Joueurs ({{count}})",
+                count: players.length,
+              })}
+            </Label>
             <Button
               type="button"
               size="sm"
@@ -176,7 +185,13 @@ function RosterPage() {
               onClick={() =>
                 setPlayers([
                   ...players,
-                  { first_name: "", last_name: "", jersey_number: "", position: "", is_captain: false },
+                  {
+                    first_name: "",
+                    last_name: "",
+                    jersey_number: "",
+                    position: "",
+                    is_captain: false,
+                  },
                 ])
               }
             >
@@ -187,7 +202,9 @@ function RosterPage() {
 
           {players.length === 0 && (
             <p className="text-sm text-muted-foreground italic">
-              {t("roster.empty", { defaultValue: "Aucun joueur pour le moment. Cliquez sur Ajouter." })}
+              {t("roster.empty", {
+                defaultValue: "Aucun joueur pour le moment. Cliquez sur Ajouter.",
+              })}
             </p>
           )}
 
@@ -242,7 +259,10 @@ function RosterPage() {
                     variant={p.is_captain ? "default" : "outline"}
                     className="col-span-7 sm:col-span-5 gap-1"
                     onClick={() => {
-                      const next = players.map((pp, j) => ({ ...pp, is_captain: j === i ? !pp.is_captain : false }));
+                      const next = players.map((pp, j) => ({
+                        ...pp,
+                        is_captain: j === i ? !pp.is_captain : false,
+                      }));
                       setPlayers(next);
                     }}
                   >
@@ -276,7 +296,11 @@ function RosterPage() {
               </p>
             )}
             <Button type="submit" disabled={saving} className="ml-auto">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("roster.save", { defaultValue: "Enregistrer" })}
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("roster.save", { defaultValue: "Enregistrer" })
+              )}
             </Button>
           </div>
         </form>

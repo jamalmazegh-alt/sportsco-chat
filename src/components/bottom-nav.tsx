@@ -33,13 +33,12 @@ export function BottomNav() {
           { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
         ]
       : [
-        { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
-        { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
-        { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
-        { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
-        { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
-      ];
-
+          { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
+          { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
+          { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
+          { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
+          { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
+        ];
 
   return (
     <nav
@@ -85,7 +84,12 @@ export function BottomNav() {
                     </span>
                   )}
                 </span>
-                <span className={cn("transition-all duration-200 tracking-tight", active && "font-black")}>
+                <span
+                  className={cn(
+                    "transition-all duration-200 tracking-tight",
+                    active && "font-black",
+                  )}
+                >
                   {it.label}
                 </span>
               </Link>

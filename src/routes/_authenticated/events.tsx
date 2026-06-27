@@ -9,7 +9,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban, Eye, EyeOff, Clock } from "lucide-react";
+import {
+  Calendar,
+  Plus,
+  Users,
+  Trophy,
+  Dumbbell,
+  BellRing,
+  Home,
+  Plane,
+  List,
+  CalendarDays,
+  Ban,
+  Eye,
+  EyeOff,
+  Clock,
+} from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -44,7 +59,8 @@ function EventsPage() {
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showPast, setShowPast] = useState(false);
@@ -89,7 +105,9 @@ function EventsPage() {
       if (teamIds.length === 0) return [];
       let q = supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home")
+        .select(
+          "id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home",
+        )
         .in("team_id", teamIds)
         .is("deleted_at", null)
         .order("starts_at", { ascending: true });
@@ -104,7 +122,10 @@ function EventsPage() {
           .select("event_id, home_score, away_score")
           .in("event_id", matchIds);
         resultsById = new Map(
-          (results ?? []).map((r: any) => [r.event_id, { home_score: r.home_score, away_score: r.away_score }])
+          (results ?? []).map((r: any) => [
+            r.event_id,
+            { home_score: r.home_score, away_score: r.away_score },
+          ]),
         );
       }
       return list.map((e) => ({
@@ -173,7 +194,13 @@ function EventsPage() {
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
   }, [visibleEvents, dateLocale]);
 
-  const typePriority: Record<string, number> = { match: 0, tournament: 1, training: 2, meeting: 3, other: 4 };
+  const typePriority: Record<string, number> = {
+    match: 0,
+    tournament: 1,
+    training: 2,
+    meeting: 3,
+    other: 4,
+  };
 
   const eventTypesByDate = useMemo(() => {
     const map = new Map<number, string>();
@@ -189,22 +216,30 @@ function EventsPage() {
 
   const matchDates = useMemo(() => {
     const arr: Date[] = [];
-    eventTypesByDate.forEach((type, ts) => { if (type === "match") arr.push(new Date(ts)); });
+    eventTypesByDate.forEach((type, ts) => {
+      if (type === "match") arr.push(new Date(ts));
+    });
     return arr;
   }, [eventTypesByDate]);
   const tournamentDates = useMemo(() => {
     const arr: Date[] = [];
-    eventTypesByDate.forEach((type, ts) => { if (type === "tournament") arr.push(new Date(ts)); });
+    eventTypesByDate.forEach((type, ts) => {
+      if (type === "tournament") arr.push(new Date(ts));
+    });
     return arr;
   }, [eventTypesByDate]);
   const trainingDates = useMemo(() => {
     const arr: Date[] = [];
-    eventTypesByDate.forEach((type, ts) => { if (type === "training") arr.push(new Date(ts)); });
+    eventTypesByDate.forEach((type, ts) => {
+      if (type === "training") arr.push(new Date(ts));
+    });
     return arr;
   }, [eventTypesByDate]);
   const meetingDates = useMemo(() => {
     const arr: Date[] = [];
-    eventTypesByDate.forEach((type, ts) => { if (type === "meeting") arr.push(new Date(ts)); });
+    eventTypesByDate.forEach((type, ts) => {
+      if (type === "meeting") arr.push(new Date(ts));
+    });
     return arr;
   }, [eventTypesByDate]);
   const otherDates = useMemo(() => [] as Date[], []);
@@ -242,26 +277,54 @@ function EventsPage() {
                   : "border-border hover:border-primary/40",
           )}
         >
-          <div className={cn(
-            "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-            isCancelled ? "bg-red-100/40" : isLoss ? "bg-defeat/15" : past ? "bg-amber-100/40 dark:bg-amber-900/30" : "bg-primary/8",
-          )}>
-            <span className={cn(
-              "text-[10px] font-semibold uppercase tracking-wider",
-              isCancelled ? "text-red-600" : past ? "text-amber-700 dark:text-amber-400" : "text-primary",
-            )}>
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center w-16 shrink-0 py-3",
+              isCancelled
+                ? "bg-red-100/40"
+                : isLoss
+                  ? "bg-defeat/15"
+                  : past
+                    ? "bg-amber-100/40 dark:bg-amber-900/30"
+                    : "bg-primary/8",
+            )}
+          >
+            <span
+              className={cn(
+                "text-[10px] font-semibold uppercase tracking-wider",
+                isCancelled
+                  ? "text-red-600"
+                  : past
+                    ? "text-amber-700 dark:text-amber-400"
+                    : "text-primary",
+              )}
+            >
               {format(d, "EEE", { locale: dateLocale })}
             </span>
-            <span className={cn("text-2xl font-bold leading-none mt-0.5", past && "text-amber-800 dark:text-amber-300")}>{format(d, "d")}</span>
+            <span
+              className={cn(
+                "text-2xl font-bold leading-none mt-0.5",
+                past && "text-amber-800 dark:text-amber-300",
+              )}
+            >
+              {format(d, "d")}
+            </span>
             <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
           </div>
           <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <Icon className={cn("h-3.5 w-3.5 shrink-0", past ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")} />
-              <span className={cn(
-                "text-[10px] uppercase tracking-wider font-semibold",
-                past ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground",
-              )}>
+              <Icon
+                className={cn(
+                  "h-3.5 w-3.5 shrink-0",
+                  past ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground",
+                )}
+              />
+              <span
+                className={cn(
+                  "text-[10px] uppercase tracking-wider font-semibold",
+                  past ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground",
+                )}
+              >
                 {t(`events.types.${e.type}`)}
               </span>
               {past && (
@@ -277,22 +340,29 @@ function EventsPage() {
                 </span>
               )}
               {e.type === "match" && e.competition_type && (
-                <span className={cn(
-                  "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
-                  e.competition_type === "friendly" && "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
-                  e.competition_type === "championship" && "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
-                  e.competition_type === "cup" && "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
-                )}>
+                <span
+                  className={cn(
+                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
+                    e.competition_type === "friendly" &&
+                      "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
+                    e.competition_type === "championship" &&
+                      "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
+                    e.competition_type === "cup" &&
+                      "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
+                  )}
+                >
                   {t(`events.competitionTypes.${e.competition_type}`)}
                 </span>
               )}
               {e.type === "match" && e.is_home !== null && e.is_home !== undefined && (
-                <span className={cn(
-                  "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
-                  e.is_home
-                    ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
-                    : "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300"
-                )}>
+                <span
+                  className={cn(
+                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
+                    e.is_home
+                      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                      : "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300",
+                  )}
+                >
                   {e.is_home ? <Home className="h-3 w-3" /> : <Plane className="h-3 w-3" />}
                   {e.is_home ? t("events.home") : t("events.away")}
                 </span>
@@ -303,10 +373,17 @@ function EventsPage() {
                 </span>
               )}
             </div>
-            <p className={cn("font-medium truncate leading-tight", isCancelled && "line-through text-muted-foreground")}>
+            <p
+              className={cn(
+                "font-medium truncate leading-tight",
+                isCancelled && "line-through text-muted-foreground",
+              )}
+            >
               {(() => {
-                if (e.type === "match" && e.opponent && e.team_name) return `${e.team_name} vs ${e.opponent}`;
-                if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs ")) return e.title;
+                if (e.type === "match" && e.opponent && e.team_name)
+                  return `${e.team_name} vs ${e.opponent}`;
+                if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs "))
+                  return e.title;
                 return (
                   <>
                     {e.title}
@@ -317,23 +394,27 @@ function EventsPage() {
                 );
               })()}
             </p>
-            {e.type === "match" && e.result && (() => {
-              const ourSide = e.is_home === false ? "away" : "home";
-              const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
-              const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
-              const oc = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
-              return (
-                <p className={cn(
-                  "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
-                  oc === "win" && "bg-present/15 text-present",
-                  oc === "loss" && "bg-defeat/15 text-defeat",
-                  oc === "draw" && "bg-draw/15 text-draw",
-                )}>
-                  <Trophy className="h-3 w-3" />
-                  {t(`match.${oc}`)} {ours} — {theirs}
-                </p>
-              );
-            })()}
+            {e.type === "match" &&
+              e.result &&
+              (() => {
+                const ourSide = e.is_home === false ? "away" : "home";
+                const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
+                const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
+                const oc = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
+                return (
+                  <p
+                    className={cn(
+                      "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
+                      oc === "win" && "bg-present/15 text-present",
+                      oc === "loss" && "bg-defeat/15 text-defeat",
+                      oc === "draw" && "bg-draw/15 text-draw",
+                    )}
+                  >
+                    <Trophy className="h-3 w-3" />
+                    {t(`match.${oc}`)} {ours} — {theirs}
+                  </p>
+                );
+              })()}
           </div>
         </Link>
       </li>
@@ -377,7 +458,9 @@ function EventsPage() {
             onClick={() => setView("list")}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              view === "list"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
             aria-pressed={view === "list"}
           >
@@ -389,7 +472,9 @@ function EventsPage() {
             onClick={() => setView("calendar")}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              view === "calendar" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              view === "calendar"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
             aria-pressed={view === "calendar"}
           >
@@ -434,7 +519,6 @@ function EventsPage() {
         </div>
       </div>
 
-
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
           <Link
@@ -460,10 +544,12 @@ function EventsPage() {
           description={
             isCoach
               ? t("events.emptyHintCoach", {
-                  defaultValue: "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+                  defaultValue:
+                    "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
                 })
               : t("events.emptyHintPlayer", {
-                  defaultValue: "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
+                  defaultValue:
+                    "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
                 })
           }
           action={
@@ -512,7 +598,9 @@ function EventsPage() {
             />
           </div>
           <p className="text-xs text-center text-muted-foreground pt-2">
-            {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
+            {t("events.calendarHint", {
+              defaultValue: "Touche un jour avec une pastille pour voir les événements.",
+            })}
           </p>
 
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-1">

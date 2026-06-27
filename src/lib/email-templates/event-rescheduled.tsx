@@ -25,9 +25,24 @@ const T = {
     preview: (title: string, newDate: string) => `Événement reporté : ${title} — ${newDate}`,
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
     intro: "L'événement",
-    forWhich: (n: string) => <> auquel <strong>{n}</strong> est convoqué·e</>,
-    withTeam: (n: string) => <> avec <strong>{n}</strong></>,
-    hasBeen: <> a été <strong>reporté</strong>.</>,
+    forWhich: (n: string) => (
+      <>
+        {" "}
+        auquel <strong>{n}</strong> est convoqué·e
+      </>
+    ),
+    withTeam: (n: string) => (
+      <>
+        {" "}
+        avec <strong>{n}</strong>
+      </>
+    ),
+    hasBeen: (
+      <>
+        {" "}
+        a été <strong>reporté</strong>.
+      </>
+    ),
     kicker: "REPORTÉ",
     reasonLabel: "Raison du report",
     foot: "Merci de mettre à jour votre réponse à la convocation si nécessaire.",
@@ -39,9 +54,24 @@ const T = {
     preview: (title: string, newDate: string) => `Event rescheduled: ${title} — ${newDate}`,
     hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
     intro: "The event",
-    forWhich: (n: string) => <> that <strong>{n}</strong> is called up to</>,
-    withTeam: (n: string) => <> with <strong>{n}</strong></>,
-    hasBeen: <> has been <strong>rescheduled</strong>.</>,
+    forWhich: (n: string) => (
+      <>
+        {" "}
+        that <strong>{n}</strong> is called up to
+      </>
+    ),
+    withTeam: (n: string) => (
+      <>
+        {" "}
+        with <strong>{n}</strong>
+      </>
+    ),
+    hasBeen: (
+      <>
+        {" "}
+        has been <strong>rescheduled</strong>.
+      </>
+    ),
     kicker: "RESCHEDULED",
     reasonLabel: "Reason",
     foot: "Please update your call-up response if needed.",
@@ -68,36 +98,42 @@ const EventRescheduledEmail = ({
   const previousDateFmt = formatEmailDateTime(previousDate, l);
   const newDateFmt = formatEmailDateTime(newDate, l) ?? newDate;
   return (
-  <EmailShell preview={`${t.preview(eventTitle, newDateFmt)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
-        <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
+    <EmailShell
+      preview={`${t.preview(eventTitle, newDateFmt)}`}
+      locale={l}
+      clubName={clubName}
+      clubLogoUrl={clubLogoUrl}
+    >
+      <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
-        <Text style={text}>
-          {t.intro}
-          {playerName ? t.forWhich(playerName) : null}
-          {teamName ? t.withTeam(teamName) : null}
-          {t.hasBeen}
-        </Text>
+      <Text style={text}>
+        {t.intro}
+        {playerName ? t.forWhich(playerName) : null}
+        {teamName ? t.withTeam(teamName) : null}
+        {t.hasBeen}
+      </Text>
 
-        <Section style={card}>
-          <Text style={cardKicker}>{t.kicker}</Text>
-          <Text style={cardTitle}>{eventTitle}</Text>
-          {previousDateFmt ? (
-            <Text style={cardMetaOld}>📅 <span style={strike}>{previousDateFmt}</span></Text>
-          ) : null}
-          <Text style={cardMetaNew}>✅ {newDateFmt}</Text>
-          {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
-        </Section>
-
-        {reason ? (
-          <Section style={reasonCard}>
-            <Text style={reasonLabel}>{t.reasonLabel}</Text>
-            <Text style={reasonText}>{reason}</Text>
-          </Section>
+      <Section style={card}>
+        <Text style={cardKicker}>{t.kicker}</Text>
+        <Text style={cardTitle}>{eventTitle}</Text>
+        {previousDateFmt ? (
+          <Text style={cardMetaOld}>
+            📅 <span style={strike}>{previousDateFmt}</span>
+          </Text>
         ) : null}
+        <Text style={cardMetaNew}>✅ {newDateFmt}</Text>
+        {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
+      </Section>
 
-        <Text style={smallText}>{t.foot}</Text>
+      {reason ? (
+        <Section style={reasonCard}>
+          <Text style={reasonLabel}>{t.reasonLabel}</Text>
+          <Text style={reasonText}>{reason}</Text>
+        </Section>
+      ) : null}
 
-        </EmailShell>
+      <Text style={smallText}>{t.foot}</Text>
+    </EmailShell>
   );
 };
 
@@ -140,10 +176,20 @@ const cardKicker = {
   fontWeight: "bold" as const,
   margin: "0 0 6px",
 };
-const cardTitle = { fontSize: "17px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 10px" };
+const cardTitle = {
+  fontSize: "17px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 10px",
+};
 const cardMeta = { fontSize: "13px", color: "#475569", margin: "0 0 4px" };
 const cardMetaOld = { fontSize: "13px", color: "#94a3b8", margin: "0 0 4px" };
-const cardMetaNew = { fontSize: "14px", color: "#047857", fontWeight: "bold" as const, margin: "4px 0" };
+const cardMetaNew = {
+  fontSize: "14px",
+  color: "#047857",
+  fontWeight: "bold" as const,
+  margin: "4px 0",
+};
 const strike = { textDecoration: "line-through" as const };
 const reasonCard = {
   backgroundColor: "#fffbeb",
@@ -160,4 +206,10 @@ const reasonLabel = {
   textTransform: "uppercase" as const,
   margin: "0 0 6px",
 };
-const reasonText = { fontSize: "14px", color: "#78350f", lineHeight: "1.5", margin: 0, whiteSpace: "pre-wrap" as const };
+const reasonText = {
+  fontSize: "14px",
+  color: "#78350f",
+  lineHeight: "1.5",
+  margin: 0,
+  whiteSpace: "pre-wrap" as const,
+};

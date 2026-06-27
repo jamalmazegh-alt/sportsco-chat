@@ -18,8 +18,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const url =
-          process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
+        const url = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!url || !key) {
           return Response.json({ error: "Server misconfigured" }, { status: 500 });
@@ -39,7 +38,9 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
-          .select("id, name, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode")
+          .select(
+            "id, name, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode",
+          )
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
         if (tErr) {
@@ -49,18 +50,12 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           return Response.json({ error: "Tournament not found" }, { status: 404 });
         }
         if (!["published", "in_progress"].includes(tournament.status)) {
-          return Response.json(
-            { error: "Tournament not open for registration" },
-            { status: 400 },
-          );
+          return Response.json({ error: "Tournament not open for registration" }, { status: 400 });
         }
 
         const reg = (tournament.settings as any)?.registration ?? {};
         if (!reg.enabled) {
-          return Response.json(
-            { error: "Registration not enabled" },
-            { status: 400 },
-          );
+          return Response.json({ error: "Registration not enabled" }, { status: 400 });
         }
         // Naive datetime strings (from <input type="datetime-local">) have no
         // timezone. The server runs in UTC, so we cannot know the organizer's
@@ -82,16 +77,10 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
         const opensAt = parseBound(reg.opensAt, "open");
         const closesAt = parseBound(reg.closesAt, "close");
         if (opensAt !== null && opensAt > now) {
-          return Response.json(
-            { error: "Registration not yet open" },
-            { status: 400 },
-          );
+          return Response.json({ error: "Registration not yet open" }, { status: 400 });
         }
         if (closesAt !== null && closesAt < now) {
-          return Response.json(
-            { error: "Registration closed" },
-            { status: 400 },
-          );
+          return Response.json({ error: "Registration closed" }, { status: 400 });
         }
 
         // Capacity cap
@@ -114,10 +103,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
               .eq("status", "pending"),
           ]);
           if ((approved ?? 0) + (pending ?? 0) >= capRaw) {
-            return Response.json(
-              { error: "Registrations full" },
-              { status: 400 },
-            );
+            return Response.json({ error: "Registrations full" }, { status: 400 });
           }
         }
 

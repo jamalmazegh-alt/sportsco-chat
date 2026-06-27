@@ -15,8 +15,12 @@ const HAS_AI_KEY = Boolean(process.env.LOVABLE_API_KEY);
 
 test.describe("Assistant chat", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("assistant"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("assistant");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("coach can chat with the AI assistant", async ({ request, baseURL }) => {
     test.skip(!REAL_AI, "E2E_REAL_AI=1 required for live AI call");

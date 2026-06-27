@@ -34,7 +34,9 @@ export function RenderWithMentions({ text, className }: { text: string; classNam
     <span className={cn("whitespace-pre-wrap break-words", className)}>
       {parts.map((p, i) =>
         p.type === "mention" ? (
-          <span key={i} className="text-primary font-medium">@{p.value}</span>
+          <span key={i} className="text-primary font-medium">
+            @{p.value}
+          </span>
         ) : (
           <span key={i}>{p.value}</span>
         ),
@@ -53,7 +55,15 @@ type Props = {
   className?: string;
 };
 
-export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, asInput, className }: Props) {
+export function MentionInput({
+  clubId,
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  asInput,
+  className,
+}: Props) {
   const ref = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
   const [members, setMembers] = useState<MentionUser[]>([]);
   const [open, setOpen] = useState(false);
@@ -65,22 +75,23 @@ export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, a
     let cancelled = false;
     (async () => {
       const { data: cm } = await supabase
-        .from("club_members").select("user_id").eq("club_id", clubId);
+        .from("club_members")
+        .select("user_id")
+        .eq("club_id", clubId);
       const ids = Array.from(new Set((cm ?? []).map((r) => r.user_id)));
       if (!ids.length) return;
-      const { data: profs } = await supabase
-        .from("profiles").select("id, full_name").in("id", ids);
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
       if (!cancelled) setMembers((profs ?? []) as MentionUser[]);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [clubId]);
 
   const matches = useMemo(() => {
     if (!open) return [];
     const q = query.toLowerCase().trim();
-    return members
-      .filter((m) => (m.full_name ?? "").toLowerCase().includes(q))
-      .slice(0, 6);
+    return members.filter((m) => (m.full_name ?? "").toLowerCase().includes(q)).slice(0, 6);
   }, [members, query, open]);
 
   function handleChange(next: string, caret: number) {
@@ -100,7 +111,10 @@ export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, a
   }
 
   function pick(u: MentionUser) {
-    if (anchor == null || !u.full_name) { setOpen(false); return; }
+    if (anchor == null || !u.full_name) {
+      setOpen(false);
+      return;
+    }
     const before = value.slice(0, anchor);
     const after = value.slice(anchor + 1 + query.length);
     const token = `@[${u.full_name}](${u.id}) `;
@@ -113,17 +127,29 @@ export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, a
       if (el) {
         const pos = (before + token).length;
         el.focus();
-        try { (el as HTMLTextAreaElement).setSelectionRange(pos, pos); } catch { /* noop */ }
+        try {
+          (el as HTMLTextAreaElement).setSelectionRange(pos, pos);
+        } catch {
+          /* noop */
+        }
       }
     }, 0);
   }
 
   function onKeyDown(e: React.KeyboardEvent) {
     if (!open || matches.length === 0) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setHover((h) => (h + 1) % matches.length); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setHover((h) => (h - 1 + matches.length) % matches.length); }
-    else if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); pick(matches[hover]); }
-    else if (e.key === "Escape") { setOpen(false); }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHover((h) => (h + 1) % matches.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHover((h) => (h - 1 + matches.length) % matches.length);
+    } else if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      pick(matches[hover]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
   }
 
   const baseCls = cn(
@@ -136,22 +162,30 @@ export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, a
     <div className="relative">
       {asInput ? (
         <input
-          ref={(el) => { ref.current = el; }}
+          ref={(el) => {
+            ref.current = el;
+          }}
           value={value}
           placeholder={placeholder}
           className={baseCls}
           onKeyDown={onKeyDown}
-          onChange={(e) => handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)}
+          onChange={(e) =>
+            handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)
+          }
         />
       ) : (
         <textarea
-          ref={(el) => { ref.current = el; }}
+          ref={(el) => {
+            ref.current = el;
+          }}
           rows={rows}
           value={value}
           placeholder={placeholder}
           className={baseCls}
           onKeyDown={onKeyDown}
-          onChange={(e) => handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)}
+          onChange={(e) =>
+            handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)
+          }
         />
       )}
       {open && matches.length > 0 && (
@@ -160,7 +194,10 @@ export function MentionInput({ clubId, value, onChange, placeholder, rows = 3, a
             <li key={m.id}>
               <button
                 type="button"
-                onMouseDown={(e) => { e.preventDefault(); pick(m); }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  pick(m);
+                }}
                 onMouseEnter={() => setHover(i)}
                 className={cn(
                   "w-full text-left px-3 py-2 hover:bg-accent",

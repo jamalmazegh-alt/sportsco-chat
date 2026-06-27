@@ -4,12 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles, Send, Wand2, Volume2, Square } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { refinePlayerReview } from "@/lib/player-feedback.functions";
@@ -111,13 +106,16 @@ export function ReviewRefineDialog({
       toast.success(t("feedback.refineUpdated", { defaultValue: "Synthèse mise à jour" }));
     } catch (e: any) {
       const msg = e?.message ?? "";
-      const assistantMessage = msg.includes("rate_limited") || msg.includes("429")
-        ? t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." })
-        : msg.includes("credits_exhausted") || msg.includes("402")
-          ? t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." })
-          : msg || t("feedback.refineFailed", {
-              defaultValue: "Je n'ai pas pu appliquer ta demande. La synthèse n'a pas été modifiée.",
-            });
+      const assistantMessage =
+        msg.includes("rate_limited") || msg.includes("429")
+          ? t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." })
+          : msg.includes("credits_exhausted") || msg.includes("402")
+            ? t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." })
+            : msg ||
+              t("feedback.refineFailed", {
+                defaultValue:
+                  "Je n'ai pas pu appliquer ta demande. La synthèse n'a pas été modifiée.",
+              });
       if (msg.includes("429"))
         toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
       else if (msg.includes("402"))
@@ -162,7 +160,9 @@ export function ReviewRefineDialog({
               <ul className="mt-2 space-y-1 text-xs">
                 <li>· « {t("feedback.refineExample1", "Résume en 5 phrases")} »</li>
                 <li>· « {t("feedback.refineExample2", "Insiste davantage sur le mental")} »</li>
-                <li>· « {t("feedback.refineExample3", "Ajoute une recommandation sur le placement")} »</li>
+                <li>
+                  · « {t("feedback.refineExample3", "Ajoute une recommandation sur le placement")} »
+                </li>
               </ul>
             </div>
           )}
@@ -192,17 +192,32 @@ export function ReviewRefineDialog({
                           speak(textToRead);
                           setSpeakingTurn(i);
                           const duration = Math.min(30000, textToRead.length * 80);
-                          setTimeout(() => setSpeakingTurn((cur) => cur === i ? null : cur), duration);
+                          setTimeout(
+                            () => setSpeakingTurn((cur) => (cur === i ? null : cur)),
+                            duration,
+                          );
                         }
                       }}
                       className={cn(
                         "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
-                        speakingTurn === i ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                        speakingTurn === i
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-foreground",
                       )}
-                      aria-label={speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                      aria-label={
+                        speakingTurn === i
+                          ? t("common.stop", "Arrêter")
+                          : t("common.listen", "Écouter")
+                      }
                     >
-                      {speakingTurn === i ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
-                      {speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                      {speakingTurn === i ? (
+                        <Square className="h-3 w-3 fill-current" />
+                      ) : (
+                        <Volume2 className="h-3 w-3" />
+                      )}
+                      {speakingTurn === i
+                        ? t("common.stop", "Arrêter")
+                        : t("common.listen", "Écouter")}
                     </button>
                   )}
                 </div>
@@ -213,7 +228,7 @@ export function ReviewRefineDialog({
                   </p>
                 )}
               </div>
-            )
+            ),
           )}
           {busy && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

@@ -39,19 +39,9 @@ export function formationSlots(formation: FormationKey): FormationSlot[] {
   const gk: FormationSlot = { id: "gk", role: "GK", x: 50, y: GK_Y };
   switch (formation) {
     case "4-4-2":
-      return [
-        gk,
-        ...row("DEF", 4, 70, "d"),
-        ...row("MID", 4, 45, "m"),
-        ...row("FWD", 2, 18, "f"),
-      ];
+      return [gk, ...row("DEF", 4, 70, "d"), ...row("MID", 4, 45, "m"), ...row("FWD", 2, 18, "f")];
     case "4-3-3":
-      return [
-        gk,
-        ...row("DEF", 4, 70, "d"),
-        ...row("MID", 3, 45, "m"),
-        ...row("FWD", 3, 18, "f"),
-      ];
+      return [gk, ...row("DEF", 4, 70, "d"), ...row("MID", 3, 45, "m"), ...row("FWD", 3, 18, "f")];
     case "4-2-3-1":
       return [
         gk,
@@ -61,26 +51,11 @@ export function formationSlots(formation: FormationKey): FormationSlot[] {
         { id: "f1", role: "FWD", x: 50, y: 15 },
       ];
     case "3-5-2":
-      return [
-        gk,
-        ...row("DEF", 3, 70, "d"),
-        ...row("MID", 5, 45, "m"),
-        ...row("FWD", 2, 18, "f"),
-      ];
+      return [gk, ...row("DEF", 3, 70, "d"), ...row("MID", 5, 45, "m"), ...row("FWD", 2, 18, "f")];
     case "3-4-3":
-      return [
-        gk,
-        ...row("DEF", 3, 70, "d"),
-        ...row("MID", 4, 45, "m"),
-        ...row("FWD", 3, 18, "f"),
-      ];
+      return [gk, ...row("DEF", 3, 70, "d"), ...row("MID", 4, 45, "m"), ...row("FWD", 3, 18, "f")];
     case "custom":
       // Free layout: 10 empty outfield slots in a neutral 4-3-3 grid as starting positions
-      return [
-        gk,
-        ...row("DEF", 4, 70, "d"),
-        ...row("MID", 3, 45, "m"),
-        ...row("FWD", 3, 18, "f"),
-      ];
+      return [gk, ...row("DEF", 4, 70, "d"), ...row("MID", 3, 45, "m"), ...row("FWD", 3, 18, "f")];
   }
 }

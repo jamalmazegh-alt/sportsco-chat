@@ -4,10 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateReceiptPdf, signedReceiptUrl } from "@/lib/payment-receipt.server";
 
-async function isAuthorizedForReceipt(
-  receiptId: string,
-  userId: string,
-): Promise<boolean> {
+async function isAuthorizedForReceipt(receiptId: string, userId: string): Promise<boolean> {
   const { data: r } = await supabaseAdmin
     .from("payment_receipts")
     .select("club_id, obligation_id")
@@ -45,9 +42,7 @@ async function isAuthorizedForReceipt(
 
 export const getReceiptDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ receiptId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ receiptId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const ok = await isAuthorizedForReceipt(data.receiptId, context.userId);
     if (!ok) throw new Error("Not authorized to download this receipt");

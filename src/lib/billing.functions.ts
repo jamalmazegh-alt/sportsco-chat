@@ -95,16 +95,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     const { data: existingSub } = await supabaseAdmin
       .from("subscriptions")
-      .select(
-        "stripe_customer_id, stripe_subscription_id, status, trial_end, exempt_from_billing",
-      )
+      .select("stripe_customer_id, stripe_subscription_id, status, trial_end, exempt_from_billing")
       .eq("club_id", data.clubId)
       .maybeSingle();
 
     if (existingSub?.exempt_from_billing === true) {
-      throw new Error(
-        "Ce club bénéficie déjà d'un accès offert — aucun abonnement Stripe requis.",
-      );
+      throw new Error("Ce club bénéficie déjà d'un accès offert — aucun abonnement Stripe requis.");
     }
 
     const existingTrialStillValid =
@@ -127,7 +123,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     // Reuse customer or create new one
     let customerId = existingSub?.stripe_customer_id ?? undefined;
     if (!customerId) {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const customer = await stripe.customers.create({
         email: user?.email ?? undefined,
         name: club.name,
@@ -136,17 +134,15 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       customerId = customer.id;
 
       // Persist customer id immediately (preserve trial_end / status if it exists)
-      await supabaseAdmin
-        .from("subscriptions")
-        .upsert(
-          {
-            club_id: club.id,
-            stripe_customer_id: customerId,
-            status: existingSub?.status ?? "incomplete",
-            trial_end: existingSub?.trial_end ?? null,
-          },
-          { onConflict: "club_id" },
-        );
+      await supabaseAdmin.from("subscriptions").upsert(
+        {
+          club_id: club.id,
+          stripe_customer_id: customerId,
+          status: existingSub?.status ?? "incomplete",
+          trial_end: existingSub?.trial_end ?? null,
+        },
+        { onConflict: "club_id" },
+      );
     }
 
     const existingStripeSubs = await stripe.subscriptions.list({
@@ -283,9 +279,10 @@ export const syncClubSubscriptionFromStripe = createServerFn({ method: "POST" })
       expand: ["data.customer"],
     });
     const fresh = subscriptions.data
-      .filter((sub) =>
-        ["active", "trialing", "past_due", "incomplete"].includes(sub.status) ||
-        sub.metadata?.club_id === data.clubId,
+      .filter(
+        (sub) =>
+          ["active", "trialing", "past_due", "incomplete"].includes(sub.status) ||
+          sub.metadata?.club_id === data.clubId,
       )
       .sort((a, b) => b.created - a.created)[0];
 
@@ -514,7 +511,11 @@ export const listClubInvoices = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { customerId, subscriptionId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    const { customerId, subscriptionId } = await getAdminClubStripeIds(
+      data.clubId,
+      userId,
+      supabase,
+    );
     const stripe = getStripe();
     const invoices = await stripe.invoices.list(
       subscriptionId

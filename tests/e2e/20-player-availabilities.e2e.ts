@@ -30,7 +30,9 @@ test.describe("Player availabilities", () => {
         .from("player_availabilities")
         .delete()
         .in("player_id", [club.player1.id, club.player2WithParent.id]);
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     await club.cleanup();
   });
 
@@ -38,8 +40,7 @@ test.describe("Player availabilities", () => {
   test("parent can create an absence for their child", async () => {
     const future = new Date(Date.now() + 14 * 24 * 3600 * 1000);
     const start = future.toISOString().split("T")[0];
-    const end = new Date(Date.now() + 21 * 24 * 3600 * 1000)
-      .toISOString().split("T")[0];
+    const end = new Date(Date.now() + 21 * 24 * 3600 * 1000).toISOString().split("T")[0];
 
     const c = await clientFor(club.player2WithParent.parent);
     const { data, error } = await c
@@ -69,7 +70,7 @@ test.describe("Player availabilities", () => {
       .eq("player_id", club.player2WithParent.id)
       .eq("status", "active");
     expect(error).toBeNull();
-    expect((data?.length ?? 0)).toBeGreaterThan(0);
+    expect(data?.length ?? 0).toBeGreaterThan(0);
   });
 
   // ── 3. Admin peut lire ──────────────────────────────────────
@@ -80,15 +81,14 @@ test.describe("Player availabilities", () => {
       .eq("player_id", club.player2WithParent.id)
       .eq("status", "active");
     expect(error).toBeNull();
-    expect((data?.length ?? 0)).toBeGreaterThan(0);
+    expect(data?.length ?? 0).toBeGreaterThan(0);
   });
 
   // ── 4. end_date < start_date rejeté ────────────────────────
   test("end_date before start_date is rejected", async () => {
     const c = await clientFor(club.player2WithParent.parent);
     const today = new Date().toISOString().split("T")[0];
-    const yesterday = new Date(Date.now() - 86400000)
-      .toISOString().split("T")[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
     const { error } = await c.from("player_availabilities").insert({
       player_id: club.player2WithParent.id,
       created_by_user_id: club.player2WithParent.parent.userId,

@@ -17,14 +17,10 @@ export const Route = createFileRoute("/api/push/subscribe")({
         if (!token) return new Response("Unauthorized", { status: 401 });
 
         const { createClient } = await import("@supabase/supabase-js");
-        const sb = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_PUBLISHABLE_KEY!,
-          {
-            global: { headers: { Authorization: `Bearer ${token}` } },
-            auth: { persistSession: false, autoRefreshToken: false },
-          },
-        );
+        const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+          global: { headers: { Authorization: `Bearer ${token}` } },
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
         const { data: userData, error: userErr } = await sb.auth.getUser(token);
         if (userErr || !userData?.user) return new Response("Unauthorized", { status: 401 });
         const userId = userData.user.id;
@@ -37,19 +33,17 @@ export const Route = createFileRoute("/api/push/subscribe")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error } = await supabaseAdmin
-          .from("push_subscriptions")
-          .upsert(
-            {
-              user_id: userId,
-              endpoint: parsed.endpoint,
-              p256dh: parsed.p256dh,
-              auth: parsed.auth,
-              user_agent: parsed.user_agent ?? null,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "endpoint" },
-          );
+        const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
+          {
+            user_id: userId,
+            endpoint: parsed.endpoint,
+            p256dh: parsed.p256dh,
+            auth: parsed.auth,
+            user_agent: parsed.user_agent ?? null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "endpoint" },
+        );
         if (error) {
           console.error("[push/subscribe] upsert failed", error);
           return new Response("Server error", { status: 500 });

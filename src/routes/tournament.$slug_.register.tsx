@@ -60,11 +60,7 @@ function RegisterPage() {
           <Trophy className="h-10 w-10 mx-auto text-muted-foreground" />
           <p className="text-lg font-medium">{t("register.unavailableTitle")}</p>
           <p className="text-sm text-muted-foreground">{t("register.unavailableBody")}</p>
-          <Link
-            to="/tournament/$slug"
-            params={{ slug }}
-            className="text-sm text-primary underline"
-          >
+          <Link to="/tournament/$slug" params={{ slug }} className="text-sm text-primary underline">
             {t("register.backTournament")}
           </Link>
         </div>
@@ -123,9 +119,7 @@ function RegisterPage() {
         window.location.href = data.checkout_url;
         return;
       }
-      toast.success(
-        data.requires_approval ? t("register.pending") : t("register.confirmed"),
-      );
+      toast.success(data.requires_approval ? t("register.pending") : t("register.confirmed"));
       // If we got a roster URL and the team is auto-approved, send them to the roster page directly
       if (data.roster_url && !data.requires_approval) {
         const path = new URL(data.roster_url).pathname;
@@ -232,4 +226,3 @@ function RegisterPage() {
     </div>
   );
 }
-

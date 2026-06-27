@@ -38,7 +38,7 @@ export function useTextToSpeech() {
       utteranceRef.current = utterance;
       window.speechSynthesis.speak(utterance);
     },
-    [i18n.language]
+    [i18n.language],
   );
 
   return { speak, stop, isSpeaking };

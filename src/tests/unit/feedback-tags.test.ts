@@ -2,9 +2,16 @@ import { describe, it, expect } from "vitest";
 import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
 
 const COMMON_TAGS = [
-  "effort", "mentality", "leadership", "teamwork",
-  "discipline", "communication", "attitude", "focus",
-  "physical", "technical",
+  "effort",
+  "mentality",
+  "leadership",
+  "teamwork",
+  "discipline",
+  "communication",
+  "attitude",
+  "focus",
+  "physical",
+  "technical",
 ];
 
 describe("getFeedbackTagsForSport — sports connus", () => {
@@ -150,7 +157,15 @@ describe("getFeedbackTagsForSport — cas limites", () => {
   });
 
   it("aucun doublon dans les tags retournés", () => {
-    const sports = ["football", "basketball", "handball", "volleyball", "rugby", "hockey", "futsal"];
+    const sports = [
+      "football",
+      "basketball",
+      "handball",
+      "volleyball",
+      "rugby",
+      "hockey",
+      "futsal",
+    ];
     for (const sport of sports) {
       const tags = getFeedbackTagsForSport(sport);
       const unique = new Set(tags);

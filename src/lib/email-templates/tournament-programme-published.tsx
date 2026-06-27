@@ -64,48 +64,46 @@ const TournamentProgrammePublishedEmail = ({
 
   return (
     <EmailShell preview={`${copy.preview(tournament)}`} locale={"fr"}>
-          <Section style={header}>
-            <Img
-              src="https://www.clubero.app/clubero-logo.png"
-              alt="Clubero"
-              width="56"
-              height="56"
-              style={logo}
-            />
-            <Text style={brand}>Clubero · Tournois</Text>
-          </Section>
-          <Heading style={h1}>{copy.hello(team)}</Heading>
-          <Text style={text}>{copy.body(tournament, date)}</Text>
+      <Section style={header}>
+        <Img
+          src="https://www.clubero.app/clubero-logo.png"
+          alt="Clubero"
+          width="56"
+          height="56"
+          style={logo}
+        />
+        <Text style={brand}>Clubero · Tournois</Text>
+      </Section>
+      <Heading style={h1}>{copy.hello(team)}</Heading>
+      <Text style={text}>{copy.body(tournament, date)}</Text>
 
-          {hasFirstMatch && (
-            <Section style={matchBox}>
-              <Text style={matchTitle}>{copy.firstMatchTitle}</Text>
-              <Text style={matchLine}>
-                {copy.iconDate(firstMatchDate as string, firstMatchTime as string)}
-              </Text>
-              {firstMatchField && (
-                <Text style={matchLine}>{copy.iconField(firstMatchField)}</Text>
-              )}
-              {firstMatchOpponent && (
-                <Text style={matchLine}>{copy.iconOpponent(firstMatchOpponent)}</Text>
-              )}
-            </Section>
-          )}
-
-          <Section style={{ textAlign: "center" as const, margin: "24px 0" }}>
-            <Button style={button} href={programmeUrl}>
-              {copy.cta}
-            </Button>
-          </Section>
-
-          <Text style={small}>
-            {lang === "fr"
-              ? "Ou copiez ce lien dans votre navigateur :"
-              : "Or copy this link into your browser:"}
-            <br />
-            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{programmeUrl}</span>
+      {hasFirstMatch && (
+        <Section style={matchBox}>
+          <Text style={matchTitle}>{copy.firstMatchTitle}</Text>
+          <Text style={matchLine}>
+            {copy.iconDate(firstMatchDate as string, firstMatchTime as string)}
           </Text>
-          </EmailShell>
+          {firstMatchField && <Text style={matchLine}>{copy.iconField(firstMatchField)}</Text>}
+          {firstMatchOpponent && (
+            <Text style={matchLine}>{copy.iconOpponent(firstMatchOpponent)}</Text>
+          )}
+        </Section>
+      )}
+
+      <Section style={{ textAlign: "center" as const, margin: "24px 0" }}>
+        <Button style={button} href={programmeUrl}>
+          {copy.cta}
+        </Button>
+      </Section>
+
+      <Text style={small}>
+        {lang === "fr"
+          ? "Ou copiez ce lien dans votre navigateur :"
+          : "Or copy this link into your browser:"}
+        <br />
+        <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{programmeUrl}</span>
+      </Text>
+    </EmailShell>
   );
 };
 
@@ -132,7 +130,13 @@ export const template = {
 
 const header = { textAlign: "center" as const, margin: "0 0 20px" };
 const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
-const brand = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
+const brand = {
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "8px 0 0",
+  textAlign: "center" as const,
+};
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 12px" };
 const matchBox = {
@@ -142,7 +146,14 @@ const matchBox = {
   margin: "16px 0",
   backgroundColor: "#f8fafc",
 };
-const matchTitle = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 8px", textTransform: "uppercase" as const, letterSpacing: "0.04em" };
+const matchTitle = {
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 8px",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.04em",
+};
 const matchLine = { fontSize: "15px", color: "#0f172a", margin: "4px 0", lineHeight: "1.5" };
 const button = {
   backgroundColor: "#10b981",

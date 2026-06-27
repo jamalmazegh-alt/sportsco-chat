@@ -37,8 +37,7 @@ const AI_ASSISTANT_BY_LANG = {
       customTeamsPlaceholder: "Andere Anzahl…",
       customDurationPlaceholder: "Andere Dauer (Min.)…",
       durationMin: "{{min}} Min.",
-      eliminatedYes:
-        "Ja — Platzierungsspiele / mehrere Tabellen (jedes Team behält Spiele)",
+      eliminatedYes: "Ja — Platzierungsspiele / mehrere Tabellen (jedes Team behält Spiele)",
       eliminatedNo: "Nein — ausgeschiedene Gruppenteams hören auf",
       eliminatedYesShort: "Platzierung / Flights",
       eliminatedNoShort: "Stopp nach Gruppenphase",
@@ -138,8 +137,7 @@ const AI_ASSISTANT_BY_LANG = {
       customTeamsPlaceholder: "Otro número…",
       customDurationPlaceholder: "Otra duración (min)…",
       durationMin: "{{min}} min",
-      eliminatedYes:
-        "Sí — partidos de clasificación / varios cuadros (cada equipo sigue jugando)",
+      eliminatedYes: "Sí — partidos de clasificación / varios cuadros (cada equipo sigue jugando)",
       eliminatedNo: "No — los eliminados de grupo se detienen",
       eliminatedYesShort: "Clasificación / flights",
       eliminatedNoShort: "Parada tras grupos",
@@ -239,8 +237,7 @@ const AI_ASSISTANT_BY_LANG = {
       customTeamsPlaceholder: "Altro numero…",
       customDurationPlaceholder: "Altra durata (min)…",
       durationMin: "{{min}} min",
-      eliminatedYes:
-        "Sì — partite di classifica / più tabelloni (ogni squadra continua a giocare)",
+      eliminatedYes: "Sì — partite di classifica / più tabelloni (ogni squadra continua a giocare)",
       eliminatedNo: "No — le eliminate dei gironi si fermano",
       eliminatedYesShort: "Classifica / flights",
       eliminatedNoShort: "Stop dopo i gironi",
@@ -340,8 +337,7 @@ const AI_ASSISTANT_BY_LANG = {
       customTeamsPlaceholder: "Ander aantal…",
       customDurationPlaceholder: "Andere duur (min)…",
       durationMin: "{{min}} min",
-      eliminatedYes:
-        "Ja — klasseringswedstrijden / meerdere tabellen (elk team blijft spelen)",
+      eliminatedYes: "Ja — klasseringswedstrijden / meerdere tabellen (elk team blijft spelen)",
       eliminatedNo: "Nee — uitgeschakelde pouleteams stoppen",
       eliminatedYesShort: "Klassering / flights",
       eliminatedNoShort: "Stop na poules",
@@ -441,8 +437,7 @@ const AI_ASSISTANT_BY_LANG = {
       customTeamsPlaceholder: "Outro número…",
       customDurationPlaceholder: "Outra duração (min)…",
       durationMin: "{{min}} min",
-      eliminatedYes:
-        "Sim — jogos de classificação / vários quadros (cada equipa mantém jogos)",
+      eliminatedYes: "Sim — jogos de classificação / vários quadros (cada equipa mantém jogos)",
       eliminatedNo: "Não — as eliminadas dos grupos param",
       eliminatedYesShort: "Classificação / flights",
       eliminatedNoShort: "Paragem após grupos",

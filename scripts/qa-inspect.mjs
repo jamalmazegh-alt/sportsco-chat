@@ -28,10 +28,7 @@ if (url.includes("woawmhuntajpiezmmgzm")) {
 }
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
-const { data: clubs } = await sb
-  .from("clubs")
-  .select("id,name,is_personal")
-  .order("name");
+const { data: clubs } = await sb.from("clubs").select("id,name,is_personal").order("name");
 console.log("\n=== CLUBS ===");
 for (const c of clubs ?? []) {
   console.log(`${c.id}  personal=${c.is_personal}  ${c.name}`);
@@ -43,7 +40,9 @@ const { data: members } = await sb
   .in("role", ["admin", "dirigeant"]);
 console.log("\n=== MEMBERS admin/dirigeant ===");
 for (const m of members ?? []) {
-  console.log(`club=${m.club_id} user=${m.user_id} role=${m.role} roles=${JSON.stringify(m.roles)}`);
+  console.log(
+    `club=${m.club_id} user=${m.user_id} role=${m.role} roles=${JSON.stringify(m.roles)}`,
+  );
 }
 
 const { data: authUsers } = await sb.auth.admin.listUsers({ page: 1, perPage: 50 });

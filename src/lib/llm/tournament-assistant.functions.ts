@@ -10,12 +10,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  callLLM,
-  cacheGet,
-  cacheSet,
-  checkLlmRateLimit,
-} from "./core.server";
+import { callLLM, cacheGet, cacheSet, checkLlmRateLimit } from "./core.server";
 
 const RecoSchema = z.object({
   pools: z.number().int().min(1).max(16),
@@ -136,9 +131,7 @@ export const answerTournamentQuestion = createServerFn({ method: "POST" })
     const sysFr = `Tu es un assistant d'organisation de tournoi sportif. Tu réponds UNIQUEMENT aux questions concernant : organisation du tournoi, choix du format, durée, nombre de terrains, gestion des équipes, conseils pratiques. Si la question sort de ce cadre, réponds poliment que tu ne peux pas aider. N'invente JAMAIS de fonctionnalités. Maximum 4 phrases. Réponse JSON STRICT : {"answer": "..."}.`;
     const sysEn = `You are a sports-tournament organisation assistant. Only answer questions about: tournament organisation, format choice, duration, number of courts, team management, practical advice. If the question is off-topic, politely decline. Never invent product features. 4 sentences max. STRICT JSON: {"answer": "..."}.`;
 
-    const historyText = data.history
-      .map((h) => `${h.role.toUpperCase()}: ${h.content}`)
-      .join("\n");
+    const historyText = data.history.map((h) => `${h.role.toUpperCase()}: ${h.content}`).join("\n");
     const prompt = `Contexte de la recommandation:\n${JSON.stringify({
       format: data.reco.format,
       pools: data.reco.pools,

@@ -19,20 +19,14 @@ const LABELS: Record<Status, string> = {
 
 import { useTranslation } from "react-i18next";
 
-export function AttendancePill({
-  status,
-  className,
-}: {
-  status: Status;
-  className?: string;
-}) {
+export function AttendancePill({ status, className }: { status: Status; className?: string }) {
   const { t } = useTranslation();
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
         STYLES[status],
-        className
+        className,
       )}
     >
       {t(LABELS[status])}

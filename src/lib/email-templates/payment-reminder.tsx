@@ -34,7 +34,10 @@ const PaymentReminderEmail = (p: Props) => {
         : `Le paiement pour « ${p.itemTitle} » est dû dans ${Math.abs(p.offsetDays)} jour${Math.abs(p.offsetDays) > 1 ? "s" : ""}.`;
 
   return (
-    <EmailShell preview={`${isInitial ? "Nouveau paiement" : "Rappel"} — ${p.itemTitle}`} locale="fr">
+    <EmailShell
+      preview={`${isInitial ? "Nouveau paiement" : "Rappel"} — ${p.itemTitle}`}
+      locale="fr"
+    >
       <Heading style={h1}>{title}</Heading>
       <Text style={leadStyle}>{lead}</Text>
       <Section style={card}>
@@ -51,8 +54,7 @@ const PaymentReminderEmail = (p: Props) => {
         </Button>
       </Section>
       <Text style={muted}>
-        Vous pouvez aussi retrouver tous vos paiements à tout moment depuis votre
-        espace Clubero.
+        Vous pouvez aussi retrouver tous vos paiements à tout moment depuis votre espace Clubero.
       </Text>
     </EmailShell>
   );
@@ -88,9 +90,22 @@ export const template = {
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 12px" };
 const leadStyle = { fontSize: "14px", color: "#334155", margin: "0 0 18px", lineHeight: "1.55" };
-const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 18px" };
+const card = {
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: "10px",
+  padding: "14px 18px",
+};
 const row = { fontSize: "13px", color: "#0f172a", margin: "4px 0", lineHeight: "1.6" };
 const key = { color: "#64748b", marginRight: "6px" };
 const val = { fontWeight: "bold" as const };
-const btn = { background: "#0f172a", color: "#ffffff", padding: "12px 22px", borderRadius: "8px", textDecoration: "none", fontWeight: 600, fontSize: "14px" };
+const btn = {
+  background: "#0f172a",
+  color: "#ffffff",
+  padding: "12px 22px",
+  borderRadius: "8px",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "14px",
+};
 const muted = { fontSize: "12px", color: "#64748b", margin: "10px 0 0", lineHeight: "1.5" };

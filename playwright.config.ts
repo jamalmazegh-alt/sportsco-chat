@@ -31,18 +31,16 @@ if (!BASE_URL) {
 
 const HAS_E2E_CONFIG = Boolean(
   (process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL) &&
-    (process.env.SUPABASE_PUBLISHABLE_KEY ??
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-      process.env.SUPABASE_ANON_KEY) &&
-    process.env.E2E_ADMIN_EMAIL &&
-    process.env.E2E_ADMIN_PASSWORD,
+  (process.env.SUPABASE_PUBLISHABLE_KEY ??
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.SUPABASE_ANON_KEY) &&
+  process.env.E2E_ADMIN_EMAIL &&
+  process.env.E2E_ADMIN_PASSWORD,
 );
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  testMatch: HAS_E2E_CONFIG
-    ? /.*\.e2e\.ts$/
-    : /00-missing-supabase-config\.e2e\.ts$/,
+  testMatch: HAS_E2E_CONFIG ? /.*\.e2e\.ts$/ : /00-missing-supabase-config\.e2e\.ts$/,
   globalSetup: HAS_E2E_CONFIG
     ? path.join(__dirname, "tests/e2e/_fixtures/global-setup.ts")
     : undefined,

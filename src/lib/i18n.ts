@@ -54,13 +54,48 @@ function detectBrowserLang(): SupportedLang {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      en: { common: enCommon, marketing: enMarketing, support: enSupport, tournaments: enTournaments },
-      fr: { common: frCommon, marketing: frMarketing, support: frSupport, tournaments: frTournaments },
-      de: { common: deCommon, marketing: deMarketing, support: deSupport, tournaments: deTournaments },
-      es: { common: esCommon, marketing: esMarketing, support: esSupport, tournaments: esTournaments },
-      pt: { common: ptCommon, marketing: ptMarketing, support: ptSupport, tournaments: ptTournaments },
-      it: { common: itCommon, marketing: itMarketing, support: itSupport, tournaments: itTournaments },
-      nl: { common: nlCommon, marketing: nlMarketing, support: nlSupport, tournaments: nlTournaments },
+      en: {
+        common: enCommon,
+        marketing: enMarketing,
+        support: enSupport,
+        tournaments: enTournaments,
+      },
+      fr: {
+        common: frCommon,
+        marketing: frMarketing,
+        support: frSupport,
+        tournaments: frTournaments,
+      },
+      de: {
+        common: deCommon,
+        marketing: deMarketing,
+        support: deSupport,
+        tournaments: deTournaments,
+      },
+      es: {
+        common: esCommon,
+        marketing: esMarketing,
+        support: esSupport,
+        tournaments: esTournaments,
+      },
+      pt: {
+        common: ptCommon,
+        marketing: ptMarketing,
+        support: ptSupport,
+        tournaments: ptTournaments,
+      },
+      it: {
+        common: itCommon,
+        marketing: itMarketing,
+        support: itSupport,
+        tournaments: itTournaments,
+      },
+      nl: {
+        common: nlCommon,
+        marketing: nlMarketing,
+        support: nlSupport,
+        tournaments: nlTournaments,
+      },
     },
     lng: "en",
     fallbackLng: "en",

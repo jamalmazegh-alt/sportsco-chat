@@ -25,7 +25,10 @@ const Email = ({ email, features, role, marketing_consent, source }: Props) => (
 );
 
 const Row = ({ k, v }: { k: string; v: string }) => (
-  <Text style={row}><strong style={key}>{k} : </strong>{v}</Text>
+  <Text style={row}>
+    <strong style={key}>{k} : </strong>
+    {v}
+  </Text>
 );
 
 export const template = {
@@ -33,10 +36,22 @@ export const template = {
   subject: (data: Record<string, any>) => `Waitlist V2 — ${data.email ?? "nouvelle inscription"}`,
   displayName: "Notification interne waitlist V2",
   to: "hello@clubero.app",
-  previewData: { email: "demo@example.com", features: ["player_network", "payments"], role: "coach", marketing_consent: true, source: "landing" },
+  previewData: {
+    email: "demo@example.com",
+    features: ["player_network", "payments"],
+    role: "coach",
+    marketing_consent: true,
+    source: "landing",
+  },
 } satisfies TemplateEntry;
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
-const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 16px", margin: "12px 0" };
+const card = {
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: "10px",
+  padding: "14px 16px",
+  margin: "12px 0",
+};
 const row = { fontSize: "14px", color: "#334155", lineHeight: "1.55", margin: "0 0 6px" };
 const key = { color: "#0f172a" };

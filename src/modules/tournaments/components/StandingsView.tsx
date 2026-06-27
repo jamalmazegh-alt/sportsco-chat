@@ -96,9 +96,7 @@ export function StandingsView({ tournamentId }: Props) {
                       key={r.teamId}
                       className={cn(
                         "border-t border-border transition-colors",
-                        qualified
-                          ? "bg-emerald-50/60 dark:bg-emerald-950/15"
-                          : "hover:bg-muted/30",
+                        qualified ? "bg-emerald-50/60 dark:bg-emerald-950/15" : "hover:bg-muted/30",
                       )}
                     >
                       <td className="px-3 py-2.5">
@@ -128,9 +126,7 @@ export function StandingsView({ tournamentId }: Props) {
                         <span
                           className={cn(
                             "inline-flex items-center justify-center min-w-[28px] h-6 rounded-md font-extrabold tabular-nums text-[13px]",
-                            qualified
-                              ? "bg-emerald-600 text-white"
-                              : "bg-muted text-foreground",
+                            qualified ? "bg-emerald-600 text-white" : "bg-muted text-foreground",
                           )}
                         >
                           {r.points}

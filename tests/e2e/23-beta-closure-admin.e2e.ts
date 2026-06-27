@@ -37,10 +37,7 @@ test.describe("Beta closure — admin/public smoke", () => {
     for (const path of MASKED_ROUTES) {
       const res = await page.goto(BASE + path, { waitUntil: "domcontentloaded" });
       const status = res?.status() ?? 0;
-      expect(
-        status,
-        `expected redirect/200 for ${path}, got ${status}`,
-      ).toBeLessThan(400);
+      expect(status, `expected redirect/200 for ${path}, got ${status}`).toBeLessThan(400);
     }
   });
 
@@ -71,8 +68,7 @@ test.describe("Beta closure — admin/public smoke", () => {
     // Asserts the public route doesn't reject a correctly-signed call (no 401/403).
     // 503 is also accepted: it means the secret isn't configured in this env,
     // which is an env-level skip rather than a regression of the gate itself.
-    const cronSecret =
-      process.env.PAYMENT_REMINDERS_SECRET ?? process.env.DATA_RETENTION_SECRET;
+    const cronSecret = process.env.PAYMENT_REMINDERS_SECRET ?? process.env.DATA_RETENTION_SECRET;
     test.skip(
       !cronSecret,
       "PAYMENT_REMINDERS_SECRET/DATA_RETENTION_SECRET non configuré — gate non testable.",
@@ -92,12 +88,8 @@ test.describe("Beta closure — admin/public smoke", () => {
     // If/when the key is promoted to CI, tighten to `processed === 0 && sent === 0`
     // with a comment explaining why zero is the invariant on staging
     // (no reminders due, no seeded data).
-    const cronSecret =
-      process.env.PAYMENT_REMINDERS_SECRET ?? process.env.DATA_RETENTION_SECRET;
-    test.skip(
-      !cronSecret,
-      "PAYMENT_REMINDERS_SECRET/DATA_RETENTION_SECRET non configuré.",
-    );
+    const cronSecret = process.env.PAYMENT_REMINDERS_SECRET ?? process.env.DATA_RETENTION_SECRET;
+    test.skip(!cronSecret, "PAYMENT_REMINDERS_SECRET/DATA_RETENTION_SECRET non configuré.");
     test.skip(
       !process.env.SUPABASE_SERVICE_ROLE_KEY,
       "SUPABASE_SERVICE_ROLE_KEY absent — handler ne peut pas s'exécuter (volontaire en CI).",
@@ -111,13 +103,9 @@ test.describe("Beta closure — admin/public smoke", () => {
     expect(typeof body.sent).toBe("number");
   });
 
-
   test("waitlist POST returns 200, no feature flip", async ({ request }) => {
     const email = `smoke+${Date.now()}@clubero.test`;
-    const before = await admin
-      .from("app_flags")
-      .select("key,enabled")
-      .order("key");
+    const before = await admin.from("app_flags").select("key,enabled").order("key");
     const res = await request.post(BASE + "/api/public/waitlist", {
       data: {
         email,
@@ -129,10 +117,7 @@ test.describe("Beta closure — admin/public smoke", () => {
     // waitlist_interest is service-role-only (no read grant available in CI),
     // so we verify the public POST contract rather than reading the row back.
     expect(res.status()).toBe(200);
-    const after = await admin
-      .from("app_flags")
-      .select("key,enabled")
-      .order("key");
+    const after = await admin.from("app_flags").select("key,enabled").order("key");
     expect(after.data).toEqual(before.data);
   });
 

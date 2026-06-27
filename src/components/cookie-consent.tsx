@@ -84,9 +84,7 @@ export function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div
-      className="fixed inset-x-0 z-[100] p-4 md:p-6 bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0"
-    >
+    <div className="fixed inset-x-0 z-[100] p-4 md:p-6 bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0">
       <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-elevated p-5 md:p-6">
         <div className="flex items-start gap-4">
           <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -108,7 +106,7 @@ export function CookieConsentBanner() {
             <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
               {t(
                 "cookie.description",
-                "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser les contenus. Vous pouvez choisir ce que vous acceptez."
+                "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser les contenus. Vous pouvez choisir ce que vous acceptez.",
               )}
             </p>
 
@@ -134,7 +132,7 @@ export function CookieConsentBanner() {
                   title={t("cookie.necessary.title", "Nécessaires")}
                   description={t(
                     "cookie.necessary.description",
-                    "Indispensables au fonctionnement du site (connexion, sécurité, préférences)."
+                    "Indispensables au fonctionnement du site (connexion, sécurité, préférences).",
                   )}
                   checked={prefs.necessary}
                   disabled
@@ -143,34 +141,25 @@ export function CookieConsentBanner() {
                   title={t("cookie.analytics.title", "Analytiques")}
                   description={t(
                     "cookie.analytics.description",
-                    "Nous aident à comprendre comment vous utilisez le site pour l'améliorer."
+                    "Nous aident à comprendre comment vous utilisez le site pour l'améliorer.",
                   )}
                   checked={prefs.analytics}
-                  onToggle={() =>
-                    setPrefs((p) => ({ ...p, analytics: !p.analytics }))
-                  }
+                  onToggle={() => setPrefs((p) => ({ ...p, analytics: !p.analytics }))}
                 />
                 <ConsentItem
                   title={t("cookie.marketing.title", "Marketing")}
                   description={t(
                     "cookie.marketing.description",
-                    "Utilisés pour vous proposer des contenus et offres personnalisées."
+                    "Utilisés pour vous proposer des contenus et offres personnalisées.",
                   )}
                   checked={prefs.marketing}
-                  onToggle={() =>
-                    setPrefs((p) => ({ ...p, marketing: !p.marketing }))
-                  }
+                  onToggle={() => setPrefs((p) => ({ ...p, marketing: !p.marketing }))}
                 />
               </div>
             )}
 
             <div className="mt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={rejectAll}
-                className="sm:ml-auto"
-              >
+              <Button variant="outline" size="sm" onClick={rejectAll} className="sm:ml-auto">
                 {t("cookie.reject", "Refuser tout")}
               </Button>
               <Button variant="outline" size="sm" onClick={acceptAll}>
@@ -206,9 +195,7 @@ function ConsentItem({
 }) {
   return (
     <div className="flex items-start gap-3">
-      {icon && (
-        <div className="mt-0.5 shrink-0 text-muted-foreground">{icon}</div>
-      )}
+      {icon && <div className="mt-0.5 shrink-0 text-muted-foreground">{icon}</div>}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-medium text-foreground">{title}</span>

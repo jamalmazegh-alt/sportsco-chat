@@ -152,9 +152,7 @@ export function WizardOptionCard({
         <div className="min-w-0 flex-1">
           <div className="font-medium text-sm leading-tight">{title}</div>
           {description && (
-            <div className="text-xs text-muted-foreground mt-0.5 leading-snug">
-              {description}
-            </div>
+            <div className="text-xs text-muted-foreground mt-0.5 leading-snug">{description}</div>
           )}
         </div>
         <div
@@ -176,7 +174,13 @@ export function WizardOptionCard({
  * Animated step container — fades content on step change.
  * Wrap each step body and key by step id/index.
  */
-export function WizardStepBody({ children, className }: { children: ReactNode; className?: string }) {
+export function WizardStepBody({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div className={cn("animate-[fade-in_0.25s_ease-out] space-y-4", className)}>{children}</div>
   );

@@ -86,9 +86,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }:
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : players.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">
-            {t("roster.empty")}
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-6">{t("roster.empty")}</p>
         ) : (
           <ul className="space-y-1.5">
             {players.map((p) => (
@@ -102,14 +100,10 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }:
                 <div className="flex-1 min-w-0">
                   <p className="text-sm truncate flex items-center gap-1">
                     {p.last_name.toUpperCase()} {p.first_name}
-                    {p.is_captain && (
-                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                    )}
+                    {p.is_captain && <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />}
                   </p>
                   {p.position && (
-                    <p className="text-[11px] text-muted-foreground truncate">
-                      {p.position}
-                    </p>
+                    <p className="text-[11px] text-muted-foreground truncate">{p.position}</p>
                   )}
                 </div>
                 <Button
@@ -186,9 +180,7 @@ function PlayerFormDialog({
   const { t } = useTranslation("tournaments");
   const [firstName, setFirstName] = useState(player?.first_name ?? "");
   const [lastName, setLastName] = useState(player?.last_name ?? "");
-  const [jersey, setJersey] = useState(
-    player?.jersey_number ? String(player.jersey_number) : "",
-  );
+  const [jersey, setJersey] = useState(player?.jersey_number ? String(player.jersey_number) : "");
   const [position, setPosition] = useState(player?.position ?? "");
   const [captain, setCaptain] = useState(player?.is_captain ?? false);
   const [license, setLicense] = useState(player?.license_number ?? "");
@@ -249,9 +241,7 @@ function PlayerFormDialog({
               <button
                 type="button"
                 onClick={() =>
-                  setLastName((v) =>
-                    v.trim() ? `${v.trim().charAt(0).toUpperCase()}.` : v,
-                  )
+                  setLastName((v) => (v.trim() ? `${v.trim().charAt(0).toUpperCase()}.` : v))
                 }
                 className="text-[11px] text-primary hover:underline"
               >
@@ -290,25 +280,14 @@ function PlayerFormDialog({
         </div>
         <div className="space-y-1.5">
           <Label>{t("roster.form.license")}</Label>
-          <Input
-            value={license}
-            onChange={(e) => setLicense(e.target.value)}
-            maxLength={60}
-          />
+          <Input value={license} onChange={(e) => setLicense(e.target.value)} maxLength={60} />
         </div>
         <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={captain}
-            onCheckedChange={(v) => setCaptain(!!v)}
-          />
+          <Checkbox checked={captain} onCheckedChange={(v) => setCaptain(!!v)} />
           {t("roster.form.captain")}
         </label>
         <Button type="submit" className="w-full" disabled={save.isPending}>
-          {save.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("roster.form.save")
-          )}
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("roster.form.save")}
         </Button>
       </form>
     </ResponsiveFormDialog>
@@ -317,7 +296,10 @@ function PlayerFormDialog({
 
 // Parse CSV: first_name, last_name[, jersey, position, captain, license]
 function parseRoster(text: string) {
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
   const rows: any[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -408,11 +390,7 @@ function BulkRosterDialog({
       <form onSubmit={onSubmit} className="space-y-3 mt-3 pb-6">
         <div className="space-y-1.5">
           <Label>{t("roster.bulk.fileLabel")}</Label>
-          <Input
-            type="file"
-            accept=".csv,text/csv,text/plain"
-            onChange={onFile}
-          />
+          <Input type="file" accept=".csv,text/csv,text/plain" onChange={onFile} />
           <p
             className="text-[11px] text-muted-foreground"
             dangerouslySetInnerHTML={{ __html: t("roster.bulk.hint") }}
@@ -429,18 +407,11 @@ function BulkRosterDialog({
           />
         </div>
         <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={replace}
-            onCheckedChange={(v) => setReplace(!!v)}
-          />
+          <Checkbox checked={replace} onCheckedChange={(v) => setReplace(!!v)} />
           {t("roster.bulk.replace")}
         </label>
         <Button type="submit" className="w-full" disabled={mut.isPending}>
-          {mut.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("roster.bulk.submit")
-          )}
+          {mut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("roster.bulk.submit")}
         </Button>
       </form>
     </ResponsiveFormDialog>

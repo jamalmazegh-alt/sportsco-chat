@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { loadStripe, type Stripe as StripeJs } from "@stripe/stripe-js";
-import {
-  Elements,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Dialog,
@@ -27,13 +22,7 @@ function getStripePromise(pk: string) {
   return stripePromiseCache.get(pk)!;
 }
 
-function SetupForm({
-  onSuccess,
-  onCancel,
-}: {
-  onSuccess: () => void;
-  onCancel: () => void;
-}) {
+function SetupForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -69,12 +58,7 @@ function SetupForm({
       <PaymentElement options={{ layout: "tabs" }} />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2 justify-end">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onCancel}
-          disabled={submitting}
-        >
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>
           Annuler
         </Button>
         <Button type="submit" disabled={!stripe || !elements || submitting}>

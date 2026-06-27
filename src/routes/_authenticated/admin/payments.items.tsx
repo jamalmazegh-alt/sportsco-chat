@@ -121,9 +121,7 @@ function PaymentItemsPage() {
   const deleteFn = useServerFn(deletePaymentItem);
   const updateFn = useServerFn(updatePaymentItem);
   const qc = useQueryClient();
-  const [collectFor, setCollectFor] = useState<
-    { id: string; title: string } | null
-  >(null);
+  const [collectFor, setCollectFor] = useState<{ id: string; title: string } | null>(null);
 
   const seasonsQ = useQuery({
     queryKey: ["seasons", activeClubId],
@@ -146,8 +144,7 @@ function PaymentItemsPage() {
   });
 
   const remove = useMutation({
-    mutationFn: (itemId: string) =>
-      deleteFn({ data: { clubId: activeClubId, itemId } }),
+    mutationFn: (itemId: string) => deleteFn({ data: { clubId: activeClubId, itemId } }),
     onSuccess: () => {
       toast.success(t("fundraising.deleted"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
@@ -184,9 +181,7 @@ function PaymentItemsPage() {
             <Receipt className="h-6 w-6 text-primary" />
             {t("fundraising.title")}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("fundraising.subtitle")}
-          </p>
+          <p className="text-sm text-muted-foreground">{t("fundraising.subtitle")}</p>
         </div>
         <div className="flex items-end gap-2">
           {seasonsQ.data && seasonsQ.data.seasons.length > 0 && (
@@ -194,9 +189,7 @@ function PaymentItemsPage() {
               <Label className="text-xs">Saison</Label>
               <Select
                 value={currentSeason?.id ?? ""}
-                onValueChange={(v) =>
-                  nav({ search: { season: v }, replace: true })
-                }
+                onValueChange={(v) => nav({ search: { season: v }, replace: true })}
               >
                 <SelectTrigger className="w-44">
                   <SelectValue placeholder="Saison" />
@@ -216,9 +209,7 @@ function PaymentItemsPage() {
             <CreateItemDialog
               clubId={activeClubId}
               seasonId={currentSeason.id}
-              onCreated={() =>
-                qc.invalidateQueries({ queryKey: ["payment-items"] })
-              }
+              onCreated={() => qc.invalidateQueries({ queryKey: ["payment-items"] })}
             />
           )}
         </div>
@@ -227,14 +218,9 @@ function PaymentItemsPage() {
       {seasonsQ.data && seasonsQ.data.seasons.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
           <p className="text-sm font-medium">{t("fundraising.noSeason")}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("fundraising.noSeasonHint")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{t("fundraising.noSeasonHint")}</p>
           <Button asChild size="sm" className="mt-3">
-            <Link
-              to="/admin/settings/payments"
-              search={{ tab: "seasons" }}
-            >
+            <Link to="/admin/settings/payments" search={{ tab: "seasons" }}>
               {t("fundraising.configureSeasons")}
             </Link>
           </Button>
@@ -277,9 +263,7 @@ function PaymentItemsPage() {
                 )}
               </div>
               {it.description && (
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                  {it.description}
-                </p>
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{it.description}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
                 {PROVIDER_LABELS[it.provider] ?? it.provider}
@@ -288,8 +272,7 @@ function PaymentItemsPage() {
             </div>
             <div className="text-right">
               <p className="text-base font-bold">
-                {(it.amount_cents / 100).toFixed(2)}{" "}
-                {(it.currency || "eur").toUpperCase()}
+                {(it.amount_cents / 100).toFixed(2)} {(it.currency || "eur").toUpperCase()}
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -317,9 +300,7 @@ function PaymentItemsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    toggleStatus.mutate({ id: it.id, status: "closed" })
-                  }
+                  onClick={() => toggleStatus.mutate({ id: it.id, status: "closed" })}
                   disabled={toggleStatus.isPending}
                 >
                   <XCircle className="h-3.5 w-3.5" /> Fermer
@@ -328,9 +309,7 @@ function PaymentItemsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    toggleStatus.mutate({ id: it.id, status: "open" })
-                  }
+                  onClick={() => toggleStatus.mutate({ id: it.id, status: "open" })}
                   disabled={toggleStatus.isPending}
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" /> Rouvrir
@@ -390,9 +369,7 @@ function CreateItemDialog({
     "stripe" | "helloasso" | "cash" | "cheque" | "bank_transfer" | "manual"
   >("stripe");
   const [allowPartial, setAllowPartial] = useState(false);
-  const [targetKind, setTargetKind] = useState<"club" | "team" | "player">(
-    "team",
-  );
+  const [targetKind, setTargetKind] = useState<"club" | "team" | "player">("team");
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
 
@@ -491,10 +468,14 @@ function CreateItemDialog({
             <div className="space-y-1.5">
               <Label className="text-xs">Type</Label>
               <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(TYPE_LABELS).map(([v, l]) => (
-                    <SelectItem key={v} value={v}>{l}</SelectItem>
+                    <SelectItem key={v} value={v}>
+                      {l}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -502,10 +483,14 @@ function CreateItemDialog({
             <div className="space-y-1.5">
               <Label className="text-xs">Mode de paiement par défaut</Label>
               <Select value={provider} onValueChange={(v) => setProvider(v as typeof provider)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(PROVIDER_LABELS).map(([v, l]) => (
-                    <SelectItem key={v} value={v}>{l}</SelectItem>
+                    <SelectItem key={v} value={v}>
+                      {l}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -544,19 +529,13 @@ function CreateItemDialog({
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Échéance (optionnel)</Label>
-              <Input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
+              <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
             <div className="space-y-1.5 flex flex-col">
               <Label className="text-xs">Paiement partiel</Label>
               <div className="flex items-center gap-2 h-9">
                 <Switch checked={allowPartial} onCheckedChange={setAllowPartial} />
-                <span className="text-xs text-muted-foreground">
-                  Autorisé
-                </span>
+                <span className="text-xs text-muted-foreground">Autorisé</span>
               </div>
             </div>
           </div>
@@ -587,9 +566,7 @@ function CreateItemDialog({
             {targetKind === "team" && (
               <div className="rounded-md border border-border max-h-48 overflow-y-auto divide-y divide-border">
                 {teamsQ.data?.length === 0 && (
-                  <p className="text-xs text-muted-foreground p-3">
-                    Aucune équipe.
-                  </p>
+                  <p className="text-xs text-muted-foreground p-3">Aucune équipe.</p>
                 )}
                 {teamsQ.data?.map((tm) => (
                   <CheckboxRow
@@ -597,9 +574,7 @@ function CreateItemDialog({
                     label={tm.name}
                     checked={selectedTeams.includes(tm.id)}
                     onChange={(c) =>
-                      setSelectedTeams((s) =>
-                        c ? [...s, tm.id] : s.filter((x) => x !== tm.id),
-                      )
+                      setSelectedTeams((s) => (c ? [...s, tm.id] : s.filter((x) => x !== tm.id)))
                     }
                   />
                 ))}
@@ -609,9 +584,7 @@ function CreateItemDialog({
             {targetKind === "player" && (
               <div className="rounded-md border border-border max-h-48 overflow-y-auto divide-y divide-border">
                 {playersQ.data?.length === 0 && (
-                  <p className="text-xs text-muted-foreground p-3">
-                    Aucun joueur.
-                  </p>
+                  <p className="text-xs text-muted-foreground p-3">Aucun joueur.</p>
                 )}
                 {playersQ.data?.map((p) => (
                   <CheckboxRow
@@ -619,9 +592,7 @@ function CreateItemDialog({
                     label={`${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "—"}
                     checked={selectedPlayers.includes(p.id)}
                     onChange={(c) =>
-                      setSelectedPlayers((s) =>
-                        c ? [...s, p.id] : s.filter((x) => x !== p.id),
-                      )
+                      setSelectedPlayers((s) => (c ? [...s, p.id] : s.filter((x) => x !== p.id)))
                     }
                   />
                 ))}
@@ -640,15 +611,8 @@ function CreateItemDialog({
           <Button variant="outline" onClick={() => setOpen(false)}>
             Annuler
           </Button>
-          <Button
-            onClick={() => create.mutate()}
-            disabled={!canSubmit || create.isPending}
-          >
-            {create.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Créer et assigner"
-            )}
+          <Button onClick={() => create.mutate()} disabled={!canSubmit || create.isPending}>
+            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Créer et assigner"}
           </Button>
         </DialogFooter>
       </DialogContent>

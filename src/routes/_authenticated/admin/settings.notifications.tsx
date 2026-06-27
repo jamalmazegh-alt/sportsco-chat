@@ -14,7 +14,11 @@ export const Route = createFileRoute("/_authenticated/admin/settings/notificatio
   component: NotificationsSettingsPage,
   head: () => ({
     meta: [
-      { title: i18nInstance.t("meta.adminNotifications.title", { defaultValue: "Notifications — Clubero" }) },
+      {
+        title: i18nInstance.t("meta.adminNotifications.title", {
+          defaultValue: "Notifications — Clubero",
+        }),
+      },
       {
         name: "description",
         content: i18nInstance.t("meta.adminNotifications.description", {
@@ -96,24 +100,22 @@ function NotificationsSettingsPage() {
     const next = { ...form, [key]: value };
     setForm(next);
     savingRef.current = true;
-    const { error } = await supabase
-      .from("club_notification_settings")
-      .upsert(
-        {
-          club_id: next.club_id,
-          convocation_on_create: next.convocation_on_create,
-          convocation_reminder: next.convocation_reminder,
-          convocation_coach_each_response: next.convocation_coach_each_response,
-          convocation_coach_complete: next.convocation_coach_complete,
-          event_reschedule: next.event_reschedule,
-          event_cancel: next.event_cancel,
-          score_result: next.score_result,
-          wall_new_post: next.wall_new_post,
-          tournament_match_reminder: next.tournament_match_reminder,
-          tournament_draw: next.tournament_draw,
-        },
-        { onConflict: "club_id" },
-      );
+    const { error } = await supabase.from("club_notification_settings").upsert(
+      {
+        club_id: next.club_id,
+        convocation_on_create: next.convocation_on_create,
+        convocation_reminder: next.convocation_reminder,
+        convocation_coach_each_response: next.convocation_coach_each_response,
+        convocation_coach_complete: next.convocation_coach_complete,
+        event_reschedule: next.event_reschedule,
+        event_cancel: next.event_cancel,
+        score_result: next.score_result,
+        wall_new_post: next.wall_new_post,
+        tournament_match_reminder: next.tournament_match_reminder,
+        tournament_draw: next.tournament_draw,
+      },
+      { onConflict: "club_id" },
+    );
     savingRef.current = false;
     if (error) {
       // revert
@@ -140,8 +142,8 @@ function NotificationsSettingsPage() {
           <div className="min-w-0">
             <h1 className="text-xl font-semibold leading-tight">Notifications push</h1>
             <p className="text-sm text-white/85 mt-1">
-              Choisissez les notifications envoyées sur l'application mobile.
-              Les emails ne sont pas affectés.
+              Choisissez les notifications envoyées sur l'application mobile. Les emails ne sont pas
+              affectés.
             </p>
           </div>
         </div>

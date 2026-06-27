@@ -18,7 +18,7 @@ const UpsertSchema = z.object({
   captain_player_id: z.string().uuid().nullable().optional(),
   gk_player_id: z.string().uuid().nullable().optional(),
   visibility: z.enum(["draft", "staff", "selected_players", "team"]),
-  
+
   publish: z.boolean().optional(),
 });
 
@@ -84,15 +84,13 @@ export const upsertLineup = createServerFn({ method: "POST" })
       captain_player_id: data.captain_player_id ?? null,
       gk_player_id: data.gk_player_id ?? null,
       visibility: data.visibility,
-      
+
       published_at: data.publish ? new Date().toISOString() : undefined,
       created_by: userId,
     };
 
     // Strip undefined so upsert keeps existing published_at when not publishing
-    const clean = Object.fromEntries(
-      Object.entries(payload).filter(([, v]) => v !== undefined),
-    );
+    const clean = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined));
 
     const { data: row, error } = await supabase
       .from("event_lineups")

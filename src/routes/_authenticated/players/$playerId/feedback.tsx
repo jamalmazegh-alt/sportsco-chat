@@ -10,7 +10,12 @@ export const Route = createFileRoute("/_authenticated/players/$playerId/feedback
   component: PlayerFeedbackPage,
 });
 
-async function canViewPlayerFeedback(userId: string, playerId: string, isAdmin: boolean, isCoach: boolean) {
+async function canViewPlayerFeedback(
+  userId: string,
+  playerId: string,
+  isAdmin: boolean,
+  isCoach: boolean,
+) {
   if (!isAdmin && !isCoach) return false;
   if (isAdmin) {
     const { data: adminOk } = await supabase.rpc("is_player_club_admin", {

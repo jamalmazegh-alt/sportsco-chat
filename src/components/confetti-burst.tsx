@@ -10,7 +10,11 @@ export function ConfettiBurst({ trigger }: { trigger: number }) {
 
   useEffect(() => {
     if (trigger <= 0) return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     setSeed(trigger);
     const t = setTimeout(() => setSeed(0), 900);
     return () => clearTimeout(t);
@@ -43,10 +47,7 @@ export function ConfettiBurst({ trigger }: { trigger: number }) {
           return (
             <span
               key={i}
-              className={cn(
-                "absolute h-2 w-2 rounded-sm",
-                colors[i % colors.length],
-              )}
+              className={cn("absolute h-2 w-2 rounded-sm", colors[i % colors.length])}
               style={{
                 left: 0,
                 top: 0,

@@ -104,13 +104,7 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
       const txs = txByObl.get(o.id) ?? [];
       const paid = txs
         .filter((t) => t.status === "succeeded")
-        .reduce(
-          (sum, t) =>
-            sum +
-            (t.amount_gross_cents ?? 0) -
-            (t.refunded_amount_cents ?? 0),
-          0,
-        );
+        .reduce((sum, t) => sum + (t.amount_gross_cents ?? 0) - (t.refunded_amount_cents ?? 0), 0);
       return {
         ...o,
         amount_paid_cents: paid,
@@ -136,8 +130,7 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
       const isSelfPayer = !o.player_id && o.payer_user_id === userId;
       const key = o.player_id ?? "self";
       const label = o.players
-        ? `${o.players.first_name ?? ""} ${o.players.last_name ?? ""}`.trim() ||
-          "Joueur"
+        ? `${o.players.first_name ?? ""} ${o.players.last_name ?? ""}`.trim() || "Joueur"
         : isSelfPayer
           ? "Moi"
           : "Sans joueur";
@@ -155,8 +148,7 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
       if (o.status !== "cancelled" && o.status !== "exempted") {
         g.totals.due_cents += o.amount_due_cents ?? 0;
         g.totals.paid_cents += o.amount_paid_cents;
-        g.totals.remaining_cents +=
-          (o.amount_due_cents ?? 0) - o.amount_paid_cents;
+        g.totals.remaining_cents += (o.amount_due_cents ?? 0) - o.amount_paid_cents;
       }
     }
 

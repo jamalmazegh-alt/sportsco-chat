@@ -10,7 +10,18 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus, X as XIcon, Move } from "lucide-react";
+import {
+  Save,
+  Send,
+  Eye,
+  EyeOff,
+  Loader2,
+  Star,
+  Hand,
+  UserPlus,
+  X as XIcon,
+  Move,
+} from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -80,7 +91,9 @@ function LineupPage() {
     queryFn: async () => {
       const { data: event } = await supabase
         .from("events")
-        .select("id, team_id, type, title, convocations_sent, starts_at, teams:team_id(name, sport)")
+        .select(
+          "id, team_id, type, title, convocations_sent, starts_at, teams:team_id(name, sport)",
+        )
         .eq("id", eventId)
         .maybeSingle();
       if (!event) return null;
@@ -105,7 +118,9 @@ function LineupPage() {
       const teamId = ctx!.event.team_id as string;
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, deleted_at)")
+        .select(
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, deleted_at)",
+        )
         .eq("team_id", teamId);
       const players = (tm ?? [])
         .map((r: any) => r.players)
@@ -135,12 +150,16 @@ function LineupPage() {
         .eq("team_id", ctx!.event.team_id as string)
         .eq("status", "active");
       if (error) throw error;
-      return (data ?? []).filter((s: any) => (s.matches_to_serve ?? 0) - (s.matches_served ?? 0) > 0);
+      return (data ?? []).filter(
+        (s: any) => (s.matches_to_serve ?? 0) - (s.matches_served ?? 0) > 0,
+      );
     },
   });
   const suspensionMap = useMemo(() => {
     const m = new Map<string, number>();
-    (suspensions ?? []).forEach((s: any) => m.set(s.player_id, s.matches_to_serve - s.matches_served));
+    (suspensions ?? []).forEach((s: any) =>
+      m.set(s.player_id, s.matches_to_serve - s.matches_served),
+    );
     return m;
   }, [suspensions]);
 
@@ -176,15 +195,16 @@ function LineupPage() {
     return m;
   }, [absences]);
 
-
   // Local state
   const [formation, setFormation] = useState<FormationKey>("4-4-2");
   const [slots, setSlots] = useState<LineupSlot[]>(() => makeEmptySlots("4-4-2"));
   const [bench, setBench] = useState<string[]>([]);
   const [captain, setCaptain] = useState<string | null>(null);
   const [gk, setGk] = useState<string | null>(null);
-  const [visibility, setVisibility] = useState<"draft" | "staff" | "selected_players" | "team">("draft");
-  
+  const [visibility, setVisibility] = useState<"draft" | "staff" | "selected_players" | "team">(
+    "draft",
+  );
+
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
@@ -210,7 +230,6 @@ function LineupPage() {
     setCaptain(l.captain_player_id ?? null);
     setGk(l.gk_player_id ?? null);
     setVisibility((l.visibility as any) ?? "draft");
-    
   }, [lineupData?.lineup]);
 
   const placedIds = useMemo(() => {
@@ -235,7 +254,6 @@ function LineupPage() {
       search: { send: 1, preselect: ids.join(",") } as any,
     });
   }
-
 
   const available = useMemo(
     () => (roster ?? []).filter((p) => !placedIds.has(p.id)),
@@ -277,7 +295,10 @@ function LineupPage() {
     if (gk === playerId) setGk(null);
   }
 
-  function placePlayer(playerId: string, target: { kind: "slot"; slotId: string } | { kind: "bench" } | { kind: "available" }) {
+  function placePlayer(
+    playerId: string,
+    target: { kind: "slot"; slotId: string } | { kind: "bench" } | { kind: "available" },
+  ) {
     setDirty(true);
 
     // Compute next slots + displaced player synchronously from current state,
@@ -368,12 +389,16 @@ function LineupPage() {
           captain_player_id: captain,
           gk_player_id: gk,
           visibility: publish && visibility === "draft" ? "team" : visibility,
-          
+
           publish,
         },
       });
       setDirty(false);
-      toast.success(publish ? t("lineup.published", "Composition publiée") : t("lineup.saved", "Brouillon enregistré"));
+      toast.success(
+        publish
+          ? t("lineup.published", "Composition publiée")
+          : t("lineup.saved", "Brouillon enregistré"),
+      );
       qc.invalidateQueries({ queryKey: ["lineup", eventId] });
     } catch (e: any) {
       toast.error(e?.message ?? "Erreur");
@@ -409,7 +434,10 @@ function LineupPage() {
         <BackLink to="/events/$eventId" params={{ eventId } as never} />
 
         <p className="text-sm text-muted-foreground">
-          {t("lineup.unavailable", "La composition est disponible uniquement pour les matchs de football.")}
+          {t(
+            "lineup.unavailable",
+            "La composition est disponible uniquement pour les matchs de football.",
+          )}
         </p>
       </div>
     );
@@ -447,15 +475,19 @@ function LineupPage() {
         <div
           className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
           dangerouslySetInnerHTML={{
-            __html: t("lineup.tapHint", "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien."),
+            __html: t(
+              "lineup.tapHint",
+              "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.",
+            ),
           }}
         />
-
 
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-muted-foreground">{t("lineup.formation", "Formation")}</Label>
+            <Label className="text-xs text-muted-foreground">
+              {t("lineup.formation", "Formation")}
+            </Label>
             <Select value={formation} onValueChange={(v) => changeFormation(v as FormationKey)}>
               <SelectTrigger className="h-9 w-[110px]">
                 <SelectValue />
@@ -470,15 +502,25 @@ function LineupPage() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-muted-foreground">{t("lineup.visibility", "Visibilité")}</Label>
-            <Select value={visibility} onValueChange={(v) => { setVisibility(v as any); setDirty(true); }}>
+            <Label className="text-xs text-muted-foreground">
+              {t("lineup.visibility", "Visibilité")}
+            </Label>
+            <Select
+              value={visibility}
+              onValueChange={(v) => {
+                setVisibility(v as any);
+                setDirty(true);
+              }}
+            >
               <SelectTrigger className="h-9 w-[180px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="draft">{t("lineup.vis.draft", "Brouillon privé")}</SelectItem>
                 <SelectItem value="staff">{t("lineup.vis.staff", "Staff uniquement")}</SelectItem>
-                <SelectItem value="selected_players">{t("lineup.vis.selected", "Joueurs convoqués")}</SelectItem>
+                <SelectItem value="selected_players">
+                  {t("lineup.vis.selected", "Joueurs convoqués")}
+                </SelectItem>
                 <SelectItem value="team">{t("lineup.vis.team", "Toute l'équipe")}</SelectItem>
               </SelectContent>
             </Select>
@@ -494,8 +536,15 @@ function LineupPage() {
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {placedCount > 0
-                  ? t("lineup.convocFromLineup.desc", "{{count}} joueur(s) placés seront pré-sélectionnés.", { count: placedCount })
-                  : t("lineup.convocFromLineup.empty", "Placez des joueurs sur le terrain ou le banc d'abord.")}
+                  ? t(
+                      "lineup.convocFromLineup.desc",
+                      "{{count}} joueur(s) placés seront pré-sélectionnés.",
+                      { count: placedCount },
+                    )
+                  : t(
+                      "lineup.convocFromLineup.empty",
+                      "Placez des joueurs sur le terrain ou le banc d'abord.",
+                    )}
               </p>
             </div>
             <Button
@@ -557,7 +606,9 @@ function LineupPage() {
           {/* Available roster */}
           <div className="space-y-3">
             <div>
-              <h2 className="text-sm font-semibold mb-2">{t("lineup.available", "Joueurs disponibles")}</h2>
+              <h2 className="text-sm font-semibold mb-2">
+                {t("lineup.available", "Joueurs disponibles")}
+              </h2>
               <DroppableAvailable
                 highlight={!!selectedPid && placedIds.has(selectedPid)}
                 onClick={
@@ -567,7 +618,9 @@ function LineupPage() {
                 }
               >
                 {available.length === 0 && (
-                  <p className="text-xs text-muted-foreground">{t("lineup.allPlaced", "Tous les joueurs sont placés.")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("lineup.allPlaced", "Tous les joueurs sont placés.")}
+                  </p>
                 )}
                 {available.map((p) => {
                   const remaining = suspensionMap.get(p.id);
@@ -583,7 +636,10 @@ function LineupPage() {
                       />
                       {remaining && remaining > 0 ? (
                         <p
-                          title={t("suspensions.warningTooltip", { defaultValue: "{{count}} match(s) restant(s) à purger", count: remaining })}
+                          title={t("suspensions.warningTooltip", {
+                            defaultValue: "{{count}} match(s) restant(s) à purger",
+                            count: remaining,
+                          })}
                           className="text-[9px] text-center font-semibold text-amber-700 dark:text-amber-300 mt-0.5"
                         >
                           ⚠ {t("suspensions.suspendedShort", "Suspendu")} · {remaining}
@@ -593,12 +649,13 @@ function LineupPage() {
                           <UnavailableBadge reason={absReason as UnavailableReason} />
                         </div>
                       ) : !p.convocated ? (
-                        <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
+                        <p className="text-[9px] text-center text-muted-foreground mt-0.5">
+                          {t("lineup.notCalled", "Non convoqué")}
+                        </p>
                       ) : null}
                     </div>
                   );
                 })}
-
               </DroppableAvailable>
             </div>
           </div>
@@ -606,13 +663,17 @@ function LineupPage() {
 
         {/* Bench */}
         <div>
-          <h2 className="text-sm font-semibold mb-2">{t("lineup.bench", "Remplaçants")} ({bench.length})</h2>
+          <h2 className="text-sm font-semibold mb-2">
+            {t("lineup.bench", "Remplaçants")} ({bench.length})
+          </h2>
           <DroppableBench
             highlight={!!selectedPid}
             onClick={selectedPid ? () => placePlayer(selectedPid, { kind: "bench" }) : undefined}
           >
             {bench.length === 0 && (
-              <p className="text-xs text-muted-foreground">{t("lineup.benchEmpty", "Touche un joueur puis le banc, ou glisse-le ici.")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("lineup.benchEmpty", "Touche un joueur puis le banc, ou glisse-le ici.")}
+              </p>
             )}
             {bench.map((id) => {
               const p = playerById.get(id);
@@ -634,14 +695,20 @@ function LineupPage() {
         {/* Sticky action bar */}
         <div className="sticky bottom-4 md:bottom-6 flex flex-wrap gap-2 justify-end bg-background/90 backdrop-blur rounded-xl border p-3 shadow-md">
           {dirty && (
-            <span className="text-xs text-amber-700 self-center mr-auto">{t("lineup.unsaved", "Modifications non enregistrées")}</span>
+            <span className="text-xs text-amber-700 self-center mr-auto">
+              {t("lineup.unsaved", "Modifications non enregistrées")}
+            </span>
           )}
           {published && (
             <Button variant="ghost" onClick={handleUnpublish}>
               <EyeOff className="h-4 w-4" /> {t("lineup.unpublish", "Retirer")}
             </Button>
           )}
-          <Button variant="outline" onClick={() => handleSave(false)} disabled={saving || lineupLoading}>
+          <Button
+            variant="outline"
+            onClick={() => handleSave(false)}
+            disabled={saving || lineupLoading}
+          >
             <Save className="h-4 w-4" /> {t("lineup.saveDraft", "Enregistrer")}
           </Button>
           <Button onClick={() => handleSave(true)} disabled={saving || lineupLoading}>
@@ -658,7 +725,10 @@ function LineupPage() {
               {playerById.get(selectedPid)?.first_name} {playerById.get(selectedPid)?.last_name}
             </span>
             <span className="opacity-90 hidden xs:inline">— touche une case</span>
-            <button onClick={() => setSelectedPid(null)} className="ml-1 rounded-full hover:bg-white/20 p-0.5">
+            <button
+              onClick={() => setSelectedPid(null)}
+              className="ml-1 rounded-full hover:bg-white/20 p-0.5"
+            >
               <XIcon className="h-4 w-4" />
             </button>
           </div>
@@ -666,31 +736,60 @@ function LineupPage() {
 
         {/* Action sheet for a placed/bench player */}
         {actionPid && playerById.get(actionPid) && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center" onClick={() => setActionPid(null)}>
-            <div onClick={(e) => e.stopPropagation()} className="w-full sm:max-w-sm bg-background rounded-t-2xl sm:rounded-2xl p-4 space-y-2 shadow-2xl">
+          <div
+            className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center"
+            onClick={() => setActionPid(null)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full sm:max-w-sm bg-background rounded-t-2xl sm:rounded-2xl p-4 space-y-2 shadow-2xl"
+            >
               <div className="flex items-center justify-between">
                 <p className="font-semibold text-sm">
                   {playerById.get(actionPid)!.first_name} {playerById.get(actionPid)!.last_name}
                 </p>
-                <button onClick={() => setActionPid(null)} className="text-muted-foreground"><XIcon className="h-4 w-4" /></button>
+                <button onClick={() => setActionPid(null)} className="text-muted-foreground">
+                  <XIcon className="h-4 w-4" />
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
-                <Button variant="outline" onClick={() => { setSelectedPid(actionPid); setActionPid(null); }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedPid(actionPid);
+                    setActionPid(null);
+                  }}
+                >
                   <Move className="h-4 w-4" /> {t("lineup.move", "Déplacer")}
                 </Button>
                 <Button
                   variant={captain === actionPid ? "default" : "outline"}
-                  onClick={() => { setCaptain(captain === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                  onClick={() => {
+                    setCaptain(captain === actionPid ? null : actionPid);
+                    setDirty(true);
+                    setActionPid(null);
+                  }}
                 >
                   <Star className="h-4 w-4" /> {t("lineup.captain", "Capitaine")}
                 </Button>
                 <Button
                   variant={gk === actionPid ? "default" : "outline"}
-                  onClick={() => { setGk(gk === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                  onClick={() => {
+                    setGk(gk === actionPid ? null : actionPid);
+                    setDirty(true);
+                    setActionPid(null);
+                  }}
                 >
                   <Hand className="h-4 w-4" /> {t("lineup.gk", "Gardien")}
                 </Button>
-                <Button variant="destructive" onClick={() => { removePlayer(actionPid); setDirty(true); setActionPid(null); }}>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    removePlayer(actionPid);
+                    setDirty(true);
+                    setActionPid(null);
+                  }}
+                >
                   <XIcon className="h-4 w-4" /> {t("lineup.remove", "Retirer")}
                 </Button>
               </div>

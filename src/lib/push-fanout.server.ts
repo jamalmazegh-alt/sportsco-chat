@@ -85,10 +85,10 @@ export async function fanoutConvocationResponse(
   await Promise.all(
     Array.from(targets).map(async (uid) => {
       const result = await sendPushToUser(uid, {
-      title,
-      body,
-      url: `/events/${ev.id}`,
-      tag: `response-${ev.id}-${uid}`,
+        title,
+        body,
+        url: `/events/${ev.id}`,
+        tag: `response-${ev.id}-${uid}`,
       });
       if (result.sent > 0) dispatched++;
     }),
@@ -132,11 +132,11 @@ export async function fanoutConvocationComplete(
   const settings = await getClubNotifSettings(clubId);
   if (!settings.convocation_coach_complete) return { dispatched: 0, complete: true };
 
-
   const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
   const dateStr = (ev as any).starts_at ? fmtDate((ev as any).starts_at) : "";
 
-  const body = `${present} présent${present > 1 ? "s" : ""} · ${absent} absent${absent > 1 ? "s" : ""} · ${uncertain} incertain${uncertain > 1 ? "s" : ""} — ${typeLabel} ${dateStr}`.trim();
+  const body =
+    `${present} présent${present > 1 ? "s" : ""} · ${absent} absent${absent > 1 ? "s" : ""} · ${uncertain} incertain${uncertain > 1 ? "s" : ""} — ${typeLabel} ${dateStr}`.trim();
 
   const { data: coaches } = await supabaseAdmin
     .from("team_members")
@@ -153,10 +153,10 @@ export async function fanoutConvocationComplete(
   await Promise.all(
     Array.from(targets).map(async (uid) => {
       const result = await sendPushToUser(uid, {
-      title: "🎯 Toute l'équipe a répondu",
-      body,
-      url: `/events/${eventId}`,
-      tag: `complete-${eventId}`,
+        title: "🎯 Toute l'équipe a répondu",
+        body,
+        url: `/events/${eventId}`,
+        tag: `complete-${eventId}`,
       });
       if (result.sent > 0) dispatched++;
     }),
@@ -167,9 +167,7 @@ export async function fanoutConvocationComplete(
 /* ------------------------------------------------------------------ */
 /* Helper — resolve target users for a tournament team                 */
 /* ------------------------------------------------------------------ */
-async function resolveTournamentTeamUserIds(
-  tournamentTeamIds: string[],
-): Promise<Set<string>> {
+async function resolveTournamentTeamUserIds(tournamentTeamIds: string[]): Promise<Set<string>> {
   const targets = new Set<string>();
   if (tournamentTeamIds.length === 0) return targets;
 
@@ -216,7 +214,9 @@ async function resolveTournamentTeamUserIds(
 /* ------------------------------------------------------------------ */
 /* #9 — Tournament match starting in ~30 min                           */
 /* ------------------------------------------------------------------ */
-export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ dispatched: number }> {
+export async function fanoutTournamentMatchReminder(
+  matchId: string,
+): Promise<{ dispatched: number }> {
   const { data: m } = await supabaseAdmin
     .from("tournament_matches")
     .select(
@@ -231,7 +231,6 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
   const settings = await getClubNotifSettings(clubId);
   if (!settings.tournament_match_reminder) return { dispatched: 0 };
 
-
   const teamA = (m as any).team_a_id as string | null;
   const teamB = (m as any).team_b_id as string | null;
   if (!teamA || !teamB) return { dispatched: 0 };
@@ -245,13 +244,17 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
 
   const slug = ((m as any).tournaments?.slug as string) || ((m as any).tournament_id as string);
   const time = (m as any).scheduled_at
-    ? new Date((m as any).scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+    ? new Date((m as any).scheduled_at).toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : "";
   const field = ((m as any).field as string) || "—";
 
   let dispatched = 0;
   for (const tid of [teamA, teamB]) {
-    const opp = tid === teamA ? nameById.get(teamB) ?? "Adversaire" : nameById.get(teamA) ?? "Adversaire";
+    const opp =
+      tid === teamA ? (nameById.get(teamB) ?? "Adversaire") : (nameById.get(teamA) ?? "Adversaire");
     const targets = await resolveTournamentTeamUserIds([tid]);
     for (const uid of targets) {
       sendPushToUserFireAndForget(uid, {
@@ -281,7 +284,6 @@ export async function fanoutTournamentDraw(tournamentId: string): Promise<{ disp
   const clubId = ((t as any).club_id as string | null) ?? null;
   const settings = await getClubNotifSettings(clubId);
   if (!settings.tournament_draw) return { dispatched: 0 };
-
 
   const { data: tteams } = await supabaseAdmin
     .from("tournament_teams")

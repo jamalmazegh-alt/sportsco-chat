@@ -3,7 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listAllSupportTickets } from "@/lib/support.functions";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Search, LifeBuoy, ChevronRight } from "lucide-react";
 import {
   SUPPORT_STATUSES,
@@ -66,27 +72,47 @@ function AdminTicketsPage() {
           />
         </div>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger><SelectValue placeholder="Statut" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Statut" />
+          </SelectTrigger>
           <SelectContent>
-            {STATUSES.map((s) => <SelectItem key={s} value={s}>{s === "all" ? "Tous statuts" : s}</SelectItem>)}
+            {STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s === "all" ? "Tous statuts" : s}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={priority} onValueChange={setPriority}>
-          <SelectTrigger><SelectValue placeholder="Priorité" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Priorité" />
+          </SelectTrigger>
           <SelectContent>
-            {PRIORITIES.map((p) => <SelectItem key={p} value={p}>{p === "all" ? "Toutes priorités" : p}</SelectItem>)}
+            {PRIORITIES.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p === "all" ? "Toutes priorités" : p}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="sm:col-start-4"><SelectValue placeholder="Catégorie" /></SelectTrigger>
+          <SelectTrigger className="sm:col-start-4">
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
           <SelectContent>
-            {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c === "all" ? "Toutes catégories" : c}</SelectItem>)}
+            {CATEGORIES.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c === "all" ? "Toutes catégories" : c}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
       ) : !data || data.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
           Aucun ticket.
@@ -110,8 +136,16 @@ function AdminTicketsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground flex-wrap">
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_CLASS[t.status as SupportStatus] ?? ""}`}>{t.status}</span>
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_BADGE_CLASS[t.priority as SupportPriority] ?? ""}`}>{t.priority}</span>
+                    <span
+                      className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_CLASS[t.status as SupportStatus] ?? ""}`}
+                    >
+                      {t.status}
+                    </span>
+                    <span
+                      className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_BADGE_CLASS[t.priority as SupportPriority] ?? ""}`}
+                    >
+                      {t.priority}
+                    </span>
                     <span>· {t.category}</span>
                     <span>· #{t.id.slice(0, 6).toUpperCase()}</span>
                     {t.user_full_name && <span>· {t.user_full_name}</span>}

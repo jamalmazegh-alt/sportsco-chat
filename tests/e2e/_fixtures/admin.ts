@@ -79,7 +79,5 @@ export const E2E_PARENT = creds("PARENT");
 
 /** True when each role has its own distinct user (vs falling back to admin). */
 export const HAS_MULTI_ROLE_USERS = Boolean(
-  process.env.E2E_COACH_USER_ID &&
-    process.env.E2E_PLAYER_USER_ID &&
-    process.env.E2E_PARENT_USER_ID,
+  process.env.E2E_COACH_USER_ID && process.env.E2E_PLAYER_USER_ID && process.env.E2E_PARENT_USER_ID,
 );

@@ -43,8 +43,8 @@ describe("dispatchUrgencyAction", () => {
 
   it("open-player → throw explicite (handler non câblé, pas de no-op silencieux)", async () => {
     const c = ctx();
-    await expect(
-      dispatchUrgencyAction({ kind: "open-player", playerId: "P1" }, c),
-    ).rejects.toThrow(/open-player/);
+    await expect(dispatchUrgencyAction({ kind: "open-player", playerId: "P1" }, c)).rejects.toThrow(
+      /open-player/,
+    );
   });
 });

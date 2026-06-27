@@ -38,9 +38,13 @@ function LoginPage() {
       return;
     }
     if (search.invite) {
-      const { error: memberErr } = await supabase.rpc("redeem_member_invite", { _token: search.invite });
+      const { error: memberErr } = await supabase.rpc("redeem_member_invite", {
+        _token: search.invite,
+      });
       if (memberErr) {
-        const { error: clubErr } = await supabase.rpc("redeem_club_invite", { _token: search.invite });
+        const { error: clubErr } = await supabase.rpc("redeem_club_invite", {
+          _token: search.invite,
+        });
         if (clubErr) {
           setBusy(false);
           toast.error(memberErr.message || clubErr.message || t("auth.inviteInvalid"));
@@ -67,8 +71,13 @@ function LoginPage() {
 
       <div className="field-bg" aria-hidden="true">
         <div className="pitch">
-          <svg viewBox="0 0 400 820" preserveAspectRatio="xMidYMid slice" fill="none"
-               stroke="rgba(150,180,255,.13)" strokeWidth="1.6">
+          <svg
+            viewBox="0 0 400 820"
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            stroke="rgba(150,180,255,.13)"
+            strokeWidth="1.6"
+          >
             <line x1="-40" y1="410" x2="440" y2="410" />
             <circle cx="200" cy="410" r="78" />
             <circle cx="200" cy="410" r="3" fill="rgba(150,180,255,.13)" stroke="none" />
@@ -85,7 +94,12 @@ function LoginPage() {
       </div>
 
       <div className="topbar">
-        <a className="back" href="https://www.clubero.app" target="_blank" rel="noopener noreferrer">
+        <a
+          className="back"
+          href="https://www.clubero.app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <ArrowLeft className="h-4 w-4" />
           {t("auth.backToWebsite")}
         </a>
@@ -96,16 +110,25 @@ function LoginPage() {
         <div className="brand">
           <span className="mark">
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-              <path d="M21 8.5A8 8 0 1 0 21 21.5" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-              <path d="M16 15h8m0 0-3.4-3.4M24 15l-3.4 3.4" stroke="#38BDF8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M21 8.5A8 8 0 1 0 21 21.5"
+                stroke="#fff"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M16 15h8m0 0-3.4-3.4M24 15l-3.4 3.4"
+                stroke="#38BDF8"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </span>
           <span className="wordmark">Clubero</span>
         </div>
 
-        <p className="tagline">
-          {t("app.tagline")}
-        </p>
+        <p className="tagline">{t("app.tagline")}</p>
 
         <form onSubmit={onSubmit} className="card">
           <div className="field">
@@ -147,18 +170,13 @@ function LoginPage() {
           <button type="submit" className="cta" disabled={busy}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.login")}
           </button>
-          <Link
-            to="/forgot-password"
-            onClick={rememberEmailForReset}
-            className="forgot"
-          >
+          <Link to="/forgot-password" onClick={rememberEmailForReset} className="forgot">
             {t("auth.forgotPassword")}
           </Link>
         </form>
 
         <p className="signup">
-          {t("auth.noAccount")}{" "}
-          <Link to="/register">{t("auth.register")}</Link>
+          {t("auth.noAccount")} <Link to="/register">{t("auth.register")}</Link>
         </p>
       </main>
     </div>

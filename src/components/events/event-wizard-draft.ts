@@ -39,11 +39,6 @@ export function draftHasProgress(s: EventWizardState | null): boolean {
   if (!s) return false;
   // Any answer beyond initial defaults counts as progress.
   return Boolean(
-    s.type ||
-      s.teamId ||
-      s.startDate ||
-      s.opponent ||
-      s.location ||
-      s.recurrence?.mode,
+    s.type || s.teamId || s.startDate || s.opponent || s.location || s.recurrence?.mode,
   );
 }

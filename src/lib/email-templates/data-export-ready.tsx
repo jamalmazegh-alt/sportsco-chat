@@ -38,7 +38,9 @@ const Email = ({ firstName, downloadUrl, expiresInDays, locale }: Props) => {
     <EmailShell preview={t.body} locale={l}>
       <Heading style={h1}>{t.hello(firstName)}</Heading>
       <Text style={text}>{t.body}</Text>
-      <Button href={downloadUrl} style={btn}>{t.cta}</Button>
+      <Button href={downloadUrl} style={btn}>
+        {t.cta}
+      </Button>
       <Text style={subtle}>{t.expires(expiresInDays)}</Text>
       <Text style={subtle}>{t.foot}</Text>
     </EmailShell>
@@ -49,10 +51,24 @@ export const template = {
   component: Email,
   subject: (d: Record<string, any>) => pick(pickLocale(d.locale)).subject,
   displayName: "Data export ready",
-  previewData: { firstName: "Alex", downloadUrl: "https://example.com/x.zip", expiresInDays: 7, locale: "fr" },
+  previewData: {
+    firstName: "Alex",
+    downloadUrl: "https://example.com/x.zip",
+    expiresInDays: 7,
+    locale: "fr",
+  },
 } satisfies TemplateEntry;
 
 const h1 = { fontSize: "20px", fontWeight: 600, margin: "0 0 12px" };
 const text = { fontSize: "14px", lineHeight: "22px", margin: "0 0 12px" };
 const subtle = { fontSize: "12px", color: "#6b7280", margin: "8px 0 0" };
-const btn = { background: "#111827", color: "#fff", padding: "12px 18px", borderRadius: "8px", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" };
+const btn = {
+  background: "#111827",
+  color: "#fff",
+  padding: "12px 18px",
+  borderRadius: "8px",
+  textDecoration: "none",
+  fontSize: "14px",
+  display: "inline-block",
+  margin: "12px 0",
+};

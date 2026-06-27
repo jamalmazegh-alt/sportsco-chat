@@ -37,13 +37,7 @@ import {
   History,
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Avatar,
-  StatusBadge,
-  subTone,
-  roleTone,
-  categorize,
-} from "@/lib/superadmin/ui";
+import { Avatar, StatusBadge, subTone, roleTone, categorize } from "@/lib/superadmin/ui";
 
 export const Route = createFileRoute("/superadmin/users/$userId")({
   component: UserDetail,
@@ -92,10 +86,7 @@ function UserDetail() {
     }
   };
 
-  if (err)
-    return (
-      <div className="p-8 text-sm text-destructive">{err}</div>
-    );
+  if (err) return <div className="p-8 text-sm text-destructive">{err}</div>;
   if (!data)
     return (
       <div className="p-8 text-sm text-muted-foreground flex items-center gap-2">
@@ -105,9 +96,7 @@ function UserDetail() {
 
   const name =
     data.profile?.full_name ??
-    [data.profile?.first_name, data.profile?.last_name]
-      .filter(Boolean)
-      .join(" ") ??
+    [data.profile?.first_name, data.profile?.last_name].filter(Boolean).join(" ") ??
     data.auth.email ??
     "—";
 
@@ -151,31 +140,24 @@ function UserDetail() {
             )}
             {data.profile?.preferred_language && (
               <span className="flex items-center gap-1">
-                <Globe className="h-3 w-3" />{" "}
-                {data.profile.preferred_language.toUpperCase()}
+                <Globe className="h-3 w-3" /> {data.profile.preferred_language.toUpperCase()}
               </span>
             )}
           </div>
-          <div className="text-[10px] font-mono text-muted-foreground/60 mt-1">
-            {userId}
-          </div>
+          <div className="text-[10px] font-mono text-muted-foreground/60 mt-1">{userId}</div>
         </div>
       </header>
 
       {/* Sensitive actions */}
       <section className="rounded-xl border border-border bg-card p-4 mb-6">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
-          Actions
-        </div>
+        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Actions</div>
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
             variant="outline"
             disabled={busy || !data.auth.email}
             onClick={() =>
-              run("Reset email sent", () =>
-                sendPasswordResetEmail({ data: { user_id: userId } }),
-              )
+              run("Reset email sent", () => sendPasswordResetEmail({ data: { user_id: userId } }))
             }
           >
             <Mail className="h-4 w-4 mr-1.5" /> Send reset email
@@ -232,11 +214,7 @@ function UserDetail() {
               variant="outline"
               disabled={busy}
               onClick={() =>
-                run(
-                  "Reactivate user",
-                  () => reactivateUser({ data: { user_id: userId } }),
-                  true,
-                )
+                run("Reactivate user", () => reactivateUser({ data: { user_id: userId } }), true)
               }
             >
               <ShieldCheck className="h-4 w-4 mr-1.5" /> Reactivate
@@ -247,11 +225,7 @@ function UserDetail() {
               variant="destructive"
               disabled={busy}
               onClick={() =>
-                run(
-                  "Disable user",
-                  () => disableUser({ data: { user_id: userId } }),
-                  true,
-                )
+                run("Disable user", () => disableUser({ data: { user_id: userId } }), true)
               }
             >
               <ShieldOff className="h-4 w-4 mr-1.5" /> Disable
@@ -268,16 +242,8 @@ function UserDetail() {
               <code className="flex-1 text-[11px] font-mono break-all bg-background border border-border rounded px-2 py-1.5">
                 {resetLink}
               </code>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => copy("reset", resetLink)}
-              >
-                {copied === "reset" ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
+              <Button size="sm" variant="outline" onClick={() => copy("reset", resetLink)}>
+                {copied === "reset" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -295,9 +261,7 @@ function UserDetail() {
           rows={[
             [
               "Created",
-              data.auth.created_at
-                ? new Date(data.auth.created_at).toLocaleDateString()
-                : "—",
+              data.auth.created_at ? new Date(data.auth.created_at).toLocaleDateString() : "—",
             ],
             [
               "Last sign-in",
@@ -326,10 +290,7 @@ function UserDetail() {
       </div>
 
       {/* Clubs */}
-      <Section
-        icon={Building2}
-        title={`Clubs (${data.clubs.length})`}
-      >
+      <Section icon={Building2} title={`Clubs (${data.clubs.length})`}>
         {data.clubs.length === 0 ? (
           <Empty>No club memberships.</Empty>
         ) : (
@@ -380,9 +341,7 @@ function UserDetail() {
                   <div className="text-sm font-medium truncate">
                     {t.team?.name ?? t.team_id.slice(0, 8)}
                   </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    {t.team?.sport ?? "—"}
-                  </div>
+                  <div className="text-[11px] text-muted-foreground">{t.team?.sport ?? "—"}</div>
                 </div>
                 <StatusBadge tone={roleTone(t.role)}>{t.role}</StatusBadge>
               </li>
@@ -400,13 +359,9 @@ function UserDetail() {
             {data.recent_convocations.map((c) => (
               <li key={c.id} className="px-4 py-2 flex items-center justify-between gap-3 text-sm">
                 <div className="min-w-0">
-                  <div className="font-medium truncate">
-                    {c.event?.title ?? "Event"}
-                  </div>
+                  <div className="font-medium truncate">{c.event?.title ?? "Event"}</div>
                   <div className="text-[11px] text-muted-foreground">
-                    {c.event?.starts_at
-                      ? new Date(c.event.starts_at).toLocaleDateString()
-                      : "—"}
+                    {c.event?.starts_at ? new Date(c.event.starts_at).toLocaleDateString() : "—"}
                   </div>
                 </div>
                 <StatusBadge
@@ -462,11 +417,8 @@ function UserDetail() {
             <DialogTitle>Impersonate user</DialogTitle>
             <DialogDescription>
               One-time magic link as{" "}
-              <span className="font-medium text-foreground">
-                {data.auth.email}
-              </span>
-              . Open in a private window so it doesn't replace your super-admin
-              session.
+              <span className="font-medium text-foreground">{data.auth.email}</span>. Open in a
+              private window so it doesn't replace your super-admin session.
             </DialogDescription>
           </DialogHeader>
           {!impLink ? (
@@ -517,16 +469,8 @@ function UserDetail() {
                 <code className="flex-1 text-[11px] font-mono break-all bg-background border border-border rounded px-2 py-1.5">
                   {impLink}
                 </code>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copy("imp", impLink)}
-                >
-                  {copied === "imp" ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
+                <Button size="sm" variant="outline" onClick={() => copy("imp", impLink)}>
+                  {copied === "imp" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               <DialogFooter>
@@ -563,11 +507,7 @@ function Section({
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="px-4 py-6 text-sm text-muted-foreground text-center">
-      {children}
-    </div>
-  );
+  return <div className="px-4 py-6 text-sm text-muted-foreground text-center">{children}</div>;
 }
 
 function InfoCard({

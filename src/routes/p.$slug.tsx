@@ -133,26 +133,25 @@ export const Route = createFileRoute("/p/$slug")({
     const displayedLast = player ? displayLastName(player) : "";
     const fullName = player ? `${player.first_name} ${displayedLast}` : "Player";
 
-    const ld =
-      player && {
-        "@context": "https://schema.org",
-        "@type": "ProfilePage",
-        url: m.url,
-        mainEntity: {
-          "@type": "Person",
-          name: fullName,
-          image: player.photo_url || undefined,
-          jobTitle: player.preferred_position || player.position || undefined,
-          memberOf: club
-            ? {
-                "@type": "SportsTeam",
-                name: club.name,
-                logo: club.logo_url || undefined,
-                sport: club.sport || undefined,
-              }
-            : undefined,
-        },
-      };
+    const ld = player && {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      url: m.url,
+      mainEntity: {
+        "@type": "Person",
+        name: fullName,
+        image: player.photo_url || undefined,
+        jobTitle: player.preferred_position || player.position || undefined,
+        memberOf: club
+          ? {
+              "@type": "SportsTeam",
+              name: club.name,
+              logo: club.logo_url || undefined,
+              sport: club.sport || undefined,
+            }
+          : undefined,
+      },
+    };
 
     return {
       meta: [
@@ -179,9 +178,7 @@ export const Route = createFileRoute("/p/$slug")({
         { name: "twitter:image:alt", content: fullName },
       ],
       links: [{ rel: "canonical", href: m.url }],
-      scripts: ld
-        ? [{ type: "application/ld+json", children: JSON.stringify(ld) }]
-        : [],
+      scripts: ld ? [{ type: "application/ld+json", children: JSON.stringify(ld) }] : [],
     };
   },
 });
@@ -191,7 +188,6 @@ function PublicPlayerProfile() {
   const { t } = useTranslation();
 
   const { data, error } = useSuspenseQuery(publicProfileQuery(slug));
-
 
   if (error || !data) {
     return (
@@ -218,7 +214,9 @@ function PublicPlayerProfile() {
       {/* Top bar */}
       <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-3xl px-5 py-3 flex items-center justify-between">
-          <a href="/" className="text-sm font-semibold tracking-tight">Clubero</a>
+          <a href="/" className="text-sm font-semibold tracking-tight">
+            Clubero
+          </a>
           <a
             href="/register"
             className="text-xs font-medium px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90"
@@ -234,7 +232,7 @@ function PublicPlayerProfile() {
           <div
             className={cn(
               "h-20 w-20 rounded-full ring-4 ring-background shadow-md flex items-center justify-center text-white text-2xl font-bold shrink-0",
-              !player.photo_url && avatarGradient(fullName)
+              !player.photo_url && avatarGradient(fullName),
             )}
           >
             {player.photo_url ? (
@@ -273,7 +271,11 @@ function PublicPlayerProfile() {
         {club && (
           <section className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4">
             {club.logo_url ? (
-              <img src={club.logo_url} alt={club.name} className="h-12 w-12 rounded-lg object-cover" />
+              <img
+                src={club.logo_url}
+                alt={club.name}
+                className="h-12 w-12 rounded-lg object-cover"
+              />
             ) : (
               <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground font-semibold">
                 {club.name.charAt(0)}
@@ -281,7 +283,9 @@ function PublicPlayerProfile() {
             )}
             <div>
               <div className="font-semibold">{club.name}</div>
-              {club.sport && <div className="text-xs text-muted-foreground capitalize">{club.sport}</div>}
+              {club.sport && (
+                <div className="text-xs text-muted-foreground capitalize">{club.sport}</div>
+              )}
             </div>
           </section>
         )}
@@ -363,7 +367,10 @@ function PublicPlayerProfile() {
         )}
 
         <footer className="border-t border-border/60 pt-6 text-center text-xs text-muted-foreground">
-          <a href="/" className="underline">Clubero</a> — the mobile-first platform for sports clubs.
+          <a href="/" className="underline">
+            Clubero
+          </a>{" "}
+          — the mobile-first platform for sports clubs.
         </footer>
       </main>
     </div>

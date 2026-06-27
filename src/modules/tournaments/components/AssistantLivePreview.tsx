@@ -1,12 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  Award,
-  Clock,
-  MapPin,
-  Sparkles,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { Award, Clock, MapPin, Sparkles, Trophy, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   buildRecommendation,
@@ -35,8 +28,7 @@ export function AssistantLivePreview({ config, answeredCount, className }: Props
         ? t("aiAssistant.formats.roundRobin")
         : t("aiAssistant.formats.singleElim");
 
-  const flightsOn =
-    config.scheduleFormat === "pools_finals" && config.eliminatedContinue;
+  const flightsOn = config.scheduleFormat === "pools_finals" && config.eliminatedContinue;
 
   return (
     <div
@@ -170,8 +162,6 @@ function Flag({
         ? "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200"
         : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200";
   return (
-    <span className={cn("rounded-md px-2 py-0.5 text-[10px] font-bold", cls)}>
-      {children}
-    </span>
+    <span className={cn("rounded-md px-2 py-0.5 text-[10px] font-bold", cls)}>{children}</span>
   );
 }

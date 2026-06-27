@@ -34,8 +34,7 @@ export function TournamentToClubBanner({
   const [dismissed, setDismissed] = useState(false);
 
   const visible =
-    !dismissed &&
-    shouldShowTournamentBanner({ tournament, hasRealClubMembership, resultsCount });
+    !dismissed && shouldShowTournamentBanner({ tournament, hasRealClubMembership, resultsCount });
 
   useEffect(() => {
     if (!visible) return;
@@ -104,9 +103,7 @@ export function TournamentToClubBanner({
           <p className="text-base font-semibold leading-tight sm:text-lg">
             {t("tournamentToClub.title")}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {t("tournamentToClub.subtitle")}
-          </p>
+          <p className="text-sm text-muted-foreground">{t("tournamentToClub.subtitle")}</p>
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
           <Button
@@ -115,10 +112,7 @@ export function TournamentToClubBanner({
             className="h-10 px-4 font-semibold shadow-sm"
             onClick={onCtaClick}
           >
-            <Link
-              to="/pricing"
-              search={ctaSearch as unknown as Record<string, string>}
-            >
+            <Link to="/pricing" search={ctaSearch as unknown as Record<string, string>}>
               {t("tournamentToClub.ctaPrimary")}
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
@@ -130,10 +124,7 @@ export function TournamentToClubBanner({
             className="h-10 px-3 text-muted-foreground hover:text-foreground"
             onClick={onLearnMore}
           >
-            <Link
-              to="/pricing"
-              search={ctaSearch as unknown as Record<string, string>}
-            >
+            <Link to="/pricing" search={ctaSearch as unknown as Record<string, string>}>
               {t("tournamentToClub.ctaSecondary")}
             </Link>
           </Button>

@@ -4,7 +4,11 @@ import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { validateInviteToken, confirmInvitedUserEmail, type InviteValidationResult } from "@/lib/invite.functions";
+import {
+  validateInviteToken,
+  confirmInvitedUserEmail,
+  type InviteValidationResult,
+} from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,9 +43,7 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [signupRole, setSignupRole] = useState<SignupRole>(
-    search.invite ? "player" : "club_admin"
-  );
+  const [signupRole, setSignupRole] = useState<SignupRole>(search.invite ? "player" : "club_admin");
   const inviteToken = search.invite ?? "";
   const hasInvite = inviteToken.length > 0;
   // Member invite kind ("player" | "parent" | "member") if the token belongs to member_invites.
@@ -221,11 +223,20 @@ function RegisterPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={144} height={72} className="mx-auto mb-3 h-16 w-36 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2" />
+          <img
+            src={logo}
+            alt="Clubero"
+            width={144}
+            height={72}
+            className="mx-auto mb-3 h-16 w-36 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2"
+          />
           <h1 className="text-2xl font-semibold">{t("auth.register")}</h1>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <form
+          onSubmit={onSubmit}
+          className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
+        >
           {showRoleSelector ? (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-2">
               <div className="font-medium">{t("auth.roleClubAdmin")}</div>
@@ -253,11 +264,21 @@ function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="first">{t("auth.firstName")}</Label>
-              <Input id="first" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+              <Input
+                id="first"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="last">{t("auth.lastName")}</Label>
-              <Input id="last" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
+              <Input
+                id="last"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
           </div>
           <div className="space-y-1.5">
@@ -273,7 +294,9 @@ function RegisterPage() {
               className={inviteEmailLocked ? "bg-muted text-muted-foreground" : undefined}
             />
             {inviteEmailLocked && (
-              <p className="text-xs text-muted-foreground">{t("auth.emailFromInvite") || "Email from your invitation."}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("auth.emailFromInvite") || "Email from your invitation."}
+              </p>
             )}
           </div>
           <div className="space-y-1.5">
@@ -286,7 +309,9 @@ function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <p className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}>
+            <p
+              className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}
+            >
               {t("auth.passwordRequirements")}
             </p>
           </div>
@@ -307,9 +332,13 @@ function RegisterPage() {
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.register")}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
-            <Link to="/legal/$kind" params={{ kind: "terms" }} className="underline">Terms</Link>
+            <Link to="/legal/$kind" params={{ kind: "terms" }} className="underline">
+              Terms
+            </Link>
             {" · "}
-            <Link to="/legal/$kind" params={{ kind: "privacy" }} className="underline">Privacy</Link>
+            <Link to="/legal/$kind" params={{ kind: "privacy" }} className="underline">
+              Privacy
+            </Link>
           </p>
         </form>
 

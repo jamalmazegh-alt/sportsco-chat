@@ -3,7 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getSupportTicket, updateSupportTicket } from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
 import { ArrowLeft, Loader2, User } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
@@ -38,7 +44,11 @@ function AdminTicketDetail() {
   });
 
   if (isLoading) {
-    return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
   if (!data) return null;
   const { ticket, messages, owner } = data;
@@ -49,11 +59,16 @@ function AdminTicketDetail() {
       {/* Thread */}
       <div className="flex-1 flex flex-col overflow-hidden border-r">
         <header className="px-5 pt-6 pb-3 border-b">
-          <Link to="/superadmin/support-tickets" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+          <Link
+            to="/superadmin/support-tickets"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-3 w-3" /> Inbox
           </Link>
           <h1 className="text-lg font-semibold mt-2">{ticket.subject}</h1>
-          <div className="text-xs text-muted-foreground mt-1">#{ticket.id.slice(0, 6).toUpperCase()} · {ticket.category}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            #{ticket.id.slice(0, 6).toUpperCase()} · {ticket.category}
+          </div>
         </header>
         <div className="flex-1 overflow-y-auto px-5 py-4">
           <TicketThread
@@ -70,9 +85,15 @@ function AdminTicketDetail() {
         <section className="space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Statut</Label>
           <Select value={ticket.status} onValueChange={(v) => update.mutate({ status: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </section>
@@ -80,15 +101,23 @@ function AdminTicketDetail() {
         <section className="space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Priorité</Label>
           <Select value={ticket.priority} onValueChange={(v) => update.mutate({ priority: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {PRIORITIES.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              {PRIORITIES.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </section>
 
         <section className="space-y-2">
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Utilisateur</Label>
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+            Utilisateur
+          </Label>
           <div className="rounded-md border bg-card p-3 text-sm">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-muted-foreground" />

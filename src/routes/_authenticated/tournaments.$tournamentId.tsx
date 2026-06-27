@@ -834,7 +834,6 @@ function StatusPillHero({ status }: { status: string }) {
   );
 }
 
-
 function Section({
   id,
   icon: Icon,

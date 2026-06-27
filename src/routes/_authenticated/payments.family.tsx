@@ -5,19 +5,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { listFamilyPayments } from "@/lib/payment-family.functions";
-import {
-  createObligationCheckout,
-} from "@/lib/payment-checkout.functions";
+import { createObligationCheckout } from "@/lib/payment-checkout.functions";
 import { getReceiptDownloadUrl } from "@/lib/payment-receipts.functions";
 import { BackLink } from "@/components/back-link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
@@ -162,8 +155,7 @@ function FamilyPortalPage() {
         ...g,
         obligations: g.obligations.filter((o) => {
           if (tab === "all") return true;
-          if (tab === "open")
-            return o.status === "pending" || o.status === "partially_paid";
+          if (tab === "open") return o.status === "pending" || o.status === "partially_paid";
           if (tab === "paid") return o.status === "paid";
           return o.status === "exempted" || o.status === "cancelled";
         }),
@@ -202,24 +194,41 @@ function FamilyPortalPage() {
             </Button>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t("payments.family.subtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("payments.family.subtitle")}</p>
       </header>
 
       {/* Family-wide summary */}
       <section className="grid grid-cols-3 gap-3">
-        <SummaryCard label={t("payments.family.remaining")} value={fmt(familyTotals.remaining, "eur", i18n.language)} accent />
-        <SummaryCard label={t("payments.family.paid")} value={fmt(familyTotals.paid, "eur", i18n.language)} />
-        <SummaryCard label={t("payments.family.totalDue")} value={fmt(familyTotals.due, "eur", i18n.language)} muted />
+        <SummaryCard
+          label={t("payments.family.remaining")}
+          value={fmt(familyTotals.remaining, "eur", i18n.language)}
+          accent
+        />
+        <SummaryCard
+          label={t("payments.family.paid")}
+          value={fmt(familyTotals.paid, "eur", i18n.language)}
+        />
+        <SummaryCard
+          label={t("payments.family.totalDue")}
+          value={fmt(familyTotals.due, "eur", i18n.language)}
+          muted
+        />
       </section>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList className="w-full">
-          <TabsTrigger value="open" className="flex-1">{t("payments.tabs.open")}</TabsTrigger>
-          <TabsTrigger value="paid" className="flex-1">{t("payments.tabs.paid")}</TabsTrigger>
-          <TabsTrigger value="other" className="flex-1">{t("payments.tabs.other")}</TabsTrigger>
-          <TabsTrigger value="all" className="flex-1">{t("payments.tabs.all")}</TabsTrigger>
+          <TabsTrigger value="open" className="flex-1">
+            {t("payments.tabs.open")}
+          </TabsTrigger>
+          <TabsTrigger value="paid" className="flex-1">
+            {t("payments.tabs.paid")}
+          </TabsTrigger>
+          <TabsTrigger value="other" className="flex-1">
+            {t("payments.tabs.other")}
+          </TabsTrigger>
+          <TabsTrigger value="all" className="flex-1">
+            {t("payments.tabs.all")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab} className="space-y-5 mt-4">
@@ -263,9 +272,7 @@ function SummaryCard({
             : "border-border bg-card"
       }`}
     >
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
+      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="text-base font-bold mt-0.5">{value}</p>
     </div>
   );
@@ -305,23 +312,20 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
   const isHelloAsso = obligation.items?.provider === "helloasso";
   const stripeReady =
-    !!obligation.clubs?.stripe_account_id &&
-    !!obligation.clubs?.stripe_charges_enabled;
+    !!obligation.clubs?.stripe_account_id && !!obligation.clubs?.stripe_charges_enabled;
   const canPay =
     !isHelloAsso &&
     (obligation.status === "pending" || obligation.status === "partially_paid") &&
     remaining > 0 &&
     stripeReady;
-  const helloAssoUrl =
-    isHelloAsso && obligation.items?.description?.match(/https?:\/\/\S+/)?.[0];
+  const helloAssoUrl = isHelloAsso && obligation.items?.description?.match(/https?:\/\/\S+/)?.[0];
   const canPayHelloAsso =
     isHelloAsso &&
     (obligation.status === "pending" || obligation.status === "partially_paid") &&
     remaining > 0;
 
   const checkout = useMutation({
-    mutationFn: () =>
-      checkoutFn({ data: { obligationId: obligation.id } }),
+    mutationFn: () => checkoutFn({ data: { obligationId: obligation.id } }),
     onSuccess: ({ url }) => {
       if (url) window.location.href = url;
     },
@@ -329,8 +333,7 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
   });
 
   const downloadReceipt = useMutation({
-    mutationFn: (receiptId: string) =>
-      receiptFn({ data: { receiptId } }),
+    mutationFn: (receiptId: string) => receiptFn({ data: { receiptId } }),
     onSuccess: ({ url }) => {
       if (url) window.open(url, "_blank", "noopener,noreferrer");
     },
@@ -338,10 +341,7 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
   });
 
   return (
-    <AccordionItem
-      value={obligation.id}
-      className="rounded-2xl border border-border bg-card px-4"
-    >
+    <AccordionItem value={obligation.id} className="rounded-2xl border border-border bg-card px-4">
       <AccordionTrigger className="py-3 hover:no-underline">
         <div className="flex-1 flex flex-wrap items-center gap-3 text-left">
           <div className="min-w-0 flex-1">
@@ -365,14 +365,13 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
             <p className="text-sm font-bold">
               {fmt(obligation.amount_due_cents, currency, locale)}
             </p>
-            {obligation.amount_paid_cents > 0 &&
-              obligation.status !== "exempted" && (
-                <p className="text-[10px] text-muted-foreground">
-                  {t("payments.family.paidAmount", {
-                    amount: fmt(obligation.amount_paid_cents, currency, locale),
-                  })}
-                </p>
-              )}
+            {obligation.amount_paid_cents > 0 && obligation.status !== "exempted" && (
+              <p className="text-[10px] text-muted-foreground">
+                {t("payments.family.paidAmount", {
+                  amount: fmt(obligation.amount_paid_cents, currency, locale),
+                })}
+              </p>
+            )}
           </div>
         </div>
       </AccordionTrigger>
@@ -391,11 +390,7 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
 
         {/* Pay button */}
         {canPay && (
-          <Button
-            size="sm"
-            onClick={() => checkout.mutate()}
-            disabled={checkout.isPending}
-          >
+          <Button size="sm" onClick={() => checkout.mutate()} disabled={checkout.isPending}>
             {checkout.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -404,13 +399,10 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
             {t("payments.payAmount", { amount: fmt(remaining, currency, locale) })}
           </Button>
         )}
-        {(obligation.status === "pending" ||
-          obligation.status === "partially_paid") &&
+        {(obligation.status === "pending" || obligation.status === "partially_paid") &&
           !isHelloAsso &&
           !stripeReady && (
-            <p className="text-xs text-muted-foreground">
-              {t("payments.onlineUnavailableShort")}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("payments.onlineUnavailableShort")}</p>
           )}
 
         {/* HelloAsso external payment */}
@@ -424,9 +416,7 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
                 </a>
               </Button>
             ) : (
-              <p className="text-xs text-muted-foreground">
-                {t("payments.helloAssoMissing")}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("payments.helloAssoMissing")}</p>
             )}
             <p className="text-[11px] text-muted-foreground italic">
               {t("payments.helloAssoExternal")}
@@ -457,10 +447,8 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
                     className="flex items-center justify-between text-xs rounded border border-border/60 px-2.5 py-1.5"
                   >
                     <span>
-                      {new Date(tx.paid_at ?? tx.created_at).toLocaleDateString(
-                        locale,
-                      )}{" "}
-                      · {methodLabel}
+                      {new Date(tx.paid_at ?? tx.created_at).toLocaleDateString(locale)} ·{" "}
+                      {methodLabel}
                       {isExternal && (
                         <span className="ml-1 text-muted-foreground">
                           {t("payments.family.recordedByClub")}
@@ -480,7 +468,6 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
                   </li>
                 );
               })}
-
             </ul>
           </div>
         )}

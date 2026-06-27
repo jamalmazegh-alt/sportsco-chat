@@ -54,7 +54,8 @@ export function EventChat({ eventId }: { eventId: string }) {
         .select("team_id, teams:team_id(club_id, clubs:club_id(event_chat_enabled))")
         .eq("id", eventId)
         .single();
-      const ec = (ev as { teams?: { clubs?: { event_chat_enabled?: boolean } } } | null)?.teams?.clubs?.event_chat_enabled;
+      const ec = (ev as { teams?: { clubs?: { event_chat_enabled?: boolean } } } | null)?.teams
+        ?.clubs?.event_chat_enabled;
       if (!active) return;
       setEnabled(ec === undefined ? true : !!ec);
       const { data } = await supabase
@@ -72,7 +73,9 @@ export function EventChat({ eventId }: { eventId: string }) {
       setMessages(withAuthors);
       setHasMore(more);
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [eventId]);
 
   async function loadMore() {
@@ -100,8 +103,14 @@ export function EventChat({ eventId }: { eventId: string }) {
     if (!enabled) return;
     const ch = supabase
       .channel(`event_messages:${eventId}`)
-      .on("postgres_changes",
-        { event: "INSERT", schema: "public", table: "event_messages", filter: `event_id=eq.${eventId}` },
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "event_messages",
+          filter: `event_id=eq.${eventId}`,
+        },
         async (payload) => {
           const incoming = payload.new as Msg;
           // Fetch author profile so the name doesn't appear as "—"
@@ -112,14 +121,19 @@ export function EventChat({ eventId }: { eventId: string }) {
             .maybeSingle();
           const withAuthor = { ...incoming, author: prof ?? null };
           setMessages((prev) =>
-            prev.some((m) => m.id === incoming.id) ? prev : [...prev, withAuthor]
+            prev.some((m) => m.id === incoming.id) ? prev : [...prev, withAuthor],
           );
-        })
+        },
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [eventId, enabled]);
 
-  useEffect(() => { if (open) endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length, open]);
+  useEffect(() => {
+    if (open) endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, open]);
 
   async function send() {
     if ((!body.trim() && atts.length === 0) || !user) return;
@@ -128,9 +142,12 @@ export function EventChat({ eventId }: { eventId: string }) {
     const attachmentsToSend = atts;
     setBody("");
     setAtts([]);
-    const { error } = await supabase
-      .from("event_messages")
-      .insert({ event_id: eventId, author_user_id: user.id, body: text, attachments: attachmentsToSend as unknown as never });
+    const { error } = await supabase.from("event_messages").insert({
+      event_id: eventId,
+      author_user_id: user.id,
+      body: text,
+      attachments: attachmentsToSend as unknown as never,
+    });
     setSending(false);
     if (error) {
       setBody(text);
@@ -161,7 +178,9 @@ export function EventChat({ eventId }: { eventId: string }) {
             <span className="text-[11px] text-muted-foreground">· {messages.length}</span>
           )}
         </div>
-        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+        <ChevronDown
+          className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")}
+        />
       </button>
 
       {open && (
@@ -175,7 +194,9 @@ export function EventChat({ eventId }: { eventId: string }) {
                   disabled={loadingMore}
                   className="text-[11px] font-medium text-primary hover:underline disabled:opacity-50"
                 >
-                  {loadingMore ? t("common.loading", { defaultValue: "Loading…" }) : t("chat.loadMore", { defaultValue: "Load earlier messages" })}
+                  {loadingMore
+                    ? t("common.loading", { defaultValue: "Loading…" })
+                    : t("chat.loadMore", { defaultValue: "Load earlier messages" })}
                 </button>
               </div>
             )}
@@ -186,18 +207,32 @@ export function EventChat({ eventId }: { eventId: string }) {
               const mine = m.author_user_id === user?.id;
               return (
                 <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-                  <div className={cn(
-                    "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
-                    mine ? "bg-primary text-primary-foreground" : "bg-muted"
-                  )}>
-                    <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
+                  <div
+                    className={cn(
+                      "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
+                      mine ? "bg-primary text-primary-foreground" : "bg-muted",
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-[11px] font-medium mb-0.5",
+                        mine ? "opacity-90" : "text-foreground/80",
+                      )}
+                    >
                       {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
                     </p>
                     {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                     {m.attachments?.length > 0 && (
-                      <div className="mt-1.5"><AttachmentList items={m.attachments as Attachment[]} /></div>
+                      <div className="mt-1.5">
+                        <AttachmentList items={m.attachments as Attachment[]} />
+                      </div>
                     )}
-                    <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
+                    <p
+                      className={cn(
+                        "text-[10px] mt-0.5",
+                        mine ? "opacity-80" : "text-muted-foreground",
+                      )}
+                    >
                       {fmt(m.created_at, "HH:mm")}
                     </p>
                   </div>
@@ -208,7 +243,10 @@ export function EventChat({ eventId }: { eventId: string }) {
           </div>
 
           <form
-            onSubmit={(e) => { e.preventDefault(); send(); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              send();
+            }}
             className="p-3 border-t border-border space-y-2"
           >
             <div className="flex gap-2">
@@ -218,7 +256,12 @@ export function EventChat({ eventId }: { eventId: string }) {
                 placeholder={t("chat.placeholder")}
                 className="h-10"
               />
-              <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || (!body.trim() && atts.length === 0)}>
+              <Button
+                type="submit"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                disabled={sending || (!body.trim() && atts.length === 0)}
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </div>

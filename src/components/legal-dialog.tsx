@@ -48,9 +48,7 @@ function inline(text: string) {
     lastIndex = m.index + m[0].length;
   }
   if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts.map((p, i) =>
-    typeof p === "string" ? <span key={i}>{p}</span> : p,
-  );
+  return parts.map((p, i) => (typeof p === "string" ? <span key={i}>{p}</span> : p));
 }
 
 function renderMarkdown(md: string) {
@@ -78,9 +76,7 @@ function renderMarkdown(md: string) {
       );
     if (/^([-*]|\d+\.)\s/.test(trimmed)) {
       const ordered = /^\d+\./.test(trimmed);
-      const items = trimmed
-        .split(/\n/)
-        .map((l) => l.replace(/^([-*]|\d+\.)\s+/, ""));
+      const items = trimmed.split(/\n/).map((l) => l.replace(/^([-*]|\d+\.)\s+/, ""));
       const Tag = ordered ? "ol" : "ul";
       return (
         <Tag

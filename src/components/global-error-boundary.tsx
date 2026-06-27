@@ -39,9 +39,7 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
           <AlertTriangle className="h-6 w-6 text-destructive" />
         </div>
         <h1 className="text-xl font-semibold">{t("common.errorTitle")}</h1>
-        <p className="text-sm text-muted-foreground">
-          {t("common.errorSubtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("common.errorSubtitle")}</p>
         {error?.message ? (
           <pre className="text-left text-xs bg-muted rounded-md p-3 overflow-auto max-h-48 whitespace-pre-wrap break-words">
             {error.message}

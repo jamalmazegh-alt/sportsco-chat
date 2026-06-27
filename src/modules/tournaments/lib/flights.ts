@@ -73,9 +73,7 @@ function nextPow2(n: number): number {
  * Heuristique simple : on essaie d'abord 2 puis 3 puis 4 Flights, et on garde
  * les options pertinentes (≥ 4 équipes par Flight minimum).
  */
-export function proposeFlightDistributions(
-  numTeams: number,
-): FlightDistribution[] {
+export function proposeFlightDistributions(numTeams: number): FlightDistribution[] {
   if (numTeams < 4) return [];
   const out: FlightDistribution[] = [];
   const seen = new Set<string>();
@@ -203,10 +201,7 @@ export function defaultQualificationRules(
  * poule) renvoient `false` : l'UI propose alors un repli sur les templates
  * existants (Consolante / Médailles / Coupe-Plaque) ou le mode manuel.
  */
-export function canAutoGenerateChampions(
-  numTeams: number,
-  numGroups: number,
-): boolean {
+export function canAutoGenerateChampions(numTeams: number, numGroups: number): boolean {
   if (numGroups < 2) return false;
   const perGroup = numTeams / numGroups;
   if (!Number.isInteger(perGroup)) return false;
@@ -361,9 +356,7 @@ export interface FlightResultInput {
  * Flight A (sort_order=0) occupe les rangs 1..N1, Flight B les rangs (N1+1)..,
  * etc.
  */
-export function computeOverallStandings(
-  flights: FlightResultInput[],
-): FinalRankingEntry[] {
+export function computeOverallStandings(flights: FlightResultInput[]): FinalRankingEntry[] {
   const sorted = [...flights].sort((a, b) => a.sort_order - b.sort_order);
   const out: FinalRankingEntry[] = [];
   let offset = 0;

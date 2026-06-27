@@ -12,7 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
@@ -48,7 +52,6 @@ function AdminUsersPage() {
     },
   });
 
-
   const CLUB_ROLE_KEYS = [
     "admin",
     "coach",
@@ -74,9 +77,11 @@ function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-
   function reset() {
-    setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
+    setInviteRoles(["coach"]);
+    setFirst("");
+    setLast("");
+    setEmail("");
   }
 
   function toggleInviteRole(r: ClubRoleKey, checked: boolean) {
@@ -97,10 +102,17 @@ function AdminUsersPage() {
       const { data: exists } = await supabase.rpc("email_exists", { _email: email });
       if (exists === true) {
         setBusy(false);
-        toast.error(t("admin.inviteEmailAlreadyUser", { defaultValue: "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil." }));
+        toast.error(
+          t("admin.inviteEmailAlreadyUser", {
+            defaultValue:
+              "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
+          }),
+        );
         return;
       }
-    } catch { /* non-blocking */ }
+    } catch {
+      /* non-blocking */
+    }
 
     const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
     const primaryRole: string = inviteRoles.includes("admin")
@@ -124,14 +136,15 @@ function AdminUsersPage() {
     }
 
     const { data: clubRow } = await supabase
-      .from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
+      .from("clubs")
+      .select("name, logo_url")
+      .eq("id", activeClubId)
+      .maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
 
-    const roleLabel = inviteRoles
-      .map((r) => t(`roles.${r}`, { defaultValue: r }))
-      .join(", ");
+    const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
 
     try {
       await sendTransactionalEmail({
@@ -149,7 +162,11 @@ function AdminUsersPage() {
       });
     } catch (err: any) {
       setBusy(false);
-      toast.error(t("admin.inviteEmailFailed", { defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé." }));
+      toast.error(
+        t("admin.inviteEmailFailed", {
+          defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
+        }),
+      );
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
       return;
     }
@@ -172,7 +189,10 @@ function AdminUsersPage() {
         </div>
         <ResponsiveFormDialog
           open={open}
-          onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}
+          onOpenChange={(o) => {
+            setOpen(o);
+            if (!o) reset();
+          }}
           trigger={
             <Button size="sm" className="h-9">
               <UserPlus className="h-4 w-4" />
@@ -185,7 +205,9 @@ function AdminUsersPage() {
             <div className="space-y-1.5">
               <Label>{t("admin.inviteRole", { defaultValue: "Rôles" })}</Label>
               <p className="text-[11px] text-muted-foreground">
-                {t("permissions.clubRolesHint", { defaultValue: "Un utilisateur peut cumuler plusieurs rôles." })}
+                {t("permissions.clubRolesHint", {
+                  defaultValue: "Un utilisateur peut cumuler plusieurs rôles.",
+                })}
               </p>
               <TooltipProvider delayDuration={150}>
                 <div className="space-y-1">
@@ -246,12 +268,22 @@ function AdminUsersPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
-              <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Label>
+                {t("players.email")}
+                <span className="text-destructive ml-1">*</span>
+              </Label>
+              <Input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <Button type="submit" className="w-full h-11" disabled={busy}>
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
                 <>
                   <Mail className="h-4 w-4" />
                   {t("admin.sendInvite", { defaultValue: "Envoyer l'invitation" })}
@@ -268,7 +300,9 @@ function AdminUsersPage() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("admin.searchUsersPlaceholder", { defaultValue: "Rechercher par nom ou email…" })}
+          placeholder={t("admin.searchUsersPlaceholder", {
+            defaultValue: "Rechercher par nom ou email…",
+          })}
           className="pl-9 pr-9 h-10"
         />
         {search && (
@@ -287,143 +321,163 @@ function AdminUsersPage() {
         <div className="flex justify-center py-10">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
-      ) : (() => {
-        const STAFF_ROLES = new Set(["admin", "coach", "assistant_coach", "staff", "tournament_manager"]);
-        const q = search.trim().toLowerCase();
-        const allUsersRaw = (data ?? []) as any[];
-        const allUsers = q
-          ? allUsersRaw.filter((u) => {
-              const fn = u.profile?.first_name ?? "";
-              const ln = u.profile?.last_name ?? "";
-              const full = u.profile?.full_name ?? `${fn} ${ln}`;
-              const em = u.email ?? "";
-              return (
-                full.toLowerCase().includes(q) ||
-                fn.toLowerCase().includes(q) ||
-                ln.toLowerCase().includes(q) ||
-                em.toLowerCase().includes(q)
-              );
-            })
-          : allUsersRaw;
-        const staff = allUsers.filter((u) => (u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)));
-        const playersParents = allUsers.filter(
-          (u) =>
-            !(u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)) &&
-            ((u.roles ?? []).includes("player") || (u.roles ?? []).includes("parent")),
-        );
-
-        const renderList = (users: any[], emptyKey: string) =>
-          users.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-              {t(emptyKey, { defaultValue: t("admin.usersEmpty") })}
-            </div>
-          ) : (
-            <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {users.map((u: any) => {
-                const name =
-                  u.profile?.full_name ??
-                  [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
-                  u.email ??
-                  "—";
-                const userRoles: string[] = u.roles ?? [];
-                const isParentOnly =
-                  userRoles.includes("parent") &&
-                  !userRoles.some((r) => STAFF_ROLES.has(r));
+      ) : (
+        (() => {
+          const STAFF_ROLES = new Set([
+            "admin",
+            "coach",
+            "assistant_coach",
+            "staff",
+            "tournament_manager",
+          ]);
+          const q = search.trim().toLowerCase();
+          const allUsersRaw = (data ?? []) as any[];
+          const allUsers = q
+            ? allUsersRaw.filter((u) => {
+                const fn = u.profile?.first_name ?? "";
+                const ln = u.profile?.last_name ?? "";
+                const full = u.profile?.full_name ?? `${fn} ${ln}`;
+                const em = u.email ?? "";
                 return (
-                  <li key={u.user_id}>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setSelectedUserId(u.user_id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setSelectedUserId(u.user_id);
-                        }
-                      }}
-                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors cursor-pointer"
-                    >
-                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden shrink-0">
-                        {u.profile?.avatar_url ? (
-                          <img src={u.profile.avatar_url} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          (name?.[0] ?? "?").toUpperCase()
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{name || "—"}</p>
-                        {u.email && (
-                          <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                            <Mail className="h-3 w-3" />
-                            {u.email}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                          {userRoles.map((r: string) => (
-                            <span
-                              key={r}
-                              className={
-                                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize inline-flex items-center gap-1 " +
-                                (r === "admin"
-                                  ? "bg-primary/15 text-primary"
-                                  : r === "coach" || r === "assistant_coach"
-                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                                  : "bg-muted text-muted-foreground")
-                              }
-                            >
-                              {r === "admin" && <ShieldCheck className="h-3 w-3" />}
-                              {(r === "coach" || r === "assistant_coach") && <Trophy className="h-3 w-3" />}
-                              {t(`roles.${r}`, { defaultValue: r })}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      {isParentOnly && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="shrink-0 gap-1.5"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedUserId(u.user_id);
-                          }}
-                        >
-                          <ShieldCheck className="h-3.5 w-3.5" />
-                          {t("admin.promoteToClubMember", { defaultValue: "Promouvoir en membre" })}
-                        </Button>
-                      )}
-                    </div>
-                  </li>
+                  full.toLowerCase().includes(q) ||
+                  fn.toLowerCase().includes(q) ||
+                  ln.toLowerCase().includes(q) ||
+                  em.toLowerCase().includes(q)
                 );
-              })}
-            </ul>
+              })
+            : allUsersRaw;
+          const staff = allUsers.filter((u) =>
+            (u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)),
+          );
+          const playersParents = allUsers.filter(
+            (u) =>
+              !(u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)) &&
+              ((u.roles ?? []).includes("player") || (u.roles ?? []).includes("parent")),
           );
 
-        return (
-          <Tabs defaultValue="staff" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="staff">
-                {t("admin.tabClubMembers", { defaultValue: "Membres du club" })} ({staff.length})
-              </TabsTrigger>
-              <TabsTrigger value="players">
-                {t("admin.tabPlayersParents", { defaultValue: "Joueurs & parents" })} ({playersParents.length})
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="staff" className="mt-3">
-              {renderList(staff, "admin.tabClubMembersEmpty")}
-            </TabsContent>
-            <TabsContent value="players" className="mt-3">
-              {renderList(playersParents, "admin.tabPlayersParentsEmpty")}
-            </TabsContent>
-          </Tabs>
-        );
-      })()}
+          const renderList = (users: any[], emptyKey: string) =>
+            users.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+                {t(emptyKey, { defaultValue: t("admin.usersEmpty") })}
+              </div>
+            ) : (
+              <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
+                {users.map((u: any) => {
+                  const name =
+                    u.profile?.full_name ??
+                    [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
+                    u.email ??
+                    "—";
+                  const userRoles: string[] = u.roles ?? [];
+                  const isParentOnly =
+                    userRoles.includes("parent") && !userRoles.some((r) => STAFF_ROLES.has(r));
+                  return (
+                    <li key={u.user_id}>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setSelectedUserId(u.user_id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedUserId(u.user_id);
+                          }
+                        }}
+                        className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors cursor-pointer"
+                      >
+                        <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden shrink-0">
+                          {u.profile?.avatar_url ? (
+                            <img
+                              src={u.profile.avatar_url}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            (name?.[0] ?? "?").toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{name || "—"}</p>
+                          {u.email && (
+                            <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                              <Mail className="h-3 w-3" />
+                              {u.email}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            {userRoles.map((r: string) => (
+                              <span
+                                key={r}
+                                className={
+                                  "text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize inline-flex items-center gap-1 " +
+                                  (r === "admin"
+                                    ? "bg-primary/15 text-primary"
+                                    : r === "coach" || r === "assistant_coach"
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                                      : "bg-muted text-muted-foreground")
+                                }
+                              >
+                                {r === "admin" && <ShieldCheck className="h-3 w-3" />}
+                                {(r === "coach" || r === "assistant_coach") && (
+                                  <Trophy className="h-3 w-3" />
+                                )}
+                                {t(`roles.${r}`, { defaultValue: r })}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        {isParentOnly && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="shrink-0 gap-1.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedUserId(u.user_id);
+                            }}
+                          >
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                            {t("admin.promoteToClubMember", {
+                              defaultValue: "Promouvoir en membre",
+                            })}
+                          </Button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+
+          return (
+            <Tabs defaultValue="staff" className="w-full">
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="staff">
+                  {t("admin.tabClubMembers", { defaultValue: "Membres du club" })} ({staff.length})
+                </TabsTrigger>
+                <TabsTrigger value="players">
+                  {t("admin.tabPlayersParents", { defaultValue: "Joueurs & parents" })} (
+                  {playersParents.length})
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="staff" className="mt-3">
+                {renderList(staff, "admin.tabClubMembersEmpty")}
+              </TabsContent>
+              <TabsContent value="players" className="mt-3">
+                {renderList(playersParents, "admin.tabPlayersParentsEmpty")}
+              </TabsContent>
+            </Tabs>
+          );
+        })()
+      )}
 
       <UserDetailSheet
         userId={selectedUserId}
         open={!!selectedUserId}
-        onOpenChange={(o) => { if (!o) setSelectedUserId(null); }}
+        onOpenChange={(o) => {
+          if (!o) setSelectedUserId(null);
+        }}
       />
     </div>
   );

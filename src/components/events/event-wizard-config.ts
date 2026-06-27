@@ -18,11 +18,7 @@ export type WizardEventType = "training" | "match" | "meeting" | "other";
 export type IsHome = "home" | "away";
 export type ConvocScope = "all" | "selection" | "none";
 
-export type RecurrenceMode =
-  | "single"
-  | "weekly_one"
-  | "weekly_multi"
-  | "custom";
+export type RecurrenceMode = "single" | "weekly_one" | "weekly_multi" | "custom";
 
 export interface RecurrenceState {
   mode: RecurrenceMode;
@@ -95,7 +91,9 @@ export function autoTitle(
   const name = teamName ?? "";
   switch (state.type) {
     case "match":
-      return state.opponent ? `${name} vs ${state.opponent}`.trim() : `${t("events.types.match")} ${name}`.trim();
+      return state.opponent
+        ? `${name} vs ${state.opponent}`.trim()
+        : `${t("events.types.match")} ${name}`.trim();
     case "training":
       return `${t("events.types.training")} ${name}`.trim();
     case "meeting":
@@ -172,22 +170,20 @@ export function toEventPayloadInput(
   // Convocation time = startDate + meetingTime
   // - Away matches: meeting point + meeting time
   // - Training/other: meeting time is "be there at" hour
-  const convocIso = state.meetingTime
-    ? toIso(state.startDate, state.meetingTime)
-    : null;
+  const convocIso = state.meetingTime ? toIso(state.startDate, state.meetingTime) : null;
 
   return {
     teamId: state.teamId,
     type: state.type,
     title,
     description: desc,
-    location: isHomeMatch ? null : state.location ?? null,
+    location: isHomeMatch ? null : (state.location ?? null),
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
     competitionName: state.competitionName?.trim() ? state.competitionName.trim() : null,
     isHome: isMatch ? state.isHome === "home" : null,
-    meetingPoint: isAwayMatch ? state.meetingPoint ?? null : null,
+    meetingPoint: isAwayMatch ? (state.meetingPoint ?? null) : null,
     startsAt: startsIso,
     endsAt: endsIso,
     convocationTime: convocIso,
@@ -210,7 +206,10 @@ export function toEventInsert(state: EventWizardState, title: string): null | Ev
  * Build a partial EventFormValues shape for prefilling EventFormSheet
  * (the "Réglages détaillés" path). 'other' stays 'other'.
  */
-export function toEventFormInitial(state: EventWizardState, title: string): Record<string, unknown> {
+export function toEventFormInitial(
+  state: EventWizardState,
+  title: string,
+): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
   const endsIso = addMinutesIso(startsIso, state.durationMin);
   const descParts: string[] = [];
@@ -225,13 +224,14 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     type: state.type || "training",
     title,
     description: descParts.length ? descParts.join("\n") : null,
-    location: state.type === "match" && state.isHome === "home" ? null : state.location ?? null,
+    location: state.type === "match" && state.isHome === "home" ? null : (state.location ?? null),
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
     competition_name: state.competitionName?.trim() ? state.competitionName.trim() : null,
     is_home: state.type === "match" ? state.isHome === "home" : null,
-    meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
+    meeting_point:
+      state.type === "match" && state.isHome === "away" ? (state.meetingPoint ?? null) : null,
     starts_at: startsIso ?? "",
     ends_at: endsIso,
     convocation_time: state.meetingTime ? toIso(state.startDate, state.meetingTime) : null,

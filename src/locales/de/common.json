@@ -838,14 +838,7 @@
     "pendingCount_plural": "{{count}} Spieler haben noch nicht geantwortet",
     "remindAllSent": "{{count}} Erinnerung gesendet",
     "remindAllSent_plural": "{{count}} Erinnerungen gesendet",
-    "reasonsAbsent": [
-      "Travail",
-      "Famille",
-      "Blessure",
-      "Maladie",
-      "Lernen",
-      "Autre engagement"
-    ],
+    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",

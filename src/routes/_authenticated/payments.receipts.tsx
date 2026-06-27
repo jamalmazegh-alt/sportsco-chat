@@ -2,10 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import {
-  listMyReceipts,
-  getReceiptDownloadUrl,
-} from "@/lib/payment-receipts.functions";
+import { listMyReceipts, getReceiptDownloadUrl } from "@/lib/payment-receipts.functions";
 import { BackLink } from "@/components/back-link";
 import { Button } from "@/components/ui/button";
 import { Loader2, Download, Receipt } from "lucide-react";
@@ -73,9 +70,7 @@ function MyReceiptsPage() {
           <Receipt className="h-6 w-6 text-primary" />
           {t("payments.receipts")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          {t("payments.receiptsSubtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("payments.receiptsSubtitle")}</p>
       </header>
 
       {q.isLoading && (

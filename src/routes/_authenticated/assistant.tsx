@@ -13,11 +13,7 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import {
-  Message,
-  MessageContent,
-  MessageResponse,
-} from "@/components/ai-elements/message";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
   PromptInput,
   PromptInputTextarea,
@@ -88,7 +84,7 @@ function AssistantPage() {
           authTokenRef.current
             ? { Authorization: `Bearer ${authTokenRef.current}` }
             : ({} as Record<string, string>),
-      })
+      }),
   );
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
@@ -97,7 +93,9 @@ function AssistantPage() {
     transport,
     onError: (err) => {
       console.error(err);
-      toast.error(err.message || t("assistant.error", { defaultValue: "Une erreur est survenue." }));
+      toast.error(
+        err.message || t("assistant.error", { defaultValue: "Une erreur est survenue." }),
+      );
     },
   });
 
@@ -134,19 +132,20 @@ function AssistantPage() {
 
   const isLoading = status === "submitted" || status === "streaming";
   const lng = i18n.language?.slice(0, 2) ?? "en";
-  const suggestions = lng === "fr"
-    ? [
-        "Quels sont mes prochains événements ?",
-        "Montre-moi mes statistiques de présence",
-        "Comment répondre à une convocation ?",
-        "Comment fonctionne l'export de mes données ?",
-      ]
-    : [
-        "What are my upcoming events?",
-        "Show my training attendance stats",
-        "How do I respond to a convocation?",
-        "How does data export work?",
-      ];
+  const suggestions =
+    lng === "fr"
+      ? [
+          "Quels sont mes prochains événements ?",
+          "Montre-moi mes statistiques de présence",
+          "Comment répondre à une convocation ?",
+          "Comment fonctionne l'export de mes données ?",
+        ]
+      : [
+          "What are my upcoming events?",
+          "Show my training attendance stats",
+          "How do I respond to a convocation?",
+          "How does data export work?",
+        ];
 
   return (
     <div className="flex flex-col h-[calc(100dvh-72px)]">
@@ -160,7 +159,9 @@ function AssistantPage() {
               {t("assistant.title", { defaultValue: "Assistant Clubero" })}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {t("assistant.subtitle", { defaultValue: "Assistant IA · vérifie les informations importantes" })}
+              {t("assistant.subtitle", {
+                defaultValue: "Assistant IA · vérifie les informations importantes",
+              })}
             </p>
           </div>
         </div>
@@ -170,7 +171,12 @@ function AssistantPage() {
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
-          <Button asChild variant="ghost" size="icon-sm" aria-label={t("assistant.close", { defaultValue: "Close" })}>
+          <Button
+            asChild
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("assistant.close", { defaultValue: "Close" })}
+          >
             <Link to="/home">
               <X className="h-4 w-4" />
             </Link>
@@ -208,7 +214,9 @@ function AssistantPage() {
                 m.role === "assistant" && mIdx === messages.length - 1 && !isLoading;
               return (
                 <Message key={m.id} from={m.role === "user" ? "user" : "assistant"}>
-                  <MessageContent className={m.role === "assistant" ? "bg-transparent p-0" : undefined}>
+                  <MessageContent
+                    className={m.role === "assistant" ? "bg-transparent p-0" : undefined}
+                  >
                     {m.parts.map((part, idx) => {
                       if (part.type === "text") {
                         let text = part.text;
@@ -260,9 +268,14 @@ function AssistantPage() {
                           );
                         }
                         return (
-                          <div key={idx} className="my-1 flex items-center gap-2 text-xs text-muted-foreground">
+                          <div
+                            key={idx}
+                            className="my-1 flex items-center gap-2 text-xs text-muted-foreground"
+                          >
                             <Wrench className="h-3 w-3 animate-pulse" />
-                            <Shimmer>{t("assistant.searching", { defaultValue: "Recherche..." })}</Shimmer>
+                            <Shimmer>
+                              {t("assistant.searching", { defaultValue: "Recherche..." })}
+                            </Shimmer>
                           </div>
                         );
                       }
@@ -293,7 +306,11 @@ function AssistantPage() {
           />
           <PromptInputFooter className="justify-end gap-1">
             <VoiceInputButton textareaRef={textareaRef} disabled={!authToken || !user} />
-            <PromptInputSubmit status={status} onStop={stop} disabled={!authToken || !user || isLoading} />
+            <PromptInputSubmit
+              status={status}
+              onStop={stop}
+              disabled={!authToken || !user || isLoading}
+            />
           </PromptInputFooter>
         </PromptInput>
       </div>

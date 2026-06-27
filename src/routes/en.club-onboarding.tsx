@@ -9,7 +9,10 @@ export const Route = createFileRoute("/en/club-onboarding")({
       { title: i18n.t("meta.onboarding.title", { lng: "en" }) },
       { name: "description", content: i18n.t("meta.onboarding.description", { lng: "en" }) },
       { property: "og:title", content: i18n.t("meta.onboarding.title", { lng: "en" }) },
-      { property: "og:description", content: i18n.t("meta.onboarding.ogDescription", { lng: "en" }) },
+      {
+        property: "og:description",
+        content: i18n.t("meta.onboarding.ogDescription", { lng: "en" }),
+      },
       { property: "og:locale", content: "en_US" },
     ],
     links: [

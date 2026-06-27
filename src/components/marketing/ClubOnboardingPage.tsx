@@ -32,7 +32,6 @@ const IMPORT_ICONS = [
   ImageIcon,
 ];
 
-
 const STEP_ILLUSTRATIONS = [
   "/images/onboarding/onboarding-step-1.webp",
   "/images/onboarding/onboarding-step-2.webp",
@@ -65,12 +64,17 @@ export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
       }
     };
     i18n.on("languageChanged", handler);
-    return () => { i18n.off("languageChanged", handler); };
+    return () => {
+      i18n.off("languageChanged", handler);
+    };
   }, [locale, i18n, navigate]);
 
   const imports = t("onboarding.imports", { returnObjects: true }) as { t: string; b: string }[];
   const steps = t("onboarding.steps", { returnObjects: true }) as { t: string; b: string }[];
-  const humanPoints = t("onboarding.humanPoints", { returnObjects: true }) as { t: string; b: string }[];
+  const humanPoints = t("onboarding.humanPoints", { returnObjects: true }) as {
+    t: string;
+    b: string;
+  }[];
   const faq = t("onboarding.faq", { returnObjects: true }) as { q: string; a: string }[];
 
   return (

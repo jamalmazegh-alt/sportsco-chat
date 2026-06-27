@@ -9,7 +9,6 @@ import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
 import { logPaymentEvent } from "./tournament-payment-events.server";
 
-
 const log = createLogger("tournament-payments.server");
 
 export async function buildCheckoutForRegistration(params: {
@@ -56,11 +55,11 @@ export async function buildCheckoutForRegistration(params: {
     .eq("club_id", t.club_id)
     .maybeSingle();
   const now = Date.now();
-  const hasActiveSubscription = !!sub && (
-    (sub.status === "trialing" && sub.trial_end && new Date(sub.trial_end).getTime() > now) ||
-    ((sub.status === "active" || sub.status === "past_due") &&
-      (!sub.current_period_end || new Date(sub.current_period_end).getTime() > now))
-  );
+  const hasActiveSubscription =
+    !!sub &&
+    ((sub.status === "trialing" && sub.trial_end && new Date(sub.trial_end).getTime() > now) ||
+      ((sub.status === "active" || sub.status === "past_due") &&
+        (!sub.current_period_end || new Date(sub.current_period_end).getTime() > now)));
 
   const fee = computeFeeForClub(t.registration_fee, hasActiveSubscription);
 
@@ -77,8 +76,7 @@ export async function buildCheckoutForRegistration(params: {
           unit_amount: t.registration_fee,
           product_data: {
             name: `${t.name} — ${reg.team_name}`,
-            description:
-              t.registration_fee_description ?? "Tournament registration fee",
+            description: t.registration_fee_description ?? "Tournament registration fee",
           },
         },
       },
@@ -116,13 +114,11 @@ export async function buildCheckoutForRegistration(params: {
     })
     .eq("id", reg.id);
 
-  await logPaymentEvent(
-    t.id,
-    reg.id,
-    "checkout_created",
-    t.registration_fee,
-    { session_id: session.id, fee, club_id: t.club_id },
-  );
+  await logPaymentEvent(t.id, reg.id, "checkout_created", t.registration_fee, {
+    session_id: session.id,
+    fee,
+    club_id: t.club_id,
+  });
 
   return { url: session.url, sessionId: session.id };
 }
@@ -139,7 +135,7 @@ export async function handleTournamentCheckoutCompleted(
   const paymentIntentId =
     typeof session.payment_intent === "string"
       ? session.payment_intent
-      : session.payment_intent?.id ?? null;
+      : (session.payment_intent?.id ?? null);
 
   const stripe = getStripe();
   let chargeId: string | null = null;
@@ -210,14 +206,14 @@ export async function handleTournamentCheckoutCompleted(
   );
 }
 
-
 export async function handleTournamentChargeRefunded(
   charge: Stripe.Charge,
   eventId: string,
 ): Promise<void> {
-  const piId = typeof charge.payment_intent === "string"
-    ? charge.payment_intent
-    : charge.payment_intent?.id ?? null;
+  const piId =
+    typeof charge.payment_intent === "string"
+      ? charge.payment_intent
+      : (charge.payment_intent?.id ?? null);
   if (!piId) return;
 
   const { data: reg } = await supabaseAdmin

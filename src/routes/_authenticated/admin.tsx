@@ -20,7 +20,12 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
-    { to: "/admin/billing", icon: CreditCard, label: t("billing.title", { defaultValue: "Abonnement" }), exact: false },
+    {
+      to: "/admin/billing",
+      icon: CreditCard,
+      label: t("billing.title", { defaultValue: "Abonnement" }),
+      exact: false,
+    },
   ];
 
   return (
@@ -40,9 +45,7 @@ function AdminLayout() {
                 to={tab.to}
                 className={cn(
                   "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                  active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted/40"
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/40",
                 )}
               >
                 <Icon className="h-4 w-4" />

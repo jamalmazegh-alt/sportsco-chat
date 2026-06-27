@@ -25,15 +25,19 @@ export const listPrivacyRequests = createServerFn({ method: "GET" })
         .limit(100),
       supabaseAdmin
         .from("account_deletion_requests")
-        .select("id, user_id, status, requested_at, scheduled_for, processed_at, reason, approved_at, approved_by, error, hard_delete")
+        .select(
+          "id, user_id, status, requested_at, scheduled_for, processed_at, reason, approved_at, approved_by, error, hard_delete",
+        )
         .order("requested_at", { ascending: false })
         .limit(100),
     ]);
     // Resolve user emails
-    const allIds = Array.from(new Set([
-      ...(exp.data ?? []).map((r: any) => r.user_id),
-      ...(del.data ?? []).map((r: any) => r.user_id),
-    ]));
+    const allIds = Array.from(
+      new Set([
+        ...(exp.data ?? []).map((r: any) => r.user_id),
+        ...(del.data ?? []).map((r: any) => r.user_id),
+      ]),
+    );
     const userMap = new Map<string, { email: string | null; name: string | null }>();
     if (allIds.length) {
       const { data: profs } = await supabaseAdmin
@@ -41,7 +45,10 @@ export const listPrivacyRequests = createServerFn({ method: "GET" })
         .select("id, first_name, last_name")
         .in("id", allIds);
       for (const p of profs ?? []) {
-        userMap.set(p.id, { email: null, name: [p.first_name, p.last_name].filter(Boolean).join(" ") || null });
+        userMap.set(p.id, {
+          email: null,
+          name: [p.first_name, p.last_name].filter(Boolean).join(" ") || null,
+        });
       }
       for (const id of allIds) {
         const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
@@ -85,7 +92,10 @@ export const approveDeletion = createServerFn({ method: "POST" })
       .eq("status", "pending");
     if (error) throw error;
     const { processDeletionRequest } = await import("@/lib/privacy-worker.server");
-    await processDeletionRequest(data.id, { processedBy: context.userId, hardDelete: !!data.hardDelete });
+    await processDeletionRequest(data.id, {
+      processedBy: context.userId,
+      hardDelete: !!data.hardDelete,
+    });
     return { ok: true };
   });
 

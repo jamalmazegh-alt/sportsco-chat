@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  listObligationsForItem,
-  recordManualPayment,
-} from "@/lib/payment-checkout.functions";
+import { listObligationsForItem, recordManualPayment } from "@/lib/payment-checkout.functions";
 import {
   exemptObligation,
   cancelObligation,
@@ -97,18 +94,17 @@ export function CollectPaymentDialog({
   });
 
   const [active, setActive] = useState<Obligation | null>(null);
-  const [reasonDialog, setReasonDialog] = useState<
-    | { kind: "exempt" | "cancel"; obligation: Obligation }
-    | null
-  >(null);
+  const [reasonDialog, setReasonDialog] = useState<{
+    kind: "exempt" | "cancel";
+    obligation: Obligation;
+  } | null>(null);
   const [refundDialog, setRefundDialog] = useState<Obligation | null>(null);
 
   const exemptFn = useServerFn(exemptObligation);
   const cancelFn = useServerFn(cancelObligation);
   const reopenFn = useServerFn(reopenObligation);
 
-  const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ["item-obligations", clubId, itemId] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["item-obligations", clubId, itemId] });
 
   const reopenMut = useMutation({
     mutationFn: (id: string) => reopenFn({ data: { obligationId: id } }),
@@ -140,8 +136,8 @@ export function CollectPaymentDialog({
 
         {q.data && q.data.obligations.length === 0 && (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Aucun joueur n'a encore d'obligation pour ce poste. Vérifiez que
-            la cible (club / équipes / joueurs) contient bien des joueurs.
+            Aucun joueur n'a encore d'obligation pour ce poste. Vérifiez que la cible (club /
+            équipes / joueurs) contient bien des joueurs.
           </p>
         )}
 
@@ -149,22 +145,16 @@ export function CollectPaymentDialog({
           {(q.data?.obligations as Obligation[] | undefined)?.map((o) => {
             const remaining = o.amount_due_cents - o.amount_paid_cents;
             const playerName =
-              `${o.players?.first_name ?? ""} ${o.players?.last_name ?? ""}`.trim() ||
-              "—";
+              `${o.players?.first_name ?? ""} ${o.players?.last_name ?? ""}`.trim() || "—";
             const currency = (o.currency || "eur").toUpperCase();
             const isClosed = o.status === "cancelled" || o.status === "exempted";
             const hasPaid = o.amount_paid_cents > 0;
             return (
-              <li
-                key={o.id}
-                className="flex flex-wrap items-center gap-3 px-3 py-2.5"
-              >
+              <li key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{playerName}</p>
                   <p className="text-[11px] text-muted-foreground truncate">
-                    {o.payer?.name
-                      ? `Payeur : ${o.payer.name}`
-                      : "Payeur non lié"}
+                    {o.payer?.name ? `Payeur : ${o.payer.name}` : "Payeur non lié"}
                   </p>
                 </div>
                 <span
@@ -208,16 +198,12 @@ export function CollectPaymentDialog({
                         {!hasPaid && (
                           <>
                             <DropdownMenuItem
-                              onClick={() =>
-                                setReasonDialog({ kind: "exempt", obligation: o })
-                              }
+                              onClick={() => setReasonDialog({ kind: "exempt", obligation: o })}
                             >
                               <ShieldOff className="h-4 w-4 mr-2" /> Exempter
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() =>
-                                setReasonDialog({ kind: "cancel", obligation: o })
-                              }
+                              onClick={() => setReasonDialog({ kind: "cancel", obligation: o })}
                             >
                               <Ban className="h-4 w-4 mr-2" /> Annuler
                             </DropdownMenuItem>
@@ -274,9 +260,7 @@ export function CollectPaymentDialog({
               try {
                 await fn({ data: { obligationId: reasonDialog.obligation.id, reason } });
                 toast.success(
-                  reasonDialog.kind === "exempt"
-                    ? "Obligation exemptée"
-                    : "Obligation annulée",
+                  reasonDialog.kind === "exempt" ? "Obligation exemptée" : "Obligation annulée",
                 );
                 setReasonDialog(null);
                 invalidate();
@@ -426,8 +410,7 @@ function RefundDialog({
               <Label className="text-xs">Transaction à rembourser</Label>
               <div className="space-y-1 max-h-48 overflow-y-auto">
                 {txQ.data!.map((t) => {
-                  const refundable =
-                    t.amount_gross_cents - (t.refunded_amount_cents ?? 0);
+                  const refundable = t.amount_gross_cents - (t.refunded_amount_cents ?? 0);
                   return (
                     <button
                       key={t.id}
@@ -444,9 +427,7 @@ function RefundDialog({
                     >
                       <span>
                         {t.method} ·{" "}
-                        {new Date(t.paid_at ?? t.created_at).toLocaleDateString(
-                          "fr-FR",
-                        )}
+                        {new Date(t.paid_at ?? t.created_at).toLocaleDateString("fr-FR")}
                       </span>
                       <span className="font-medium">
                         {(refundable / 100).toFixed(2)} {currency}
@@ -581,10 +562,7 @@ function ManualPaymentForm({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">Mode</Label>
-              <Select
-                value={method}
-                onValueChange={(v) => setMethod(v as typeof method)}
-              >
+              <Select value={method} onValueChange={(v) => setMethod(v as typeof method)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -646,11 +624,7 @@ function ManualPaymentForm({
               Math.round(parseFloat(amount || "0") * 100) > remaining
             }
           >
-            {save.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Enregistrer"
-            )}
+            {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
           </Button>
         </DialogFooter>
       </DialogContent>

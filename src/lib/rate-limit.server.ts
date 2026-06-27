@@ -34,11 +34,7 @@ function currentHourBucket(): string {
  * Returns true when the request is within the allowed quota, false when it
  * should be rejected with HTTP 429.
  */
-export async function checkRateLimit(
-  ip: string,
-  route: string,
-  limit: number,
-): Promise<boolean> {
+export async function checkRateLimit(ip: string, route: string, limit: number): Promise<boolean> {
   const windowStart = currentHourBucket();
   try {
     const { data, error } = await supabaseAdmin.rpc("increment_rate_limit" as any, {

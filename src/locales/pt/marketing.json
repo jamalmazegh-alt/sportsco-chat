@@ -1225,11 +1225,7 @@
         "b": "Fases finais após uma temporada regular."
       }
     ],
-    "formatsExtras": [
-      "Programação automática",
-      "Atribuição de campos",
-      "Gestão de qualificações"
-    ],
+    "formatsExtras": ["Programação automática", "Atribuição de campos", "Gestão de qualificações"],
     "mobileTitle": "Mobile first, diretamente no campo.",
     "mobileSubtitle": "Feito para ser usado com uma mão, entre dois jogos.",
     "mobilePoints": [

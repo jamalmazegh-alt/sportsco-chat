@@ -9,7 +9,10 @@ export const Route = createFileRoute("/fr/tournois")({
       { title: i18n.t("meta.tournamentsPage.title", { lng: "fr" }) },
       { name: "description", content: i18n.t("meta.tournamentsPage.description", { lng: "fr" }) },
       { property: "og:title", content: i18n.t("meta.tournamentsPage.title", { lng: "fr" }) },
-      { property: "og:description", content: i18n.t("meta.tournamentsPage.ogDescription", { lng: "fr" }) },
+      {
+        property: "og:description",
+        content: i18n.t("meta.tournamentsPage.ogDescription", { lng: "fr" }),
+      },
       { property: "og:locale", content: "fr_FR" },
       { property: "og:url", content: "https://clubero.app/fr/tournois" },
     ],

@@ -29,12 +29,7 @@ import { setClubMemberRoles } from "@/lib/permissions.functions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,21 +87,15 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
     enabled: !!userId && !!activeClubId && roles.includes("admin") && open,
-    queryFn: () =>
-      fetchDetail({ data: { club_id: activeClubId!, user_id: userId! } }),
+    queryFn: () => fetchDetail({ data: { club_id: activeClubId!, user_id: userId! } }),
   });
 
   const p = data?.profile;
   const name =
-    (p?.full_name
-      ?? [p?.first_name, p?.last_name].filter(Boolean).join(" "))
-    || data?.email
-    || "—";
+    (p?.full_name ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ")) || data?.email || "—";
   const isSelf = user?.id === userId;
 
-  const clubMemberships = (data?.memberships ?? []).filter(
-    (m: any) => m.club_id === activeClubId,
-  );
+  const clubMemberships = (data?.memberships ?? []).filter((m: any) => m.club_id === activeClubId);
   const allClubRoles: Set<string> = (() => {
     const set = new Set<string>();
     for (const m of clubMemberships) {
@@ -268,13 +257,17 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                     {p?.created_at && (
                       <div>
                         <p className="uppercase tracking-wider">{t("admin.joined")}</p>
-                        <p className="text-foreground/80 mt-0.5">{fmt(new Date(p.created_at), "PP")}</p>
+                        <p className="text-foreground/80 mt-0.5">
+                          {fmt(new Date(p.created_at), "PP")}
+                        </p>
                       </div>
                     )}
                     {data.last_sign_in_at && (
                       <div>
                         <p className="uppercase tracking-wider">{t("admin.lastSignIn")}</p>
-                        <p className="text-foreground/80 mt-0.5">{fmt(new Date(data.last_sign_in_at), "PP")}</p>
+                        <p className="text-foreground/80 mt-0.5">
+                          {fmt(new Date(data.last_sign_in_at), "PP")}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -345,7 +338,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                                 disabled={isDisabled}
                                 onCheckedChange={(v) => toggleRole(r, !!v)}
                               />
-                              <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+                              <span className="text-sm">
+                                {t(`roles.${r}`, { defaultValue: r })}
+                              </span>
                             </label>
                           );
                           if (incompatible && blockingRole) {
@@ -356,7 +351,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   {t("roles.incompatibleWith", {
-                                    role: t(`roles.${blockingRole}`, { defaultValue: blockingRole }),
+                                    role: t(`roles.${blockingRole}`, {
+                                      defaultValue: blockingRole,
+                                    }),
                                   })}
                                 </TooltipContent>
                               </Tooltip>
@@ -369,7 +366,6 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                   )}
                 </section>
               )}
-
 
               {/* Linked players */}
               {(data.linkedPlayers.length > 0 || data.parentLinks.length > 0) && (
@@ -390,7 +386,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                           className="text-sm text-primary hover:underline"
                         >
                           {pl.first_name} {pl.last_name}{" "}
-                          <span className="text-xs text-muted-foreground">({t("roles.player")})</span>
+                          <span className="text-xs text-muted-foreground">
+                            ({t("roles.player")})
+                          </span>
                         </Link>
                       </li>
                     ))}
@@ -405,10 +403,12 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                               className="text-sm text-primary hover:underline"
                             >
                               {pp.players.first_name} {pp.players.last_name}{" "}
-                              <span className="text-xs text-muted-foreground">({t("roles.parent")})</span>
+                              <span className="text-xs text-muted-foreground">
+                                ({t("roles.parent")})
+                              </span>
                             </Link>
                           </li>
-                        )
+                        ),
                     )}
                   </ul>
                 </section>

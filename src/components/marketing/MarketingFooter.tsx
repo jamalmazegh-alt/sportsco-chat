@@ -16,9 +16,7 @@ export function MarketingFooter() {
             <Link to="/" className="flex items-center" aria-label="Clubero">
               <img src={logo} alt="Clubero" className="h-11 w-auto object-contain" />
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              {t("footer.tagline")}
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{t("footer.tagline")}</p>
           </div>
 
           <div>
@@ -26,12 +24,36 @@ export function MarketingFooter() {
               {t("footer.product")}
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/features" className="hover:text-foreground">{t("nav.features")}</Link></li>
-              <li><Link to={tournamentsTo} className="hover:text-foreground">{t("nav.tournaments")}</Link></li>
-              <li><Link to={onboardingTo} className="hover:text-foreground">{t("nav.onboarding")}</Link></li>
-              <li><Link to="/pricing" className="hover:text-foreground">{t("nav.pricing")}</Link></li>
-              <li><Link to="/demo" className="hover:text-foreground">{t("nav.demo")}</Link></li>
-              <li><Link to="/login" className="hover:text-foreground">{t("nav.login")}</Link></li>
+              <li>
+                <Link to="/features" className="hover:text-foreground">
+                  {t("nav.features")}
+                </Link>
+              </li>
+              <li>
+                <Link to={tournamentsTo} className="hover:text-foreground">
+                  {t("nav.tournaments")}
+                </Link>
+              </li>
+              <li>
+                <Link to={onboardingTo} className="hover:text-foreground">
+                  {t("nav.onboarding")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="hover:text-foreground">
+                  {t("nav.pricing")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/demo" className="hover:text-foreground">
+                  {t("nav.demo")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-foreground">
+                  {t("nav.login")}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -40,8 +62,16 @@ export function MarketingFooter() {
               {t("footer.company")}
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/faq" className="hover:text-foreground">{t("nav.faq")}</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground">{t("nav.contact")}</Link></li>
+              <li>
+                <Link to="/faq" className="hover:text-foreground">
+                  {t("nav.faq")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-foreground">
+                  {t("nav.contact")}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -51,17 +81,29 @@ export function MarketingFooter() {
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <Link to="/legal/$kind" params={{ kind: "terms" }} className="hover:text-foreground">
+                <Link
+                  to="/legal/$kind"
+                  params={{ kind: "terms" }}
+                  className="hover:text-foreground"
+                >
                   {t("footer.terms")}
                 </Link>
               </li>
               <li>
-                <Link to="/legal/$kind" params={{ kind: "privacy" }} className="hover:text-foreground">
+                <Link
+                  to="/legal/$kind"
+                  params={{ kind: "privacy" }}
+                  className="hover:text-foreground"
+                >
                   {t("footer.privacy")}
                 </Link>
               </li>
               <li>
-                <Link to="/legal/$kind" params={{ kind: "legal_notice" }} className="hover:text-foreground">
+                <Link
+                  to="/legal/$kind"
+                  params={{ kind: "legal_notice" }}
+                  className="hover:text-foreground"
+                >
                   {t("footer.legalNotice")}
                 </Link>
               </li>

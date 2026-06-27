@@ -85,5 +85,5 @@ if (missing > 0) {
 }
 console.log(
   `✓ i18n parity OK across ${locales.length} locales / ${namespaces.length} namespaces` +
-    (extra > 0 ? ` (${extra} extra key(s) noted)` : "")
+    (extra > 0 ? ` (${extra} extra key(s) noted)` : ""),
 );

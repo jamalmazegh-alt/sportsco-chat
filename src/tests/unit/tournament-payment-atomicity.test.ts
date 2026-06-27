@@ -35,9 +35,17 @@ vi.mock("@/integrations/supabase/client.server", () => {
       if (table !== "tournament_registrations") {
         // unrelated calls (e.g. logger) — return a no-op chain
         return {
-          select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
-          insert: () => ({ select: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
-          update: () => ({ eq: () => ({ select: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }),
+          select: () => ({
+            eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+          }),
+          insert: () => ({
+            select: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+          }),
+          update: () => ({
+            eq: () => ({
+              select: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+            }),
+          }),
         };
       }
       return {
@@ -184,9 +192,7 @@ describe("payment atomicity — client cannot inject amount/tournament", () => {
     expect(state.reg.tournament_team_id).toMatch(/^team-/);
     // The RPC was called with registration_id only — tournament_id and amount
     // are not parameters, so they cannot be poisoned.
-    const ensureCalls = state.rpcCalls.filter(
-      (c) => c.name === "ensure_team_for_registration",
-    );
+    const ensureCalls = state.rpcCalls.filter((c) => c.name === "ensure_team_for_registration");
     expect(ensureCalls).toHaveLength(1);
     expect(ensureCalls[0].args).toEqual({ _registration_id: "reg-1" });
   });

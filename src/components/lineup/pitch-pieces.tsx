@@ -35,7 +35,9 @@ export function PlayerChip({
           className={cn(
             "rounded-full ring-2 ring-white shadow-md grid place-content-center font-bold overflow-hidden",
             dim,
-            player.convocated === false ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground",
+            player.convocated === false
+              ? "bg-muted text-muted-foreground"
+              : "bg-primary text-primary-foreground",
           )}
         >
           {player.photo_url ? (

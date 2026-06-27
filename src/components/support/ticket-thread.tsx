@@ -104,7 +104,9 @@ export function TicketThread({
                   </div>
                 )}
                 {!m.is_internal_note && isStaff && !mine && (
-                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">{t("thread.staff_label")}</div>
+                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">
+                    {t("thread.staff_label")}
+                  </div>
                 )}
                 <div>{m.body}</div>
                 {m.attachment_paths.length > 0 && (
@@ -115,7 +117,9 @@ export function TicketThread({
                         onClick={() => openAttachment(p)}
                         className={cn(
                           "flex items-center gap-1.5 text-xs underline-offset-2 hover:underline",
-                          mine && !m.is_internal_note ? "text-primary-foreground/90" : "text-foreground/80",
+                          mine && !m.is_internal_note
+                            ? "text-primary-foreground/90"
+                            : "text-foreground/80",
                         )}
                       >
                         <Download className="h-3 w-3" />
@@ -183,12 +187,12 @@ export function TicketThread({
               </label>
             )}
           </div>
-          <Button
-            onClick={() => send.mutate()}
-            disabled={send.isPending || !body.trim()}
-            size="sm"
-          >
-            {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          <Button onClick={() => send.mutate()} disabled={send.isPending || !body.trim()} size="sm">
+            {send.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
             {t("thread.send")}
           </Button>
         </div>

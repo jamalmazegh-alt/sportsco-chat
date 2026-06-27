@@ -1,4 +1,12 @@
-import { createFileRoute, Outlet, Link, notFound, useLocation, useNavigate, isRedirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  Link,
+  notFound,
+  useLocation,
+  useNavigate,
+  isRedirect,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { checkSuperAdmin } from "@/lib/superadmin.functions";
 import { useAuth } from "@/lib/auth-context";
@@ -48,14 +56,11 @@ const NAV: NavItem[] = [
   { to: "/superadmin/settings", label: "Settings", icon: Settings },
 ];
 
-
 function SuperAdminLayout() {
   const { session, loading } = useAuth();
   const { verified } = Route.useLoaderData();
   // If the server loader verified, we skip the client re-check (no spinner flash).
-  const [state, setState] = useState<"checking" | "ok" | "denied">(
-    verified ? "ok" : "checking",
-  );
+  const [state, setState] = useState<"checking" | "ok" | "denied">(verified ? "ok" : "checking");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -190,4 +195,3 @@ function SuperAdminLayout() {
     </div>
   );
 }
-

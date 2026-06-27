@@ -27,12 +27,12 @@ export function VoiceInputButton({ textareaRef, disabled, className }: VoiceInpu
       // React tracks input via a native setter; bypass it so onChange fires.
       const setter = Object.getOwnPropertyDescriptor(
         window.HTMLTextAreaElement.prototype,
-        "value"
+        "value",
       )?.set;
       setter?.call(ta, value);
       ta.dispatchEvent(new Event("input", { bubbles: true }));
     },
-    [textareaRef]
+    [textareaRef],
   );
 
   const { isListening, isSupported, start, stop } = useSpeechToText({

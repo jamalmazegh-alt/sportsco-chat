@@ -4,7 +4,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Eye, ExternalLink, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
+import {
+  Eye,
+  ExternalLink,
+  Loader2,
+  MegaphoneIcon,
+  MessageSquare,
+  Pin,
+  PinOff,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -16,7 +26,14 @@ import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
-type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
+type Comment = {
+  id: string;
+  post_id: string;
+  author_user_id: string;
+  body: string;
+  created_at: string;
+  author?: Profile | null;
+};
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
 type AudienceType = "club" | "team" | "multi_team";
 type Team = { id: string; name: string };
@@ -39,10 +56,15 @@ type Post = {
   reads?: { user_id: string; read_at: string }[];
 };
 
-
 const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: string }> = {
-  instagram: { label: "Instagram", cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30" },
-  facebook: { label: "Facebook", cls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30" },
+  instagram: {
+    label: "Instagram",
+    cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30",
+  },
+  facebook: {
+    label: "Facebook",
+    cls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
+  },
   twitter: { label: "X", cls: "bg-foreground/10 text-foreground border-foreground/20" },
 };
 
@@ -68,12 +90,17 @@ export function WallFeed({ clubId }: { clubId: string }) {
   async function load() {
     setLoading(true);
     const { data: club } = await supabase
-      .from("clubs").select("wall_comments_enabled").eq("id", clubId).single();
+      .from("clubs")
+      .select("wall_comments_enabled")
+      .eq("id", clubId)
+      .single();
     setCommentsEnabled(!!club?.wall_comments_enabled);
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type")
+      .select(
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type",
+      )
       .eq("club_id", clubId)
       .is("deleted_at", null)
       .order("is_pinned", { ascending: false })
@@ -82,7 +109,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     // Dedupe by id (realtime + initial fetch sometimes overlap)
     const seen = new Set<string>();
-    const ps = ((rawPosts ?? []) as Post[]).filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)));
+    const ps = ((rawPosts ?? []) as Post[]).filter((p) =>
+      seen.has(p.id) ? false : (seen.add(p.id), true),
+    );
     if (ps.length) {
       const ids = ps.map((p) => p.id);
       const { data: rawComments } = await supabase
@@ -91,12 +120,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .in("post_id", ids)
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
-      const allUserIds = Array.from(new Set([
-        ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
-        ...((rawComments ?? []).map((c) => c.author_user_id)),
-      ]));
+      const allUserIds = Array.from(
+        new Set([
+          ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
+          ...(rawComments ?? []).map((c) => c.author_user_id),
+        ]),
+      );
       const { data: profs } = await supabase
-        .from("profiles").select("id, full_name, avatar_url").in("id", allUserIds);
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", allUserIds);
       const map = new Map((profs ?? []).map((p) => [p.id, p as Profile]));
       const cByPost = new Map<string, Comment[]>();
       const seenComments = new Set<string>();
@@ -120,7 +153,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         rByPost.set(r.post_id, arr);
       });
       ps.forEach((p) => {
-        p.author = p.author_user_id ? map.get(p.author_user_id) ?? null : null;
+        p.author = p.author_user_id ? (map.get(p.author_user_id) ?? null) : null;
         p.comments = cByPost.get(p.id) ?? [];
         p.reads = rByPost.get(p.id) ?? [];
       });
@@ -146,21 +179,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
     setLoading(false);
   }
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [clubId]);
+  useEffect(() => {
+    load(); /* eslint-disable-next-line */
+  }, [clubId]);
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
     const channelName = `wall:${clubId}:${Math.random().toString(36).slice(2)}`;
     const ch = supabase
       .channel(channelName)
-      .on("postgres_changes",
+      .on(
+        "postgres_changes",
         { event: "*", schema: "public", table: "wall_posts", filter: `club_id=eq.${clubId}` },
-        () => load())
-      .on("postgres_changes",
-        { event: "*", schema: "public", table: "wall_comments" },
-        () => load())
+        () => load(),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
+        load(),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
     // eslint-disable-next-line
   }, [clubId]);
 
@@ -190,7 +229,10 @@ export function WallFeed({ clubId }: { clubId: string }) {
           .from("team_members")
           .select("team_id")
           .eq("user_id", user.id)
-          .in("team_id", all.map((t) => t.id));
+          .in(
+            "team_id",
+            all.map((t) => t.id),
+          );
         const allowed = new Set((tm ?? []).map((r) => (r as any).team_id as string));
         targetable = all.filter((t) => allowed.has(t.id));
       }
@@ -209,21 +251,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
         setAudience([]);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line
   }, [clubId, user?.id, roles.join("|")]);
-
 
   async function notifyMentioned(ids: string[], link: string, snippet: string) {
     if (!user || ids.length === 0) return;
     const recipients = ids.filter((id) => id !== user.id);
     if (recipients.length === 0) return;
-    const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
+    const authorName =
+      (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data
+        ?.full_name ?? "—";
     await supabase.from("notifications").insert(
       recipients.map((uid) => ({
         user_id: uid,
         type: "wall_mention",
-        title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
+        title: t("wall.mentionTitle", {
+          defaultValue: "{{name}} vous a mentionné",
+          name: authorName,
+        }),
         body: snippet.slice(0, 140),
         link,
       })),
@@ -241,7 +289,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
     const audienceForInsert: string[] | null =
       audience === null ? null : audience.length === 0 ? null : audience;
     if (!isPriv && audienceForInsert === null && audience !== null) {
-      toast.error(t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe ou « Tout le club »." }));
+      toast.error(
+        t("wall.audienceRequired", {
+          defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
+        }),
+      );
       return;
     }
 
@@ -318,14 +370,18 @@ export function WallFeed({ clubId }: { clubId: string }) {
       await notifyMentioned(mentioned, `/inbox#${data.id}`, body.trim());
     }
     if (data?.id) {
-      const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
+      const authorName =
+        (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data
+          ?.full_name ?? "—";
 
       // Recipient set for in-app notifications must mirror the post audience
       // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
       const recipientSet = new Set<string>();
       if (audienceForInsert === null) {
         const { data: members } = await supabase
-          .from("club_members").select("user_id").eq("club_id", clubId);
+          .from("club_members")
+          .select("user_id")
+          .eq("club_id", clubId);
         for (const m of members ?? []) {
           const uid = (m as any).user_id as string | null;
           if (uid) recipientSet.add(uid);
@@ -333,14 +389,18 @@ export function WallFeed({ clubId }: { clubId: string }) {
       } else {
         // Admins/dirigeants always see every post.
         const { data: priv } = await supabase
-          .from("club_members").select("user_id, role").eq("club_id", clubId)
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
           .in("role", ["admin", "dirigeant"]);
         for (const m of priv ?? []) {
           const uid = (m as any).user_id as string | null;
           if (uid) recipientSet.add(uid);
         }
         const { data: tm } = await supabase
-          .from("team_members").select("user_id, player_id").in("team_id", audienceForInsert);
+          .from("team_members")
+          .select("user_id, player_id")
+          .in("team_id", audienceForInsert);
         const playerIds: string[] = [];
         for (const r of tm ?? []) {
           const uid = (r as any).user_id as string | null;
@@ -350,13 +410,17 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
         if (playerIds.length) {
           const { data: pls } = await supabase
-            .from("players").select("user_id").in("id", playerIds);
+            .from("players")
+            .select("user_id")
+            .in("id", playerIds);
           for (const p of pls ?? []) {
             const uid = (p as any).user_id as string | null;
             if (uid) recipientSet.add(uid);
           }
           const { data: parents } = await supabase
-            .from("player_parents").select("parent_user_id").in("player_id", playerIds);
+            .from("player_parents")
+            .select("parent_user_id")
+            .in("player_id", playerIds);
           for (const pr of parents ?? []) {
             const uid = (pr as any).parent_user_id as string | null;
             if (uid) recipientSet.add(uid);
@@ -368,12 +432,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
       const recipients = Array.from(recipientSet);
       if (recipients.length) {
-        const snippet = body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
+        const snippet =
+          body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
         await supabase.from("notifications").insert(
           recipients.map((uid) => ({
             user_id: uid,
             type: "wall_post",
-            title: t("wall.newPostTitle", { defaultValue: "{{name}} a publié sur le mur", name: authorName }),
+            title: t("wall.newPostTitle", {
+              defaultValue: "{{name}} a publié sur le mur",
+              name: authorName,
+            }),
             body: snippet.slice(0, 140),
             link: `/inbox#${data.id}`,
           })),
@@ -398,15 +466,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
     else setAudience([]);
   }
 
-
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast(t("wall.postDeleted", { defaultValue: "Post deleted" }), {
       action: {
         label: t("common.undo", { defaultValue: "Undo" }),
         onClick: async () => {
-          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "wall_post", _id: id });
+          const { error: e2 } = await supabase.rpc("restore_entity", {
+            _kind: "wall_post",
+            _id: id,
+          });
           if (e2) toast.error(e2.message);
           else load();
         },
@@ -429,11 +502,13 @@ export function WallFeed({ clubId }: { clubId: string }) {
     return <WallFeedSkeleton />;
   }
 
-  const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const canPost =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const audienceMissing =
     canPost &&
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
-    audience !== null && audience.length === 0;
+    audience !== null &&
+    audience.length === 0;
 
   return (
     <div className="space-y-4">
@@ -450,7 +525,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
             teams={targetableTeams}
             value={audience}
             onChange={setAudience}
-            canPickClubWide={roles.includes("admin") || roles.includes("dirigeant") || targetableTeams.length === allTeams.length}
+            canPickClubWide={
+              roles.includes("admin") ||
+              roles.includes("dirigeant") ||
+              targetableTeams.length === allTeams.length
+            }
           />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <div className="flex items-center justify-between gap-2">
@@ -458,9 +537,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
               <p className="text-xs text-destructive">
                 {t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe." })}
               </p>
-            ) : <span />}
-            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0) || audienceMissing}>
-              {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
+            ) : (
+              <span />
+            )}
+            <Button
+              onClick={submitPost}
+              disabled={posting || (!body.trim() && atts.length === 0) || audienceMissing}
+            >
+              {posting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-1.5" />
+                  {t("wall.post")}
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -496,7 +587,10 @@ function AudiencePicker({
   const { t } = useTranslation();
   const isClubWide = value === null;
   function toggleTeam(id: string) {
-    if (value === null) { onChange([id]); return; }
+    if (value === null) {
+      onChange([id]);
+      return;
+    }
     if (value.includes(id)) {
       const next = value.filter((x) => x !== id);
       onChange(next);
@@ -560,14 +654,15 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
       </span>
     );
   }
-  const live = post.audience_team_ids
-    .map((id) => teamsById.get(id))
-    .filter((x): x is Team => !!x);
+  const live = post.audience_team_ids.map((id) => teamsById.get(id)).filter((x): x is Team => !!x);
   if (live.length === 0) {
     return (
       <span
         className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-muted text-muted-foreground border-border"
-        title={t("wall.scope.restrictedTitle", { defaultValue: "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement." })}
+        title={t("wall.scope.restrictedTitle", {
+          defaultValue:
+            "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement.",
+        })}
       >
         {t("wall.scope.restricted", { defaultValue: "Audience restreinte" })}
       </span>
@@ -576,7 +671,12 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
   let label: string;
   if (live.length === 1) label = live[0].name;
   else if (live.length === 2) label = `${live[0].name} + ${live[1].name}`;
-  else label = t("wall.scope.plusOthers", { defaultValue: "{{first}} + {{n}} autres", first: live[0].name, n: live.length - 1 });
+  else
+    label = t("wall.scope.plusOthers", {
+      defaultValue: "{{first}} + {{n}} autres",
+      first: live[0].name,
+      n: live.length - 1,
+    });
   const tooltip = live.map((tt) => tt.name).join(" · ");
   return (
     <span
@@ -587,9 +687,6 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
     </span>
   );
 }
-
-
-
 
 function WallGrouped({
   posts,
@@ -612,7 +709,6 @@ function WallGrouped({
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
-
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
@@ -634,7 +730,10 @@ function WallGrouped({
       <EmptyState
         icon={<MegaphoneIcon className="h-6 w-6" />}
         title={t("wall.empty")}
-        description={t("wall.emptyHint", { defaultValue: "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici." })}
+        description={t("wall.emptyHint", {
+          defaultValue:
+            "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici.",
+        })}
       />
     );
   }
@@ -644,9 +743,7 @@ function WallGrouped({
     const isExternal = p.source && p.source !== "clubero";
     const sourceMeta = isExternal ? SOURCE_META[p.source as Exclude<PostSource, "clubero">] : null;
     const canManage = !isExternal && (p.author_user_id === currentUserId || role === "admin");
-    const authorLabel = isExternal
-      ? (sourceMeta?.label ?? "—")
-      : (p.author?.full_name ?? "—");
+    const authorLabel = isExternal ? (sourceMeta?.label ?? "—") : (p.author?.full_name ?? "—");
     return (
       <li
         key={p.id}
@@ -655,18 +752,24 @@ function WallGrouped({
           "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
           "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
           "animate-in fade-in-0 slide-in-from-bottom-1 duration-300",
-          p.is_pinned ? "border-primary/40 ring-1 ring-primary/15 shadow-sm" : "border-border"
+          p.is_pinned ? "border-primary/40 ring-1 ring-primary/15 shadow-sm" : "border-border",
         )}
       >
-        <div className={cn(
-          "flex flex-col items-center justify-center w-16 shrink-0 py-3 transition-colors",
-          p.is_pinned ? "bg-primary/15" : "bg-primary/8 group-hover:bg-primary/12"
-        )}>
+        <div
+          className={cn(
+            "flex flex-col items-center justify-center w-16 shrink-0 py-3 transition-colors",
+            p.is_pinned ? "bg-primary/15" : "bg-primary/8 group-hover:bg-primary/12",
+          )}
+        >
           <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
             {fmt(d, "EEE")}
           </span>
-          <span className="text-2xl font-bold leading-none mt-0.5 tabular-nums">{format(d, "d")}</span>
-          <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">{format(d, "HH:mm")}</span>
+          <span className="text-2xl font-bold leading-none mt-0.5 tabular-nums">
+            {format(d, "d")}
+          </span>
+          <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">
+            {format(d, "HH:mm")}
+          </span>
         </div>
         <div className="flex-1 min-w-0 py-3 pr-3">
           <header className="flex items-start justify-between gap-2 mb-1.5">
@@ -674,7 +777,12 @@ function WallGrouped({
               {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30 shrink-0" />}
               <p className="text-sm font-semibold truncate">{authorLabel}</p>
               {sourceMeta && (
-                <span className={cn("text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0", sourceMeta.cls)}>
+                <span
+                  className={cn(
+                    "text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
+                    sourceMeta.cls,
+                  )}
+                >
                   {sourceMeta.label}
                 </span>
               )}
@@ -686,8 +794,16 @@ function WallGrouped({
                 <button
                   onClick={() => onTogglePin(p.id, !p.is_pinned)}
                   className="text-muted-foreground hover:text-primary p-1 -m-1 rounded-md hover:bg-primary/10 transition-colors"
-                  aria-label={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
-                  title={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
+                  aria-label={
+                    p.is_pinned
+                      ? t("wall.unpin", { defaultValue: "Désépingler" })
+                      : t("wall.pin", { defaultValue: "Épingler" })
+                  }
+                  title={
+                    p.is_pinned
+                      ? t("wall.unpin", { defaultValue: "Désépingler" })
+                      : t("wall.pin", { defaultValue: "Épingler" })
+                  }
                 >
                   {p.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
                 </button>
@@ -731,11 +847,16 @@ function WallGrouped({
               className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
-              {t("wall.viewOn", { defaultValue: "Voir sur {{network}}", network: sourceMeta?.label ?? "" })}
+              {t("wall.viewOn", {
+                defaultValue: "Voir sur {{network}}",
+                network: sourceMeta?.label ?? "",
+              })}
             </a>
           )}
-          {!isExternal && (p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
-            memberCount > 0 && (() => {
+          {!isExternal &&
+            (p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+            memberCount > 0 &&
+            (() => {
               const denom = Math.max(memberCount - 1, 0);
               const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
               const capped = Math.min(readers, denom);
@@ -780,7 +901,17 @@ function WallGrouped({
   );
 }
 
-function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; currentUserId: string | null; role: string | null; clubId: string }) {
+function CommentBlock({
+  post,
+  currentUserId,
+  role,
+  clubId,
+}: {
+  post: Post;
+  currentUserId: string | null;
+  role: string | null;
+  clubId: string;
+}) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -794,15 +925,23 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
       .select("id")
       .single();
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     const mentioned = parseMentions(text).filter((id) => id !== currentUserId);
     if (mentioned.length && data?.id) {
-      const authorName = (await supabase.from("profiles").select("full_name").eq("id", currentUserId).single()).data?.full_name ?? "—";
+      const authorName =
+        (await supabase.from("profiles").select("full_name").eq("id", currentUserId).single()).data
+          ?.full_name ?? "—";
       await supabase.from("notifications").insert(
         mentioned.map((uid) => ({
           user_id: uid,
           type: "wall_mention",
-          title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
+          title: t("wall.mentionTitle", {
+            defaultValue: "{{name}} vous a mentionné",
+            name: authorName,
+          }),
           body: text.trim().slice(0, 140),
           link: `/inbox#${post.id}`,
         })),
@@ -813,12 +952,18 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
 
   async function del(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_comment", _id: id });
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast(t("wall.commentDeleted", { defaultValue: "Comment deleted" }), {
       action: {
         label: t("common.undo", { defaultValue: "Undo" }),
         onClick: async () => {
-          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "wall_comment", _id: id });
+          const { error: e2 } = await supabase.rpc("restore_entity", {
+            _kind: "wall_comment",
+            _id: id,
+          });
           if (e2) toast.error(e2.message);
         },
       },
@@ -835,18 +980,25 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
               <span className="font-medium">{c.author?.full_name ?? "—"}</span>{" "}
               <RenderWithMentions text={c.body} />
             </p>
-            <p className="text-[10px] text-muted-foreground">
-              {fmt(c.created_at, "d MMM HH:mm")}
-            </p>
+            <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
           </div>
           {(c.author_user_id === currentUserId || role === "admin") && (
-            <button onClick={() => del(c.id)} className="text-muted-foreground hover:text-destructive">
+            <button
+              onClick={() => del(c.id)}
+              className="text-muted-foreground hover:text-destructive"
+            >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
       ))}
-      <form onSubmit={(e) => { e.preventDefault(); add(); }} className="flex gap-2">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          add();
+        }}
+        className="flex gap-2"
+      >
         <div className="flex-1">
           <MentionInput
             clubId={clubId}

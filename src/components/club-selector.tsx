@@ -13,7 +13,14 @@ import { cn } from "@/lib/utils";
 
 type RoleKey = "admin" | "coach" | "assistant_coach" | "dirigeant" | "parent" | "player";
 
-const ROLE_PRIORITY: RoleKey[] = ["admin", "coach", "assistant_coach", "dirigeant", "parent", "player"];
+const ROLE_PRIORITY: RoleKey[] = [
+  "admin",
+  "coach",
+  "assistant_coach",
+  "dirigeant",
+  "parent",
+  "player",
+];
 
 function pickPrimaryRole(roles: string[] | undefined, fallback: string): RoleKey {
   const all = new Set<string>(roles && roles.length ? roles : [fallback]);
@@ -28,14 +35,14 @@ function RoleBadge({ role, className }: { role: RoleKey; className?: string }) {
       role === "admin"
         ? "Admin"
         : role === "coach"
-        ? "Coach"
-        : role === "assistant_coach"
-        ? "Adj."
-        : role === "dirigeant"
-        ? "Dirig."
-        : role === "parent"
-        ? "Parent"
-        : "Joueur",
+          ? "Coach"
+          : role === "assistant_coach"
+            ? "Adj."
+            : role === "dirigeant"
+              ? "Dirig."
+              : role === "parent"
+                ? "Parent"
+                : "Joueur",
   });
   return (
     <span
@@ -81,11 +88,7 @@ export function ClubSelector({ className }: { className?: string }) {
           aria-label={t("clubSelector.label", { defaultValue: "Changer de club" })}
         >
           {active?.club.logo_url ? (
-            <img
-              src={active.club.logo_url}
-              alt=""
-              className="h-5 w-5 rounded-sm object-cover"
-            />
+            <img src={active.club.logo_url} alt="" className="h-5 w-5 rounded-sm object-cover" />
           ) : (
             <Building2 className="h-4 w-4 text-muted-foreground" />
           )}
@@ -112,15 +115,11 @@ export function ClubSelector({ className }: { className?: string }) {
                 onClick={() => setActiveClubId(m.club_id)}
                 className={cn(
                   "flex items-center gap-2 cursor-pointer",
-                  isActive && "bg-accent font-medium"
+                  isActive && "bg-accent font-medium",
                 )}
               >
                 {m.club.logo_url ? (
-                  <img
-                    src={m.club.logo_url}
-                    alt=""
-                    className="h-5 w-5 rounded-sm object-cover"
-                  />
+                  <img src={m.club.logo_url} alt="" className="h-5 w-5 rounded-sm object-cover" />
                 ) : (
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                 )}

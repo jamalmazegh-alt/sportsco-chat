@@ -93,7 +93,12 @@ function Block({
           preserveAspectRatio="none"
         >
           <defs>
-            <pattern id={`gf-diag-${title.replace(/\W/g, "")}`} width="18" height="18" patternUnits="userSpaceOnUse">
+            <pattern
+              id={`gf-diag-${title.replace(/\W/g, "")}`}
+              width="18"
+              height="18"
+              patternUnits="userSpaceOnUse"
+            >
               <path d="M0 18 L18 0" stroke="white" strokeWidth="0.5" />
             </pattern>
           </defs>
@@ -111,16 +116,13 @@ function Block({
           <h3 className="text-sm font-extrabold leading-tight truncate tracking-tight text-white">
             {title}
           </h3>
-          {subtitle && (
-            <p className="text-[11px] text-white/80 mt-0.5 truncate">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-[11px] text-white/80 mt-0.5 truncate">{subtitle}</p>}
         </div>
       </header>
       <div className="p-4 space-y-4">{children}</div>
     </section>
   );
 }
-
 
 function Stepper({
   label,
@@ -387,7 +389,6 @@ export function GroupsAndFixtures({
     },
   });
 
-
   const saveSettings = useMutation({
     mutationFn: () => {
       const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
@@ -487,7 +488,8 @@ export function GroupsAndFixtures({
               {/* B-04 — once the tournament is in_progress/completed the draw
                   must not be re-triggered from this surface. The dialog still
                   exposes a confirm-protected Relancer for emergencies. */}
-              {(["in_progress", "completed"].includes(status) || (status === "published" && hasExistingDraw)) ? (
+              {["in_progress", "completed"].includes(status) ||
+              (status === "published" && hasExistingDraw) ? (
                 <p className="text-[11px] text-amber-600 dark:text-amber-400">
                   {t("groups.drawLockedStarted", {
                     defaultValue:

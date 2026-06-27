@@ -36,10 +36,7 @@ export async function assertTournamentMutable(
   if (error) throw new Response("Internal error", { status: 500 });
   if (!data) throw new Response("Tournament not found", { status: 404 });
   if (FROZEN_STATUSES.has(data.status as string)) {
-    throw new Response(
-      `Tournament is ${data.status}; structure is frozen`,
-      { status: 409 },
-    );
+    throw new Response(`Tournament is ${data.status}; structure is frozen`, { status: 409 });
   }
 }
 
@@ -65,9 +62,7 @@ export interface MatchEditContext {
  *
  * Returns the match row so callers don't re-fetch.
  */
-export async function assertCanEditMatchScore(
-  ctx: MatchEditContext,
-): Promise<{
+export async function assertCanEditMatchScore(ctx: MatchEditContext): Promise<{
   match: {
     id: string;
     tournament_id: string;
@@ -98,20 +93,17 @@ export async function assertCanEditMatchScore(
   }
 
   // organizer path — cross-tenant via the same RPC the rest of the module uses.
-  const { data: ok, error: rpcErr } = await supabase.rpc(
-    "can_manage_tournament",
-    { _user_id: userId, _tournament_id: match.tournament_id },
-  );
+  const { data: ok, error: rpcErr } = await supabase.rpc("can_manage_tournament", {
+    _user_id: userId,
+    _tournament_id: match.tournament_id,
+  });
   if (rpcErr) throw new Response("Internal error", { status: 500 });
   if (!ok) throw new Response("Forbidden", { status: 403 });
 
   if (match.validated_at) {
     const reason = (correctionReason ?? "").trim();
     if (!reason) {
-      throw new Response(
-        "A correction reason is required to edit a locked match",
-        { status: 400 },
-      );
+      throw new Response("A correction reason is required to edit a locked match", { status: 400 });
     }
   }
   return { match };

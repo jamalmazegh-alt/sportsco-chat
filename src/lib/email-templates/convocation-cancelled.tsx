@@ -19,7 +19,8 @@ interface Props {
 
 const T = {
   fr: {
-    subject: (title: string, date?: string) => `Convocation annulée : ${title}${date ? ` — ${date}` : ""}`,
+    subject: (title: string, date?: string) =>
+      `Convocation annulée : ${title}${date ? ` — ${date}` : ""}`,
     preview: "Convocation annulée",
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
     bodyPlayer: "n'est plus convoqué·e",
@@ -32,7 +33,8 @@ const T = {
     via: "via Clubero",
   },
   en: {
-    subject: (title: string, date?: string) => `Call-up cancelled: ${title}${date ? ` — ${date}` : ""}`,
+    subject: (title: string, date?: string) =>
+      `Call-up cancelled: ${title}${date ? ` — ${date}` : ""}`,
     preview: "Call-up cancelled",
     hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
     bodyPlayer: "is no longer called up",
@@ -61,25 +63,40 @@ const ConvocationCancelledEmail = ({
   const t = T[l];
   const eventDateFmt = formatEmailDateTime(eventDate, l);
   return (
-  <EmailShell preview={`${t.preview}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
-        <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
+    <EmailShell
+      preview={`${t.preview}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`}
+      locale={l}
+      clubName={clubName}
+      clubLogoUrl={clubLogoUrl}
+    >
+      <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
-        <Text style={text}>
-          {playerName ? <><strong>{playerName}</strong> {t.bodyPlayer}</> : <>{t.bodyYou}</>}
-          {teamName ? <> {t.withTeam} <strong>{teamName}</strong></> : null}
-          {" "}{t.forEvent}
-        </Text>
+      <Text style={text}>
+        {playerName ? (
+          <>
+            <strong>{playerName}</strong> {t.bodyPlayer}
+          </>
+        ) : (
+          <>{t.bodyYou}</>
+        )}
+        {teamName ? (
+          <>
+            {" "}
+            {t.withTeam} <strong>{teamName}</strong>
+          </>
+        ) : null}{" "}
+        {t.forEvent}
+      </Text>
 
-        <Section style={card}>
-          <Text style={cardKicker}>{t.kicker}</Text>
-          <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
-          {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
-        </Section>
+      <Section style={card}>
+        <Text style={cardKicker}>{t.kicker}</Text>
+        <Text style={cardTitle}>{eventTitle}</Text>
+        {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
+        {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
+      </Section>
 
-        <Text style={smallText}>{t.foot}</Text>
-
-        </EmailShell>
+      <Text style={smallText}>{t.foot}</Text>
+    </EmailShell>
   );
 };
 
@@ -87,7 +104,10 @@ export const template = {
   component: ConvocationCancelledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, formatEmailDateTime(d.eventDate as string | undefined, l));
+    return T[l].subject(
+      d.eventTitle as string,
+      formatEmailDateTime(d.eventDate as string | undefined, l),
+    );
   },
   displayName: "Convocation cancelled",
   previewData: {
@@ -119,5 +139,10 @@ const cardKicker = {
   fontWeight: "bold" as const,
   margin: "0 0 6px",
 };
-const cardTitle = { fontSize: "17px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 10px" };
+const cardTitle = {
+  fontSize: "17px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 10px",
+};
 const cardMeta = { fontSize: "13px", color: "#475569", margin: "0 0 4px" };

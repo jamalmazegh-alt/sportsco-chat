@@ -3,15 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import {
-  Plus,
-  Trash2,
-  MapPin,
-  Clock,
-  Loader2,
-  GripVertical,
-  Radio,
-} from "lucide-react";
+import { Plus, Trash2, MapPin, Clock, Loader2, GripVertical, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  updateTournament,
-  updateMatchSchedule,
-} from "@/modules/tournaments/tournaments.functions";
+import { updateTournament, updateMatchSchedule } from "@/modules/tournaments/tournaments.functions";
 
 type Match = {
   id: string;
@@ -62,19 +51,15 @@ export function FieldsManager({
   fieldStreams,
 }: Props) {
   const { t, i18n } = useTranslation("tournaments");
-  const initial = (fields && fields.length > 0 ? fields : [t("common.field") + " 1"]).map(
-    (f) => String(f),
+  const initial = (fields && fields.length > 0 ? fields : [t("common.field") + " 1"]).map((f) =>
+    String(f),
   );
   const [localFields, setLocalFields] = useState<string[]>(initial);
-  const [streams, setStreams] = useState<Record<string, string>>(
-    () => ({ ...(fieldStreams ?? {}) }),
-  );
-  const [startTime, setStartTime] = useState<string>(
-    (dailyStartTime ?? "09:00:00").slice(0, 5),
-  );
-  const [endTime, setEndTime] = useState<string>(
-    (dailyEndTime ?? "20:00:00").slice(0, 5),
-  );
+  const [streams, setStreams] = useState<Record<string, string>>(() => ({
+    ...(fieldStreams ?? {}),
+  }));
+  const [startTime, setStartTime] = useState<string>((dailyStartTime ?? "09:00:00").slice(0, 5));
+  const [endTime, setEndTime] = useState<string>((dailyEndTime ?? "20:00:00").slice(0, 5));
   const [newField, setNewField] = useState("");
 
   const updateFn = useServerFn(updateTournament);
@@ -124,7 +109,7 @@ export function FieldsManager({
   });
 
   const teamName = (id: string | null) =>
-    id ? teams.find((t) => t.id === id)?.name ?? "?" : "?";
+    id ? (teams.find((t) => t.id === id)?.name ?? "?") : "?";
 
   const matchesByField = useMemo(() => {
     const map = new Map<string, Match[]>();
@@ -273,19 +258,11 @@ export function FieldsManager({
         <div className="grid grid-cols-2 gap-3 pt-2">
           <div>
             <Label className="text-xs">{t("fields.dayStart")}</Label>
-            <Input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
+            <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
           </div>
           <div>
             <Label className="text-xs">{t("fields.dayEnd")}</Label>
-            <Input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
+            <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
           </div>
         </div>
 
@@ -294,9 +271,7 @@ export function FieldsManager({
             onClick={() => saveSettings.mutate()}
             disabled={saveSettings.isPending || localFields.length === 0}
           >
-            {saveSettings.isPending && (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            )}
+            {saveSettings.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("fields.save")}
           </Button>
         </div>
@@ -312,10 +287,7 @@ export function FieldsManager({
         {localFields.map((f) => {
           const list = matchesByField.get(f) ?? [];
           return (
-            <div
-              key={f}
-              className="rounded-xl border border-border bg-card overflow-hidden"
-            >
+            <div key={f} className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-4 py-2 bg-muted/40 flex items-center justify-between">
                 <span className="font-medium text-sm">{f}</span>
                 <span className="text-xs text-muted-foreground">
@@ -329,19 +301,13 @@ export function FieldsManager({
               ) : (
                 <ul className="divide-y divide-border">
                   {list.map((m) => (
-                    <li
-                      key={m.id}
-                      className="px-4 py-2.5 flex items-center gap-3"
-                    >
+                    <li key={m.id} className="px-4 py-2.5 flex items-center gap-3">
                       <div className="text-xs text-muted-foreground w-28 shrink-0">
                         {formatTime(m.scheduled_at)}
                       </div>
                       <div className="flex-1 min-w-0 text-sm truncate">
-                        <span className="text-muted-foreground mr-2">
-                          #{m.match_number}
-                        </span>
-                        {teamName(m.team_a_id)}{" "}
-                        <span className="text-muted-foreground">vs</span>{" "}
+                        <span className="text-muted-foreground mr-2">#{m.match_number}</span>
+                        {teamName(m.team_a_id)} <span className="text-muted-foreground">vs</span>{" "}
                         {teamName(m.team_b_id)}
                       </div>
                       <Select
@@ -357,9 +323,7 @@ export function FieldsManager({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value={UNASSIGNED}>
-                            {t("fields.unassigned")}
-                          </SelectItem>
+                          <SelectItem value={UNASSIGNED}>{t("fields.unassigned")}</SelectItem>
                           {localFields.map((ff) => (
                             <SelectItem key={ff} value={ff}>
                               {ff}
@@ -390,11 +354,8 @@ export function FieldsManager({
                     {formatTime(m.scheduled_at)}
                   </div>
                   <div className="flex-1 min-w-0 text-sm truncate">
-                    <span className="text-muted-foreground mr-2">
-                      #{m.match_number}
-                    </span>
-                    {teamName(m.team_a_id)}{" "}
-                    <span className="text-muted-foreground">vs</span>{" "}
+                    <span className="text-muted-foreground mr-2">#{m.match_number}</span>
+                    {teamName(m.team_a_id)} <span className="text-muted-foreground">vs</span>{" "}
                     {teamName(m.team_b_id)}
                   </div>
                   <Select

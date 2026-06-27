@@ -14,19 +14,11 @@ interface CommonProps {
  * Pill-shaped back button with a chevron in a circle.
  * Use either `to` (router link) OR `onClick` (button).
  */
-export function BackLink({
-  label,
-  className,
-  ...linkProps
-}: CommonProps & LinkProps) {
+export function BackLink({ label, className, ...linkProps }: CommonProps & LinkProps) {
   const { t } = useTranslation();
   const text = label ?? t("common.back", { defaultValue: "Retour" });
   return (
-    <Link
-      {...(linkProps as LinkProps)}
-      aria-label={text}
-      className={cn(backClasses, className)}
-    >
+    <Link {...(linkProps as LinkProps)} aria-label={text} className={cn(backClasses, className)}>
       <span className={chevronWrapClasses}>
         <ChevronLeft className="h-3.5 w-3.5" />
       </span>
@@ -47,12 +39,7 @@ export function BackButton({
   const { t } = useTranslation();
   const text = label ?? t("common.back", { defaultValue: "Retour" });
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      aria-label={text}
-      className={cn(backClasses, className)}
-    >
+    <button type={type} onClick={onClick} aria-label={text} className={cn(backClasses, className)}>
       <span className={chevronWrapClasses}>
         <ChevronLeft className="h-3.5 w-3.5" />
       </span>

@@ -10,7 +10,11 @@ import { buildEventPayload } from "./events/event-payload";
 
 const SlotSchema = z.object({
   weekday: z.number().int().min(0).max(6),
-  meeting_time: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+  meeting_time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .nullable()
+    .optional(),
   start_time: z.string().regex(/^\d{2}:\d{2}$/),
   end_time: z.string().regex(/^\d{2}:\d{2}$/),
   location: z.string().max(255).nullable().optional(),
@@ -28,7 +32,10 @@ const CreateInputSchema = z.object({
   isOfficial: z.boolean().default(true),
   carpoolEnabled: z.boolean().nullable().optional(),
   slots: z.array(SlotSchema).min(1).max(14),
-  excludedDates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(366).default([]),
+  excludedDates: z
+    .array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/))
+    .max(366)
+    .default([]),
   excludedRanges: z
     .array(z.object({ from: z.string(), to: z.string() }))
     .max(50)
@@ -168,11 +175,18 @@ export const deleteSeriesOccurrence = createServerFn({ method: "POST" })
       .single();
     if (e1 || !ev) throw new Error("Event not found");
     if (data.scope === "single" || !ev.series_id) {
-      const { error } = await supabase.from("events").update({ deleted_at: new Date().toISOString() }).eq("id", ev.id);
+      const { error } = await supabase
+        .from("events")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", ev.id);
       if (error) throw new Error(error.message);
       return { deletedCount: 1 };
     }
-    let q = supabase.from("events").update({ deleted_at: new Date().toISOString() }).eq("series_id", ev.series_id).is("deleted_at", null);
+    let q = supabase
+      .from("events")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("series_id", ev.series_id)
+      .is("deleted_at", null);
     if (data.scope === "future") q = q.gte("starts_at", ev.starts_at);
     const { data: rows, error } = await q.select("id");
     if (error) throw new Error(error.message);
@@ -214,7 +228,11 @@ export const updateSeriesOccurrence = createServerFn({ method: "POST" })
       return { updatedCount: 1 };
     }
 
-    let q = supabase.from("events").update(data.patch).eq("series_id", ev.series_id).is("deleted_at", null);
+    let q = supabase
+      .from("events")
+      .update(data.patch)
+      .eq("series_id", ev.series_id)
+      .is("deleted_at", null);
     if (data.scope === "future") q = q.gte("starts_at", ev.starts_at);
     const { data: rows, error } = await q.select("id");
     if (error) throw new Error(error.message);

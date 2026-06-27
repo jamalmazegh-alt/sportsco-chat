@@ -17,7 +17,11 @@ const COPY = {
     brand: "Clubero · Tournois",
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
     body: (t: string, r: string) => (
-      <>Vous venez d'être ajouté à l'organisation du tournoi <strong>{t}</strong> en tant que <strong>{r}</strong>. Vous pouvez accéder dès maintenant au tournoi depuis votre tableau de bord.</>
+      <>
+        Vous venez d'être ajouté à l'organisation du tournoi <strong>{t}</strong> en tant que{" "}
+        <strong>{r}</strong>. Vous pouvez accéder dès maintenant au tournoi depuis votre tableau de
+        bord.
+      </>
     ),
     cta: "Accéder au tournoi",
     or: "Ou copiez ce lien dans votre navigateur :",
@@ -29,7 +33,10 @@ const COPY = {
     brand: "Clubero · Tournaments",
     hello: (n?: string) => (n ? `Hi ${n},` : "Hello,"),
     body: (t: string, r: string) => (
-      <>You have just been added to the organization of tournament <strong>{t}</strong> as <strong>{r}</strong>. You can access the tournament right away from your dashboard.</>
+      <>
+        You have just been added to the organization of tournament <strong>{t}</strong> as{" "}
+        <strong>{r}</strong>. You can access the tournament right away from your dashboard.
+      </>
     ),
     cta: "Open tournament",
     or: "Or copy this link in your browser:",
@@ -50,24 +57,27 @@ const TournamentMemberAddedEmail = ({
   const role = roleLabel ?? (locale === "fr" ? "collaborateur" : "collaborator");
   return (
     <EmailShell preview={`${c.preview(tournament, role)}`} locale={"fr"}>
-          <Section style={header}>
-            <Img
-              src="https://www.clubero.app/clubero-logo.png"
-              alt="Clubero"
-              width="56"
-              height="56"
-              style={logo}
-            />
-            <Text style={brand}>{c.brand}</Text>
-          </Section>
-          <Heading style={h1}>{c.hello(displayName)}</Heading>
-          <Text style={text}>{c.body(tournament, role)}</Text>
-          <Button style={button} href={tournamentUrl}>{c.cta}</Button>
-          <Text style={small}>
-            {c.or}<br />
-            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{tournamentUrl}</span>
-          </Text>
-          </EmailShell>
+      <Section style={header}>
+        <Img
+          src="https://www.clubero.app/clubero-logo.png"
+          alt="Clubero"
+          width="56"
+          height="56"
+          style={logo}
+        />
+        <Text style={brand}>{c.brand}</Text>
+      </Section>
+      <Heading style={h1}>{c.hello(displayName)}</Heading>
+      <Text style={text}>{c.body(tournament, role)}</Text>
+      <Button style={button} href={tournamentUrl}>
+        {c.cta}
+      </Button>
+      <Text style={small}>
+        {c.or}
+        <br />
+        <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{tournamentUrl}</span>
+      </Text>
+    </EmailShell>
   );
 };
 
@@ -92,7 +102,13 @@ export const template = {
 
 const header = { textAlign: "center" as const, margin: "0 0 20px" };
 const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
-const brand = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
+const brand = {
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "8px 0 0",
+  textAlign: "center" as const,
+};
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };
 const button = {

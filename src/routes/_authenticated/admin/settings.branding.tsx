@@ -75,17 +75,13 @@ function BrandingSettingsPage() {
       storeTheme(key);
       qc.invalidateQueries({ queryKey: ["club-theme", activeClubId] });
       qc.invalidateQueries({ queryKey: ["club-branding", activeClubId] });
-      toast.success(
-        t("admin.branding.saved", { defaultValue: "Couleur du club mise à jour" })
-      );
+      toast.success(t("admin.branding.saved", { defaultValue: "Couleur du club mise à jour" }));
     },
     onError: () => {
       // revert preview
       applyClubTheme(initial);
       setSelected(initial);
-      toast.error(
-        t("admin.branding.saveError", { defaultValue: "Impossible de sauvegarder" })
-      );
+      toast.error(t("admin.branding.saveError", { defaultValue: "Impossible de sauvegarder" }));
     },
   });
 
@@ -121,9 +117,7 @@ function BrandingSettingsPage() {
             <p className="text-sm font-semibold">
               {t("admin.branding.previewTitle", { defaultValue: "Aperçu" })}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {CLUB_THEMES[selected].label}
-            </p>
+            <p className="text-xs text-muted-foreground">{CLUB_THEMES[selected].label}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -195,9 +189,7 @@ function BrandingSettingsPage() {
           disabled={!dirty || saveMutation.isPending}
           onClick={() => saveMutation.mutate(selected)}
         >
-          {saveMutation.isPending && (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          )}
+          {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           {t("common.save", { defaultValue: "Enregistrer" })}
         </Button>
       </div>

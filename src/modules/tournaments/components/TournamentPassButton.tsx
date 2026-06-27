@@ -89,8 +89,6 @@ export function TournamentPassButton({
   const checkout = useServerFn(createTournamentPassCheckout);
   const resolvedLabel = label ?? t("pass.buyLabel");
 
-
-
   async function startCheckout(emailToUse: string, qty: number) {
     if (busy) return;
     setBusy(true);
@@ -141,9 +139,7 @@ export function TournamentPassButton({
         </div>
       )}
       <div className="space-y-2">
-        <Label>
-          {t("pass.quantityLabel", { defaultValue: "Nombre de pass" })}
-        </Label>
+        <Label>{t("pass.quantityLabel", { defaultValue: "Nombre de pass" })}</Label>
         <QuantityStepper value={quantity} onChange={setQuantity} disabled={busy} />
         <p className="text-xs text-muted-foreground">
           {t("pass.unitPriceHint", {
@@ -176,9 +172,7 @@ export function TournamentPassButton({
             </div>
             <div className="min-w-0">
               <p className="font-semibold leading-tight">{t("pass.dialogTitle")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t("pass.dialogDesc")}
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("pass.dialogDesc")}</p>
             </div>
           </div>
           {formBody}

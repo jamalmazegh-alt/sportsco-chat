@@ -70,8 +70,13 @@ function ResetPasswordPage() {
 
       <div className="field-bg" aria-hidden="true">
         <div className="pitch">
-          <svg viewBox="0 0 400 820" preserveAspectRatio="xMidYMid slice" fill="none"
-               stroke="rgba(150,180,255,.13)" strokeWidth="1.6">
+          <svg
+            viewBox="0 0 400 820"
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            stroke="rgba(150,180,255,.13)"
+            strokeWidth="1.6"
+          >
             <line x1="-40" y1="410" x2="440" y2="410" />
             <circle cx="200" cy="410" r="78" />
             <circle cx="200" cy="410" r="3" fill="rgba(150,180,255,.13)" stroke="none" />
@@ -99,8 +104,19 @@ function ResetPasswordPage() {
         <div className="brand">
           <span className="mark">
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-              <path d="M21 8.5A8 8 0 1 0 21 21.5" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-              <path d="M16 15h8m0 0-3.4-3.4M24 15l-3.4 3.4" stroke="#38BDF8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M21 8.5A8 8 0 1 0 21 21.5"
+                stroke="#fff"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M16 15h8m0 0-3.4-3.4M24 15l-3.4 3.4"
+                stroke="#38BDF8"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </span>
           <span className="wordmark">Clubero</span>

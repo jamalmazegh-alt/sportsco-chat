@@ -838,20 +838,8 @@
     "pendingCount_plural": "{{count}} Jugadores aún no han respondido",
     "remindAllSent": "{{count}} recordatorios enviados",
     "remindAllSent_plural": "{{count}} recordatorios enviados",
-    "reasonsAbsent": [
-      "Trabajo",
-      "Familia",
-      "Lesión",
-      "Enfermedad",
-      "Estudios",
-      "Otro compromiso"
-    ],
-    "reasonsUncertain": [
-      "Por confirmar",
-      "Trabajo",
-      "Familia",
-      "Problema de salud leve"
-    ],
+    "reasonsAbsent": ["Trabajo", "Familia", "Lesión", "Enfermedad", "Estudios", "Otro compromiso"],
+    "reasonsUncertain": ["Por confirmar", "Trabajo", "Familia", "Problema de salud leve"],
     "suggestedReasons": "Sugerencias",
     "forceResponseTitle": "¿Forzar respuesta?",
     "forceResponseDesc": "{{name}} ya ha respondido {{current}}. ¿De verdad quieres cambiar el estado a {{next}}?",

@@ -65,11 +65,20 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
   const trialExpired = status === "trialing" && trialTime !== null && trialTime <= Date.now();
   const map: Record<string, { label: string; cls: string }> = {
     trialing: { label: t("billing.statusTrialing"), cls: "bg-primary/10 text-primary" },
-    active: { label: t("billing.statusActive"), cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-    past_due: { label: t("billing.statusPastDue"), cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+    active: {
+      label: t("billing.statusActive"),
+      cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    past_due: {
+      label: t("billing.statusPastDue"),
+      cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
     canceled: { label: t("billing.statusCanceled"), cls: "bg-muted text-muted-foreground" },
     incomplete: { label: t("billing.statusIncomplete"), cls: "bg-muted text-muted-foreground" },
-    incomplete_expired: { label: t("billing.statusIncompleteExpired"), cls: "bg-destructive/10 text-destructive" },
+    incomplete_expired: {
+      label: t("billing.statusIncompleteExpired"),
+      cls: "bg-destructive/10 text-destructive",
+    },
     unpaid: { label: t("billing.statusUnpaid"), cls: "bg-destructive/10 text-destructive" },
     paused: { label: t("billing.statusPaused"), cls: "bg-muted text-muted-foreground" },
   };
@@ -78,7 +87,9 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
     : (map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" });
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.cls}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.cls}`}
+    >
       {s.label}
       {status === "trialing" && trialEnd && (
         <>
@@ -250,8 +261,7 @@ function BillingPage() {
     if (!open) setBusy((b) => (b === "card" ? null : b));
   }
 
-  const cancelDate =
-    (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
+  const cancelDate = (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
   const scheduledCancel = sub && (sub.cancel_at_period_end || (sub as any).cancel_at);
 
   const FEATURES = [
@@ -304,267 +314,272 @@ function BillingPage() {
       )}
 
       {!isExempt && (
-      <>
-      {/* Current status */}
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <p className="text-sm text-muted-foreground">{t("billing.status")}</p>
-            <div className="mt-1.5">
-              {sub ? (
-                <StatusBadge status={sub.status} trialEnd={sub.trial_end} />
-              ) : (
-                <span className="text-sm text-muted-foreground">{t("billing.noSubscription")}</span>
-              )}
-            </div>
-          </div>
-          {sub?.plan && (
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">{t("billing.plan")}</p>
-              <p className="font-semibold mt-1.5">
-                {sub.plan === "yearly" ? t("billing.planYearly") : t("billing.planMonthly")}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {scheduledCancel && cancelDate ? (
-          <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-            <AlertCircle className="h-4 w-4" />
-            {t("billing.scheduledCancel", { date: new Date(cancelDate).toLocaleDateString(locale) })}
-          </div>
-        ) : sub?.current_period_end ? (
-          <div className="text-sm text-muted-foreground">
-            {t("billing.nextRenewal", { date: new Date(sub.current_period_end).toLocaleDateString(locale) })}
-          </div>
-        ) : null}
-
-        {trialExpired && (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {t("billing.trialExpiredSubscribeHint")}
-          </div>
-        )}
-
-        {canManageSubscription && (
-          <div className="grid gap-2 sm:grid-cols-2 pt-1">
-            <Button
-              onClick={onUpdateCard}
-              variant="outline"
-              disabled={busy === "card"}
-              className="w-full"
-            >
-              {busy === "card" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <CreditCard className="h-4 w-4" />
-                  {t("billing.updateCard")}
-                </>
-              )}
-            </Button>
-
-            {scheduledCancel ? (
-              <Button
-                onClick={onReactivate}
-                variant="outline"
-                disabled={busy === "reactivate"}
-                className="w-full"
-              >
-                {busy === "reactivate" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <RotateCcw className="h-4 w-4" />
-                    {t("billing.reactivate")}
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => setConfirmCancel(true)}
-                variant="outline"
-                disabled={busy === "cancel"}
-                className="w-full text-destructive hover:text-destructive"
-              >
-                <XCircle className="h-4 w-4" />
-                {t("billing.cancel")}
-              </Button>
-            )}
-          </div>
-        )}
-
-        {canManageSubscription && (
-          <button
-            onClick={openPortal}
-            disabled={busy === "portal"}
-            className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline inline-flex items-center gap-1"
-          >
-            {busy === "portal" ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : (
-              <>
-                {t("billing.advancedPortal")} <ExternalLink className="h-3 w-3" />
-              </>
-            )}
-          </button>
-        )}
-      </section>
-
-      {/* Invoices */}
-      {canManageSubscription && invoicesData?.invoices && invoicesData.invoices.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
-            <h2 className="font-semibold">{t("billing.invoices")}</h2>
-          </div>
-          <ul className="divide-y divide-border">
-            {invoicesData.invoices.map((inv) => (
-              <li key={inv.id} className="py-2.5 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {inv.number ?? inv.id}
-                    {inv.status === "paid" && (
-                      <span className="ml-2 text-xs text-emerald-600 dark:text-emerald-400">
-                        {t("billing.invoicePaid")}
-                      </span>
-                    )}
-                    {inv.status === "open" && (
-                      <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
-                        {t("billing.invoiceOpen")}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(inv.created * 1000).toLocaleDateString(locale)} ·{" "}
-                    {formatAmount(inv.amount_paid || inv.amount_due, inv.currency)}
+        <>
+          {/* Current status */}
+          <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm text-muted-foreground">{t("billing.status")}</p>
+                <div className="mt-1.5">
+                  {sub ? (
+                    <StatusBadge status={sub.status} trialEnd={sub.trial_end} />
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      {t("billing.noSubscription")}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {sub?.plan && (
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">{t("billing.plan")}</p>
+                  <p className="font-semibold mt-1.5">
+                    {sub.plan === "yearly" ? t("billing.planYearly") : t("billing.planMonthly")}
                   </p>
                 </div>
-                {inv.invoice_pdf && (
-                  <button
-                    type="button"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      try {
-                        const res = await fetch(inv.invoice_pdf!, { mode: "cors" });
-                        if (!res.ok) throw new Error("download_failed");
-                        const blob = await res.blob();
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = url;
-                        a.download = `${inv.number ?? inv.id}.pdf`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(url), 1000);
-                      } catch {
-                        // Fallback: noopener prevents the iframe parent from being replaced
-                        window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
-                      }
-                    }}
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+              )}
+            </div>
+
+            {scheduledCancel && cancelDate ? (
+              <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                <AlertCircle className="h-4 w-4" />
+                {t("billing.scheduledCancel", {
+                  date: new Date(cancelDate).toLocaleDateString(locale),
+                })}
+              </div>
+            ) : sub?.current_period_end ? (
+              <div className="text-sm text-muted-foreground">
+                {t("billing.nextRenewal", {
+                  date: new Date(sub.current_period_end).toLocaleDateString(locale),
+                })}
+              </div>
+            ) : null}
+
+            {trialExpired && (
+              <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {t("billing.trialExpiredSubscribeHint")}
+              </div>
+            )}
+
+            {canManageSubscription && (
+              <div className="grid gap-2 sm:grid-cols-2 pt-1">
+                <Button
+                  onClick={onUpdateCard}
+                  variant="outline"
+                  disabled={busy === "card"}
+                  className="w-full"
+                >
+                  {busy === "card" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4" />
+                      {t("billing.updateCard")}
+                    </>
+                  )}
+                </Button>
+
+                {scheduledCancel ? (
+                  <Button
+                    onClick={onReactivate}
+                    variant="outline"
+                    disabled={busy === "reactivate"}
+                    className="w-full"
                   >
-                    PDF <ExternalLink className="h-3 w-3" />
-                  </button>
+                    {busy === "reactivate" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <RotateCcw className="h-4 w-4" />
+                        {t("billing.reactivate")}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setConfirmCancel(true)}
+                    variant="outline"
+                    disabled={busy === "cancel"}
+                    className="w-full text-destructive hover:text-destructive"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    {t("billing.cancel")}
+                  </Button>
                 )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+              </div>
+            )}
 
-      {/* Plans (when not active) */}
-      {showPlans && (
-        <section className="rounded-2xl border border-primary bg-card p-5 space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Sparkles className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-bold text-lg">CLUBERO</h2>
-              <p className="text-sm text-muted-foreground">{t("billing.allInclusive")}</p>
-            </div>
-          </div>
+            {canManageSubscription && (
+              <button
+                onClick={openPortal}
+                disabled={busy === "portal"}
+                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline inline-flex items-center gap-1"
+              >
+                {busy === "portal" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <>
+                    {t("billing.advancedPortal")} <ExternalLink className="h-3 w-3" />
+                  </>
+                )}
+              </button>
+            )}
+          </section>
 
-          <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm">
-            <p className="font-medium text-primary">{t("billing.trialBadge")}</p>
-            <p className="text-muted-foreground mt-1">{t("billing.trialDescription")}</p>
-          </div>
+          {/* Invoices */}
+          {canManageSubscription && invoicesData?.invoices && invoicesData.invoices.length > 0 && (
+            <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold">{t("billing.invoices")}</h2>
+              </div>
+              <ul className="divide-y divide-border">
+                {invoicesData.invoices.map((inv) => (
+                  <li key={inv.id} className="py-2.5 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {inv.number ?? inv.id}
+                        {inv.status === "paid" && (
+                          <span className="ml-2 text-xs text-emerald-600 dark:text-emerald-400">
+                            {t("billing.invoicePaid")}
+                          </span>
+                        )}
+                        {inv.status === "open" && (
+                          <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
+                            {t("billing.invoiceOpen")}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(inv.created * 1000).toLocaleDateString(locale)} ·{" "}
+                        {formatAmount(inv.amount_paid || inv.amount_due, inv.currency)}
+                      </p>
+                    </div>
+                    {inv.invoice_pdf && (
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          try {
+                            const res = await fetch(inv.invoice_pdf!, { mode: "cors" });
+                            if (!res.ok) throw new Error("download_failed");
+                            const blob = await res.blob();
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `${inv.number ?? inv.id}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                          } catch {
+                            // Fallback: noopener prevents the iframe parent from being replaced
+                            window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
+                          }
+                        }}
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+                      >
+                        PDF <ExternalLink className="h-3 w-3" />
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => startCheckout("monthly")}
-              disabled={busy !== null}
-              className="rounded-xl border-2 border-border hover:border-primary p-4 text-left transition-colors disabled:opacity-50"
-            >
-              <p className="text-sm text-muted-foreground">{t("billing.monthly")}</p>
-              <p className="font-display text-2xl font-bold mt-1">49 €</p>
-              <p className="text-xs text-muted-foreground">{t("billing.perMonth")}</p>
-              <span className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
-                {t("billing.subscribeMonthly")}
-              </span>
-              {busy === "monthly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
-            </button>
-            <button
-              onClick={() => startCheckout("yearly")}
-              disabled={busy !== null}
-              className="rounded-xl border-2 border-primary bg-primary/5 p-4 text-left relative disabled:opacity-50"
-            >
-              <span className="absolute -top-2 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                {t("billing.twoMonthsFree")}
-              </span>
-              <p className="text-sm text-muted-foreground">{t("billing.yearly")}</p>
-              <p className="font-display text-2xl font-bold mt-1">490 €</p>
-              <p className="text-xs text-muted-foreground">{t("billing.perYear")}</p>
-              <span className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
-                {t("billing.subscribeYearly")}
-              </span>
-              {busy === "yearly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
-            </button>
-          </div>
+          {/* Plans (when not active) */}
+          {showPlans && (
+            <section className="rounded-2xl border border-primary bg-card p-5 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">CLUBERO</h2>
+                  <p className="text-sm text-muted-foreground">{t("billing.allInclusive")}</p>
+                </div>
+              </div>
 
-          <p className="text-xs text-muted-foreground text-center -mt-1">
-            {t("billing.taxNotice")}
-          </p>
+              <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm">
+                <p className="font-medium text-primary">{t("billing.trialBadge")}</p>
+                <p className="text-muted-foreground mt-1">{t("billing.trialDescription")}</p>
+              </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            <Trans
-              i18nKey="billing.termsNotice"
-              t={t}
-              components={{
-                1: (
-                  <Link
-                    to="/legal/$kind"
-                    params={{ kind: "terms" }}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline hover:text-foreground"
-                  />
-                ),
-                3: (
-                  <Link
-                    to="/legal/$kind"
-                    params={{ kind: "privacy" }}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline hover:text-foreground"
-                  />
-                ),
-              }}
-            />
-          </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => startCheckout("monthly")}
+                  disabled={busy !== null}
+                  className="rounded-xl border-2 border-border hover:border-primary p-4 text-left transition-colors disabled:opacity-50"
+                >
+                  <p className="text-sm text-muted-foreground">{t("billing.monthly")}</p>
+                  <p className="font-display text-2xl font-bold mt-1">49 €</p>
+                  <p className="text-xs text-muted-foreground">{t("billing.perMonth")}</p>
+                  <span className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
+                    {t("billing.subscribeMonthly")}
+                  </span>
+                  {busy === "monthly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
+                </button>
+                <button
+                  onClick={() => startCheckout("yearly")}
+                  disabled={busy !== null}
+                  className="rounded-xl border-2 border-primary bg-primary/5 p-4 text-left relative disabled:opacity-50"
+                >
+                  <span className="absolute -top-2 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                    {t("billing.twoMonthsFree")}
+                  </span>
+                  <p className="text-sm text-muted-foreground">{t("billing.yearly")}</p>
+                  <p className="font-display text-2xl font-bold mt-1">490 €</p>
+                  <p className="text-xs text-muted-foreground">{t("billing.perYear")}</p>
+                  <span className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
+                    {t("billing.subscribeYearly")}
+                  </span>
+                  {busy === "yearly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
+                </button>
+              </div>
 
-          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">
-            {FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-sm">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span className="text-foreground/80">{f}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+              <p className="text-xs text-muted-foreground text-center -mt-1">
+                {t("billing.taxNotice")}
+              </p>
 
-      </>
+              <p className="text-xs text-muted-foreground text-center">
+                <Trans
+                  i18nKey="billing.termsNotice"
+                  t={t}
+                  components={{
+                    1: (
+                      <Link
+                        to="/legal/$kind"
+                        params={{ kind: "terms" }}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline hover:text-foreground"
+                      />
+                    ),
+                    3: (
+                      <Link
+                        to="/legal/$kind"
+                        params={{ kind: "privacy" }}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline hover:text-foreground"
+                      />
+                    ),
+                  }}
+                />
+              </p>
+
+              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">
+                {FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-foreground/80">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       )}
 
       <UpdateCardDialog
@@ -596,7 +611,11 @@ function BillingPage() {
               disabled={busy === "cancel"}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {busy === "cancel" ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.confirmCancelAction")}
+              {busy === "cancel" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("billing.confirmCancelAction")
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

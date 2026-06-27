@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
 
-
 export const Route = createFileRoute("/_authenticated/follow-ups")({
   component: FollowUpsPage,
 
@@ -41,7 +40,8 @@ function FollowUpsPage() {
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [bulkSending, setBulkSending] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
@@ -94,7 +94,10 @@ function FollowUpsPage() {
   });
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { event_id: string; title: string; starts_at: string; team_name: string; items: Row[] }>();
+    const map = new Map<
+      string,
+      { event_id: string; title: string; starts_at: string; team_name: string; items: Row[] }
+    >();
     for (const r of rows ?? []) {
       if (!map.has(r.event_id)) {
         map.set(r.event_id, {
@@ -120,7 +123,11 @@ function FollowUpsPage() {
       .eq("convocation_id", row.convocation_id)
       .order("sent_at", { ascending: false })
       .limit(1);
-    if (recent && recent[0] && Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000) {
+    if (
+      recent &&
+      recent[0] &&
+      Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000
+    ) {
       if (!opts?.silent) toast.info(t("attendance.alreadyRemindedRecently"));
       return false;
     }
@@ -186,7 +193,9 @@ function FollowUpsPage() {
   if (!isCoach) {
     return (
       <div className="px-5 pt-8 pb-8">
-        <p className="text-sm text-muted-foreground">{t("common.unauthorized", { defaultValue: "Accès réservé aux coachs." })}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("common.unauthorized", { defaultValue: "Accès réservé aux coachs." })}
+        </p>
       </div>
     );
   }
@@ -197,7 +206,9 @@ function FollowUpsPage() {
     <div className="px-5 pt-8 pb-8 space-y-5">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">{t("followUps.title", { defaultValue: "À relancer" })}</h1>
+          <h1 className="text-2xl font-semibold">
+            {t("followUps.title", { defaultValue: "À relancer" })}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {t("followUps.subtitle", {
               defaultValue: "Joueurs sans réponse sur les prochains événements.",
@@ -205,12 +216,7 @@ function FollowUpsPage() {
           </p>
         </div>
         {total > 0 && (
-          <Button
-            size="sm"
-            onClick={handleRemindAll}
-            disabled={bulkSending}
-            className="shrink-0"
-          >
+          <Button size="sm" onClick={handleRemindAll} disabled={bulkSending} className="shrink-0">
             {bulkSending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -263,12 +269,16 @@ function FollowUpsPage() {
                       key={row.convocation_id}
                       className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5"
                     >
-                      <div className={cn(
-                        "h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0",
-                      )}>
+                      <div
+                        className={cn(
+                          "h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0",
+                        )}
+                      >
                         {row.jersey_number ?? row.player_name.slice(0, 1)}
                       </div>
-                      <p className="flex-1 min-w-0 text-sm font-medium truncate">{row.player_name}</p>
+                      <p className="flex-1 min-w-0 text-sm font-medium truncate">
+                        {row.player_name}
+                      </p>
                       <Button
                         size="sm"
                         variant="outline"

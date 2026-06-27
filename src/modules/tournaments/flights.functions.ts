@@ -106,10 +106,9 @@ export const saveFlights = createServerFn({ method: "POST" })
         .neq("status", "scheduled")
         .limit(1);
       if (started && started.length > 0) {
-        throw new Response(
-          "Cannot replace flights: some flight matches have already started",
-          { status: 409 },
-        );
+        throw new Response("Cannot replace flights: some flight matches have already started", {
+          status: 409,
+        });
       }
       // Supprime les matchs non joués des flights existants puis les flights
       await supabaseAdmin
@@ -175,10 +174,7 @@ export const generateAllFlightBrackets = createServerFn({ method: "POST" })
           .select("*")
           .eq("tournament_id", data.tournament_id)
           .order("sort_order"),
-        supabaseAdmin
-          .from("tournament_teams")
-          .select("*")
-          .eq("tournament_id", data.tournament_id),
+        supabaseAdmin.from("tournament_teams").select("*").eq("tournament_id", data.tournament_id),
         supabaseAdmin
           .from("tournament_matches")
           .select("*")
@@ -224,8 +220,7 @@ export const generateAllFlightBrackets = createServerFn({ method: "POST" })
     // B3 — ne jamais wiper silencieusement des résultats de flight existants.
     const flightHasProgress = (matches ?? []).some(
       (m: any) =>
-        m.flight_id &&
-        (m.status !== "scheduled" || m.score_a != null || m.score_b != null),
+        m.flight_id && (m.status !== "scheduled" || m.score_a != null || m.score_b != null),
     );
     if (flightHasProgress && !data.force) {
       throw new Response("FLIGHTS_ALREADY_STARTED", { status: 409 });
@@ -286,18 +281,10 @@ export const generateAllFlightBrackets = createServerFn({ method: "POST" })
           placement_kind: m.placement_kind,
           bracket_position: m.bracketPosition,
           match_number: matchCounter,
-          team_a_id:
-            m.teamASource && "teamId" in m.teamASource
-              ? m.teamASource.teamId
-              : null,
-          team_b_id:
-            m.teamBSource && "teamId" in m.teamBSource
-              ? m.teamBSource.teamId
-              : null,
-          team_a_source:
-            m.teamASource && "fromMatch" in m.teamASource ? m.teamASource : null,
-          team_b_source:
-            m.teamBSource && "fromMatch" in m.teamBSource ? m.teamBSource : null,
+          team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
+          team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
+          team_a_source: m.teamASource && "fromMatch" in m.teamASource ? m.teamASource : null,
+          team_b_source: m.teamBSource && "fromMatch" in m.teamBSource ? m.teamBSource : null,
           status: "scheduled",
         });
       }
@@ -360,10 +347,9 @@ export const moveTeamToFlight = createServerFn({ method: "POST" })
       .neq("status", "scheduled")
       .limit(1);
     if (started && started.length > 0) {
-      throw new Response(
-        "Cannot move team: target flight has matches in progress",
-        { status: 409 },
-      );
+      throw new Response("Cannot move team: target flight has matches in progress", {
+        status: 409,
+      });
     }
 
     // Remplace l'équipe dans le bracket : on patch les matchs encore prévus
@@ -399,9 +385,7 @@ export const moveTeamToFlight = createServerFn({ method: "POST" })
     if (!slot) {
       throw new Response("Target flight has no free slot", { status: 409 });
     }
-    const patch: any = !slot.team_a_id
-      ? { team_a_id: data.team_id }
-      : { team_b_id: data.team_id };
+    const patch: any = !slot.team_a_id ? { team_a_id: data.team_id } : { team_b_id: data.team_id };
 
     const { error: updErr } = await supabaseAdmin
       .from("tournament_matches")
@@ -436,20 +420,13 @@ export const getOverallStandings = createServerFn({ method: "POST" })
     if (!flights) return { ranking: [] };
 
     const flightInputs: FlightResultInput[] = (flights as any[]).map((f) => {
-      const flightMatches = (matches ?? []).filter(
-        (m: any) => m.flight_id === f.id,
-      );
+      const flightMatches = (matches ?? []).filter((m: any) => m.flight_id === f.id);
       const final = flightMatches.find((m: any) => m.placement_kind === "final");
-      const thirdPlace = flightMatches.find(
-        (m: any) => m.placement_kind === "third_place",
-      );
+      const thirdPlace = flightMatches.find((m: any) => m.placement_kind === "third_place");
       const ordered: string[] = [];
       if (final?.winner_team_id) {
         ordered.push(final.winner_team_id);
-        const runner =
-          final.team_a_id === final.winner_team_id
-            ? final.team_b_id
-            : final.team_a_id;
+        const runner = final.team_a_id === final.winner_team_id ? final.team_b_id : final.team_a_id;
         if (runner) ordered.push(runner);
       }
       if (thirdPlace?.winner_team_id) {

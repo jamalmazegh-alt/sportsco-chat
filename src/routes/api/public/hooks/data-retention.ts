@@ -17,7 +17,10 @@ async function deleteOlderThan(
   extra?: { column: string; value: unknown },
 ): Promise<CleanupResult> {
   const cutoff = new Date(Date.now() - intervalDays * 24 * 3600 * 1000).toISOString();
-  let q = supabaseAdmin.from(table as any).delete({ count: "exact" }).lt(column, cutoff);
+  let q = supabaseAdmin
+    .from(table as any)
+    .delete({ count: "exact" })
+    .lt(column, cutoff);
   if (extra) q = q.eq(extra.column, extra.value);
   const { count, error } = await q;
   if (error) return { table, deleted: 0, error: error.message };

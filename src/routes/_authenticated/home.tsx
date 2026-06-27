@@ -119,17 +119,19 @@ function HomePage() {
       const ownIds = new Set((own ?? []).map((p: any) => p.id));
       const players = [
         ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
-        ...((children ?? [])
+        ...(children ?? [])
           .map((c: any) => c.players)
           .filter(Boolean)
-          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) })),
       ];
       const playerIds = players.map((p) => p.id);
       if (playerIds.length === 0) return [];
 
       const { data } = await supabase
         .from("convocations")
-        .select("id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id)")
+        .select(
+          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id)",
+        )
         .in("player_id", playerIds)
         .order("created_at", { ascending: false });
 
@@ -142,7 +144,9 @@ function HomePage() {
           convocation: { id: c.id, status: c.status },
           player: players.find((p) => p.id === c.player_id) ?? null,
         }))
-        .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+        .sort(
+          (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
+        );
     },
   });
 
@@ -161,10 +165,10 @@ function HomePage() {
       const ownIds = new Set((own ?? []).map((p: any) => p.id));
       const players = [
         ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
-        ...((children ?? [])
+        ...(children ?? [])
           .map((c: any) => c.players)
           .filter(Boolean)
-          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) })),
       ];
       if (players.length === 0) return [] as any[];
       const playerIds = players.map((p) => p.id);
@@ -192,7 +196,8 @@ function HomePage() {
     queryFn: () => listMyObligationsFn({ data: {} }),
   });
 
-  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
 
   const playerHomeEvents = useMemo(() => {
@@ -208,7 +213,9 @@ function HomePage() {
     const obligations = paymentData?.obligations ?? [];
     if (obligations.length === 0) return null;
     const totalCents = obligations.reduce((sum: number, obligation: any) => {
-      return sum + Math.max(0, (obligation.amount_due_cents ?? 0) - (obligation.amount_paid_cents ?? 0));
+      return (
+        sum + Math.max(0, (obligation.amount_due_cents ?? 0) - (obligation.amount_paid_cents ?? 0))
+      );
     }, 0);
     const currency = obligations[0]?.currency ?? "eur";
     return {
@@ -225,17 +232,29 @@ function HomePage() {
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">
       {/* Club hero */}
-      <header
-        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-border bg-card p-5 shadow-sm"
-      >
+      <header className="relative overflow-hidden rounded-[20px] border-[1.5px] border-border bg-card p-5 shadow-sm">
         <svg
           aria-hidden
           className="absolute inset-0 h-full w-full opacity-[0.07] dark:opacity-[0.12] pointer-events-none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <pattern id="terrain-home" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="40" stroke="currentColor" strokeWidth="1" className="text-primary" />
+            <pattern
+              id="terrain-home"
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
+              <line
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="40"
+                stroke="currentColor"
+                strokeWidth="1"
+                className="text-primary"
+              />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#terrain-home)" />
@@ -260,7 +279,9 @@ function HomePage() {
               {club?.name}
             </p>
             <h1 className="mt-0.5 truncate text-[22px] font-black leading-tight tracking-tight text-foreground">
-              {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
+              {t("dashboard.greeting", {
+                name: user?.user_metadata?.full_name?.split(" ")[0] ?? "",
+              })}
             </h1>
           </div>
         </div>
@@ -313,7 +334,10 @@ function HomePage() {
             <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
               {t("dashboard.nextEvent")}
             </h2>
-            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
+            <Link
+              to="/events"
+              className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors"
+            >
               {t("dashboard.viewAll")}
               <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
             </Link>
@@ -321,7 +345,9 @@ function HomePage() {
           {!upcoming || upcoming.length === 0 ? (
             <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
               <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
-              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
+              <p className="text-sm text-muted-foreground font-medium">
+                {t("dashboard.noUpcoming")}
+              </p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -342,16 +368,30 @@ function HomePage() {
                       {isFirst && (
                         <div
                           className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
-                          style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+                          style={{
+                            background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                          }}
                         >
                           ★ {t("dashboard.nextEvent")}
                         </div>
                       )}
-                      <div className={cn("flex items-center justify-between gap-3", isFirst ? "p-4" : "p-3.5")}>
+                      <div
+                        className={cn(
+                          "flex items-center justify-between gap-3",
+                          isFirst ? "p-4" : "p-3.5",
+                        )}
+                      >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 min-w-0 flex-wrap">
                             <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
+                            <p
+                              className={cn(
+                                "font-bold truncate text-foreground",
+                                isFirst ? "text-[15px]" : "text-sm",
+                              )}
+                            >
+                              {e.title}
+                            </p>
                           </div>
                           <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />
@@ -365,7 +405,15 @@ function HomePage() {
                             )}
                           </p>
                         </div>
-                        <ChevronRight className={cn("shrink-0", isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
+                        <ChevronRight
+                          className={cn(
+                            "shrink-0",
+                            isFirst
+                              ? "h-5 w-5 text-foreground"
+                              : "h-4 w-4 text-muted-foreground/70",
+                          )}
+                          strokeWidth={2.4}
+                        />
                       </div>
                     </Link>
                   </li>
@@ -421,21 +469,14 @@ function HomePage() {
               />
             </>
           )}
-          {activeClubId && (
-            <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />
-          )}
+          {activeClubId && <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />}
         </div>
       )}
-
 
       {/* For players/parents: quick absence declaration */}
       {!isCoach && myTeams && myTeams.length > 0 && (
         <section>
-          <Button
-            variant="outline"
-            className="w-full h-11"
-            onClick={() => setAbsenceOpen(true)}
-          >
+          <Button variant="outline" className="w-full h-11" onClick={() => setAbsenceOpen(true)}>
             <Plus className="h-4 w-4" />
             {t("availability.declare", { defaultValue: "Déclarer une absence" })}
           </Button>
@@ -455,7 +496,11 @@ function HomePage() {
             >
               <div className="flex items-center gap-3 min-w-0">
                 {team.image_url ? (
-                  <img src={team.image_url} alt={team.name} className="h-10 w-10 rounded-xl object-cover shrink-0" />
+                  <img
+                    src={team.image_url}
+                    alt={team.name}
+                    className="h-10 w-10 rounded-xl object-cover shrink-0"
+                  />
                 ) : (
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Users className="h-5 w-5 text-primary" />
@@ -469,7 +514,9 @@ function HomePage() {
                     {" · "}
                     {team.name}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate">{t("dashboard.teamHint")}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {t("dashboard.teamHint")}
+                  </p>
                 </div>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -479,153 +526,191 @@ function HomePage() {
       )}
 
       {/* For players/parents: shortcut to attendance stats (own or child's) */}
-      {!isCoach && myConvocs && myConvocs.length > 0 && (() => {
-        const seen = new Map<string, { id: string; first_name: string; last_name?: string; isOwn?: boolean }>();
-        for (const e of myConvocs as any[]) {
-          if (e.player && !seen.has(e.player.id)) seen.set(e.player.id, e.player);
-        }
-        const players = Array.from(seen.values());
-        if (players.length === 0) return null;
-        return (
-          <section className="space-y-2">
-            {players.map((p) => (
-              <Link
-                key={p.id}
-                to="/players/$playerId"
-                params={{ playerId: p.id }}
-                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <BarChart3 className="h-5 w-5 text-primary" />
+      {!isCoach &&
+        myConvocs &&
+        myConvocs.length > 0 &&
+        (() => {
+          const seen = new Map<
+            string,
+            { id: string; first_name: string; last_name?: string; isOwn?: boolean }
+          >();
+          for (const e of myConvocs as any[]) {
+            if (e.player && !seen.has(e.player.id)) seen.set(e.player.id, e.player);
+          }
+          const players = Array.from(seen.values());
+          if (players.length === 0) return null;
+          return (
+            <section className="space-y-2">
+              {players.map((p) => (
+                <Link
+                  key={p.id}
+                  to="/players/$playerId"
+                  params={{ playerId: p.id }}
+                  className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <BarChart3 className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {p.isOwn
+                          ? t("dashboard.myStats")
+                          : t("dashboard.childStats", { name: p.first_name })}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {p.isOwn
+                          ? t("dashboard.myStatsHint")
+                          : t("dashboard.childStatsHint", { name: p.first_name })}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {p.isOwn
-                        ? t("dashboard.myStats")
-                        : t("dashboard.childStats", { name: p.first_name })}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {p.isOwn
-                        ? t("dashboard.myStatsHint")
-                        : t("dashboard.childStatsHint", { name: p.first_name })}
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            ))}
-          </section>
-        );
-      })()}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                </Link>
+              ))}
+            </section>
+          );
+        })()}
 
       {/* For players/parents: unified list of upcoming events with action-required highlight on pending convocations */}
-      {!isCoach && (() => {
-        const convocPlayers = new Map<string, { id: string; first_name: string; isOwn?: boolean }>();
-        for (const e of (myConvocs ?? []) as any[]) {
-          if (e.player && !convocPlayers.has(e.player.id)) convocPlayers.set(e.player.id, e.player);
-        }
-        const list = Array.from(convocPlayers.values());
-        const hasOwn = list.some((p) => p.isOwn);
-        const childOnly = list.length > 0 && !hasOwn;
-        const headerLabel = !childOnly
-          ? t("dashboard.myConvocations")
-          : list.length === 1
-            ? t("dashboard.childConvocations", { name: list[0].first_name })
-            : t("dashboard.childrenConvocations");
-        return (
-        <section>
-          <div className="flex items-center justify-between mb-2.5 px-0.5">
-            <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
-              {headerLabel}
-            </h2>
-            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
-              {t("dashboard.viewAll")}
-              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
-            </Link>
-          </div>
-          {playerHomeEvents.length === 0 ? (
-            <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
-              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
-            </div>
-          ) : (
-            <ul className="space-y-2">
-              {playerHomeEvents.map((e: any, idx: number) => {
-                const isCancelled = e.status === "cancelled";
-                const actionRequired = !isCancelled && e.convocation?.status === "pending";
-                const isFirst = idx === 0 && !actionRequired && !isCancelled;
-                return (
-                  <li key={e.id}>
-                    <Link
-                      to="/events/$eventId"
-                      params={{ eventId: e.id }}
-                      className={cn(
-                        "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
-                        isCancelled
-                          ? "border-red-400/70 bg-red-50/40 dark:bg-red-950/20"
-                          : actionRequired
-                            ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
-                            : isFirst
-                              ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
-                              : "border-border bg-card hover:border-border",
-                      )}
-                    >
-                      {isFirst && (
-                        <div
-                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
-                          style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+      {!isCoach &&
+        (() => {
+          const convocPlayers = new Map<
+            string,
+            { id: string; first_name: string; isOwn?: boolean }
+          >();
+          for (const e of (myConvocs ?? []) as any[]) {
+            if (e.player && !convocPlayers.has(e.player.id))
+              convocPlayers.set(e.player.id, e.player);
+          }
+          const list = Array.from(convocPlayers.values());
+          const hasOwn = list.some((p) => p.isOwn);
+          const childOnly = list.length > 0 && !hasOwn;
+          const headerLabel = !childOnly
+            ? t("dashboard.myConvocations")
+            : list.length === 1
+              ? t("dashboard.childConvocations", { name: list[0].first_name })
+              : t("dashboard.childrenConvocations");
+          return (
+            <section>
+              <div className="flex items-center justify-between mb-2.5 px-0.5">
+                <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
+                  {headerLabel}
+                </h2>
+                <Link
+                  to="/events"
+                  className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors"
+                >
+                  {t("dashboard.viewAll")}
+                  <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
+                </Link>
+              </div>
+              {playerHomeEvents.length === 0 ? (
+                <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
+                  <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {t("dashboard.noUpcoming")}
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {playerHomeEvents.map((e: any, idx: number) => {
+                    const isCancelled = e.status === "cancelled";
+                    const actionRequired = !isCancelled && e.convocation?.status === "pending";
+                    const isFirst = idx === 0 && !actionRequired && !isCancelled;
+                    return (
+                      <li key={e.id}>
+                        <Link
+                          to="/events/$eventId"
+                          params={{ eventId: e.id }}
+                          className={cn(
+                            "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
+                            isCancelled
+                              ? "border-red-400/70 bg-red-50/40 dark:bg-red-950/20"
+                              : actionRequired
+                                ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
+                                : isFirst
+                                  ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                                  : "border-border bg-card hover:border-border",
+                          )}
                         >
-                          ★ {t("dashboard.nextEvent")}
-                        </div>
-                      )}
-                      <div className={cn("flex items-center justify-between gap-3", isFirst ? "p-4" : "p-3.5")}>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn(
-                              "font-bold truncate text-foreground",
-                              isFirst ? "text-[15px]" : "text-sm",
-                              isCancelled && "line-through text-red-700 dark:text-red-300",
-                            )}>{e.title}</p>
-                            {isCancelled ? (
-                              <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
-                                {t("events.status.cancelled", { defaultValue: "Annulé" })}
-                              </span>
-                            ) : actionRequired && (
-                              <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
-                                {t("dashboard.actionRequired")}
-                              </span>
+                          {isFirst && (
+                            <div
+                              className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
+                              style={{
+                                background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                              }}
+                            >
+                              ★ {t("dashboard.nextEvent")}
+                            </div>
+                          )}
+                          <div
+                            className={cn(
+                              "flex items-center justify-between gap-3",
+                              isFirst ? "p-4" : "p-3.5",
                             )}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <EventTypeBadge
+                                  type={(e as any).type}
+                                  size={isFirst ? "md" : "sm"}
+                                />
+                                <p
+                                  className={cn(
+                                    "font-bold truncate text-foreground",
+                                    isFirst ? "text-[15px]" : "text-sm",
+                                    isCancelled && "line-through text-red-700 dark:text-red-300",
+                                  )}
+                                >
+                                  {e.title}
+                                </p>
+                                {isCancelled ? (
+                                  <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
+                                    {t("events.status.cancelled", { defaultValue: "Annulé" })}
+                                  </span>
+                                ) : (
+                                  actionRequired && (
+                                    <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
+                                      {t("dashboard.actionRequired")}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                              <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
+                                <Calendar className="h-3 w-3" strokeWidth={2.4} />
+                                <span>{formatWhen(new Date(e.starts_at))}</span>
+                                {e.player && <span>· {e.player.first_name}</span>}
+                                {e.team_name && <span>· {e.team_name}</span>}
+                                {e.location && (
+                                  <>
+                                    <MapPin className="h-3 w-3" strokeWidth={2.4} />
+                                    <span className="truncate">{e.location}</span>
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {e.convocation && <AttendancePill status={e.convocation.status} />}
+                              <ChevronRight
+                                className={cn(
+                                  isFirst
+                                    ? "h-5 w-5 text-foreground"
+                                    : "h-4 w-4 text-muted-foreground/70",
+                                )}
+                                strokeWidth={2.4}
+                              />
+                            </div>
                           </div>
-                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
-                            <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                            <span>{formatWhen(new Date(e.starts_at))}</span>
-                            {e.player && <span>· {e.player.first_name}</span>}
-                            {e.team_name && <span>· {e.team_name}</span>}
-                            {e.location && (
-                              <>
-                                <MapPin className="h-3 w-3" strokeWidth={2.4} />
-                                <span className="truncate">{e.location}</span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {e.convocation && <AttendancePill status={e.convocation.status} />}
-                          <ChevronRight className={cn(isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-        );
-      })()}
-
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          );
+        })()}
     </div>
   );
 }

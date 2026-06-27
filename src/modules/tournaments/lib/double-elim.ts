@@ -20,9 +20,7 @@ export interface DoubleElimMatch extends BracketMatch {
  * Construit le bracket double élimination complet pour N équipes seedées.
  * Seul un sous-ensemble de tailles est supporté en V1 : 4, 8, 16.
  */
-export function generateDoubleEliminationBracket(
-  seededTeamIds: string[],
-): DoubleElimMatch[] {
+export function generateDoubleEliminationBracket(seededTeamIds: string[]): DoubleElimMatch[] {
   const n = seededTeamIds.length;
   if (n < 4) return [];
   if (![4, 8, 16].includes(n)) {

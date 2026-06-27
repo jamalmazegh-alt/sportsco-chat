@@ -27,7 +27,5 @@ export async function waitForEmail(
     if (data && data.length > 0) return data[0];
     await new Promise((r) => setTimeout(r, 1000));
   }
-  throw new Error(
-    `waitForEmail timeout: ${recipient} template=${options.template ?? "*"}`,
-  );
+  throw new Error(`waitForEmail timeout: ${recipient} template=${options.template ?? "*"}`);
 }

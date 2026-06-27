@@ -125,8 +125,7 @@ function PaymentsDashboardPage() {
   const txQ = useQuery({
     queryKey: ["payments-tx", filters],
     enabled: !!activeClubId,
-    queryFn: () =>
-      fetchTransactions({ data: { ...filters, limit: 200 } }),
+    queryFn: () => fetchTransactions({ data: { ...filters, limit: 200 } }),
   });
 
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
@@ -172,11 +171,15 @@ function PaymentsDashboardPage() {
           <div>
             <Label className="text-xs">Saison</Label>
             <Select value={seasonId} onValueChange={(v) => setSeasonId(v as string)}>
-              <SelectTrigger><SelectValue placeholder="Toutes" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Toutes" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes</SelectItem>
                 {seasonsQ.data?.seasons.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -262,7 +265,8 @@ function PaymentsDashboardPage() {
                         <div className="min-w-0">
                           <p className="font-medium truncate">{it.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {it.total_count} ciblés • {it.paid_count} payés • {it.partial_count} partiels • {it.pending_count} en attente
+                            {it.total_count} ciblés • {it.paid_count} payés • {it.partial_count}{" "}
+                            partiels • {it.pending_count} en attente
                           </p>
                         </div>
                         <div className="text-right shrink-0">
@@ -301,9 +305,7 @@ function PaymentsDashboardPage() {
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
                         <p className="font-medium">{METHOD_LABELS[m] ?? m}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {v.count} transactions
-                        </p>
+                        <p className="text-xs text-muted-foreground">{v.count} transactions</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold">{fmtCents(v.gross, currency)}</p>
@@ -360,7 +362,10 @@ function PaymentsDashboardPage() {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-medium text-sm truncate">{t.item_title}</p>
-                            <Badge variant={STATUS_VARIANTS[t.status] ?? "secondary"} className="text-[10px]">
+                            <Badge
+                              variant={STATUS_VARIANTS[t.status] ?? "secondary"}
+                              className="text-[10px]"
+                            >
                               {t.status}
                             </Badge>
                             <Badge variant="outline" className="text-[10px]">

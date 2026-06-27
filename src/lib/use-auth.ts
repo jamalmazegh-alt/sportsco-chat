@@ -166,7 +166,6 @@ export function useAuthState(): AuthState {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);

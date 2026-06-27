@@ -66,14 +66,12 @@ export function DisciplineWidget({ clubId, className }: Props) {
           <div
             className={cn(
               "h-8 w-8 rounded-lg flex items-center justify-center",
-              total > 0 ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-600",
+              total > 0
+                ? "bg-destructive/10 text-destructive"
+                : "bg-emerald-500/10 text-emerald-600",
             )}
           >
-            {total > 0 ? (
-              <ShieldAlert className="h-4 w-4" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
+            {total > 0 ? <ShieldAlert className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
           </div>
           <h2 className="text-sm font-semibold">
             {isLoading
@@ -98,9 +96,7 @@ export function DisciplineWidget({ clubId, className }: Props) {
       {total > 0 && (
         <ul className="mt-3 space-y-1.5">
           {top.map((r) => {
-            const name = r.player
-              ? `${r.player.first_name} ${r.player.last_name.charAt(0)}.`
-              : "—";
+            const name = r.player ? `${r.player.first_name} ${r.player.last_name.charAt(0)}.` : "—";
             return (
               <li
                 key={r.id}
@@ -144,11 +140,7 @@ export function DisciplineWidget({ clubId, className }: Props) {
         </Button>
       </div>
 
-      <QuickSanctionDrawer
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        clubId={clubId}
-      />
+      <QuickSanctionDrawer open={drawerOpen} onOpenChange={setDrawerOpen} clubId={clubId} />
     </section>
   );
 }

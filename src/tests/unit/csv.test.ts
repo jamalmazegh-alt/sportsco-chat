@@ -132,7 +132,13 @@ describe("toCsv — cas réel : export présences", () => {
   it("génère le bon CSV pour une liste de présences", () => {
     const rows = [
       { last_name: "Dupont", first_name: "Jean", jersey_number: 7, status: "present", comment: "" },
-      { last_name: "Martin", first_name: "Pierre", jersey_number: 11, status: "absent", comment: "Blessure, genou" },
+      {
+        last_name: "Martin",
+        first_name: "Pierre",
+        jersey_number: 11,
+        status: "absent",
+        comment: "Blessure, genou",
+      },
       { last_name: "Hassan", first_name: "Ali", jersey_number: 3, status: "pending", comment: "" },
     ];
     const cols = [

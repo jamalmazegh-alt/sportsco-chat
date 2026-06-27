@@ -69,9 +69,7 @@ export async function expectInsertAllowed(
   table: string,
   row: Record<string, unknown>,
 ): Promise<any> {
-  const { data, error } = await (client.from(table as any).insert(row) as any)
-    .select()
-    .single();
+  const { data, error } = await (client.from(table as any).insert(row) as any).select().single();
   expect(error, `INSERT into ${table} failed: ${error?.message ?? ""}`).toBeNull();
   expect(data).toBeTruthy();
   return data;
@@ -93,11 +91,7 @@ export async function expectUpdateBlocked(
 }
 
 /** Assert DELETE affects zero rows. */
-export async function expectDeleteBlocked(
-  client: SupabaseClient,
-  table: string,
-  rowId: string,
-) {
+export async function expectDeleteBlocked(client: SupabaseClient, table: string, rowId: string) {
   const { data, error } = await (client.from(table as any).delete() as any)
     .eq("id", rowId)
     .select();

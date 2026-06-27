@@ -1,12 +1,7 @@
 // Pure logic for the urgency center — no React, no Supabase.
 // Extracted so the lattice / merge / status can be table-tested in isolation.
 
-import {
-  SEVERITY_ORDER,
-  type UrgencyItem,
-  type UrgencySource,
-  type UrgencyStatus,
-} from "./types";
+import { SEVERITY_ORDER, type UrgencyItem, type UrgencySource, type UrgencyStatus } from "./types";
 
 export type SurfaceState = "pending" | "error" | "partial" | "empty" | "list";
 
@@ -15,10 +10,7 @@ export type SurfaceState = "pending" | "error" | "partial" | "empty" | "list";
  * Invariant clé : la branche 'empty' (SuccessBanner) n'est JAMAIS atteinte
  * si `status.failedSources` est non vide — pas de succès si une source a échoué.
  */
-export function selectSurfaceState(
-  status: UrgencyStatus,
-  itemCount: number,
-): SurfaceState {
+export function selectSurfaceState(status: UrgencyStatus, itemCount: number): SurfaceState {
   if (status.phase === "pending") return "pending";
   const hasFailures = status.failedSources.length > 0;
   if (hasFailures && itemCount === 0) return "error";

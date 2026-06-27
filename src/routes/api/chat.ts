@@ -109,7 +109,8 @@ export const Route = createFileRoute("/api/chat")({
 
         const tools = {
           getMyProfile: tool({
-            description: "Récupère le profil de l'utilisateur connecté : nom, langue, clubs et rôles.",
+            description:
+              "Récupère le profil de l'utilisateur connecté : nom, langue, clubs et rôles.",
             inputSchema: z.object({}),
             execute: async () => {
               const [{ data: profile }, { data: memberships }] = await Promise.all([
@@ -145,13 +146,16 @@ export const Route = createFileRoute("/api/chat")({
               const { data } = await supabase
                 .from("convocations")
                 .select(
-                  "status, player_id, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))"
+                  "status, player_id, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))",
                 )
                 .in("player_id", playerIds)
                 .order("created_at", { ascending: false });
               const now = new Date();
               const events = (data ?? [])
-                .filter((c: any) => c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now)
+                .filter(
+                  (c: any) =>
+                    c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now,
+                )
                 .map((c: any) => ({
                   id: c.event.id,
                   title: c.event.title,
@@ -177,8 +181,7 @@ export const Route = createFileRoute("/api/chat")({
               if (playerIds.length === 0) {
                 return {
                   players: [],
-                  note:
-                    "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Les statistiques de présence ne s'appliquent donc pas à ce profil — par exemple un dirigeant ou un coach sans enfant inscrit.",
+                  note: "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Les statistiques de présence ne s'appliquent donc pas à ce profil — par exemple un dirigeant ou un coach sans enfant inscrit.",
                 };
               }
               const { data: players } = await supabase
@@ -190,13 +193,27 @@ export const Route = createFileRoute("/api/chat")({
                 .select("player_id, status, event:event_id(type, status, starts_at)")
                 .in("player_id", playerIds);
               const now = Date.now();
-              const byPlayer = new Map<string, { present: number; absent: number; uncertain: number; pending: number; total: number }>();
+              const byPlayer = new Map<
+                string,
+                {
+                  present: number;
+                  absent: number;
+                  uncertain: number;
+                  pending: number;
+                  total: number;
+                }
+              >();
               for (const c of convs ?? []) {
                 const ev = (c as any).event;
                 if (!ev || ev.status !== "published" || ev.type !== "training") continue;
                 if (new Date(ev.starts_at).getTime() > now) continue; // past trainings only
-                const stats =
-                  byPlayer.get(c.player_id) ?? { present: 0, absent: 0, uncertain: 0, pending: 0, total: 0 };
+                const stats = byPlayer.get(c.player_id) ?? {
+                  present: 0,
+                  absent: 0,
+                  uncertain: 0,
+                  pending: 0,
+                  total: 0,
+                };
                 stats.total += 1;
                 if (c.status === "present") stats.present += 1;
                 else if (c.status === "absent") stats.absent += 1;
@@ -206,7 +223,13 @@ export const Route = createFileRoute("/api/chat")({
               }
               return {
                 players: (players ?? []).map((p) => {
-                  const s = byPlayer.get(p.id) ?? { present: 0, absent: 0, uncertain: 0, pending: 0, total: 0 };
+                  const s = byPlayer.get(p.id) ?? {
+                    present: 0,
+                    absent: 0,
+                    uncertain: 0,
+                    pending: 0,
+                    total: 0,
+                  };
                   return {
                     name: `${p.first_name} ${p.last_name}`,
                     ...s,
@@ -220,15 +243,14 @@ export const Route = createFileRoute("/api/chat")({
 
           getMyPerformanceStats: tool({
             description:
-              "Statistiques de performance (matchs) de l'utilisateur ou de ses enfants : buts, passes décisives, cartons jaunes/rouges/blancs, essais, points, fautes, pénalités, csc. Renvoie un total par joueur, tous matchs confondus. À utiliser quand l'utilisateur demande \"mes buts\", \"mes stats\", \"combien de cartons\", \"combien de passes\", etc.",
+              'Statistiques de performance (matchs) de l\'utilisateur ou de ses enfants : buts, passes décisives, cartons jaunes/rouges/blancs, essais, points, fautes, pénalités, csc. Renvoie un total par joueur, tous matchs confondus. À utiliser quand l\'utilisateur demande "mes buts", "mes stats", "combien de cartons", "combien de passes", etc.',
             inputSchema: z.object({}),
             execute: async () => {
               const playerIds = await getMyPlayerIds();
               if (playerIds.length === 0) {
                 return {
                   players: [],
-                  note:
-                    "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Il n'y a donc pas de statistiques de performance à afficher.",
+                  note: "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Il n'y a donc pas de statistiques de performance à afficher.",
                 };
               }
               const { data: players } = await supabase
@@ -236,8 +258,14 @@ export const Route = createFileRoute("/api/chat")({
                 .select("id, first_name, last_name")
                 .in("id", playerIds);
               const [{ data: scored }, { data: assisted }] = await Promise.all([
-                supabase.from("event_goals").select("scorer_player_id, kind").in("scorer_player_id", playerIds),
-                supabase.from("event_goals").select("assist_player_id").in("assist_player_id", playerIds),
+                supabase
+                  .from("event_goals")
+                  .select("scorer_player_id, kind")
+                  .in("scorer_player_id", playerIds),
+                supabase
+                  .from("event_goals")
+                  .select("assist_player_id")
+                  .in("assist_player_id", playerIds),
               ]);
               const byPlayer = new Map<string, Record<string, number>>();
               for (const g of scored ?? []) {
@@ -262,7 +290,6 @@ export const Route = createFileRoute("/api/chat")({
               };
             },
           }),
-
 
           getMyTeams: tool({
             description: "Liste les équipes auxquelles l'utilisateur (ou ses enfants) appartient.",
@@ -297,7 +324,8 @@ export const Route = createFileRoute("/api/chat")({
           }),
 
           getRecentClubAnnouncements: tool({
-            description: "Récupère les dernières annonces du mur des clubs auxquels l'utilisateur appartient.",
+            description:
+              "Récupère les dernières annonces du mur des clubs auxquels l'utilisateur appartient.",
             inputSchema: z.object({
               limit: z.number().int().min(1).max(10).optional(),
             }),
@@ -388,11 +416,16 @@ export const Route = createFileRoute("/api/chat")({
             description:
               "Pour coachs/admins uniquement : envoie un rappel in-app aux joueurs/parents qui n'ont pas encore répondu à un événement donné. **N'utilise ce tool QU'APRÈS avoir demandé une confirmation explicite à l'utilisateur** (ex : 'Veux-tu que je leur envoie un rappel ?' → 'Oui'). Évite les doublons : ne relance pas un joueur déjà relancé dans les 30 dernières minutes. Retourne le nombre de rappels envoyés.",
             inputSchema: z.object({
-              eventId: z.string().uuid().describe("ID de l'événement obtenu via getPendingResponsesForCoach"),
+              eventId: z
+                .string()
+                .uuid()
+                .describe("ID de l'événement obtenu via getPendingResponsesForCoach"),
               playerIds: z
                 .array(z.string().uuid())
                 .optional()
-                .describe("Optionnel : restreindre aux joueurs précis. Sinon, tous les pending de l'événement."),
+                .describe(
+                  "Optionnel : restreindre aux joueurs précis. Sinon, tous les pending de l'événement.",
+                ),
             }),
             execute: async ({ eventId, playerIds }) => {
               const { data: ev } = await supabase
@@ -419,7 +452,8 @@ export const Route = createFileRoute("/api/chat")({
                 q = q.in("player_id", playerIds);
               }
               const { data: convs } = await q;
-              if (!convs || convs.length === 0) return { sent: 0, note: "Aucun joueur en attente." };
+              if (!convs || convs.length === 0)
+                return { sent: 0, note: "Aucun joueur en attente." };
 
               let sent = 0;
               const skipped: string[] = [];
@@ -445,11 +479,7 @@ export const Route = createFileRoute("/api/chat")({
                     .from("player_parents")
                     .select("parent_user_id")
                     .eq("player_id", c.player_id),
-                  supabase
-                    .from("players")
-                    .select("user_id")
-                    .eq("id", c.player_id)
-                    .maybeSingle(),
+                  supabase.from("players").select("user_id").eq("id", c.player_id).maybeSingle(),
                 ]);
                 const recipients = Array.from(
                   new Set([
@@ -457,7 +487,7 @@ export const Route = createFileRoute("/api/chat")({
                     ...((parents ?? [])
                       .map((p: any) => p.parent_user_id)
                       .filter(Boolean) as string[]),
-                  ])
+                  ]),
                 );
                 await supabase
                   .from("reminders")
@@ -470,7 +500,7 @@ export const Route = createFileRoute("/api/chat")({
                       title: ev.title,
                       body: "Merci de confirmer ta présence.",
                       link: `/events/${eventId}`,
-                    }))
+                    })),
                   );
                 }
                 sent += 1;
@@ -490,19 +520,66 @@ export const Route = createFileRoute("/api/chat")({
             description:
               "Pour coachs/admins uniquement : crée un événement (entraînement, match, tournoi, réunion) en BROUILLON pour une équipe encadrée par l'utilisateur. L'événement n'est PAS publié automatiquement — l'utilisateur doit le réviser et le publier dans la page Événements pour envoyer les convocations. **Demande TOUJOURS confirmation explicite avant d'appeler ce tool** (récapitule équipe, titre, type, date/heure et lieu, puis attends un 'oui' clair). Si l'utilisateur n'a pas précisé une info essentielle (équipe, date, heure), redemande-la avant d'appeler. **Si `type = 'match'`, le champ `opponent` (nom de l'équipe adverse) est OBLIGATOIRE : ne JAMAIS appeler ce tool sans `opponent` quand c'est un match — redemande-le à l'utilisateur s'il n'a pas été précisé.**",
             inputSchema: z.object({
-              teamName: z.string().min(1).describe("Nom (ou portion) de l'équipe. Sera matché de façon flexible parmi les équipes encadrées."),
-              title: z.string().min(1).max(200).describe("Titre de l'événement (ex : 'U13 vs FC Riverside', 'Entraînement hebdo')."),
+              teamName: z
+                .string()
+                .min(1)
+                .describe(
+                  "Nom (ou portion) de l'équipe. Sera matché de façon flexible parmi les équipes encadrées.",
+                ),
+              title: z
+                .string()
+                .min(1)
+                .max(200)
+                .describe(
+                  "Titre de l'événement (ex : 'U13 vs FC Riverside', 'Entraînement hebdo').",
+                ),
               type: z.enum(["training", "match", "tournament", "meeting"]),
-              startsAt: z.string().describe("Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler."),
+              startsAt: z
+                .string()
+                .describe(
+                  "Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler.",
+                ),
               endsAt: z.string().optional().describe("Date/heure de fin ISO 8601 (optionnel)."),
-              convocationTime: z.string().optional().describe("Heure du rendez-vous (convocation) au format ISO 8601 avec fuseau. Renseigne-la dès que l'utilisateur mentionne une heure de RDV distincte (ex : RDV 11h00 pour un match à 12h30)."),
-              location: z.string().max(200).optional().describe("Lieu de l'événement (ex : stade, gymnase)."),
-              meetingPoint: z.string().max(200).optional().describe("Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement."),
+              convocationTime: z
+                .string()
+                .optional()
+                .describe(
+                  "Heure du rendez-vous (convocation) au format ISO 8601 avec fuseau. Renseigne-la dès que l'utilisateur mentionne une heure de RDV distincte (ex : RDV 11h00 pour un match à 12h30).",
+                ),
+              location: z
+                .string()
+                .max(200)
+                .optional()
+                .describe("Lieu de l'événement (ex : stade, gymnase)."),
+              meetingPoint: z
+                .string()
+                .max(200)
+                .optional()
+                .describe(
+                  "Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement.",
+                ),
               opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
-              isHome: z.boolean().optional().describe("Pour les matchs : true = match à domicile, false = à l'extérieur. **Déduis-le toi-même** : si le lieu est une ville/stade adverse ou différent du club de l'utilisateur, mets false. Si l'utilisateur dit explicitement 'à domicile' / 'à la maison' / 'chez nous', mets true. Si l'utilisateur dit 'à [ville extérieure]' ou nomme un stade adverse, mets false. Ne demande pas confirmation pour ce champ — déduis-le du contexte."),
+              isHome: z
+                .boolean()
+                .optional()
+                .describe(
+                  "Pour les matchs : true = match à domicile, false = à l'extérieur. **Déduis-le toi-même** : si le lieu est une ville/stade adverse ou différent du club de l'utilisateur, mets false. Si l'utilisateur dit explicitement 'à domicile' / 'à la maison' / 'chez nous', mets true. Si l'utilisateur dit 'à [ville extérieure]' ou nomme un stade adverse, mets false. Ne demande pas confirmation pour ce champ — déduis-le du contexte.",
+                ),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
+            execute: async ({
+              teamName,
+              title,
+              type,
+              startsAt,
+              endsAt,
+              convocationTime,
+              location,
+              meetingPoint,
+              opponent,
+              isHome,
+              description,
+            }) => {
               // Guard: a match draft requires the opponent — refuse and tell the agent to ask.
               if (type === "match" && (!opponent || !opponent.trim())) {
                 return {
@@ -556,7 +633,10 @@ export const Route = createFileRoute("/api/chat")({
               }
               const MAX_HORIZON_MS = 1000 * 60 * 60 * 24 * 365 * 2; // 2 ans
               if (startsAtDate.getTime() > Date.now() + MAX_HORIZON_MS) {
-                return { created: false, note: "Date/heure de début trop éloignée (max 2 ans). Vérifie l'année." };
+                return {
+                  created: false,
+                  note: "Date/heure de début trop éloignée (max 2 ans). Vérifie l'année.",
+                };
               }
               let endsAtDate: Date | null = null;
               if (endsAt) {
@@ -565,10 +645,16 @@ export const Route = createFileRoute("/api/chat")({
                   return { created: false, note: "Date/heure de fin invalide." };
                 }
                 if (endsAtDate.getTime() <= startsAtDate.getTime()) {
-                  return { created: false, note: "La date/heure de fin doit être postérieure au début." };
+                  return {
+                    created: false,
+                    note: "La date/heure de fin doit être postérieure au début.",
+                  };
                 }
                 if (endsAtDate.getTime() - startsAtDate.getTime() > 1000 * 60 * 60 * 24) {
-                  return { created: false, note: "Durée d'événement trop longue (max 24 h). Vérifie la date de fin." };
+                  return {
+                    created: false,
+                    note: "Durée d'événement trop longue (max 24 h). Vérifie la date de fin.",
+                  };
                 }
               }
               if (convocationTime) {
@@ -577,10 +663,16 @@ export const Route = createFileRoute("/api/chat")({
                   return { created: false, note: "Heure de convocation invalide." };
                 }
                 if (conv.getTime() > startsAtDate.getTime()) {
-                  return { created: false, note: "L'heure de convocation doit être avant (ou égale au) début de l'événement." };
+                  return {
+                    created: false,
+                    note: "L'heure de convocation doit être avant (ou égale au) début de l'événement.",
+                  };
                 }
                 if (startsAtDate.getTime() - conv.getTime() > 1000 * 60 * 60 * 6) {
-                  return { created: false, note: "Heure de convocation suspecte (plus de 6 h avant le début)." };
+                  return {
+                    created: false,
+                    note: "Heure de convocation suspecte (plus de 6 h avant le début).",
+                  };
                 }
               }
 
@@ -619,7 +711,9 @@ export const Route = createFileRoute("/api/chat")({
                   type,
                   starts_at: startsAtDate.toISOString(),
                   ends_at: endsAt ? new Date(endsAt).toISOString() : null,
-                  convocation_time: convocationTime ? new Date(convocationTime).toISOString() : null,
+                  convocation_time: convocationTime
+                    ? new Date(convocationTime).toISOString()
+                    : null,
                   location: location ?? null,
                   meeting_point: meetingPoint ?? null,
                   opponent: opponent ?? null,
@@ -660,14 +754,31 @@ export const Route = createFileRoute("/api/chat")({
               title: z.string().min(1).max(200).optional(),
               startsAt: z.string().optional().describe("ISO 8601 avec fuseau."),
               endsAt: z.string().optional().describe("ISO 8601 avec fuseau."),
-              convocationTime: z.string().optional().describe("Heure de RDV, ISO 8601 avec fuseau."),
+              convocationTime: z
+                .string()
+                .optional()
+                .describe("Heure de RDV, ISO 8601 avec fuseau."),
               location: z.string().max(200).optional(),
               meetingPoint: z.string().max(200).optional(),
               opponent: z.string().max(200).optional(),
-              isHome: z.boolean().optional().describe("true = match à domicile, false = à l'extérieur."),
+              isHome: z
+                .boolean()
+                .optional()
+                .describe("true = match à domicile, false = à l'extérieur."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
+            execute: async ({
+              eventId,
+              title,
+              startsAt,
+              endsAt,
+              convocationTime,
+              location,
+              meetingPoint,
+              opponent,
+              isHome,
+              description,
+            }) => {
               const { data: ev, error: evErr } = await supabase
                 .from("events")
                 .select("id, team_id, title, team:team_id(name)")
@@ -678,13 +789,17 @@ export const Route = createFileRoute("/api/chat")({
               }
               const managedTeamIds = await getManagedTeamIds();
               if (!managedTeamIds.includes(ev.team_id)) {
-                return { updated: false, note: "L'utilisateur n'encadre pas l'équipe de cet événement." };
+                return {
+                  updated: false,
+                  note: "L'utilisateur n'encadre pas l'équipe de cet événement.",
+                };
               }
               const patch: Database["public"]["Tables"]["events"]["Update"] = {};
               if (title !== undefined) patch.title = title;
               if (startsAt !== undefined) {
                 const d = new Date(startsAt);
-                if (Number.isNaN(d.getTime())) return { updated: false, note: "startsAt invalide." };
+                if (Number.isNaN(d.getTime()))
+                  return { updated: false, note: "startsAt invalide." };
                 patch.starts_at = d.toISOString();
               }
               if (endsAt !== undefined) {
@@ -694,7 +809,8 @@ export const Route = createFileRoute("/api/chat")({
               }
               if (convocationTime !== undefined) {
                 const d = new Date(convocationTime);
-                if (Number.isNaN(d.getTime())) return { updated: false, note: "convocationTime invalide." };
+                if (Number.isNaN(d.getTime()))
+                  return { updated: false, note: "convocationTime invalide." };
                 patch.convocation_time = d.toISOString();
               }
               if (location !== undefined) patch.location = location;
@@ -712,7 +828,10 @@ export const Route = createFileRoute("/api/chat")({
                 .select("id, title, starts_at, convocation_time, location, meeting_point, status")
                 .single();
               if (error || !updated) {
-                return { updated: false, note: `Échec de la mise à jour : ${error?.message ?? "erreur inconnue"}.` };
+                return {
+                  updated: false,
+                  note: `Échec de la mise à jour : ${error?.message ?? "erreur inconnue"}.`,
+                };
               }
               return {
                 updated: true,
@@ -727,27 +846,26 @@ export const Route = createFileRoute("/api/chat")({
               "Liste les tournois liés à l'utilisateur : ceux qu'il organise (créateur, admin/dirigeant du club organisateur, co-organisateur ou arbitre invité) et ceux où l'une de ses équipes est inscrite. Renvoie id, slug, nom, lieu, dates, sport, statut et rôle de l'utilisateur. Utile pour répondre à 'Quels tournois j'ai ?', 'Mon prochain tournoi', etc.",
             inputSchema: z.object({}),
             execute: async () => {
-              const [
-                { data: createdRows },
-                { data: collabRows },
-                { data: clubRoles },
-              ] = await Promise.all([
-                supabase
-                  .from("tournaments")
-                  .select("id, slug, name, location, starts_on, ends_on, sport, status, club_id")
-                  .eq("created_by", userId),
-                supabase
-                  .from("tournament_collaborators")
-                  .select("role, tournament:tournament_id(id, slug, name, location, starts_on, ends_on, sport, status, club_id)")
-                  .eq("user_id", userId)
-                  .not("accepted_at", "is", null)
-                  .is("revoked_at", null),
-                supabase
-                  .from("club_members")
-                  .select("club_id, role")
-                  .eq("user_id", userId)
-                  .in("role", ["admin", "dirigeant"]),
-              ]);
+              const [{ data: createdRows }, { data: collabRows }, { data: clubRoles }] =
+                await Promise.all([
+                  supabase
+                    .from("tournaments")
+                    .select("id, slug, name, location, starts_on, ends_on, sport, status, club_id")
+                    .eq("created_by", userId),
+                  supabase
+                    .from("tournament_collaborators")
+                    .select(
+                      "role, tournament:tournament_id(id, slug, name, location, starts_on, ends_on, sport, status, club_id)",
+                    )
+                    .eq("user_id", userId)
+                    .not("accepted_at", "is", null)
+                    .is("revoked_at", null),
+                  supabase
+                    .from("club_members")
+                    .select("club_id, role")
+                    .eq("user_id", userId)
+                    .in("role", ["admin", "dirigeant"]),
+                ]);
 
               const map = new Map<string, any>();
               const add = (t: any, role: string) => {
@@ -773,7 +891,9 @@ export const Route = createFileRoute("/api/chat")({
               };
 
               (createdRows ?? []).forEach((t: any) => add(t, "créateur"));
-              (collabRows ?? []).forEach((c: any) => add(c.tournament, c.role === "co_organizer" ? "co-organisateur" : "arbitre"));
+              (collabRows ?? []).forEach((c: any) =>
+                add(c.tournament, c.role === "co_organizer" ? "co-organisateur" : "arbitre"),
+              );
 
               const adminClubIds = (clubRoles ?? []).map((c: any) => c.club_id);
               if (adminClubIds.length > 0) {
@@ -805,7 +925,9 @@ export const Route = createFileRoute("/api/chat")({
               }
               let q = supabase
                 .from("tournaments")
-                .select("id, slug, name, location, starts_on, ends_on, sport, status, format, num_teams");
+                .select(
+                  "id, slug, name, location, starts_on, ends_on, sport, status, format, num_teams",
+                );
               q = tournamentId ? q.eq("id", tournamentId) : q.eq("slug", slug!);
               const { data: tournament } = await q.maybeSingle();
               if (!tournament) {
@@ -819,7 +941,9 @@ export const Route = createFileRoute("/api/chat")({
                   .eq("tournament_id", tournament.id),
                 supabase
                   .from("tournament_matches")
-                  .select("id, round, match_number, team_a_id, team_b_id, score_a, score_b, penalty_score_a, penalty_score_b, status, scheduled_at, field, winner_team_id, group_id")
+                  .select(
+                    "id, round, match_number, team_a_id, team_b_id, score_a, score_b, penalty_score_a, penalty_score_b, status, scheduled_at, field, winner_team_id, group_id",
+                  )
                   .eq("tournament_id", tournament.id)
                   .order("scheduled_at", { ascending: true, nullsFirst: false }),
                 supabase
@@ -835,13 +959,14 @@ export const Route = createFileRoute("/api/chat")({
                 match_number: m.match_number,
                 team_a: m.team_a_id ? (teamMap.get(m.team_a_id) as any)?.name : "À déterminer",
                 team_b: m.team_b_id ? (teamMap.get(m.team_b_id) as any)?.name : "À déterminer",
-                score: m.score_a != null && m.score_b != null
-                  ? `${m.score_a}-${m.score_b}${
-                      m.penalty_score_a != null && m.penalty_score_b != null
-                        ? ` (tab ${m.penalty_score_a}-${m.penalty_score_b})`
-                        : ""
-                    }`
-                  : null,
+                score:
+                  m.score_a != null && m.score_b != null
+                    ? `${m.score_a}-${m.score_b}${
+                        m.penalty_score_a != null && m.penalty_score_b != null
+                          ? ` (tab ${m.penalty_score_a}-${m.penalty_score_b})`
+                          : ""
+                      }`
+                    : null,
                 status: m.status,
                 scheduled_at: m.scheduled_at,
                 field: m.field,
@@ -852,7 +977,11 @@ export const Route = createFileRoute("/api/chat")({
               const allMatches = (matches ?? []) as any[];
               const live = allMatches.filter((m) => m.status === "live").map(fmtMatch);
               const upcoming = allMatches
-                .filter((m) => m.status === "scheduled" && (!m.scheduled_at || new Date(m.scheduled_at).getTime() >= now - 3600_000))
+                .filter(
+                  (m) =>
+                    m.status === "scheduled" &&
+                    (!m.scheduled_at || new Date(m.scheduled_at).getTime() >= now - 3600_000),
+                )
                 .slice(0, 10)
                 .map(fmtMatch);
               const recentDone = allMatches
@@ -863,22 +992,37 @@ export const Route = createFileRoute("/api/chat")({
               // Group standings (lightweight)
               const standings = (groups ?? []).map((g: any) => {
                 const groupTeams = (teams ?? []).filter((t: any) => t.group_id === g.id);
-                const rows = groupTeams.map((t: any) => {
-                  let pts = 0, w = 0, d = 0, l = 0, gf = 0, ga = 0;
-                  for (const m of allMatches) {
-                    if (m.round !== "group" || m.group_id !== g.id || m.status !== "completed") continue;
-                    if (m.team_a_id !== t.id && m.team_b_id !== t.id) continue;
-                    const isA = m.team_a_id === t.id;
-                    const my = isA ? m.score_a : m.score_b;
-                    const opp = isA ? m.score_b : m.score_a;
-                    if (my == null || opp == null) continue;
-                    gf += my; ga += opp;
-                    if (my > opp) { w++; pts += 3; }
-                    else if (my === opp) { d++; pts += 1; }
-                    else { l++; }
-                  }
-                  return { team: t.name, pts, w, d, l, gf, ga, diff: gf - ga };
-                }).sort((a, b) => b.pts - a.pts || b.diff - a.diff || b.gf - a.gf);
+                const rows = groupTeams
+                  .map((t: any) => {
+                    let pts = 0,
+                      w = 0,
+                      d = 0,
+                      l = 0,
+                      gf = 0,
+                      ga = 0;
+                    for (const m of allMatches) {
+                      if (m.round !== "group" || m.group_id !== g.id || m.status !== "completed")
+                        continue;
+                      if (m.team_a_id !== t.id && m.team_b_id !== t.id) continue;
+                      const isA = m.team_a_id === t.id;
+                      const my = isA ? m.score_a : m.score_b;
+                      const opp = isA ? m.score_b : m.score_a;
+                      if (my == null || opp == null) continue;
+                      gf += my;
+                      ga += opp;
+                      if (my > opp) {
+                        w++;
+                        pts += 3;
+                      } else if (my === opp) {
+                        d++;
+                        pts += 1;
+                      } else {
+                        l++;
+                      }
+                    }
+                    return { team: t.name, pts, w, d, l, gf, ga, diff: gf - ga };
+                  })
+                  .sort((a, b) => b.pts - a.pts || b.diff - a.diff || b.gf - a.gf);
                 return { group: g.name, table: rows };
               });
 
@@ -898,7 +1042,6 @@ export const Route = createFileRoute("/api/chat")({
             },
           }),
         };
-
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
@@ -935,10 +1078,14 @@ export const Route = createFileRoute("/api/chat")({
           console.error("[chat] streamText error", err);
           const status = err?.statusCode ?? err?.status ?? 500;
           if (status === 429) {
-            return new Response("Trop de requêtes. Merci de réessayer dans un instant.", { status: 429 });
+            return new Response("Trop de requêtes. Merci de réessayer dans un instant.", {
+              status: 429,
+            });
           }
           if (status === 402) {
-            return new Response("Crédits IA épuisés. L'admin doit recharger l'espace de travail.", { status: 402 });
+            return new Response("Crédits IA épuisés. L'admin doit recharger l'espace de travail.", {
+              status: 402,
+            });
           }
           return new Response("Erreur de l'assistant.", { status: 500 });
         }

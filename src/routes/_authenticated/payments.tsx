@@ -4,10 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import {
-  listMyObligations,
-  createObligationCheckout,
-} from "@/lib/payment-checkout.functions";
+import { listMyObligations, createObligationCheckout } from "@/lib/payment-checkout.functions";
 import { BackLink } from "@/components/back-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,9 +95,7 @@ function MyPaymentsPage() {
             <Link to="/payments/receipts">{t("payments.receipts")}</Link>
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t("payments.subtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("payments.subtitle")}</p>
       </header>
 
       {search?.success && (
@@ -124,9 +119,7 @@ function MyPaymentsPage() {
       {q.data && q.data.obligations.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
           <p className="text-sm font-medium">{t("payments.emptyTitle")}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("payments.emptyHint")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{t("payments.emptyHint")}</p>
         </div>
       )}
 
@@ -139,13 +132,7 @@ function MyPaymentsPage() {
   );
 }
 
-function ObligationRow({
-  obligation,
-  locale,
-}: {
-  obligation: Obligation;
-  locale: string;
-}) {
+function ObligationRow({ obligation, locale }: { obligation: Obligation; locale: string }) {
   const { t } = useTranslation();
   const checkoutFn = useServerFn(createObligationCheckout);
   const [partialOpen, setPartialOpen] = useState(false);
@@ -154,13 +141,11 @@ function ObligationRow({
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
   const currency = (obligation.currency || "eur").toUpperCase();
   const stripeReady =
-    !!obligation.clubs?.stripe_account_id &&
-    !!obligation.clubs?.stripe_charges_enabled;
+    !!obligation.clubs?.stripe_account_id && !!obligation.clubs?.stripe_charges_enabled;
   const allowPartial = !!obligation.items?.allow_partial;
-  const playerName =
-    obligation.players
-      ? `${obligation.players.first_name ?? ""} ${obligation.players.last_name ?? ""}`.trim()
-      : "";
+  const playerName = obligation.players
+    ? `${obligation.players.first_name ?? ""} ${obligation.players.last_name ?? ""}`.trim()
+    : "";
 
   const checkout = useMutation({
     mutationFn: (cents?: number) =>
@@ -199,9 +184,7 @@ function ObligationRow({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-lg font-bold">
-            {formatAmount(remaining, currency, locale)}
-          </p>
+          <p className="text-lg font-bold">{formatAmount(remaining, currency, locale)}</p>
           {obligation.amount_paid_cents > 0 && (
             <p className="text-[11px] text-muted-foreground">
               {t("payments.alreadyPaid", {
@@ -232,7 +215,7 @@ function ObligationRow({
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  setAmount(((remaining / 100) / 2).toFixed(2));
+                  setAmount((remaining / 100 / 2).toFixed(2));
                   setPartialOpen(true);
                 }}
               >
@@ -241,9 +224,7 @@ function ObligationRow({
             )}
           </>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {t("payments.onlineUnavailable")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("payments.onlineUnavailable")}</p>
         )}
       </div>
 
@@ -253,9 +234,7 @@ function ObligationRow({
             <DialogTitle>{t("payments.partial")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <Label className="text-xs">
-              {t("payments.amountLabel", { currency })}
-            </Label>
+            <Label className="text-xs">{t("payments.amountLabel", { currency })}</Label>
             <Input
               type="number"
               min="1"

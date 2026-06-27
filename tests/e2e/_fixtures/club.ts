@@ -51,9 +51,7 @@ export type SeededClub = {
 function resolveAdminUser(): SeededUser {
   const userId = process.env.E2E_ADMIN_USER_ID;
   if (!userId) {
-    throw new Error(
-      "E2E_ADMIN_USER_ID is missing — Playwright globalSetup must run first.",
-    );
+    throw new Error("E2E_ADMIN_USER_ID is missing — Playwright globalSetup must run first.");
   }
   return { email: E2E_ADMIN_EMAIL, password: E2E_ADMIN_PASSWORD, userId };
 }

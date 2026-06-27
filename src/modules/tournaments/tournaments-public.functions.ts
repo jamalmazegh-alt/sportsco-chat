@@ -4,9 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const getPublicTournament = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
-    z.object({ slug: z.string().min(1).max(80) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: t } = await supabaseAdmin
@@ -66,11 +64,8 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     };
   });
 
-
 export const getTournamentInviteByToken = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ token: z.string().min(8).max(120) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ token: z.string().min(8).max(120) }).parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: result, error } = await (supabaseAdmin as any).rpc(
@@ -83,15 +78,12 @@ export const getTournamentInviteByToken = createServerFn({ method: "GET" })
 
 export const acceptTournamentInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ token: z.string().min(8).max(120) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ token: z.string().min(8).max(120) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: result, error } = await (supabase as any).rpc(
-      "accept_tournament_invite",
-      { _token: data.token },
-    );
+    const { data: result, error } = await (supabase as any).rpc("accept_tournament_invite", {
+      _token: data.token,
+    });
     if (error) throw new Response(error.message, { status: 400 });
     return { result };
   });

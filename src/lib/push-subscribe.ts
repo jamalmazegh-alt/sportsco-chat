@@ -131,7 +131,11 @@ export async function syncPushSubscriptionState(): Promise<void> {
   // Hard "denied" → clean local + DB and bail out.
   if (permission === "denied") {
     if (sub) {
-      try { await sub.unsubscribe(); } catch { /* noop */ }
+      try {
+        await sub.unsubscribe();
+      } catch {
+        /* noop */
+      }
     }
     try {
       await fetch("/api/push/unsubscribe", {
@@ -142,7 +146,9 @@ export async function syncPushSubscriptionState(): Promise<void> {
         },
         body: JSON.stringify({ all_for_user: true }),
       });
-    } catch { /* best effort */ }
+    } catch {
+      /* best effort */
+    }
     return;
   }
 
@@ -167,14 +173,15 @@ export async function syncPushSubscriptionState(): Promise<void> {
           },
           body: JSON.stringify({ all_for_user: true }),
         });
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
       return;
     }
   }
 
   // Permission "default" and no sub → nothing to do (don't silently prompt).
   if (!sub) return;
-
 
   // Permission granted with a live sub: ensure DB has exactly this endpoint
   // for the current device. iOS rotates the endpoint on every re-enable,
@@ -206,6 +213,8 @@ export async function syncPushSubscriptionState(): Promise<void> {
           user_agent: navigator.userAgent,
         }),
       });
-    } catch { /* best effort */ }
+    } catch {
+      /* best effort */
+    }
   }
 }

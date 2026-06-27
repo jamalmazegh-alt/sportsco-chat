@@ -1,66 +1,69 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
-import { useEffect, useState, useCallback } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useEffect, useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle, Loader2, RefreshCw } from "lucide-react";
 
 // Lightweight gate: not a security boundary (resolvers are public DNS),
 // just stops drive-by URLs from indexing internal tooling.
-const DNS_CHECK_KEY = 'clubero-ops'
+const DNS_CHECK_KEY = "clubero-ops";
 
-export const Route = createFileRoute('/dns-check')({
+export const Route = createFileRoute("/dns-check")({
   validateSearch: (search: Record<string, unknown>) => ({
-    key: typeof search.key === 'string' ? search.key : undefined,
+    key: typeof search.key === "string" ? search.key : undefined,
   }),
   beforeLoad: ({ search }) => {
     if (search.key !== DNS_CHECK_KEY) {
-      throw notFound()
+      throw notFound();
     }
   },
   component: DnsCheckPage,
   head: () => ({
     meta: [
-      { title: 'DNS propagation check — clubero.app' },
-      { name: 'description', content: 'Internal Clubero utility to verify DNS propagation (A and TXT records) for clubero.app across Google and Cloudflare resolvers.' },
-      { name: 'robots', content: 'noindex, nofollow' },
+      { title: "DNS propagation check — clubero.app" },
+      {
+        name: "description",
+        content:
+          "Internal Clubero utility to verify DNS propagation (A and TXT records) for clubero.app across Google and Cloudflare resolvers.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-})
+});
 
-const EXPECTED_A = '185.158.133.1'
-const HOSTS = ['clubero.app', 'www.clubero.app'] as const
+const EXPECTED_A = "185.158.133.1";
+const HOSTS = ["clubero.app", "www.clubero.app"] as const;
 const RESOLVERS = [
-  { name: 'Google', url: 'https://dns.google/resolve' },
-  { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query' },
-] as const
+  { name: "Google", url: "https://dns.google/resolve" },
+  { name: "Cloudflare", url: "https://cloudflare-dns.com/dns-query" },
+] as const;
 
 type CheckResult = {
-  resolver: string
-  host: string
-  type: 'A' | 'TXT'
-  values: string[]
-  ok: boolean
-  error?: string
-}
+  resolver: string;
+  host: string;
+  type: "A" | "TXT";
+  values: string[];
+  ok: boolean;
+  error?: string;
+};
 
 async function resolve(
   resolver: (typeof RESOLVERS)[number],
   host: string,
-  type: 'A' | 'TXT',
+  type: "A" | "TXT",
 ): Promise<CheckResult> {
   try {
-    const res = await fetch(
-      `${resolver.url}?name=${encodeURIComponent(host)}&type=${type}`,
-      { headers: { Accept: 'application/dns-json' } },
-    )
-    const json: { Answer?: Array<{ data: string }> } = await res.json()
-    const values = (json.Answer ?? []).map((a) => a.data.replace(/^"|"$/g, ''))
+    const res = await fetch(`${resolver.url}?name=${encodeURIComponent(host)}&type=${type}`, {
+      headers: { Accept: "application/dns-json" },
+    });
+    const json: { Answer?: Array<{ data: string }> } = await res.json();
+    const values = (json.Answer ?? []).map((a) => a.data.replace(/^"|"$/g, ""));
     const ok =
-      type === 'A'
+      type === "A"
         ? values.includes(EXPECTED_A)
-        : values.some((v) => v.includes('lovable_verify='))
-    return { resolver: resolver.name, host, type, values, ok }
+        : values.some((v) => v.includes("lovable_verify="));
+    return { resolver: resolver.name, host, type, values, ok };
   } catch (e) {
     return {
       resolver: resolver.name,
@@ -68,50 +71,45 @@ async function resolve(
       type,
       values: [],
       ok: false,
-      error: e instanceof Error ? e.message : 'Failed',
-    }
+      error: e instanceof Error ? e.message : "Failed",
+    };
   }
 }
 
 function DnsCheckPage() {
-  const [results, setResults] = useState<CheckResult[]>([])
-  const [loading, setLoading] = useState(false)
-  const [lastRun, setLastRun] = useState<Date | null>(null)
+  const [results, setResults] = useState<CheckResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [lastRun, setLastRun] = useState<Date | null>(null);
 
   const runChecks = useCallback(async () => {
-    setLoading(true)
-    const tasks: Promise<CheckResult>[] = []
+    setLoading(true);
+    const tasks: Promise<CheckResult>[] = [];
     for (const resolver of RESOLVERS) {
-      for (const host of HOSTS) tasks.push(resolve(resolver, host, 'A'))
-      tasks.push(resolve(resolver, '_lovable.clubero.app', 'TXT'))
+      for (const host of HOSTS) tasks.push(resolve(resolver, host, "A"));
+      tasks.push(resolve(resolver, "_lovable.clubero.app", "TXT"));
     }
-    const all = await Promise.all(tasks)
-    setResults(all)
-    setLastRun(new Date())
-    setLoading(false)
-  }, [])
+    const all = await Promise.all(tasks);
+    setResults(all);
+    setLastRun(new Date());
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    runChecks()
-  }, [runChecks])
+    runChecks();
+  }, [runChecks]);
 
-  const aChecks = results.filter((r) => r.type === 'A')
+  const aChecks = results.filter((r) => r.type === "A");
   const allActive =
     aChecks.length > 0 &&
-    HOSTS.every((h) =>
-      aChecks.filter((r) => r.host === h).every((r) => r.ok),
-    )
+    HOSTS.every((h) => aChecks.filter((r) => r.host === h).every((r) => r.ok));
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            DNS propagation check
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">DNS propagation check</h1>
           <p className="text-muted-foreground">
-            Verifies that <code>clubero.app</code> and{' '}
-            <code>www.clubero.app</code> resolve to{' '}
+            Verifies that <code>clubero.app</code> and <code>www.clubero.app</code> resolve to{" "}
             <code>{EXPECTED_A}</code> across public resolvers.
           </p>
         </header>
@@ -129,10 +127,10 @@ function DnsCheckPage() {
               <div>
                 <p className="font-semibold">
                   {loading
-                    ? 'Checking…'
+                    ? "Checking…"
                     : allActive
-                      ? 'Both hosts fully propagated'
-                      : 'Not yet fully active'}
+                      ? "Both hosts fully propagated"
+                      : "Not yet fully active"}
                 </p>
                 {lastRun && (
                   <p className="text-xs text-muted-foreground">
@@ -159,9 +157,7 @@ function DnsCheckPage() {
                     <code className="truncate text-sm">{r.host}</code>
                   </div>
                   <div className="mt-2 text-sm text-muted-foreground">
-                    {r.values.length === 0
-                      ? r.error || 'No records returned'
-                      : r.values.join(', ')}
+                    {r.values.length === 0 ? r.error || "No records returned" : r.values.join(", ")}
                   </div>
                 </div>
                 {r.ok ? (
@@ -175,10 +171,10 @@ function DnsCheckPage() {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          DNS changes can take up to 72h. SSL is provisioned automatically once
-          both A records resolve to {EXPECTED_A}.
+          DNS changes can take up to 72h. SSL is provisioned automatically once both A records
+          resolve to {EXPECTED_A}.
         </p>
       </div>
     </div>
-  )
+  );
 }

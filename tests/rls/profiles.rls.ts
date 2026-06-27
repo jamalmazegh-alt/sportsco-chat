@@ -19,10 +19,7 @@ describe("RLS: profiles", () => {
   it("non-clubmate cannot read profile", async () => {
     const fx = getFixtures();
     const c = await signInAs("playerB");
-    const { data } = await c
-      .from("profiles")
-      .select("id")
-      .eq("id", fx.users.adminA.userId);
+    const { data } = await c.from("profiles").select("id").eq("id", fx.users.adminA.userId);
     expect(data ?? []).toHaveLength(0);
   });
 

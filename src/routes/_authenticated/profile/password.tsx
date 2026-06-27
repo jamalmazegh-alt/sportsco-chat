@@ -101,7 +101,6 @@ function PasswordPage() {
     <div className="px-5 pt-6 pb-10 space-y-6 max-w-lg mx-auto">
       <BackLink to="/profile" />
 
-
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
           <KeyRound className="h-5 w-5" />
@@ -118,10 +117,7 @@ function PasswordPage() {
         </div>
       </div>
 
-      <form
-        onSubmit={onSubmit}
-        className="rounded-2xl border border-border bg-card p-5 space-y-4"
-      >
+      <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="current">
             {t("profile.password.current", { defaultValue: "Mot de passe actuel" })}

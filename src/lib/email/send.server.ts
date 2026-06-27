@@ -10,7 +10,9 @@ const FROM_DOMAIN = "clubero.app";
 function generateToken(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 /**
@@ -63,7 +65,10 @@ export async function enqueueTransactionalEmailServer(params: {
     unsubscribeToken = generateToken();
     await supabaseAdmin
       .from("email_unsubscribe_tokens")
-      .upsert({ token: unsubscribeToken, email: normalized }, { onConflict: "email", ignoreDuplicates: true });
+      .upsert(
+        { token: unsubscribeToken, email: normalized },
+        { onConflict: "email", ignoreDuplicates: true },
+      );
     const { data: stored } = await supabaseAdmin
       .from("email_unsubscribe_tokens")
       .select("token")

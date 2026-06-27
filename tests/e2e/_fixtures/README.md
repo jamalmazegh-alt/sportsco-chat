@@ -12,12 +12,12 @@ RLS.
 In Lovable Cloud → **Users** → **Add user** (one per role). For each: pick a
 strong password, set **email confirmed = true**.
 
-| Role   | Email                       | Password stored in    |
-| ------ | --------------------------- | --------------------- |
-| admin  | `e2e-admin@clubero.app`     | `E2E_ADMIN_PASSWORD`  |
-| coach  | `e2e-coach@clubero.app`     | `E2E_COACH_PASSWORD`  |
-| player | `e2e-player@clubero.app`    | `E2E_PLAYER_PASSWORD` |
-| parent | `e2e-parent@clubero.app`    | `E2E_PARENT_PASSWORD` |
+| Role   | Email                    | Password stored in    |
+| ------ | ------------------------ | --------------------- |
+| admin  | `e2e-admin@clubero.app`  | `E2E_ADMIN_PASSWORD`  |
+| coach  | `e2e-coach@clubero.app`  | `E2E_COACH_PASSWORD`  |
+| player | `e2e-player@clubero.app` | `E2E_PLAYER_PASSWORD` |
+| parent | `e2e-parent@clubero.app` | `E2E_PARENT_PASSWORD` |
 
 ### 2. Create the E2E test club (admin only)
 
@@ -88,19 +88,19 @@ on conflict (id) do nothing;
 
 Repo → **Settings** → **Secrets and variables** → **Actions** → **New secret**:
 
-| Secret name           | Value                                                  |
-| --------------------- | ------------------------------------------------------ |
-| `SUPABASE_URL`        | your `VITE_SUPABASE_URL`                               |
-| `SUPABASE_ANON_KEY`   | your `VITE_SUPABASE_PUBLISHABLE_KEY`                   |
-| `E2E_BASE_URL`        | preview URL, e.g. `https://sportsco-chat.lovable.app`  |
-| `E2E_ADMIN_EMAIL`     | `e2e-admin@clubero.app`                                |
-| `E2E_ADMIN_PASSWORD`  | password from step 1                                   |
-| `E2E_COACH_EMAIL`     | `e2e-coach@clubero.app`                                |
-| `E2E_COACH_PASSWORD`  | password from step 1                                   |
-| `E2E_PLAYER_EMAIL`    | `e2e-player@clubero.app`                               |
-| `E2E_PLAYER_PASSWORD` | password from step 1                                   |
-| `E2E_PARENT_EMAIL`    | `e2e-parent@clubero.app`                               |
-| `E2E_PARENT_PASSWORD` | password from step 1                                   |
+| Secret name           | Value                                                 |
+| --------------------- | ----------------------------------------------------- |
+| `SUPABASE_URL`        | your `VITE_SUPABASE_URL`                              |
+| `SUPABASE_ANON_KEY`   | your `VITE_SUPABASE_PUBLISHABLE_KEY`                  |
+| `E2E_BASE_URL`        | preview URL, e.g. `https://sportsco-chat.lovable.app` |
+| `E2E_ADMIN_EMAIL`     | `e2e-admin@clubero.app`                               |
+| `E2E_ADMIN_PASSWORD`  | password from step 1                                  |
+| `E2E_COACH_EMAIL`     | `e2e-coach@clubero.app`                               |
+| `E2E_COACH_PASSWORD`  | password from step 1                                  |
+| `E2E_PLAYER_EMAIL`    | `e2e-player@clubero.app`                              |
+| `E2E_PLAYER_PASSWORD` | password from step 1                                  |
+| `E2E_PARENT_EMAIL`    | `e2e-parent@clubero.app`                              |
+| `E2E_PARENT_PASSWORD` | password from step 1                                  |
 
 `SUPABASE_SERVICE_ROLE_KEY` is **not** required.
 

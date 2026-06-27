@@ -21,9 +21,7 @@ export function PublicProfileCard({
   const [busy, setBusy] = useState(false);
 
   const publicUrl =
-    slug && typeof window !== "undefined"
-      ? `${window.location.origin}/p/${slug}`
-      : null;
+    slug && typeof window !== "undefined" ? `${window.location.origin}/p/${slug}` : null;
 
   async function toggle(next: boolean) {
     setBusy(true);

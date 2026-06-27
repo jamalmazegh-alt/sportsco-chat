@@ -4,29 +4,29 @@ Effective access matrix after Phase 4 hardening. RLS is the source of truth — 
 
 ## Roles
 
-| Role | Source | Scope |
-|---|---|---|
-| `super_admin` | `super_admins` table | Platform‑wide (support / DPO ops) |
-| `admin` | `club_members.role = 'admin'` | One club |
-| `dirigeant` | `club_members.role = 'dirigeant'` | One club, restricted writes |
-| `coach` | `club_members.role = 'coach'` + `team_members` | Their assigned teams |
-| `parent` | `player_parents.parent_user_id` | Their children only |
-| `player` | `players.user_id` | Themselves |
+| Role          | Source                                         | Scope                             |
+| ------------- | ---------------------------------------------- | --------------------------------- |
+| `super_admin` | `super_admins` table                           | Platform‑wide (support / DPO ops) |
+| `admin`       | `club_members.role = 'admin'`                  | One club                          |
+| `dirigeant`   | `club_members.role = 'dirigeant'`              | One club, restricted writes       |
+| `coach`       | `club_members.role = 'coach'` + `team_members` | Their assigned teams              |
+| `parent`      | `player_parents.parent_user_id`                | Their children only               |
+| `player`      | `players.user_id`                              | Themselves                        |
 
 ## Visibility matrix
 
-| Resource | super_admin | club admin | coach | parent | player | other |
-|---|---|---|---|---|---|---|
-| Club profile | RW | RW | R | R (own club) | R (own club) | — |
-| Team roster | R | RW | RW (assigned) | R (child's team) | R (own team) | — |
-| Player PII (email, phone) | R | RW | R (assigned team) | RW (own child) | RW (self) | — |
-| Player photo (minor) | R | R if `media_consent_status='granted'` | same | RW (own child) | — | — |
-| `player_parents` | R | R (club) | R (club) | R (self only) | — | — |
-| Events / attendance | R | RW | RW | R (child) | RW (self attendance) | — |
-| Messages | — | within conversations | within conversations | within conversations | within conversations | — |
-| `user_consents` | R | — | — | R (own + on behalf of child) | R (own) | — |
-| `audit_logs` | R | R (club) | — | — | — | — |
-| Data export / deletion requests | R | — | — | R (own) | R (own) | — |
+| Resource                        | super_admin | club admin                            | coach                | parent                       | player               | other |
+| ------------------------------- | ----------- | ------------------------------------- | -------------------- | ---------------------------- | -------------------- | ----- |
+| Club profile                    | RW          | RW                                    | R                    | R (own club)                 | R (own club)         | —     |
+| Team roster                     | R           | RW                                    | RW (assigned)        | R (child's team)             | R (own team)         | —     |
+| Player PII (email, phone)       | R           | RW                                    | R (assigned team)    | RW (own child)               | RW (self)            | —     |
+| Player photo (minor)            | R           | R if `media_consent_status='granted'` | same                 | RW (own child)               | —                    | —     |
+| `player_parents`                | R           | R (club)                              | R (club)             | R (self only)                | —                    | —     |
+| Events / attendance             | R           | RW                                    | RW                   | R (child)                    | RW (self attendance) | —     |
+| Messages                        | —           | within conversations                  | within conversations | within conversations         | within conversations | —     |
+| `user_consents`                 | R           | —                                     | —                    | R (own + on behalf of child) | R (own)              | —     |
+| `audit_logs`                    | R           | R (club)                              | —                    | —                            | —                    | —     |
+| Data export / deletion requests | R           | —                                     | —                    | R (own)                      | R (own)              | —     |
 
 R = read, RW = read+write, — = no access.
 

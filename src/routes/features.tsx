@@ -28,8 +28,22 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
-const SPORTS = ["Football", "Futsal", "Basketball", "Rugby", "Handball", "Volleyball", "Ice hockey", "Field hockey"];
-const AUDIENCE_COLORS = ["var(--brand-blue-deep)", "var(--brand-blue)", "var(--secondary)", "var(--primary)"];
+const SPORTS = [
+  "Football",
+  "Futsal",
+  "Basketball",
+  "Rugby",
+  "Handball",
+  "Volleyball",
+  "Ice hockey",
+  "Field hockey",
+];
+const AUDIENCE_COLORS = [
+  "var(--brand-blue-deep)",
+  "var(--brand-blue)",
+  "var(--secondary)",
+  "var(--primary)",
+];
 
 function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
   return (
@@ -41,7 +55,10 @@ function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
 
 function FeaturesPage() {
   const { t } = useTranslation("marketing");
-  const audiences = t("features.audiences", { returnObjects: true }) as { t: string; p: string[] }[];
+  const audiences = t("features.audiences", { returnObjects: true }) as {
+    t: string;
+    p: string[];
+  }[];
 
   return (
     <MarketingLayout>
@@ -59,14 +76,30 @@ function FeaturesPage() {
         </div>
       </section>
 
-      <Anchor id="tournaments"><TournamentsSection /></Anchor>
-      <Anchor id="coach-ai"><CoachAssistSection /></Anchor>
-      <Anchor id="wall"><ClubWallSection /></Anchor>
-      <Anchor id="whatsapp"><WhatsAppHybrid /></Anchor>
-      <Anchor id="player"><PlayerJournalSection /></Anchor>
-      <Anchor id="players"><PlayersSection /></Anchor>
-      <Anchor id="coach-profile"><CoachProfileSection /></Anchor>
-      <Anchor id="network"><NetworkSection /></Anchor>
+      <Anchor id="tournaments">
+        <TournamentsSection />
+      </Anchor>
+      <Anchor id="coach-ai">
+        <CoachAssistSection />
+      </Anchor>
+      <Anchor id="wall">
+        <ClubWallSection />
+      </Anchor>
+      <Anchor id="whatsapp">
+        <WhatsAppHybrid />
+      </Anchor>
+      <Anchor id="player">
+        <PlayerJournalSection />
+      </Anchor>
+      <Anchor id="players">
+        <PlayersSection />
+      </Anchor>
+      <Anchor id="coach-profile">
+        <CoachProfileSection />
+      </Anchor>
+      <Anchor id="network">
+        <NetworkSection />
+      </Anchor>
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
@@ -74,9 +107,7 @@ function FeaturesPage() {
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               {t("features.sportsTitle")}
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              {t("features.sportsBody")}
-            </p>
+            <p className="mt-4 text-muted-foreground">{t("features.sportsBody")}</p>
           </div>
           <div className="mt-10 flex flex-wrap justify-center gap-2.5">
             {SPORTS.map((s) => (
@@ -104,9 +135,7 @@ function FeaturesPage() {
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               {t("features.rolesTitle")}
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              {t("features.rolesBody")}
-            </p>
+            <p className="mt-4 text-muted-foreground">{t("features.rolesBody")}</p>
           </div>
 
           <div className="mt-14 grid gap-6 lg:grid-cols-2">

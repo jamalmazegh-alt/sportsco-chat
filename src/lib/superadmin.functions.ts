@@ -90,10 +90,9 @@ export const listAllClubs = createServerFn({ method: "POST" })
 
     let query = supabaseAdmin
       .from("clubs")
-      .select(
-        "id, name, created_at, created_by, logo_url, archived_at, is_personal",
-        { count: "exact" },
-      )
+      .select("id, name, created_at, created_by, logo_url, archived_at, is_personal", {
+        count: "exact",
+      })
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);
 
@@ -125,10 +124,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
 
     // Member counts
     const { data: members } = clubIds.length
-      ? await supabaseAdmin
-          .from("club_members")
-          .select("club_id")
-          .in("club_id", clubIds)
+      ? await supabaseAdmin.from("club_members").select("club_id").in("club_id", clubIds)
       : { data: [] as never[] };
 
     const subByClub = new Map((subs ?? []).map((s) => [s.club_id, s]));
@@ -150,9 +146,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
 /** Detailed view for one club. */
 export const getClubDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ club_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     await logAction({
@@ -163,23 +157,18 @@ export const getClubDetail = createServerFn({ method: "POST" })
       club_id: data.club_id,
     });
 
-    const [{ data: club }, { data: sub }, { data: members }, { data: teams }] =
-      await Promise.all([
-        supabaseAdmin.from("clubs").select("*").eq("id", data.club_id).single(),
-        supabaseAdmin
-          .from("subscriptions")
-          .select("*")
-          .eq("club_id", data.club_id)
-          .maybeSingle(),
-        supabaseAdmin
-          .from("club_members")
-          .select("user_id, role, created_at")
-          .eq("club_id", data.club_id),
-        supabaseAdmin
-          .from("teams")
-          .select("id, name, sport, created_at, deleted_at")
-          .eq("club_id", data.club_id),
-      ]);
+    const [{ data: club }, { data: sub }, { data: members }, { data: teams }] = await Promise.all([
+      supabaseAdmin.from("clubs").select("*").eq("id", data.club_id).single(),
+      supabaseAdmin.from("subscriptions").select("*").eq("club_id", data.club_id).maybeSingle(),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id, role, created_at")
+        .eq("club_id", data.club_id),
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, sport, created_at, deleted_at")
+        .eq("club_id", data.club_id),
+    ]);
 
     const userIds = (members ?? []).map((m) => m.user_id);
     const { data: profiles } = userIds.length
@@ -224,9 +213,7 @@ export const searchUsers = createServerFn({ method: "POST" })
 
     if (data.search) {
       const s = `%${data.search}%`;
-      q = q.or(
-        `full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`,
-      );
+      q = q.or(`full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`);
     }
 
     const { data: profiles, error } = await q;
@@ -247,7 +234,11 @@ export const listSuperadminLogs = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { data: rows, error, count } = await supabaseAdmin
+    const {
+      data: rows,
+      error,
+      count,
+    } = await supabaseAdmin
       .from("superadmin_audit_logs")
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
@@ -262,9 +253,7 @@ export const listSubscriptions = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
-        status: z
-          .enum(["trialing", "active", "past_due", "canceled", "incomplete"])
-          .optional(),
+        status: z.enum(["trialing", "active", "past_due", "canceled", "incomplete"]).optional(),
         limit: z.number().int().min(1).max(200).default(100),
       })
       .parse(input),
@@ -287,10 +276,7 @@ export const listSubscriptions = createServerFn({ method: "POST" })
 
     const clubIds = Array.from(new Set((subs ?? []).map((s) => s.club_id)));
     const { data: clubs } = clubIds.length
-      ? await supabaseAdmin
-          .from("clubs")
-          .select("id, name")
-          .in("id", clubIds)
+      ? await supabaseAdmin.from("clubs").select("id, name").in("id", clubIds)
       : { data: [] as never[] };
     const nameById = new Map((clubs ?? []).map((c) => [c.id, c.name]));
 
@@ -318,10 +304,9 @@ export const disableUser = createServerFn({ method: "POST" })
     if (data.user_id === context.userId) {
       throw new Error("You cannot disable your own account.");
     }
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
-      data.user_id,
-      { ban_duration: "876000h" },
-    );
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      ban_duration: "876000h",
+    });
     if (error) throw new Error(error.message);
     await logAction({
       actor: context.userId,
@@ -336,15 +321,12 @@ export const disableUser = createServerFn({ method: "POST" })
 /** Reactivate (unban) a previously disabled user. */
 export const reactivateUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
-      data.user_id,
-      { ban_duration: "none" },
-    );
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      ban_duration: "none",
+    });
     if (error) throw new Error(error.message);
     await logAction({
       actor: context.userId,
@@ -358,13 +340,10 @@ export const reactivateUser = createServerFn({ method: "POST" })
 /** Generate a password reset link for a user. Returns the link to the super admin. */
 export const generatePasswordResetLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { data: u, error: ue } =
-      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const { data: u, error: ue } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
     if (ue || !u?.user?.email) {
       throw new Error("User has no email on file.");
     }
@@ -418,9 +397,7 @@ export const archiveClub = createServerFn({ method: "POST" })
 /** Restore an archived club. */
 export const unarchiveClub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ club_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     const { error } = await supabaseAdmin
@@ -441,23 +418,16 @@ export const unarchiveClub = createServerFn({ method: "POST" })
 /** Lightweight auth-level status for a user (banned/email confirmed). */
 export const getUserAuthStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { data: u, error } = await supabaseAdmin.auth.admin.getUserById(
-      data.user_id,
-    );
+    const { data: u, error } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
     if (error) throw new Error(error.message);
-    const banned_until =
-      (u?.user as { banned_until?: string | null } | null)?.banned_until ?? null;
+    const banned_until = (u?.user as { banned_until?: string | null } | null)?.banned_until ?? null;
     return {
       email: u?.user?.email ?? null,
       banned_until,
-      is_banned: banned_until
-        ? new Date(banned_until).getTime() > Date.now()
-        : false,
+      is_banned: banned_until ? new Date(banned_until).getTime() > Date.now() : false,
       last_sign_in_at: u?.user?.last_sign_in_at ?? null,
       created_at: u?.user?.created_at ?? null,
     };
@@ -466,9 +436,7 @@ export const getUserAuthStatus = createServerFn({ method: "POST" })
 /** Aggregate support snapshot for a user — clubs, teams, players linked. */
 export const getUserSupportSummary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     await logAction({
@@ -478,37 +446,39 @@ export const getUserSupportSummary = createServerFn({ method: "POST" })
       target_id: data.user_id,
     });
 
-    const [{ data: profile }, { data: memberships }, { data: teamRoles }, { data: playerSelf }, { data: parentLinks }] =
-      await Promise.all([
-        supabaseAdmin
-          .from("profiles")
-          .select("id, full_name, first_name, last_name, phone, preferred_language, created_at")
-          .eq("id", data.user_id)
-          .maybeSingle(),
-        supabaseAdmin
-          .from("club_members")
-          .select("club_id, role, created_at")
-          .eq("user_id", data.user_id),
-        supabaseAdmin
-          .from("team_members")
-          .select("team_id, role, player_id")
-          .eq("user_id", data.user_id),
-        supabaseAdmin
-          .from("players")
-          .select("id, first_name, last_name, club_id")
-          .eq("user_id", data.user_id),
-        supabaseAdmin
-          .from("player_parents")
-          .select("player_id, can_respond")
-          .eq("parent_user_id", data.user_id),
-      ]);
+    const [
+      { data: profile },
+      { data: memberships },
+      { data: teamRoles },
+      { data: playerSelf },
+      { data: parentLinks },
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, phone, preferred_language, created_at")
+        .eq("id", data.user_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("club_members")
+        .select("club_id, role, created_at")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("team_members")
+        .select("team_id, role, player_id")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("players")
+        .select("id, first_name, last_name, club_id")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("player_parents")
+        .select("player_id, can_respond")
+        .eq("parent_user_id", data.user_id),
+    ]);
 
     const clubIds = Array.from(new Set((memberships ?? []).map((m) => m.club_id)));
     const { data: clubs } = clubIds.length
-      ? await supabaseAdmin
-          .from("clubs")
-          .select("id, name, archived_at")
-          .in("id", clubIds)
+      ? await supabaseAdmin.from("clubs").select("id, name, archived_at").in("id", clubIds)
       : { data: [] as never[] };
     const clubMap = new Map((clubs ?? []).map((c) => [c.id, c]));
 
@@ -554,8 +524,7 @@ export const generateImpersonationLink = createServerFn({ method: "POST" })
       throw new Error("Cannot impersonate another super admin.");
     }
 
-    const { data: u, error: ue } =
-      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const { data: u, error: ue } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
     if (ue || !u?.user?.email) {
       throw new Error("Target user has no email on file.");
     }
@@ -584,9 +553,7 @@ export const generateImpersonationLink = createServerFn({ method: "POST" })
 /** Support snapshot for a club — admins, recent events, subscription. */
 export const getClubSupportSummary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ club_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     await logAction({
@@ -606,7 +573,9 @@ export const getClubSupportSummary = createServerFn({ method: "POST" })
           .maybeSingle(),
         supabaseAdmin
           .from("subscriptions")
-          .select("status, plan, trial_end, current_period_end, cancel_at_period_end, stripe_customer_id")
+          .select(
+            "status, plan, trial_end, current_period_end, cancel_at_period_end, stripe_customer_id",
+          )
           .eq("club_id", data.club_id)
           .maybeSingle(),
         supabaseAdmin
@@ -619,12 +588,9 @@ export const getClubSupportSummary = createServerFn({ method: "POST" })
           .select("id, title, type, starts_at, team_id, deleted_at")
           .in(
             "team_id",
-            (
-              await supabaseAdmin
-                .from("teams")
-                .select("id")
-                .eq("club_id", data.club_id)
-            ).data?.map((t) => t.id) ?? [],
+            (await supabaseAdmin.from("teams").select("id").eq("club_id", data.club_id)).data?.map(
+              (t) => t.id,
+            ) ?? [],
           )
           .order("created_at", { ascending: false })
           .limit(10),
@@ -632,10 +598,7 @@ export const getClubSupportSummary = createServerFn({ method: "POST" })
 
     const adminIds = (admins ?? []).map((a) => a.user_id);
     const { data: adminProfiles } = adminIds.length
-      ? await supabaseAdmin
-          .from("profiles")
-          .select("id, full_name, phone")
-          .in("id", adminIds)
+      ? await supabaseAdmin.from("profiles").select("id, full_name, phone").in("id", adminIds)
       : { data: [] as never[] };
     const pMap = new Map((adminProfiles ?? []).map((p) => [p.id, p]));
 
@@ -670,11 +633,10 @@ export const listAllUsers = createServerFn({ method: "POST" })
     await assertSuperAdmin(context.userId);
 
     // Pull a page of auth users (we need email + last_sign_in_at + banned_until).
-    const { data: authPage, error: authErr } =
-      await supabaseAdmin.auth.admin.listUsers({
-        page: data.page,
-        perPage: data.limit,
-      });
+    const { data: authPage, error: authErr } = await supabaseAdmin.auth.admin.listUsers({
+      page: data.page,
+      perPage: data.limit,
+    });
     if (authErr) throw new Error(authErr.message);
     const authUsers = authPage?.users ?? [];
 
@@ -686,18 +648,12 @@ export const listAllUsers = createServerFn({ method: "POST" })
       const { data: matches } = await supabaseAdmin
         .from("profiles")
         .select("id")
-        .or(
-          `full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`,
-        )
+        .or(`full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`)
         .limit(200);
       const matchIds = new Set((matches ?? []).map((m) => m.id));
       const emailMatch = data.search.toLowerCase();
       candidateIds = authUsers
-        .filter(
-          (u) =>
-            matchIds.has(u.id) ||
-            (u.email ?? "").toLowerCase().includes(emailMatch),
-        )
+        .filter((u) => matchIds.has(u.id) || (u.email ?? "").toLowerCase().includes(emailMatch))
         .map((u) => u.id);
     }
 
@@ -705,43 +661,32 @@ export const listAllUsers = createServerFn({ method: "POST" })
       return { items: [], total: authPage?.total ?? 0, page: data.page };
     }
 
-    const [{ data: profiles }, { data: memberships }, { data: teamMembers }] =
-      await Promise.all([
-        supabaseAdmin
-          .from("profiles")
-          .select(
-            "id, full_name, first_name, last_name, phone, avatar_url, preferred_language, created_at",
-          )
-          .in("id", candidateIds),
-        supabaseAdmin
-          .from("club_members")
-          .select("user_id, club_id, role")
-          .in("user_id", candidateIds),
-        supabaseAdmin
-          .from("team_members")
-          .select("user_id, team_id, role")
-          .in("user_id", candidateIds),
-      ]);
+    const [{ data: profiles }, { data: memberships }, { data: teamMembers }] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select(
+          "id, full_name, first_name, last_name, phone, avatar_url, preferred_language, created_at",
+        )
+        .in("id", candidateIds),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id, club_id, role")
+        .in("user_id", candidateIds),
+      supabaseAdmin
+        .from("team_members")
+        .select("user_id, team_id, role")
+        .in("user_id", candidateIds),
+    ]);
 
-    const clubIds = Array.from(
-      new Set((memberships ?? []).map((m) => m.club_id)),
-    );
-    const teamIds = Array.from(
-      new Set((teamMembers ?? []).map((m) => m.team_id)),
-    );
+    const clubIds = Array.from(new Set((memberships ?? []).map((m) => m.club_id)));
+    const teamIds = Array.from(new Set((teamMembers ?? []).map((m) => m.team_id)));
 
     const [{ data: clubs }, { data: teams }, { data: subs }] = await Promise.all([
       clubIds.length
-        ? supabaseAdmin
-            .from("clubs")
-            .select("id, name, logo_url, archived_at")
-            .in("id", clubIds)
+        ? supabaseAdmin.from("clubs").select("id, name, logo_url, archived_at").in("id", clubIds)
         : Promise.resolve({ data: [] as never[] }),
       teamIds.length
-        ? supabaseAdmin
-            .from("teams")
-            .select("id, name, club_id")
-            .in("id", teamIds)
+        ? supabaseAdmin.from("teams").select("id, name, club_id").in("id", teamIds)
         : Promise.resolve({ data: [] as never[] }),
       clubIds.length
         ? supabaseAdmin
@@ -756,10 +701,7 @@ export const listAllUsers = createServerFn({ method: "POST" })
     const teamMap = new Map((teams ?? []).map((t) => [t.id, t]));
     const subByClub = new Map((subs ?? []).map((s) => [s.club_id, s]));
 
-    const membershipsByUser = new Map<
-      string,
-      Array<{ club_id: string; role: string }>
-    >();
+    const membershipsByUser = new Map<string, Array<{ club_id: string; role: string }>>();
     (memberships ?? []).forEach((m) => {
       const arr = membershipsByUser.get(m.user_id) ?? [];
       arr.push({ club_id: m.club_id, role: m.role });
@@ -784,8 +726,7 @@ export const listAllUsers = createServerFn({ method: "POST" })
           role: m.role,
           name: clubMap.get(m.club_id)?.name ?? null,
           logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
-          subscription_status:
-            subByClub.get(m.club_id)?.status ?? null,
+          subscription_status: subByClub.get(m.club_id)?.status ?? null,
         }));
         const teamsForUser = teamRows.map((t) => ({
           team_id: t.team_id,
@@ -793,8 +734,7 @@ export const listAllUsers = createServerFn({ method: "POST" })
           name: teamMap.get(t.team_id)?.name ?? null,
           club_id: teamMap.get(t.team_id)?.club_id ?? null,
         }));
-        const banned_until =
-          (u as { banned_until?: string | null }).banned_until ?? null;
+        const banned_until = (u as { banned_until?: string | null }).banned_until ?? null;
         return {
           id: u.id,
           email: u.email ?? null,
@@ -805,9 +745,7 @@ export const listAllUsers = createServerFn({ method: "POST" })
           created_at: u.created_at,
           last_sign_in_at: u.last_sign_in_at ?? null,
           email_confirmed_at: u.email_confirmed_at ?? null,
-          is_banned: banned_until
-            ? new Date(banned_until).getTime() > Date.now()
-            : false,
+          is_banned: banned_until ? new Date(banned_until).getTime() > Date.now() : false,
           clubs: clubsForUser,
           teams: teamsForUser,
           primary_role: clubsForUser[0]?.role ?? teamsForUser[0]?.role ?? null,
@@ -821,9 +759,7 @@ export const listAllUsers = createServerFn({ method: "POST" })
 /** Detailed view of a single user: profile, auth, clubs, teams, players, recent activity. */
 export const getUserDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     await logAction({
@@ -843,11 +779,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
       { data: recentLogs },
     ] = await Promise.all([
       supabaseAdmin.auth.admin.getUserById(data.user_id),
-      supabaseAdmin
-        .from("profiles")
-        .select("*")
-        .eq("id", data.user_id)
-        .maybeSingle(),
+      supabaseAdmin.from("profiles").select("*").eq("id", data.user_id).maybeSingle(),
       supabaseAdmin
         .from("club_members")
         .select("club_id, role, created_at")
@@ -884,16 +816,10 @@ export const getUserDetail = createServerFn({ method: "POST" })
     const teamIds = Array.from(new Set((teamRoles ?? []).map((t) => t.team_id)));
     const [{ data: clubs }, { data: teams }, { data: subs }] = await Promise.all([
       clubIds.length
-        ? supabaseAdmin
-            .from("clubs")
-            .select("id, name, logo_url, archived_at")
-            .in("id", clubIds)
+        ? supabaseAdmin.from("clubs").select("id, name, logo_url, archived_at").in("id", clubIds)
         : Promise.resolve({ data: [] as never[] }),
       teamIds.length
-        ? supabaseAdmin
-            .from("teams")
-            .select("id, name, club_id, sport")
-            .in("id", teamIds)
+        ? supabaseAdmin.from("teams").select("id, name, club_id, sport").in("id", teamIds)
         : Promise.resolve({ data: [] as never[] }),
       clubIds.length
         ? supabaseAdmin
@@ -918,9 +844,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
           .limit(10)
       : { data: [] as never[] };
 
-    const eventIds = Array.from(
-      new Set((convos ?? []).map((c) => c.event_id)),
-    );
+    const eventIds = Array.from(new Set((convos ?? []).map((c) => c.event_id)));
     const { data: events } = eventIds.length
       ? await supabaseAdmin
           .from("events")
@@ -941,9 +865,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
         last_sign_in_at: authUser?.last_sign_in_at ?? null,
         email_confirmed_at: authUser?.email_confirmed_at ?? null,
         created_at: authUser?.created_at ?? null,
-        is_banned: banned_until
-          ? new Date(banned_until).getTime() > Date.now()
-          : false,
+        is_banned: banned_until ? new Date(banned_until).getTime() > Date.now() : false,
         banned_until,
       },
       clubs: (memberships ?? []).map((m) => ({
@@ -972,13 +894,10 @@ export const getUserDetail = createServerFn({ method: "POST" })
 /** Triggers Supabase's built-in password reset email (no link returned). */
 export const sendPasswordResetEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { data: u, error: ue } =
-      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const { data: u, error: ue } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
     if (ue || !u?.user?.email) throw new Error("User has no email on file.");
 
     // Generate a recovery link — the auth-email-hook will turn it into a branded email.
@@ -1001,13 +920,10 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
 /** Re-sends an onboarding magic-link email to a user. */
 export const resendOnboardingEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ user_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ user_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { data: u, error: ue } =
-      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const { data: u, error: ue } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
     if (ue || !u?.user?.email) throw new Error("User has no email on file.");
 
     const { error } = await supabaseAdmin.auth.admin.generateLink({
@@ -1029,38 +945,29 @@ export const resendOnboardingEmail = createServerFn({ method: "POST" })
 /** Extended club detail: + recent events, recent convocations, WhatsApp config, billing badges. */
 export const getClubDetailExtended = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ club_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
 
-    const [{ data: club }, { data: sub }, { data: teams }, { data: members }] =
-      await Promise.all([
-        supabaseAdmin.from("clubs").select("*").eq("id", data.club_id).maybeSingle(),
-        supabaseAdmin
-          .from("subscriptions")
-          .select("*")
-          .eq("club_id", data.club_id)
-          .maybeSingle(),
-        supabaseAdmin
-          .from("teams")
-          .select("id, name, sport, championship, age_group, communication_mode, whatsapp_group_url, image_url, deleted_at, created_at")
-          .eq("club_id", data.club_id),
-        supabaseAdmin
-          .from("club_members")
-          .select("user_id, role, created_at")
-          .eq("club_id", data.club_id),
-      ]);
+    const [{ data: club }, { data: sub }, { data: teams }, { data: members }] = await Promise.all([
+      supabaseAdmin.from("clubs").select("*").eq("id", data.club_id).maybeSingle(),
+      supabaseAdmin.from("subscriptions").select("*").eq("club_id", data.club_id).maybeSingle(),
+      supabaseAdmin
+        .from("teams")
+        .select(
+          "id, name, sport, championship, age_group, communication_mode, whatsapp_group_url, image_url, deleted_at, created_at",
+        )
+        .eq("club_id", data.club_id),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id, role, created_at")
+        .eq("club_id", data.club_id),
+    ]);
 
     const teamIds = (teams ?? []).map((t) => t.id);
     const userIds = (members ?? []).map((m) => m.user_id);
 
-    const [
-      { data: profiles },
-      { data: recentEvents },
-      { data: recentConvos },
-    ] = await Promise.all([
+    const [{ data: profiles }, { data: recentEvents }, { data: recentConvos }] = await Promise.all([
       userIds.length
         ? supabaseAdmin
             .from("profiles")
@@ -1086,9 +993,7 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
 
     // Filter convos to events of this club via recent events list (cheap heuristic).
     const eventIds = new Set((recentEvents ?? []).map((e) => e.id));
-    const clubConvos = (recentConvos ?? []).filter((c) =>
-      eventIds.has(c.event_id),
-    );
+    const clubConvos = (recentConvos ?? []).filter((c) => eventIds.has(c.event_id));
 
     const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
@@ -1102,9 +1007,7 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
       })),
       recent_events: recentEvents ?? [],
       recent_convocations: clubConvos,
-      whatsapp_configured_count: (teams ?? []).filter(
-        (t) => !!t.whatsapp_group_url,
-      ).length,
+      whatsapp_configured_count: (teams ?? []).filter((t) => !!t.whatsapp_group_url).length,
     };
   });
 
@@ -1118,9 +1021,7 @@ export const getSupportAlerts = createServerFn({ method: "GET" })
     await assertSuperAdmin(context.userId);
     const now = new Date();
     const in7d = new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString();
-    const past30d = new Date(
-      now.getTime() - 30 * 24 * 3600 * 1000,
-    ).toISOString();
+    const past30d = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();
 
     const [
       { data: trialsEnding },
@@ -1162,10 +1063,7 @@ export const getSupportAlerts = createServerFn({ method: "GET" })
       ]),
     );
     const { data: clubs } = clubIds.length
-      ? await supabaseAdmin
-          .from("clubs")
-          .select("id, name")
-          .in("id", clubIds)
+      ? await supabaseAdmin.from("clubs").select("id, name").in("id", clubIds)
       : { data: [] as never[] };
     const clubMap = new Map((clubs ?? []).map((c) => [c.id, c.name]));
 
@@ -1206,9 +1104,7 @@ export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
       .limit(data.limit);
     if (error) throw new Error(error.message);
 
-    const actorIds = Array.from(
-      new Set((rows ?? []).map((r) => r.actor_user_id).filter(Boolean)),
-    );
+    const actorIds = Array.from(new Set((rows ?? []).map((r) => r.actor_user_id).filter(Boolean)));
     const targetUserIds = Array.from(
       new Set(
         (rows ?? [])
@@ -1232,10 +1128,7 @@ export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
             .in("id", [...new Set([...actorIds, ...targetUserIds])])
         : Promise.resolve({ data: [] as never[] }),
       clubTargetIds.length
-        ? supabaseAdmin
-            .from("clubs")
-            .select("id, name")
-            .in("id", clubTargetIds)
+        ? supabaseAdmin.from("clubs").select("id, name").in("id", clubTargetIds)
         : Promise.resolve({ data: [] as never[] }),
     ]);
 
@@ -1247,15 +1140,12 @@ export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
         ...r,
         actor_profile: profileMap.get(r.actor_user_id) ?? null,
         target_user_profile:
-          r.target_type === "user" && r.target_id
-            ? profileMap.get(r.target_id) ?? null
+          r.target_type === "user" && r.target_id ? (profileMap.get(r.target_id) ?? null) : null,
+        target_club: r.club_id
+          ? (clubMap.get(r.club_id) ?? null)
+          : r.target_type === "club" && r.target_id
+            ? (clubMap.get(r.target_id) ?? null)
             : null,
-        target_club:
-          r.club_id
-            ? clubMap.get(r.club_id) ?? null
-            : r.target_type === "club" && r.target_id
-              ? clubMap.get(r.target_id) ?? null
-              : null,
       })),
     };
   });
@@ -1362,7 +1252,9 @@ export const getFinanceOverview = createServerFn({ method: "GET" })
     ] = await Promise.all([
       supabaseAdmin
         .from("subscriptions")
-        .select("id, status, plan, trial_end, current_period_end, canceled_at, created_at, stripe_subscription_id"),
+        .select(
+          "id, status, plan, trial_end, current_period_end, canceled_at, created_at, stripe_subscription_id",
+        ),
       supabaseAdmin
         .from("subscriptions")
         .select("id", { count: "exact", head: true })
@@ -1392,15 +1284,13 @@ export const getFinanceOverview = createServerFn({ method: "GET" })
 
     // Trial conversion: trials created >30d ago that are now active
     const oldTrialCreated = subs.filter(
-      (s) => s.created_at < since30 && (s.status === "active" || s.status === "trialing" || s.status === "canceled"),
+      (s) =>
+        s.created_at < since30 &&
+        (s.status === "active" || s.status === "trialing" || s.status === "canceled"),
     );
-    const convertedFromTrial = subs.filter(
-      (s) => s.status === "active" && s.created_at < since30,
-    );
+    const convertedFromTrial = subs.filter((s) => s.status === "active" && s.created_at < since30);
     const trialConvRate =
-      oldTrialCreated.length > 0
-        ? (convertedFromTrial.length / oldTrialCreated.length) * 100
-        : 0;
+      oldTrialCreated.length > 0 ? (convertedFromTrial.length / oldTrialCreated.length) * 100 : 0;
 
     // ---- Stripe MRR computation (cached, TTL 10 min) -----------------------
     let mrrCents = 0;
@@ -1517,11 +1407,18 @@ export const getClubFinancials = createServerFn({ method: "POST" })
       }
 
       if (!("deleted" in customer) || !customer.deleted) {
-        const pm =
-          (customer as { invoice_settings?: { default_payment_method?: unknown } })
-            .invoice_settings?.default_payment_method;
-        if (pm && typeof pm === "object" && "card" in pm && (pm as { card?: { brand: string; last4: string; exp_month: number; exp_year: number } }).card) {
-          const card = (pm as { card: { brand: string; last4: string; exp_month: number; exp_year: number } }).card;
+        const pm = (customer as { invoice_settings?: { default_payment_method?: unknown } })
+          .invoice_settings?.default_payment_method;
+        if (
+          pm &&
+          typeof pm === "object" &&
+          "card" in pm &&
+          (pm as { card?: { brand: string; last4: string; exp_month: number; exp_year: number } })
+            .card
+        ) {
+          const card = (
+            pm as { card: { brand: string; last4: string; exp_month: number; exp_year: number } }
+          ).card;
           paymentMethod = {
             brand: card.brand,
             last4: card.last4,
@@ -1532,9 +1429,11 @@ export const getClubFinancials = createServerFn({ method: "POST" })
 
       if (sub.stripe_subscription_id) {
         try {
-          const upcoming = await (stripe.invoices as unknown as {
-            retrieveUpcoming: (p: { customer: string }) => Promise<{ amount_due: number }>;
-          }).retrieveUpcoming({ customer: sub.stripe_customer_id });
+          const upcoming = await (
+            stripe.invoices as unknown as {
+              retrieveUpcoming: (p: { customer: string }) => Promise<{ amount_due: number }>;
+            }
+          ).retrieveUpcoming({ customer: sub.stripe_customer_id });
           upcomingAmount = upcoming.amount_due;
         } catch {
           // no upcoming invoice (e.g. canceled or unsupported on this api version)

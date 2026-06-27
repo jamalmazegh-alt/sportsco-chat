@@ -49,10 +49,7 @@ export const Route = createFileRoute("/players")({
     if (!isV2("public_player_profiles")) throw redirect({ to: "/", replace: true });
   },
   head: () => ({
-    meta: [
-      { title: "Clubero" },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
+    meta: [{ title: "Clubero" }, { name: "robots", content: "noindex,nofollow" }],
   }),
   component: PublicPlayersDirectory,
 });
@@ -136,7 +133,10 @@ function PublicPlayersDirectory() {
             )}
           </p>
 
-          <form onSubmit={submitSearch} className="mt-8 grid gap-3 md:grid-cols-[1fr_160px_200px_160px_auto]">
+          <form
+            onSubmit={submitSearch}
+            className="mt-8 grid gap-3 md:grid-cols-[1fr_160px_200px_160px_auto]"
+          >
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -146,21 +146,43 @@ function PublicPlayersDirectory() {
                 className="pl-9"
               />
             </div>
-            <Select value={sport} onValueChange={(v) => { setSport(v); setPage(0); }}>
-              <SelectTrigger><SelectValue placeholder={t("search.filterSport", "Sport")} /></SelectTrigger>
+            <Select
+              value={sport}
+              onValueChange={(v) => {
+                setSport(v);
+                setPage(0);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("search.filterSport", "Sport")} />
+              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("publicPlayers.allSports", "Tous les sports")}</SelectItem>
+                <SelectItem value="all">
+                  {t("publicPlayers.allSports", "Tous les sports")}
+                </SelectItem>
                 {sports.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select value={clubId} onValueChange={(v) => { setClubId(v); setPage(0); }}>
-              <SelectTrigger><SelectValue placeholder="Club" /></SelectTrigger>
+            <Select
+              value={clubId}
+              onValueChange={(v) => {
+                setClubId(v);
+                setPage(0);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Club" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("publicPlayers.allClubs", "Tous les clubs")}</SelectItem>
                 {clubs.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -238,7 +260,11 @@ function PublicPlayersDirectory() {
                     )}
                   >
                     {p.photo_url ? (
-                      <img src={p.photo_url} alt={fullName} className="h-full w-full object-cover" />
+                      <img
+                        src={p.photo_url}
+                        alt={fullName}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <span>{initials}</span>
                     )}
@@ -313,7 +339,9 @@ function PublicPlayersDirectory() {
               <Link to="/register/player">{t("publicPlayers.ctaJoin", "Créer mon compte")}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/features">{t("publicPlayers.ctaFeatures", "Voir les fonctionnalités")}</Link>
+              <Link to="/features">
+                {t("publicPlayers.ctaFeatures", "Voir les fonctionnalités")}
+              </Link>
             </Button>
           </div>
         </div>

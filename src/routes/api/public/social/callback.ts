@@ -31,9 +31,11 @@ export const Route = createFileRoute("/api/public/social/callback")({
 
         try {
           const provider = getProvider(state.network) as {
-            exchangeCode: (code: string, redirectUri: string, codeVerifier?: string) => Promise<
-              import("@/lib/social/providers.server").OAuthResult
-            >;
+            exchangeCode: (
+              code: string,
+              redirectUri: string,
+              codeVerifier?: string,
+            ) => Promise<import("@/lib/social/providers.server").OAuthResult>;
           };
           const oauth =
             state.network === "twitter"
@@ -41,9 +43,7 @@ export const Route = createFileRoute("/api/public/social/callback")({
               : await provider.exchangeCode(code, redirectUri);
 
           const encAccess = await encryptToken(oauth.accessToken);
-          const encRefresh = oauth.refreshToken
-            ? await encryptToken(oauth.refreshToken)
-            : null;
+          const encRefresh = oauth.refreshToken ? await encryptToken(oauth.refreshToken) : null;
 
           // Upsert
           const { data: existing } = await supabaseAdmin

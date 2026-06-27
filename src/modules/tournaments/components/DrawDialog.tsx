@@ -24,7 +24,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dices, Loader2, Shuffle, Hand, Sparkles, RotateCcw, Trophy, CheckCircle2 } from "lucide-react";
+import {
+  Dices,
+  Loader2,
+  Shuffle,
+  Hand,
+  Sparkles,
+  RotateCcw,
+  Trophy,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { applyTeamDraw } from "../tournaments.functions";
 import { recommendedPools } from "../lib/planner";
@@ -86,7 +95,6 @@ export function DrawDialog({
   const qc = useQueryClient();
   const applyFn = useServerFn(applyTeamDraw);
 
-
   const supportsGroups = format !== "knockout";
   const drawMode: "groups" | "knockout" = supportsGroups ? "groups" : "knockout";
 
@@ -135,7 +143,8 @@ export function DrawDialog({
     setManualAssign(init);
   }, [open, teams, hasExistingDraw]);
 
-  const drawLocked = ["in_progress", "completed"].includes(status) || (status === "published" && hasExistingDraw);
+  const drawLocked =
+    ["in_progress", "completed"].includes(status) || (status === "published" && hasExistingDraw);
 
   useEffect(() => {
     return () => {
@@ -180,7 +189,6 @@ export function DrawDialog({
     },
     onError: (e: any) => toast.error(e?.message ?? t("draw.errorToast")),
   });
-
 
   // ---------- Build a randomized auto-distribution
   function buildRandomAssignments(): { team_id: string; group_index: number }[] {
@@ -309,14 +317,12 @@ export function DrawDialog({
     }
   }
 
-
   // ---------- Render
   const slotsArray = Array.from({ length: numSlots }, (_, i) => i);
   const slotLabel = (i: number) =>
     drawMode === "groups"
       ? t("draw.groupLabel", { letter: String.fromCharCode(65 + i) })
       : t("draw.positionLabel", { n: i + 1 });
-
 
   const canDraw = teams.length >= 2;
   const tournamentStarted = ["in_progress", "completed"].includes(status);
@@ -339,9 +345,7 @@ export function DrawDialog({
           {!canDraw && (
             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
               <Dices className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                {t("draw.emptyHint")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("draw.emptyHint")}</p>
             </div>
           )}
 
@@ -350,7 +354,6 @@ export function DrawDialog({
               {t("draw.startedWarn")}
             </div>
           )}
-
 
           {canDraw && (
             <>
@@ -429,7 +432,6 @@ export function DrawDialog({
                 </p>
               </div>
 
-
               <Tabs value={mode} onValueChange={(v) => setMode(v as DrawMode)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="auto" disabled={drawing}>
@@ -448,9 +450,7 @@ export function DrawDialog({
 
                 {/* AUTO */}
                 <TabsContent value="auto" className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    {t("draw.autoDesc")}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t("draw.autoDesc")}</p>
                   {/* B-04 — once the draw is done, hide the green CTA. The
                       footer "Relancer" (outline + confirm sheet) is the only
                       way to re-roll, with strong confirmation. */}
@@ -474,18 +474,15 @@ export function DrawDialog({
                     <p className="text-xs text-muted-foreground italic">
                       {t("draw.relaunchFromFooterHint", {
                         defaultValue:
-                          'Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus).',
+                          "Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus).",
                       })}
                     </p>
                   )}
                 </TabsContent>
 
-
                 {/* PROGRESSIVE */}
                 <TabsContent value="progressive" className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    {t("draw.progressiveDesc")}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t("draw.progressiveDesc")}</p>
 
                   {!drawing && revealed.length === 0 && !finished && (
                     <Button
@@ -502,10 +499,9 @@ export function DrawDialog({
                       footer Relancer button (with confirm sheet) instead. */}
                   {finished && !drawing && (
                     <p className="text-xs text-muted-foreground italic">
-                      {t("draw.relaunchFromFooterHint", { defaultValue: '' })}
+                      {t("draw.relaunchFromFooterHint", { defaultValue: "" })}
                     </p>
                   )}
-
 
                   {drawing && (
                     <div className="space-y-3">
@@ -551,7 +547,6 @@ export function DrawDialog({
                           <Dices className="h-4 w-4" />
                           {t("draw.drawNextRemaining", { count: pool.length })}
                         </Button>
-
                       </div>
                     </div>
                   )}
@@ -609,7 +604,9 @@ export function DrawDialog({
                 {/* MANUAL */}
                 <TabsContent value="manual" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    {drawMode === "groups" ? t("draw.manualDescGroups") : t("draw.manualDescKnockout")}
+                    {drawMode === "groups"
+                      ? t("draw.manualDescGroups")
+                      : t("draw.manualDescKnockout")}
                   </p>
                   <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
                     {teams.map((team) => (
@@ -673,7 +670,6 @@ export function DrawDialog({
                     </Button>
                   )}
                 </TabsContent>
-
               </Tabs>
 
               {finished && (
@@ -724,7 +720,6 @@ export function DrawDialog({
           if (action) action();
         }}
       />
-
     </>
   );
 }

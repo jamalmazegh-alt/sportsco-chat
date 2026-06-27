@@ -126,9 +126,7 @@ function SupportPage() {
           <h2 className="text-sm font-semibold flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
             Live alerts
-            {totalAlerts > 0 && (
-              <StatusBadge tone="warn">{totalAlerts}</StatusBadge>
-            )}
+            {totalAlerts > 0 && <StatusBadge tone="warn">{totalAlerts}</StatusBadge>}
           </h2>
           {alertsLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
@@ -213,7 +211,9 @@ function SupportPage() {
                   <StatusBadge tone="danger">{e.status}</StatusBadge>
                 </div>
                 {e.error_message && (
-                  <div className="text-[11px] text-muted-foreground truncate">{e.error_message}</div>
+                  <div className="text-[11px] text-muted-foreground truncate">
+                    {e.error_message}
+                  </div>
                 )}
               </li>
             ))}
@@ -277,9 +277,13 @@ function SupportPage() {
                   <div className="text-xs text-muted-foreground truncate">{u.phone ?? u.id}</div>
                 </div>
                 <div className="flex gap-1.5">
-                  <Button size="sm" variant="ghost" onClick={() => loadUser(u.id)}>Summary</Button>
+                  <Button size="sm" variant="ghost" onClick={() => loadUser(u.id)}>
+                    Summary
+                  </Button>
                   <Button asChild size="sm" variant="outline">
-                    <Link to="/superadmin/users/$userId" params={{ userId: u.id }}>Manage</Link>
+                    <Link to="/superadmin/users/$userId" params={{ userId: u.id }}>
+                      Manage
+                    </Link>
                   </Button>
                 </div>
               </li>
@@ -296,9 +300,13 @@ function SupportPage() {
               <li key={c.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
                 <div className="text-sm font-medium truncate">{c.name}</div>
                 <div className="flex gap-1.5">
-                  <Button size="sm" variant="ghost" onClick={() => loadClub(c.id)}>Summary</Button>
+                  <Button size="sm" variant="ghost" onClick={() => loadClub(c.id)}>
+                    Summary
+                  </Button>
                   <Button asChild size="sm" variant="outline">
-                    <Link to="/superadmin/clubs/$clubId" params={{ clubId: c.id }}>Manage</Link>
+                    <Link to="/superadmin/clubs/$clubId" params={{ clubId: c.id }}>
+                      Manage
+                    </Link>
                   </Button>
                 </div>
               </li>
@@ -312,7 +320,8 @@ function SupportPage() {
               <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">User</div>
               <div className="text-sm font-medium">{userSummary.profile?.full_name ?? "—"}</div>
               <div className="text-xs text-muted-foreground">
-                {userSummary.profile?.phone ?? "—"} · {userSummary.profile?.preferred_language ?? "—"}
+                {userSummary.profile?.phone ?? "—"} ·{" "}
+                {userSummary.profile?.preferred_language ?? "—"}
               </div>
             </div>
             <div>
@@ -359,7 +368,9 @@ function SupportPage() {
               <div className="text-sm font-medium">{clubSummary.club?.name}</div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Admins</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                Admins
+              </div>
               <ul className="space-y-1 text-sm">
                 {clubSummary.admins.map((a) => (
                   <li key={a.user_id} className="flex justify-between">

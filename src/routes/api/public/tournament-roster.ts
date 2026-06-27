@@ -5,7 +5,10 @@ import { z } from "zod";
 const PlayerSchema = z.object({
   first_name: z.string().trim().min(1).max(80),
   last_name: z.string().trim().min(1).max(80),
-  jersey_number: z.union([z.number().int().min(0).max(999), z.string()]).nullable().optional(),
+  jersey_number: z
+    .union([z.number().int().min(0).max(999), z.string()])
+    .nullable()
+    .optional(),
   position: z.string().trim().max(40).nullable().optional(),
   is_captain: z.boolean().optional(),
 });
@@ -51,7 +54,10 @@ export const Route = createFileRoute("/api/public/tournament-roster")({
         });
         const parsed = Body.safeParse(body);
         if (!parsed.success) {
-          return Response.json({ error: "Invalid input", details: parsed.error.issues }, { status: 400 });
+          return Response.json(
+            { error: "Invalid input", details: parsed.error.issues },
+            { status: 400 },
+          );
         }
         const normalized = parsed.data.players.map((p) => ({
           first_name: p.first_name,

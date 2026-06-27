@@ -61,10 +61,13 @@ function AvailabilityPage() {
         .maybeSingle();
       if (player?.user_id === uid) return true;
 
-      const { data: viaRpc, error: rpcErr } = await (supabase.rpc as any)("can_view_player_availability", {
-        _user_id: uid,
-        _player_id: playerId,
-      });
+      const { data: viaRpc, error: rpcErr } = await (supabase.rpc as any)(
+        "can_view_player_availability",
+        {
+          _user_id: uid,
+          _player_id: playerId,
+        },
+      );
       if (!rpcErr && viaRpc) return true;
 
       // Fallback until migration is deployed: same rules as RLS / can_view_player_availability.
@@ -110,7 +113,8 @@ function AvailabilityPage() {
   });
 
   async function cancel(row: Row) {
-    if (!confirm(t("availability.confirmCancel", { defaultValue: "Annuler cette absence ?" }))) return;
+    if (!confirm(t("availability.confirmCancel", { defaultValue: "Annuler cette absence ?" })))
+      return;
     const { error } = await supabase
       .from("player_availabilities")
       .update({ status: "cancelled" })
@@ -127,9 +131,7 @@ function AvailabilityPage() {
   }
 
   const activeAbsences = rows.filter((r) => r.status === "active");
-  const activeSusp = suspensions.filter(
-    (s) => s.matches_to_serve - s.matches_served > 0,
-  );
+  const activeSusp = suspensions.filter((s) => s.matches_to_serve - s.matches_served > 0);
 
   useEffect(() => {
     if (!accessLoading && canView === false) {
@@ -153,7 +155,9 @@ function AvailabilityPage() {
     <div className="space-y-4">
       <BackLink />
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-semibold">{t("availability.title", { defaultValue: "Disponibilités" })}</h1>
+        <h1 className="text-lg font-semibold">
+          {t("availability.title", { defaultValue: "Disponibilités" })}
+        </h1>
         {canDeclare && (
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -176,7 +180,11 @@ function AvailabilityPage() {
           <ul className="space-y-2">
             {activeAbsences.map((r) => (
               <li key={r.id} className="flex items-center gap-2">
-                <UnavailableBadge reason={r.reason} detail={`${fmt(r.start_date)} → ${fmt(r.end_date)}`} size="md" />
+                <UnavailableBadge
+                  reason={r.reason}
+                  detail={`${fmt(r.start_date)} → ${fmt(r.end_date)}`}
+                  size="md"
+                />
               </li>
             ))}
             {activeSusp.map((s) => (
@@ -197,7 +205,9 @@ function AvailabilityPage() {
       {/* History */}
       <section className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="px-4 py-3 border-b border-border">
-          <h2 className="text-sm font-semibold">{t("availability.history", { defaultValue: "Historique" })}</h2>
+          <h2 className="text-sm font-semibold">
+            {t("availability.history", { defaultValue: "Historique" })}
+          </h2>
         </div>
         {isLoading ? (
           <div className="p-6 flex justify-center">
@@ -249,7 +259,9 @@ function AvailabilityPage() {
         )}
       </section>
 
-      {canDeclare && <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />}
+      {canDeclare && (
+        <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />
+      )}
     </div>
   );
 }

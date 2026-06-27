@@ -35,28 +35,36 @@ const LABELS: Record<EventType, string> = {
 
 function fmt(d?: string | null) {
   if (!d) return "—";
-  try { return new Date(d).toLocaleString("fr-FR"); } catch { return d; }
+  try {
+    return new Date(d).toLocaleString("fr-FR");
+  } catch {
+    return d;
+  }
 }
 
 const SubscriptionAdminNotification = (props: Props) => {
   const label = LABELS[props.eventType] ?? props.eventType;
   return (
-    <EmailShell preview={`${label} — ${props.clubName ?? "Club"}`} locale="fr" clubName={props.clubName}>
-          <Heading style={h1}>{label}</Heading>
-          <Text style={text}>
-            Club : <strong>{props.clubName ?? "—"}</strong>
-          </Text>
-          <Section style={card}>
-            <Row k="Plan" v={props.plan ?? "—"} />
-            <Row k="Statut Stripe" v={props.status ?? "—"} />
-            <Row k="Email client" v={props.customerEmail ?? "—"} />
-            <Row k="Fin essai" v={fmt(props.trialEnd)} />
-            <Row k="Fin période" v={fmt(props.currentPeriodEnd)} />
-            <Row k="Annulation prévue" v={fmt(props.cancelAt)} />
-            <Row k="Subscription ID" v={props.stripeSubscriptionId ?? "—"} />
-            <Row k="Club ID" v={props.clubId ?? "—"} />
-          </Section>
-        </EmailShell>
+    <EmailShell
+      preview={`${label} — ${props.clubName ?? "Club"}`}
+      locale="fr"
+      clubName={props.clubName}
+    >
+      <Heading style={h1}>{label}</Heading>
+      <Text style={text}>
+        Club : <strong>{props.clubName ?? "—"}</strong>
+      </Text>
+      <Section style={card}>
+        <Row k="Plan" v={props.plan ?? "—"} />
+        <Row k="Statut Stripe" v={props.status ?? "—"} />
+        <Row k="Email client" v={props.customerEmail ?? "—"} />
+        <Row k="Fin essai" v={fmt(props.trialEnd)} />
+        <Row k="Fin période" v={fmt(props.currentPeriodEnd)} />
+        <Row k="Annulation prévue" v={fmt(props.cancelAt)} />
+        <Row k="Subscription ID" v={props.stripeSubscriptionId ?? "—"} />
+        <Row k="Club ID" v={props.clubId ?? "—"} />
+      </Section>
+    </EmailShell>
   );
 };
 
@@ -90,7 +98,12 @@ export const template = {
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "14px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
-const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 16px" };
+const card = {
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: "10px",
+  padding: "12px 16px",
+};
 const row = { fontSize: "13px", color: "#0f172a", margin: "4px 0", lineHeight: "1.5" };
 const key = { color: "#64748b", marginRight: "6px" };
 const val = { fontWeight: "bold" as const };

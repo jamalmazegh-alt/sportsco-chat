@@ -45,8 +45,7 @@ async function assertAdminOrFinAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -54,7 +53,9 @@ async function assertAdminOrFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Seuls les admins du club ou les admins financiers peuvent consulter ces données");
+  throw new Error(
+    "Seuls les admins du club ou les admins financiers peuvent consulter ces données",
+  );
 }
 
 function getOrigin(): string {
@@ -84,7 +85,6 @@ async function sumPaid(obligationId: string): Promise<number> {
   return (data ?? []).reduce((s, r) => s + (r.amount_gross_cents ?? 0), 0);
 }
 
-
 async function maybeIssueReceipt(transactionId: string): Promise<void> {
   // Idempotent: skip if a receipt already exists for this transaction
   const { data: existing } = await supabaseAdmin
@@ -96,18 +96,14 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
 
   const { data: tx } = await supabaseAdmin
     .from("payment_transactions")
-    .select(
-      "id, obligation_id, club_id, method, amount_gross_cents, currency, status",
-    )
+    .select("id, obligation_id, club_id, method, amount_gross_cents, currency, status")
     .eq("id", transactionId)
     .maybeSingle();
   if (!tx || tx.status !== "succeeded") return;
 
   const { data: obl } = await supabaseAdmin
     .from("payment_obligations")
-    .select(
-      "id, payer_user_id, player_id, payment_item_id",
-    )
+    .select("id, payer_user_id, player_id, payment_item_id")
     .eq("id", tx.obligation_id)
     .maybeSingle();
   if (!obl) return;
@@ -151,9 +147,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
       payer_name: payer
         ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
         : null,
-      player_name: player
-        ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
-        : null,
+      player_name: player ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() : null,
       item_title: item?.title ?? null,
       amount_gross_cents: tx.amount_gross_cents,
       currency: tx.currency,
@@ -196,14 +190,16 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
         .eq("id", tx.club_id)
         .maybeSingle();
       const methodLabel =
-        ({
-          stripe: "Carte (Stripe)",
-          helloasso: "HelloAsso",
-          cash: "Espèces",
-          cheque: "Chèque",
-          bank_transfer: "Virement bancaire",
-          manual: "Manuel",
-        } as Record<string, string>)[tx.method] ?? tx.method;
+        (
+          {
+            stripe: "Carte (Stripe)",
+            helloasso: "HelloAsso",
+            cash: "Espèces",
+            cheque: "Chèque",
+            bank_transfer: "Virement bancaire",
+            manual: "Manuel",
+          } as Record<string, string>
+        )[tx.method] ?? tx.method;
       await enqueueTransactionalEmailServer({
         templateName: "payment-receipt",
         recipientEmail,
@@ -213,9 +209,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
           payerName: payer
             ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
             : null,
-          playerName: player
-            ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
-            : null,
+          playerName: player ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() : null,
           itemTitle: item?.title ?? "Paiement",
           amountLabel: `${(tx.amount_gross_cents / 100).toFixed(2)} ${(tx.currency || "eur").toUpperCase()}`,
           methodLabel,
@@ -437,20 +431,18 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
 
     // Insert pending transaction keyed by session id so the Connect webhook
     // can finalize it (FIX 11).
-    const { error: pendingErr } = await supabaseAdmin
-      .from("payment_transactions")
-      .insert({
-        obligation_id: obl.id,
-        club_id: obl.club_id,
-        method: "stripe",
-        status: "pending",
-        amount_gross_cents: amount,
-        provider_fee_cents: fee,
-        amount_net_cents: amount - fee,
-        currency: (obl.currency || "eur").toLowerCase(),
-        external_reference: session.id,
-        recorded_by: userId,
-      });
+    const { error: pendingErr } = await supabaseAdmin.from("payment_transactions").insert({
+      obligation_id: obl.id,
+      club_id: obl.club_id,
+      method: "stripe",
+      status: "pending",
+      amount_gross_cents: amount,
+      provider_fee_cents: fee,
+      amount_net_cents: amount - fee,
+      currency: (obl.currency || "eur").toLowerCase(),
+      external_reference: session.id,
+      recorded_by: userId,
+    });
     if (pendingErr) {
       // Non-fatal: the webhook will self-heal on success. We still want the
       // failure visible in logs to investigate root cause.
@@ -460,7 +452,6 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
         error: pendingErr.message,
       });
     }
-
 
     log.info("Created obligation checkout", {
       obligation: obl.id,
@@ -505,9 +496,7 @@ export const recordManualPayment = createServerFn({ method: "POST" })
     const alreadyPaid = await sumPaid(obl.id);
     const remaining = obl.amount_due_cents - alreadyPaid;
     if (data.amountCents > remaining) {
-      throw new Error(
-        `Amount exceeds remaining due (${(remaining / 100).toFixed(2)})`,
-      );
+      throw new Error(`Amount exceeds remaining due (${(remaining / 100).toFixed(2)})`);
     }
 
     const { data: tx, error } = await supabaseAdmin
@@ -713,15 +702,12 @@ export async function finalizeStripeTransactionByPI(params: {
   });
 }
 
-
 /* ----------------------- LIST OBLIGATIONS (admin) ----------------------- */
 
 export const listObligationsForItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), itemId: z.string().uuid() })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), itemId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     // Lecture seule — accessible aux admins club ET aux admins financiers.
@@ -765,8 +751,7 @@ export const listObligationsForItem = createServerFn({ method: "POST" })
         .in("id", payerIds);
       profiles?.forEach((p) =>
         payerMap.set(p.id, {
-          name:
-            `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null,
+          name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null,
         }),
       );
     }

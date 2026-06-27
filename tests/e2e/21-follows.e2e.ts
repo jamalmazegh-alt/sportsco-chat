@@ -24,43 +24,55 @@ test.describe.skip("Follows", () => {
     // et il ne peut pas supprimer les follows d'un autre user. On nettoie donc
     // via le client coach (RLS lui permet de supprimer ses propres follows).
     coachClient = await clientFor(club.coach);
-    await coachClient.from("follows").delete()
-      .eq("follower_id", club.coach.userId);
+    await coachClient.from("follows").delete().eq("follower_id", club.coach.userId);
   });
 
   test.afterAll(async () => {
     try {
-      await coachClient.from("follows").delete()
-        .eq("follower_id", club.coach.userId);
-    } catch { /* best-effort */ }
+      await coachClient.from("follows").delete().eq("follower_id", club.coach.userId);
+    } catch {
+      /* best-effort */
+    }
     await club.cleanup();
   });
 
   test("authenticated user can follow a player", async () => {
-    const { error } = await coachClient.from("follows").insert({
-      follower_id: club.coach.userId,
-      target_type: "player",
-      followed_player_id: club.player1.id,
-    }).select("id").single();
+    const { error } = await coachClient
+      .from("follows")
+      .insert({
+        follower_id: club.coach.userId,
+        target_type: "player",
+        followed_player_id: club.player1.id,
+      })
+      .select("id")
+      .single();
     expect(error).toBeNull();
   });
 
   test("authenticated user can follow a club", async () => {
     // Nettoyage via le client coach (RLS) — admin ne peut pas supprimer
     // les follows d'un autre user.
-    await coachClient.from("follows").delete()
+    await coachClient
+      .from("follows")
+      .delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_club_id", club.clubId);
-    const { error } = await coachClient.from("follows").insert({
-      follower_id: club.coach.userId,
-      target_type: "club",
-      followed_club_id: club.clubId,
-    }).select("id").single();
+    const { error } = await coachClient
+      .from("follows")
+      .insert({
+        follower_id: club.coach.userId,
+        target_type: "club",
+        followed_club_id: club.clubId,
+      })
+      .select("id")
+      .single();
     expect(error).toBeNull();
   });
 
   test("cannot follow the same player twice", async () => {
-    await coachClient.from("follows").delete()
+    await coachClient
+      .from("follows")
+      .delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_player_id", club.player2WithParent.id);
     await coachClient.from("follows").insert({
@@ -80,27 +92,33 @@ test.describe.skip("Follows", () => {
   });
 
   test("followers_count is incremented after follow (trigger)", async () => {
-    const { data } = await admin.from("players")
-      .select("followers_count").eq("id", club.player1.id).single();
+    const { data } = await admin
+      .from("players")
+      .select("followers_count")
+      .eq("id", club.player1.id)
+      .single();
     if ((data?.followers_count ?? 0) === 0) {
-      test.skip(true,
-        "followers_count trigger not implemented. Validated manually via UI."
-      );
+      test.skip(true, "followers_count trigger not implemented. Validated manually via UI.");
       return;
     }
     expect(data?.followers_count).toBeGreaterThan(0);
   });
 
   test("user can unfollow a player", async () => {
-    const { error } = await coachClient.from("follows").delete()
+    const { error } = await coachClient
+      .from("follows")
+      .delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_player_id", club.player1.id);
     expect(error).toBeNull();
   });
 
   test("followers_count is decremented after unfollow", async () => {
-    const { data } = await admin.from("players")
-      .select("followers_count").eq("id", club.player1.id).single();
+    const { data } = await admin
+      .from("players")
+      .select("followers_count")
+      .eq("id", club.player1.id)
+      .single();
     expect(data?.followers_count ?? 0).toBe(0);
   });
 
