@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 parallele Tableaus nach Niveau — alle Teams spielen weiter, eingeteilt in Elite / Mittel / Entdeckung.",
+      "cup_plate": "Hauptbaum (Pokal) für die Sieger + Nebenbaum (Platte) für die Verlierer der 1. Runde. Niemand scheidet früh aus.",
+      "medals": "K.-o.-System mit Podium Gold / Silber / Bronze für die Top 3. Kurzes, klassisches Format.",
+      "consolation": "2 Tableaus: Haupt (Gruppensieger) und Trostrunde (Verlierer). Einfache Lösung, damit jedes Team weiterspielt."
     }
   },
   "controlCenter": {

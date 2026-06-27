@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 quadros paralelos por nível — todas as equipas continuam a jogar, divididas em Elite / Médio / Descoberta.",
+      "cup_plate": "Quadro principal (Taça) para os vencedores + quadro secundário (Prato) para os perdedores da 1ª ronda. Ninguém é eliminado cedo.",
+      "medals": "Eliminação direta com pódio Ouro / Prata / Bronze para as 3 primeiras equipas. Formato curto e clássico.",
+      "consolation": "2 quadros: Principal (vencedores de grupo) e Consolação (perdedores). Solução simples para manter todas as equipas a jogar."
     }
   },
   "controlCenter": {
