@@ -543,7 +543,6 @@ function drawCoverBlock(
   ctx.y = bottom;
 }
 
-
 function drawArticle(ctx: Ctx, n: number, paragraphs: string[]) {
   ensureSpace(ctx, 40);
   const title = `${I18N[ctx.lang].article} ${n}. ${I18N[ctx.lang].titles[n - 1]}`;

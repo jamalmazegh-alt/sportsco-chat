@@ -1720,9 +1720,8 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
       return { document: row };
     }
 
-    const { buildRegulationsPdf, fetchImage } = await import(
-      "@/routes/api/public/tournament.$id.regulations"
-    );
+    const { buildRegulationsPdf, fetchImage } =
+      await import("@/routes/api/public/tournament.$id.regulations");
     let logoBytes: ArrayBuffer | null = null;
     try {
       const origin = process.env.APP_URL || "https://www.clubero.app";
@@ -2558,7 +2557,6 @@ export const listTournamentReferees = createServerFn({ method: "GET" })
     return { referees };
   });
 
-
 export const assignMatchReferee = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -2638,7 +2636,7 @@ export const getMyTournamentRole = createServerFn({ method: "POST" })
       return { role: "owner" as const };
     }
 
-    let q = supabaseAdmin
+    const q = supabaseAdmin
       .from("tournament_collaborators")
       .select("role, user_id, email")
       .eq("tournament_id", data.tournament_id)
