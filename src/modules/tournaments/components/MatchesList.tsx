@@ -1536,20 +1536,36 @@ function MatchCard({
           )}
 
           {validated ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => validateM.mutate(false)}
-              disabled={validateM.isPending}
-              className="w-full h-12"
-            >
-              {validateM.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ShieldCheck className="h-4 w-4" />
+            <div className="space-y-2">
+              {nextMatchId && (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    setJustSaved(false);
+                    onAdvanceToNext?.(nextMatchId);
+                  }}
+                  className="w-full h-12"
+                >
+                  <Zap className="h-4 w-4" />
+                  {t("matches.nextMatch", { defaultValue: "Match suivant" })}
+                </Button>
               )}
-              {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
-            </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => validateM.mutate(false)}
+                disabled={validateM.isPending}
+                className="w-full h-12"
+              >
+                {validateM.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ShieldCheck className="h-4 w-4" />
+                )}
+                {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
+              </Button>
+            </div>
           ) : justSaved ? (
             <div className="space-y-2">
               <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
