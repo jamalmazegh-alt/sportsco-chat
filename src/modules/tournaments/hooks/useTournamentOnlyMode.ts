@@ -24,7 +24,7 @@ export function useTournamentOnlyMode(): {
     enabled: !!userId && !isTournamentOrganizer,
     staleTime: 60_000,
     queryFn: async () => {
-      const [passes, entitlements, subs, collaborations] = await Promise.all([
+      const [passes, entitlements, subs, collaborations, pendingByEmail] = await Promise.all([
         supabase
           .from("tournament_passes")
           .select("id", { count: "exact", head: true })
@@ -52,14 +52,8 @@ export function useTournamentOnlyMode(): {
       const usedCount = passes.count ?? 0;
       const activeEntitlements = entitlements.count ?? 0;
       const activeSubs = (subs as { count: number | null }).count ?? 0;
-      const activeCollaborations = collaborations.count ?? 0;
-      const pendingCollabByEmail = (arguments[4] as { data: boolean | null })?.data === true;
-      return {
-        usedCount,
-        activeEntitlements,
-        activeSubs,
-        activeCollaborations: activeCollaborations + (pendingCollabByEmail ? 1 : 0),
-      };
+      const activeCollaborations =
+        (collaborations.count ?? 0) + (pendingByEmail?.data === true ? 1 : 0);
       return { usedCount, activeEntitlements, activeSubs, activeCollaborations };
     },
   });
