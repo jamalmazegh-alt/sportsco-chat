@@ -64,7 +64,7 @@ function HomePage() {
   const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   const listMyObligationsFn = useServerFn(listMyObligations);
-  if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
+
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
