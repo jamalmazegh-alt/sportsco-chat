@@ -130,6 +130,27 @@ function TvSlideshowPage() {
       render: () => <IntroSlide tournament={tournament as any} qrUrl={publicUrl} />,
     });
 
+    // Final podium when tournament is completed
+    if (isCompleted) {
+      out.push({
+        key: "podium",
+        title: t("finalStandings.title", { defaultValue: "Classement final" }),
+        icon: <Trophy className="h-7 w-7 text-amber-500" />,
+        render: () => (
+          <div className="h-full w-full overflow-auto flex items-start justify-center">
+            <div className="w-full max-w-5xl">
+              <FinalStandings
+                matches={matches as any}
+                teams={teams as any}
+                flights={(flights as any) ?? []}
+                tournamentName={tournament.name}
+              />
+            </div>
+          </div>
+        ),
+      });
+    }
+
     // Live matches first when available
     if (live.length > 0) {
       out.push({
