@@ -187,10 +187,12 @@ function TournamentDetailPage() {
             groupsCount: data.groups.length,
             matches: data.matches,
             flightsCount: data.flights.length,
+            expectedTeams: data.tournament.num_teams ?? null,
           })
         : { kind: "all_done" },
     [data],
   );
+
 
   const counters = useMemo(() => countMatches(data?.matches ?? []), [data]);
 
