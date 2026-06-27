@@ -164,6 +164,7 @@ function SuperAdminClubs() {
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
               <th className="text-left font-medium px-3 py-2">Club</th>
+              <th className="text-left font-medium px-3 py-2">Contact</th>
               <th className="text-left font-medium px-3 py-2">Membres</th>
               <th className="text-left font-medium px-3 py-2">Facturation</th>
               <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Créé le</th>
