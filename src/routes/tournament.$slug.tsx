@@ -775,6 +775,34 @@ function MatchBadges({ match }: { match: any }) {
   );
 }
 
+function resolveTeamLabel(
+  team: { name?: string | null } | null | undefined,
+  source: any,
+  t: (k: string, opts?: any) => string,
+): string {
+  if (team?.name) return team.name;
+  if (source && typeof source === "object" && typeof source.fromMatch === "number") {
+    const key = source.outcome === "loser" ? "bracket.loserOf" : "bracket.winnerOf";
+    return t(key, { n: source.fromMatch });
+  }
+  return t("common.tbd");
+}
+
+function matchRoundLabel(match: any, t: (k: string, opts?: any) => string): string | null {
+  if (!match) return null;
+  if (match.round === "group") return t("matches.groupPhase");
+  const map: Record<string, string> = {
+    r32: "matches.rounds.r32",
+    r16: "matches.rounds.r16",
+    qf: "matches.rounds.qf",
+    sf: "matches.rounds.sf",
+    final: "matches.rounds.final",
+    third_place: "matches.rounds.third_place",
+  };
+  const k = map[match.round];
+  return k ? t(k) : null;
+}
+
 function MatchRow({
   match,
   teamMap,
@@ -793,6 +821,9 @@ function MatchRow({
   const isLive = match.status === "live";
   const winnerA = match.winner_team_id && match.winner_team_id === match.team_a_id;
   const winnerB = match.winner_team_id && match.winner_team_id === match.team_b_id;
+  const labelA = resolveTeamLabel(a, match.team_a_source, t);
+  const labelB = resolveTeamLabel(b, match.team_b_source, t);
+  const roundLbl = matchRoundLabel(match, t);
   return (
     <li
       className={cn(
@@ -800,6 +831,14 @@ function MatchRow({
         isLive && "bg-red-500/5 animate-pulse-ring",
       )}
     >
+      {roundLbl && (
+        <div className="flex justify-center mb-1">
+          <span className="rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+            {roundLbl}
+            {match.match_number ? ` · M${match.match_number}` : ""}
+          </span>
+        </div>
+      )}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span
           className={cn(
@@ -808,7 +847,7 @@ function MatchRow({
           )}
         >
           {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
-          {a?.name ?? t("common.tbd")}
+          {labelA}
         </span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
           <span className={cn(winnerA && "text-foreground", !winnerA && "text-muted-foreground")}>
@@ -826,7 +865,7 @@ function MatchRow({
             winnerB && "font-semibold text-foreground",
           )}
         >
-          {b?.name ?? t("common.tbd")}
+          {labelB}
           {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
         </span>
       </div>
@@ -903,6 +942,9 @@ function PublicMatches({
         const evts = eventsByMatch.get(m.id) ?? [];
         const winnerA = m.winner_team_id && m.winner_team_id === m.team_a_id;
         const winnerB = m.winner_team_id && m.winner_team_id === m.team_b_id;
+        const labelA = resolveTeamLabel(teamMap.get(m.team_a_id), m.team_a_source, t);
+        const labelB = resolveTeamLabel(teamMap.get(m.team_b_id), m.team_b_source, t);
+        const roundLbl = matchRoundLabel(m, t);
         return (
           <li
             key={m.id}
@@ -915,6 +957,14 @@ function PublicMatches({
                   : "border-border hover:border-primary/30",
             )}
           >
+            {roundLbl && (
+              <div className="flex justify-center mb-2">
+                <span className="rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                  {roundLbl}
+                  {m.match_number ? ` · M${m.match_number}` : ""}
+                </span>
+              </div>
+            )}
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
               <span
                 className={cn(
@@ -923,7 +973,7 @@ function PublicMatches({
                 )}
               >
                 {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
-                {teamMap.get(m.team_a_id)?.name ?? t("common.tbd")}
+                {labelA}
               </span>
               <span className="tabular-nums font-bold flex items-center gap-1.5">
                 <span className={cn(!winnerA && "text-muted-foreground")}>{m.score_a ?? "–"}</span>
@@ -937,7 +987,7 @@ function PublicMatches({
                   winnerB ? "font-bold text-foreground" : "font-medium text-muted-foreground",
                 )}
               >
-                {teamMap.get(m.team_b_id)?.name ?? t("common.tbd")}
+                {labelB}
                 {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
               </span>
             </div>
