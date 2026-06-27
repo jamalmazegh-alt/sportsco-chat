@@ -502,7 +502,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
           <p className="text-sm font-semibold text-muted-foreground">{t("teams.empty")}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {teams.map((tm, idx) => {
             const palettes = [
               "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
