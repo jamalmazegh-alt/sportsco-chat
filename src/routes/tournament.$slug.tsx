@@ -31,6 +31,7 @@ import { getPublicTournament } from "@/modules/tournaments/tournaments-public.fu
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
 import { FlightsPublicView } from "@/modules/tournaments/components/FlightsPublicView";
+import { FinalStandings } from "@/modules/tournaments/components/FinalStandings";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
@@ -165,6 +166,7 @@ function PublicTournamentPage() {
   const opens = parseLocalish(rules.registration.opensAt);
   const closes = parseLocalish(rules.registration.closesAt);
   const registrationOpen =
+    tournament.status === "published" &&
     rules.registration.enabled &&
     (opens === null || now >= opens) &&
     (closes === null || now <= closes);
@@ -462,13 +464,23 @@ function PublicTournamentPage() {
             </div>
           )}
           {tab === "overview" && (
-            <Overview
-              groups={groups}
-              teams={teams}
-              matches={filteredMatches}
-              scoring={scoring}
-              eventsByMatch={eventsByMatch}
-            />
+            <>
+              {tournament.status === "completed" && (
+                <FinalStandings
+                  matches={matches as any}
+                  teams={teams as any}
+                  flights={flights as any}
+                  tournamentName={tournament.name}
+                />
+              )}
+              <Overview
+                groups={groups}
+                teams={teams}
+                matches={filteredMatches}
+                scoring={scoring}
+                eventsByMatch={eventsByMatch}
+              />
+            </>
           )}
           {tab === "teams" && <TeamsGrid teams={teams as any} />}
           {tab === "matches" && (
