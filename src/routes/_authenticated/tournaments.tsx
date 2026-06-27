@@ -246,7 +246,7 @@ function TournamentsList() {
       )}
 
       {/* ─── Bandeau organisateur "30s avec l'IA" ─────────────────── */}
-      {noClub && (
+      {noClub && !collaboratorOnly && (
         <div
           className="relative overflow-hidden rounded-[18px] p-5 text-white"
           style={{ background: GREEN_GRADIENT, boxShadow: CARD_SHADOW }}
