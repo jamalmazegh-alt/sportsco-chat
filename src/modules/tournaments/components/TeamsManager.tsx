@@ -80,6 +80,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   // Bulk import state
   const [bulkText, setBulkText] = useState("");
+  const [bulkError, setBulkError] = useState<string | null>(null);
 
   const addFn = useServerFn(addTournamentTeam);
   const removeFn = useServerFn(removeTournamentTeam);
