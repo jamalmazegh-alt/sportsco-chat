@@ -117,7 +117,7 @@ function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/home`,
+        emailRedirectTo: `${window.location.origin}${nextPath}`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
