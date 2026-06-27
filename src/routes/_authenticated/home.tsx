@@ -224,10 +224,13 @@ function HomePage() {
     };
   }, [i18n.language, paymentData?.obligations]);
 
+  if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
+
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {
     return <HomeSkeleton />;
   }
+
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">

@@ -60,11 +60,9 @@ function DisciplinePage() {
   const [reasonFilter, setReasonFilter] = useState<string>("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  if (!activeClubId) return <Navigate to="/home" replace />;
-  if (!allowed) return <Navigate to="/home" replace />;
-
   const { data: teams = [] } = useQuery({
     queryKey: ["club-teams", activeClubId],
+
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
