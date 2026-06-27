@@ -1027,6 +1027,18 @@ function TeamDetail() {
                     </form>
                   </SheetContent>
                 </Sheet>
+                {activeClubId && (
+                  <ImportPlayersCsvDialog
+                    open={importOpen}
+                    onOpenChange={setImportOpen}
+                    teamId={teamId}
+                    clubId={activeClubId}
+                    onDone={() => {
+                      qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+                      qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+                    }}
+                  />
+                )}
               </>
             )}
           </div>
