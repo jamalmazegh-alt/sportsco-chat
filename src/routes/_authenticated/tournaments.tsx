@@ -237,9 +237,10 @@ function TournamentsList() {
         </div>
       </div>
 
-      {canManage && !noClub && activeClubId && (
-        <TournamentCreateChooser clubId={activeClubId} open={open} onOpenChange={setOpen} />
+      {canManage && effectiveClubId && (
+        <TournamentCreateChooser clubId={effectiveClubId} open={open} onOpenChange={setOpen} />
       )}
+
 
       {/* ─── Bandeau organisateur "30s avec l'IA" ─────────────────── */}
       {noClub && (
