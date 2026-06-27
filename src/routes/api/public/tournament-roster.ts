@@ -50,7 +50,7 @@ export const Route = createFileRoute("/api/public/tournament-roster")({
         }
         const Body = z.object({
           token: TokenSchema,
-          players: z.array(PlayerSchema).max(40),
+          players: z.array(PlayerSchema).max(60),
         });
         const parsed = Body.safeParse(body);
         if (!parsed.success) {
