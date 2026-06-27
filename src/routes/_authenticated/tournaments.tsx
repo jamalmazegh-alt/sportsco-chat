@@ -328,11 +328,9 @@ function TournamentsList() {
             canManage ? (
               noClub ? (
                 canCreate ? (
-                  <ShimmerButton asChild>
-                    <Link to="/tournaments/new-from-pass">
-                      <Plus className="h-4 w-4" />
-                      {t("list.create")}
-                    </Link>
+                  <ShimmerButton onClick={openCreate} disabled={!effectiveClubId}>
+                    <Plus className="h-4 w-4" />
+                    {t("list.create")}
                   </ShimmerButton>
                 ) : (
                   <ShimmerButton asChild>
@@ -351,6 +349,7 @@ function TournamentsList() {
             ) : null
           }
         />
+
       ) : (
         <ul className="space-y-3">
           {tournaments.map((trn: any) => (
