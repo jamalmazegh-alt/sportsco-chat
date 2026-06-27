@@ -91,7 +91,8 @@ function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const { memberships } = useAuth();
+  const { user, memberships } = useAuth();
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
