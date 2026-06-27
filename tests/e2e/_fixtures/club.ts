@@ -166,7 +166,6 @@ export async function createTestClub(suiteName = "suite"): Promise<SeededClub> {
         .eq("club_id", clubId)
         .like("email", `%${prefix}%`);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.warn(`[e2e cleanup] ${prefix}:`, (e as Error).message);
     }
   };

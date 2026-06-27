@@ -313,7 +313,7 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
 
     // Existing feedback by current user for these players on this event
     const playerIds = players.map((p) => p.player.id);
-    let existing: Record<string, any> = {};
+    const existing: Record<string, any> = {};
     if (playerIds.length) {
       const { data: rows } = await supabase
         .from("player_feedback" as any)

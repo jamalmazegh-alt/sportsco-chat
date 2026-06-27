@@ -149,7 +149,7 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     const model = gateway("google/gemini-3-flash-preview");
 
     // 1) Demande IA : seulement le mapping (petit, fiable)
-    let mapping: Record<string, string> = {};
+    const mapping: Record<string, string> = {};
     try {
       const { object } = await generateObject({
         model,

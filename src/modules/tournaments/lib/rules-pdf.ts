@@ -108,8 +108,8 @@ export async function buildRulesPdf(
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const t = I18N[rules.language];
 
-  let page = doc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H - MARGIN;
+  const page = doc.addPage([PAGE_W, PAGE_H]);
+  const y = PAGE_H - MARGIN;
 
   const accent = parseColor(rules.branding.primaryColor) ?? rgb(0.13, 0.36, 0.85);
 

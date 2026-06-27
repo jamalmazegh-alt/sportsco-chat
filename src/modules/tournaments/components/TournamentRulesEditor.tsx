@@ -823,13 +823,11 @@ function UploadedRegulations({
     setUploading(true);
     try {
       const path = `${tournamentId}/regulations/${crypto.randomUUID()}.pdf`;
-      const { error } = await supabase.storage
-        .from("tournament-documents")
-        .upload(path, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: "application/pdf",
-        });
+      const { error } = await supabase.storage.from("tournament-documents").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: "application/pdf",
+      });
       if (error) throw error;
       const { data: pub } = supabase.storage.from("tournament-documents").getPublicUrl(path);
       onChange({

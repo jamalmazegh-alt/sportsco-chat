@@ -467,24 +467,21 @@ async function teardownAll(fx: Fixtures) {
 }
 
 export default async function () {
-  // eslint-disable-next-line no-console
   console.log(`[rls] Seeding fixtures (run ${RUN_ID})...`);
   const fx = await seedAll();
   writeFileSync(fixturesPath(), JSON.stringify(fx, null, 2));
-  // eslint-disable-next-line no-console
+
   console.log(`[rls] Seed complete. Fixtures at ${fixturesPath()}.`);
 
   return async () => {
-    // eslint-disable-next-line no-console
     console.log(`[rls] Tearing down fixtures (run ${RUN_ID})...`);
     try {
       await teardownAll(fx);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(`[rls] Teardown error:`, e);
     }
     if (existsSync(fixturesPath())) unlinkSync(fixturesPath());
-    // eslint-disable-next-line no-console
+
     console.log(`[rls] Teardown complete.`);
   };
 }

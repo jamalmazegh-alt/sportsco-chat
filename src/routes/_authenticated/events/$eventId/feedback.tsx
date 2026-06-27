@@ -113,9 +113,6 @@ function PostMatchFeedback() {
     setDirty(new Set());
   }, [data]);
 
-  if (!isAccessLoading && !isCoach && canAccessFeedback === false)
-    return <Navigate to="/home" replace />;
-
   const patch = useCallback((playerId: string, p: Partial<RowValue>) => {
     setValues((prev) => ({ ...prev, [playerId]: { ...(prev[playerId] ?? EMPTY), ...p } }));
     setDirty((prev) => {
@@ -255,6 +252,9 @@ function PostMatchFeedback() {
   const event = data?.event;
   const sport = (data as any)?.sport ?? null;
   const tags = useMemo(() => getFeedbackTagsForSport(sport), [sport]);
+
+  if (!isAccessLoading && !isCoach && canAccessFeedback === false)
+    return <Navigate to="/home" replace />;
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">

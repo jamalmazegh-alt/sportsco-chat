@@ -105,17 +105,6 @@ function PaymentItemsPage() {
   const search = Route.useSearch();
   const nav = Route.useNavigate();
 
-  if (!roles.includes("admin") && !roles.includes("financial_admin")) {
-    return <Navigate to="/profile" replace />;
-  }
-  if (!activeClubId) {
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   const listSeasonsFn = useServerFn(listSeasons);
   const listItemsFn = useServerFn(listPaymentItems);
   const deleteFn = useServerFn(deletePaymentItem);
@@ -125,7 +114,8 @@ function PaymentItemsPage() {
 
   const seasonsQ = useQuery({
     queryKey: ["seasons", activeClubId],
-    queryFn: () => listSeasonsFn({ data: { clubId: activeClubId } }),
+    enabled: !!activeClubId,
+    queryFn: () => listSeasonsFn({ data: { clubId: activeClubId! } }),
   });
 
   const currentSeason = useMemo(() => {
@@ -136,15 +126,15 @@ function PaymentItemsPage() {
 
   const itemsQ = useQuery({
     queryKey: ["payment-items", activeClubId, currentSeason?.id],
-    enabled: !!currentSeason,
+    enabled: !!currentSeason && !!activeClubId,
     queryFn: () =>
       listItemsFn({
-        data: { clubId: activeClubId, seasonId: currentSeason!.id },
+        data: { clubId: activeClubId!, seasonId: currentSeason!.id },
       }),
   });
 
   const remove = useMutation({
-    mutationFn: (itemId: string) => deleteFn({ data: { clubId: activeClubId, itemId } }),
+    mutationFn: (itemId: string) => deleteFn({ data: { clubId: activeClubId!, itemId } }),
     onSuccess: () => {
       toast.success(t("fundraising.deleted"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
@@ -155,7 +145,7 @@ function PaymentItemsPage() {
   const toggleStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: "open" | "closed" }) =>
       updateFn({
-        data: { clubId: activeClubId, itemId: id, patch: { status } },
+        data: { clubId: activeClubId!, itemId: id, patch: { status } },
       }),
     onSuccess: () => {
       toast.success(t("fundraising.statusUpdated"));
@@ -170,6 +160,17 @@ function PaymentItemsPage() {
     onSuccess: (res) => toast.success(t("fundraising.remindersSent", { count: res.sent })),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  if (!roles.includes("admin") && !roles.includes("financial_admin")) {
+    return <Navigate to="/profile" replace />;
+  }
+  if (!activeClubId) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 py-4 space-y-5 max-w-5xl">

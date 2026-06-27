@@ -64,7 +64,6 @@ function HomePage() {
   const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   const listMyObligationsFn = useServerFn(listMyObligations);
-  if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
@@ -223,6 +222,8 @@ function HomePage() {
       totalLabel: formatPaymentAmount(totalCents, currency, i18n.language),
     };
   }, [i18n.language, paymentData?.obligations]);
+
+  if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
 
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {

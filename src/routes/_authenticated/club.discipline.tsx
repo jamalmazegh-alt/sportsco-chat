@@ -60,16 +60,14 @@ function DisciplinePage() {
   const [reasonFilter, setReasonFilter] = useState<string>("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  if (!activeClubId) return <Navigate to="/home" replace />;
-  if (!allowed) return <Navigate to="/home" replace />;
-
   const { data: teams = [] } = useQuery({
     queryKey: ["club-teams", activeClubId],
+    enabled: !!activeClubId,
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
         .select("id, name")
-        .eq("club_id", activeClubId)
+        .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .order("name");
       return data ?? [];
@@ -78,13 +76,14 @@ function DisciplinePage() {
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["club-all-suspensions", activeClubId],
+    enabled: !!activeClubId,
     queryFn: async (): Promise<Row[]> => {
       const { data, error } = await supabase
         .from("player_suspensions")
         .select(
           "id, player_id, team_id, matches_to_serve, matches_served, suspension_start_date, suspension_reason, status, created_at, players:player_id(id, first_name, last_name), teams:team_id(id, name)",
         )
-        .eq("club_id", activeClubId)
+        .eq("club_id", activeClubId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
@@ -129,6 +128,9 @@ function DisciplinePage() {
     const completedC = inSeason.filter((r) => r.status === "completed").length;
     return { reds, yellows, activeC, completedC };
   }, [rows]);
+
+  if (!activeClubId) return <Navigate to="/home" replace />;
+  if (!allowed) return <Navigate to="/home" replace />;
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">

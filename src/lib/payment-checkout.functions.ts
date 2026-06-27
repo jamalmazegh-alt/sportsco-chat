@@ -264,7 +264,7 @@ export const listMyObligations = createServerFn({ method: "POST" })
     const list = data ?? [];
     // For each, compute amount already paid
     const ids = list.map((o) => o.id);
-    let paidByObl = new Map<string, number>();
+    const paidByObl = new Map<string, number>();
     if (ids.length > 0) {
       const { data: txs } = await supabaseAdmin
         .from("payment_transactions")

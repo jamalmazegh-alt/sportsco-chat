@@ -21,12 +21,13 @@ function normalizeDate(v: string): string {
   // Accept JJ/MM/AAAA, JJ-MM-AAAA, YYYY-MM-DD, Excel serial (number-as-string)
   const trimmed = v.trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
-  const m = trimmed.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  const m = trimmed.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
   if (m) {
-    let [, d, mo, y] = m;
-    if (y.length === 2) y = (parseInt(y, 10) > 30 ? "19" : "20") + y;
-    return `${y}-${mo.padStart(2, "0")}-${d.padStart(2, "0")}`;
+    const [, d, moRaw, yRaw] = m;
+    const y = yRaw.length === 2 ? (parseInt(yRaw, 10) > 30 ? "19" : "20") + yRaw : yRaw;
+    return `${y}-${moRaw.padStart(2, "0")}-${d.padStart(2, "0")}`;
   }
+
   // Excel serial number
   const n = Number(trimmed);
   if (!isNaN(n) && n > 10000 && n < 80000) {

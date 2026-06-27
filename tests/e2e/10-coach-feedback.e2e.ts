@@ -68,7 +68,7 @@ test.describe("Coach feedback + AI synthesis", () => {
   // La feature est validée en production et via les tests manuels.
   test.skip(
     "coach creates a player synthesis (requires service_role for reliable setup)",
-    // @ts-ignore
+    // @ts-expect-error — playwright test.skip expects function, we pass string reason
     "player_reviews RLS requires can_author_player_feedback which depends on " +
       "team_members insert reliability. Validated manually in production.",
   );

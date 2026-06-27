@@ -30,7 +30,10 @@ export function useSpeechToText({ onResult, onError }: UseSpeechToTextOptions) {
   const stop = useCallback(() => {
     try {
       recognitionRef.current?.stop();
-    } catch {}
+    } catch {
+      // ignore — recognition may not be active
+    }
+
     setIsListening(false);
   }, []);
 
