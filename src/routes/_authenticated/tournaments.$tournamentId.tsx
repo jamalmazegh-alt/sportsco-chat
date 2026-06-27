@@ -188,6 +188,18 @@ function TournamentDetailPage() {
     roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
 
+  // Vue arbitre : utilisateur qui n'est QUE collaborateur "referee" du tournoi
+  // (pas admin/dirigeant club, pas créateur). On masque toute la gestion et on
+  // ne laisse que matchs (avec filtre "Mes matchs"), classements et bracket.
+  const roleFn = useServerFn(getMyTournamentRole);
+  const myRoleQ = useQuery({
+    queryKey: ["tournament-my-role", tournamentId],
+    queryFn: () => roleFn({ data: { tournament_id: tournamentId } }),
+    enabled: !canManage,
+    staleTime: 5 * 60_000,
+  });
+  const isRefereeOnly = !canManage && myRoleQ.data?.role === "referee";
+
   const publicUrl = tournament?.slug
     ? typeof window !== "undefined"
       ? `${window.location.origin}/tournament/${tournament.slug}`
