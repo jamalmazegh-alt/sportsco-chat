@@ -47,13 +47,9 @@ export const Route = createFileRoute("/api/public/tournament-roster-logo")({
         }
 
         const ext =
-          file.type === "image/svg+xml"
-            ? "svg"
-            : file.type === "image/png"
-              ? "png"
-              : file.type === "image/webp"
-                ? "webp"
-                : "jpg";
+          file.type === "image/png" ? "png"
+          : file.type === "image/webp" ? "webp"
+          : "jpg";
         const path = `${reg.tournament_team_id}/roster-${Date.now()}.${ext}`;
         const buf = new Uint8Array(await file.arrayBuffer());
 
