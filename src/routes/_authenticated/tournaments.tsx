@@ -166,9 +166,10 @@ function TournamentsList() {
   const { activeClubId, memberships } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const { tournamentOnly } = useTournamentOnlyMode();
+  const { tournamentOnly, collaboratorOnly } = useTournamentOnlyMode();
   const noClub = memberships.length === 0 || tournamentOnly;
-  const canManage = roles.includes("admin") || (role as string) === "dirigeant" || noClub;
+  const canManage =
+    !collaboratorOnly && (roles.includes("admin") || (role as string) === "dirigeant" || noClub);
   const [open, setOpen] = useState(false);
 
   const clubFn = useServerFn(listMyTournaments);
@@ -245,7 +246,7 @@ function TournamentsList() {
       )}
 
       {/* ─── Bandeau organisateur "30s avec l'IA" ─────────────────── */}
-      {noClub && (
+      {noClub && !collaboratorOnly && (
         <div
           className="relative overflow-hidden rounded-[18px] p-5 text-white"
           style={{ background: GREEN_GRADIENT, boxShadow: CARD_SHADOW }}
@@ -308,7 +309,7 @@ function TournamentsList() {
         </div>
       )}
 
-      {(tournamentOnly || noClub) && <TournamentUpgradeCard />}
+      {(tournamentOnly || noClub) && !collaboratorOnly && <TournamentUpgradeCard />}
 
       {/* ─── Liste ─────────────────────────────────────────────────── */}
       {q.isLoading ? (
