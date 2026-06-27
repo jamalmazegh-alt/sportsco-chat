@@ -142,14 +142,12 @@ export function EventChat({ eventId }: { eventId: string }) {
     const attachmentsToSend = atts;
     setBody("");
     setAtts([]);
-    const { error } = await supabase
-      .from("event_messages")
-      .insert({
-        event_id: eventId,
-        author_user_id: user.id,
-        body: text,
-        attachments: attachmentsToSend as unknown as never,
-      });
+    const { error } = await supabase.from("event_messages").insert({
+      event_id: eventId,
+      author_user_id: user.id,
+      body: text,
+      attachments: attachmentsToSend as unknown as never,
+    });
     setSending(false);
     if (error) {
       setBody(text);
