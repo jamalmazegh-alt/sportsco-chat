@@ -457,16 +457,22 @@ export async function buildRegulationsPdf(
 
 // ───────────────────────────── Sections ─────────────────────────────
 
-function drawCoverBlock(ctx: Ctx, t: Tournament, lang: Lang) {
+function drawCoverBlock(
+  ctx: Ctx,
+  t: Tournament,
+  lang: Lang,
+  clubImg: PDFImage | null = null,
+  tourneyImg: PDFImage | null = null,
+) {
   const top = PAGE_H - 18;
   // Trait épais
   ctx.page.drawRectangle({ x: MARGIN_L, y: top - 2, width: CONTENT_W, height: 2.2, color: BLACK });
 
-  // Cercles logos
+  // Logos (uniquement si présents — pas de placeholder)
   const circleY = top - 38;
   const r = 22;
-  drawLogoCircle(ctx, MARGIN_L + r + 4, circleY, r, I18N[lang].logoClub);
-  drawLogoCircle(ctx, MARGIN_L + CONTENT_W - r - 4, circleY, r, I18N[lang].logoTournament);
+  if (clubImg) drawLogoImage(ctx, MARGIN_L + r + 4, circleY, r, clubImg);
+  if (tourneyImg) drawLogoImage(ctx, MARGIN_L + CONTENT_W - r - 4, circleY, r, tourneyImg);
 
   // Nom du tournoi
   const titleSize = 24;
