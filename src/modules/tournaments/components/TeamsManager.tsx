@@ -291,7 +291,11 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
         <div className="flex gap-2">
           <ResponsiveFormDialog
             open={bulkOpen}
-            onOpenChange={(v) => !atLimit && setBulkOpen(v)}
+            onOpenChange={(v) => {
+              if (atLimit) return;
+              setBulkOpen(v);
+              if (!v) setBulkError(null);
+            }}
             trigger={
               <Button size="sm" variant="outline" disabled={atLimit}>
                 <Upload className="h-4 w-4" />
