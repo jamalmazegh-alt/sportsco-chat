@@ -327,12 +327,21 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                 <Label>{t("teams.dialog.pasteLabel")}</Label>
                 <Textarea
                   value={bulkText}
-                  onChange={(e) => setBulkText(e.target.value)}
+                  onChange={(e) => {
+                    setBulkText(e.target.value);
+                    if (bulkError) setBulkError(null);
+                  }}
                   rows={8}
                   placeholder={"FC United\nReal Madrid, RMA, 1\nAtlético, ATM, 2"}
                   className="font-mono text-xs"
                 />
               </div>
+              {bulkError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{bulkError}</AlertDescription>
+                </Alert>
+              )}
               <Button type="submit" className="w-full" disabled={bulk.isPending}>
                 {bulk.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.import")}
               </Button>
