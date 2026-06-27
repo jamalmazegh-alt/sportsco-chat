@@ -76,32 +76,34 @@ export function TournamentRulesAIGenerator({ tournamentId, locale = "fr", onInse
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{t("rulesAi.modalTitle")}</DialogTitle>
             <DialogDescription>{t("rulesAi.modalDescription")}</DialogDescription>
           </DialogHeader>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin mr-2" />
-              {t("rulesAi.loading")}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <Textarea
-                value={html}
-                onChange={(e) => setHtml(e.target.value)}
-                rows={12}
-                className="font-mono text-xs"
-              />
-              <div className="rounded-md border border-border p-3 prose prose-sm max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="flex-1 overflow-y-auto min-h-0 -mx-1 px-1">
+            {loading ? (
+              <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                {t("rulesAi.loading")}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="space-y-3">
+                <Textarea
+                  value={html}
+                  onChange={(e) => setHtml(e.target.value)}
+                  rows={10}
+                  className="font-mono text-xs"
+                />
+                <div className="rounded-md border border-border p-3 prose prose-sm max-w-none">
+                  <div dangerouslySetInnerHTML={{ __html: html }} />
+                </div>
+              </div>
+            )}
+          </div>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2 sm:gap-2 pt-2 border-t border-border">
             <Button variant="ghost" onClick={() => setOpen(false)}>
               {t("rulesAi.close")}
             </Button>
@@ -114,6 +116,7 @@ export function TournamentRulesAIGenerator({ tournamentId, locale = "fr", onInse
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </>
   );
 }
