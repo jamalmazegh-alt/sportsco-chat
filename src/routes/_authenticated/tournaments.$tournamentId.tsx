@@ -27,7 +27,11 @@ import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { googleMapsSearchUrl } from "@/lib/google-maps";
-import { getTournament, updateTournament } from "@/modules/tournaments/tournaments.functions";
+import {
+  getTournament,
+  updateTournament,
+  getMyTournamentRole,
+} from "@/modules/tournaments/tournaments.functions";
 import { resolveScoring, type ScoringRules } from "@/modules/tournaments/lib/formats";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 
