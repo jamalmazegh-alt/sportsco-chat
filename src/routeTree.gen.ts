@@ -83,6 +83,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPublicWaitlistRouteImport } from './routes/api/public/waitlist'
+import { Route as ApiPublicTournamentRosterLogoRouteImport } from './routes/api/public/tournament-roster-logo'
 import { Route as ApiPublicTournamentRosterRouteImport } from './routes/api/public/tournament-roster'
 import { Route as ApiPublicTournamentRegistrationRouteImport } from './routes/api/public/tournament-registration'
 import { Route as ApiPublicTournamentPaymentLinkRouteImport } from './routes/api/public/tournament-payment-link'
@@ -516,6 +517,12 @@ const ApiPublicWaitlistRoute = ApiPublicWaitlistRouteImport.update({
   path: '/api/public/waitlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTournamentRosterLogoRoute =
+  ApiPublicTournamentRosterLogoRouteImport.update({
+    id: '/api/public/tournament-roster-logo',
+    path: '/api/public/tournament-roster-logo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTournamentRosterRoute =
   ApiPublicTournamentRosterRouteImport.update({
     id: '/api/public/tournament-roster',
@@ -927,6 +934,7 @@ export interface FileRoutesByFullPath {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/tournament-roster-logo': typeof ApiPublicTournamentRosterLogoRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -1055,6 +1063,7 @@ export interface FileRoutesByTo {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/tournament-roster-logo': typeof ApiPublicTournamentRosterLogoRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -1189,6 +1198,7 @@ export interface FileRoutesById {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/tournament-roster-logo': typeof ApiPublicTournamentRosterLogoRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -1323,6 +1333,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/tournament-roster-logo'
     | '/api/public/waitlist'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -1451,6 +1462,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/tournament-roster-logo'
     | '/api/public/waitlist'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -1584,6 +1596,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/tournament-roster-logo'
     | '/api/public/waitlist'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -1686,6 +1699,7 @@ export interface RootRouteChildren {
   ApiPublicTournamentPaymentLinkRoute: typeof ApiPublicTournamentPaymentLinkRoute
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   ApiPublicTournamentRosterRoute: typeof ApiPublicTournamentRosterRoute
+  ApiPublicTournamentRosterLogoRoute: typeof ApiPublicTournamentRosterLogoRoute
   ApiPublicWaitlistRoute: typeof ApiPublicWaitlistRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
@@ -2229,6 +2243,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/waitlist'
       fullPath: '/api/public/waitlist'
       preLoaderRoute: typeof ApiPublicWaitlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tournament-roster-logo': {
+      id: '/api/public/tournament-roster-logo'
+      path: '/api/public/tournament-roster-logo'
+      fullPath: '/api/public/tournament-roster-logo'
+      preLoaderRoute: typeof ApiPublicTournamentRosterLogoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tournament-roster': {
@@ -2979,6 +3000,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTournamentPaymentLinkRoute: ApiPublicTournamentPaymentLinkRoute,
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   ApiPublicTournamentRosterRoute: ApiPublicTournamentRosterRoute,
+  ApiPublicTournamentRosterLogoRoute: ApiPublicTournamentRosterLogoRoute,
   ApiPublicWaitlistRoute: ApiPublicWaitlistRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,

@@ -157,6 +157,7 @@ function RosterPage() {
         contact_name: string;
         status: "pending" | "approved" | "rejected";
         tournament_team_id: string | null;
+        logo_url: string | null;
         roster_submitted_at: string | null;
         max_players: number;
         players: Array<{
