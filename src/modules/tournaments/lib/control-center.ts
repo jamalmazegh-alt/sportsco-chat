@@ -35,7 +35,10 @@ export interface ContinueAction {
   matchId?: string | null;
   /** Optional anchor id to scroll to. */
   anchor?: string;
+  /** Optional human-readable hint (e.g. "3/8 équipes inscrites"). */
+  note?: string;
 }
+
 
 interface MatchLike {
   id: string;
@@ -145,7 +148,15 @@ export interface ComputeArgs {
   groupsCount: number;
   matches: MatchLike[];
   flightsCount: number;
+  /**
+   * Target number of registered teams (from `tournaments.num_teams`).
+   * When provided AND >= 2, the workflow stays on "add_team" until the
+   * tournament is full — preventing a draw with an incomplete roster.
+   * Leave null/undefined to keep the legacy behaviour (no capacity gate).
+   */
+  expectedTeams?: number | null;
 }
+
 
 /** Returns the 5-step progress array with computed state. */
 export function computeStepper(args: ComputeArgs): StepperStep[] {
@@ -206,10 +217,27 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
     return { kind: "add_team", anchor: "section-teams" };
   }
 
+  // 1.bis) Roster not full yet — block the draw until every expected team
+  // is registered. Opt-in: only triggers when `expectedTeams` is supplied
+  // (e.g. `tournaments.num_teams`) and >= 2.
+  const expected = args.expectedTeams ?? null;
+  if (
+    typeof expected === "number" &&
+    expected >= MIN_TEAMS_TO_START &&
+    teamsCount < expected
+  ) {
+    return {
+      kind: "add_team",
+      anchor: "section-teams",
+      note: `${teamsCount}/${expected}`,
+    };
+  }
+
   // 2) Draw not generated (only when pools are expected)
   if (poolsRequired(tournament.format) && groupsCount === 0) {
     return { kind: "run_draw", anchor: "section-matches" };
   }
+
 
   // 3) Matches not generated
   if (matches.length === 0) {
