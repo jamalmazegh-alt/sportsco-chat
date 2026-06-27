@@ -349,6 +349,8 @@ export async function buildRegulationsPdf(
   rules: ReturnType<typeof mergeRules>,
   lang: Lang,
   logoBytes: ArrayBuffer | null,
+  clubLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null,
+  tournamentLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`${t.name} — ${I18N[lang].subtitle}`);
@@ -359,10 +361,13 @@ export async function buildRegulationsPdf(
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const italic = await doc.embedFont(StandardFonts.HelveticaOblique);
 
+  const clubImg = await embedImage(doc, clubLogo);
+  const tourneyImg = await embedImage(doc, tournamentLogo);
+
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const ctx: Ctx = { doc, page, y: PAGE_H - MARGIN_T, font, bold, italic, lang, pageNo: 1 };
 
-  drawCoverBlock(ctx, t, lang);
+  drawCoverBlock(ctx, t, lang, clubImg, tourneyImg);
   ctx.y -= 18;
 
   // ── Articles ──
