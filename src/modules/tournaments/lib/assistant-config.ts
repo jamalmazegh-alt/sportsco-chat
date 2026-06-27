@@ -43,6 +43,8 @@ export interface AssistantTournamentConfig {
   endsOn: string;
   location: string;
   useFairPlay: boolean;
+  /** Open public registration on the tournament's public page. */
+  publicRegistration: boolean;
   category: string;
 }
 
