@@ -54,7 +54,7 @@ function LoginPage() {
       }
     }
     if (typeof window !== "undefined") {
-      window.location.replace("/home");
+      window.location.replace(search.next ?? "/home");
     }
   }
 
