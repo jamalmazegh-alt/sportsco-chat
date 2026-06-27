@@ -35,6 +35,7 @@ import { template as tournamentMemberAddedTemplate } from "./tournament-member-a
 import { template as tournamentPaymentRequestTemplate } from "./tournament-payment-request";
 import { template as tournamentProgrammePublishedTemplate } from "./tournament-programme-published";
 import { template as tournamentRosterLinkTemplate } from "./tournament-roster-link";
+import { template as tournamentRegistrationReceivedTemplate } from "./tournament-registration-received";
 import { template as paymentReceiptTemplate } from "./payment-receipt";
 import { template as paymentReminderTemplate } from "./payment-reminder";
 import { template as coachAssignedTemplate } from "./coach-assigned";
@@ -64,6 +65,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "tournament-payment-request": tournamentPaymentRequestTemplate,
   "tournament-programme-published": tournamentProgrammePublishedTemplate,
   "tournament-roster-link": tournamentRosterLinkTemplate,
+  "tournament-registration-received": tournamentRegistrationReceivedTemplate,
   "payment-receipt": paymentReceiptTemplate,
   "payment-reminder": paymentReminderTemplate,
   "coach-assigned": coachAssignedTemplate,
