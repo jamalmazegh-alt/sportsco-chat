@@ -189,7 +189,24 @@ function TournamentsList() {
   const hasAnnual = !!entQ.data?.activeAnnual;
   const singlesLeft = entQ.data?.unusedSingles?.length ?? 0;
 
+  // Pass-only users have no real club. Pre-resolve their personal club id so
+  // the unified TournamentCreateChooser/Wizard can run for them too.
+  const personalClubFn = useServerFn(ensurePersonalClubId);
+  const personalClubQ = useQuery({
+    queryKey: ["personal-club-id"],
+    enabled: noClub && canCreate,
+    queryFn: () => personalClubFn({ data: undefined as never }),
+    staleTime: 5 * 60 * 1000,
+  });
+  const effectiveClubId = noClub ? personalClubQ.data?.clubId ?? null : activeClubId;
+
+  function openCreate() {
+    if (noClub && !canCreate) return;
+    setOpen(true);
+  }
+
   const tournaments = q.data?.tournaments ?? [];
+
 
   return (
     <div className="space-y-5 px-4 pb-24 pt-5">
