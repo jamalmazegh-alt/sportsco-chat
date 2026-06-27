@@ -141,7 +141,8 @@ function ShimmerButton({
   return (
     <Button
       asChild={asChild}
-      className={`relative overflow-hidden border-0 text-white shadow-md transition-transform active:scale-[0.98] ${className}`}
+      size="lg"
+      className={`relative h-12 overflow-hidden rounded-2xl border-0 px-5 text-[15px] font-bold text-white ring-1 ring-emerald-300/40 shadow-[0_10px_30px_-12px_rgba(16,122,69,0.55)] transition-all hover:shadow-[0_14px_36px_-12px_rgba(16,122,69,0.7)] active:scale-[0.98] ${className}`}
       style={{ background: GREEN_GRADIENT }}
       {...rest}
     >
@@ -149,13 +150,14 @@ function ShimmerButton({
         {children}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-[1] translate-x-[-120%] bg-gradient-to-r from-transparent via-white/35 to-transparent"
+          className="pointer-events-none absolute inset-0 -z-[1] translate-x-[-120%] bg-gradient-to-r from-transparent via-white/40 to-transparent"
           style={{ animation: "tournament-shimmer 2.6s ease-in-out infinite" }}
         />
       </span>
     </Button>
   );
 }
+
 
 function TournamentsList() {
   const { t } = useTranslation("tournaments");
