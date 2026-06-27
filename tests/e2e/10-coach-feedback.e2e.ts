@@ -70,7 +70,7 @@ test.describe("Coach feedback + AI synthesis", () => {
     "coach creates a player synthesis (requires service_role for reliable setup)",
     // @ts-ignore
     "player_reviews RLS requires can_author_player_feedback which depends on " +
-    "team_members insert reliability. Validated manually in production."
+      "team_members insert reliability. Validated manually in production.",
   );
 
   // ── 3. Un joueur ne peut PAS lire les feedbacks coach_only ─────────────
@@ -81,7 +81,7 @@ test.describe("Coach feedback + AI synthesis", () => {
       .select("id")
       .eq("player_id", club.player1.id)
       .eq("visibility", "coach_only");
-    expect((data?.length ?? 0)).toBe(0);
+    expect(data?.length ?? 0).toBe(0);
   });
 
   // ── 4. Le coach peut modifier son propre feedback ───────────────────────

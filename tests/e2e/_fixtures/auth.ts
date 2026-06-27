@@ -23,10 +23,7 @@ export async function getSessionForUser(email: string, password: string) {
  * Hydrate the page with a Supabase session so the app boots logged-in.
  * Must be called BEFORE the first page.goto().
  */
-export async function loginAs(
-  page: Page,
-  user: { email: string; password: string },
-) {
+export async function loginAs(page: Page, user: { email: string; password: string }) {
   const session = await getSessionForUser(user.email, user.password);
   // Supabase JS v2 stores the session under `sb-<projectRef>-auth-token`.
   // We can derive the storage key from the URL (subdomain = project ref).

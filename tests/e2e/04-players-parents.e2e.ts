@@ -11,8 +11,12 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Players & parents", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("players"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("players");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("admin adds player without parent", async () => {
     const c = await clientFor(club.admin);

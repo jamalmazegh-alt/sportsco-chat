@@ -24,63 +24,78 @@ test.describe("Tournament lifecycle", () => {
   test.afterAll(async () => {
     try {
       if (tournamentId) {
-        await admin.from("tournament_matches").delete()
-          .eq("tournament_id", tournamentId);
-        await admin.from("tournament_groups").delete()
-          .eq("tournament_id", tournamentId);
-        await admin.from("tournament_teams").delete()
-          .eq("tournament_id", tournamentId);
-        await admin.from("tournaments").delete()
-          .eq("id", tournamentId);
+        await admin.from("tournament_matches").delete().eq("tournament_id", tournamentId);
+        await admin.from("tournament_groups").delete().eq("tournament_id", tournamentId);
+        await admin.from("tournament_teams").delete().eq("tournament_id", tournamentId);
+        await admin.from("tournaments").delete().eq("id", tournamentId);
       }
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     await club.cleanup();
   });
 
   test("admin creates a draft tournament", async () => {
-    const future = new Date(Date.now() + 7 * 24 * 3600 * 1000)
-      .toISOString().split("T")[0];
+    const future = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().split("T")[0];
     const slug = `e2e-${nanoid(8)}`.toLowerCase();
-    const { data, error } = await admin.from("tournaments").insert({
-      club_id: club.clubId,
-      name: `__e2e_tournament_${club.prefix}`,
-      slug,
-      status: "draft",
-      sport: "football",
-      starts_on: future,
-      created_by: club.admin.userId,
-    }).select("id").single();
+    const { data, error } = await admin
+      .from("tournaments")
+      .insert({
+        club_id: club.clubId,
+        name: `__e2e_tournament_${club.prefix}`,
+        slug,
+        status: "draft",
+        sport: "football",
+        starts_on: future,
+        created_by: club.admin.userId,
+      })
+      .select("id")
+      .single();
     expect(error).toBeNull();
     tournamentId = data!.id;
   });
 
   test("admin adds 4 teams", async () => {
-    if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
-    const { data, error } = await admin.from("tournament_teams").insert([
-      { tournament_id: tournamentId, name: "Team A" },
-      { tournament_id: tournamentId, name: "Team B" },
-      { tournament_id: tournamentId, name: "Team C" },
-      { tournament_id: tournamentId, name: "Team D" },
-    ]).select("id");
+    if (!tournamentId) {
+      test.skip(true, "No tournamentId");
+      return;
+    }
+    const { data, error } = await admin
+      .from("tournament_teams")
+      .insert([
+        { tournament_id: tournamentId, name: "Team A" },
+        { tournament_id: tournamentId, name: "Team B" },
+        { tournament_id: tournamentId, name: "Team C" },
+        { tournament_id: tournamentId, name: "Team D" },
+      ])
+      .select("id");
     expect(error).toBeNull();
     teamIds = (data ?? []).map((t: any) => t.id);
   });
 
   test("admin draws 1 group and assigns the 4 teams", async () => {
-    if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
+    if (!tournamentId) {
+      test.skip(true, "No tournamentId");
+      return;
+    }
     const { data: groupData, error: groupErr } = await admin
       .from("tournament_groups")
       .insert({ tournament_id: tournamentId, name: "Groupe A" })
-      .select("id").single();
+      .select("id")
+      .single();
     expect(groupErr).toBeNull();
 
-    const { data: teams } = await admin.from("tournament_teams")
-      .select("id").eq("tournament_id", tournamentId);
-    expect((teams?.length ?? 0)).toBe(4);
+    const { data: teams } = await admin
+      .from("tournament_teams")
+      .select("id")
+      .eq("tournament_id", tournamentId);
+    expect(teams?.length ?? 0).toBe(4);
     if (teamIds.length === 0) teamIds = (teams ?? []).map((t: any) => t.id);
 
-    const { error } = await admin.from("tournament_teams")
-      .update({ group_id: groupData!.id }).eq("tournament_id", tournamentId);
+    const { error } = await admin
+      .from("tournament_teams")
+      .update({ group_id: groupData!.id })
+      .eq("tournament_id", tournamentId);
     expect(error).toBeNull();
   });
 
@@ -101,31 +116,50 @@ test.describe("Tournament lifecycle", () => {
   });
 
   test("admin records results and validates matches", async () => {
-    if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
-    const { error } = await admin.from("tournament_matches")
+    if (!tournamentId) {
+      test.skip(true, "No tournamentId");
+      return;
+    }
+    const { error } = await admin
+      .from("tournament_matches")
       .update({ score_a: 2, score_b: 1, status: "completed" })
       .eq("tournament_id", tournamentId);
     expect(error).toBeNull();
   });
 
   test("admin publishes the programme and marks tournament live", async () => {
-    if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
-    const { error } = await admin.from("tournaments")
+    if (!tournamentId) {
+      test.skip(true, "No tournamentId");
+      return;
+    }
+    const { error } = await admin
+      .from("tournaments")
       .update({ status: "in_progress", published_programme_at: new Date().toISOString() })
       .eq("id", tournamentId);
     expect(error).toBeNull();
-    const { data } = await admin.from("tournaments")
-      .select("status, published_programme_at").eq("id", tournamentId).single();
+    const { data } = await admin
+      .from("tournaments")
+      .select("status, published_programme_at")
+      .eq("id", tournamentId)
+      .single();
     expect(data?.status).toBe("in_progress");
   });
 
   test("admin closes the tournament", async () => {
-    if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
-    const { error } = await admin.from("tournaments")
-      .update({ status: "completed" }).eq("id", tournamentId);
+    if (!tournamentId) {
+      test.skip(true, "No tournamentId");
+      return;
+    }
+    const { error } = await admin
+      .from("tournaments")
+      .update({ status: "completed" })
+      .eq("id", tournamentId);
     expect(error).toBeNull();
-    const { data } = await admin.from("tournaments")
-      .select("status").eq("id", tournamentId).single();
+    const { data } = await admin
+      .from("tournaments")
+      .select("status")
+      .eq("id", tournamentId)
+      .single();
     expect(data?.status).toBe("completed");
   });
 });

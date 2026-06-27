@@ -61,9 +61,7 @@ async function seedAll(): Promise<Fixtures> {
 
   // 3. Super-admin row
   {
-    const { error } = await admin
-      .from("super_admins")
-      .insert({ user_id: users.superadmin.userId });
+    const { error } = await admin.from("super_admins").insert({ user_id: users.superadmin.userId });
     if (error) throw new Error(`super_admins insert: ${error.message}`);
   }
 
@@ -227,11 +225,6 @@ async function seedAll(): Promise<Fixtures> {
   if (notifErr || !notif) throw new Error(`notifications insert: ${notifErr?.message}`);
   const notificationA = notif.id;
 
-
-
-
-
-
   // 14. Support tickets (one from adminA, one from playerA)
   const { data: tickets, error: ticketsErr } = await admin
     .from("support_tickets")
@@ -308,8 +301,20 @@ async function seedAll(): Promise<Fixtures> {
   const { data: seasonsRows, error: seasonsErr } = await admin
     .from("seasons")
     .insert([
-      { club_id: clubA, label: `${PREFIX}_seasonA`, start_date: startDate, end_date: endDate, is_current: true },
-      { club_id: clubB, label: `${PREFIX}_seasonB`, start_date: startDate, end_date: endDate, is_current: true },
+      {
+        club_id: clubA,
+        label: `${PREFIX}_seasonA`,
+        start_date: startDate,
+        end_date: endDate,
+        is_current: true,
+      },
+      {
+        club_id: clubB,
+        label: `${PREFIX}_seasonB`,
+        start_date: startDate,
+        end_date: endDate,
+        is_current: true,
+      },
     ])
     .select("id, club_id");
   if (seasonsErr || !seasonsRows) throw new Error(`seasons insert: ${seasonsErr?.message}`);
@@ -435,42 +440,21 @@ async function teardownAll(fx: Fixtures) {
   // delete explicitly to avoid relying on ON DELETE CASCADE we don't control.
 
   await admin.from("support_messages").delete().eq("ticket_id", fx.ticketA);
-  await admin
-    .from("support_tickets")
-    .delete()
-    .in("id", [fx.ticketA, fx.ticketSuperOnly]);
+  await admin.from("support_tickets").delete().in("id", [fx.ticketA, fx.ticketSuperOnly]);
   await admin.from("audit_logs").delete().eq("id", fx.auditLogA);
   await admin.from("data_export_requests").delete().eq("id", fx.exportRequestA);
-  await admin
-    .from("account_deletion_requests")
-    .delete()
-    .eq("id", fx.deletionRequestA);
+  await admin.from("account_deletion_requests").delete().eq("id", fx.deletionRequestA);
   await admin.from("notifications").delete().eq("id", fx.notificationA);
-  await admin
-    .from("subscriptions")
-    .delete()
-    .in("id", [fx.subscriptionA, fx.subscriptionB]);
-  await admin
-    .from("convocations")
-    .delete()
-    .in("event_id", [fx.eventA, fx.eventB]);
+  await admin.from("subscriptions").delete().in("id", [fx.subscriptionA, fx.subscriptionB]);
+  await admin.from("convocations").delete().in("event_id", [fx.eventA, fx.eventB]);
   await admin.from("events").delete().in("id", [fx.eventA, fx.eventB]);
-  await admin
-    .from("team_members")
-    .delete()
-    .in("team_id", [fx.teamA, fx.teamB]);
-  await admin
-    .from("player_parents")
-    .delete()
-    .eq("parent_user_id", fx.users.parentA.userId);
+  await admin.from("team_members").delete().in("team_id", [fx.teamA, fx.teamB]);
+  await admin.from("player_parents").delete().eq("parent_user_id", fx.users.parentA.userId);
   await admin.from("players").delete().in("id", [fx.playerA, fx.playerB]);
   await admin.from("teams").delete().in("id", [fx.teamA, fx.teamB]);
   await admin.from("club_members").delete().in("club_id", [fx.clubA, fx.clubB]);
   await admin.from("clubs").delete().in("id", [fx.clubA, fx.clubB]);
-  await admin
-    .from("super_admins")
-    .delete()
-    .eq("user_id", fx.users.superadmin.userId);
+  await admin.from("super_admins").delete().eq("user_id", fx.users.superadmin.userId);
 
   // Profiles + auth users last
   const userIds = Object.values(fx.users).map((u) => u.userId);

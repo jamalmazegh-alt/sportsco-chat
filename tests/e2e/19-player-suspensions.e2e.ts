@@ -29,7 +29,9 @@ test.describe("Player suspensions", () => {
       if (suspensionId) {
         await admin.from("player_suspensions").delete().eq("id", suspensionId);
       }
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     await club.cleanup();
   });
 
@@ -65,7 +67,7 @@ test.describe("Player suspensions", () => {
       .eq("player_id", club.player1.id)
       .eq("status", "active");
     expect(error).toBeNull();
-    expect((data?.length ?? 0)).toBeGreaterThan(0);
+    expect(data?.length ?? 0).toBeGreaterThan(0);
     expect(data![0].matches_to_serve).toBe(2);
   });
 
@@ -76,7 +78,7 @@ test.describe("Player suspensions", () => {
       .from("player_suspensions")
       .select("id")
       .eq("player_id", club.player1.id);
-    expect((data?.length ?? 0)).toBe(0);
+    expect(data?.length ?? 0).toBe(0);
   });
 
   // ── 4. Admin peut aussi lire ─────────────────────────────────
@@ -88,7 +90,7 @@ test.describe("Player suspensions", () => {
       .eq("club_id", club.clubId)
       .eq("status", "active");
     expect(error).toBeNull();
-    expect((data?.length ?? 0)).toBeGreaterThan(0);
+    expect(data?.length ?? 0).toBeGreaterThan(0);
   });
 
   // ── 5. Coach peut annuler ────────────────────────────────────

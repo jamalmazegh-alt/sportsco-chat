@@ -24,7 +24,8 @@ test.describe.skip("Player public profile", () => {
   });
 
   test.afterAll(async () => {
-    await admin.from("players")
+    await admin
+      .from("players")
       .update({ public_profile_enabled: false, public_slug: null })
       .eq("id", club.player1.id);
     await club.cleanup();
@@ -35,8 +36,12 @@ test.describe.skip("Player public profile", () => {
       auth: { persistSession: false },
     });
     const { data, error } = await anonClient.rpc("list_public_players", {
-      _search: null, _sport: null, _club_id: null, _region: null,
-      _limit: 50, _offset: 0,
+      _search: null,
+      _sport: null,
+      _club_id: null,
+      _region: null,
+      _limit: 50,
+      _offset: 0,
     });
     if (error?.message?.includes(SKIP_RPC_ERROR)) {
       test.skip(true, `list_public_players RPC broken: ${error.message}`);
@@ -61,9 +66,11 @@ test.describe.skip("Player public profile", () => {
     expect(error).toBeNull();
     expect(data).toBeTruthy();
 
-    const { data: player } = await admin.from("players")
+    const { data: player } = await admin
+      .from("players")
       .select("public_slug, public_profile_enabled")
-      .eq("id", club.player1.id).single();
+      .eq("id", club.player1.id)
+      .single();
     expect(player?.public_profile_enabled).toBe(true);
     expect(player?.public_slug).toBeTruthy();
     publicSlug = player!.public_slug!;
@@ -93,8 +100,12 @@ test.describe.skip("Player public profile", () => {
       auth: { persistSession: false },
     });
     const { data, error } = await anonClient.rpc("list_public_players", {
-      _search: null, _sport: null, _club_id: null, _region: null,
-      _limit: 100, _offset: 0,
+      _search: null,
+      _sport: null,
+      _club_id: null,
+      _region: null,
+      _limit: 100,
+      _offset: 0,
     });
     if (error?.message?.includes(SKIP_RPC_ERROR)) {
       test.skip(true, `list_public_players RPC broken: ${error.message}`);
@@ -121,9 +132,12 @@ test.describe.skip("Player public profile", () => {
       auth: { persistSession: false },
     });
     const { data, error } = await anonClient.rpc("list_public_players", {
-      _search: null, _sport: null, _club_id: null,
+      _search: null,
+      _sport: null,
+      _club_id: null,
       _region: "region-that-does-not-exist-xyz",
-      _limit: 10, _offset: 0,
+      _limit: 10,
+      _offset: 0,
     });
     if (error?.message?.includes(SKIP_RPC_ERROR)) {
       test.skip(true, `list_public_players RPC broken: ${error.message}`);

@@ -86,9 +86,7 @@ test.describe.skip("Clubero pack — admin flow (checkout + webhook)", () => {
     }
   });
 
-  test("admin sans sub → /admin/billing → checkout → webhook → unlock", async ({
-    page,
-  }) => {
+  test("admin sans sub → /admin/billing → checkout → webhook → unlock", async ({ page }) => {
     test.skip(true, "Incompatible with Lovable preview auth-bridge");
     if (!seed) throw new Error("seed missing");
 
@@ -122,9 +120,7 @@ test.describe.skip("Clubero pack — admin flow (checkout + webhook)", () => {
       .toBeGreaterThan(0);
 
     const redirects = await readCapturedRedirects(page);
-    const stripeUrl = redirects.find((u) =>
-      /checkout\.stripe\.com|stripe\.com\/c\/pay/.test(u),
-    );
+    const stripeUrl = redirects.find((u) => /checkout\.stripe\.com|stripe\.com\/c\/pay/.test(u));
     expect(
       stripeUrl,
       `expected Stripe checkout URL, got: ${JSON.stringify(redirects)}`,
@@ -165,10 +161,9 @@ test.describe.skip("Clubero pack — admin flow (checkout + webhook)", () => {
 
     // Le helper RPC utilisé par l'app pour gater les actions doit
     // maintenant renvoyer true.
-    const { data: isActiveData, error: rpcErr } = await admin.rpc(
-      "club_has_active_subscription",
-      { _club_id: seed.clubId },
-    );
+    const { data: isActiveData, error: rpcErr } = await admin.rpc("club_has_active_subscription", {
+      _club_id: seed.clubId,
+    });
     expect(rpcErr).toBeNull();
     expect(isActiveData).toBe(true);
 

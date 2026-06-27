@@ -9,9 +9,7 @@ const url = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !serviceKey) {
-  throw new Error(
-    "RLS tests require SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars.",
-  );
+  throw new Error("RLS tests require SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars.");
 }
 
 export const admin = createClient(url, serviceKey, {

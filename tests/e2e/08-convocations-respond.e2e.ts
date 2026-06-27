@@ -23,7 +23,9 @@ test.describe("Convocations — respond", () => {
     conv1 = data!.find((d) => d.player_id === club.player1.id)!.id;
     conv2 = data!.find((d) => d.player_id === club.player2WithParent.id)!.id;
   });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("player responds present", async () => {
     const c = await clientFor(club.player1.user);
@@ -56,16 +58,9 @@ test.describe("Convocations — respond", () => {
 
   test("coach overrides player1 to absent", async () => {
     const c = await clientFor(club.coach);
-    const { error } = await c
-      .from("convocations")
-      .update({ status: "absent" })
-      .eq("id", conv1);
+    const { error } = await c.from("convocations").update({ status: "absent" }).eq("id", conv1);
     expect(error).toBeNull();
-    const { data } = await admin
-      .from("convocations")
-      .select("status")
-      .eq("id", conv1)
-      .single();
+    const { data } = await admin.from("convocations").select("status").eq("id", conv1).single();
     expect(data?.status).toBe("absent");
   });
 });

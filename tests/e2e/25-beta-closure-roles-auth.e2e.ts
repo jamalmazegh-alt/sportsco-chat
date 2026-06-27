@@ -35,12 +35,22 @@ type RoleSpec = {
 };
 
 const ROLES: RoleSpec[] = [
-  { name: "admin",  emailEnv: "E2E_ADMIN_EMAIL",  passwordEnv: "E2E_ADMIN_PASSWORD" },
-  { name: "coach",  emailEnv: "E2E_COACH_EMAIL",  passwordEnv: "E2E_COACH_PASSWORD" },
+  { name: "admin", emailEnv: "E2E_ADMIN_EMAIL", passwordEnv: "E2E_ADMIN_PASSWORD" },
+  { name: "coach", emailEnv: "E2E_COACH_EMAIL", passwordEnv: "E2E_COACH_PASSWORD" },
   { name: "player", emailEnv: "E2E_PLAYER_EMAIL", passwordEnv: "E2E_PLAYER_PASSWORD" },
   { name: "parent", emailEnv: "E2E_PARENT_EMAIL", passwordEnv: "E2E_PARENT_PASSWORD" },
-  { name: "tournament_organizer", emailEnv: "E2E_TOURN_ORG_EMAIL",   passwordEnv: "E2E_TOURN_ORG_PASSWORD",   optional: true },
-  { name: "tournament_staff",     emailEnv: "E2E_TOURN_STAFF_EMAIL", passwordEnv: "E2E_TOURN_STAFF_PASSWORD", optional: true },
+  {
+    name: "tournament_organizer",
+    emailEnv: "E2E_TOURN_ORG_EMAIL",
+    passwordEnv: "E2E_TOURN_ORG_PASSWORD",
+    optional: true,
+  },
+  {
+    name: "tournament_staff",
+    emailEnv: "E2E_TOURN_STAFF_EMAIL",
+    passwordEnv: "E2E_TOURN_STAFF_PASSWORD",
+    optional: true,
+  },
 ];
 
 // Labels strictement interdits hors d'un flip de flag V2.
@@ -93,20 +103,23 @@ test.describe("Beta closure — authenticated role matrix (mobile 375)", () => {
       }
 
       // 2) Bottom-nav : tous les liens sont dans la whitelist V1.
-      const navHrefs = await page.$$eval(
-        'nav[aria-label] a[href]',
-        (els) => els.map((e) => (e as HTMLAnchorElement).getAttribute("href") ?? ""),
+      const navHrefs = await page.$$eval("nav[aria-label] a[href]", (els) =>
+        els.map((e) => (e as HTMLAnchorElement).getAttribute("href") ?? ""),
       );
       for (const href of navHrefs) {
         const path = href.split("?")[0].split("#")[0].replace(/\/$/, "") || "/";
         expect(
-          [...ALLOWED_NAV_HREFS].some((allowed) => path === allowed || path.startsWith(allowed + "/")),
+          [...ALLOWED_NAV_HREFS].some(
+            (allowed) => path === allowed || path.startsWith(allowed + "/"),
+          ),
           `${role.name}: bottom-nav contient un href non-whitelisté: ${href}`,
         ).toBeTruthy();
       }
 
       // 3) Onboarding / checklist : si présent, aucun item V2.
-      const checklist = await page.$('[data-testid="onboarding-checklist"], [data-onboarding-checklist]');
+      const checklist = await page.$(
+        '[data-testid="onboarding-checklist"], [data-onboarding-checklist]',
+      );
       if (checklist) {
         const text = (await checklist.textContent()) ?? "";
         for (const re of FORBIDDEN_LABELS) {

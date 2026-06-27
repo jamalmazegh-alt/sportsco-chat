@@ -11,8 +11,12 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Users & roles", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("roles"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("roles");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("admin can invite admin + coach", async () => {
     const c = await clientFor(club.admin);

@@ -39,14 +39,12 @@ test.describe("Convert personal club → real club", () => {
 
     // Insérer l'admin dans club_members et vérifier que ça passe
     // NB: has_club_role lit le tableau `roles` (text[]), pas la colonne legacy `role`.
-    const { error: cm1Err } = await adminClient
-      .from("club_members")
-      .insert({
-        club_id: personalClubId,
-        user_id: helperClub.admin.userId,
-        role: "admin",
-        roles: ["admin"],
-      });
+    const { error: cm1Err } = await adminClient.from("club_members").insert({
+      club_id: personalClubId,
+      user_id: helperClub.admin.userId,
+      role: "admin",
+      roles: ["admin"],
+    });
     if (cm1Err) throw new Error(`club_members insert club1: ${cm1Err.message}`);
 
     // ── Club 2 ──────────────────────────────────────────────────────────
@@ -62,14 +60,12 @@ test.describe("Convert personal club → real club", () => {
     if (e2 || !club2) throw new Error(`club2 insert: ${e2?.message}`);
     personalClub2Id = club2.id;
 
-    const { error: cm2Err } = await adminClient
-      .from("club_members")
-      .insert({
-        club_id: personalClub2Id,
-        user_id: helperClub.admin.userId,
-        role: "admin",
-        roles: ["admin"],
-      });
+    const { error: cm2Err } = await adminClient.from("club_members").insert({
+      club_id: personalClub2Id,
+      user_id: helperClub.admin.userId,
+      role: "admin",
+      roles: ["admin"],
+    });
     if (cm2Err) throw new Error(`club_members insert club2: ${cm2Err.message}`);
   });
 
@@ -83,7 +79,9 @@ test.describe("Convert personal club → real club", () => {
         await adminClient.from("club_members").delete().eq("club_id", personalClub2Id);
         await adminClient.from("clubs").delete().eq("id", personalClub2Id);
       }
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     await helperClub.cleanup();
   });
 

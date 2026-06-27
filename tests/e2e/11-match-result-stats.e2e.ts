@@ -8,8 +8,12 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Match result, goals, cards, stats", () => {
   let club: SeededClub;
-  test.beforeAll(async () => { club = await createTestClub("stats"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.beforeAll(async () => {
+    club = await createTestClub("stats");
+  });
+  test.afterAll(async () => {
+    await club.cleanup();
+  });
 
   test("coach records score", async () => {
     const c = await clientFor(club.coach);

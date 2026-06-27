@@ -70,9 +70,7 @@ export default async function globalSetup() {
   }
 
   // 2. Sign in the other roles in parallel (independent of the club lookup).
-  await Promise.all(
-    (["coach", "player", "parent"] as Role[]).map((r) => signIn(r)),
-  );
+  await Promise.all((["coach", "player", "parent"] as Role[]).map((r) => signIn(r)));
 
   // Fail fast in CI if coach/player/parent creds are missing — otherwise the
   // fixture silently falls back to the admin user and RLS-scoped tests pass
