@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_teams ADD COLUMN IF NOT EXISTS contact_name text;
