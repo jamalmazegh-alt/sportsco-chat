@@ -47,7 +47,7 @@ export function useTournamentOnlyMode(): {
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId!)
           .is("revoked_at", null),
-        supabase.rpc("current_user_has_tournament_collab"),
+        (supabase.rpc as any)("current_user_has_tournament_collab"),
       ]);
       const usedCount = passes.count ?? 0;
       const activeEntitlements = entitlements.count ?? 0;
