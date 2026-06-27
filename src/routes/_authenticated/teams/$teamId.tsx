@@ -34,9 +34,11 @@ import {
   CheckSquare,
   Trash2,
   Download,
+  Upload,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
@@ -213,6 +215,7 @@ function TeamDetail() {
 
   // Add player form state
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
@@ -824,6 +827,17 @@ function TeamDetail() {
                     {t("players.invite")}
                   </Button>
                 )}
+                {isCoach && activeClubId && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    {t("players.import.button", { defaultValue: "Import CSV" })}
+                  </Button>
+                )}
                 <Sheet
                   open={open}
                   onOpenChange={(o) => {
@@ -1013,6 +1027,18 @@ function TeamDetail() {
                     </form>
                   </SheetContent>
                 </Sheet>
+                {activeClubId && (
+                  <ImportPlayersCsvDialog
+                    open={importOpen}
+                    onOpenChange={setImportOpen}
+                    teamId={teamId}
+                    clubId={activeClubId}
+                    onDone={() => {
+                      qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+                      qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+                    }}
+                  />
+                )}
               </>
             )}
           </div>
