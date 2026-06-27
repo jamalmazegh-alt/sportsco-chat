@@ -413,7 +413,7 @@
       "templateHint": "Noch keine Datei? Lade die Vorlage herunter.",
       "csvTemplate": "CSV-Vorlage",
       "csvFileLabel": "CSV-Datei",
-      "csvHint": "Ein Team pro Zeile. Spalten: <code>name, kurzname, seed</code> (nur der Name ist Pflicht). Kompatibel mit Excel / Numbers / Google Sheets.",
+      "csvHint": "Ein Team pro Zeile. Spalten: <code>name, kurzname, seed, kontakt_name, kontakt_email, kontakt_telefon</code> (nur der Name ist Pflicht). Kompatibel mit Excel / Numbers / Google Sheets.",
       "pasteLabel": "Oder füge deine Liste ein",
       "logoHint": "Logos können anschließend Mannschaft für Mannschaft hinzugefügt werden.",
       "external": "Externe Mannschaft",

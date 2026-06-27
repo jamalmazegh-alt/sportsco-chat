@@ -413,7 +413,7 @@
       "templateHint": "Nog geen bestand? Download de sjabloon.",
       "csvTemplate": "CSV-sjabloon",
       "csvFileLabel": "CSV-bestand",
-      "csvHint": "Eén Team per regel. Kolommen: <code>name, shortname, seed</code> (alleen de naam is verplicht). Compatibel met Excel / Numbers / Google Sheets.",
+      "csvHint": "Eén Team per regel. Kolommen: <code>name, shortname, seed, contact_name, contact_email, contact_phone</code> (alleen de naam is verplicht). Compatibel met Excel / Numbers / Google Sheets.",
       "pasteLabel": "Of plak je lijst",
       "logoHint": "Logo's kunnen later per Team worden toegevoegd.",
       "external": "Extern Team",

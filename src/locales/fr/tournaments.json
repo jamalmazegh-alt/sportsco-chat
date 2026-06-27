@@ -413,7 +413,7 @@
       "templateHint": "Pas encore de fichier ? Télécharge le modèle.",
       "csvTemplate": "Modèle CSV",
       "csvFileLabel": "Fichier CSV",
-      "csvHint": "Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.",
+      "csvHint": "Une équipe par ligne. Colonnes : <code>nom, nom_court, seed, contact_nom, contact_email, contact_tel</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.",
       "pasteLabel": "Ou collez votre liste",
       "logoHint": "Les logos peuvent être ajoutés ensuite équipe par équipe.",
       "external": "Équipe externe",

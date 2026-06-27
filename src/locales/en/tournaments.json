@@ -413,7 +413,7 @@
       "templateHint": "No file yet? Download the template.",
       "csvTemplate": "CSV template",
       "csvFileLabel": "CSV file",
-      "csvHint": "One team per line. Columns: <code>name, short_name, seed</code> (only name is required). Compatible with Excel / Numbers / Google Sheets.",
+      "csvHint": "One team per line. Columns: <code>name, short_name, seed, contact_name, contact_email, contact_phone</code> (only name is required). Compatible with Excel / Numbers / Google Sheets.",
       "pasteLabel": "Or paste your list",
       "logoHint": "Logos can be added later, team by team.",
       "external": "External team",
