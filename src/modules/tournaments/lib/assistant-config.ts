@@ -43,6 +43,8 @@ export interface AssistantTournamentConfig {
   endsOn: string;
   location: string;
   useFairPlay: boolean;
+  /** Open public registration on the tournament's public page. */
+  publicRegistration: boolean;
   category: string;
 }
 
@@ -59,6 +61,7 @@ export type AssistantStepId =
   | "terrains"
   | "terrainNaming"
   | "terrainNames"
+  | "publicRegistration"
   | "paid"
   | "paidAmount"
   | "name"
@@ -128,6 +131,7 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     endsOn: "",
     location: "",
     useFairPlay: true,
+    publicRegistration: true,
     category: "",
     ...partial,
   };
@@ -206,7 +210,7 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
   }
   steps.push("matchDuration", "breaks", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
-  steps.push("fairPlay", "paid");
+  steps.push("fairPlay", "publicRegistration", "paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
@@ -329,6 +333,10 @@ export function configToCreatePayload(
   rules.fairPlay = {
     ...rules.fairPlay,
     enabled: cfg.useFairPlay,
+  };
+  rules.registration = {
+    ...rules.registration,
+    enabled: cfg.publicRegistration,
   };
   if (cfg.useFairPlay) {
     const ordered = rules.tiebreakers.filter((key) => key !== "fair_play");

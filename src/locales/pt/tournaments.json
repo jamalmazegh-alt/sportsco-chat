@@ -1212,7 +1212,8 @@
       "name": "Nome mostrado na página pública.",
       "date": "Quando se realiza o torneio?",
       "location": "Morada ou cidade do recinto.",
-      "summary": "Tudo pronto. Toca numa linha para ajustar e cria."
+      "summary": "Tudo pronto. Toca numa linha para ajustar e cria.",
+      "publicRegistration": "Ativa a página pública de inscrição online para as equipas."
     },
     "questionLabel": "Pergunta {{n}}",
     "tapHint": "Toca numa resposta — o assistente continua sozinho",
@@ -1286,7 +1287,8 @@
       "name": "Como se chama o torneio?",
       "date": "Que data (e fim se for de vários dias)?",
       "location": "Onde se realiza?",
-      "summary": "Resumo"
+      "summary": "Resumo",
+      "publicRegistration": "Abrir as inscrições ao público?"
     },
     "opts": {
       "playersPerTeam": "{{count}} jogadores",
@@ -1330,7 +1332,11 @@
       "lunch0": "Sem pausa",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure"
+      "lunch60": "1 heure",
+      "publicRegistrationYes": "Sim, abrir a página pública",
+      "publicRegistrationYesHint": "As equipas podem inscrever-se online",
+      "publicRegistrationNo": "Não, faço as inscrições manualmente",
+      "publicRegistrationNoHint": "Convidas as equipas tu próprio"
     },
     "cta": {
       "create": "Criar torneio",

@@ -285,6 +285,10 @@ export function TournamentAIAssistant({
     patch({ paid, registrationFeeCents: paid ? config.registrationFeeCents : 0 });
     advance();
   }
+  function selectPublicRegistration(v: boolean) {
+    patch({ publicRegistration: v });
+    advance();
+  }
   function confirmPaidAmount() {
     const euros = parseFloat(paidAmount.replace(",", "."));
     if (!Number.isFinite(euros) || euros <= 0) {
@@ -447,6 +451,7 @@ export function TournamentAIAssistant({
             onTerrainNaming={selectTerrainNaming}
             onConfirmTerrainNames={confirmTerrainNames}
             onPaid={selectPaid}
+            onPublicRegistration={selectPublicRegistration}
             onConfirmPaidAmount={confirmPaidAmount}
             onConfirmName={confirmName}
             onConfirmDate={confirmDate}
@@ -694,6 +699,7 @@ interface QuestionViewProps {
   onTerrainNaming: (v: "now" | "later") => void;
   onConfirmTerrainNames: () => void;
   onPaid: (v: boolean) => void;
+  onPublicRegistration: (v: boolean) => void;
   onConfirmPaidAmount: () => void;
   onConfirmName: () => void;
   onConfirmDate: () => void;
@@ -1040,6 +1046,23 @@ function QuestionView(p: QuestionViewProps) {
               {t("aiAssistant.cta.next")}
             </Button>
           </div>
+        )}
+
+        {stepId === "publicRegistration" && (
+          <OptList>
+            <Opt
+              onClick={() => p.onPublicRegistration(true)}
+              hint={t("aiAssistant.opts.publicRegistrationYesHint")}
+            >
+              {t("aiAssistant.opts.publicRegistrationYes")}
+            </Opt>
+            <Opt
+              onClick={() => p.onPublicRegistration(false)}
+              hint={t("aiAssistant.opts.publicRegistrationNoHint")}
+            >
+              {t("aiAssistant.opts.publicRegistrationNo")}
+            </Opt>
+          </OptList>
         )}
 
         {stepId === "paid" && (
