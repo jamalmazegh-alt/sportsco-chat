@@ -824,6 +824,17 @@ function TeamDetail() {
                     {t("players.invite")}
                   </Button>
                 )}
+                {isCoach && activeClubId && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    {t("players.import.button", { defaultValue: "Import CSV" })}
+                  </Button>
+                )}
                 <Sheet
                   open={open}
                   onOpenChange={(o) => {
