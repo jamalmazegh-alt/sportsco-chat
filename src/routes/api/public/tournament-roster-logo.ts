@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const TokenSchema = z.string().uuid();
 
-const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
+const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_BYTES = 4 * 1024 * 1024;
 
 function getAdmin() {
@@ -47,13 +47,9 @@ export const Route = createFileRoute("/api/public/tournament-roster-logo")({
         }
 
         const ext =
-          file.type === "image/svg+xml"
-            ? "svg"
-            : file.type === "image/png"
-              ? "png"
-              : file.type === "image/webp"
-                ? "webp"
-                : "jpg";
+          file.type === "image/png" ? "png"
+          : file.type === "image/webp" ? "webp"
+          : "jpg";
         const path = `${reg.tournament_team_id}/roster-${Date.now()}.${ext}`;
         const buf = new Uint8Array(await file.arrayBuffer());
 
