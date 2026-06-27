@@ -755,6 +755,37 @@ function TournamentDetailPage() {
         </div>
       )}
 
+      {/* ─── Auto-schedule CTA (when matches exist but no fields assigned) ─ */}
+      {canManage &&
+        matches.length > 0 &&
+        matches.every((m) => !(m as unknown as { field?: string | null }).field) && (
+          <div className="px-5 pt-4">
+            <button
+              type="button"
+              onClick={() => openSettings("format", "schedule")}
+              className="w-full flex items-center gap-3 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/15 hover:to-primary/10 transition p-4 text-left"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">
+                  {t("detail.autoScheduleCta.title", {
+                    defaultValue: "Planifier automatiquement les matchs",
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("detail.autoScheduleCta.subtitle", {
+                    defaultValue:
+                      "Aucun terrain ni horaire n'est encore assigné. Lancez la planification automatique.",
+                  })}
+                </p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+            </button>
+          </div>
+        )}
+
       {/* ─── Live courts ─────────────────────────────────────────────────── */}
       <div className="px-5 pt-5">
         {/* DB rows vs LiveCourts' local shapes — cast to the component's own
