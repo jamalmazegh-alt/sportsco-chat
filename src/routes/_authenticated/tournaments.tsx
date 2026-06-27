@@ -417,11 +417,13 @@ function TournamentsList() {
         <div className="pt-1">
           {noClub ? (
             canCreate ? (
-              <ShimmerButton asChild className="w-full">
-                <Link to="/tournaments/new-from-pass">
-                  <Plus className="h-4 w-4" />
-                  {t("list.create")}
-                </Link>
+              <ShimmerButton
+                onClick={openCreate}
+                disabled={!effectiveClubId}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4" />
+                {t("list.create")}
               </ShimmerButton>
             ) : (
               <ShimmerButton asChild className="w-full">
@@ -439,6 +441,7 @@ function TournamentsList() {
               </ShimmerButton>
             )
           )}
+
         </div>
       )}
     </div>
