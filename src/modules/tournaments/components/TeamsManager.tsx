@@ -147,6 +147,28 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
+  const setPayment = useMutation({
+    mutationFn: async (vars: { teamId: string; status: "unpaid" | "paid" | "exempt" }) => {
+      const { data, error } = await supabase.rpc("set_tournament_team_payment", {
+        _team_id: vars.teamId,
+        _status: vars.status,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_d, vars) => {
+      const msg =
+        vars.status === "paid"
+          ? t("teams.payment.markedPaid", { defaultValue: "Marqué comme payé" })
+          : vars.status === "exempt"
+            ? t("teams.payment.markedExempt", { defaultValue: "Marqué exempté" })
+            : t("teams.payment.markedUnpaid", { defaultValue: "Marqué impayé" });
+      toast.success(msg);
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
+  });
+
   const bulk = useMutation({
     mutationFn: (
       rows: Array<{
