@@ -274,7 +274,7 @@ export const getTournament = createServerFn({ method: "POST" })
         .order("sort_order"),
       supabase
         .from("tournament_teams")
-        .select("*")
+        .select("*, tournament_registrations(contact_name, contact_email, contact_phone)")
         .eq("tournament_id", data.tournament_id)
         .order("seed", { nullsFirst: false }),
       supabase

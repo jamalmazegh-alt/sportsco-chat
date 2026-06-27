@@ -20,6 +20,9 @@ import {
   Pencil,
   UsersRound,
   Download,
+  Mail,
+  Phone,
+  User2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -38,6 +41,12 @@ interface TeamRow {
   logo_url: string | null;
   seed: number | null;
   team_id: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  tournament_registrations?:
+    | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }
+    | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }[]
+    | null;
 }
 
 interface Props {
@@ -459,6 +468,43 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                       {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
                     </span>
                   </p>
+                  {(() => {
+                    const reg = Array.isArray(tm.tournament_registrations)
+                      ? tm.tournament_registrations[0]
+                      : tm.tournament_registrations;
+                    const contactName = reg?.contact_name ?? null;
+                    const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
+                    const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
+                    if (!contactName && !contactEmail && !contactPhone) return null;
+                    return (
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                        {contactName && (
+                          <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
+                            <User2 className="h-3 w-3" />
+                            {contactName}
+                          </span>
+                        )}
+                        {contactEmail && (
+                          <a
+                            href={`mailto:${contactEmail}`}
+                            className="inline-flex items-center gap-1 hover:text-foreground hover:underline"
+                          >
+                            <Mail className="h-3 w-3" />
+                            {contactEmail}
+                          </a>
+                        )}
+                        {contactPhone && (
+                          <a
+                            href={`tel:${contactPhone}`}
+                            className="inline-flex items-center gap-1 hover:text-foreground hover:underline"
+                          >
+                            <Phone className="h-3 w-3" />
+                            {contactPhone}
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <Button
                   size="icon"
