@@ -85,9 +85,10 @@ function AuthLayout() {
   }
 
   if (memberships.length === 0) {
-    // Tournament organizers don't need a club — render the route with just
-    // the bottom nav, no club onboarding screen, consent gate, or wizard.
-    if (isTournamentOrganizer) {
+    // Tournament organizers and tournament-only collaborators (referees,
+    // co-organizers) don't need a club — render the route with just the
+    // bottom nav, no club onboarding screen, consent gate, or wizard.
+    if (isTournamentOrganizer || tournamentOnly) {
       return (
         <div className="min-h-screen bg-background pb-[164px]">
           <div className="mx-auto max-w-xl">
