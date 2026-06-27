@@ -41,8 +41,10 @@ interface TeamRow {
   logo_url: string | null;
   seed: number | null;
   team_id: string | null;
+  contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+
   tournament_registrations?:
     | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }
     | {
