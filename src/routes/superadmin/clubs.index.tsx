@@ -225,6 +225,40 @@ function SuperAdminClubs() {
                         </span>
                       </div>
                     </td>
+                    <td className="px-3 py-2.5 align-top">
+                      {c.contact_name || c.contact_email || c.contact_phone ? (
+                        <div className="space-y-0.5 text-xs">
+                          {c.contact_name && (
+                            <div className="flex items-center gap-1.5 font-medium">
+                              <User2 className="h-3 w-3 text-muted-foreground" />
+                              {c.contact_name}
+                            </div>
+                          )}
+                          {c.contact_email && (
+                            <a
+                              href={`mailto:${c.contact_email}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:underline"
+                            >
+                              <Mail className="h-3 w-3" />
+                              {c.contact_email}
+                            </a>
+                          )}
+                          {c.contact_phone && (
+                            <a
+                              href={`tel:${c.contact_phone}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:underline"
+                            >
+                              <Phone className="h-3 w-3" />
+                              {c.contact_phone}
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
                     <td className="px-3 py-2.5 tabular-nums">{c.member_count}</td>
                     <td className="px-3 py-2.5">
                       <Link
