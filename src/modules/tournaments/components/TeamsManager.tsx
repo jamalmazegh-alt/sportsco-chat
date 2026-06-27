@@ -209,11 +209,19 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setBulkText(String(reader.result ?? ""));
+      const text = String(reader.result ?? "");
+      setBulkText(text);
+      const rows = parseBulk(text);
+      if (rows.length === 0) {
+        toast.error(t("teams.noneDetected"));
+        return;
+      }
+      bulk.mutate(rows);
     };
     reader.readAsText(file);
     e.target.value = "";
   }
+
 
   function downloadCsvTemplate() {
     const csv =
