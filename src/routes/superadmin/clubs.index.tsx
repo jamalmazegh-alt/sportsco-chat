@@ -4,7 +4,7 @@ import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, Phone, Search, ShieldCheck, User2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
@@ -30,6 +30,9 @@ type Club = {
   archived_at: string | null;
   is_personal: boolean;
   subscription: Subscription | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
 };
 
 type BillingPill = {
@@ -161,6 +164,7 @@ function SuperAdminClubs() {
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
               <th className="text-left font-medium px-3 py-2">Club</th>
+              <th className="text-left font-medium px-3 py-2">Contact</th>
               <th className="text-left font-medium px-3 py-2">Membres</th>
               <th className="text-left font-medium px-3 py-2">Facturation</th>
               <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Créé le</th>
@@ -169,7 +173,7 @@ function SuperAdminClubs() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
                   Chargement…
                 </td>
@@ -177,7 +181,7 @@ function SuperAdminClubs() {
             )}
             {!loading && clubs.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   Aucun club trouvé.
                 </td>
               </tr>
@@ -220,6 +224,40 @@ function SuperAdminClubs() {
                           {c.id.slice(0, 8)}
                         </span>
                       </div>
+                    </td>
+                    <td className="px-3 py-2.5 align-top">
+                      {c.contact_name || c.contact_email || c.contact_phone ? (
+                        <div className="space-y-0.5 text-xs">
+                          {c.contact_name && (
+                            <div className="flex items-center gap-1.5 font-medium">
+                              <User2 className="h-3 w-3 text-muted-foreground" />
+                              {c.contact_name}
+                            </div>
+                          )}
+                          {c.contact_email && (
+                            <a
+                              href={`mailto:${c.contact_email}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:underline"
+                            >
+                              <Mail className="h-3 w-3" />
+                              {c.contact_email}
+                            </a>
+                          )}
+                          {c.contact_phone && (
+                            <a
+                              href={`tel:${c.contact_phone}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:underline"
+                            >
+                              <Phone className="h-3 w-3" />
+                              {c.contact_phone}
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5 tabular-nums">{c.member_count}</td>
                     <td className="px-3 py-2.5">
@@ -299,6 +337,36 @@ function SuperAdminClubs() {
                     {pill.label}
                   </span>
                 </div>
+                {(c.contact_name || c.contact_email || c.contact_phone) && (
+                  <div className="mt-2 pt-2 border-t border-border space-y-1 text-[11px]">
+                    {c.contact_name && (
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <User2 className="h-3 w-3 text-muted-foreground" />
+                        {c.contact_name}
+                      </div>
+                    )}
+                    {c.contact_email && (
+                      <a
+                        href={`mailto:${c.contact_email}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1.5 text-muted-foreground hover:underline"
+                      >
+                        <Mail className="h-3 w-3" />
+                        {c.contact_email}
+                      </a>
+                    )}
+                    {c.contact_phone && (
+                      <a
+                        href={`tel:${c.contact_phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1.5 text-muted-foreground hover:underline"
+                      >
+                        <Phone className="h-3 w-3" />
+                        {c.contact_phone}
+                      </a>
+                    )}
+                  </div>
+                )}
                 {exempt && c.subscription?.exempt_reason && (
                   <div className="text-[10px] text-muted-foreground mt-1.5 pt-1.5 border-t border-border">
                     {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
