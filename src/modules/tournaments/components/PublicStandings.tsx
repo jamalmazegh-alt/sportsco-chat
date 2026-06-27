@@ -50,15 +50,16 @@ export function PublicStandings({ groups, teams, matches }: Props) {
     <div className="space-y-4">
       {sorted.map((g) => {
         const ids = teams.filter((tm) => tm.group_id === g.id).map((tm) => tm.id);
-        const groupMatches = matches
-          .filter((m) => m.round === "group" && m.group_id === g.id)
-          .map((m) => ({
-            teamAId: m.team_a_id,
-            teamBId: m.team_b_id,
-            scoreA: m.score_a,
-            scoreB: m.score_b,
-            status: m.status,
-          }));
+        const groupMatchesRaw = matches.filter((m) => m.round === "group" && m.group_id === g.id);
+        const groupMatches = groupMatchesRaw.map((m) => ({
+          teamAId: m.team_a_id,
+          teamBId: m.team_b_id,
+          scoreA: m.score_a,
+          scoreB: m.score_b,
+          status: m.status,
+        }));
+        const allCompleted =
+          groupMatchesRaw.length > 0 && groupMatchesRaw.every((m) => m.status === "completed");
         const rows = computeStandings(ids, groupMatches);
         return (
           <section key={g.id} className="rounded-xl border border-border bg-card overflow-hidden">
@@ -83,8 +84,8 @@ export function PublicStandings({ groups, teams, matches }: Props) {
               </thead>
               <tbody>
                 {rows.map((r, i) => {
-                  const qualified = i < g.qualifiers_count;
-                  const isFirstNonQualified = i === g.qualifiers_count;
+                  const qualified = allCompleted && i < g.qualifiers_count;
+                  const isFirstNonQualified = allCompleted && i === g.qualifiers_count;
                   const tm = teamMap.get(r.teamId);
                   return (
                     <tr
