@@ -24,6 +24,8 @@ type SignupRole = "club_admin" | "player" | "parent";
 export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({
     invite: typeof search.invite === "string" ? search.invite : undefined,
+    email: typeof search.email === "string" ? search.email : undefined,
+    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
   }),
   component: RegisterPage,
   head: () => ({
