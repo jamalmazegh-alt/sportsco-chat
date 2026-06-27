@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import {
+  PDFDocument,
+  StandardFonts,
+  rgb,
+  type PDFFont,
+  type PDFImage,
+  type PDFPage,
+} from "pdf-lib";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sportAllowsDraw } from "@/lib/sports";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
@@ -67,7 +74,22 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
           logoBytes = null;
         }
 
-        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes);
+        // Fetch club + tournament logos (best-effort).
+        let clubLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+        let tournamentLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+        if (t.club_id) {
+          const { data: club } = await supabaseAdmin
+            .from("clubs")
+            .select("logo_url")
+            .eq("id", t.club_id)
+            .maybeSingle();
+          if (club?.logo_url) clubLogo = await fetchImage(club.logo_url);
+        }
+        if (t.cover_image_url) {
+          tournamentLogo = await fetchImage(t.cover_image_url);
+        }
+
+        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes, clubLogo, tournamentLogo);
 
         return new Response(pdf as unknown as BodyInit, {
           status: 200,
@@ -334,6 +356,8 @@ export async function buildRegulationsPdf(
   rules: ReturnType<typeof mergeRules>,
   lang: Lang,
   logoBytes: ArrayBuffer | null,
+  clubLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null,
+  tournamentLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`${t.name} — ${I18N[lang].subtitle}`);
@@ -344,10 +368,13 @@ export async function buildRegulationsPdf(
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const italic = await doc.embedFont(StandardFonts.HelveticaOblique);
 
+  const clubImg = await embedImage(doc, clubLogo);
+  const tourneyImg = await embedImage(doc, tournamentLogo);
+
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const ctx: Ctx = { doc, page, y: PAGE_H - MARGIN_T, font, bold, italic, lang, pageNo: 1 };
 
-  drawCoverBlock(ctx, t, lang);
+  drawCoverBlock(ctx, t, lang, clubImg, tourneyImg);
   ctx.y -= 18;
 
   // ── Articles ──
@@ -430,16 +457,22 @@ export async function buildRegulationsPdf(
 
 // ───────────────────────────── Sections ─────────────────────────────
 
-function drawCoverBlock(ctx: Ctx, t: Tournament, lang: Lang) {
+function drawCoverBlock(
+  ctx: Ctx,
+  t: Tournament,
+  lang: Lang,
+  clubImg: PDFImage | null = null,
+  tourneyImg: PDFImage | null = null,
+) {
   const top = PAGE_H - 18;
   // Trait épais
   ctx.page.drawRectangle({ x: MARGIN_L, y: top - 2, width: CONTENT_W, height: 2.2, color: BLACK });
 
-  // Cercles logos
+  // Logos (uniquement si présents — pas de placeholder)
   const circleY = top - 38;
   const r = 22;
-  drawLogoCircle(ctx, MARGIN_L + r + 4, circleY, r, I18N[lang].logoClub);
-  drawLogoCircle(ctx, MARGIN_L + CONTENT_W - r - 4, circleY, r, I18N[lang].logoTournament);
+  if (clubImg) drawLogoImage(ctx, MARGIN_L + r + 4, circleY, r, clubImg);
+  if (tourneyImg) drawLogoImage(ctx, MARGIN_L + CONTENT_W - r - 4, circleY, r, tourneyImg);
 
   // Nom du tournoi
   const titleSize = 24;
@@ -510,28 +543,6 @@ function drawCoverBlock(ctx: Ctx, t: Tournament, lang: Lang) {
   ctx.y = bottom;
 }
 
-function drawLogoCircle(ctx: Ctx, cx: number, cy: number, r: number, label: string) {
-  ctx.page.drawCircle({
-    x: cx,
-    y: cy,
-    size: r,
-    color: SOFT_BG,
-    borderColor: LIGHT_GREY,
-    borderWidth: 0.6,
-  });
-  const lines = label.split(" / ");
-  const size = 6;
-  lines.forEach((line, i) => {
-    const w = ctx.font.widthOfTextAtSize(line, size);
-    ctx.page.drawText(safe(line), {
-      x: cx - w / 2,
-      y: cy + (lines.length === 1 ? -2 : i === 0 ? 2 : -6),
-      size,
-      font: ctx.font,
-      color: GREY,
-    });
-  });
-}
 
 function drawArticle(ctx: Ctx, n: number, paragraphs: string[]) {
   ensureSpace(ctx, 40);
@@ -701,4 +712,57 @@ function formatLongDate(iso: string, lang: Lang): string {
 function formatShortDate(d: Date, lang: Lang): string {
   const months = I18N[lang].monthsShort;
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ───────────────────────────── Logo helpers ─────────────────────────────
+
+async function fetchImage(
+  url: string,
+): Promise<{ bytes: ArrayBuffer; kind: "png" | "jpg" } | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const ct = (res.headers.get("content-type") ?? "").toLowerCase();
+    const bytes = await res.arrayBuffer();
+    if (ct.includes("png") || url.toLowerCase().endsWith(".png")) return { bytes, kind: "png" };
+    if (
+      ct.includes("jpeg") ||
+      ct.includes("jpg") ||
+      url.toLowerCase().endsWith(".jpg") ||
+      url.toLowerCase().endsWith(".jpeg")
+    )
+      return { bytes, kind: "jpg" };
+    const head = new Uint8Array(bytes.slice(0, 4));
+    if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47)
+      return { bytes, kind: "png" };
+    if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return { bytes, kind: "jpg" };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function embedImage(
+  doc: PDFDocument,
+  img: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null,
+): Promise<PDFImage | null> {
+  if (!img) return null;
+  try {
+    return img.kind === "png" ? await doc.embedPng(img.bytes) : await doc.embedJpg(img.bytes);
+  } catch {
+    return null;
+  }
+}
+
+function drawLogoImage(ctx: Ctx, cx: number, cy: number, r: number, img: PDFImage) {
+  const maxSide = r * 2;
+  const ratio = img.width / img.height;
+  const w = ratio >= 1 ? maxSide : maxSide * ratio;
+  const h = ratio >= 1 ? maxSide / ratio : maxSide;
+  ctx.page.drawImage(img, {
+    x: cx - w / 2,
+    y: cy - h / 2,
+    width: w,
+    height: h,
+  });
 }
