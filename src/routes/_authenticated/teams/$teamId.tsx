@@ -34,6 +34,7 @@ import {
   CheckSquare,
   Trash2,
   Download,
+  Upload,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
