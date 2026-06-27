@@ -24,6 +24,7 @@ import {
   Mail,
   Phone,
   User2,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
