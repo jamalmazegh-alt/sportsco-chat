@@ -5160,6 +5160,15 @@ export type Database = {
             }
             Returns: string
           }
+      get_club_stripe_status: {
+        Args: { _club_id: string }
+        Returns: {
+          stripe_account_id: string
+          stripe_account_status: string
+          stripe_charges_enabled: boolean
+          stripe_payouts_enabled: boolean
+        }[]
+      }
       get_convocation_by_token: {
         Args: { _token: string }
         Returns: {
