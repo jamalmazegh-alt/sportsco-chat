@@ -36,6 +36,8 @@ function AdminSettingsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
+  const { tournamentOnly } = useTournamentOnlyMode();
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["club-name", activeClubId],
