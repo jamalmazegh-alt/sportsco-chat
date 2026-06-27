@@ -52,6 +52,10 @@ const TournamentInviteEmail = ({
       <Button style={button} href={inviteUrl}>
         Accepter l'invitation
       </Button>
+      <Text style={text}>
+        Si vous n'avez pas encore de compte Clubero, vous serez invité à le créer avec cette adresse
+        email avant d'accepter l'invitation.
+      </Text>
       <Text style={small}>
         Ou copiez ce lien dans votre navigateur :<br />
         <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
