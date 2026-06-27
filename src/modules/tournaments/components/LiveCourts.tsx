@@ -16,6 +16,10 @@ interface MatchLike {
   score_a: number | null;
   score_b: number | null;
   scheduled_at: string | null;
+  match_number?: number | null;
+  round?: string | null;
+  team_a_source?: { fromMatch?: number; outcome?: "winner" | "loser" } | null;
+  team_b_source?: { fromMatch?: number; outcome?: "winner" | "loser" } | null;
 }
 
 interface Props {
@@ -31,9 +35,16 @@ interface Props {
 
 const GREEN_GRADIENT = "linear-gradient(135deg,#16a34a 0%,#15803d 100%)";
 
-function teamLabel(t: Team | undefined): string {
-  if (!t) return "—";
-  return t.short_name ?? t.name;
+function teamLabel(
+  t: Team | undefined,
+  source?: { fromMatch?: number; outcome?: "winner" | "loser" } | null,
+): string {
+  if (t) return t.name || t.short_name || "—";
+  if (source && source.fromMatch) {
+    const prefix = source.outcome === "loser" ? "Perdant" : "Vainqueur";
+    return `${prefix} M${source.fromMatch}`;
+  }
+  return "—";
 }
 
 function sortByScheduled<T extends MatchLike>(arr: T[]): T[] {
@@ -259,7 +270,7 @@ function MatchRow({
       )}
       <div className="flex flex-1 min-w-0 items-center gap-2">
         <span className="flex-1 truncate text-right text-sm font-semibold text-foreground dark:text-slate-100">
-          {teamLabel(a)}
+          {teamLabel(a, m.team_a_source)}
         </span>
         <span
           className={cn(
@@ -273,7 +284,7 @@ function MatchRow({
           {m.score_a ?? 0} - {m.score_b ?? 0}
         </span>
         <span className="flex-1 truncate text-sm font-semibold text-foreground dark:text-slate-100">
-          {teamLabel(b)}
+          {teamLabel(b, m.team_b_source)}
         </span>
       </div>
       {interactive && (
