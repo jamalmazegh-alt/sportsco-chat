@@ -451,6 +451,7 @@ export function TournamentAIAssistant({
             onTerrainNaming={selectTerrainNaming}
             onConfirmTerrainNames={confirmTerrainNames}
             onPaid={selectPaid}
+            onPublicRegistration={selectPublicRegistration}
             onConfirmPaidAmount={confirmPaidAmount}
             onConfirmName={confirmName}
             onConfirmDate={confirmDate}
