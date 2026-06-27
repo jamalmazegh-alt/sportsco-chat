@@ -561,7 +561,9 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
       .insert(rows)
       .select("id");
     if (error) throw new Response(error.message, { status: 400 });
-    return { inserted: inserted?.length ?? 0 };
+    // RLS sur RETURNING peut filtrer les lignes même quand l'INSERT réussit ;
+    // on retombe sur la taille du payload pour refléter le vrai nombre inséré.
+    return { inserted: inserted?.length || rows.length };
   });
 
 export const removeTournamentTeam = createServerFn({ method: "POST" })
