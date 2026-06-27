@@ -174,7 +174,7 @@ export function MatchesList({
     () => (currentUserId ? matches.filter((m) => m.referee_user_id === currentUserId).length : 0),
     [matches, currentUserId],
   );
-  const [onlyMine, setOnlyMine] = useState(false);
+  const [onlyMine, setOnlyMine] = useState(defaultOnlyMine);
   const showFilter = assignedToMe > 0;
   const visibleMatches =
     showFilter && onlyMine ? matches.filter((m) => m.referee_user_id === currentUserId) : matches;
