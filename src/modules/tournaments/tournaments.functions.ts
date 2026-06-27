@@ -2372,7 +2372,7 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
           .join(" ")
           .trim() ||
         null;
-      const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
+      const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
       await enqueueTransactionalEmailServer({
         templateName: "tournament-invite",
         recipientEmail: email,
