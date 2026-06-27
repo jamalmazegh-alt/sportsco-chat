@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 parallelle tableaus per niveau — alle teams blijven spelen, verdeeld in Elite / Midden / Ontdekking.",
+      "cup_plate": "Hoofdtableau (Beker) voor de winnaars + nevenpoule (Plaat) voor de verliezers van de 1e ronde. Niemand valt vroeg af.",
+      "medals": "Directe eliminatie met podium Goud / Zilver / Brons voor de top 3. Kort en klassiek format.",
+      "consolation": "2 tableaus: Hoofd (groepswinnaars) en Troostronde (verliezers). Eenvoudige oplossing om iedereen te laten spelen."
     }
   },
   "controlCenter": {

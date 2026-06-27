@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 tabelloni paralleli per livello — tutte le squadre continuano a giocare, divise in Élite / Medio / Scoperta.",
+      "cup_plate": "Tabellone principale (Coppa) per i vincitori + tabellone secondario (Piatto) per i perdenti del 1° turno. Nessuno è eliminato presto.",
+      "medals": "Eliminazione diretta con podio Oro / Argento / Bronzo per le prime 3 squadre. Formato breve e classico.",
+      "consolation": "2 tabelloni: Principale (vincitori dei gironi) e Consolazione (perdenti). Soluzione semplice per far giocare tutti."
     }
   },
   "controlCenter": {

@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 parallel brackets by level — every team keeps playing, sorted into Elite / Mid / Discovery tiers.",
+      "cup_plate": "Main bracket (Cup) for winners + secondary bracket (Plate) for first-round losers. Nobody is knocked out early.",
+      "medals": "Single elimination with a Gold / Silver / Bronze podium for the top 3 teams. Short and classic.",
+      "consolation": "2 brackets: Main (pool winners) and Consolation (pool losers). Simple way to keep every team playing."
     }
   },
   "controlCenter": {

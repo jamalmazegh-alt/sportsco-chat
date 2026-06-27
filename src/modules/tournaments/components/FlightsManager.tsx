@@ -368,20 +368,20 @@ export function FlightsManager({
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               {t("flights.wizard.template", { defaultValue: "Template de noms" })}
             </Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
               {FLIGHT_TEMPLATES.map((tpl) => (
                 <button
                   key={tpl.id}
                   type="button"
                   onClick={() => setTemplate(tpl.id)}
                   className={cn(
-                    "p-2 rounded-lg border text-sm font-medium transition-colors",
+                    "p-3 rounded-lg border text-left text-sm transition-colors",
                     template === tpl.id
                       ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted",
                   )}
                 >
-                  <div>
+                  <div className="font-medium">
                     {t(tpl.labelKey, {
                       defaultValue:
                         tpl.id === "champions"
@@ -393,7 +393,10 @@ export function FlightsManager({
                               : "Principal / Consolante",
                     })}
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                  <div className="text-xs text-muted-foreground mt-1 leading-snug">
+                    {t(`flights.templatesDesc.${tpl.id}`, { defaultValue: "" })}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground/70 mt-1.5 truncate">
                     {tpl.names
                       .slice(0, 3)
                       .map((n) => n[lang] ?? n.en)
@@ -402,6 +405,7 @@ export function FlightsManager({
                 </button>
               ))}
             </div>
+
 
             {/* Fix F — message de repli si "Champions" non applicable */}
             {template === "champions" && !championsApplicable && (

@@ -1122,6 +1122,12 @@
     "public": {
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
       "noMatches": "Matches will be generated after group stage."
+    },
+    "templatesDesc": {
+      "champions": "3 tableaux parallèles par niveau — toutes les équipes continuent à jouer, classées Élite / Intermédiaire / Découverte.",
+      "cup_plate": "Tableau principal (Coupe) pour les vainqueurs + tableau secondaire (Plaque) pour les perdants du 1er tour. Personne n'est éliminé tôt.",
+      "medals": "Élimination directe avec podium Or / Argent / Bronze pour les 3 premières équipes. Format court et classique.",
+      "consolation": "2 tableaux : Principal (vainqueurs de poule) et Consolante (perdants de poule). Solution simple pour faire jouer tout le monde."
     }
   },
   "controlCenter": {
