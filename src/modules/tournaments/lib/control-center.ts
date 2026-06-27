@@ -217,10 +217,27 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
     return { kind: "add_team", anchor: "section-teams" };
   }
 
+  // 1.bis) Roster not full yet — block the draw until every expected team
+  // is registered. Opt-in: only triggers when `expectedTeams` is supplied
+  // (e.g. `tournaments.num_teams`) and >= 2.
+  const expected = args.expectedTeams ?? null;
+  if (
+    typeof expected === "number" &&
+    expected >= MIN_TEAMS_TO_START &&
+    teamsCount < expected
+  ) {
+    return {
+      kind: "add_team",
+      anchor: "section-teams",
+      note: `${teamsCount}/${expected}`,
+    };
+  }
+
   // 2) Draw not generated (only when pools are expected)
   if (poolsRequired(tournament.format) && groupsCount === 0) {
     return { kind: "run_draw", anchor: "section-matches" };
   }
+
 
   // 3) Matches not generated
   if (matches.length === 0) {
