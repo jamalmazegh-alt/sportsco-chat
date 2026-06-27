@@ -455,12 +455,61 @@ function TournamentDetailPage() {
           )}
 
           <div className="relative p-5 pr-14">
-            <h1
-              className="text-[20px] font-extrabold leading-tight"
-              style={{ letterSpacing: "-0.3px" }}
-            >
-              {tournament.name}
-            </h1>
+            <div className="flex items-start gap-3">
+              {canManage ? (
+                <label
+                  className="group relative h-14 w-14 shrink-0 rounded-xl ring-1 ring-white/30 bg-white/10 backdrop-blur overflow-hidden cursor-pointer hover:ring-white/60 transition"
+                  title={
+                    tournament.cover_image_url
+                      ? t("detail.changeLogo", { defaultValue: "Changer le logo" })
+                      : t("detail.addLogo", { defaultValue: "Ajouter un logo" })
+                  }
+                >
+                  {tournament.cover_image_url ? (
+                    <img
+                      src={tournament.cover_image_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-white/80">
+                      <ImagePlus className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
+                    {uploadingLogo ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    ) : (
+                      <Camera className="h-4 w-4 text-white" />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingLogo}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) onUploadLogo(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              ) : tournament.cover_image_url ? (
+                <img
+                  src={tournament.cover_image_url}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-xl object-cover ring-1 ring-white/30"
+                />
+              ) : null}
+              <h1
+                className="text-[20px] font-extrabold leading-tight"
+                style={{ letterSpacing: "-0.3px" }}
+              >
+                {tournament.name}
+              </h1>
+            </div>
+
 
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/90">
               <span className="inline-flex items-center gap-1.5">
