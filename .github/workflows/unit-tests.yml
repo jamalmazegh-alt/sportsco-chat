@@ -16,13 +16,22 @@ jobs:
           bun-version: latest
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      # --- Checks rapides d'abord (échec en quelques secondes) ---
       - name: Check server function guards
         run: bun run check:guards
       - name: Check i18n parity
         run: bun run check:i18n
-      - name: Typecheck (non-blocking until router search params are cleaned up)
-        continue-on-error: true
+      - name: Lint
+        run: bun run lint
+
+      # --- Typecheck : passe `continue-on-error` à false UNE FOIS que
+      #     `bun run typecheck` est vert en local (router search params nettoyés). ---
+      - name: Typecheck
+        continue-on-error: true # ← mettre false quand vert
         run: bun run typecheck
+
+      # --- Étapes coûteuses en dernier ---
       - name: Unit tests
         run: bun run test
       - name: Production build
