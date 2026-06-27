@@ -19,7 +19,10 @@ import {
   ClipboardList,
   ChevronRight,
   MapPin,
+  Camera,
+  ImagePlus,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -88,7 +91,8 @@ function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const { memberships } = useAuth();
+  const { user, memberships } = useAuth();
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
@@ -117,6 +121,40 @@ function TournamentDetailPage() {
         (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
       ),
   });
+
+  async function onUploadLogo(file: File) {
+    if (!user) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("common.fileTooLarge", { defaultValue: "Fichier trop volumineux (max 5 Mo)" }));
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("common.invalidImage", { defaultValue: "Format d'image non supporté" }));
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${user.id}/tournament-cover/${Date.now()}-${safe}`;
+      const { error: upErr } = await supabase.storage.from("attachments").upload(path, file, {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("attachments").getPublicUrl(path);
+      await updateFn({
+        data: { tournament_id: tournamentId, patch: { cover_image_url: pub.publicUrl } },
+      });
+      toast.success(t("detail.logoUpdated", { defaultValue: "Logo mis à jour" }));
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    } catch (e) {
+      toast.error(
+        (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
+      );
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
 
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
@@ -417,12 +455,61 @@ function TournamentDetailPage() {
           )}
 
           <div className="relative p-5 pr-14">
-            <h1
-              className="text-[20px] font-extrabold leading-tight"
-              style={{ letterSpacing: "-0.3px" }}
-            >
-              {tournament.name}
-            </h1>
+            <div className="flex items-start gap-3">
+              {canManage ? (
+                <label
+                  className="group relative h-14 w-14 shrink-0 rounded-xl ring-1 ring-white/30 bg-white/10 backdrop-blur overflow-hidden cursor-pointer hover:ring-white/60 transition"
+                  title={
+                    tournament.cover_image_url
+                      ? t("detail.changeLogo", { defaultValue: "Changer le logo" })
+                      : t("detail.addLogo", { defaultValue: "Ajouter un logo" })
+                  }
+                >
+                  {tournament.cover_image_url ? (
+                    <img
+                      src={tournament.cover_image_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-white/80">
+                      <ImagePlus className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
+                    {uploadingLogo ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    ) : (
+                      <Camera className="h-4 w-4 text-white" />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingLogo}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) onUploadLogo(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              ) : tournament.cover_image_url ? (
+                <img
+                  src={tournament.cover_image_url}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-xl object-cover ring-1 ring-white/30"
+                />
+              ) : null}
+              <h1
+                className="text-[20px] font-extrabold leading-tight"
+                style={{ letterSpacing: "-0.3px" }}
+              >
+                {tournament.name}
+              </h1>
+            </div>
+
 
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/90">
               <span className="inline-flex items-center gap-1.5">

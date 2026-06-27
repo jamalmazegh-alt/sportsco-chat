@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
@@ -35,6 +36,8 @@ function AdminSettingsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
+  const { tournamentOnly } = useTournamentOnlyMode();
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["club-name", activeClubId],
@@ -67,6 +70,7 @@ function AdminSettingsPage() {
     hint: string;
     tone: string;
     hidden?: boolean;
+    clubOnly?: boolean;
   }> = [
     {
       to: "/admin/billing",
@@ -92,6 +96,7 @@ function AdminSettingsPage() {
       tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
       // Bêta V1 : collectes/cagnottes masquées derrière fundraising_v2.
       hidden: !isV2("fundraising_v2"),
+      clubOnly: true,
     },
     {
       to: "/admin/payments/dashboard",
@@ -100,6 +105,7 @@ function AdminSettingsPage() {
       hint: "KPIs, taux d'encaissement, exports CSV",
       tone: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
       hidden: !isV2("fundraising_v2"),
+      clubOnly: true,
     },
     {
       to: "/admin/settings/convocations",
@@ -107,6 +113,7 @@ function AdminSettingsPage() {
       title: t("admin.hubConvocations"),
       hint: t("admin.hubConvocationsHint"),
       tone: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+      clubOnly: true,
     },
     {
       to: "/admin/settings/communications",
@@ -114,6 +121,7 @@ function AdminSettingsPage() {
       title: t("admin.hubCommunications"),
       hint: t("admin.hubCommunicationsHint"),
       tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      clubOnly: true,
     },
     {
       to: "/admin/settings/social",
@@ -121,6 +129,7 @@ function AdminSettingsPage() {
       title: "Réseaux sociaux",
       hint: "Affichez vos posts Instagram, Facebook et X sur le mur du club",
       tone: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+      clubOnly: true,
     },
     {
       to: "/admin/settings/reminders",
@@ -128,6 +137,7 @@ function AdminSettingsPage() {
       title: t("admin.hubReminders"),
       hint: t("admin.hubRemindersHint"),
       tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+      clubOnly: true,
     },
     {
       to: "/admin/settings/notifications",
@@ -135,6 +145,7 @@ function AdminSettingsPage() {
       title: "Notifications push",
       hint: "Choisissez les notifications envoyées à vos membres",
       tone: "bg-green-500/10 text-green-600 dark:text-green-400",
+      clubOnly: true,
     },
     {
       to: "/admin/settings/branding",
@@ -144,9 +155,11 @@ function AdminSettingsPage() {
         defaultValue: "Couleur principale de l'app pour ton club",
       }),
       tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+      clubOnly: true,
     },
   ];
-  const items = allItems.filter((it) => !it.hidden);
+  const items = allItems.filter((it) => !it.hidden && !(tournamentOnly && it.clubOnly));
+
 
   return (
     <div className="px-5 py-4 space-y-4">
