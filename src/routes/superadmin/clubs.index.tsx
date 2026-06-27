@@ -4,7 +4,7 @@ import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, Phone, Search, ShieldCheck, User2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
