@@ -299,11 +299,11 @@ function RosterPage() {
     setImportText("");
     toast.success(
       t("roster.import.ok", {
-        defaultValue: "{{n}} joueur(s) importé(s){{note}}",
+        defaultValue: "{{n}} joueur(s) importé(s)",
         n: parsed.length,
-        note: truncatedNote,
       }),
     );
+
   }
 
   async function handleFile(file: File) {
