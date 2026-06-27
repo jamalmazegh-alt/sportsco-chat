@@ -949,13 +949,13 @@ function PublishedRegistrationView({
 
   const parseLocalish = (s: string | null | undefined): number | null => {
     if (!s) return null;
-    // datetime-local inputs ("2026-05-25T00:11") have no TZ. The API treats
-    // them as UTC, so do the same here to keep FE/BE consistent.
+    // datetime-local inputs ("2026-05-25T00:11") have no TZ. Treat them as
+    // local time (matching what the organizer typed in the form).
     const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
-    const iso = hasTz ? s : `${s}Z`;
-    const t = new Date(iso).getTime();
-    return Number.isFinite(t) ? t : null;
+    const t = new Date(s).getTime(); // no-TZ string => parsed as local
+    return Number.isFinite(t) ? t : (hasTz ? null : null);
   };
+
   const now = Date.now();
   const opens = parseLocalish(rules.registration.opensAt);
   const closes = parseLocalish(rules.registration.closesAt);
