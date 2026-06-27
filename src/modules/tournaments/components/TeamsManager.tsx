@@ -478,9 +478,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                     const reg = Array.isArray(tm.tournament_registrations)
                       ? tm.tournament_registrations[0]
                       : tm.tournament_registrations;
-                    const contactName = reg?.contact_name ?? null;
+                    const contactName = reg?.contact_name ?? tm.contact_name ?? null;
                     const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
                     const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
+
                     if (!contactName && !contactEmail && !contactPhone) return null;
                     return (
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
