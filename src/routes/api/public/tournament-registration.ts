@@ -79,8 +79,8 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           return kind === "open" ? t - TZ_TOLERANCE_MS : t + TZ_TOLERANCE_MS;
         };
         const now = Date.now();
-        const opensAt = parseLocalish(reg.opensAt);
-        const closesAt = parseLocalish(reg.closesAt);
+        const opensAt = parseBound(reg.opensAt, "open");
+        const closesAt = parseBound(reg.closesAt, "close");
         if (opensAt !== null && opensAt > now) {
           return Response.json(
             { error: "Registration not yet open" },
