@@ -67,7 +67,22 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
           logoBytes = null;
         }
 
-        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes);
+        // Fetch club + tournament logos (best-effort).
+        let clubLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+        let tournamentLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+        if (t.club_id) {
+          const { data: club } = await supabaseAdmin
+            .from("clubs")
+            .select("logo_url")
+            .eq("id", t.club_id)
+            .maybeSingle();
+          if (club?.logo_url) clubLogo = await fetchImage(club.logo_url);
+        }
+        if (t.cover_image_url) {
+          tournamentLogo = await fetchImage(t.cover_image_url);
+        }
+
+        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes, clubLogo, tournamentLogo);
 
         return new Response(pdf as unknown as BodyInit, {
           status: 200,
