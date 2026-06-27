@@ -4479,6 +4479,7 @@ export type Database = {
       tournament_teams: {
         Row: {
           contact_email: string | null
+          contact_name: string | null
           contact_phone: string | null
           created_at: string
           group_id: string | null
@@ -4493,6 +4494,7 @@ export type Database = {
         }
         Insert: {
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
           group_id?: string | null
@@ -4507,6 +4509,7 @@ export type Database = {
         }
         Update: {
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
           group_id?: string | null

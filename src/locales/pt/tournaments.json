@@ -413,7 +413,7 @@
       "templateHint": "Ainda não tem um ficheiro? Descarregue o modelo.",
       "csvTemplate": "Modelo CSV",
       "csvFileLabel": "Ficheiro CSV",
-      "csvHint": "Uma equipa por linha. Colunas: <code>name, shortname, seed</code> (apenas o nome é obrigatório). Compatível com Excel / Numbers / Google Sheets.",
+      "csvHint": "Uma equipa por linha. Colunas: <code>name, shortname, seed, contact_name, contact_email, contact_phone</code> (apenas o nome é obrigatório). Compatível com Excel / Numbers / Google Sheets.",
       "pasteLabel": "Ou cole a sua lista",
       "logoHint": "Os logótipos podem ser adicionados posteriormente, equipa a equipa.",
       "external": "Equipa externa",

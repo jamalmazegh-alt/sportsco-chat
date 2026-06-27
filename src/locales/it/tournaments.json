@@ -413,7 +413,7 @@
       "templateHint": "Non hai ancora un file? Scarica il modello.",
       "csvTemplate": "Modello CSV",
       "csvFileLabel": "File CSV",
-      "csvHint": "Una squadra per riga. Colonne: <code>name, kurzname, seed</code> (solo il nome è obbligatorio). Compatibile con Excel / Numbers / Google Sheets.",
+      "csvHint": "Una squadra per riga. Colonne: <code>name, kurzname, seed, contact_name, contact_email, contact_phone</code> (solo il nome è obbligatorio). Compatibile con Excel / Numbers / Google Sheets.",
       "pasteLabel": "Oppure incolla la tua lista",
       "logoHint": "I loghi possono essere aggiunti in seguito, squadra per squadra.",
       "external": "Squadra esterna",

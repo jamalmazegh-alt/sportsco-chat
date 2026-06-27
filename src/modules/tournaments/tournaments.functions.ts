@@ -519,6 +519,7 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
               name: z.string().min(1).max(120),
               short_name: z.string().max(20).nullable().optional(),
               seed: z.number().int().min(1).nullable().optional(),
+              contact_name: z.string().max(120).nullable().optional(),
               contact_email: z.string().email().nullable().optional(),
               contact_phone: z.string().max(40).nullable().optional(),
             }),
@@ -550,9 +551,11 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
       name: t.name,
       short_name: t.short_name ?? null,
       seed: t.seed ?? null,
+      contact_name: t.contact_name ?? null,
       contact_email: t.contact_email ?? null,
       contact_phone: t.contact_phone ?? null,
     }));
+
     const { error, data: inserted } = await supabase
       .from("tournament_teams")
       .insert(rows)

@@ -41,8 +41,10 @@ interface TeamRow {
   logo_url: string | null;
   seed: number | null;
   team_id: string | null;
+  contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+
   tournament_registrations?:
     | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }
     | {
@@ -136,8 +138,16 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
   });
 
   const bulk = useMutation({
-    mutationFn: (rows: Array<{ name: string; short_name?: string | null; seed?: number | null }>) =>
-      bulkFn({ data: { tournament_id: tournamentId, teams: rows } }),
+    mutationFn: (
+      rows: Array<{
+        name: string;
+        short_name?: string | null;
+        seed?: number | null;
+        contact_name?: string | null;
+        contact_email?: string | null;
+        contact_phone?: string | null;
+      }>,
+    ) => bulkFn({ data: { tournament_id: tournamentId, teams: rows } }),
     onSuccess: (res: any) => {
       toast.success(t("teams.importedToast", { count: res.inserted }));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
@@ -147,25 +157,38 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
-  // Parse CSV / line list. Format per line: name[,short_name[,seed]]
+  // Parse CSV / line list. Columns: name[,short_name[,seed[,contact_name[,contact_email[,contact_phone]]]]]
   function parseBulk(text: string) {
     const lines = text
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter(Boolean);
-    const rows: Array<{ name: string; short_name?: string | null; seed?: number | null }> = [];
+    const rows: Array<{
+      name: string;
+      short_name?: string | null;
+      seed?: number | null;
+      contact_name?: string | null;
+      contact_email?: string | null;
+      contact_phone?: string | null;
+    }> = [];
     for (const line of lines) {
       // skip header
-      if (/^name[\s,;]/i.test(line) && rows.length === 0) continue;
+      if (/^(name|nom)[\s,;\t]/i.test(line) && rows.length === 0) continue;
       const parts = line.split(/[;,\t]/).map((p) => p.trim());
       const teamName = parts[0];
       if (!teamName) continue;
       const sn = parts[1] || null;
       const sd = parts[2] ? parseInt(parts[2], 10) : null;
+      const cName = parts[3] || null;
+      const cEmail = parts[4] || null;
+      const cPhone = parts[5] || null;
       rows.push({
         name: teamName,
         short_name: sn || null,
         seed: Number.isFinite(sd) && sd && sd > 0 ? sd : null,
+        contact_name: cName,
+        contact_email: cEmail && /.+@.+\..+/.test(cEmail) ? cEmail : null,
+        contact_phone: cPhone,
       });
     }
     return rows;
@@ -194,11 +217,11 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   function downloadCsvTemplate() {
     const csv =
-      "nom,nom_court,seed\n" +
-      "FC United,FCU,1\n" +
-      "Real Madrid,RMA,2\n" +
-      "Atlético,ATM,\n" +
-      "Olympique Lyonnais,OL,\n";
+      "nom,nom_court,seed,contact_nom,contact_email,contact_tel\n" +
+      "FC United,FCU,1,Jean Dupont,jean@fcu.com,+33600000001\n" +
+      "Real Madrid,RMA,2,,contact@rma.com,\n" +
+      "Atlético,ATM,,,,\n" +
+      "Olympique Lyonnais,OL,,Marie Martin,,+33600000004\n";
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -209,6 +232,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -476,9 +500,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                     const reg = Array.isArray(tm.tournament_registrations)
                       ? tm.tournament_registrations[0]
                       : tm.tournament_registrations;
-                    const contactName = reg?.contact_name ?? null;
+                    const contactName = reg?.contact_name ?? tm.contact_name ?? null;
                     const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
                     const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
+
                     if (!contactName && !contactEmail && !contactPhone) return null;
                     return (
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
