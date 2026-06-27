@@ -20,10 +20,12 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
   const { t } = useTranslation("common");
   let session: unknown = null;
   try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- intentional: boundary may render outside AuthProvider
     session = useAuth().session;
   } catch {
     // Rendered outside AuthProvider — fall back to public root.
   }
+
   const homeHref = session ? "/home" : "/";
   useEffect(() => {
     if (error) {
