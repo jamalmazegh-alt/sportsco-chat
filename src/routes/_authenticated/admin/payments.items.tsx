@@ -118,7 +118,6 @@ function PaymentItemsPage() {
     queryFn: () => listSeasonsFn({ data: { clubId: activeClubId! } }),
   });
 
-
   const currentSeason = useMemo(() => {
     const s = seasonsQ.data?.seasons ?? [];
     if (search.season) return s.find((x) => x.id === search.season) ?? null;
@@ -175,7 +174,6 @@ function PaymentItemsPage() {
 
   return (
     <div className="px-5 py-4 space-y-5 max-w-5xl">
-
       <BackLink to="/admin" label={t("common.back")} />
 
       <header className="flex flex-wrap items-end justify-between gap-3">

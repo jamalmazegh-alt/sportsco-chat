@@ -65,7 +65,6 @@ function HomePage() {
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   const listMyObligationsFn = useServerFn(listMyObligations);
 
-
   const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
     enabled: !!activeClubId,
@@ -230,7 +229,6 @@ function HomePage() {
   if (activeClubId && teamsLoading) {
     return <HomeSkeleton />;
   }
-
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">

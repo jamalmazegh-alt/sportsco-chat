@@ -150,7 +150,6 @@ function PublicTournamentPage() {
   const { tournament, groups, teams, matches } = data;
   void matches; // matchesAll/filteredMatches above use q.data directly
 
-
   const rules = mergeRules((tournament as any).settings);
   const scoring = resolveScoring(
     (tournament as any).sport,

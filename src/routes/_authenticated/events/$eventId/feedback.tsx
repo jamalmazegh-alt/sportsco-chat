@@ -114,7 +114,6 @@ function PostMatchFeedback() {
   }, [data]);
 
   const patch = useCallback((playerId: string, p: Partial<RowValue>) => {
-
     setValues((prev) => ({ ...prev, [playerId]: { ...(prev[playerId] ?? EMPTY), ...p } }));
     setDirty((prev) => {
       if (prev.has(playerId)) return prev;
@@ -256,8 +255,6 @@ function PostMatchFeedback() {
 
   if (!isAccessLoading && !isCoach && canAccessFeedback === false)
     return <Navigate to="/home" replace />;
-
-
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">

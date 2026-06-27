@@ -94,7 +94,6 @@ function DisciplinePage() {
     },
   });
 
-
   const filtered = useMemo(() => {
     const q = playerSearch.trim().toLowerCase();
     return rows.filter((r) => {
@@ -135,7 +134,6 @@ function DisciplinePage() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-
       <div className="flex items-center justify-between gap-2">
         <Link to="/home" className="inline-flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="h-4 w-4" />

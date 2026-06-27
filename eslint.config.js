@@ -36,7 +36,6 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "warn",
     },
-
   },
   eslintPluginPrettier,
 );
