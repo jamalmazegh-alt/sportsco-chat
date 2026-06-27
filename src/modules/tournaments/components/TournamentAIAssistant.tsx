@@ -699,6 +699,7 @@ interface QuestionViewProps {
   onTerrainNaming: (v: "now" | "later") => void;
   onConfirmTerrainNames: () => void;
   onPaid: (v: boolean) => void;
+  onPublicRegistration: (v: boolean) => void;
   onConfirmPaidAmount: () => void;
   onConfirmName: () => void;
   onConfirmDate: () => void;
