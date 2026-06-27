@@ -12,6 +12,13 @@ import { useAuth } from "@/lib/auth-context";
 export function useTournamentOnlyMode(): {
   isLoading: boolean;
   tournamentOnly: boolean;
+  /**
+   * True when the user is in tournament-only mode purely because they
+   * collaborate on a tournament (referee / co-organizer invite), without
+   * any pass / entitlement / organizer signup of their own. These are
+   * "light" profiles: no club, no tournament-creation surface, no pricing.
+   */
+  collaboratorOnly: boolean;
 } {
   const { user, memberships } = useAuth();
   const userId = user?.id ?? null;
@@ -21,7 +28,7 @@ export function useTournamentOnlyMode(): {
 
   const { data, isLoading } = useQuery({
     queryKey: ["tournament-only-mode", userId, clubIds.sort().join(",")],
-    enabled: !!userId && !isTournamentOrganizer,
+    enabled: !!userId,
     staleTime: 60_000,
     queryFn: async () => {
       const [passes, entitlements, subs, collaborations, pendingByEmail] = await Promise.all([
@@ -63,5 +70,15 @@ export function useTournamentOnlyMode(): {
     (!!data &&
       (data.usedCount > 0 || data.activeEntitlements > 0 || data.activeCollaborations > 0) &&
       data.activeSubs === 0);
-  return { isLoading: isLoading && !isTournamentOrganizer, tournamentOnly };
+
+  const collaboratorOnly =
+    !isTournamentOrganizer &&
+    !!data &&
+    data.activeCollaborations > 0 &&
+    data.usedCount === 0 &&
+    data.activeEntitlements === 0 &&
+    data.activeSubs === 0 &&
+    memberships.length === 0;
+
+  return { isLoading, tournamentOnly, collaboratorOnly };
 }
