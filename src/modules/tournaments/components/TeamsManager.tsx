@@ -46,6 +46,10 @@ interface TeamRow {
   contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  payment_status?: "unpaid" | "paid" | "exempt" | null;
+  amount_paid_cents?: number | null;
+  payment_currency?: string | null;
+  paid_at?: string | null;
 
   tournament_registrations?:
     | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }
