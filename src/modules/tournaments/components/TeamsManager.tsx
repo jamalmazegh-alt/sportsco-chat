@@ -25,6 +25,9 @@ import {
   Phone,
   User2,
   AlertCircle,
+  CheckCircle2,
+  Circle,
+  Banknote,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -46,6 +49,10 @@ interface TeamRow {
   contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  payment_status?: "unpaid" | "paid" | "exempt" | null;
+  amount_paid_cents?: number | null;
+  payment_currency?: string | null;
+  paid_at?: string | null;
 
   tournament_registrations?:
     | { contact_name?: string | null; contact_email?: string | null; contact_phone?: string | null }
@@ -136,6 +143,28 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
       toast.success(t("teams.deletedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setTeamToDelete(null);
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
+  });
+
+  const setPayment = useMutation({
+    mutationFn: async (vars: { teamId: string; status: "unpaid" | "paid" | "exempt" }) => {
+      const { data, error } = await supabase.rpc("set_tournament_team_payment", {
+        _team_id: vars.teamId,
+        _status: vars.status,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_d, vars) => {
+      const msg =
+        vars.status === "paid"
+          ? t("teams.payment.markedPaid", { defaultValue: "Marqué comme payé" })
+          : vars.status === "exempt"
+            ? t("teams.payment.markedExempt", { defaultValue: "Marqué exempté" })
+            : t("teams.payment.markedUnpaid", { defaultValue: "Marqué impayé" });
+      toast.success(msg);
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
@@ -563,6 +592,49 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                           </a>
                         )}
                       </div>
+                    );
+                  })()}
+                  {(() => {
+                    const ps = tm.payment_status ?? "unpaid";
+                    const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
+                      unpaid: "paid",
+                      paid: "exempt",
+                      exempt: "unpaid",
+                    };
+                    const styles =
+                      ps === "paid"
+                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        : ps === "exempt"
+                          ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-100";
+                    const label =
+                      ps === "paid"
+                        ? t("teams.payment.paid", { defaultValue: "Payé" })
+                        : ps === "exempt"
+                          ? t("teams.payment.exempt", { defaultValue: "Exempté" })
+                          : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
+                    const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
+                    return (
+                      <button
+                        type="button"
+                        disabled={setPayment.isPending}
+                        onClick={() =>
+                          setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
+                        }
+                        className={cn(
+                          "mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors disabled:opacity-50",
+                          styles,
+                        )}
+                        title={t("teams.payment.cycleHint", {
+                          defaultValue: "Cliquer pour changer le statut de paiement",
+                        })}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {label}
+                        {ps === "paid" && tm.amount_paid_cents
+                          ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
+                          : ""}
+                      </button>
                     );
                   })()}
                 </div>

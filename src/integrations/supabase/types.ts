@@ -4478,6 +4478,7 @@ export type Database = {
       }
       tournament_teams: {
         Row: {
+          amount_paid_cents: number | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -4485,14 +4486,21 @@ export type Database = {
           group_id: string | null
           id: string
           logo_url: string | null
+          marked_paid_by: string | null
           name: string
           notes: string | null
+          paid_at: string | null
+          payment_currency: string | null
+          payment_method: string | null
+          payment_note: string | null
+          payment_status: string
           seed: number | null
           short_name: string | null
           team_id: string | null
           tournament_id: string
         }
         Insert: {
+          amount_paid_cents?: number | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -4500,14 +4508,21 @@ export type Database = {
           group_id?: string | null
           id?: string
           logo_url?: string | null
+          marked_paid_by?: string | null
           name: string
           notes?: string | null
+          paid_at?: string | null
+          payment_currency?: string | null
+          payment_method?: string | null
+          payment_note?: string | null
+          payment_status?: string
           seed?: number | null
           short_name?: string | null
           team_id?: string | null
           tournament_id: string
         }
         Update: {
+          amount_paid_cents?: number | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -4515,8 +4530,14 @@ export type Database = {
           group_id?: string | null
           id?: string
           logo_url?: string | null
+          marked_paid_by?: string | null
           name?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_currency?: string | null
+          payment_method?: string | null
+          payment_note?: string | null
+          payment_status?: string
           seed?: number | null
           short_name?: string | null
           team_id?: string | null
@@ -4528,6 +4549,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "tournament_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_teams_marked_paid_by_fkey"
+            columns: ["marked_paid_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -5387,6 +5415,44 @@ export type Database = {
       set_team_logo_via_token: {
         Args: { _logo_url: string; _token: string }
         Returns: Json
+      }
+      set_tournament_team_payment: {
+        Args: {
+          _amount_cents?: number
+          _currency?: string
+          _method?: string
+          _note?: string
+          _status: string
+          _team_id: string
+        }
+        Returns: {
+          amount_paid_cents: number | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          group_id: string | null
+          id: string
+          logo_url: string | null
+          marked_paid_by: string | null
+          name: string
+          notes: string | null
+          paid_at: string | null
+          payment_currency: string | null
+          payment_method: string | null
+          payment_note: string | null
+          payment_status: string
+          seed: number | null
+          short_name: string | null
+          team_id: string | null
+          tournament_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "tournament_teams"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }
