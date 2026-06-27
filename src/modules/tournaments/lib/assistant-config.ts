@@ -130,6 +130,7 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     endsOn: "",
     location: "",
     useFairPlay: true,
+    publicRegistration: true,
     category: "",
     ...partial,
   };
