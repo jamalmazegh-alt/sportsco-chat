@@ -61,6 +61,7 @@ export type AssistantStepId =
   | "terrains"
   | "terrainNaming"
   | "terrainNames"
+  | "publicRegistration"
   | "paid"
   | "paidAmount"
   | "name"
