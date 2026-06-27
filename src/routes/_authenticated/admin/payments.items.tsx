@@ -105,17 +105,6 @@ function PaymentItemsPage() {
   const search = Route.useSearch();
   const nav = Route.useNavigate();
 
-  if (!roles.includes("admin") && !roles.includes("financial_admin")) {
-    return <Navigate to="/profile" replace />;
-  }
-  if (!activeClubId) {
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   const listSeasonsFn = useServerFn(listSeasons);
   const listItemsFn = useServerFn(listPaymentItems);
   const deleteFn = useServerFn(deletePaymentItem);
@@ -125,8 +114,10 @@ function PaymentItemsPage() {
 
   const seasonsQ = useQuery({
     queryKey: ["seasons", activeClubId],
-    queryFn: () => listSeasonsFn({ data: { clubId: activeClubId } }),
+    enabled: !!activeClubId,
+    queryFn: () => listSeasonsFn({ data: { clubId: activeClubId! } }),
   });
+
 
   const currentSeason = useMemo(() => {
     const s = seasonsQ.data?.seasons ?? [];
