@@ -118,6 +118,8 @@ interface Props {
   autoOpenMatchId?: string | null;
   /** Called after the auto-open has been consumed, so the parent can reset its state. */
   onAutoOpenConsumed?: () => void;
+  /** Pré-active le filtre « Mes matchs » au montage (vue arbitre). */
+  defaultOnlyMine?: boolean;
 }
 
 export function MatchesList({
@@ -129,6 +131,7 @@ export function MatchesList({
   scoring,
   autoOpenMatchId,
   onAutoOpenConsumed,
+  defaultOnlyMine = false,
 }: Props) {
   const { t } = useTranslation("tournaments");
   const { user } = useAuth();
