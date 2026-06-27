@@ -62,15 +62,25 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             { status: 400 },
           );
         }
-        const parseLocalish = (s: string | null | undefined): number | null => {
+        // Naive datetime strings (from <input type="datetime-local">) have no
+        // timezone. The server runs in UTC, so we cannot know the organizer's
+        // local zone — apply a ±14h tolerance to cover any timezone. Strings
+        // that already include a timezone are honored exactly.
+        const TZ_TOLERANCE_MS = 14 * 60 * 60 * 1000;
+        const parseBound = (
+          s: string | null | undefined,
+          kind: "open" | "close",
+        ): number | null => {
           if (!s) return null;
           const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
           const t = new Date(hasTz ? s : `${s}Z`).getTime();
-          return Number.isFinite(t) ? t : null;
+          if (!Number.isFinite(t)) return null;
+          if (hasTz) return t;
+          return kind === "open" ? t - TZ_TOLERANCE_MS : t + TZ_TOLERANCE_MS;
         };
         const now = Date.now();
-        const opensAt = parseLocalish(reg.opensAt);
-        const closesAt = parseLocalish(reg.closesAt);
+        const opensAt = parseBound(reg.opensAt, "open");
+        const closesAt = parseBound(reg.closesAt, "close");
         if (opensAt !== null && opensAt > now) {
           return Response.json(
             { error: "Registration not yet open" },
