@@ -270,7 +270,7 @@ function MatchRow({
       )}
       <div className="flex flex-1 min-w-0 items-center gap-2">
         <span className="flex-1 truncate text-right text-sm font-semibold text-foreground dark:text-slate-100">
-          {teamLabel(a)}
+          {teamLabel(a, m.team_a_source)}
         </span>
         <span
           className={cn(
@@ -284,7 +284,7 @@ function MatchRow({
           {m.score_a ?? 0} - {m.score_b ?? 0}
         </span>
         <span className="flex-1 truncate text-sm font-semibold text-foreground dark:text-slate-100">
-          {teamLabel(b)}
+          {teamLabel(b, m.team_b_source)}
         </span>
       </div>
       {interactive && (
