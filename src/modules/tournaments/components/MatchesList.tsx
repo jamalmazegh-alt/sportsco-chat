@@ -850,6 +850,29 @@ function MatchCard({
       : "__none__";
   const [refMode, setRefMode] = useState<string>(initialRefValue);
   const [refFreeName, setRefFreeName] = useState<string>(match.referee_name ?? "");
+
+  // Re-sync schedule/referee edit fields with the latest match data whenever
+  // the dialog opens — otherwise initial useState values (captured when the
+  // row mounted, sometimes before the match payload had field/time/referee)
+  // make the dialog look empty even though the match is already scheduled.
+  useEffect(() => {
+    if (!editOpen) return;
+    const d = match.scheduled_at ? new Date(match.scheduled_at) : null;
+    setEditField(match.field ?? "");
+    setEditDate(
+      d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "",
+    );
+    setEditTime(d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "");
+    setRefMode(
+      match.referee_user_id
+        ? `user:${match.referee_user_id}`
+        : match.referee_name
+          ? "free"
+          : "__none__",
+    );
+    setRefFreeName(match.referee_name ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editOpen, match.field, match.scheduled_at, match.referee_user_id, match.referee_name]);
   const saveRef = useMutation({
     mutationFn: () => {
       let payload: { referee_user_id: string | null; referee_name: string | null };
