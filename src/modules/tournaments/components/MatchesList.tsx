@@ -219,7 +219,7 @@ export function MatchesList({
                 tournamentId={tournamentId}
                 teamA={m.team_a_id ? teamMap.get(m.team_a_id) : undefined}
                 teamB={m.team_b_id ? teamMap.get(m.team_b_id) : undefined}
-                canManage={!!canManage}
+                canManage={!!canManage || (!!currentUserId && m.referee_user_id === currentUserId)}
                 fields={fields ?? []}
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
