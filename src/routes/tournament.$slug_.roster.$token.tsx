@@ -141,7 +141,9 @@ function RosterPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState("");
   const [importMode, setImportMode] = useState<"replace" | "append">("append");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const q = useQuery({
     queryKey: ["roster", token],
