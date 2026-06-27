@@ -1048,6 +1048,23 @@ function QuestionView(p: QuestionViewProps) {
           </div>
         )}
 
+        {stepId === "publicRegistration" && (
+          <OptList>
+            <Opt
+              onClick={() => p.onPublicRegistration(true)}
+              hint={t("aiAssistant.opts.publicRegistrationYesHint")}
+            >
+              {t("aiAssistant.opts.publicRegistrationYes")}
+            </Opt>
+            <Opt
+              onClick={() => p.onPublicRegistration(false)}
+              hint={t("aiAssistant.opts.publicRegistrationNoHint")}
+            >
+              {t("aiAssistant.opts.publicRegistrationNo")}
+            </Opt>
+          </OptList>
+        )}
+
         {stepId === "paid" && (
           <OptGrid cols={2}>
             <OptG onClick={() => p.onPaid(false)}>{t("aiAssistant.opts.free")}</OptG>
