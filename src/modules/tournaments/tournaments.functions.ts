@@ -182,8 +182,21 @@ export const createTournament = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
+
+    // For personal-club tournaments, consume one single entitlement (no-op for annual / superadmin).
+    if (isPersonal && row) {
+      try {
+        await supabaseAdmin.rpc("consume_single_entitlement", {
+          _user_id: userId,
+          _tournament_id: row.id,
+        });
+      } catch (e) {
+        console.warn("consume_single_entitlement failed (non-fatal)", e);
+      }
+    }
     return { tournament: row };
   });
+
 
 export const listMyTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
