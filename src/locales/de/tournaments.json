@@ -1212,7 +1212,8 @@
       "name": "Name auf der öffentlichen Seite.",
       "date": "Wann findet das Turnier statt?",
       "location": "Adresse oder Stadt des Austragungsorts.",
-      "summary": "Alles bereit. Tippe eine Zeile zum Bearbeiten und erstelle."
+      "summary": "Alles bereit. Tippe eine Zeile zum Bearbeiten und erstelle.",
+      "publicRegistration": "Aktiviere die öffentliche Anmeldeseite für Teams."
     },
     "questionLabel": "Frage {{n}}",
     "tapHint": "Antwort antippen — der Assistent macht automatisch weiter",
@@ -1286,7 +1287,8 @@
       "name": "Wie heißt das Turnier?",
       "date": "Welches Datum (und Enddatum bei mehrtägig)?",
       "location": "Wo findet es statt?",
-      "summary": "Zusammenfassung"
+      "summary": "Zusammenfassung",
+      "publicRegistration": "Anmeldungen öffentlich öffnen?"
     },
     "opts": {
       "playersPerTeam": "{{count}} Spieler",
@@ -1330,7 +1332,11 @@
       "lunch0": "Keine Pause",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure"
+      "lunch60": "1 heure",
+      "publicRegistrationYes": "Ja, öffentliche Seite öffnen",
+      "publicRegistrationYesHint": "Teams können sich online anmelden",
+      "publicRegistrationNo": "Nein, ich verwalte die Anmeldungen selbst",
+      "publicRegistrationNoHint": "Du lädst die Teams selbst ein"
     },
     "cta": {
       "create": "Turnier erstellen",

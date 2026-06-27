@@ -1212,7 +1212,8 @@
       "name": "Le nom qui sera affiché sur la page publique.",
       "date": "Quand a lieu le tournoi ?",
       "location": "L'adresse ou la ville du tournoi.",
-      "summary": "Tout est prêt. Clique sur n'importe quelle ligne pour ajuster, puis crée."
+      "summary": "Tout est prêt. Clique sur n'importe quelle ligne pour ajuster, puis crée.",
+      "publicRegistration": "Active la page publique d'inscription en ligne pour les équipes."
     },
     "questionLabel": "Question {{n}}",
     "tapHint": "Touche une réponse — l'assistant enchaîne tout seul",
@@ -1286,7 +1287,8 @@
       "name": "Comment s'appelle le tournoi ?",
       "date": "Quelle date (et fin si plusieurs jours) ?",
       "location": "Où se déroule le tournoi ?",
-      "summary": "Récapitulatif"
+      "summary": "Récapitulatif",
+      "publicRegistration": "Ouvrir les inscriptions au public ?"
     },
     "opts": {
       "playersPerTeam": "{{count}} joueurs",
@@ -1330,7 +1332,11 @@
       "lunch0": "Sans pause",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure"
+      "lunch60": "1 heure",
+      "publicRegistrationYes": "Oui, ouvrir la page publique",
+      "publicRegistrationYesHint": "Les équipes pourront s'inscrire en ligne",
+      "publicRegistrationNo": "Non, inscription gérée à la main",
+      "publicRegistrationNoHint": "Tu invites les équipes toi-même"
     },
     "cta": {
       "create": "Créer le tournoi",

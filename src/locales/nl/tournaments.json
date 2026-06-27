@@ -1212,7 +1212,8 @@
       "name": "Naam op de publieke pagina.",
       "date": "Wanneer vindt het toernooi plaats?",
       "location": "Adres of stad van de locatie.",
-      "summary": "Alles klaar. Tik op een rij om aan te passen en maak aan."
+      "summary": "Alles klaar. Tik op een rij om aan te passen en maak aan.",
+      "publicRegistration": "Activeer de openbare inschrijvingspagina voor teams."
     },
     "questionLabel": "Vraag {{n}}",
     "tapHint": "Tik een antwoord — de assistent gaat vanzelf verder",
@@ -1286,7 +1287,8 @@
       "name": "Hoe heet het toernooi?",
       "date": "Welke datum (en einddatum bij meerdere dagen)?",
       "location": "Waar vindt het plaats?",
-      "summary": "Overzicht"
+      "summary": "Overzicht",
+      "publicRegistration": "Inschrijvingen openstellen voor het publiek?"
     },
     "opts": {
       "playersPerTeam": "{{count}} spelers",
@@ -1330,7 +1332,11 @@
       "lunch0": "Geen pauze",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure"
+      "lunch60": "1 heure",
+      "publicRegistrationYes": "Ja, open de openbare pagina",
+      "publicRegistrationYesHint": "Teams kunnen zich online inschrijven",
+      "publicRegistrationNo": "Nee, ik beheer inschrijvingen zelf",
+      "publicRegistrationNoHint": "Je nodigt teams zelf uit"
     },
     "cta": {
       "create": "Toernooi maken",
