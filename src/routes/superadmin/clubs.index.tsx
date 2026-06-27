@@ -30,6 +30,9 @@ type Club = {
   archived_at: string | null;
   is_personal: boolean;
   subscription: Subscription | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
 };
 
 type BillingPill = {
