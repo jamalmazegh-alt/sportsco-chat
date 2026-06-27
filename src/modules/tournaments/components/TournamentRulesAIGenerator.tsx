@@ -116,7 +116,6 @@ export function TournamentRulesAIGenerator({ tournamentId, locale = "fr", onInse
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </>
   );
 }

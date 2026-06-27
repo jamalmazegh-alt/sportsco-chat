@@ -29,7 +29,6 @@ import {
   Circle,
   Banknote,
   RefreshCw,
-
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -533,11 +532,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                     }
                   >
                     {tm.logo_url ? (
-                      <img
-                        src={tm.logo_url}
-                        alt={tm.name}
-                        className="h-full w-full object-cover"
-                      />
+                      <img src={tm.logo_url} alt={tm.name} className="h-full w-full object-cover" />
                     ) : (
                       <span>{initials || "?"}</span>
                     )}
@@ -552,9 +547,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                           #{tm.seed}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground/70">
-                          {t("teams.row.noSeed")}
-                        </span>
+                        <span className="text-muted-foreground/70">{t("teams.row.noSeed")}</span>
                       )}
                       <span
                         className={cn(
@@ -658,9 +651,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                       <button
                         type="button"
                         disabled={setPayment.isPending}
-                        onClick={() =>
-                          setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
-                        }
+                        onClick={() => setPayment.mutate({ teamId: tm.id, status: cycle[ps] })}
                         className={cn(
                           "group ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-dashed transition-colors disabled:opacity-50 cursor-pointer",
                           styles,

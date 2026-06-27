@@ -406,7 +406,6 @@ export function FlightsManager({
               ))}
             </div>
 
-
             {/* Fix F — message de repli si "Champions" non applicable */}
             {template === "champions" && !championsApplicable && (
               <div className="mt-3 flex items-start gap-3 rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 p-3">

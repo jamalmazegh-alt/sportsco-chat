@@ -401,7 +401,6 @@ function TournamentDetailPage() {
     );
   }
 
-
   // ─── Vue arbitre simplifiée ─────────────────────────────────────────────
   if (isRefereeOnly) {
     return (
@@ -632,7 +631,6 @@ function TournamentDetailPage() {
                 {tournament.name}
               </h1>
             </div>
-
 
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/90">
               <span className="inline-flex items-center gap-1.5">

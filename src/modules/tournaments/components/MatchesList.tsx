@@ -859,9 +859,7 @@ function MatchCard({
     if (!editOpen) return;
     const d = match.scheduled_at ? new Date(match.scheduled_at) : null;
     setEditField(match.field ?? "");
-    setEditDate(
-      d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "",
-    );
+    setEditDate(d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "");
     setEditTime(d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "");
     setRefMode(
       match.referee_user_id
@@ -871,7 +869,6 @@ function MatchCard({
           : "__none__",
     );
     setRefFreeName(match.referee_name ?? "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editOpen, match.field, match.scheduled_at, match.referee_user_id, match.referee_name]);
   const saveRef = useMutation({
     mutationFn: () => {

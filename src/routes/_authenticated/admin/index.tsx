@@ -38,7 +38,6 @@ function AdminSettingsPage() {
   const roles = useMyRoles();
   const { tournamentOnly } = useTournamentOnlyMode();
 
-
   const { data, isLoading } = useQuery({
     queryKey: ["club-name", activeClubId],
     enabled: !!activeClubId,
@@ -159,7 +158,6 @@ function AdminSettingsPage() {
     },
   ];
   const items = allItems.filter((it) => !it.hidden && !(tournamentOnly && it.clubOnly));
-
 
   return (
     <div className="px-5 py-4 space-y-4">

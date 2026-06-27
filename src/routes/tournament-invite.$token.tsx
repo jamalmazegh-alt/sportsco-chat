@@ -128,10 +128,7 @@ function AcceptInvitePage() {
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full">
-            <Link
-              to="/login"
-              search={{ next: `/tournament-invite/${token}` }}
-            >
+            <Link to="/login" search={{ next: `/tournament-invite/${token}` }}>
               {t("invite.signIn")}
             </Link>
           </Button>
