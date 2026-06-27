@@ -42,12 +42,14 @@ function RegisterPage() {
   const search = useSearch({ from: "/register" });
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(search.email ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [signupRole, setSignupRole] = useState<SignupRole>(search.invite ? "player" : "club_admin");
   const inviteToken = search.invite ?? "";
   const hasInvite = inviteToken.length > 0;
+  const nextPath = search.next ?? "/home";
+  const emailLockedByQuery = !!search.email && !hasInvite;
   // Member invite kind ("player" | "parent" | "member") if the token belongs to member_invites.
   // Null while loading; "club" means token isn't found in member_invites and we'll fall back to club_invites.
   const [inviteKind, setInviteKind] = useState<string | null>(null);
