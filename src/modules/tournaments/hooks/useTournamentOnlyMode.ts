@@ -47,11 +47,19 @@ export function useTournamentOnlyMode(): {
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId!)
           .is("revoked_at", null),
+        supabase.rpc("current_user_has_tournament_collab"),
       ]);
       const usedCount = passes.count ?? 0;
       const activeEntitlements = entitlements.count ?? 0;
       const activeSubs = (subs as { count: number | null }).count ?? 0;
       const activeCollaborations = collaborations.count ?? 0;
+      const pendingCollabByEmail = (arguments[4] as { data: boolean | null })?.data === true;
+      return {
+        usedCount,
+        activeEntitlements,
+        activeSubs,
+        activeCollaborations: activeCollaborations + (pendingCollabByEmail ? 1 : 0),
+      };
       return { usedCount, activeEntitlements, activeSubs, activeCollaborations };
     },
   });
