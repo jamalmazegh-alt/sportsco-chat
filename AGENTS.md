@@ -49,3 +49,44 @@ Features like marketing AI chat (`/api/public/marketing-chat`) need `LOVABLE_API
 ### Deploy target
 
 Production deploys to **Cloudflare Workers** via `wrangler.jsonc`. Local dev uses Vite SSR; no Wrangler dev server is required for normal development.
+
+## Discipline de tests obligatoire
+
+- Après tout changement touchant :
+  - `src/lib/**`
+  - `src/modules/**`
+  - `src/components/**`
+  - `src/routes/api/**`
+  - tout fichier importé par un `*.test.ts`
+
+  lancer obligatoirement :
+
+  ```bash
+  bun run test
+  ```
+
+- Si le changement touche une zone critique sécurité ou données :
+  - RLS
+  - feature flags
+  - rate-limit
+  - privacy-worker
+  - `src/routes/api/**`
+  - onboarding
+  - tournament registration / roster
+
+  lancer aussi :
+
+  ```bash
+  bun run check:guards
+  bun run check:i18n
+  ```
+
+- Ne jamais considérer une tâche terminée sans indiquer clairement :
+  - tests lancés
+  - résultat
+  - tests rouges éventuels
+  - corrections appliquées
+
+- Ne jamais faire passer un test au vert en affaiblissant son assertion sans validation explicite.
+  Mettre à jour une fixture car un schéma a changé est autorisé.
+  Modifier une assertion de comportement est interdit sans expliquer le changement et obtenir validation.
