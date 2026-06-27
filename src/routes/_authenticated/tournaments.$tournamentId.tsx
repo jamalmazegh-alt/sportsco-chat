@@ -753,7 +753,7 @@ function TournamentDetailPage() {
             id="section-registrations"
             icon={ClipboardList}
             title={t("tabs.registrations", { defaultValue: "Inscriptions" })}
-            collapsedByDefault
+          
           >
             <RegistrationsManager
               tournamentId={tournament.id}

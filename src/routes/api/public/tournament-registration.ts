@@ -190,6 +190,43 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           }
         }
 
+        // Notify the organizer (tournament creator) of the new registration
+        try {
+          const { data: organizer } = await supabase.auth.admin.getUserById(
+            (tournament as any).created_by ?? "",
+          );
+          const organizerEmail = organizer?.user?.email ?? null;
+          if (organizerEmail) {
+            const { data: organizerProfile } = await supabase
+              .from("profiles")
+              .select("first_name, full_name")
+              .eq("id", (tournament as any).created_by)
+              .maybeSingle();
+            const organizerName =
+              (organizerProfile as any)?.first_name ||
+              (organizerProfile as any)?.full_name ||
+              undefined;
+            const manageUrl = `${origin}/tournaments/${tournament.id}#section-registrations`;
+            await enqueueTransactionalEmailServer({
+              templateName: "tournament-registration-received",
+              recipientEmail: organizerEmail,
+              templateData: {
+                organizerName,
+                tournamentName: tournament.name,
+                teamName: parsed.team_name,
+                contactName: parsed.contact_name,
+                contactEmail: parsed.contact_email,
+                contactPhone: parsed.contact_phone ?? undefined,
+                manageUrl,
+                requiresApproval: !!reg.requiresApproval,
+              },
+              idempotencyKey: `registration-received:${row.id}`,
+            });
+          }
+        } catch (e) {
+          console.error("Failed to notify organizer of new registration", e);
+        }
+
         // Online payment
         const fee = (tournament as any).registration_fee ?? 0;
         const mode = (tournament as any).payment_mode ?? "offline";
