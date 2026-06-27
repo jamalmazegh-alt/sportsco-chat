@@ -62,16 +62,21 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             { status: 400 },
           );
         }
-        // Naive datetime strings (from <input type="datetime-local">) are
-        // intentionally interpreted as LOCAL time to match what the organizer
-        // typed in the form. Strings that already include a timezone are
-        // honored as-is.
-        const parseLocalish = (s: string | null | undefined): number | null => {
+        // Naive datetime strings (from <input type="datetime-local">) have no
+        // timezone. The server runs in UTC, so we cannot know the organizer's
+        // local zone — apply a ±14h tolerance to cover any timezone. Strings
+        // that already include a timezone are honored exactly.
+        const TZ_TOLERANCE_MS = 14 * 60 * 60 * 1000;
+        const parseBound = (
+          s: string | null | undefined,
+          kind: "open" | "close",
+        ): number | null => {
           if (!s) return null;
           const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
-          const t = new Date(s).getTime();
-          if (hasTz) return Number.isFinite(t) ? t : null;
-          return Number.isFinite(t) ? t : null;
+          const t = new Date(hasTz ? s : `${s}Z`).getTime();
+          if (!Number.isFinite(t)) return null;
+          if (hasTz) return t;
+          return kind === "open" ? t - TZ_TOLERANCE_MS : t + TZ_TOLERANCE_MS;
         };
         const now = Date.now();
         const opensAt = parseLocalish(reg.opensAt);
