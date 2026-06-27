@@ -594,6 +594,49 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                       </div>
                     );
                   })()}
+                  {(() => {
+                    const ps = tm.payment_status ?? "unpaid";
+                    const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
+                      unpaid: "paid",
+                      paid: "exempt",
+                      exempt: "unpaid",
+                    };
+                    const styles =
+                      ps === "paid"
+                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        : ps === "exempt"
+                          ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-100";
+                    const label =
+                      ps === "paid"
+                        ? t("teams.payment.paid", { defaultValue: "Payé" })
+                        : ps === "exempt"
+                          ? t("teams.payment.exempt", { defaultValue: "Exempté" })
+                          : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
+                    const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
+                    return (
+                      <button
+                        type="button"
+                        disabled={setPayment.isPending}
+                        onClick={() =>
+                          setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
+                        }
+                        className={cn(
+                          "mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors disabled:opacity-50",
+                          styles,
+                        )}
+                        title={t("teams.payment.cycleHint", {
+                          defaultValue: "Cliquer pour changer le statut de paiement",
+                        })}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {label}
+                        {ps === "paid" && tm.amount_paid_cents
+                          ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
+                          : ""}
+                      </button>
+                    );
+                  })()}
                 </div>
                 <Button
                   size="icon"
