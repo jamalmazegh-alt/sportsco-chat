@@ -821,6 +821,9 @@ function MatchRow({
   const isLive = match.status === "live";
   const winnerA = match.winner_team_id && match.winner_team_id === match.team_a_id;
   const winnerB = match.winner_team_id && match.winner_team_id === match.team_b_id;
+  const labelA = resolveTeamLabel(a, match.team_a_source, t);
+  const labelB = resolveTeamLabel(b, match.team_b_source, t);
+  const roundLbl = matchRoundLabel(match, t);
   return (
     <li
       className={cn(
@@ -828,6 +831,14 @@ function MatchRow({
         isLive && "bg-red-500/5 animate-pulse-ring",
       )}
     >
+      {roundLbl && (
+        <div className="flex justify-center mb-1">
+          <span className="rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+            {roundLbl}
+            {match.match_number ? ` · M${match.match_number}` : ""}
+          </span>
+        </div>
+      )}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span
           className={cn(
@@ -836,7 +847,7 @@ function MatchRow({
           )}
         >
           {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
-          {a?.name ?? t("common.tbd")}
+          {labelA}
         </span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
           <span className={cn(winnerA && "text-foreground", !winnerA && "text-muted-foreground")}>
@@ -854,7 +865,7 @@ function MatchRow({
             winnerB && "font-semibold text-foreground",
           )}
         >
-          {b?.name ?? t("common.tbd")}
+          {labelB}
           {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
         </span>
       </div>
