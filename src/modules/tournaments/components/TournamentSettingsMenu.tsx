@@ -132,6 +132,7 @@ export function TournamentSettingsMenu({
         <Button
           variant="outline"
           size="icon"
+          className="bg-white text-slate-900 hover:bg-white/90 hover:text-slate-900 border-white shadow-sm"
           aria-label={t("controlCenter.settings.title", { defaultValue: "Configuration" })}
         >
           <MoreVertical className="h-4 w-4" />
