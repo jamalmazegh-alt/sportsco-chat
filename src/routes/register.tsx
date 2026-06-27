@@ -24,6 +24,8 @@ type SignupRole = "club_admin" | "player" | "parent";
 export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({
     invite: typeof search.invite === "string" ? search.invite : undefined,
+    email: typeof search.email === "string" ? search.email : undefined,
+    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
   }),
   component: RegisterPage,
   head: () => ({
@@ -40,12 +42,14 @@ function RegisterPage() {
   const search = useSearch({ from: "/register" });
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(search.email ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [signupRole, setSignupRole] = useState<SignupRole>(search.invite ? "player" : "club_admin");
   const inviteToken = search.invite ?? "";
   const hasInvite = inviteToken.length > 0;
+  const nextPath = search.next ?? "/home";
+  const emailLockedByQuery = !!search.email && !hasInvite;
   // Member invite kind ("player" | "parent" | "member") if the token belongs to member_invites.
   // Null while loading; "club" means token isn't found in member_invites and we'll fall back to club_invites.
   const [inviteKind, setInviteKind] = useState<string | null>(null);
@@ -113,7 +117,7 @@ function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/home`,
+        emailRedirectTo: `${window.location.origin}${nextPath}`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
@@ -143,7 +147,7 @@ function RegisterPage() {
       }
       setBusy(false);
       toast.success(t("auth.signupSuccess"));
-      navigate({ to: "/home" });
+      (navigate as any)({ to: nextPath });
       return;
     }
     // No session: email confirmation is required. For invited users the
@@ -165,7 +169,7 @@ function RegisterPage() {
         }
         setBusy(false);
         toast.success(t("auth.signupSuccess"));
-        navigate({ to: "/home" });
+        (navigate as any)({ to: nextPath });
         return;
       } catch (err: any) {
         setBusy(false);
@@ -290,8 +294,8 @@ function RegisterPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={inviteEmailLocked || inviteLoading}
-              className={inviteEmailLocked ? "bg-muted text-muted-foreground" : undefined}
+              disabled={inviteEmailLocked || emailLockedByQuery || inviteLoading}
+              className={inviteEmailLocked || emailLockedByQuery ? "bg-muted text-muted-foreground" : undefined}
             />
             {inviteEmailLocked && (
               <p className="text-xs text-muted-foreground">

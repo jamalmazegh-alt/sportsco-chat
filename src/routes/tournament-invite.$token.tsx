@@ -109,11 +109,38 @@ function AcceptInvitePage() {
           </Button>
         </div>
       ) : !user ? (
-        <div className="space-y-2">
-          <p className="text-sm text-center text-muted-foreground">{t("invite.loginPrompt")}</p>
+        <div className="space-y-3">
+          <p className="text-sm text-center text-muted-foreground">
+            {t("invite.noAccountPrompt", {
+              defaultValue:
+                "Pour accepter cette invitation, créez votre compte Clubero avec l'email invité ou connectez-vous si vous en avez déjà un.",
+            })}
+          </p>
           <Button asChild className="w-full">
-            <Link to="/login">{t("invite.signIn")}</Link>
+            <Link
+              to="/register"
+              search={{
+                email: invite.email,
+                next: `/tournament-invite/${token}`,
+              }}
+            >
+              {t("invite.createAccount", { defaultValue: "Créer mon compte" })}
+            </Link>
           </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link
+              to="/login"
+              search={{ next: `/tournament-invite/${token}` }}
+            >
+              {t("invite.signIn")}
+            </Link>
+          </Button>
+          <p className="text-xs text-center text-muted-foreground">
+            {t("invite.useExactEmail", {
+              defaultValue: "Utilisez bien l'email {{email}} pour que l'invitation soit reconnue.",
+              email: invite.email,
+            })}
+          </p>
         </div>
       ) : (
         <Button className="w-full" disabled={accept.isPending} onClick={() => accept.mutate()}>

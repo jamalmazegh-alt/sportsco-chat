@@ -10,6 +10,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
     invite: typeof search.invite === "string" ? search.invite : undefined,
+    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
   }),
   component: LoginPage,
   head: () => ({
@@ -53,7 +54,7 @@ function LoginPage() {
       }
     }
     if (typeof window !== "undefined") {
-      window.location.replace("/home");
+      window.location.replace(search.next ?? "/home");
     }
   }
 
