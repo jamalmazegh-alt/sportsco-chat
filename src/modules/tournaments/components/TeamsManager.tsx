@@ -148,11 +148,12 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
         contact_phone?: string | null;
       }>,
     ) => bulkFn({ data: { tournament_id: tournamentId, teams: rows } }),
-    onSuccess: (res: any) => {
-      toast.success(t("teams.importedToast", { count: res.inserted }));
-      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    onSuccess: async (res: any) => {
+      toast.success(t("teams.importedToast", { count: res?.inserted ?? 0 }));
       setBulkOpen(false);
       setBulkText("");
+      await qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      await qc.refetchQueries({ queryKey: ["tournament", tournamentId], type: "active" });
     },
     onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
