@@ -98,6 +98,24 @@ function PublicTournamentPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [teamFilter, setTeamFilter] = useState<string>("all");
 
+  const events = ((q.data as any)?.events ?? []) as any[];
+  const eventsByMatch = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const e of events) {
+      const arr = map.get(e.match_id) ?? [];
+      arr.push(e);
+      map.set(e.match_id, arr);
+    }
+    return map;
+  }, [events]);
+  const matchesAll = (q.data as any)?.matches ?? [];
+  const filteredMatches = useMemo(() => {
+    if (teamFilter === "all") return matchesAll;
+    return (matchesAll as any[]).filter(
+      (m) => m.team_a_id === teamFilter || m.team_b_id === teamFilter,
+    );
+  }, [matchesAll, teamFilter]);
+
   if (q.isLoading && !q.data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -130,22 +148,8 @@ function PublicTournamentPage() {
   }
 
   const { tournament, groups, teams, matches } = data;
-  const events = ((q.data as any).events ?? []) as any[];
-  const eventsByMatch = useMemo(() => {
-    const map = new Map<string, any[]>();
-    for (const e of events) {
-      const arr = map.get(e.match_id) ?? [];
-      arr.push(e);
-      map.set(e.match_id, arr);
-    }
-    return map;
-  }, [events]);
-  const filteredMatches = useMemo(() => {
-    if (teamFilter === "all") return matches;
-    return (matches as any[]).filter(
-      (m) => m.team_a_id === teamFilter || m.team_b_id === teamFilter,
-    );
-  }, [matches, teamFilter]);
+  void matches; // matchesAll/filteredMatches above use q.data directly
+
 
   const rules = mergeRules((tournament as any).settings);
   const scoring = resolveScoring(
