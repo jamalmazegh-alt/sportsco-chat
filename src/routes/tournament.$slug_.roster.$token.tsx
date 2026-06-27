@@ -334,6 +334,120 @@ function RosterPage() {
       </h1>
       <p className="text-sm text-muted-foreground mb-4">{reg.tournament_name}</p>
 
+      {approved && (
+        <div className="mb-5 flex items-center gap-4 rounded-md border bg-card p-3">
+          <div className="h-16 w-16 rounded-md border bg-muted overflow-hidden flex items-center justify-center shrink-0">
+            {reg.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={reg.logo_url}
+                alt={reg.team_name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                {t("roster.logo.none", { defaultValue: "Pas de logo" })}
+              </span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">
+              {t("roster.logo.title", { defaultValue: "Logo de l'équipe" })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t("roster.logo.help", {
+                defaultValue: "PNG, JPG, WEBP ou SVG · 4 Mo max",
+              })}
+            </p>
+            <div className="mt-2 flex gap-2 flex-wrap">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={uploadingLogo}
+                onClick={() => logoInputRef.current?.click()}
+              >
+                {uploadingLogo ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                {reg.logo_url
+                  ? t("roster.logo.change", { defaultValue: "Changer" })
+                  : t("roster.logo.upload", { defaultValue: "Ajouter un logo" })}
+              </Button>
+              {reg.logo_url && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={uploadingLogo}
+                  onClick={async () => {
+                    setUploadingLogo(true);
+                    try {
+                      const res = await fetch(
+                        `/api/public/tournament-roster-logo?token=${encodeURIComponent(token)}`,
+                        { method: "DELETE" },
+                      );
+                      const data = await res.json();
+                      if (!res.ok) {
+                        toast.error(data?.error ?? "Erreur");
+                        return;
+                      }
+                      toast.success(
+                        t("roster.logo.removed", { defaultValue: "Logo supprimé" }),
+                      );
+                      q.refetch();
+                    } finally {
+                      setUploadingLogo(false);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t("common.remove", { defaultValue: "Supprimer" })}
+                </Button>
+              )}
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!f) return;
+                  if (f.size > 4 * 1024 * 1024) {
+                    toast.error(
+                      t("roster.logo.tooLarge", { defaultValue: "Fichier trop volumineux (4 Mo max)" }),
+                    );
+                    return;
+                  }
+                  setUploadingLogo(true);
+                  try {
+                    const fd = new FormData();
+                    fd.append("token", token);
+                    fd.append("file", f);
+                    const res = await fetch("/api/public/tournament-roster-logo", {
+                      method: "POST",
+                      body: fd,
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                      toast.error(data?.error ?? "Erreur");
+                      return;
+                    }
+                    toast.success(t("roster.logo.uploaded", { defaultValue: "Logo enregistré" }));
+                    q.refetch();
+                  } finally {
+                    setUploadingLogo(false);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {!approved ? (
         <div className="rounded-md border bg-muted/40 p-4 text-sm">
           <p className="font-medium mb-1">
