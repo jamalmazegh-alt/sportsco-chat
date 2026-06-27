@@ -233,7 +233,6 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     URL.revokeObjectURL(url);
   }
 
-
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (mode === "internal") {

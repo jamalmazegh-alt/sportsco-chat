@@ -339,11 +339,7 @@ function RosterPage() {
           <div className="h-16 w-16 rounded-md border bg-muted overflow-hidden flex items-center justify-center shrink-0">
             {reg.logo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={reg.logo_url}
-                alt={reg.team_name}
-                className="h-full w-full object-cover"
-              />
+              <img src={reg.logo_url} alt={reg.team_name} className="h-full w-full object-cover" />
             ) : (
               <span className="text-xs text-muted-foreground">
                 {t("roster.logo.none", { defaultValue: "Pas de logo" })}
@@ -394,9 +390,7 @@ function RosterPage() {
                         toast.error(data?.error ?? "Erreur");
                         return;
                       }
-                      toast.success(
-                        t("roster.logo.removed", { defaultValue: "Logo supprimé" }),
-                      );
+                      toast.success(t("roster.logo.removed", { defaultValue: "Logo supprimé" }));
                       q.refetch();
                     } finally {
                       setUploadingLogo(false);
@@ -418,7 +412,9 @@ function RosterPage() {
                   if (!f) return;
                   if (f.size > 4 * 1024 * 1024) {
                     toast.error(
-                      t("roster.logo.tooLarge", { defaultValue: "Fichier trop volumineux (4 Mo max)" }),
+                      t("roster.logo.tooLarge", {
+                        defaultValue: "Fichier trop volumineux (4 Mo max)",
+                      }),
                     );
                     return;
                   }
