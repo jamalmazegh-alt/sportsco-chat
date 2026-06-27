@@ -325,7 +325,6 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .single();
     setPosting(false);
     if (error) {
-      // eslint-disable-next-line no-console
       console.error("[wall_posts.insert] failed", {
         code: (error as any).code,
         message: error.message,

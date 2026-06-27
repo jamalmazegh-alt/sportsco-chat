@@ -29,7 +29,6 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
   const homeHref = session ? "/home" : "/";
   useEffect(() => {
     if (error) {
-      // eslint-disable-next-line no-console
       console.error("[GlobalErrorBoundary]", error);
       Sentry.captureException(error);
     }

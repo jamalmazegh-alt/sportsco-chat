@@ -40,7 +40,6 @@ export default async function globalSetup() {
     const email = process.env[ENV_KEYS[role].email];
     const password = process.env[ENV_KEYS[role].password];
     if (!email || !password) {
-      // eslint-disable-next-line no-console
       console.warn(
         `[globalSetup] ${role}: missing ${ENV_KEYS[role].email}/${ENV_KEYS[role].password} — falling back to admin user for this role.`,
       );
