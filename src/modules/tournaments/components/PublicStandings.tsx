@@ -84,8 +84,8 @@ export function PublicStandings({ groups, teams, matches }: Props) {
               </thead>
               <tbody>
                 {rows.map((r, i) => {
-                  const qualified = i < g.qualifiers_count;
-                  const isFirstNonQualified = i === g.qualifiers_count;
+                  const qualified = allCompleted && i < g.qualifiers_count;
+                  const isFirstNonQualified = allCompleted && i === g.qualifiers_count;
                   const tm = teamMap.get(r.teamId);
                   return (
                     <tr
