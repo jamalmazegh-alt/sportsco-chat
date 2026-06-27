@@ -294,8 +294,8 @@ function RegisterPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={inviteEmailLocked || inviteLoading}
-              className={inviteEmailLocked ? "bg-muted text-muted-foreground" : undefined}
+              disabled={inviteEmailLocked || emailLockedByQuery || inviteLoading}
+              className={inviteEmailLocked || emailLockedByQuery ? "bg-muted text-muted-foreground" : undefined}
             />
             {inviteEmailLocked && (
               <p className="text-xs text-muted-foreground">
