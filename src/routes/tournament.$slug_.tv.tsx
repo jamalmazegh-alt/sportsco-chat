@@ -29,6 +29,7 @@ import { getPublicTournament } from "@/modules/tournaments/tournaments-public.fu
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
+import { FinalStandings } from "@/modules/tournaments/components/FinalStandings";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
 
