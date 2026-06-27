@@ -843,7 +843,15 @@ export const recordMatchScore = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    // Allow organizer, co-organizer OR assigned referee for this match.
+    const { data: canValidate } = await (supabase as any).rpc("can_validate_match", {
+      _user_id: userId,
+      _match_id: data.match_id,
+    });
+    if (!canValidate) {
+      // Fallback to organizer-only check (also enforces tournament scope)
+      await assertCanManage(supabase, userId, data.tournament_id);
+    }
     const { data: row, error } = await supabase
       .from("tournament_matches")
       .update({
