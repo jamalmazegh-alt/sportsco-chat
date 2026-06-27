@@ -309,7 +309,7 @@ function TournamentsList() {
         </div>
       )}
 
-      {(tournamentOnly || noClub) && <TournamentUpgradeCard />}
+      {(tournamentOnly || noClub) && !collaboratorOnly && <TournamentUpgradeCard />}
 
       {/* ─── Liste ─────────────────────────────────────────────────── */}
       {q.isLoading ? (
