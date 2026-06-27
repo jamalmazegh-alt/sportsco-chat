@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import {
+  PDFDocument,
+  StandardFonts,
+  rgb,
+  type PDFFont,
+  type PDFImage,
+  type PDFPage,
+} from "pdf-lib";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sportAllowsDraw } from "@/lib/sports";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
