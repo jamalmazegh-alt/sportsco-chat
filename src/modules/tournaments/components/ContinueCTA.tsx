@@ -137,9 +137,17 @@ export function ContinueCTA({ action, onAction, variant = "sticky", disabled }: 
         }
       >
         <Icon className="h-5 w-5" strokeWidth={2.5} />
-        {label}
+        <span className="flex-1 text-left">
+          {label}
+          {action.note && (
+            <span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold tabular-nums">
+              {action.note}
+            </span>
+          )}
+        </span>
         {!isDone && <ChevronRight className="ml-auto h-4 w-4" />}
       </Button>
     </div>
   );
 }
+
