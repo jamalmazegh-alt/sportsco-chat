@@ -22,7 +22,11 @@ import {
   listMyTournaments,
   listMyPersonalTournaments,
 } from "@/modules/tournaments/tournaments.functions";
-import { listMyTournamentEntitlements } from "@/modules/tournaments/entitlements.functions";
+import {
+  listMyTournamentEntitlements,
+  ensurePersonalClubId,
+} from "@/modules/tournaments/entitlements.functions";
+
 import { TournamentCreateChooser } from "@/modules/tournaments/components/TournamentCreateChooser";
 import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
