@@ -502,7 +502,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
           <p className="text-sm font-semibold text-muted-foreground">{t("teams.empty")}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {teams.map((tm, idx) => {
             const palettes = [
               "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
@@ -622,22 +622,19 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                             setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
                           }
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold border transition-colors disabled:opacity-50 shadow-sm",
+                            "group inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-dashed transition-colors disabled:opacity-50 cursor-pointer",
                             styles,
                           )}
                           title={t("teams.payment.cycleHint", {
                             defaultValue: "Cliquer pour changer le statut de paiement",
                           })}
                         >
-                          <Icon className="h-3.5 w-3.5" />
+                          <Icon className="h-3 w-3" />
                           <span>{label}</span>
                           {ps === "paid" && tm.amount_paid_cents
                             ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
                             : ""}
-                          <RefreshCw className="h-3 w-3 opacity-70 ml-0.5" />
-                          <span className="text-[10px] font-normal opacity-80">
-                            {t("teams.payment.change", { defaultValue: "Modifier" })}
-                          </span>
+                          <Pencil className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100 ml-0.5" />
                         </button>
                       </div>
                     );
