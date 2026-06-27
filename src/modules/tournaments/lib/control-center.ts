@@ -148,7 +148,15 @@ export interface ComputeArgs {
   groupsCount: number;
   matches: MatchLike[];
   flightsCount: number;
+  /**
+   * Target number of registered teams (from `tournaments.num_teams`).
+   * When provided AND >= 2, the workflow stays on "add_team" until the
+   * tournament is full — preventing a draw with an incomplete roster.
+   * Leave null/undefined to keep the legacy behaviour (no capacity gate).
+   */
+  expectedTeams?: number | null;
 }
+
 
 /** Returns the 5-step progress array with computed state. */
 export function computeStepper(args: ComputeArgs): StepperStep[] {
