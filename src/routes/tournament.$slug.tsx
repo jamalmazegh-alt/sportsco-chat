@@ -775,6 +775,34 @@ function MatchBadges({ match }: { match: any }) {
   );
 }
 
+function resolveTeamLabel(
+  team: { name?: string | null } | null | undefined,
+  source: any,
+  t: (k: string, opts?: any) => string,
+): string {
+  if (team?.name) return team.name;
+  if (source && typeof source === "object" && typeof source.fromMatch === "number") {
+    const key = source.outcome === "loser" ? "bracket.loserOf" : "bracket.winnerOf";
+    return t(key, { n: source.fromMatch });
+  }
+  return t("common.tbd");
+}
+
+function matchRoundLabel(match: any, t: (k: string, opts?: any) => string): string | null {
+  if (!match) return null;
+  if (match.round === "group") return t("matches.groupPhase");
+  const map: Record<string, string> = {
+    r32: "matches.rounds.r32",
+    r16: "matches.rounds.r16",
+    qf: "matches.rounds.qf",
+    sf: "matches.rounds.sf",
+    final: "matches.rounds.final",
+    third_place: "matches.rounds.third_place",
+  };
+  const k = map[match.round];
+  return k ? t(k) : null;
+}
+
 function MatchRow({
   match,
   teamMap,
