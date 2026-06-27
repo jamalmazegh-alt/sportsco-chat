@@ -431,7 +431,8 @@
       "seedOption": "N°{{n}}",
       "seedBest": " (sterkste Team)",
       "seedHint": "Optioneel — gebruikt voor de loting en de volgorde in de toernooistructuur.",
-      "save": "Opslaan"
+      "save": "Opslaan",
+      "exceedsMax": "Te veel teams: {{count}} in het bestand, nog maar {{remaining}} plek(ken) over (max {{max}}, al ingeschreven {{current}}). Kort je lijst in en importeer opnieuw."
     },
     "row": {
       "seed": "Plaatsing {{n}}",

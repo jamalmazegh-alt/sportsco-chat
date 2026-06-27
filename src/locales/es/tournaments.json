@@ -431,7 +431,8 @@
       "seedOption": "N.º {{n}}",
       "seedBest": " (equipo más fuerte)",
       "seedHint": "Opcional — utilizado para el sorteo y el orden en el cuadro del torneo.",
-      "save": "Guardar"
+      "save": "Guardar",
+      "exceedsMax": "Demasiados equipos: {{count}} en el archivo, solo {{remaining}} plaza(s) disponible(s) (máx {{max}}, ya inscritos {{current}}). Reduzca su lista y vuelva a importar."
     },
     "row": {
       "seed": "Clasificación {{n}}",
