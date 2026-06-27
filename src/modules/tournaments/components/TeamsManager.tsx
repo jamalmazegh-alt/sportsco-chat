@@ -28,6 +28,8 @@ import {
   CheckCircle2,
   Circle,
   Banknote,
+  RefreshCw,
+
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -564,9 +566,30 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                     const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
                     const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
 
-                    if (!contactName && !contactEmail && !contactPhone) return null;
+                    const hasContact = contactName || contactEmail || contactPhone;
+
+                    const ps = tm.payment_status ?? "unpaid";
+                    const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
+                      unpaid: "paid",
+                      paid: "exempt",
+                      exempt: "unpaid",
+                    };
+                    const styles =
+                      ps === "paid"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                        : ps === "exempt"
+                          ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
+                          : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100";
+                    const label =
+                      ps === "paid"
+                        ? t("teams.payment.paid", { defaultValue: "Payé" })
+                        : ps === "exempt"
+                          ? t("teams.payment.exempt", { defaultValue: "Exempté" })
+                          : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
+                    const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
+
                     return (
-                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                         {contactName && (
                           <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
                             <User2 className="h-3 w-3" />
@@ -591,52 +614,35 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                             {contactPhone}
                           </a>
                         )}
+                        {hasContact && <span className="text-border">·</span>}
+                        <button
+                          type="button"
+                          disabled={setPayment.isPending}
+                          onClick={() =>
+                            setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
+                          }
+                          className={cn(
+                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold border transition-colors disabled:opacity-50 shadow-sm",
+                            styles,
+                          )}
+                          title={t("teams.payment.cycleHint", {
+                            defaultValue: "Cliquer pour changer le statut de paiement",
+                          })}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          <span>{label}</span>
+                          {ps === "paid" && tm.amount_paid_cents
+                            ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
+                            : ""}
+                          <RefreshCw className="h-3 w-3 opacity-70 ml-0.5" />
+                          <span className="text-[10px] font-normal opacity-80">
+                            {t("teams.payment.change", { defaultValue: "Modifier" })}
+                          </span>
+                        </button>
                       </div>
                     );
                   })()}
-                  {(() => {
-                    const ps = tm.payment_status ?? "unpaid";
-                    const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
-                      unpaid: "paid",
-                      paid: "exempt",
-                      exempt: "unpaid",
-                    };
-                    const styles =
-                      ps === "paid"
-                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                        : ps === "exempt"
-                          ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-100";
-                    const label =
-                      ps === "paid"
-                        ? t("teams.payment.paid", { defaultValue: "Payé" })
-                        : ps === "exempt"
-                          ? t("teams.payment.exempt", { defaultValue: "Exempté" })
-                          : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
-                    const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
-                    return (
-                      <button
-                        type="button"
-                        disabled={setPayment.isPending}
-                        onClick={() =>
-                          setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
-                        }
-                        className={cn(
-                          "mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors disabled:opacity-50",
-                          styles,
-                        )}
-                        title={t("teams.payment.cycleHint", {
-                          defaultValue: "Cliquer pour changer le statut de paiement",
-                        })}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {label}
-                        {ps === "paid" && tm.amount_paid_cents
-                          ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
-                          : ""}
-                      </button>
-                    );
-                  })()}
+
                 </div>
                 <Button
                   size="icon"
