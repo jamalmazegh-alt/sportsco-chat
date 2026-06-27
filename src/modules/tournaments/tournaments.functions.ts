@@ -2491,25 +2491,65 @@ export const listTournamentReferees = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
-    const { data: rows, error } = await (supabase as any)
+
+    // 1) New system: tournament_members (in-app accepted referees)
+    const { data: members, error: mErr } = await (supabase as any)
       .from("tournament_members")
       .select("id, user_id, email, first_name, last_name, joined_at")
       .eq("tournament_id", data.tournament_id)
       .eq("role", "referee")
       .order("invited_at", { ascending: false });
-    if (error) throw new Response(error.message, { status: 400 });
-    const referees = (rows ?? []).map((r: any) => {
+    if (mErr) throw new Response(mErr.message, { status: 400 });
+
+    // 2) Legacy/current invite flow: tournament_collaborators
+    const { data: collabs, error: cErr } = await (supabase as any)
+      .from("tournament_collaborators")
+      .select("id, user_id, email, display_name, accepted_at, revoked_at")
+      .eq("tournament_id", data.tournament_id)
+      .eq("role", "referee")
+      .is("revoked_at", null)
+      .order("invited_at", { ascending: false });
+    if (cErr) throw new Response(cErr.message, { status: 400 });
+
+    const seen = new Set<string>();
+    const referees: Array<{
+      id: string;
+      user_id: string | null;
+      label: string;
+      offline: boolean;
+      accepted: boolean;
+    }> = [];
+
+    for (const r of members ?? []) {
       const name = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
-      return {
+      const key = (r.user_id as string | null) ?? `email:${r.email}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      referees.push({
         id: r.id as string,
         user_id: (r.user_id as string | null) ?? null,
         label: name || (r.email as string) || "—",
         offline: !r.user_id,
         accepted: !!r.joined_at,
-      };
-    });
+      });
+    }
+
+    for (const c of collabs ?? []) {
+      const key = (c.user_id as string | null) ?? `email:${c.email}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      referees.push({
+        id: c.id as string,
+        user_id: (c.user_id as string | null) ?? null,
+        label: (c.display_name as string) || (c.email as string) || "—",
+        offline: !c.user_id,
+        accepted: !!c.accepted_at,
+      });
+    }
+
     return { referees };
   });
+
 
 export const assignMatchReferee = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
