@@ -1063,6 +1063,21 @@ function PublishedRegistrationView({
                 {t("tournament.registrationClosed")}
               </p>
             </div>
+          ) : notYetOpen ? (
+            <div className="space-y-1">
+              <p className="text-base font-semibold">
+                {t("tournament.registrationOpensAt", {
+                  date: new Date(opens!).toLocaleString(),
+                  defaultValue: `Inscriptions ouvrent le ${new Date(opens!).toLocaleString()}`,
+                })}
+              </p>
+              {maxTeams != null && (
+                <p className="text-sm text-muted-foreground">
+                  {t("tournament.teamsRegistered", { count: teamsCount, total: maxTeams })}
+                </p>
+              )}
+            </div>
+
           ) : (
             <>
               <div>
