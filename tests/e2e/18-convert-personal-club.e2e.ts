@@ -82,7 +82,7 @@ test.describe("Convert personal club → real club", () => {
     } catch {
       /* best-effort */
     }
-    await helperClub.cleanup();
+    if (helperClub) await helperClub.cleanup();
   });
 
   // ── 1. Club perso créé avec is_personal = true ────────────────────────
