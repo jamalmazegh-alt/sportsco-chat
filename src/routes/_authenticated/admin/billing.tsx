@@ -333,7 +333,9 @@ function BillingPage() {
           <div className="flex items-start gap-3">
             <Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-emerald-900">{t("billing.activationComplete")}</p>
+              <p className="text-sm font-semibold text-emerald-900">
+                {t("billing.activationComplete")}
+              </p>
               <p className="text-xs text-emerald-700 mt-0.5">{t("billing.activationMenusReady")}</p>
             </div>
           </div>
