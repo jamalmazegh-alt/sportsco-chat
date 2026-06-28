@@ -128,6 +128,8 @@ function BillingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [updateCardOpen, setUpdateCardOpen] = useState(false);
+  const [activationPending, setActivationPending] = useState(false);
+  const [activationDone, setActivationDone] = useState(false);
   const checkoutReturnSynced = useRef<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
@@ -139,14 +141,26 @@ function BillingPage() {
   });
 
   const qc = useQueryClient();
+  const ACTIVATION_TOAST = "billing-activation";
   useEffect(() => {
     if (search.billing === "success") {
       const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
       if (checkoutReturnSynced.current === syncKey) return;
       checkoutReturnSynced.current = syncKey;
-      toast.success(t("billing.toastActivated"));
-      if (!activeClubId) return;
-      const invalidateAll = () => {
+      setActivationPending(true);
+      setActivationDone(false);
+      toast.info(t("billing.activationInProgress"), {
+        id: ACTIVATION_TOAST,
+        duration: 60_000,
+      });
+      if (!activeClubId) {
+        setActivationPending(false);
+        setActivationDone(true);
+        return;
+      }
+      const finish = () => {
+        setActivationPending(false);
+        setActivationDone(true);
         // Refresh menu-gating caches so the user sees the full club menu
         // immediately after subscribing (no logout/login required).
         refetch();
@@ -158,9 +172,15 @@ function BillingPage() {
         qc.invalidateQueries({ queryKey: ["feature-flags"] });
       };
       syncSubscription({ data: { clubId: activeClubId } })
-        .then(invalidateAll)
-        .catch(invalidateAll);
+        .then(finish)
+        .catch(finish)
+        .finally(() => {
+          toast.success(t("billing.toastActivated"), { id: ACTIVATION_TOAST });
+        });
     } else if (search.billing === "canceled") {
+      toast.dismiss(ACTIVATION_TOAST);
+      setActivationPending(false);
+      setActivationDone(false);
       toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
       toast.success(t("billing.toastCardUpdated"));
@@ -297,6 +317,30 @@ function BillingPage() {
         <p className="text-sm text-muted-foreground mt-1">{t("billing.subtitle")}</p>
       </div>
 
+      {activationPending && (
+        <section className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold">{t("billing.activationInProgress")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("billing.activationMenus")}</p>
+            </div>
+          </div>
+        </section>
+      )}
+      {activationDone && !activationPending && (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="flex items-start gap-3">
+            <Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">
+                {t("billing.activationComplete")}
+              </p>
+              <p className="text-xs text-emerald-700 mt-0.5">{t("billing.activationMenusReady")}</p>
+            </div>
+          </div>
+        </section>
+      )}
       {isExempt && (
         <section
           className="rounded-2xl p-5 space-y-2 border-[1.5px] border-[#86efac]"
