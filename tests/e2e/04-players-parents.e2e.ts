@@ -15,6 +15,7 @@ test.describe("Players & parents", () => {
     club = await createTestClub("players");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

@@ -22,6 +22,7 @@ test.describe("Tournament lifecycle", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     try {
       if (tournamentId) {
         await admin.from("tournament_matches").delete().eq("tournament_id", tournamentId);

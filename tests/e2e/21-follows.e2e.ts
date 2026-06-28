@@ -28,6 +28,7 @@ test.describe.skip("Follows", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     try {
       await coachClient.from("follows").delete().eq("follower_id", club.coach.userId);
     } catch {

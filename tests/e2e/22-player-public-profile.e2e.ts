@@ -24,6 +24,7 @@ test.describe.skip("Player public profile", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     await admin
       .from("players")
       .update({ public_profile_enabled: false, public_slug: null })

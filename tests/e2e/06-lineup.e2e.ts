@@ -14,6 +14,7 @@ test.describe("Lineup", () => {
     club = await createTestClub("lineup");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

@@ -20,6 +20,7 @@ test.describe("Convocation lifecycle", () => {
     convId = data!.id;
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

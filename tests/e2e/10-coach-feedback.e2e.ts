@@ -21,6 +21,7 @@ test.describe("Coach feedback + AI synthesis", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     await admin
       .from("player_reviews")
       .delete()

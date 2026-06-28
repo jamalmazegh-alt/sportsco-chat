@@ -25,6 +25,7 @@ test.describe("Player suspensions", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     try {
       if (suspensionId) {
         await admin.from("player_suspensions").delete().eq("id", suspensionId);

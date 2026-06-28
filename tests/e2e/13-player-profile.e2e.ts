@@ -12,6 +12,7 @@ test.describe("Player profile", () => {
     club = await createTestClub("playerprof");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

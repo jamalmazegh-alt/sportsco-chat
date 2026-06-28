@@ -64,6 +64,7 @@ test.describe("Carpool (covoiturage)", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     try {
       const { data: carpools } = await admin
         .from("carpools")

@@ -14,6 +14,7 @@ test.describe("Convocations — send", () => {
     club = await createTestClub("convsend");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 
