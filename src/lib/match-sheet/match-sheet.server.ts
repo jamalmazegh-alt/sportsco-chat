@@ -311,6 +311,7 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
   const typeLabel = isTournament ? t.typeTournament : t.typeMatch;
 
   const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
   doc.setTitle(`${title} — ${event.title ?? ""}`.trim());
   doc.setCreator("Clubero");
 
