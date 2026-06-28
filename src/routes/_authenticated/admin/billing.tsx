@@ -141,14 +141,26 @@ function BillingPage() {
   });
 
   const qc = useQueryClient();
+  const ACTIVATION_TOAST = "billing-activation";
   useEffect(() => {
     if (search.billing === "success") {
       const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
       if (checkoutReturnSynced.current === syncKey) return;
       checkoutReturnSynced.current = syncKey;
-      toast.success(t("billing.toastActivated"));
-      if (!activeClubId) return;
-      const invalidateAll = () => {
+      setActivationPending(true);
+      setActivationDone(false);
+      toast.info(t("billing.activationInProgress"), {
+        id: ACTIVATION_TOAST,
+        duration: 60_000,
+      });
+      if (!activeClubId) {
+        setActivationPending(false);
+        setActivationDone(true);
+        return;
+      }
+      const finish = () => {
+        setActivationPending(false);
+        setActivationDone(true);
         // Refresh menu-gating caches so the user sees the full club menu
         // immediately after subscribing (no logout/login required).
         refetch();
@@ -160,9 +172,15 @@ function BillingPage() {
         qc.invalidateQueries({ queryKey: ["feature-flags"] });
       };
       syncSubscription({ data: { clubId: activeClubId } })
-        .then(invalidateAll)
-        .catch(invalidateAll);
+        .then(finish)
+        .catch(finish)
+        .finally(() => {
+          toast.success(t("billing.toastActivated"), { id: ACTIVATION_TOAST });
+        });
     } else if (search.billing === "canceled") {
+      toast.dismiss(ACTIVATION_TOAST);
+      setActivationPending(false);
+      setActivationDone(false);
       toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
       toast.success(t("billing.toastCardUpdated"));
