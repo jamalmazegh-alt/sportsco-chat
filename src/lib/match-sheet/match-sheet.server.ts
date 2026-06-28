@@ -211,17 +211,11 @@ export function pickLang(raw: string | undefined | null): MatchSheetLang {
   return "en";
 }
 
-// Helvetica WinAnsi already covers Latin-1 accents (é, è, à, ç, ü, ö, ñ, ã).
-// Strip only chars outside that range; never throw.
-function safe(s: string | null | undefined): string {
-  const v = (s ?? "").toString();
-  return v
-    .replace(/[\u2212\u2012\u2013\u2014\u2015]/g, "-")
-    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
-    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
-    .replace(/\u2026/g, "...")
-    .replace(/\u00A0/g, " ")
-    .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?");
+// DejaVu Sans is embedded as a Unicode TTF (regular + bold). No glyph
+// substitution is needed — names like Szczęsny, Çağlar, Łukasz, Đorđić render
+// directly. Kept as a thin pass-through so call sites stay symmetrical.
+function txt(s: string | null | undefined): string {
+  return (s ?? "").toString();
 }
 
 function fmtDate(iso: string | null | undefined, lang: MatchSheetLang): string {
