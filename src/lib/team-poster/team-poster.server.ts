@@ -344,181 +344,98 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     }
   }
 
-  // ── Header (logos + center dot) — larger, no redundant "clubero" wordmark
-  const headerY = H - 62;
+  // ── Header (logos prominently sized)
+  const headerCenterY = H - 60;
   const clubero = await embed(doc, await fetchImage(CLUBERO_LOGO_URL));
   if (clubero) {
-    const max = 58;
+    const max = 110;
     const r = Math.min(max / clubero.width, max / clubero.height);
     const w = clubero.width * r;
     const h = clubero.height * r;
-    page.drawImage(clubero, { x: 40, y: headerY - h / 2, width: w, height: h });
+    page.drawImage(clubero, { x: 40, y: headerCenterY - h / 2, width: w, height: h });
   }
 
-  // Club logo (right) — optional, safe
+  // Club logo (right) — larger, clearly legible
   const clubLogo = input.clubLogoUrl ? await embed(doc, await fetchImage(input.clubLogoUrl)) : null;
   if (clubLogo) {
-    const max = 64;
+    const max = 95;
     const r = Math.min(max / clubLogo.width, max / clubLogo.height);
     const w = clubLogo.width * r;
     const h = clubLogo.height * r;
-    page.drawImage(clubLogo, { x: W - 40 - w, y: headerY - h / 2, width: w, height: h });
+    page.drawImage(clubLogo, { x: W - 40 - w, y: headerCenterY - h / 2, width: w, height: h });
   } else if (input.clubName) {
     const name = input.clubName.toUpperCase();
-    const f = fitText(name, bold, 13, 170);
+    const f = fitText(name, bold, 16, 200);
     page.drawText(f.text, {
       x: W - 40 - bold.widthOfTextAtSize(f.text, f.size),
-      y: headerY - 5,
+      y: headerCenterY - 6,
       size: f.size,
       font: bold,
       color: ink,
     });
   }
 
-  // center "dot" separator
-  page.drawCircle({ x: W / 2, y: headerY, size: 3, color: teal });
-
   // Brand tagline tiny (under right logo)
-  drawCenteredText(page, t.brandTag, W - 110, headerY - 40, 6.5, bold, teal);
+  drawCenteredText(page, t.brandTag, W - 110, headerCenterY - 60, 6.5, bold, teal);
 
+  // ── Big title — moved up, just below header
+  drawCenteredText(page, t.title1, W / 2, H - 160, 42, bold, ink);
+  drawCenteredText(page, t.title2, W / 2, H - 200, 32, bold, teal);
 
-  // ── Big title
-  drawCenteredText(page, t.title1, W / 2, H - 150, 44, bold, ink);
-  drawCenteredText(page, t.title2, W / 2, H - 192, 34, bold, teal);
+  // ── Subtitle + body — fully above the QR card
+  drawCenteredText(page, t.subtitle, W / 2, H - 232, 12, font, muted);
+  drawCenteredText(page, t.bodyP1, W / 2, H - 252, 10, font, muted);
+  drawCenteredText(page, t.bodyP2, W / 2, H - 266, 10, font, muted);
 
-  // ── Subtitle
-  drawCenteredText(page, t.subtitle, W / 2, H - 226, 11.5, font, muted);
-  drawCenteredText(page, t.bodyP1, W / 2, H - 243, 9.5, font, muted);
-  drawCenteredText(page, t.bodyP2, W / 2, H - 256, 9.5, font, muted);
-
-  // ── QR Card (pushed down to clear subtitle)
-  const cardW = 320;
-  const cardH = 350;
-  const cardX = (W - cardW) / 2;
-  const cardY = 240;
-
-
-  // Drop shadow (soft, multiple offset)
-  for (let i = 6; i >= 1; i--) {
-    page.drawRectangle({
-      x: cardX - i * 0.4,
-      y: cardY - i * 0.6,
-      width: cardW + i * 0.8,
-      height: cardH + i * 0.6,
-      color: rgb(0, 0, 0),
-      opacity: 0.025,
-    });
-  }
-  // Card
-  page.drawRectangle({
-    x: cardX,
-    y: cardY,
-    width: cardW,
-    height: cardH,
-    color: white,
-    borderColor: rgb(0.92, 0.94, 0.96),
-    borderWidth: 1,
-  });
-
-  // Team badge label
-  const badgeText = t.teamBadge;
-  const badgeY = cardY + cardH - 30;
-  drawCenteredText(page, badgeText, W / 2, badgeY, 11, bold, teal);
-
-  // Team name (big)
-  const teamNameClean = (input.teamName || "").trim().toUpperCase();
-  const tn = fitText(teamNameClean, bold, 22, cardW - 30);
-  drawCenteredText(page, tn.text, W / 2, badgeY - 26, tn.size, bold, ink);
-
-  // small accent underline
-  page.drawRectangle({
-    x: W / 2 - 22,
-    y: badgeY - 34,
-    width: 44,
-    height: 2,
-    color: teal,
-  });
-
-  // ── QR matrix
-  const qr = buildQrMatrix(input.inviteUrl);
-  const qrAreaSize = 230;
-  const moduleSize = qrAreaSize / qr.size;
-  const qrX = (W - qrAreaSize) / 2;
-  const qrY = cardY + 60;
-
-  // Corner markers (decorative L-shapes, teal)
-  const corner = 18;
-  const cornerT = 3;
-  // top-left
-  page.drawRectangle({ x: qrX - 10, y: qrY + qrAreaSize + 6, width: corner, height: cornerT, color: teal });
-  page.drawRectangle({ x: qrX - 10, y: qrY + qrAreaSize - corner + 9, width: cornerT, height: corner, color: teal });
-  // top-right
-  page.drawRectangle({ x: qrX + qrAreaSize + 10 - corner, y: qrY + qrAreaSize + 6, width: corner, height: cornerT, color: teal });
-  page.drawRectangle({ x: qrX + qrAreaSize + 10 - cornerT, y: qrY + qrAreaSize - corner + 9, width: cornerT, height: corner, color: teal });
-  // bottom-left
-  page.drawRectangle({ x: qrX - 10, y: qrY - 9, width: corner, height: cornerT, color: teal });
-  page.drawRectangle({ x: qrX - 10, y: qrY - 9, width: cornerT, height: corner, color: teal });
-  // bottom-right
-  page.drawRectangle({ x: qrX + qrAreaSize + 10 - corner, y: qrY - 9, width: corner, height: cornerT, color: teal });
-  page.drawRectangle({ x: qrX + qrAreaSize + 10 - cornerT, y: qrY - 9, width: cornerT, height: corner, color: teal });
-
-  // Draw the QR modules (vector black squares)
-  const dark = rgb(0, 0, 0);
-  for (let row = 0; row < qr.size; row++) {
-    for (let col = 0; col < qr.size; col++) {
-      if (qr.data[row * qr.size + col]) {
-        page.drawRectangle({
-          x: qrX + col * moduleSize,
-          y: qrY + (qr.size - 1 - row) * moduleSize,
-          width: moduleSize + 0.2,
-          height: moduleSize + 0.2,
-          color: dark,
-        });
-      }
-    }
-  }
-
-  // scan hint
-  drawCenteredText(page, t.scanHint, W / 2, cardY + 22, 10, bold, teal);
-
-  // ── Illustration scattered across the bottom (left, right, center)
+  // ── Scattered illustrations BEFORE the card so the card sits on top.
+  // Place individual figures around the page (not a bottom band).
   const illu = await embed(doc, await fetchImage(ILLUSTRATION_URL));
   if (illu) {
     const ratio = illu.height / illu.width;
 
-    // Left cluster — anchored partially off the left edge
-    const leftW = 220;
+    // Mid-left figure — anchored partially off the left edge, higher up
+    const leftW = 175;
     const leftH = leftW * ratio;
     page.drawImage(illu, {
-      x: -70,
-      y: 70,
+      x: -55,
+      y: 340,
       width: leftW,
       height: leftH,
-      opacity: 0.85,
+      opacity: 0.78,
     });
 
-    // Right cluster — same image, anchored partially off the right edge
-    const rightW = 220;
+    // Mid-right figure — anchored partially off the right edge, lower than left
+    const rightW = 180;
     const rightH = rightW * ratio;
     page.drawImage(illu, {
-      x: W - rightW + 70,
-      y: 70,
+      x: W - rightW + 55,
+      y: 280,
       width: rightW,
       height: rightH,
-      opacity: 0.85,
+      opacity: 0.78,
     });
 
-    // Center accent — smaller, lower, softer
-    const cW = 170;
+    // Bottom-center — sits under/around benefits strip, soft
+    const cW = 200;
     const cH = cW * ratio;
     page.drawImage(illu, {
       x: (W - cW) / 2,
-      y: 56,
+      y: 78,
       width: cW,
       height: cH,
-      opacity: 0.55,
+      opacity: 0.42,
     });
+
+    // Small ball accent — bottom-left corner
+    page.drawCircle({ x: 70, y: 110, size: 14, color: rgb(0.98, 0.74, 0.31), opacity: 0.55 });
+    page.drawCircle({ x: W - 80, y: 200, size: 10, color: lavender });
   }
+
+  // ── QR Card (pushed down to clear subtitle/body)
+  const cardW = 320;
+  const cardH = 340;
+  const cardX = (W - cardW) / 2;
+  const cardY = 230;
 
 
   // ── Benefits strip (pill row)
