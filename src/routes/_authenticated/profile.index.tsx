@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { isV2 } from "@/config/features";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { EnablePushCard } from "@/components/pwa/EnablePushCard";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -276,6 +277,8 @@ function ProfilePage() {
           <ChevronRight className="h-4 w-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       )}
+
+      <EnablePushCard />
 
       {user?.email && (
         <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
