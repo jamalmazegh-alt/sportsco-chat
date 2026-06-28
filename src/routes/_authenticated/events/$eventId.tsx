@@ -2235,6 +2235,36 @@ function EventDetail() {
                   <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
                 </Link>
               )}
+              {isCoach && (event.type === "match" || event.type === "tournament") && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="h-9 gap-1.5 flex-1 min-w-[7rem]"
+                  onClick={downloadMatchSheet}
+                  disabled={generatingSheet}
+                  title={t(
+                    event.type === "tournament"
+                      ? "events.matchSheet.labelTournament"
+                      : "events.matchSheet.label",
+                    { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
+                  )}
+                >
+                  {generatingSheet ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  <span>
+                    {t(
+                      event.type === "tournament"
+                        ? "events.matchSheet.labelTournament"
+                        : "events.matchSheet.label",
+                      { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
+                    )}
+                  </span>
+                </Button>
+              )}
             </div>
           )}
         </div>
