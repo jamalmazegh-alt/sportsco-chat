@@ -451,12 +451,25 @@ export function RegistrationsManager({
         <div className="py-10 flex justify-center">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
+      ) : q.isError ? (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive space-y-2">
+          <p className="font-medium">
+            {t("registrations.loadError", { defaultValue: "Erreur de chargement des inscriptions" })}
+          </p>
+          <p className="text-xs opacity-80 break-all">
+            {(q.error as any)?.message ?? String(q.error)}
+          </p>
+          <Button size="sm" variant="outline" onClick={() => q.refetch()}>
+            {t("common.retry", { defaultValue: "Réessayer" })}
+          </Button>
+        </div>
       ) : regs.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           {t("registrations.empty", {
             suffix: filter !== "all" ? ` (${t(`registrations.filter.${filter}`)})` : "",
           })}
         </div>
+
       ) : (
         <ul className="space-y-2">
           {regs.map((r) => (
