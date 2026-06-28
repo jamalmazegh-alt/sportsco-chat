@@ -383,19 +383,20 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
 
 
   // ── Big title
-  drawCenteredText(page, t.title1, W / 2, H - 130, 46, bold, ink);
-  drawCenteredText(page, t.title2, W / 2, H - 175, 36, bold, teal);
+  drawCenteredText(page, t.title1, W / 2, H - 150, 44, bold, ink);
+  drawCenteredText(page, t.title2, W / 2, H - 192, 34, bold, teal);
 
   // ── Subtitle
-  drawCenteredText(page, t.subtitle, W / 2, H - 215, 12, font, muted);
-  drawCenteredText(page, t.bodyP1, W / 2, H - 232, 10, font, muted);
-  drawCenteredText(page, t.bodyP2, W / 2, H - 246, 10, font, muted);
+  drawCenteredText(page, t.subtitle, W / 2, H - 226, 11.5, font, muted);
+  drawCenteredText(page, t.bodyP1, W / 2, H - 243, 9.5, font, muted);
+  drawCenteredText(page, t.bodyP2, W / 2, H - 256, 9.5, font, muted);
 
-  // ── QR Card
+  // ── QR Card (pushed down to clear subtitle)
   const cardW = 320;
-  const cardH = 360;
+  const cardH = 350;
   const cardX = (W - cardW) / 2;
-  const cardY = 270;
+  const cardY = 240;
+
 
   // Drop shadow (soft, multiple offset)
   for (let i = 6; i >= 1; i--) {
