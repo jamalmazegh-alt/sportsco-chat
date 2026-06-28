@@ -316,8 +316,8 @@ function draftEventLabel(
 ): string {
   const team =
     draft.teamId === teamA?.id
-      ? (teamA.short_name ?? teamA.name)
-      : (teamB?.short_name ?? teamB?.name);
+      ? (teamA.name)
+      : (teamB?.name);
   if (draft.type === "goal") {
     const who = draft.scorer || draft.assist || t("matches.matchDetails.goal");
     const min = draft.minute ? ` ${draft.minute}'` : "";
@@ -404,7 +404,7 @@ function MatchDetailsSection({
                   {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
                   {ev.player_name && <span>{ev.player_name}</span>}
                   <span className="text-muted-foreground">
-                    {isA ? (teamA?.short_name ?? teamA?.name) : (teamB?.short_name ?? teamB?.name)}
+                    {isA ? (teamA?.name) : (teamB?.name)}
                   </span>
                   {!disabled && (
                     <button
@@ -1109,7 +1109,7 @@ function MatchCard({
           {canManage && lifecycle === "live" && !setsMode && teamA && teamB ? (
             <div className="flex items-center justify-around gap-2">
               <ScoreStepper
-                label={teamA.short_name ?? teamA.name}
+                label={teamA.name}
                 value={match.score_a ?? 0}
                 onChange={(v) => liveUpdate.mutate({ score_a: v, score_b: match.score_b ?? 0 })}
                 disabled={liveUpdate.isPending}
@@ -1117,7 +1117,7 @@ function MatchCard({
               />
               <span className="text-xl text-muted-foreground">:</span>
               <ScoreStepper
-                label={teamB.short_name ?? teamB.name}
+                label={teamB.name}
                 value={match.score_b ?? 0}
                 onChange={(v) => liveUpdate.mutate({ score_a: match.score_a ?? 0, score_b: v })}
                 disabled={liveUpdate.isPending}
@@ -1132,7 +1132,7 @@ function MatchCard({
               className="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-3 active:scale-[0.99] transition disabled:opacity-80 disabled:active:scale-100"
             >
               <span className="truncate text-sm font-bold text-right">
-                {teamA?.short_name ?? teamA?.name ?? t("matches.tbd")}
+                {teamA?.name ?? t("matches.tbd")}
               </span>
               {hasScore ? (
                 <span className="inline-flex items-center gap-2 tabular-nums">
@@ -1159,7 +1159,7 @@ function MatchCard({
                 </span>
               )}
               <span className="truncate text-sm font-bold">
-                {teamB?.short_name ?? teamB?.name ?? t("matches.tbd")}
+                {teamB?.name ?? t("matches.tbd")}
               </span>
             </button>
           )}
@@ -1440,7 +1440,7 @@ function MatchCard({
                   </div>
                   <div className="flex items-center justify-around gap-2">
                     <ScoreStepper
-                      label={teamA?.short_name ?? teamA?.name}
+                      label={teamA?.name}
                       value={s.a}
                       onChange={(v) => {
                         const next = [...sets];
@@ -1452,7 +1452,7 @@ function MatchCard({
                     />
                     <span className="text-xl text-muted-foreground">:</span>
                     <ScoreStepper
-                      label={teamB?.short_name ?? teamB?.name}
+                      label={teamB?.name}
                       value={s.b}
                       onChange={(v) => {
                         const next = [...sets];
@@ -1510,7 +1510,7 @@ function MatchCard({
               </p>
               <div className="flex items-center justify-around gap-3">
                 <ScoreStepper
-                  label={t("matches.tab", { team: teamA.short_name ?? teamA.name })}
+                  label={t("matches.tab", { team: teamA.name })}
                   value={penA}
                   onChange={setPenA}
                   size="md"
@@ -1518,7 +1518,7 @@ function MatchCard({
                 />
                 <span className="text-xl text-muted-foreground">:</span>
                 <ScoreStepper
-                  label={t("matches.tab", { team: teamB.short_name ?? teamB.name })}
+                  label={t("matches.tab", { team: teamB.name })}
                   value={penB}
                   onChange={setPenB}
                   size="md"
