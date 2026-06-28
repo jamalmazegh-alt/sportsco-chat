@@ -150,7 +150,6 @@ function NotificationsSettingsPage() {
         </div>
       </header>
 
-      <EnablePushCard />
 
       <Section title="Convocations">
 
