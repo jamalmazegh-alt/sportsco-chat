@@ -128,6 +128,8 @@ function BillingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [updateCardOpen, setUpdateCardOpen] = useState(false);
+  const [activationPending, setActivationPending] = useState(false);
+  const [activationDone, setActivationDone] = useState(false);
   const checkoutReturnSynced = useRef<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
