@@ -1485,20 +1485,22 @@ function MatchCard({
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-around gap-3 py-2">
+            <div className="flex items-center justify-around gap-2 py-2 sm:gap-3">
               <ScoreStepper
                 label={teamA?.name}
                 value={a}
                 onChange={setA}
-                size="lg"
+                size="md"
+                responsiveLg
                 disabled={validated}
               />
-              <span className="text-2xl font-semibold text-muted-foreground">:</span>
+              <span className="text-xl font-semibold text-muted-foreground sm:text-2xl">:</span>
               <ScoreStepper
                 label={teamB?.name}
                 value={b}
                 onChange={setB}
-                size="lg"
+                size="md"
+                responsiveLg
                 disabled={validated}
               />
             </div>
