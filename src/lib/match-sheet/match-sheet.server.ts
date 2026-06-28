@@ -207,7 +207,16 @@ const STRINGS: Record<MatchSheetLang, I18nStrings> = {
 
 export function pickLang(raw: string | undefined | null): MatchSheetLang {
   const v = (raw ?? "").toLowerCase().slice(0, 2);
-  if (v === "fr" || v === "en" || v === "de" || v === "es" || v === "it" || v === "nl" || v === "pt") return v;
+  if (
+    v === "fr" ||
+    v === "en" ||
+    v === "de" ||
+    v === "es" ||
+    v === "it" ||
+    v === "nl" ||
+    v === "pt"
+  )
+    return v;
   return "en";
 }
 
@@ -406,7 +415,13 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
       if (y < 70) {
         // continue on a new page if we ever overflow A4
         const np = doc.addPage([W, H]);
-        np.drawText(txt(title) + " (suite)", { x: ML, y: H - 40, size: 12, font: bold, color: ink });
+        np.drawText(txt(title) + " (suite)", {
+          x: ML,
+          y: H - 40,
+          size: 12,
+          font: bold,
+          color: ink,
+        });
         y = H - 70;
       }
       if (i % 2 === 1) {
@@ -496,14 +511,17 @@ export async function generateMatchSheetForUser(opts: {
     .select("id, name, club_id, clubs:club_id(id, name, logo_url)")
     .eq("id", ev.team_id)
     .maybeSingle();
-  const club = (team as { clubs?: { id?: string; name?: string | null; logo_url?: string | null } } | null)
-    ?.clubs ?? null;
+  const club =
+    (team as { clubs?: { id?: string; name?: string | null; logo_url?: string | null } } | null)
+      ?.clubs ?? null;
 
   // 4) Fetch convocated players for THIS event only.
   //    Brief-restricted columns only — no email / phone / parent data.
   const { data: convs } = await supabaseAdmin
     .from("convocations")
-    .select("player_id, players:player_id(id, first_name, last_name, jersey_number, birth_date, license_number)")
+    .select(
+      "player_id, players:player_id(id, first_name, last_name, jersey_number, birth_date, license_number)",
+    )
     .eq("event_id", eventId);
 
   const players: MatchSheetPlayer[] = ((convs ?? []) as Array<{ players: MatchSheetPlayer | null }>)

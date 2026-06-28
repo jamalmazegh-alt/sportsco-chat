@@ -5,12 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { generateTeamPoster } from "@/lib/team-poster/team-poster.functions";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Share2, Copy, Download, Loader2, FileText } from "lucide-react";
@@ -53,9 +48,7 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
       a.download = filename;
       a.click();
       URL.revokeObjectURL(href);
-      toast.success(
-        t("teams.posterReady", { defaultValue: "Affiche prête" }),
-      );
+      toast.success(t("teams.posterReady", { defaultValue: "Affiche prête" }));
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
@@ -78,10 +71,8 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
 
       let token = existing?.[0]?.token as string | undefined;
       const row = existing?.[0];
-      const expired =
-        !!row?.expires_at && new Date(row.expires_at).getTime() < Date.now();
-      const usedUp =
-        row?.max_uses != null && (row.uses_count ?? 0) >= row.max_uses;
+      const expired = !!row?.expires_at && new Date(row.expires_at).getTime() < Date.now();
+      const usedUp = row?.max_uses != null && (row.uses_count ?? 0) >= row.max_uses;
 
       if (!token || expired || usedUp) {
         token = `${crypto.randomUUID()}${crypto.randomUUID()}`.replace(/-/g, "");

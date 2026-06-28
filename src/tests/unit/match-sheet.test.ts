@@ -42,10 +42,7 @@ describe("sortConvocatedPlayers", () => {
   });
 
   it("does not mutate the input array", () => {
-    const input = [
-      p({ id: "a", jersey_number: 5 }),
-      p({ id: "b", jersey_number: 1 }),
-    ];
+    const input = [p({ id: "a", jersey_number: 5 }), p({ id: "b", jersey_number: 1 })];
     const snap = input.map((x) => x.id);
     sortConvocatedPlayers(input);
     expect(input.map((x) => x.id)).toEqual(snap);
