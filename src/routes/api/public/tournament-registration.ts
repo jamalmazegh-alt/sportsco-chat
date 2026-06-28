@@ -247,10 +247,25 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 regId: row.id,
               });
             }
+            // Push notification to the organizer (fire-and-forget)
+            try {
+              const { sendPushToUserFireAndForget } = await import(
+                "@/lib/push-send.server"
+              );
+              sendPushToUserFireAndForget(createdBy, {
+                title: "🆕 Nouvelle inscription",
+                body: `${parsed.team_name} vient de s'inscrire à ${tournament.name}`,
+                url: `/tournaments/${tournament.id}#section-registrations`,
+                tag: `registration-${row.id}`,
+              });
+            } catch (e) {
+              console.error("Failed to push organizer", e);
+            }
           }
         } catch (e) {
           console.error("Failed to notify organizer of new registration", e);
         }
+
 
         // Online payment
         const fee = (tournament as any).registration_fee ?? 0;
