@@ -8,6 +8,8 @@ interface ScoreStepperProps {
   min?: number;
   max?: number;
   size?: "sm" | "md" | "lg";
+  /** Upgrade md→lg on sm+ screens (keeps mobile compact). */
+  responsiveLg?: boolean;
   disabled?: boolean;
 }
 
@@ -25,6 +27,7 @@ export function ScoreStepper({
   min = 0,
   max = 999,
   size = "md",
+  responsiveLg = false,
   disabled,
 }: ScoreStepperProps) {
   const dec = () => onChange(Math.max(min, value - 1));
@@ -32,7 +35,13 @@ export function ScoreStepper({
 
   const sizes = {
     sm: { num: "text-2xl h-11 min-w-[3rem] rounded-xl", btn: "h-9 w-9", icon: "h-3.5 w-3.5" },
-    md: { num: "text-4xl h-16 min-w-[4.5rem] rounded-2xl", btn: "h-11 w-11", icon: "h-4 w-4" },
+    md: responsiveLg
+      ? {
+          num: "text-4xl sm:text-6xl h-16 sm:h-24 min-w-[3.5rem] sm:min-w-[5.5rem] rounded-2xl",
+          btn: "h-10 w-10 sm:h-14 sm:w-14",
+          icon: "h-4 w-4 sm:h-5 sm:w-5",
+        }
+      : { num: "text-4xl h-16 min-w-[4.5rem] rounded-2xl", btn: "h-11 w-11", icon: "h-4 w-4" },
     lg: {
       num: "text-6xl h-24 min-w-[5.5rem] rounded-2xl",
       btn: "h-14 w-14",
