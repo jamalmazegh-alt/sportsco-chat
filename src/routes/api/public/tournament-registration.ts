@@ -247,20 +247,22 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 regId: row.id,
               });
             }
-            // Push notification to the organizer (fire-and-forget)
+            // Push notification to the organizer
+            // NOTE: on Cloudflare Workers, fire-and-forget promises are killed
+            // when the response is returned. We must await (or use waitUntil).
             try {
-              const { sendPushToUserFireAndForget } = await import(
-                "@/lib/push-send.server"
-              );
-              sendPushToUserFireAndForget(createdBy, {
+              const { sendPushToUser } = await import("@/lib/push-send.server");
+              const res = await sendPushToUser(createdBy, {
                 title: "🆕 Nouvelle inscription",
                 body: `${parsed.team_name} vient de s'inscrire à ${tournament.name}`,
                 url: `/tournaments/${tournament.id}#section-registrations`,
                 tag: `registration-${row.id}`,
               });
+              console.log("Organizer push sent", { createdBy, ...res });
             } catch (e) {
               console.error("Failed to push organizer", e);
             }
+
           }
         } catch (e) {
           console.error("Failed to notify organizer of new registration", e);
