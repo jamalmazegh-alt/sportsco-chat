@@ -409,9 +409,3 @@ export async function sendPushToUser(
   return { sent, pruned: toPrune.length };
 }
 
-/** Fire-and-forget — never blocks or throws on caller. */
-export function sendPushToUserFireAndForget(userId: string, payload: PushPayload): void {
-  sendPushToUser(userId, payload).catch((e) =>
-    console.warn("[push] background send failed", (e as Error).message),
-  );
-}

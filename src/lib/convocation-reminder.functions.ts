@@ -45,7 +45,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
     const { loadLineupForConvocationEmailServer } = await import("@/lib/lineup-email.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
 
     // 1. Load convocation + event + club via admin (we already verified the
@@ -245,15 +245,17 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
           ? ` · ${ev.location}`
           : "";
       const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
-      for (const uid of pushTargets) {
-        sendPushToUserFireAndForget(uid, {
-          title: "🔔 Rappel convocation",
-          body: reminderBody,
-          url: `/events/${ev.id}`,
-          tag: `conv-reminder-${(conv as any).id}`,
-        });
-        pushSent++;
-      }
+      await Promise.allSettled(
+        pushTargets.map((uid) =>
+          sendPushToUser(uid, {
+            title: "🔔 Rappel convocation",
+            body: reminderBody,
+            url: `/events/${ev.id}`,
+            tag: `conv-reminder-${(conv as any).id}`,
+          }),
+        ),
+      );
+      pushSent += pushTargets.length;
     }
 
     // 8. Record the reminder (single row, channel = email — drives cooldown).
