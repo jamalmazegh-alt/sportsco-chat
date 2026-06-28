@@ -96,9 +96,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   es: {
     brandTag: "TODOS LOS CLUBES. TODAS LAS PASIONES.",
     title1: "¡ÚNETE",
-    title2: "A NUESTRO EQUIPO!",
-    subtitle: "Escanea este código QR para unirte a este equipo en Clubero.",
-    bodyP1: "En segundos, solicita unirte al equipo",
+    title2: "¡A TU EQUIPO!",
+    subtitle: "Escanea este código QR para unirte a tu equipo en Clubero.",
+    bodyP1: "En segundos, solicita unirte a tu equipo",
     bodyP2: "y mantente al día con entrenamientos, partidos, convocatorias e info.",
     teamBadge: "EQUIPO",
     scanHint: "Escanea con tu móvil",
