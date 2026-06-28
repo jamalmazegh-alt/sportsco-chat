@@ -12,6 +12,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { COMPANY_LEGAL, formatCompanyFooterLine } from "@/config/company";
 
 export type Locale = "fr" | "en" | "es" | "de" | "it" | "nl" | "pt";
 
@@ -310,11 +311,12 @@ export const EmailShell = ({
               </Link>
             </Text>
             <Text style={copyright}>
-              © {new Date().getFullYear()} Clubero — {f.help}{" "}
+              © {new Date().getFullYear()} {COMPANY_LEGAL.brandName} — {f.help}{" "}
               <Link href={`mailto:${SUPPORT_EMAIL}`} style={footerLink}>
                 {SUPPORT_EMAIL}
               </Link>
             </Text>
+            <Text style={legalLine}>{formatCompanyFooterLine()}</Text>
           </Section>
         </Container>
       </Body>
@@ -366,11 +368,12 @@ const StandardFooter = ({ locale, f }: { locale: Locale; f: (typeof FOOTER_COPY)
       </Link>
     </Text>
     <Text style={copyright}>
-      © {new Date().getFullYear()} Clubero — {f.help}{" "}
+      © {new Date().getFullYear()} {COMPANY_LEGAL.brandName} — {f.help}{" "}
       <Link href={`mailto:${SUPPORT_EMAIL}`} style={footerLink}>
         {SUPPORT_EMAIL}
       </Link>
     </Text>
+    <Text style={legalLine}>{formatCompanyFooterLine()}</Text>
   </Section>
 );
 
@@ -525,4 +528,11 @@ const copyright: React.CSSProperties = {
   color: C.muted,
   margin: "8px 0 0",
   lineHeight: 1.6,
+};
+
+const legalLine: React.CSSProperties = {
+  fontSize: "11px",
+  color: C.muted,
+  margin: "10px 0 0",
+  lineHeight: 1.5,
 };
