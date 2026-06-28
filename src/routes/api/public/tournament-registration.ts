@@ -273,12 +273,10 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             } catch (e) {
               console.error("Failed to push organizer", e);
             }
-
           }
         } catch (e) {
           console.error("Failed to notify organizer of new registration", e);
         }
-
 
         // Online payment
         const fee = (tournament as any).registration_fee ?? 0;

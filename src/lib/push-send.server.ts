@@ -408,4 +408,3 @@ export async function sendPushToUser(
 
   return { sent, pruned: toPrune.length };
 }
-
