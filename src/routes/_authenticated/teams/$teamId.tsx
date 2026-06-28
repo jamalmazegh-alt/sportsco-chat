@@ -43,6 +43,7 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
