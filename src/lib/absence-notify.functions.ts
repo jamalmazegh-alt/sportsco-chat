@@ -2,10 +2,42 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sendPushToUser } from "@/lib/push-send.server";
 
 const InputSchema = z.object({
   availabilityId: z.string().uuid(),
 });
+
+const PUSH_STRINGS: Record<string, { title: (name: string) => string; body: (args: { playerName: string; start: string; end: string; reason: string }) => string }> = {
+  fr: {
+    title: (n) => `Absence déclarée — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} indisponible du ${start} au ${end} (${reason})`,
+  },
+  en: {
+    title: (n) => `Absence declared — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} unavailable from ${start} to ${end} (${reason})`,
+  },
+  es: {
+    title: (n) => `Ausencia declarada — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} no disponible del ${start} al ${end} (${reason})`,
+  },
+  de: {
+    title: (n) => `Abwesenheit gemeldet — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} nicht verfügbar vom ${start} bis ${end} (${reason})`,
+  },
+  it: {
+    title: (n) => `Assenza dichiarata — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} non disponibile dal ${start} al ${end} (${reason})`,
+  },
+  nl: {
+    title: (n) => `Afwezigheid gemeld — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} niet beschikbaar van ${start} tot ${end} (${reason})`,
+  },
+  pt: {
+    title: (n) => `Ausência declarada — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} indisponível de ${start} a ${end} (${reason})`,
+  },
+};
 
 const REASON_LABELS: Record<string, Record<string, string>> = {
   fr: {
@@ -172,6 +204,22 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
         REASON_LABELS.fr[avail.reason as string] ??
         (avail.reason as string);
 
+      const startStr = fmt(avail.start_date as string);
+      const endStr = fmt(avail.end_date as string);
+
+      // Push (best-effort, non-blocking)
+      try {
+        const strings = PUSH_STRINGS[locale] ?? PUSH_STRINGS.fr;
+        sendPushToUser((p as any).id, {
+          title: strings.title(playerName),
+          body: strings.body({ playerName, start: startStr, end: endStr, reason: reasonLabel }),
+          url: `/players/${avail.player_id}`,
+          tag: `absence-${availabilityId}-${(p as any).id}`,
+        }).catch(() => undefined);
+      } catch {
+        // best-effort
+      }
+
       try {
         await fetch(`${baseUrl}/lovable/email/transactional/send`, {
           method: "POST",
@@ -186,8 +234,8 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
             templateData: {
               coachFirstName: (p as any).first_name ?? null,
               playerName,
-              startDate: fmt(avail.start_date as string),
-              endDate: fmt(avail.end_date as string),
+              startDate: startStr,
+              endDate: endStr,
               reasonLabel,
               declaredByName,
               eventUrl: `${baseUrl}/players/${avail.player_id}`,
