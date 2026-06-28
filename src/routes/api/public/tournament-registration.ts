@@ -251,6 +251,12 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             // NOTE: on Cloudflare Workers, fire-and-forget promises are killed
             // when the response is returned. We must await (or use waitUntil).
             try {
+              await supabase.from("push_dispatch_log").insert({
+                kind: "tournament_registration",
+                ref_id: row.id,
+                targets_count: 1,
+                sent_count: 0,
+              });
               const { sendPushToUser } = await import("@/lib/push-send.server");
               const res = await sendPushToUser(createdBy, {
                 title: "🆕 Nouvelle inscription",
@@ -258,6 +264,11 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 url: `/tournaments/${tournament.id}#section-registrations`,
                 tag: `registration-${row.id}`,
               });
+              await supabase
+                .from("push_dispatch_log")
+                .update({ sent_count: res.sent })
+                .eq("kind", "tournament_registration")
+                .eq("ref_id", row.id);
               console.log("Organizer push sent", { createdBy, ...res });
             } catch (e) {
               console.error("Failed to push organizer", e);
