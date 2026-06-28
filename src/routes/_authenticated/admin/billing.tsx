@@ -340,6 +340,7 @@ function BillingPage() {
         </section>
       )}
       {isExempt && (
+        <section
           className="rounded-2xl p-5 space-y-2 border-[1.5px] border-[#86efac]"
           style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #f8fffe 100%)" }}
         >
