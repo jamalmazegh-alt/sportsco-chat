@@ -253,7 +253,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                   : "";
               const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
               await Promise.allSettled(
-                pushTargets.map((uid) =>
+                Array.from(pushTargets).map((uid) =>
                   sendPushToUser(uid, {
                     title: "🔔 Rappel convocation",
                     body: reminderBody,

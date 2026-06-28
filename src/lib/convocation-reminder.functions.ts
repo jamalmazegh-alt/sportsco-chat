@@ -245,8 +245,9 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
           ? ` · ${ev.location}`
           : "";
       const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
+      const uids = Array.from(pushTargets);
       await Promise.allSettled(
-        pushTargets.map((uid) =>
+        uids.map((uid) =>
           sendPushToUser(uid, {
             title: "🔔 Rappel convocation",
             body: reminderBody,
@@ -255,7 +256,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
           }),
         ),
       );
-      pushSent += pushTargets.length;
+      pushSent += uids.length;
     }
 
     // 8. Record the reminder (single row, channel = email — drives cooldown).
