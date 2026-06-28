@@ -317,7 +317,28 @@ function BillingPage() {
         <p className="text-sm text-muted-foreground mt-1">{t("billing.subtitle")}</p>
       </div>
 
-      {isExempt && (
+      {activationPending && (
+        <section className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold">{t("billing.activationInProgress")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("billing.activationMenus")}</p>
+            </div>
+          </div>
+        </section>
+      )}
+      {activationDone && !activationPending && (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="flex items-start gap-3">
+            <Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">{t("billing.activationComplete")}</p>
+              <p className="text-xs text-emerald-700 mt-0.5">{t("billing.activationMenusReady")}</p>
+            </div>
+          </div>
+        </section>
+      )}
         <section
           className="rounded-2xl p-5 space-y-2 border-[1.5px] border-[#86efac]"
           style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #f8fffe 100%)" }}
