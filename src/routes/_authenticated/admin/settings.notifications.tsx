@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { BackLink } from "@/components/back-link";
 import i18nInstance from "@/lib/i18n";
-import { EnablePushCard } from "@/components/pwa/EnablePushCard";
+
 
 export const Route = createFileRoute("/_authenticated/admin/settings/notifications")({
   component: NotificationsSettingsPage,
@@ -150,7 +150,6 @@ function NotificationsSettingsPage() {
         </div>
       </header>
 
-      <EnablePushCard />
 
       <Section title="Convocations">
 
