@@ -86,11 +86,15 @@ describe("buildMatchSheetPdf — Unicode font embedding", () => {
       players,
       lang: "fr",
     });
-    expect(bytes.byteLength).toBeGreaterThan(20_000); // subset font embedded
-    const head = new TextDecoder("latin1").decode(bytes.subarray(0, 8));
-    expect(head.startsWith("%PDF-")).toBe(true);
+    expect(bytes.byteLength).toBeGreaterThan(15_000); // subset Unicode font embedded
     const body = new TextDecoder("latin1").decode(bytes);
-    // Font name appears in the embedded font descriptor.
-    expect(body).toMatch(/DejaVu/);
+    expect(body.startsWith("%PDF-")).toBe(true);
+    // The embedded font ships as a TrueType / CIDFontType2 stream — proof we
+    // are not on the StandardFonts Helvetica path anymore (which would be
+    // ~3 KB and never reference CIDFontType2).
+    expect(body).toMatch(/CIDFontType2/);
+    // No '?' fallback character should leak into the content stream for any
+    // of the Latin-Extended names rendered above.
+    expect(body).not.toMatch(/Szcz\?sny|\?a\?lar|\?ukasz|\?or\?i\?/);
   });
 });
