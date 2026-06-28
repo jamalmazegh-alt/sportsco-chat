@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { sortConvocatedPlayers, type MatchSheetPlayer } from "@/lib/match-sheet/sort";
+import { buildMatchSheetPdf } from "@/lib/match-sheet/match-sheet.server";
 
 function p(over: Partial<MatchSheetPlayer>): MatchSheetPlayer {
   return {
