@@ -278,6 +278,8 @@ function ProfilePage() {
         </Link>
       )}
 
+      <EnablePushCard />
+
       {user?.email && (
         <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
