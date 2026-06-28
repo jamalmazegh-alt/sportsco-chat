@@ -60,3 +60,37 @@ describe("sortConvocatedPlayers", () => {
     expect(out[0].id).toBe("2"); // Adam first
   });
 });
+
+describe("buildMatchSheetPdf — Unicode font embedding", () => {
+  it("renders Latin-Extended names without '?' substitution and embeds DejaVu", async () => {
+    const players: MatchSheetPlayer[] = [
+      p({ id: "1", jersey_number: 1, first_name: "Wojciech", last_name: "Szczęsny" }),
+      p({ id: "2", jersey_number: 2, first_name: "Çağlar", last_name: "Söyüncü" }),
+      p({ id: "3", jersey_number: 3, first_name: "Łukasz", last_name: "Piszczek" }),
+      p({ id: "4", jersey_number: 4, first_name: "Luka", last_name: "Đorđić" }),
+      p({ id: "5", jersey_number: 5, first_name: "Thomas", last_name: "Müller" }),
+    ];
+    const bytes = await buildMatchSheetPdf({
+      event: {
+        id: "evt-1",
+        type: "match",
+        title: "Test — Szczęsny",
+        starts_at: "2026-06-28T18:00:00Z",
+        location: "Stade Łazienkowska",
+        opponent: "FC Çankaya",
+        team_id: "team-1",
+      },
+      clubName: "Łódź FC",
+      teamName: "U15 — Đorđić",
+      clubLogoUrl: null,
+      players,
+      lang: "fr",
+    });
+    expect(bytes.byteLength).toBeGreaterThan(20_000); // subset font embedded
+    const head = new TextDecoder("latin1").decode(bytes.subarray(0, 8));
+    expect(head.startsWith("%PDF-")).toBe(true);
+    const body = new TextDecoder("latin1").decode(bytes);
+    // Font name appears in the embedded font descriptor.
+    expect(body).toMatch(/DejaVu/);
+  });
+});
