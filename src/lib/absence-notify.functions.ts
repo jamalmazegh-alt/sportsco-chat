@@ -2,10 +2,42 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sendPushToUser } from "@/lib/push-send.server";
 
 const InputSchema = z.object({
   availabilityId: z.string().uuid(),
 });
+
+const PUSH_STRINGS: Record<string, { title: (name: string) => string; body: (args: { playerName: string; start: string; end: string; reason: string }) => string }> = {
+  fr: {
+    title: (n) => `Absence déclarée — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} indisponible du ${start} au ${end} (${reason})`,
+  },
+  en: {
+    title: (n) => `Absence declared — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} unavailable from ${start} to ${end} (${reason})`,
+  },
+  es: {
+    title: (n) => `Ausencia declarada — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} no disponible del ${start} al ${end} (${reason})`,
+  },
+  de: {
+    title: (n) => `Abwesenheit gemeldet — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} nicht verfügbar vom ${start} bis ${end} (${reason})`,
+  },
+  it: {
+    title: (n) => `Assenza dichiarata — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} non disponibile dal ${start} al ${end} (${reason})`,
+  },
+  nl: {
+    title: (n) => `Afwezigheid gemeld — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} niet beschikbaar van ${start} tot ${end} (${reason})`,
+  },
+  pt: {
+    title: (n) => `Ausência declarada — ${n}`,
+    body: ({ playerName, start, end, reason }) => `${playerName} indisponível de ${start} a ${end} (${reason})`,
+  },
+};
 
 const REASON_LABELS: Record<string, Record<string, string>> = {
   fr: {
