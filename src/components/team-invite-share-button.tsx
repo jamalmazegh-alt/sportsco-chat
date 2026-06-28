@@ -27,12 +27,41 @@ interface Props {
  * Reuses an existing non-expired token for the club when possible.
  */
 export function TeamInviteShareButton({ clubId, teamName }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [posterBusy, setPosterBusy] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const downloadPoster = useServerFn(generateTeamPoster);
+
+  const handleDownloadPoster = async () => {
+    if (!teamName) return;
+    setPosterBusy(true);
+    try {
+      const { base64, filename } = await downloadPoster({
+        data: { clubId, teamName, lang: i18n.language?.slice(0, 2) },
+      });
+      const bin = atob(base64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: "application/pdf" });
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(href);
+      toast.success(
+        t("teams.posterReady", { defaultValue: "Affiche prête" }),
+      );
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setPosterBusy(false);
+    }
+  };
 
   async function ensureToken() {
     if (!user?.id) return;
