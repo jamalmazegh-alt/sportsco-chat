@@ -784,7 +784,13 @@
     "viewCalendar": "Calendrier",
     "viewList": "Liste",
     "emptyHintCoach": "Créez votre premier entraînement ou match — les joueurs seront convoqués automatiquement.",
-    "emptyHintPlayer": "Aucun événement prévu pour le moment. Vous serez notifié dès qu'un coach en programme un."
+    "emptyHintPlayer": "Aucun événement prévu pour le moment. Vous serez notifié dès qu'un coach en programme un.",
+    "matchSheet": {
+      "label": "Feuille de match",
+      "labelTournament": "Liste des joueurs",
+      "downloading": "Génération…",
+      "failed": "Échec de la génération"
+    }
   },
   "followUps": {
     "title": "À relancer",
@@ -838,8 +844,20 @@
     "pendingCount_plural": "{{count}} joueurs n'ont pas encore répondu",
     "remindAllSent": "{{count}} relance envoyée",
     "remindAllSent_plural": "{{count}} relances envoyées",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",

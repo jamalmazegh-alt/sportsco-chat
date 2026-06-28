@@ -784,7 +784,13 @@
     "viewCalendar": "Kalender",
     "viewList": "Liste",
     "emptyHintCoach": "Erstelle dein erstes Training oder Spiel — Spieler werden automatisch eingeladen.",
-    "emptyHintPlayer": "Kein Event geplant. Du wirst benachrichtigt, sobald ein Trainer eines plant."
+    "emptyHintPlayer": "Kein Event geplant. Du wirst benachrichtigt, sobald ein Trainer eines plant.",
+    "matchSheet": {
+      "label": "Spielbericht",
+      "labelTournament": "Spielerliste",
+      "downloading": "Wird erstellt…",
+      "failed": "Erstellung fehlgeschlagen"
+    }
   },
   "followUps": {
     "title": "Zu erinnern",
@@ -838,7 +844,14 @@
     "pendingCount_plural": "{{count}} Spieler haben noch nicht geantwortet",
     "remindAllSent": "{{count}} Erinnerung gesendet",
     "remindAllSent_plural": "{{count}} Erinnerungen gesendet",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",

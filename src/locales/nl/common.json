@@ -784,7 +784,13 @@
     "viewCalendar": "Kalender",
     "viewList": "Lijst",
     "emptyHintCoach": "Maak je eerste Training of Wedstrijd aan — Spelers worden automatisch uitgenodigd.",
-    "emptyHintPlayer": "Geen evenement gepland. Je ontvangt een melding zodra een Coach er een plant."
+    "emptyHintPlayer": "Geen evenement gepland. Je ontvangt een melding zodra een Coach er een plant.",
+    "matchSheet": {
+      "label": "Wedstrijdformulier",
+      "labelTournament": "Spelerslijst",
+      "downloading": "Bezig…",
+      "failed": "Genereren mislukt"
+    }
   },
   "followUps": {
     "title": "Te herinneren",
@@ -838,8 +844,20 @@
     "pendingCount_plural": "{{count}} Spelers hebben nog niet geantwoord",
     "remindAllSent": "{{count}} herinnering verzonden",
     "remindAllSent_plural": "{{count}} herinneringen verzonden",
-    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
-    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
+    "reasonsAbsent": [
+      "Werk",
+      "Familie",
+      "Blessure",
+      "Ziekte",
+      "Studie",
+      "Andere verplichting"
+    ],
+    "reasonsUncertain": [
+      "Nog te bevestigen",
+      "Werk",
+      "Familie",
+      "Lichte gezondheidsklachten"
+    ],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",

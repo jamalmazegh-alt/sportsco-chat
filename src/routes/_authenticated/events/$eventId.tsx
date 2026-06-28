@@ -100,6 +100,7 @@ import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
+import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
 import {
   dispatchConvocationPush,
   dispatchConvocationResponsePush,
@@ -277,7 +278,39 @@ function EventDetail() {
   const [sending, setSending] = useState(false);
   const [confirmSendSuspendedOpen, setConfirmSendSuspendedOpen] = useState(false);
   const [sharingLineup, setSharingLineup] = useState(false);
+  const [generatingSheet, setGeneratingSheet] = useState(false);
+  const generateMatchSheetFn = useServerFn(generateMatchSheet);
   const lineupCardRef = useRef<HTMLDivElement | null>(null);
+
+  async function downloadMatchSheet() {
+    if (!event) return;
+    setGeneratingSheet(true);
+    try {
+      const res = await generateMatchSheetFn({
+        data: { eventId: event.id, lang: i18n.language },
+      });
+      // base64 → Blob → download
+      const bin = atob(res.base64);
+      const len = bin.length;
+      const buf = new Uint8Array(len);
+      for (let i = 0; i < len; i++) buf[i] = bin.charCodeAt(i);
+      const blob = new Blob([buf], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error(t("events.matchSheet.failed", { defaultValue: "Generation failed" }) + (msg ? ` — ${msg}` : ""));
+    } finally {
+      setGeneratingSheet(false);
+    }
+  }
+
 
   async function shareLineupAsImage(messageText: string) {
     const node = lineupCardRef.current;
@@ -2201,6 +2234,36 @@ function EventDetail() {
                   <ClipboardList className="h-4 w-4" />
                   <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
                 </Link>
+              )}
+              {isCoach && (event.type === "match" || event.type === "tournament") && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="h-9 gap-1.5 flex-1 min-w-[7rem]"
+                  onClick={downloadMatchSheet}
+                  disabled={generatingSheet}
+                  title={t(
+                    event.type === "tournament"
+                      ? "events.matchSheet.labelTournament"
+                      : "events.matchSheet.label",
+                    { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
+                  )}
+                >
+                  {generatingSheet ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  <span>
+                    {t(
+                      event.type === "tournament"
+                        ? "events.matchSheet.labelTournament"
+                        : "events.matchSheet.label",
+                      { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
+                    )}
+                  </span>
+                </Button>
               )}
             </div>
           )}
