@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -138,6 +138,7 @@ function BillingPage() {
     refetchOnMount: "always",
   });
 
+  const qc = useQueryClient();
   useEffect(() => {
     if (search.billing === "success") {
       const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
@@ -145,15 +146,26 @@ function BillingPage() {
       checkoutReturnSynced.current = syncKey;
       toast.success(t("billing.toastActivated"));
       if (!activeClubId) return;
+      const invalidateAll = () => {
+        // Refresh menu-gating caches so the user sees the full club menu
+        // immediately after subscribing (no logout/login required).
+        refetch();
+        qc.invalidateQueries({ queryKey: ["tournament-only-mode"] });
+        qc.invalidateQueries({ queryKey: ["club-subscription"] });
+        qc.invalidateQueries({ queryKey: ["club-subscription-full"] });
+        qc.invalidateQueries({ queryKey: ["has-paid-access"] });
+        qc.invalidateQueries({ queryKey: ["entitlements"] });
+        qc.invalidateQueries({ queryKey: ["feature-flags"] });
+      };
       syncSubscription({ data: { clubId: activeClubId } })
-        .then(() => refetch())
-        .catch(() => refetch());
+        .then(invalidateAll)
+        .catch(invalidateAll);
     } else if (search.billing === "canceled") {
       toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
       toast.success(t("billing.toastCardUpdated"));
     }
-  }, [activeClubId, refetch, search.billing, search.card, syncSubscription, t]);
+  }, [activeClubId, qc, refetch, search.billing, search.card, syncSubscription, t]);
 
   const sub = data?.subscription;
   const isExempt = sub?.exempt_from_billing === true;
