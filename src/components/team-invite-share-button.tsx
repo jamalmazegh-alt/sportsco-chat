@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { generateTeamPoster } from "@/lib/team-poster/team-poster.functions";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy, Download, Loader2 } from "lucide-react";
+import { Share2, Copy, Download, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -25,12 +27,41 @@ interface Props {
  * Reuses an existing non-expired token for the club when possible.
  */
 export function TeamInviteShareButton({ clubId, teamName }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [posterBusy, setPosterBusy] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const downloadPoster = useServerFn(generateTeamPoster);
+
+  const handleDownloadPoster = async () => {
+    if (!teamName) return;
+    setPosterBusy(true);
+    try {
+      const { base64, filename } = await downloadPoster({
+        data: { clubId, teamName, lang: i18n.language?.slice(0, 2) },
+      });
+      const bin = atob(base64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: "application/pdf" });
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(href);
+      toast.success(
+        t("teams.posterReady", { defaultValue: "Affiche prête" }),
+      );
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setPosterBusy(false);
+    }
+  };
 
   async function ensureToken() {
     if (!user?.id) return;
@@ -156,6 +187,19 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
                     {t("share.trigger", { defaultValue: "Partager" })}
                   </Button>
                 </div>
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleDownloadPoster}
+                  disabled={posterBusy}
+                >
+                  {posterBusy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                  {t("teams.downloadPoster", { defaultValue: "Télécharger l'affiche PDF" })}
+                </Button>
               </>
             )}
           </div>
