@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { isV2 } from "@/config/features";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { EnablePushCard } from "@/components/pwa/EnablePushCard";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
