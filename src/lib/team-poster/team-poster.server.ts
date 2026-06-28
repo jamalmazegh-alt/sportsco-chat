@@ -403,56 +403,129 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
 
   // ── Scattered illustrations BEFORE the card so the card sits on top.
   // Place individual figures around the page (not a bottom band).
-  const illu = await embed(doc, await fetchImage(ILLUSTRATION_URL));
-  if (illu) {
-    const ratio = illu.height / illu.width;
+  // ── Individual scattered figures (one per location, no clustering)
+  const figLeft = await embed(doc, { kind: "png", bytes: decode(FIGURE_LEFT_B64) });
+  const figRight = await embed(doc, { kind: "png", bytes: decode(FIGURE_RIGHT_B64) });
+  const figBottom = await embed(doc, { kind: "png", bytes: decode(FIGURE_BOTTOM_B64) });
 
-    // Mid-left figure — anchored partially off the left edge, higher up
-    const leftW = 175;
-    const leftH = leftW * ratio;
-    page.drawImage(illu, {
-      x: -55,
-      y: 340,
-      width: leftW,
-      height: leftH,
-      opacity: 0.78,
-    });
-
-    // Mid-right figure — anchored partially off the right edge, lower than left
-    const rightW = 180;
-    const rightH = rightW * ratio;
-    page.drawImage(illu, {
-      x: W - rightW + 55,
-      y: 280,
-      width: rightW,
-      height: rightH,
-      opacity: 0.78,
-    });
-
-    // Bottom-center — sits under/around benefits strip, soft
-    const cW = 200;
-    const cH = cW * ratio;
-    page.drawImage(illu, {
-      x: (W - cW) / 2,
-      y: 78,
-      width: cW,
-      height: cH,
-      opacity: 0.42,
-    });
-
-    // Small ball accent — bottom-left corner
-    page.drawCircle({ x: 70, y: 110, size: 14, color: rgb(0.98, 0.74, 0.31), opacity: 0.55 });
-    page.drawCircle({ x: W - 80, y: 200, size: 10, color: lavender });
+  if (figLeft) {
+    const targetH = 180;
+    const r = targetH / FIGURE_LEFT_H;
+    const w = FIGURE_LEFT_W * r;
+    page.drawImage(figLeft, { x: 8, y: 200, width: w, height: targetH, opacity: 0.95 });
+  }
+  if (figRight) {
+    const targetH = 180;
+    const r = targetH / FIGURE_RIGHT_H;
+    const w = FIGURE_RIGHT_W * r;
+    page.drawImage(figRight, { x: W - w - 8, y: 200, width: w, height: targetH, opacity: 0.95 });
+  }
+  if (figBottom) {
+    // Sits in the gap between QR card bottom (y=230) and benefits pills top (y=114)
+    const targetH = 96;
+    const r = targetH / FIGURE_BOTTOM_H;
+    const w = FIGURE_BOTTOM_W * r;
+    page.drawImage(figBottom, { x: (W - w) / 2, y: 122, width: w, height: targetH, opacity: 0.9 });
   }
 
-  // ── QR Card (pushed down to clear subtitle/body)
+  // Decorative ball accents
+  page.drawCircle({ x: 60, y: 360, size: 12, color: rgb(0.98, 0.74, 0.31), opacity: 0.55 });
+  page.drawCircle({ x: W - 60, y: 410, size: 10, color: lavender });
+
+  // ── QR Card (centered, prominent)
   const cardW = 320;
   const cardH = 340;
   const cardX = (W - cardW) / 2;
   const cardY = 230;
 
+  // Soft drop shadow
+  page.drawRectangle({
+    x: cardX + 4,
+    y: cardY - 6,
+    width: cardW,
+    height: cardH,
+    color: rgb(0.85, 0.88, 0.92),
+    opacity: 0.5,
+  });
+  // Card background
+  page.drawRectangle({
+    x: cardX,
+    y: cardY,
+    width: cardW,
+    height: cardH,
+    color: white,
+    borderColor: rgb(0.9, 0.93, 0.96),
+    borderWidth: 1,
+  });
 
-  // ── Benefits strip (pill row)
+  // Badge "TEAM / ÉQUIPE"
+  const badgeText = t.teamBadge;
+  const badgeFontSize = 9;
+  const badgePadX = 12;
+  const badgeW = bold.widthOfTextAtSize(badgeText, badgeFontSize) + badgePadX * 2;
+  const badgeH = 20;
+  const badgeX = cardX + (cardW - badgeW) / 2;
+  const badgeY = cardY + cardH - badgeH - 18;
+  page.drawRectangle({
+    x: badgeX,
+    y: badgeY,
+    width: badgeW,
+    height: badgeH,
+    color: teal,
+  });
+  page.drawText(badgeText, {
+    x: badgeX + badgePadX,
+    y: badgeY + 6,
+    size: badgeFontSize,
+    font: bold,
+    color: white,
+  });
+
+  // Team name (centered, fitted)
+  const nameMaxW = cardW - 32;
+  const teamFitted = fitText(input.teamName, bold, 22, nameMaxW);
+  drawCenteredText(
+    page,
+    teamFitted.text,
+    cardX + cardW / 2,
+    badgeY - 26,
+    teamFitted.size,
+    bold,
+    ink,
+  );
+
+  // QR matrix
+  const qr = buildQrMatrix(input.inviteUrl);
+  const qrAreaSize = 200;
+  const cell = qrAreaSize / qr.size;
+  const qrX = cardX + (cardW - qrAreaSize) / 2;
+  const qrY = cardY + 50;
+  // Quiet zone background
+  page.drawRectangle({
+    x: qrX - 8,
+    y: qrY - 8,
+    width: qrAreaSize + 16,
+    height: qrAreaSize + 16,
+    color: white,
+  });
+  for (let y = 0; y < qr.size; y++) {
+    for (let x = 0; x < qr.size; x++) {
+      if (qr.data[y * qr.size + x]) {
+        page.drawRectangle({
+          x: qrX + x * cell,
+          y: qrY + (qr.size - 1 - y) * cell,
+          width: cell + 0.4,
+          height: cell + 0.4,
+          color: ink,
+        });
+      }
+    }
+  }
+
+  // Scan hint
+  drawCenteredText(page, t.scanHint, cardX + cardW / 2, cardY + 20, 9.5, font, muted);
+
+
   const benY = 92;
   const pillH = 22;
   const pillGap = 6;
