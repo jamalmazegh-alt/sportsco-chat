@@ -344,38 +344,31 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     }
   }
 
-  // ── Header (logos + center dot)
-  const headerY = H - 60;
+  // ── Header (logos + center dot) — larger, no redundant "clubero" wordmark
+  const headerY = H - 62;
   const clubero = await embed(doc, await fetchImage(CLUBERO_LOGO_URL));
   if (clubero) {
-    const max = 32;
+    const max = 58;
     const r = Math.min(max / clubero.width, max / clubero.height);
     const w = clubero.width * r;
     const h = clubero.height * r;
     page.drawImage(clubero, { x: 40, y: headerY - h / 2, width: w, height: h });
-    page.drawText("clubero", {
-      x: 40 + w + 8,
-      y: headerY - 8,
-      size: 16,
-      font: bold,
-      color: ink,
-    });
   }
 
   // Club logo (right) — optional, safe
   const clubLogo = input.clubLogoUrl ? await embed(doc, await fetchImage(input.clubLogoUrl)) : null;
   if (clubLogo) {
-    const max = 38;
+    const max = 64;
     const r = Math.min(max / clubLogo.width, max / clubLogo.height);
     const w = clubLogo.width * r;
     const h = clubLogo.height * r;
     page.drawImage(clubLogo, { x: W - 40 - w, y: headerY - h / 2, width: w, height: h });
   } else if (input.clubName) {
     const name = input.clubName.toUpperCase();
-    const f = fitText(name, bold, 11, 150);
+    const f = fitText(name, bold, 13, 170);
     page.drawText(f.text, {
       x: W - 40 - bold.widthOfTextAtSize(f.text, f.size),
-      y: headerY - 4,
+      y: headerY - 5,
       size: f.size,
       font: bold,
       color: ink,
@@ -386,7 +379,8 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   page.drawCircle({ x: W / 2, y: headerY, size: 3, color: teal });
 
   // Brand tagline tiny (under right logo)
-  drawCenteredText(page, t.brandTag, W - 110, headerY - 26, 6.5, bold, teal);
+  drawCenteredText(page, t.brandTag, W - 110, headerY - 40, 6.5, bold, teal);
+
 
   // ── Big title
   drawCenteredText(page, t.title1, W / 2, H - 130, 46, bold, ink);
