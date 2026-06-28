@@ -636,11 +636,16 @@ function TeamDetail() {
                 </p>
               )}
             </div>
-            {isCoach && team && (
-              <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
+            <div className="flex items-center gap-1 shrink-0">
+              {roles.includes("admin") && team?.club_id && (
+                <TeamInviteShareButton clubId={team.club_id} teamName={team.name} />
+              )}
+              {isCoach && team && (
+                <Button size="icon" variant="ghost" className="h-8 w-8" onClick={openEdit}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
