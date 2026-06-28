@@ -314,10 +314,7 @@ function draftEventLabel(
   teamB: Team | undefined,
   t: (k: string) => string,
 ): string {
-  const team =
-    draft.teamId === teamA?.id
-      ? (teamA.name)
-      : (teamB?.name);
+  const team = draft.teamId === teamA?.id ? teamA.name : teamB?.name;
   if (draft.type === "goal") {
     const who = draft.scorer || draft.assist || t("matches.matchDetails.goal");
     const min = draft.minute ? ` ${draft.minute}'` : "";
@@ -403,9 +400,7 @@ function MatchDetailsSection({
                   <span>{meta.emoji}</span>
                   {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
                   {ev.player_name && <span>{ev.player_name}</span>}
-                  <span className="text-muted-foreground">
-                    {isA ? (teamA?.name) : (teamB?.name)}
-                  </span>
+                  <span className="text-muted-foreground">{isA ? teamA?.name : teamB?.name}</span>
                   {!disabled && (
                     <button
                       type="button"
@@ -1158,9 +1153,7 @@ function MatchCard({
                   {t("matches.vs")}
                 </span>
               )}
-              <span className="truncate text-sm font-bold">
-                {teamB?.name ?? t("matches.tbd")}
-              </span>
+              <span className="truncate text-sm font-bold">{teamB?.name ?? t("matches.tbd")}</span>
             </button>
           )}
 

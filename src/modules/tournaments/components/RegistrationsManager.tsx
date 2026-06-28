@@ -454,7 +454,9 @@ export function RegistrationsManager({
       ) : q.isError ? (
         <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive space-y-2">
           <p className="font-medium">
-            {t("registrations.loadError", { defaultValue: "Erreur de chargement des inscriptions" })}
+            {t("registrations.loadError", {
+              defaultValue: "Erreur de chargement des inscriptions",
+            })}
           </p>
           <p className="text-xs opacity-80 break-all">
             {(q.error as any)?.message ?? String(q.error)}
@@ -469,7 +471,6 @@ export function RegistrationsManager({
             suffix: filter !== "all" ? ` (${t(`registrations.filter.${filter}`)})` : "",
           })}
         </div>
-
       ) : (
         <ul className="space-y-2">
           {regs.map((r) => (

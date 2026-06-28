@@ -10,7 +10,6 @@ import { Switch } from "@/components/ui/switch";
 import { BackLink } from "@/components/back-link";
 import i18nInstance from "@/lib/i18n";
 
-
 export const Route = createFileRoute("/_authenticated/admin/settings/notifications")({
   component: NotificationsSettingsPage,
   head: () => ({
@@ -150,9 +149,7 @@ function NotificationsSettingsPage() {
         </div>
       </header>
 
-
       <Section title="Convocations">
-
         <Toggle
           label="Push envoyé à la création"
           hint="Notifie joueurs et parents dès qu'une convocation est créée."
