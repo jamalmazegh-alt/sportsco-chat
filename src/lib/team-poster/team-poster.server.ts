@@ -134,9 +134,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   nl: {
     brandTag: "ALLE CLUBS. ALLE PASSIES.",
     title1: "WORD",
-    title2: "LID VAN ONS TEAM!",
-    subtitle: "Scan deze QR-code om dit team te vervoegen op Clubero.",
-    bodyP1: "Vraag in enkele seconden om bij het team te komen",
+    title2: "LID VAN JOUW TEAM!",
+    subtitle: "Scan deze QR-code om je team te vervoegen op Clubero.",
+    bodyP1: "Vraag in enkele seconden om bij je team te komen",
     bodyP2: "en volg trainingen, wedstrijden, oproepen en nieuws.",
     teamBadge: "TEAM",
     scanHint: "Scan met je telefoon",
