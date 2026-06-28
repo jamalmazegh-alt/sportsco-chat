@@ -15,6 +15,7 @@ test.describe("Events all types & sports", () => {
     club = await createTestClub("events");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

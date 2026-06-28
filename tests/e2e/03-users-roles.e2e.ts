@@ -15,6 +15,7 @@ test.describe("Users & roles", () => {
     club = await createTestClub("roles");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

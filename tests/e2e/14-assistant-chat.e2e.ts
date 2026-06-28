@@ -19,6 +19,7 @@ test.describe("Assistant chat", () => {
     club = await createTestClub("assistant");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

@@ -24,6 +24,7 @@ test.describe("Convocations — respond", () => {
     conv2 = data!.find((d) => d.player_id === club.player2WithParent.id)!.id;
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

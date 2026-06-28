@@ -12,6 +12,7 @@ test.describe("Event chat", () => {
     club = await createTestClub("chat");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

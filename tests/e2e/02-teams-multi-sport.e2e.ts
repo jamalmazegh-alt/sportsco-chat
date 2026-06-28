@@ -16,6 +16,7 @@ test.describe("Multi-sport teams", () => {
     club = await createTestClub("sports");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 

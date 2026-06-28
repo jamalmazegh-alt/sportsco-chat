@@ -25,6 +25,7 @@ test.describe("Player availabilities", () => {
   });
 
   test.afterAll(async () => {
+    if (!club) return;
     try {
       await admin
         .from("player_availabilities")

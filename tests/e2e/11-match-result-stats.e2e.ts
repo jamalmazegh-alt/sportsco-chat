@@ -12,6 +12,7 @@ test.describe("Match result, goals, cards, stats", () => {
     club = await createTestClub("stats");
   });
   test.afterAll(async () => {
+    if (!club) return;
     await club.cleanup();
   });
 
