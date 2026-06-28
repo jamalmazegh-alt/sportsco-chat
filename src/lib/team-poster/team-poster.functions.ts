@@ -71,9 +71,8 @@ export const generateTeamPoster = createServerFn({ method: "POST" })
       .maybeSingle();
 
     // 4. Build PDF.
-    const { buildTeamPosterPdf, posterFilename, pickPosterLang } = await import(
-      "./team-poster.server"
-    );
+    const { buildTeamPosterPdf, posterFilename, pickPosterLang } =
+      await import("./team-poster.server");
     const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token!)}`;
     const bytes = await buildTeamPosterPdf({
       inviteUrl,

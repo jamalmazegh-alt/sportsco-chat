@@ -305,12 +305,14 @@ function EventDetail() {
       URL.revokeObjectURL(url);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      toast.error(t("events.matchSheet.failed", { defaultValue: "Generation failed" }) + (msg ? ` — ${msg}` : ""));
+      toast.error(
+        t("events.matchSheet.failed", { defaultValue: "Generation failed" }) +
+          (msg ? ` — ${msg}` : ""),
+      );
     } finally {
       setGeneratingSheet(false);
     }
   }
-
 
   async function shareLineupAsImage(messageText: string) {
     const node = lineupCardRef.current;

@@ -298,21 +298,9 @@ export interface BuildTeamPosterInput {
 
 const CLUBERO_LOGO_URL = "https://clubero.app/clubero-logo.png";
 
-import {
-  FIGURE_LEFT_B64,
-  FIGURE_LEFT_W,
-  FIGURE_LEFT_H,
-} from "./figure-left.b64";
-import {
-  FIGURE_RIGHT_B64,
-  FIGURE_RIGHT_W,
-  FIGURE_RIGHT_H,
-} from "./figure-right.b64";
-import {
-  FIGURE_BOTTOM_B64,
-  FIGURE_BOTTOM_W,
-  FIGURE_BOTTOM_H,
-} from "./figure-bottom.b64";
+import { FIGURE_LEFT_B64, FIGURE_LEFT_W, FIGURE_LEFT_H } from "./figure-left.b64";
+import { FIGURE_RIGHT_B64, FIGURE_RIGHT_W, FIGURE_RIGHT_H } from "./figure-right.b64";
+import { FIGURE_BOTTOM_B64, FIGURE_BOTTOM_W, FIGURE_BOTTOM_H } from "./figure-bottom.b64";
 
 export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<Uint8Array> {
   const t = STRINGS[input.lang];
@@ -525,7 +513,6 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   // Scan hint
   drawCenteredText(page, t.scanHint, cardX + cardW / 2, cardY + 20, 9.5, font, muted);
 
-
   const benY = 92;
   const pillH = 22;
   const pillGap = 6;
@@ -545,7 +532,12 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
       borderColor: rgb(0.92, 0.94, 0.96),
       borderWidth: 0.8,
     });
-    page.drawCircle({ x: px + 9, y: benY + pillH / 2, size: 3, color: dotColors[i % dotColors.length] });
+    page.drawCircle({
+      x: px + 9,
+      y: benY + pillH / 2,
+      size: 3,
+      color: dotColors[i % dotColors.length],
+    });
     page.drawText(label, {
       x: px + 16,
       y: benY + 7,
