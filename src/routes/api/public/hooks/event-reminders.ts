@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
-import { sendPushToUserFireAndForget } from "@/lib/push-send.server";
+import { sendPushToUser } from "@/lib/push-send.server";
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
@@ -252,14 +252,16 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                   ? ` · ${ev.location}`
                   : "";
               const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
-              for (const uid of pushTargets) {
-                sendPushToUserFireAndForget(uid, {
-                  title: "🔔 Rappel convocation",
-                  body: reminderBody,
-                  url: `/events/${ev.id}`,
-                  tag: `conv-reminder-${conv.id}`,
-                });
-              }
+              await Promise.allSettled(
+                Array.from(pushTargets).map((uid) =>
+                  sendPushToUser(uid, {
+                    title: "🔔 Rappel convocation",
+                    body: reminderBody,
+                    url: `/events/${ev.id}`,
+                    tag: `conv-reminder-${conv.id}`,
+                  }),
+                ),
+              );
             }
 
             await supabaseAdmin.from("reminders").insert({

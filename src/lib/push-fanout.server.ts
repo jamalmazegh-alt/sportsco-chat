@@ -4,7 +4,7 @@
  * dispatchers and public webhook routes (token-protected).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendPushToUser, sendPushToUserFireAndForget } from "./push-send.server";
+import { sendPushToUser } from "./push-send.server";
 import { getClubNotifSettings } from "./club-notif-settings.server";
 
 async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
@@ -256,15 +256,18 @@ export async function fanoutTournamentMatchReminder(
     const opp =
       tid === teamA ? (nameById.get(teamB) ?? "Adversaire") : (nameById.get(teamA) ?? "Adversaire");
     const targets = await resolveTournamentTeamUserIds([tid]);
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
-        title: "🏟️ Votre match commence bientôt",
-        body: `vs ${opp} — ${time} · Terrain ${field}`,
-        url: `/t/${slug}`,
-        tag: `tournament-match-${matchId}-${uid}`,
-      });
-      dispatched++;
-    }
+    const uids = Array.from(targets);
+    await Promise.allSettled(
+      uids.map((uid) =>
+        sendPushToUser(uid, {
+          title: "🏟️ Votre match commence bientôt",
+          body: `vs ${opp} — ${time} · Terrain ${field}`,
+          url: `/t/${slug}`,
+          tag: `tournament-match-${matchId}-${uid}`,
+        }),
+      ),
+    );
+    dispatched += uids.length;
   }
   return { dispatched };
 }
@@ -301,14 +304,16 @@ export async function fanoutTournamentDraw(tournamentId: string): Promise<{ disp
 
   const slug = ((t as any).slug as string) || tournamentId;
   const name = ((t as any).name as string) || "le tournoi";
-  for (const uid of targets) {
-    sendPushToUserFireAndForget(uid, {
-      title: "🎲 Les poules sont disponibles",
-      body: `Tournoi ${name} — Consultez votre groupe`,
-      url: `/t/${slug}`,
-      tag: `draw-${tournamentId}`,
-    });
-  }
+  await Promise.allSettled(
+    Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
+        title: "🎲 Les poules sont disponibles",
+        body: `Tournoi ${name} — Consultez votre groupe`,
+        url: `/t/${slug}`,
+        tag: `draw-${tournamentId}`,
+      }),
+    ),
+  );
   return { dispatched: targets.size };
 }
 
