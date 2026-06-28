@@ -533,7 +533,12 @@
       "whatsapp": "WhatsApp only (no attendance tracking)"
     },
     "whatsappGroupHint": "Paste the team's WhatsApp group invite link. Used to quickly share call-ups.",
-    "commModeHint": "In WhatsApp-only mode, you share events without requesting responses in the app."
+    "commModeHint": "In WhatsApp-only mode, you share events without requesting responses in the app.",
+    "shareInvite": "Share invite link",
+    "shareInviteTitle": "Invite to join",
+    "shareInviteHint": "Scan the QR or share the link. New members join the club as a player.",
+    "downloadPoster": "Download PDF poster",
+    "posterReady": "Poster ready"
   },
   "club": {
     "logo": "Club logo",
@@ -2058,5 +2063,10 @@
     "self": {
       "convocationSilence": "You haven't replied"
     }
+  },
+  "share": {
+    "linkCopied": "Link copied",
+    "qrCode": "QR code",
+    "trigger": "Share"
   }
 }

@@ -533,7 +533,12 @@
       "whatsapp": "Nur WhatsApp (keine Anwesenheitsverfolgung)"
     },
     "whatsappGroupHint": "Füge den Einladungslink der WhatsApp-Gruppe des Teams ein. Wird genutzt, um Aufgebote schnell zu teilen.",
-    "commModeHint": "Im reinen WhatsApp-Modus teilst du die Events, ohne Antworten in der App anzufordern."
+    "commModeHint": "Im reinen WhatsApp-Modus teilst du die Events, ohne Antworten in der App anzufordern.",
+    "shareInvite": "Einladungslink teilen",
+    "shareInviteTitle": "Zum Beitritt einladen",
+    "shareInviteHint": "Scanne den QR oder teile den Link. Neue Mitglieder treten dem Verein als Spieler bei.",
+    "downloadPoster": "PDF-Plakat herunterladen",
+    "posterReady": "Plakat bereit"
   },
   "club": {
     "logo": "Vereinslogo",
@@ -2058,5 +2063,10 @@
     "self": {
       "convocationSilence": "Du hast nicht geantwortet"
     }
+  },
+  "share": {
+    "linkCopied": "Link kopiert",
+    "qrCode": "QR-Code",
+    "trigger": "Teilen"
   }
 }
