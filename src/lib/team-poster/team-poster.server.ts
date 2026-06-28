@@ -481,23 +481,45 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   // scan hint
   drawCenteredText(page, t.scanHint, W / 2, cardY + 22, 10, bold, teal);
 
-  // ── Illustration (bottom decorative)
+  // ── Illustration scattered across the bottom (left, right, center)
   const illu = await embed(doc, await fetchImage(ILLUSTRATION_URL));
   if (illu) {
-    const targetW = W - 80;
-    const ratio = targetW / illu.width;
-    const h = illu.height * ratio;
-    const maxH = 150;
-    const finalH = Math.min(h, maxH);
-    const finalW = (illu.width * finalH) / illu.height;
+    const ratio = illu.height / illu.width;
+
+    // Left cluster — anchored partially off the left edge
+    const leftW = 220;
+    const leftH = leftW * ratio;
     page.drawImage(illu, {
-      x: (W - finalW) / 2,
-      y: 120,
-      width: finalW,
-      height: finalH,
-      opacity: 1,
+      x: -70,
+      y: 70,
+      width: leftW,
+      height: leftH,
+      opacity: 0.85,
+    });
+
+    // Right cluster — same image, anchored partially off the right edge
+    const rightW = 220;
+    const rightH = rightW * ratio;
+    page.drawImage(illu, {
+      x: W - rightW + 70,
+      y: 70,
+      width: rightW,
+      height: rightH,
+      opacity: 0.85,
+    });
+
+    // Center accent — smaller, lower, softer
+    const cW = 170;
+    const cH = cW * ratio;
+    page.drawImage(illu, {
+      x: (W - cW) / 2,
+      y: 56,
+      width: cW,
+      height: cH,
+      opacity: 0.55,
     });
   }
+
 
   // ── Benefits strip (pill row)
   const benY = 92;
