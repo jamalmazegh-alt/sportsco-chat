@@ -533,7 +533,12 @@
       "whatsapp": "Apenas WhatsApp (sem controlo de presenças)"
     },
     "whatsappGroupHint": "Insira o link de convite do grupo WhatsApp da equipa. Será usado para partilhar rapidamente as convocatórias.",
-    "commModeHint": "No modo apenas WhatsApp, partilha os eventos sem solicitar respostas na app."
+    "commModeHint": "No modo apenas WhatsApp, partilha os eventos sem solicitar respostas na app.",
+    "shareInvite": "Partilhar link de convite",
+    "shareInviteTitle": "Convidar para juntar-se",
+    "shareInviteHint": "Digitalize o QR ou partilhe o link. Os novos membros entram no clube como jogador.",
+    "downloadPoster": "Descarregar cartaz PDF",
+    "posterReady": "Cartaz pronto"
   },
   "club": {
     "logo": "Logótipo do Clube",
@@ -2058,5 +2063,10 @@
     "self": {
       "convocationSilence": "Não respondeste"
     }
+  },
+  "share": {
+    "linkCopied": "Link copiado",
+    "qrCode": "Código QR",
+    "trigger": "Partilhar"
   }
 }

@@ -533,7 +533,12 @@
       "whatsapp": "Alleen WhatsApp (geen aanwezigheidsregistratie)"
     },
     "whatsappGroupHint": "Voeg de uitnodigingslink van de WhatsApp-groep van het Team toe. Wordt gebruikt om opstellingen snel te delen.",
-    "commModeHint": "In de pure WhatsApp-modus deel je de evenementen zonder antwoorden in de app te vragen."
+    "commModeHint": "In de pure WhatsApp-modus deel je de evenementen zonder antwoorden in de app te vragen.",
+    "shareInvite": "Uitnodigingslink delen",
+    "shareInviteTitle": "Uitnodigen om deel te nemen",
+    "shareInviteHint": "Scan de QR of deel de link. Nieuwe leden komen bij de club als speler.",
+    "downloadPoster": "PDF-poster downloaden",
+    "posterReady": "Poster klaar"
   },
   "club": {
     "logo": "Clublogo",
@@ -2058,5 +2063,10 @@
     "self": {
       "convocationSilence": "Je hebt niet geantwoord"
     }
+  },
+  "share": {
+    "linkCopied": "Link gekopieerd",
+    "qrCode": "QR-code",
+    "trigger": "Delen"
   }
 }
