@@ -153,9 +153,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   pt: {
     brandTag: "TODOS OS CLUBES. TODAS AS PAIXÕES.",
     title1: "JUNTA-TE",
-    title2: "À NOSSA EQUIPA!",
-    subtitle: "Lê este QR Code para entrar nesta equipa no Clubero.",
-    bodyP1: "Em segundos, pede para entrar na equipa",
+    title2: "À TUA EQUIPA!",
+    subtitle: "Lê este QR Code para entrar na tua equipa no Clubero.",
+    bodyP1: "Em segundos, pede para entrar na tua equipa",
     bodyP2: "e acompanha treinos, jogos, convocatórias e novidades.",
     teamBadge: "EQUIPA",
     scanHint: "Lê com o teu telemóvel",
