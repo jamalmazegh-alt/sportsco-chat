@@ -784,7 +784,13 @@
     "viewCalendar": "Calendário",
     "viewList": "Lista",
     "emptyHintCoach": "Crie o seu primeiro treino ou jogo — os Jogadores serão convidados automaticamente.",
-    "emptyHintPlayer": "Nenhum Evento agendado. Será notificado assim que um Treinador agendar um."
+    "emptyHintPlayer": "Nenhum Evento agendado. Será notificado assim que um Treinador agendar um.",
+    "matchSheet": {
+      "label": "Ficha de jogo",
+      "labelTournament": "Lista de jogadores",
+      "downloading": "A gerar…",
+      "failed": "Falha ao gerar"
+    }
   },
   "followUps": {
     "title": "Lembretes",
@@ -838,8 +844,20 @@
     "pendingCount_plural": "{{count}} Jogadores ainda não responderam",
     "remindAllSent": "{{count}} lembrete enviado",
     "remindAllSent_plural": "{{count}} lembretes enviados",
-    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
-    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
+    "reasonsAbsent": [
+      "Trabalho",
+      "Família",
+      "Lesão",
+      "Doença",
+      "Estudos",
+      "Outro compromisso"
+    ],
+    "reasonsUncertain": [
+      "A confirmar",
+      "Trabalho",
+      "Família",
+      "Problema de saúde ligeiro"
+    ],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
