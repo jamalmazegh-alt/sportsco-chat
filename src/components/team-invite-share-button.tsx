@@ -187,6 +187,19 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
                     {t("share.trigger", { defaultValue: "Partager" })}
                   </Button>
                 </div>
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleDownloadPoster}
+                  disabled={posterBusy}
+                >
+                  {posterBusy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                  {t("teams.downloadPoster", { defaultValue: "Télécharger l'affiche PDF" })}
+                </Button>
               </>
             )}
           </div>
