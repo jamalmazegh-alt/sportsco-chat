@@ -39,9 +39,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   fr: {
     brandTag: "TOUS LES CLUBS. TOUTES LES PASSIONS.",
     title1: "REJOINS",
-    title2: "NOTRE ÉQUIPE !",
-    subtitle: "Scanne ce QR Code pour rejoindre cette équipe sur Clubero.",
-    bodyP1: "En quelques secondes, demande à rejoindre l'équipe",
+    title2: "TON ÉQUIPE !",
+    subtitle: "Scanne ce QR Code pour rejoindre ton équipe sur Clubero.",
+    bodyP1: "En quelques secondes, demande à rejoindre ton équipe",
     bodyP2: "et retrouve entraînements, matchs, convocations et infos.",
     teamBadge: "ÉQUIPE",
     scanHint: "Scanne avec ton téléphone",
@@ -58,9 +58,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   en: {
     brandTag: "ALL CLUBS. ALL PASSIONS.",
     title1: "JOIN",
-    title2: "OUR TEAM!",
-    subtitle: "Scan this QR code to join this team on Clubero.",
-    bodyP1: "In seconds, ask to join the team",
+    title2: "YOUR TEAM!",
+    subtitle: "Scan this QR code to join your team on Clubero.",
+    bodyP1: "In seconds, ask to join your team",
     bodyP2: "and stay up to date with training, matches, line-ups and news.",
     teamBadge: "TEAM",
     scanHint: "Scan with your phone",
@@ -77,9 +77,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   de: {
     brandTag: "ALLE VEREINE. ALLE LEIDENSCHAFTEN.",
     title1: "TRETE",
-    title2: "UNSEREM TEAM BEI!",
-    subtitle: "Scanne diesen QR-Code, um diesem Team auf Clubero beizutreten.",
-    bodyP1: "Bitte in Sekunden um den Beitritt zum Team",
+    title2: "DEINEM TEAM BEI!",
+    subtitle: "Scanne diesen QR-Code, um deinem Team auf Clubero beizutreten.",
+    bodyP1: "Bitte in Sekunden um den Beitritt zu deinem Team",
     bodyP2: "und bleibe bei Trainings, Spielen, Aufstellungen und News dabei.",
     teamBadge: "TEAM",
     scanHint: "Mit deinem Handy scannen",
@@ -96,9 +96,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   es: {
     brandTag: "TODOS LOS CLUBES. TODAS LAS PASIONES.",
     title1: "¡ÚNETE",
-    title2: "A NUESTRO EQUIPO!",
-    subtitle: "Escanea este código QR para unirte a este equipo en Clubero.",
-    bodyP1: "En segundos, solicita unirte al equipo",
+    title2: "¡A TU EQUIPO!",
+    subtitle: "Escanea este código QR para unirte a tu equipo en Clubero.",
+    bodyP1: "En segundos, solicita unirte a tu equipo",
     bodyP2: "y mantente al día con entrenamientos, partidos, convocatorias e info.",
     teamBadge: "EQUIPO",
     scanHint: "Escanea con tu móvil",
@@ -115,9 +115,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   it: {
     brandTag: "TUTTI I CLUB. TUTTE LE PASSIONI.",
     title1: "UNISCITI",
-    title2: "ALLA NOSTRA SQUADRA!",
-    subtitle: "Scansiona questo QR Code per unirti a questa squadra su Clubero.",
-    bodyP1: "In pochi secondi, chiedi di unirti alla squadra",
+    title2: "ALLA TUA SQUADRA!",
+    subtitle: "Scansiona questo QR Code per unirti alla tua squadra su Clubero.",
+    bodyP1: "In pochi secondi, chiedi di unirti alla tua squadra",
     bodyP2: "e segui allenamenti, partite, convocazioni e novità.",
     teamBadge: "SQUADRA",
     scanHint: "Scansiona con il tuo telefono",
@@ -134,9 +134,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   nl: {
     brandTag: "ALLE CLUBS. ALLE PASSIES.",
     title1: "WORD",
-    title2: "LID VAN ONS TEAM!",
-    subtitle: "Scan deze QR-code om dit team te vervoegen op Clubero.",
-    bodyP1: "Vraag in enkele seconden om bij het team te komen",
+    title2: "LID VAN JOUW TEAM!",
+    subtitle: "Scan deze QR-code om je team te vervoegen op Clubero.",
+    bodyP1: "Vraag in enkele seconden om bij je team te komen",
     bodyP2: "en volg trainingen, wedstrijden, oproepen en nieuws.",
     teamBadge: "TEAM",
     scanHint: "Scan met je telefoon",
@@ -153,9 +153,9 @@ const STRINGS: Record<PosterLang, Strings> = {
   pt: {
     brandTag: "TODOS OS CLUBES. TODAS AS PAIXÕES.",
     title1: "JUNTA-TE",
-    title2: "À NOSSA EQUIPA!",
-    subtitle: "Lê este QR Code para entrar nesta equipa no Clubero.",
-    bodyP1: "Em segundos, pede para entrar na equipa",
+    title2: "À TUA EQUIPA!",
+    subtitle: "Lê este QR Code para entrar na tua equipa no Clubero.",
+    bodyP1: "Em segundos, pede para entrar na tua equipa",
     bodyP2: "e acompanha treinos, jogos, convocatórias e novidades.",
     teamBadge: "EQUIPA",
     scanHint: "Lê com o teu telemóvel",
@@ -344,38 +344,31 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     }
   }
 
-  // ── Header (logos + center dot)
-  const headerY = H - 60;
+  // ── Header (logos + center dot) — larger, no redundant "clubero" wordmark
+  const headerY = H - 62;
   const clubero = await embed(doc, await fetchImage(CLUBERO_LOGO_URL));
   if (clubero) {
-    const max = 32;
+    const max = 58;
     const r = Math.min(max / clubero.width, max / clubero.height);
     const w = clubero.width * r;
     const h = clubero.height * r;
     page.drawImage(clubero, { x: 40, y: headerY - h / 2, width: w, height: h });
-    page.drawText("clubero", {
-      x: 40 + w + 8,
-      y: headerY - 8,
-      size: 16,
-      font: bold,
-      color: ink,
-    });
   }
 
   // Club logo (right) — optional, safe
   const clubLogo = input.clubLogoUrl ? await embed(doc, await fetchImage(input.clubLogoUrl)) : null;
   if (clubLogo) {
-    const max = 38;
+    const max = 64;
     const r = Math.min(max / clubLogo.width, max / clubLogo.height);
     const w = clubLogo.width * r;
     const h = clubLogo.height * r;
     page.drawImage(clubLogo, { x: W - 40 - w, y: headerY - h / 2, width: w, height: h });
   } else if (input.clubName) {
     const name = input.clubName.toUpperCase();
-    const f = fitText(name, bold, 11, 150);
+    const f = fitText(name, bold, 13, 170);
     page.drawText(f.text, {
       x: W - 40 - bold.widthOfTextAtSize(f.text, f.size),
-      y: headerY - 4,
+      y: headerY - 5,
       size: f.size,
       font: bold,
       color: ink,
@@ -386,22 +379,24 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   page.drawCircle({ x: W / 2, y: headerY, size: 3, color: teal });
 
   // Brand tagline tiny (under right logo)
-  drawCenteredText(page, t.brandTag, W - 110, headerY - 26, 6.5, bold, teal);
+  drawCenteredText(page, t.brandTag, W - 110, headerY - 40, 6.5, bold, teal);
+
 
   // ── Big title
-  drawCenteredText(page, t.title1, W / 2, H - 130, 46, bold, ink);
-  drawCenteredText(page, t.title2, W / 2, H - 175, 36, bold, teal);
+  drawCenteredText(page, t.title1, W / 2, H - 150, 44, bold, ink);
+  drawCenteredText(page, t.title2, W / 2, H - 192, 34, bold, teal);
 
   // ── Subtitle
-  drawCenteredText(page, t.subtitle, W / 2, H - 215, 12, font, muted);
-  drawCenteredText(page, t.bodyP1, W / 2, H - 232, 10, font, muted);
-  drawCenteredText(page, t.bodyP2, W / 2, H - 246, 10, font, muted);
+  drawCenteredText(page, t.subtitle, W / 2, H - 226, 11.5, font, muted);
+  drawCenteredText(page, t.bodyP1, W / 2, H - 243, 9.5, font, muted);
+  drawCenteredText(page, t.bodyP2, W / 2, H - 256, 9.5, font, muted);
 
-  // ── QR Card
+  // ── QR Card (pushed down to clear subtitle)
   const cardW = 320;
-  const cardH = 360;
+  const cardH = 350;
   const cardX = (W - cardW) / 2;
-  const cardY = 270;
+  const cardY = 240;
+
 
   // Drop shadow (soft, multiple offset)
   for (let i = 6; i >= 1; i--) {
@@ -486,23 +481,45 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   // scan hint
   drawCenteredText(page, t.scanHint, W / 2, cardY + 22, 10, bold, teal);
 
-  // ── Illustration (bottom decorative)
+  // ── Illustration scattered across the bottom (left, right, center)
   const illu = await embed(doc, await fetchImage(ILLUSTRATION_URL));
   if (illu) {
-    const targetW = W - 80;
-    const ratio = targetW / illu.width;
-    const h = illu.height * ratio;
-    const maxH = 150;
-    const finalH = Math.min(h, maxH);
-    const finalW = (illu.width * finalH) / illu.height;
+    const ratio = illu.height / illu.width;
+
+    // Left cluster — anchored partially off the left edge
+    const leftW = 220;
+    const leftH = leftW * ratio;
     page.drawImage(illu, {
-      x: (W - finalW) / 2,
-      y: 120,
-      width: finalW,
-      height: finalH,
-      opacity: 1,
+      x: -70,
+      y: 70,
+      width: leftW,
+      height: leftH,
+      opacity: 0.85,
+    });
+
+    // Right cluster — same image, anchored partially off the right edge
+    const rightW = 220;
+    const rightH = rightW * ratio;
+    page.drawImage(illu, {
+      x: W - rightW + 70,
+      y: 70,
+      width: rightW,
+      height: rightH,
+      opacity: 0.85,
+    });
+
+    // Center accent — smaller, lower, softer
+    const cW = 170;
+    const cH = cW * ratio;
+    page.drawImage(illu, {
+      x: (W - cW) / 2,
+      y: 56,
+      width: cW,
+      height: cH,
+      opacity: 0.55,
     });
   }
+
 
   // ── Benefits strip (pill row)
   const benY = 92;
