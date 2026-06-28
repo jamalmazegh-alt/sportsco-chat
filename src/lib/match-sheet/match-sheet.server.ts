@@ -21,7 +21,7 @@ import { DEJAVU_SANS_REGULAR_B64, DEJAVU_SANS_BOLD_B64 } from "./fonts.server";
 
 // Decode the embedded DejaVu Sans TTFs once per worker instance. DejaVu covers
 // the full Latin Extended-A/B range (Polish ł/ś/ż/ę, Czech č/ř, Hungarian ő/ű,
-// Turkish ş/ğ/ı, Croatian, etc.) so we can drop the Latin-1 `safe()` filter.
+// Turkish ş/ğ/ı, Croatian, etc.) so we can drop the Latin-1 `txt()` filter.
 let _regularBytes: Uint8Array | null = null;
 let _boldBytes: Uint8Array | null = null;
 function decodeFontBytes(b64: string): Uint8Array {
@@ -315,8 +315,8 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
   doc.setCreator("Clubero");
 
   const page = doc.addPage([595.28, 841.89]); // A4 portrait
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const font = await doc.embedFont(regularFontBytes(), { subset: true });
+  const bold = await doc.embedFont(boldFontBytes(), { subset: true });
   const ink = rgb(0.06, 0.09, 0.16);
   const muted = rgb(0.39, 0.45, 0.55);
   const stripe = rgb(0.965, 0.965, 0.97);
@@ -330,14 +330,14 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
 
   // ── Header band ─────────────────────────────────────────────
   page.drawRectangle({ x: 0, y: H - 80, width: W, height: 80, color: accent });
-  page.drawText(safe(title), {
+  page.drawText(txt(title), {
     x: ML,
     y: H - 35,
     size: 20,
     font: bold,
     color: rgb(1, 1, 1),
   });
-  page.drawText(safe(typeLabel + (event.title ? " — " + event.title : "")), {
+  page.drawText(txt(typeLabel + (event.title ? " — " + event.title : "")), {
     x: ML,
     y: H - 58,
     size: 11,
@@ -368,8 +368,8 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
   if (!isTournament && event.opponent) meta.push([t.opponent, event.opponent]);
 
   for (const [k, v] of meta) {
-    page.drawText(safe(k) + ":", { x: ML, y, size: 10, font, color: muted });
-    page.drawText(safe(v), { x: ML + 130, y, size: 10, font: bold, color: ink });
+    page.drawText(txt(k) + ":", { x: ML, y, size: 10, font, color: muted });
+    page.drawText(txt(v), { x: ML + 130, y, size: 10, font: bold, color: ink });
     y -= 16;
   }
 
@@ -387,7 +387,7 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
   const tableW = W - ML - MR;
   page.drawRectangle({ x: ML, y: y - 4, width: tableW, height: 22, color: ink });
   for (const c of cols) {
-    const label = safe(c.label);
+    const label = txt(c.label);
     const tx =
       c.align === "center" ? c.x + c.w / 2 - bold.widthOfTextAtSize(label, 9) / 2 : c.x + 6;
     page.drawText(label, { x: tx, y: y + 4, size: 9, font: bold, color: rgb(1, 1, 1) });
@@ -397,7 +397,7 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
   // ── Rows ────────────────────────────────────────────────────
   const sorted = sortConvocatedPlayers(players);
   if (sorted.length === 0) {
-    page.drawText(safe(t.noPlayers), { x: ML, y, size: 11, font, color: muted });
+    page.drawText(txt(t.noPlayers), { x: ML, y, size: 11, font, color: muted });
     y -= 18;
   } else {
     for (let i = 0; i < sorted.length; i++) {
@@ -405,7 +405,7 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
       if (y < 70) {
         // continue on a new page if we ever overflow A4
         const np = doc.addPage([W, H]);
-        np.drawText(safe(title) + " (suite)", { x: ML, y: H - 40, size: 12, font: bold, color: ink });
+        np.drawText(txt(title) + " (suite)", { x: ML, y: H - 40, size: 12, font: bold, color: ink });
         y = H - 70;
       }
       if (i % 2 === 1) {
@@ -414,10 +414,10 @@ export async function buildMatchSheetPdf(inputs: MatchSheetInputs): Promise<Uint
       const jersey = typeof p.jersey_number === "number" ? String(p.jersey_number) : "—";
       const cells: Record<string, string> = {
         jersey,
-        last: safe(p.last_name) || "—",
-        first: safe(p.first_name) || "—",
+        last: txt(p.last_name) || "—",
+        first: txt(p.first_name) || "—",
         birth: fmtBirth(p.birth_date, lang),
-        license: safe(p.license_number) || "—",
+        license: txt(p.license_number) || "—",
       };
       for (const c of cols) {
         const v = cells[c.key] ?? "—";
@@ -455,9 +455,9 @@ function drawFooter(
     ":" +
     String(now.getUTCMinutes()).padStart(2, "0") +
     " UTC";
-  page.drawText(safe(t.generatedBy), { x: ML, y: 40, size: 8, font, color: muted });
+  page.drawText(txt(t.generatedBy), { x: ML, y: 40, size: 8, font, color: muted });
   page.drawText(stamp, { x: ML, y: 28, size: 8, font, color: muted });
-  page.drawText(safe(t.eventId) + ": " + eventId, { x: ML, y: 16, size: 8, font, color: muted });
+  page.drawText(txt(t.eventId) + ": " + eventId, { x: ML, y: 16, size: 8, font, color: muted });
   void W;
 }
 
