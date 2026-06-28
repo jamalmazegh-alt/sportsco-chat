@@ -15,6 +15,7 @@ import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
 import { registerServiceWorker } from "@/lib/pwa";
 import { syncPushSubscriptionState } from "@/lib/push-subscribe";
+import { COMPANY_LEGAL } from "@/config/company";
 
 import appCss from "../styles.css?url";
 
@@ -76,9 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Clubero",
-          url: "https://clubero.app",
-          logo: "https://clubero.app/clubero-logo.png",
+          name: COMPANY_LEGAL.legalName,
+          legalName: COMPANY_LEGAL.legalName,
+          url: COMPANY_LEGAL.website,
+          logo: `${COMPANY_LEGAL.website}/clubero-logo.png`,
+          email: COMPANY_LEGAL.email,
+          foundingDate: COMPANY_LEGAL.incorporationDate,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: COMPANY_LEGAL.registeredOffice.street,
+            postalCode: COMPANY_LEGAL.registeredOffice.postalCode,
+            addressLocality: COMPANY_LEGAL.registeredOffice.city,
+            addressCountry: COMPANY_LEGAL.registeredOffice.countryCode,
+          },
+          identifier: {
+            "@type": "PropertyValue",
+            propertyID: "Estonian Business Register (registrikood)",
+            value: COMPANY_LEGAL.registrationNumber,
+          },
         }),
       },
       {
@@ -86,8 +102,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Clubero",
-          url: "https://clubero.app",
+          name: COMPANY_LEGAL.brandName,
+          url: COMPANY_LEGAL.website,
         }),
       },
     ],

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import logo from "@/assets/clubero-logo.png";
+import { COMPANY_LEGAL, formatCompanyAddress } from "@/config/company";
 
 export function MarketingFooter() {
   const { t, i18n } = useTranslation("marketing");
@@ -111,9 +112,21 @@ export function MarketingFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>{t("footer.rights", { year: new Date().getFullYear() })}</p>
-          <p>{t("footer.tagline2")}</p>
+        <div className="mt-12 border-t border-border/60 pt-6 text-xs text-muted-foreground">
+          <p className="font-medium text-foreground/80">
+            {COMPANY_LEGAL.legalName} — Reg. No. {COMPANY_LEGAL.registrationNumber} ·{" "}
+            {formatCompanyAddress()}
+          </p>
+          <p className="mt-1">
+            {COMPANY_LEGAL.vatLabel} ·{" "}
+            <a href={`mailto:${COMPANY_LEGAL.email}`} className="hover:text-foreground">
+              {COMPANY_LEGAL.email}
+            </a>
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p>{t("footer.rights", { year: new Date().getFullYear() })}</p>
+            <p>{t("footer.tagline2")}</p>
+          </div>
         </div>
       </div>
     </footer>

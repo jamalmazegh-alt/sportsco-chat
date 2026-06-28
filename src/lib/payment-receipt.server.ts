@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createLogger } from "@/lib/logger.server";
+import { COMPANY_LEGAL } from "@/config/company";
 
 const log = createLogger("payment-receipt");
 
@@ -176,17 +177,29 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
     y -= 18;
   }
 
-  // Footer
+  // Footer — supplier identity (legal block)
+  const supplierLines = [
+    `Supplier: ${COMPANY_LEGAL.legalName}`,
+    `Registration No. ${COMPANY_LEGAL.registrationNumber} · ${COMPANY_LEGAL.vatLabel}`,
+    `${COMPANY_LEGAL.registeredOffice.street}, ${COMPANY_LEGAL.registeredOffice.postalCode} ${COMPANY_LEGAL.registeredOffice.city}, ${COMPANY_LEGAL.registeredOffice.country}`,
+    COMPANY_LEGAL.email,
+  ];
+  let fy = 96;
+  for (const line of supplierLines) {
+    page.drawText(line, { x: 50, y: fy, font, size: 8, color: muted });
+    fy -= 11;
+  }
+
   page.drawText("Ce reçu atteste du paiement effectué. Il ne tient pas lieu de facture.", {
     x: 50,
-    y: 60,
+    y: 46,
     font,
     size: 9,
     color: muted,
   });
-  page.drawText("Généré par Clubero — clubero.app", {
+  page.drawText(`Généré par ${COMPANY_LEGAL.brandName} — clubero.app`, {
     x: 50,
-    y: 46,
+    y: 32,
     font,
     size: 9,
     color: muted,

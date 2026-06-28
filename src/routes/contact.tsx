@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Mail, MapPin } from "lucide-react";
+import { COMPANY_LEGAL } from "@/config/company";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -127,6 +128,18 @@ function ContactPage() {
                   {t("contact.whereLabel")}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">{t("contact.whereBody")}</p>
+                <address className="mt-3 not-italic text-sm text-muted-foreground">
+                  <div className="font-medium text-foreground">{COMPANY_LEGAL.legalName}</div>
+                  <div>{COMPANY_LEGAL.registeredOffice.street}</div>
+                  <div>
+                    {COMPANY_LEGAL.registeredOffice.postalCode}{" "}
+                    {COMPANY_LEGAL.registeredOffice.city}
+                  </div>
+                  <div>{COMPANY_LEGAL.registeredOffice.country}</div>
+                  <div className="mt-1 text-xs">
+                    Reg. No. {COMPANY_LEGAL.registrationNumber} · {COMPANY_LEGAL.vatLabel}
+                  </div>
+                </address>
               </div>
             </div>
           </div>
