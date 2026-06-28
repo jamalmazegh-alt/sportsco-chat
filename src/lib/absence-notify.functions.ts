@@ -204,6 +204,22 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
         REASON_LABELS.fr[avail.reason as string] ??
         (avail.reason as string);
 
+      const startStr = fmt(avail.start_date as string);
+      const endStr = fmt(avail.end_date as string);
+
+      // Push (best-effort, non-blocking)
+      try {
+        const strings = PUSH_STRINGS[locale] ?? PUSH_STRINGS.fr;
+        sendPushToUser((p as any).id, {
+          title: strings.title(playerName),
+          body: strings.body({ playerName, start: startStr, end: endStr, reason: reasonLabel }),
+          url: `/players/${avail.player_id}`,
+          tag: `absence-${availabilityId}-${(p as any).id}`,
+        }).catch(() => undefined);
+      } catch {
+        // best-effort
+      }
+
       try {
         await fetch(`${baseUrl}/lovable/email/transactional/send`, {
           method: "POST",
@@ -218,8 +234,8 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
             templateData: {
               coachFirstName: (p as any).first_name ?? null,
               playerName,
-              startDate: fmt(avail.start_date as string),
-              endDate: fmt(avail.end_date as string),
+              startDate: startStr,
+              endDate: endStr,
               reasonLabel,
               declaredByName,
               eventUrl: `${baseUrl}/players/${avail.player_id}`,
