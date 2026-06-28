@@ -13,9 +13,31 @@
  *  - SVG club logos are rejected (no raw embed — XSS hardening parity with the
  *    public roster logo upload).
  */
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage } from "pdf-lib";
+import { PDFDocument, rgb, type PDFFont, type PDFImage } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sortConvocatedPlayers, type MatchSheetPlayer } from "./sort";
+import { DEJAVU_SANS_REGULAR_B64, DEJAVU_SANS_BOLD_B64 } from "./fonts.server";
+
+// Decode the embedded DejaVu Sans TTFs once per worker instance. DejaVu covers
+// the full Latin Extended-A/B range (Polish ł/ś/ż/ę, Czech č/ř, Hungarian ő/ű,
+// Turkish ş/ğ/ı, Croatian, etc.) so we can drop the Latin-1 `safe()` filter.
+let _regularBytes: Uint8Array | null = null;
+let _boldBytes: Uint8Array | null = null;
+function decodeFontBytes(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function regularFontBytes(): Uint8Array {
+  if (!_regularBytes) _regularBytes = decodeFontBytes(DEJAVU_SANS_REGULAR_B64);
+  return _regularBytes;
+}
+function boldFontBytes(): Uint8Array {
+  if (!_boldBytes) _boldBytes = decodeFontBytes(DEJAVU_SANS_BOLD_B64);
+  return _boldBytes;
+}
 
 export type MatchSheetLang = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 
