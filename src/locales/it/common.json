@@ -407,7 +407,8 @@
       "playersAlert": "Giocatori in allerta",
       "playersAlertHint": "≥ 3 assenze in 30 giorni",
       "upcoming7d": "Prossimi (7 giorni)",
-      "noData": "—"
+      "noData": "—",
+      "pendingResponses": "Risposte in sospeso"
     }
   },
   "payments": {

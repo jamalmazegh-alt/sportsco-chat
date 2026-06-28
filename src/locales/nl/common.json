@@ -407,7 +407,8 @@
       "playersAlert": "Spelers in alarm",
       "playersAlertHint": "≥ 3 afwezigheden in 30D",
       "upcoming7d": "Aankomend (7D)",
-      "noData": "—"
+      "noData": "—",
+      "pendingResponses": "Antwoorden in afwachting"
     }
   },
   "payments": {

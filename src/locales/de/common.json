@@ -407,7 +407,8 @@
       "playersAlert": "Spieler im Alarm",
       "playersAlertHint": "≥ 3 Abwesenheiten in 30T",
       "upcoming7d": "Bevorstehend (7T)",
-      "noData": "—"
+      "noData": "—",
+      "pendingResponses": "Ausstehende Antworten"
     }
   },
   "payments": {

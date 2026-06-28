@@ -407,7 +407,8 @@
       "playersAlert": "Joueurs en alerte",
       "playersAlertHint": "≥ 3 absences sur 30j",
       "upcoming7d": "À venir (7j)",
-      "noData": "—"
+      "noData": "—",
+      "pendingResponses": "Réponses en attente"
     }
   },
   "payments": {
