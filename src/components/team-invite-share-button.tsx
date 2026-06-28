@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { generateTeamPoster } from "@/lib/team-poster/team-poster.functions";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy, Download, Loader2 } from "lucide-react";
+import { Share2, Copy, Download, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
