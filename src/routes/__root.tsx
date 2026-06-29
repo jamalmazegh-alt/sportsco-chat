@@ -8,6 +8,7 @@ import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
 import { initSentry } from "@/lib/sentry";
+import { initPostHog } from "@/lib/posthog";
 import { CookieConsentBanner } from "@/components/cookie-consent";
 import { ClubThemeProvider } from "@/components/club-theme-provider";
 import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
@@ -133,6 +134,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
     initSentry();
+    initPostHog();
     bootstrapTheme();
     // Apply the last-known club brand colour ASAP (covers login page).
     applyClubTheme(readStoredTheme());
