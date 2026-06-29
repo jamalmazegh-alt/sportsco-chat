@@ -11,10 +11,16 @@ export function initPostHog(): void {
   posthog.init(key, {
     api_host: host,
     person_profiles: "identified_only",
+    // Beta policy: pageviews + identify/reset only.
+    // Business events are added explicitly later via an analytics wrapper.
     capture_pageview: true,
     capture_pageleave: true,
-    autocapture: true,
+    autocapture: false,
     disable_session_recording: true,
+    rageclick: false,
+    capture_performance: false,
+    capture_heatmaps: false,
+    advanced_disable_toolbar_metrics: true,
     persistence: "localStorage+cookie",
   });
   initialized = true;
