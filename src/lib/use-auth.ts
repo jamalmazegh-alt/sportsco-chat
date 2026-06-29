@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "@/lib/i18n";
+import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
 async function redeemPendingInvite(session: Session) {
   const token = (session.user?.user_metadata as any)?.invite_token as string | undefined;
@@ -137,10 +138,12 @@ export function useAuthState(): AuthState {
       if (event === "TOKEN_REFRESHED" && !newSession) return;
       setSession(newSession);
       if (newSession) {
+        identifyPostHog(newSession.user.id, { email: newSession.user.email ?? null });
         setTimeout(() => {
           redeemPendingInvite(newSession).finally(() => refreshMemberships());
         }, 0);
       } else if (event === "SIGNED_OUT") {
+        resetPostHog();
         setMemberships([]);
         setActiveClubId(null);
       }
@@ -154,6 +157,7 @@ export function useAuthState(): AuthState {
       if (cancelled) return;
       setSession(data.session);
       if (data.session) {
+        identifyPostHog(data.session.user.id, { email: data.session.user.email ?? null });
         await refreshMemberships();
       }
       setLoading(false);
