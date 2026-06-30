@@ -24,8 +24,13 @@ const COPY = {
     category: "Catégorie",
     follow: "Suivez votre demande :",
     sign: "L'équipe Clubero",
-    subject_line: (id?: string) =>
-      id ? `Demande de support reçue (#${id}) — Clubero` : "Demande de support reçue — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Demande de support reçue (#${id}) : ${s} — Clubero`;
+      if (id) return `Demande de support reçue (#${id}) — Clubero`;
+      if (s) return `Demande de support reçue : ${s} — Clubero`;
+      return "Demande de support reçue — Clubero";
+    },
   },
   en: {
     lang: "en",
@@ -37,10 +42,21 @@ const COPY = {
     category: "Category",
     follow: "Follow your request:",
     sign: "The Clubero team",
-    subject_line: (id?: string) =>
-      id ? `Support request received (#${id}) — Clubero` : "Support request received — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Support request received (#${id}): ${s} — Clubero`;
+      if (id) return `Support request received (#${id}) — Clubero`;
+      if (s) return `Support request received: ${s} — Clubero`;
+      return "Support request received — Clubero";
+    },
   },
 } as const;
+
+const MAX_SUBJECT_IN_EMAIL_LINE = 60;
+function truncateSubject(s: string) {
+  if (s.length <= MAX_SUBJECT_IN_EMAIL_LINE) return s;
+  return s.slice(0, MAX_SUBJECT_IN_EMAIL_LINE - 1).trimEnd() + "…";
+}
 
 const pick = (locale?: string) => (locale === "en" ? COPY.en : COPY.fr);
 
