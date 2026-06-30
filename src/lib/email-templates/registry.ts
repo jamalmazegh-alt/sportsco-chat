@@ -29,6 +29,8 @@ import { template as inboundInquiryTemplate } from "./inbound-inquiry";
 import { template as inquiryConfirmationTemplate } from "./inquiry-confirmation";
 import { template as supportTicketCreatedTemplate } from "./support-ticket-created";
 import { template as supportTicketReplyTemplate } from "./support-ticket-reply";
+import { template as supportTicketInternalTemplate } from "./support-ticket-internal";
+import { template as supportTicketStatusTemplate } from "./support-ticket-status";
 import { template as tournamentPassPurchasedTemplate } from "./tournament-pass-purchased";
 import { template as tournamentInviteTemplate } from "./tournament-invite";
 import { template as tournamentMemberAddedTemplate } from "./tournament-member-added";
@@ -59,6 +61,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "inbound-inquiry": inboundInquiryTemplate,
   "support-ticket-created": supportTicketCreatedTemplate,
   "support-ticket-reply": supportTicketReplyTemplate,
+  "support-ticket-internal": supportTicketInternalTemplate,
+  "support-ticket-status": supportTicketStatusTemplate,
   "tournament-pass-purchased": tournamentPassPurchasedTemplate,
   "tournament-invite": tournamentInviteTemplate,
   "tournament-member-added": tournamentMemberAddedTemplate,

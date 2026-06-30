@@ -123,25 +123,25 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       link: `/superadmin/support-tickets/${ticket.id}`,
     });
 
-    // Email confirmation to user
+    // Internal notification to hello@clubero.app
     const profile = await getUserProfile(userId);
     const email = await getUserEmail(userId);
-    if (email) {
-      const locale = profile?.preferred_language === "en" ? "en" : "fr";
-      await enqueueTransactionalEmailServer({
-        templateName: "support-ticket-created",
-        recipientEmail: email,
-        templateData: {
-          name: profile?.first_name ?? profile?.full_name ?? null,
-          subject: ticket.subject,
-          ticketShortId: shortId(ticket.id),
-          category: ticket.category,
-          ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
-          locale,
-        },
-        idempotencyKey: `support-created-${ticket.id}`,
-      }).catch((e) => console.error("[support] email failed", e));
-    }
+    await enqueueTransactionalEmailServer({
+      templateName: "support-ticket-internal",
+      recipientEmail: "hello@clubero.app",
+      templateData: {
+        kind: "new_ticket",
+        ticketShortId: shortId(ticket.id),
+        subject: ticket.subject,
+        category: ticket.category,
+        priority: data.priority,
+        authorName: profile?.full_name ?? profile?.first_name ?? null,
+        authorEmail: email,
+        bodyPreview: data.description.slice(0, 600),
+        ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${ticket.id}`,
+      },
+      idempotencyKey: `support-internal-created-${ticket.id}`,
+    }).catch((e) => console.error("[support] internal email failed", e));
 
     return { id: ticket.id };
   });
@@ -280,6 +280,26 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
+    if (!data.internal_note && senderRole === "user") {
+      // Internal notification to hello@clubero.app on user reply
+      const profile = await getUserProfile(userId);
+      const email = await getUserEmail(userId);
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-internal",
+        recipientEmail: "hello@clubero.app",
+        templateData: {
+          kind: "user_reply",
+          ticketShortId: shortId(ticket.id),
+          subject: ticket.subject,
+          authorName: profile?.full_name ?? profile?.first_name ?? null,
+          authorEmail: email,
+          bodyPreview: data.body.slice(0, 600),
+          ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${ticket.id}`,
+        },
+        idempotencyKey: `support-internal-reply-${messageId}`,
+      }).catch((e) => console.error("[support] internal reply email failed", e));
+    }
+
     return { ok: true };
   });
 
@@ -384,11 +404,53 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
     if (!Object.keys(patch).length) return { ok: true };
 
+    // Read current status to detect change
+    const { data: before } = await supabaseAdmin
+      .from("support_tickets")
+      .select("status, user_id, subject")
+      .eq("id", data.ticket_id)
+      .maybeSingle();
+
     const { error } = await supabaseAdmin
       .from("support_tickets")
       .update(patch)
       .eq("id", data.ticket_id);
     if (error) throw new Error(error.message);
+
+    // Notify ticket owner on status change
+    if (
+      before &&
+      patch.status !== undefined &&
+      patch.status !== before.status &&
+      before.user_id
+    ) {
+      await supabaseAdmin.from("notifications").insert({
+        user_id: before.user_id,
+        type: "support_status",
+        title: `Mise à jour #${shortId(data.ticket_id)}`,
+        body: `Statut : ${patch.status}`,
+        link: `/support/${data.ticket_id}`,
+      });
+      const profile = await getUserProfile(before.user_id);
+      const email = await getUserEmail(before.user_id);
+      if (email) {
+        const locale = profile?.preferred_language === "en" ? "en" : "fr";
+        await enqueueTransactionalEmailServer({
+          templateName: "support-ticket-status",
+          recipientEmail: email,
+          templateData: {
+            name: profile?.first_name ?? profile?.full_name ?? null,
+            subject: before.subject,
+            ticketShortId: shortId(data.ticket_id),
+            newStatus: patch.status,
+            ticketUrl: `${APP_BASE_URL}/support/${data.ticket_id}`,
+            locale,
+          },
+          idempotencyKey: `support-status-${data.ticket_id}-${patch.status}`,
+        }).catch((e) => console.error("[support] status email failed", e));
+      }
+    }
+
     return { ok: true };
   });
 
