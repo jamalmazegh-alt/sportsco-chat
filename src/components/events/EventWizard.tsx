@@ -878,7 +878,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                           : "border-border bg-card hover:bg-muted/40",
                     )}
                   >
-                    {label}
+                    {formatHalvesLabel(label)}
                   </button>
                 );
               })}
