@@ -28,7 +28,6 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       .eq("id", convocationId)
       .single();
 
-
     if (!conv || !conv.events) return { sent: 0 };
     const status = conv.status as string;
     if (status !== "absent" && status !== "uncertain") return { sent: 0 };
@@ -137,9 +136,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               coachFirstName: (p as any).first_name ?? null,
               playerName,
               eventTitle:
-                ev.type === "match" && ev.opponent
-                  ? `${ev.title} vs ${ev.opponent}`
-                  : ev.title,
+                ev.type === "match" && ev.opponent ? `${ev.title} vs ${ev.opponent}` : ev.title,
               eventDate,
               status,
               reason: conv.comment ?? null,
@@ -147,7 +144,6 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               eventUrl: `${baseUrl}/events/${ev.id}`,
               locale,
             },
-
           }),
         });
         sent += 1;

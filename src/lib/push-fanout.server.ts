@@ -69,7 +69,6 @@ export async function fanoutConvocationResponse(
   const title = `${emoji} ${firstName} a répondu`;
   const body = `${statusLabel} · ${typeLabel} ${dateStr}`.trim();
 
-
   const { data: coaches } = await supabaseAdmin
     .from("team_members")
     .select("user_id")
@@ -146,7 +145,6 @@ export async function fanoutConvocationComplete(
 
   const body =
     `${present} présent${present > 1 ? "s" : ""} · ${absent} absent${absent > 1 ? "s" : ""} · ${uncertain} incertain${uncertain > 1 ? "s" : ""} — ${typeLabel} ${dateStr}`.trim();
-
 
   const { data: coaches } = await supabaseAdmin
     .from("team_members")

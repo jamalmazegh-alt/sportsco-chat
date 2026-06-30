@@ -17,7 +17,7 @@ export function initPostHog(): void {
   const host = envHost || POSTHOG_HOST_FALLBACK;
   // Temporary diagnostic: confirm whether the key was inlined at build time.
   // Never logs the full key — only presence + length + a short prefix.
-  // eslint-disable-next-line no-console
+
   console.info("[posthog] init check", {
     hasEnvKey: Boolean(envKey),
     keyLen: key.length,
