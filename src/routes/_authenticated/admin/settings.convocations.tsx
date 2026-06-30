@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings/convocation
 });
 
 type ChannelKey = "email";
+// In-app convocations are temporarily hidden because the feature is not working reliably.
 const CHANNELS: ChannelKey[] = ["email"];
 
 function ConvocationsSettings() {
