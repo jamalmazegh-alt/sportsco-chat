@@ -485,12 +485,13 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       const email = await getUserEmail(before.user_id);
       const locale = profile?.preferred_language === "en" ? "en" : "fr";
       const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
-      sendPushToUser(before.user_id, {
+      await sendPushToUser(before.user_id, {
         title: pushStrings.status.title(shortId(data.ticket_id)),
         body: pushStrings.status.body(patch.status),
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
+
       if (email) {
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-status",
