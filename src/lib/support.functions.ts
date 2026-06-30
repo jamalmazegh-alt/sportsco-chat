@@ -167,6 +167,24 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       idempotencyKey: `support-internal-created-${ticket.id}`,
     }).catch((e) => console.error("[support] internal email failed", e));
 
+    // Confirmation email to the user
+    if (email) {
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-created",
+        recipientEmail: email,
+        templateData: {
+          name: profile?.first_name ?? profile?.full_name ?? null,
+          subject: ticket.subject,
+          ticketShortId: shortId(ticket.id),
+          category: ticket.category,
+          ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
+          locale,
+        },
+        idempotencyKey: `support-created-user-${ticket.id}`,
+      }).catch((e) => console.error("[support] user confirmation email failed", e));
+    }
+
     return { id: ticket.id };
   });
 
