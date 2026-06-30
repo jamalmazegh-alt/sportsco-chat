@@ -996,7 +996,7 @@ function EventDetail() {
       toast.error(t("attendance.noPlayersSelected"));
       return;
     }
-    const teamRow = teams?.[0] as any;
+    const teamRow = eventTeam as any;
     const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
     const clubChannelsRaw = teamRow?.clubs?.convocation_channels;
     const clubChannels: string[] = Array.isArray(clubChannelsRaw)
@@ -2420,7 +2420,7 @@ function EventDetail() {
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
       {isCoach &&
         (() => {
-          const team = teams?.[0] as any;
+          const team = eventTeam as any;
           if (!team) return null;
           const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
           const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
