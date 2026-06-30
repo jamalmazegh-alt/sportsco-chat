@@ -123,25 +123,25 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       link: `/superadmin/support-tickets/${ticket.id}`,
     });
 
-    // Email confirmation to user
+    // Internal notification to hello@clubero.app
     const profile = await getUserProfile(userId);
     const email = await getUserEmail(userId);
-    if (email) {
-      const locale = profile?.preferred_language === "en" ? "en" : "fr";
-      await enqueueTransactionalEmailServer({
-        templateName: "support-ticket-created",
-        recipientEmail: email,
-        templateData: {
-          name: profile?.first_name ?? profile?.full_name ?? null,
-          subject: ticket.subject,
-          ticketShortId: shortId(ticket.id),
-          category: ticket.category,
-          ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
-          locale,
-        },
-        idempotencyKey: `support-created-${ticket.id}`,
-      }).catch((e) => console.error("[support] email failed", e));
-    }
+    await enqueueTransactionalEmailServer({
+      templateName: "support-ticket-internal",
+      recipientEmail: "hello@clubero.app",
+      templateData: {
+        kind: "new_ticket",
+        ticketShortId: shortId(ticket.id),
+        subject: ticket.subject,
+        category: ticket.category,
+        priority: data.priority,
+        authorName: profile?.full_name ?? profile?.first_name ?? null,
+        authorEmail: email,
+        bodyPreview: data.description.slice(0, 600),
+        ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${ticket.id}`,
+      },
+      idempotencyKey: `support-internal-created-${ticket.id}`,
+    }).catch((e) => console.error("[support] internal email failed", e));
 
     return { id: ticket.id };
   });
