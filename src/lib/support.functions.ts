@@ -280,6 +280,26 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
+    if (!data.internal_note && senderRole === "user") {
+      // Internal notification to hello@clubero.app on user reply
+      const profile = await getUserProfile(userId);
+      const email = await getUserEmail(userId);
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-internal",
+        recipientEmail: "hello@clubero.app",
+        templateData: {
+          kind: "user_reply",
+          ticketShortId: shortId(ticket.id),
+          subject: ticket.subject,
+          authorName: profile?.full_name ?? profile?.first_name ?? null,
+          authorEmail: email,
+          bodyPreview: data.body.slice(0, 600),
+          ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${ticket.id}`,
+        },
+        idempotencyKey: `support-internal-reply-${messageId}`,
+      }).catch((e) => console.error("[support] internal reply email failed", e));
+    }
+
     return { ok: true };
   });
 
