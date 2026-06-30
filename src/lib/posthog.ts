@@ -30,8 +30,8 @@ export function initPostHog(): void {
     person_profiles: "identified_only",
     // Beta policy: pageviews + identify/reset only.
     // Business events are added explicitly later via an analytics wrapper.
-    capture_pageview: true,
-    capture_pageleave: true,
+    capture_pageview: false,
+    capture_pageleave: false,
     autocapture: false,
     disable_session_recording: true,
     rageclick: false,
@@ -41,6 +41,9 @@ export function initPostHog(): void {
     persistence: "localStorage+cookie",
   });
   initialized = true;
+  posthog.capture("$pageview", {
+    $current_url: window.location.href,
+  });
 }
 
 export function identifyPostHog(
