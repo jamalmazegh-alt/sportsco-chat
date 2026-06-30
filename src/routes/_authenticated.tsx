@@ -275,6 +275,14 @@ function NoMembershipScreen({
     } catch {
       /* ignore */
     }
+    // Admin email notification (hello@clubero.app) — best effort
+    try {
+      const { notifyClubCreated } = await import("@/lib/club-created-notify.functions");
+      await notifyClubCreated({ data: { clubId: club.id } });
+    } catch {
+      /* ignore */
+    }
+
     await onDone();
     setBusy(false);
   }
