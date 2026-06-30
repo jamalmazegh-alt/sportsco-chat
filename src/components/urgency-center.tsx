@@ -254,7 +254,21 @@ export function UrgencyCenter({ className }: Props) {
                     ? t("urgency.cta.respond", { defaultValue: "Répondre" })
                     : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
               </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  dismissItem(item.id);
+                  toast.success(
+                    t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
+                  );
+                }}
+                aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
+                className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={2.4} />
+              </button>
             </li>
+
           );
         })}
       </ul>
