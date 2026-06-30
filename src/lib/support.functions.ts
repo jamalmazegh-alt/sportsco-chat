@@ -3,6 +3,30 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { sendPushToUser } from "@/lib/push-send.server";
+
+const PUSH_STRINGS = {
+  fr: {
+    reply: {
+      title: (id: string) => `Réponse à votre ticket #${id}`,
+      body: (subject: string) => subject,
+    },
+    status: {
+      title: (id: string) => `Ticket #${id} mis à jour`,
+      body: (status: string) => `Nouveau statut : ${status}`,
+    },
+  },
+  en: {
+    reply: {
+      title: (id: string) => `Reply to your ticket #${id}`,
+      body: (subject: string) => subject,
+    },
+    status: {
+      title: (id: string) => `Ticket #${id} updated`,
+      body: (status: string) => `New status: ${status}`,
+    },
+  },
+} as const;
 
 const CATEGORIES = [
   "bug",
