@@ -83,10 +83,29 @@ export function UrgencyCenter({ className }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { items, status } = useUrgencies();
+  const { items: rawItems, status } = useUrgencies();
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
+  const [dismissed, setDismissed] = useState<DismissMap>(() => readDismissed());
+
+  useEffect(() => {
+    // Re-prune at mount in case TTL expired since last write.
+    const fresh = readDismissed();
+    setDismissed(fresh);
+    writeDismissed(fresh);
+  }, []);
+
+  const items = rawItems.filter((i) => !dismissed[i.id]);
+
+  function dismissItem(id: string) {
+    setDismissed((prev) => {
+      const next = { ...prev, [id]: Date.now() };
+      writeDismissed(next);
+      return next;
+    });
+  }
 
   const surface = selectSurfaceState(status, items.length);
+
   const hasFailures = status.failedSources.length > 0;
 
   if (surface === "pending") {
