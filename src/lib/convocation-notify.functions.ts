@@ -136,7 +136,10 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
             templateData: {
               coachFirstName: (p as any).first_name ?? null,
               playerName,
-              eventTitle: ev.title,
+              eventTitle:
+                ev.type === "match" && ev.opponent
+                  ? `${ev.title} vs ${ev.opponent}`
+                  : ev.title,
               eventDate,
               status,
               reason: conv.comment ?? null,
@@ -144,6 +147,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               eventUrl: `${baseUrl}/events/${ev.id}`,
               locale,
             },
+
           }),
         });
         sent += 1;
