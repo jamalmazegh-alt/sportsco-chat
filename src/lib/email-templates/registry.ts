@@ -61,6 +61,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "inbound-inquiry": inboundInquiryTemplate,
   "support-ticket-created": supportTicketCreatedTemplate,
   "support-ticket-reply": supportTicketReplyTemplate,
+  "support-ticket-internal": supportTicketInternalTemplate,
+  "support-ticket-status": supportTicketStatusTemplate,
   "tournament-pass-purchased": tournamentPassPurchasedTemplate,
   "tournament-invite": tournamentInviteTemplate,
   "tournament-member-added": tournamentMemberAddedTemplate,
