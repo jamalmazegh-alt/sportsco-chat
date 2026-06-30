@@ -143,8 +143,23 @@ function getGameFormatPresets(sport: string | null | undefined): string[] {
     case "padel":
       return ["1v1", "2v2"];
     default:
-      return ["5v5", "7v7", "11v11"];
+      return ["5v5", "7v7", "8v8", "9v9", "11v11"];
   }
+}
+
+/** Display label: "2x40" → "2 x 40 min", "best-of-3" → "Best of 3". */
+function formatHalvesLabel(label: string): string {
+  const m = /^(\d+)x(\d+)$/.exec(label);
+  if (m) return `${m[1]} x ${m[2]} min`;
+  if (label.startsWith("best-of-")) return `Best of ${label.slice(8)}`;
+  return label;
+}
+
+/** Display label: "11v11" → "11 vs 11". */
+function formatGameFormatLabel(label: string): string {
+  const m = /^(\d+)v(\d+)$/.exec(label);
+  if (m) return `${m[1]} vs ${m[2]}`;
+  return label;
 }
 
 function halvesToMinutes(label: string): number | null {
