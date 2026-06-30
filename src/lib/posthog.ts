@@ -6,8 +6,18 @@ export function initPostHog(): void {
   if (initialized) return;
   if (typeof window === "undefined") return;
   const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+  const host =
+    (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? "https://eu.i.posthog.com";
+  // Temporary diagnostic: confirm whether the key was inlined at build time.
+  // Never logs the full key — only presence + length + a short prefix.
+  // eslint-disable-next-line no-console
+  console.info("[posthog] init check", {
+    hasKey: Boolean(key),
+    keyLen: key?.length ?? 0,
+    keyPrefix: key ? key.slice(0, 8) : null,
+    host,
+  });
   if (!key) return;
-  const host = (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? "https://eu.i.posthog.com";
   posthog.init(key, {
     api_host: host,
     person_profiles: "identified_only",
