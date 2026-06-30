@@ -2,19 +2,26 @@ import posthog from "posthog-js";
 
 let initialized = false;
 
+// PostHog client (publishable) key — safe to ship in the browser bundle.
+// Fallback ensures prod builds work even when VITE_POSTHOG_KEY isn't injected
+// at build time (Lovable reserves the VITE_ prefix, so we can't add it as a secret).
+const POSTHOG_KEY_FALLBACK = "phc_woXHHb3AivAeGnzdNgW6EjRYLU42gDNLrRpLZH3NTz5m";
+const POSTHOG_HOST_FALLBACK = "https://eu.i.posthog.com";
+
 export function initPostHog(): void {
   if (initialized) return;
   if (typeof window === "undefined") return;
-  const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
-  const host =
-    (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? "https://eu.i.posthog.com";
+  const envKey = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+  const envHost = import.meta.env.VITE_POSTHOG_HOST as string | undefined;
+  const key = envKey || POSTHOG_KEY_FALLBACK;
+  const host = envHost || POSTHOG_HOST_FALLBACK;
   // Temporary diagnostic: confirm whether the key was inlined at build time.
   // Never logs the full key — only presence + length + a short prefix.
   // eslint-disable-next-line no-console
   console.info("[posthog] init check", {
-    hasKey: Boolean(key),
-    keyLen: key?.length ?? 0,
-    keyPrefix: key ? key.slice(0, 8) : null,
+    hasEnvKey: Boolean(envKey),
+    keyLen: key.length,
+    keyPrefix: key.slice(0, 8),
     host,
   });
   if (!key) return;
