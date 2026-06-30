@@ -3,6 +3,30 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { sendPushToUser } from "@/lib/push-send.server";
+
+const PUSH_STRINGS = {
+  fr: {
+    reply: {
+      title: (id: string) => `Réponse à votre ticket #${id}`,
+      body: (subject: string) => subject,
+    },
+    status: {
+      title: (id: string) => `Ticket #${id} mis à jour`,
+      body: (status: string) => `Nouveau statut : ${status}`,
+    },
+  },
+  en: {
+    reply: {
+      title: (id: string) => `Reply to your ticket #${id}`,
+      body: (subject: string) => subject,
+    },
+    status: {
+      title: (id: string) => `Ticket #${id} updated`,
+      body: (status: string) => `New status: ${status}`,
+    },
+  },
+} as const;
 
 const CATEGORIES = [
   "bug",
@@ -143,6 +167,24 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       idempotencyKey: `support-internal-created-${ticket.id}`,
     }).catch((e) => console.error("[support] internal email failed", e));
 
+    // Confirmation email to the user
+    if (email) {
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-created",
+        recipientEmail: email,
+        templateData: {
+          name: profile?.first_name ?? profile?.full_name ?? null,
+          subject: ticket.subject,
+          ticketShortId: shortId(ticket.id),
+          category: ticket.category,
+          ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
+          locale,
+        },
+        idempotencyKey: `support-created-user-${ticket.id}`,
+      }).catch((e) => console.error("[support] user confirmation email failed", e));
+    }
+
     return { id: ticket.id };
   });
 
@@ -261,8 +303,15 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       });
       const profile = await getUserProfile(ticket.user_id);
       const email = await getUserEmail(ticket.user_id);
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
+      sendPushToUser(ticket.user_id, {
+        title: pushStrings.reply.title(shortId(ticket.id)),
+        body: pushStrings.reply.body(ticket.subject),
+        url: `/support/${ticket.id}`,
+        tag: `support-reply-${messageId}`,
+      }).catch((e) => console.error("[support] reply push failed", e));
       if (email) {
-        const locale = profile?.preferred_language === "en" ? "en" : "fr";
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-reply",
           recipientEmail: email,
@@ -433,8 +482,15 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       });
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
+      sendPushToUser(before.user_id, {
+        title: pushStrings.status.title(shortId(data.ticket_id)),
+        body: pushStrings.status.body(patch.status),
+        url: `/support/${data.ticket_id}`,
+        tag: `support-status-${data.ticket_id}-${patch.status}`,
+      }).catch((e) => console.error("[support] status push failed", e));
       if (email) {
-        const locale = profile?.preferred_language === "en" ? "en" : "fr";
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-status",
           recipientEmail: email,
