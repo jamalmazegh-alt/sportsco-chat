@@ -68,7 +68,7 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 // Security headers applied to every response.
 // CSP is intentionally permissive on connect-src to allow Supabase, Stripe,
-// Google APIs (Maps, Search Console), and the Lovable AI gateway.
+// Google APIs (Maps, Search Console), PostHog, and the Lovable AI gateway.
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
@@ -83,9 +83,9 @@ const SECURITY_HEADERS: Record<string, string> = {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://www.googletagmanager.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://www.googletagmanager.com https://eu-assets.i.posthog.com",
     "frame-src https://js.stripe.com https://hooks.stripe.com",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.cloud wss://*.lovable.cloud https://api.stripe.com https://maps.googleapis.com https://*.googleapis.com https://ai.gateway.lovable.dev",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.cloud wss://*.lovable.cloud https://api.stripe.com https://maps.googleapis.com https://*.googleapis.com https://eu.i.posthog.com https://eu-assets.i.posthog.com https://ai.gateway.lovable.dev",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "form-action 'self'",
