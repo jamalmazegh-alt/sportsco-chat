@@ -303,8 +303,15 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       });
       const profile = await getUserProfile(ticket.user_id);
       const email = await getUserEmail(ticket.user_id);
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
+      sendPushToUser(ticket.user_id, {
+        title: pushStrings.reply.title(shortId(ticket.id)),
+        body: pushStrings.reply.body(ticket.subject),
+        url: `/support/${ticket.id}`,
+        tag: `support-reply-${messageId}`,
+      }).catch((e) => console.error("[support] reply push failed", e));
       if (email) {
-        const locale = profile?.preferred_language === "en" ? "en" : "fr";
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-reply",
           recipientEmail: email,
