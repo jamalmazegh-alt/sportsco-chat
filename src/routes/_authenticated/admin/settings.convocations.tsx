@@ -21,8 +21,9 @@ export const Route = createFileRoute("/_authenticated/admin/settings/convocation
   }),
 });
 
-type ChannelKey = "in_app" | "email";
-const CHANNELS: ChannelKey[] = ["in_app", "email"];
+type ChannelKey = "email";
+// In-app convocations are temporarily hidden because the feature is not working reliably.
+const CHANNELS: ChannelKey[] = ["email"];
 
 function ConvocationsSettings() {
   const { t } = useTranslation();
@@ -50,8 +51,8 @@ function ConvocationsSettings() {
     if (data) {
       setChannels(
         Array.isArray(data.convocation_channels)
-          ? (data.convocation_channels as string[])
-          : ["email", "in_app"],
+          ? (data.convocation_channels as string[]).filter((c) => c === "email")
+          : ["email"],
       );
     }
   }, [data]);
