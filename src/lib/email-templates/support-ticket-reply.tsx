@@ -87,7 +87,8 @@ const SupportTicketReplyEmail = ({
 
 export const template = {
   component: SupportTicketReplyEmail,
-  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId, data.subject),
+  subject: (data: Record<string, any>) =>
+    pick(data.locale).subject_line(data.ticketShortId, data.subject),
   displayName: "Support — Réponse staff",
   previewData: {
     name: "Jane",

@@ -54,7 +54,6 @@ function writeDismissed(map: DismissMap) {
   }
 }
 
-
 interface Props {
   className?: string;
 }
@@ -268,7 +267,6 @@ export function UrgencyCenter({ className }: Props) {
                 <X className="h-3.5 w-3.5" strokeWidth={2.4} />
               </button>
             </li>
-
           );
         })}
       </ul>
