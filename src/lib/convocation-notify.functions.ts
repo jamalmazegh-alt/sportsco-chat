@@ -23,10 +23,11 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id,teams:team_id(clubs:club_id(default_language)))",
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,type,opponent,starts_at,team_id,teams:team_id(name,clubs:club_id(default_language)))",
       )
       .eq("id", convocationId)
       .single();
+
 
     if (!conv || !conv.events) return { sent: 0 };
     const status = conv.status as string;
