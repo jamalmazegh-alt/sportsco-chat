@@ -31,13 +31,10 @@ export const notifyClubCreated = createServerFn({ method: "POST" })
 
     let customerEmail: string | null = null;
     if (club.created_by) {
-      const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("email, full_name")
-        .eq("id", club.created_by)
-        .maybeSingle();
-      customerEmail = profile?.email ?? null;
+      const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(club.created_by);
+      customerEmail = userRes?.user?.email ?? null;
     }
+
 
     await enqueueTransactionalEmailServer({
       templateName: "subscription-admin-notification",
