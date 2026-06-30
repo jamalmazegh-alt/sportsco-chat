@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Loader2,
   Users,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +22,38 @@ import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
 import { selectSurfaceState } from "@/lib/urgency/pure";
 import { remindAllForEvent } from "@/lib/urgency/remind";
 import type { UrgencyAction, UrgencyItem, UrgencySeverity } from "@/lib/urgency/types";
+
+const DISMISS_STORAGE_KEY = "clubero:urgency:dismissed";
+const DISMISS_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+type DismissMap = Record<string, number>;
+
+function readDismissed(): DismissMap {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(DISMISS_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as DismissMap;
+    const now = Date.now();
+    const fresh: DismissMap = {};
+    for (const [id, ts] of Object.entries(parsed)) {
+      if (now - ts < DISMISS_TTL_MS) fresh[id] = ts;
+    }
+    return fresh;
+  } catch {
+    return {};
+  }
+}
+
+function writeDismissed(map: DismissMap) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(DISMISS_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
 
 interface Props {
   className?: string;
