@@ -21,10 +21,13 @@ const COPY = {
       `Notre équipe support vient de répondre à votre demande${subject ? ` "${subject}"` : ""}${id ? ` (#${id})` : ""}.`,
     follow: "Consultez et répondez :",
     sign: "L'équipe Clubero",
-    subject_line: (id?: string) =>
-      id
-        ? `Réponse à votre demande #${id} — Clubero`
-        : "Réponse à votre demande de support — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Réponse à votre demande #${id} : ${s} — Clubero`;
+      if (id) return `Réponse à votre demande #${id} — Clubero`;
+      if (s) return `Réponse à votre demande : ${s} — Clubero`;
+      return "Réponse à votre demande de support — Clubero";
+    },
   },
   en: {
     lang: "en",
@@ -34,10 +37,21 @@ const COPY = {
       `Our support team has just replied to your request${subject ? ` "${subject}"` : ""}${id ? ` (#${id})` : ""}.`,
     follow: "View and reply:",
     sign: "The Clubero team",
-    subject_line: (id?: string) =>
-      id ? `Reply to your request #${id} — Clubero` : "Reply to your support request — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Reply to your request #${id}: ${s} — Clubero`;
+      if (id) return `Reply to your request #${id} — Clubero`;
+      if (s) return `Reply to your request: ${s} — Clubero`;
+      return "Reply to your support request — Clubero";
+    },
   },
 } as const;
+
+const MAX_SUBJECT_IN_EMAIL_LINE = 60;
+function truncateSubject(s: string) {
+  if (s.length <= MAX_SUBJECT_IN_EMAIL_LINE) return s;
+  return s.slice(0, MAX_SUBJECT_IN_EMAIL_LINE - 1).trimEnd() + "…";
+}
 
 const pick = (locale?: string) => (locale === "en" ? COPY.en : COPY.fr);
 
@@ -73,7 +87,7 @@ const SupportTicketReplyEmail = ({
 
 export const template = {
   component: SupportTicketReplyEmail,
-  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId),
+  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId, data.subject),
   displayName: "Support — Réponse staff",
   previewData: {
     name: "Jane",

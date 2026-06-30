@@ -34,8 +34,13 @@ const COPY = {
     intro: (subject?: string, id?: string, status?: string) =>
       `Le statut de votre demande${subject ? ` "${subject}"` : ""}${id ? ` (#${id})` : ""} a été mis à jour : ${status ?? "—"}.`,
     follow: "Consulter le ticket :",
-    subject_line: (id?: string) =>
-      id ? `Mise à jour de votre demande #${id} — Clubero` : "Mise à jour de votre demande — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Mise à jour de votre demande #${id} : ${s} — Clubero`;
+      if (id) return `Mise à jour de votre demande #${id} — Clubero`;
+      if (s) return `Mise à jour de votre demande : ${s} — Clubero`;
+      return "Mise à jour de votre demande — Clubero";
+    },
     label: (s?: string) => (s ? (STATUS_LABELS_FR[s] ?? s) : "—"),
   },
   en: {
@@ -44,11 +49,22 @@ const COPY = {
     intro: (subject?: string, id?: string, status?: string) =>
       `The status of your request${subject ? ` "${subject}"` : ""}${id ? ` (#${id})` : ""} was updated to: ${status ?? "—"}.`,
     follow: "View the ticket:",
-    subject_line: (id?: string) =>
-      id ? `Update on your request #${id} — Clubero` : "Update on your support request — Clubero",
+    subject_line: (id?: string, subject?: string) => {
+      const s = subject ? truncateSubject(subject) : "";
+      if (id && s) return `Update on your request #${id}: ${s} — Clubero`;
+      if (id) return `Update on your request #${id} — Clubero`;
+      if (s) return `Update on your request: ${s} — Clubero`;
+      return "Update on your support request — Clubero";
+    },
     label: (s?: string) => (s ? (STATUS_LABELS_EN[s] ?? s) : "—"),
   },
 } as const;
+
+const MAX_SUBJECT_IN_EMAIL_LINE = 60;
+function truncateSubject(s: string) {
+  if (s.length <= MAX_SUBJECT_IN_EMAIL_LINE) return s;
+  return s.slice(0, MAX_SUBJECT_IN_EMAIL_LINE - 1).trimEnd() + "…";
+}
 
 const pick = (locale?: string) => (locale === "en" ? COPY.en : COPY.fr);
 
@@ -79,7 +95,7 @@ const SupportTicketStatusEmail = ({
 
 export const template = {
   component: SupportTicketStatusEmail,
-  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId),
+  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId, data.subject),
   displayName: "Support — Changement de statut",
   previewData: {
     name: "Jane",
