@@ -37,7 +37,7 @@ export async function fanoutConvocationResponse(
   const { data: conv } = await supabaseAdmin
     .from("convocations")
     .select(
-      "id, status, event_id, player_id, players:player_id(first_name, last_name), events:event_id(id, title, type, starts_at, team_id)",
+      "id, status, event_id, player_id, players:player_id(first_name, last_name), events:event_id(id, title, type, starts_at, team_id, opponent)",
     )
     .eq("id", convocationId)
     .maybeSingle();
@@ -57,7 +57,9 @@ export async function fanoutConvocationResponse(
   const player: any = (conv as any).players ?? {};
   const firstName = (player.first_name as string) || (player.last_name as string) || "Un joueur";
 
-  const typeLabel = ev.type === "match" ? "Match" : ev.title || "Événement";
+  const opponent = (ev.opponent as string | null) || null;
+  const typeLabel =
+    ev.type === "match" ? (opponent ? `Match vs ${opponent}` : "Match") : ev.title || "Événement";
   const dateStr = ev.starts_at ? fmtDate(ev.starts_at) : "";
 
   const emoji = status === "present" ? "✅" : status === "absent" ? "❌" : "❓";
@@ -66,6 +68,7 @@ export async function fanoutConvocationResponse(
 
   const title = `${emoji} ${firstName} a répondu`;
   const body = `${statusLabel} · ${typeLabel} ${dateStr}`.trim();
+
 
   const { data: coaches } = await supabaseAdmin
     .from("team_members")
@@ -122,7 +125,7 @@ export async function fanoutConvocationComplete(
 
   const { data: ev } = await supabaseAdmin
     .from("events")
-    .select("id, title, type, starts_at, team_id")
+    .select("id, title, type, starts_at, team_id, opponent")
     .eq("id", eventId)
     .maybeSingle();
   if (!ev || !(ev as any).team_id) return { dispatched: 0, complete: true };
@@ -132,11 +135,18 @@ export async function fanoutConvocationComplete(
   const settings = await getClubNotifSettings(clubId);
   if (!settings.convocation_coach_complete) return { dispatched: 0, complete: true };
 
-  const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
+  const opponent = ((ev as any).opponent as string | null) || null;
+  const typeLabel =
+    (ev as any).type === "match"
+      ? opponent
+        ? `Match vs ${opponent}`
+        : "Match"
+      : (ev as any).title || "Événement";
   const dateStr = (ev as any).starts_at ? fmtDate((ev as any).starts_at) : "";
 
   const body =
     `${present} présent${present > 1 ? "s" : ""} · ${absent} absent${absent > 1 ? "s" : ""} · ${uncertain} incertain${uncertain > 1 ? "s" : ""} — ${typeLabel} ${dateStr}`.trim();
+
 
   const { data: coaches } = await supabaseAdmin
     .from("team_members")
