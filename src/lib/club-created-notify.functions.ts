@@ -35,7 +35,6 @@ export const notifyClubCreated = createServerFn({ method: "POST" })
       customerEmail = userRes?.user?.email ?? null;
     }
 
-
     await enqueueTransactionalEmailServer({
       templateName: "subscription-admin-notification",
       idempotencyKey: `club-created-${club.id}`,

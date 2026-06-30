@@ -468,12 +468,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Notify ticket owner on status change
-    if (
-      before &&
-      patch.status !== undefined &&
-      patch.status !== before.status &&
-      before.user_id
-    ) {
+    if (before && patch.status !== undefined && patch.status !== before.status && before.user_id) {
       await supabaseAdmin.from("notifications").insert({
         user_id: before.user_id,
         type: "support_status",

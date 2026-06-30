@@ -95,7 +95,8 @@ const SupportTicketStatusEmail = ({
 
 export const template = {
   component: SupportTicketStatusEmail,
-  subject: (data: Record<string, any>) => pick(data.locale).subject_line(data.ticketShortId, data.subject),
+  subject: (data: Record<string, any>) =>
+    pick(data.locale).subject_line(data.ticketShortId, data.subject),
   displayName: "Support — Changement de statut",
   previewData: {
     name: "Jane",
