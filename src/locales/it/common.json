@@ -2088,6 +2088,7 @@
       "uploadError": "Caricamento non riuscito",
       "unsupportedFormat": "Formato non supportato (PNG/JPG/WebP)",
       "ratioWarning": "Il logo potrebbe essere tagliato o stirato, consigliato 4:1.",
+      "logoContrastHint": "Logo leggibile su sfondo chiaro (scuro o colorato, evita il bianco).",
       "active": "Attivo",
       "save": "Salva",
       "saved": "Partner salvato",
