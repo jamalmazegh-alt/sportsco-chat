@@ -204,12 +204,7 @@ interface DeckProps {
 const SWIPE_THRESHOLD = 90; // px
 
 function UrgencyDeck({
-  items,
-  hasFailures,
-  busyIds,
-  onAction,
-  onDismiss,
-  className,
+  items, hasFailures, busyIds, onAction, onDismiss, className,
 }: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
