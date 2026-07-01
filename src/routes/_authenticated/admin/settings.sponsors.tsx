@@ -258,7 +258,7 @@ function SponsorsSettingsPage() {
     <div className="px-5 py-4 space-y-6">
       <SettingsSubHeader
         title={t("sponsor.admin.title", { defaultValue: "Sponsors" })}
-        subtitle={t("sponsor.admin.subtitle", {
+        description={t("sponsor.admin.subtitle", {
           defaultValue: "Affichez vos partenaires en haut de la page d'accueil.",
         })}
       />
