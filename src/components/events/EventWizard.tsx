@@ -411,6 +411,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     meetingtime: t("eventWizard.hint.meetingtime", {
       defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?",
     }),
+    places: t("eventWizard.hint.places", {
+      defaultValue: "Point de rendez-vous et lieu du match.",
+    }),
     opponent: t("eventWizard.hint.opponent", { defaultValue: "L'adversaire." }),
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
