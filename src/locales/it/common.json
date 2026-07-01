@@ -1133,7 +1133,9 @@
       "previewSecondary": "Secondario"
     },
     "promoteToClubMember": "Promuovi a membro del Club",
-    "rolesUpdated": "Ruoli aggiornati"
+    "rolesUpdated": "Ruoli aggiornati",
+    "hubSponsors": "Sponsor",
+    "hubSponsorsHint": "Mostra i tuoi partner in cima alla schermata iniziale"
   },
   "attachments": {
     "add": "Aggiungi file",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Link copiato",
     "qrCode": "Codice QR",
     "trigger": "Condividi"
+  },
+  "sponsor": {
+    "thanksLabel": "Grazie al nostro partner",
+    "visitAria": "Visita il sito di {{name}}",
+    "admin": {
+      "title": "Sponsor",
+      "subtitle": "Mostra i tuoi partner in cima alla schermata iniziale.",
+      "add": "Aggiungi un partner",
+      "addTitle": "Nuovo partner",
+      "editTitle": "Modifica partner",
+      "name": "Nome",
+      "targetUrl": "URL del sito",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 consigliato)",
+      "logoUploaded": "Logo caricato",
+      "uploadError": "Caricamento non riuscito",
+      "unsupportedFormat": "Formato non supportato (PNG/JPG/WebP)",
+      "ratioWarning": "Il logo potrebbe essere tagliato o stirato, consigliato 4:1.",
+      "active": "Attivo",
+      "save": "Salva",
+      "saved": "Partner salvato",
+      "saveError": "Errore nel salvataggio",
+      "deleted": "Partner eliminato",
+      "confirmDelete": "Eliminare questo partner?",
+      "empty": "Nessun partner al momento.",
+      "statsTitle": "Statistiche",
+      "noStats": "Nessun dato nel periodo.",
+      "exportCsv": "Esporta (CSV)",
+      "rangeToday": "Oggi",
+      "range7d": "Ultimi 7 giorni",
+      "range30d": "Ultimi 30 giorni",
+      "rangeMonth": "Mese in corso",
+      "rangeSeason": "Stagione in corso",
+      "rangeCustom": "Periodo personalizzato",
+      "colSponsor": "Sponsor",
+      "colPeriod": "Periodo",
+      "colImpressions": "Impressioni",
+      "colClicks": "Clic",
+      "colCtr": "Tasso di clic (%)"
+    }
   }
 }

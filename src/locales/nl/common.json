@@ -1133,7 +1133,9 @@
       "previewSecondary": "Secundair"
     },
     "promoteToClubMember": "Promoveer tot Clublid",
-    "rolesUpdated": "Rollen bijgewerkt"
+    "rolesUpdated": "Rollen bijgewerkt",
+    "hubSponsors": "Sponsors",
+    "hubSponsorsHint": "Toon je partners bovenaan het startscherm"
   },
   "attachments": {
     "add": "Bestand toevoegen",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Link gekopieerd",
     "qrCode": "QR-code",
     "trigger": "Delen"
+  },
+  "sponsor": {
+    "thanksLabel": "Met dank aan onze partner",
+    "visitAria": "Bezoek de website van {{name}}",
+    "admin": {
+      "title": "Sponsors",
+      "subtitle": "Toon je partners bovenaan het startscherm.",
+      "add": "Partner toevoegen",
+      "addTitle": "Nieuwe partner",
+      "editTitle": "Partner bewerken",
+      "name": "Naam",
+      "targetUrl": "Website-URL",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 aanbevolen)",
+      "logoUploaded": "Logo geüpload",
+      "uploadError": "Upload mislukt",
+      "unsupportedFormat": "Formaat niet ondersteund (PNG/JPG/WebP)",
+      "ratioWarning": "Het logo kan bijgesneden of uitgerekt worden, 4:1 aanbevolen.",
+      "active": "Actief",
+      "save": "Opslaan",
+      "saved": "Partner opgeslagen",
+      "saveError": "Opslaan mislukt",
+      "deleted": "Partner verwijderd",
+      "confirmDelete": "Deze partner verwijderen?",
+      "empty": "Nog geen partners.",
+      "statsTitle": "Statistieken",
+      "noStats": "Geen gegevens voor deze periode.",
+      "exportCsv": "Exporteren (CSV)",
+      "rangeToday": "Vandaag",
+      "range7d": "Laatste 7 dagen",
+      "range30d": "Laatste 30 dagen",
+      "rangeMonth": "Deze maand",
+      "rangeSeason": "Huidig seizoen",
+      "rangeCustom": "Aangepaste periode",
+      "colSponsor": "Sponsor",
+      "colPeriod": "Periode",
+      "colImpressions": "Impressies",
+      "colClicks": "Klikken",
+      "colCtr": "Klikratio (%)"
+    }
   }
 }
