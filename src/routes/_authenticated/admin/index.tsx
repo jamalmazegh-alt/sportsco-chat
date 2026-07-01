@@ -157,6 +157,16 @@ function AdminSettingsPage() {
       tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
       clubOnly: true,
     },
+    {
+      to: "/admin/settings/sponsors",
+      icon: Handshake,
+      title: t("admin.hubSponsors", { defaultValue: "Sponsors" }),
+      hint: t("admin.hubSponsorsHint", {
+        defaultValue: "Affichez vos partenaires en haut de la page d'accueil",
+      }),
+      tone: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+      clubOnly: true,
+    },
   ];
   const items = allItems.filter((it) => !it.hidden && !(tournamentOnly && it.clubOnly));
 
