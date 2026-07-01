@@ -2158,9 +2158,6 @@ function EventDetail() {
                         event.location_url ??
                         `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
                       }
-                        event.location_url ??
-                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
-                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
