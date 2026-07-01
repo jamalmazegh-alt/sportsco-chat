@@ -1947,7 +1947,8 @@
       "comment": "¿Algo que añadir? (opcional)",
       "gameformat": "¿Cuántos jugadores en el campo?",
       "halves": "Formato del tiempo de juego.",
-      "meetingtime": "¿A qué hora deben presentarse los jugadores?"
+      "meetingtime": "¿A qué hora deben presentarse los jugadores?",
+      "places": "Punto de encuentro y lugar del partido."
     },
     "q": {
       "type": "¿Qué tipo de evento?",
@@ -1965,7 +1966,9 @@
       "comment": "¿Quieres añadir un mensaje?",
       "gameformat": "¿Formato de juego?",
       "halves": "¿Formato del partido?",
-      "meetingtime": "¿Hora de encuentro?"
+      "meetingtime": "¿Hora de encuentro?",
+      "matchLocation": "¿Lugar del partido?",
+      "places": "Punto de encuentro y lugar del partido"
     },
     "chip": {
       "tonight": "Esta noche",
@@ -2038,9 +2041,19 @@
       "convocation": "Convocar auto",
       "carpool": "Coche compartido",
       "comment": "Un mensaje",
-      "summary": "Todo listo"
+      "summary": "Todo listo",
+      "places": "Lugares"
     },
-    "skip": "Omitir"
+    "skip": "Omitir",
+    "summary": {
+      "meeting": "Encuentro",
+      "place": "Lugar"
+    },
+    "matchLocationPlaceholder": "Estadio / dirección del partido",
+    "places": {
+      "meetingSection": "Punto de encuentro",
+      "matchSection": "Lugar del partido"
+    }
   },
   "urgency": {
     "empty": {

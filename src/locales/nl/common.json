@@ -1947,7 +1947,8 @@
       "comment": "Iets toe te voegen? (optioneel)",
       "gameformat": "Hoeveel spelers op het veld?",
       "halves": "Formaat van de speeltijd.",
-      "meetingtime": "Hoe laat moeten de spelers aanwezig zijn?"
+      "meetingtime": "Hoe laat moeten de spelers aanwezig zijn?",
+      "places": "Verzamelpunt en wedstrijdlocatie."
     },
     "q": {
       "type": "Wat voor soort evenement?",
@@ -1965,7 +1966,9 @@
       "comment": "Een bericht toevoegen?",
       "gameformat": "Spelformaat?",
       "halves": "Wedstrijdformaat?",
-      "meetingtime": "Verzameltijd?"
+      "meetingtime": "Verzameltijd?",
+      "matchLocation": "Wedstrijdlocatie?",
+      "places": "Verzamelpunt en wedstrijdlocatie"
     },
     "chip": {
       "tonight": "Vanavond",
@@ -2038,9 +2041,19 @@
       "convocation": "Auto-uitnodigen",
       "carpool": "Carpoolen",
       "comment": "Een bericht",
-      "summary": "Alles klaar"
+      "summary": "Alles klaar",
+      "places": "Locaties"
     },
-    "skip": "Overslaan"
+    "skip": "Overslaan",
+    "summary": {
+      "meeting": "Verzamelen",
+      "place": "Locatie"
+    },
+    "matchLocationPlaceholder": "Stadion / wedstrijdadres",
+    "places": {
+      "meetingSection": "Verzamelpunt",
+      "matchSection": "Wedstrijdlocatie"
+    }
   },
   "urgency": {
     "empty": {

@@ -88,6 +88,7 @@ type Step =
   | "homeaway"
   | "meetingpoint"
   | "meetingtime"
+  | "places"
   | "opponent"
   | "official"
   | "location"
@@ -222,7 +223,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     s.push("when");
     if (state.type === "match") {
       s.push("halves", "gameformat", "homeaway");
-      if (state.isHome === "away") s.push("meetingpoint");
+      if (state.isHome === "away") s.push("places");
       s.push("opponent", "official");
     } else if (!isRecurring) {
       s.push("duration");
@@ -232,7 +233,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
-      if (state.type !== "match" || state.isHome === "away") s.push("location");
+      if (state.type !== "match") s.push("location");
       s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
@@ -410,6 +411,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     meetingtime: t("eventWizard.hint.meetingtime", {
       defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?",
     }),
+    places: t("eventWizard.hint.places", {
+      defaultValue: "Point de rendez-vous et lieu du match.",
+    }),
     opponent: t("eventWizard.hint.opponent", { defaultValue: "L'adversaire." }),
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
@@ -447,6 +451,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     },
     meetingtime: {
       text: t("eventWizard.qShort.meetingtime", { defaultValue: "Heure de RDV" }),
+      mark: "?",
+    },
+    places: {
+      text: t("eventWizard.qShort.places", { defaultValue: "Lieux" }),
       mark: "?",
     },
     opponent: { text: t("eventWizard.qShort.opponent", { defaultValue: "Contre qui" }), mark: "?" },
@@ -1030,6 +1038,76 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
+        {current === "places" && (
+          <StepQuestion
+            title={t("eventWizard.q.places", {
+              defaultValue: "Point de RDV et lieu du match",
+            })}
+          >
+            {/* RDV section */}
+            <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span>👥</span>
+                <span>
+                  {t("eventWizard.places.meetingSection", { defaultValue: "Point de rendez-vous" })}
+                </span>
+              </div>
+              <div>
+                <Label className="text-xs">
+                  {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
+                </Label>
+                <LocationAutocomplete
+                  value={state.meetingPoint ?? ""}
+                  onChange={(v) => patch("meetingPoint", v)}
+                  placeholder={t("eventWizard.meeting.addressPlaceholder", {
+                    defaultValue: "Adresse du point de rendez-vous",
+                  })}
+                />
+              </div>
+              <div>
+                <Label className="text-xs">
+                  {t("eventWizard.meeting.time", { defaultValue: "Heure de rendez-vous" })}
+                </Label>
+                <TimePicker
+                  value={state.meetingTime ?? ""}
+                  onChange={(v: string) => patch("meetingTime", v)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Match section */}
+            <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2 mt-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span>📍</span>
+                <span>
+                  {t("eventWizard.places.matchSection", { defaultValue: "Lieu du match" })}
+                </span>
+              </div>
+              <div>
+                <Label className="text-xs">
+                  {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
+                </Label>
+                <LocationAutocomplete
+                  value={state.location ?? ""}
+                  onChange={(v) => patch("location", v)}
+                  placeholder={t("eventWizard.matchLocationPlaceholder", {
+                    defaultValue: "Stade / adresse du match",
+                  })}
+                />
+              </div>
+            </div>
+
+            <Button
+              className="w-full mt-3"
+              disabled={!state.meetingPoint?.trim() || !state.location?.trim()}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
         {current === "opponent" && (
           <StepQuestion
             title={t("eventWizard.q.opponent", { defaultValue: "Contre quelle équipe ?" })}
@@ -1453,6 +1531,7 @@ const STEP_ICONS: Record<Step, LucideIcon> = {
   homeaway: Home,
   meetingpoint: MapPin,
   meetingtime: Clock,
+  places: MapPin,
   opponent: Shield,
   official: Trophy,
   location: MapPin,
