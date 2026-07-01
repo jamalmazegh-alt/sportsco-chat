@@ -2103,20 +2103,16 @@ function EventDetail() {
               <h1 className="text-[15px] font-extrabold tracking-[-0.3px] leading-[1.25] text-foreground">
                 {event.title}
               </h1>
-              <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <Clock className="h-3.5 w-3.5 text-[#1d7a45]" />
-                <span className="text-foreground">{fmt(event.starts_at, "HH:mm")}</span>
-                {event.ends_at && (
-                  <>
-                    <span className="text-muted-foreground/60">→</span>
-                    <span>{fmt(event.ends_at, "HH:mm")}</span>
-                  </>
-                )}
-                {event.convocation_time && (
-                  <span className="text-muted-foreground/80">
-                    · {t("events.convocationTime")} {fmt(event.convocation_time, "HH:mm")}
-                  </span>
-                )}
+              <div className="mt-2 flex items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-sm font-extrabold text-emerald-700">
+                  <Clock className="h-4 w-4 text-[#1d7a45]" />
+                  {fmt(event.starts_at, "HH:mm")}
+                  {event.ends_at && (
+                    <span className="text-emerald-600/70 font-semibold">
+                      → {fmt(event.ends_at, "HH:mm")}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -2150,7 +2146,13 @@ function EventDetail() {
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">{event.location}</p>
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    {event.convocation_time && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
+                        <Clock className="h-3 w-3 text-[#1d7a45]" />
+                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
+                      </span>
+                    )}
                     <a
                       href={
                         event.location_url ??
@@ -2182,14 +2184,22 @@ function EventDetail() {
                     <span className="font-medium">{t("events.meetingPoint")}:</span>{" "}
                     {event.meeting_point}
                   </p>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                  >
-                    {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
-                  </a>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    {event.convocation_time && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
+                        <Clock className="h-3 w-3 text-[#1d7a45]" />
+                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
+                      </span>
+                    )}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    >
+                      {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
                 </div>
               </div>
             )}
