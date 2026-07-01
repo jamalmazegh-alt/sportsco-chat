@@ -310,24 +310,29 @@ function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, onRefre
       <div className="flex items-center justify-between px-0.5">
         <div className="flex items-center gap-2">
           <div
-            className="h-7 w-7 rounded-[8px] flex items-center justify-center shadow-[0_2px_6px_rgba(220,38,38,0.25)]"
-            style={{ background: "linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%)" }}
+            className="h-8 w-8 rounded-[10px] flex items-center justify-center shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
+            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
           >
-            <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2.4} />
+            <Sparkles className="h-4 w-4 text-white" strokeWidth={2.4} />
           </div>
-          <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
-            {t("urgency.deck.title", { defaultValue: "Insights urgents" })}
+          <h2 className="text-[12px] font-black text-foreground uppercase tracking-[0.16em]">
+            {t("urgency.deck.title", { defaultValue: "Insights" })}
           </h2>
           <span
-            className="text-[10px] font-black px-2 py-0.5 rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(220,38,38,0.3)]"
-            style={{ background: "linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%)" }}
+            className="text-[10px] font-black h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(15,74,38,0.3)]"
+            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
           >
-            {position}/{total}
+            {total}
           </span>
         </div>
-        <span className="text-[10px] font-semibold text-muted-foreground">
-          {t("urgency.deck.hint", { defaultValue: "Swipe pour passer" })}
-        </span>
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-1.5 hover:border-[#2d9d5f] hover:text-[#0f4a26] transition-colors"
+        >
+          <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
+          {t("common.refresh", { defaultValue: "Actualiser" })}
+        </button>
       </div>
 
       {hasFailures && (
