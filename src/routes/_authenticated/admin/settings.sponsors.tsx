@@ -362,7 +362,7 @@ function SponsorsSettingsPage() {
                   setEditing({
                     id: s.id,
                     name: s.name,
-                    targetUrl: s.target_url,
+                    targetUrl: s.target_url ?? "",
                     logoPath: s.logo_url,
                     isActive: s.is_active,
                   });
