@@ -322,15 +322,21 @@ function SponsorsSettingsPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{s.name}</p>
-                <a
-                  href={s.target_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground hover:text-primary"
-                >
-                  {s.target_url}
-                  <ExternalLink className="h-3 w-3 shrink-0" />
-                </a>
+                {s.target_url ? (
+                  <a
+                    href={s.target_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground hover:text-primary"
+                  >
+                    {s.target_url}
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                  </a>
+                ) : (
+                  <p className="mt-0.5 truncate text-xs italic text-muted-foreground">
+                    {t("sponsor.admin.noUrl", { defaultValue: "Pas de lien" })}
+                  </p>
+                )}
               </div>
               <Switch
                 checked={s.is_active}
