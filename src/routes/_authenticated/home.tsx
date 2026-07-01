@@ -429,8 +429,7 @@ function HomePage() {
         </section>
       )}
 
-      {/* Stats: insights + KPIs (admins/coaches) */}
-      {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
+      {/* KPIs (admins/coaches) — insights are now unified in UrgencyCenter deck above */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
 
       {/* Primary CTA + duo (quick cards) */}
