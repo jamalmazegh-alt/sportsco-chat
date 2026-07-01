@@ -2088,6 +2088,7 @@
       "uploadError": "Échec du téléversement",
       "unsupportedFormat": "Format non supporté (PNG/JPG/WebP)",
       "ratioWarning": "Le logo risque d'être rogné/étiré, format 4:1 recommandé.",
+      "logoContrastHint": "Logo lisible sur fond clair (foncé ou couleur, éviter le blanc).",
       "active": "Actif",
       "save": "Enregistrer",
       "saved": "Partenaire enregistré",

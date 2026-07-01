@@ -12,6 +12,8 @@ import { shouldRecordClick, shouldRecordImpression } from "@/lib/sponsor-session
 const ROTATION_MS = 12_000;
 const IMPRESSION_VISIBLE_MS = 1_000;
 const CLICK_DEBOUNCE_MS = 500;
+/** Visibility knob — max rendered height of the logo (object-contain). */
+const SPONSOR_LOGO_MAX_HEIGHT = 40;
 
 type Sponsor = {
   id: string;
@@ -42,8 +44,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
     refetchOnWindowFocus: false,
   });
 
-  // Round-robin index. Advance on mount (already handled by initial state) and
-  // on visibility-gated interval.
   const [index, setIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isVisibleRef = useRef(false);
@@ -60,12 +60,11 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
 
   const current = list.length > 0 ? list[index % list.length] : null;
 
-  // Reset image error when sponsor changes.
   useEffect(() => {
     setImgFailed(false);
   }, [current?.id]);
 
-  // IntersectionObserver — track visibility and count impression after 1s visible.
+  // Impression tracking — >50% visible ~1s, gated by document visibility.
   useEffect(() => {
     if (!current || !containerRef.current) return;
     const el = containerRef.current;
@@ -105,7 +104,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
     };
   }, [current, impressionFn]);
 
-  // Auto-advance only when visible and foregrounded.
   useEffect(() => {
     if (list.length <= 1) return;
     const id = setInterval(() => {
@@ -129,30 +127,36 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
     window.open(current.target_url, "_blank", "noopener,noreferrer");
   };
 
+  // Nothing to show → render nothing (no separators, no layout shift).
   if (!current) return null;
 
   const showTextFallback = !current.logo_url || imgFailed;
 
   return (
-    <div ref={containerRef} className="w-full">
-      <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-        {t("sponsor.thanksLabel")}
-      </p>
+    <div
+      ref={containerRef}
+      className="w-full border-y border-border/60 bg-transparent"
+      style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+    >
       <button
         type="button"
         onClick={onClick}
         aria-label={t("sponsor.visitAria", { name: current.name })}
-        className="group flex aspect-[4/1] w-full items-center justify-center overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/40"
+        className="flex w-full min-h-12 flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          {t("sponsor.thanksLabel")}
+        </span>
         {showTextFallback ? (
-          <span className="line-clamp-2 px-4 text-center text-sm font-semibold text-neutral-800">
+          <span className="line-clamp-2 text-sm font-semibold text-foreground">
             {current.name}
           </span>
         ) : (
           <img
             src={current.logo_url!}
             alt={current.name}
-            className="max-h-full max-w-full object-contain"
+            style={{ maxHeight: `${SPONSOR_LOGO_MAX_HEIGHT}px` }}
+            className="w-auto max-w-full object-contain"
             onError={() => setImgFailed(true)}
             loading="lazy"
           />

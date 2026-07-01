@@ -2088,6 +2088,7 @@
       "uploadError": "Upload fehlgeschlagen",
       "unsupportedFormat": "Nicht unterstütztes Format (PNG/JPG/WebP)",
       "ratioWarning": "Das Logo könnte beschnitten oder gestreckt werden, 4:1 empfohlen.",
+      "logoContrastHint": "Logo gut lesbar auf hellem Hintergrund (dunkel oder farbig, kein Weiß).",
       "active": "Aktiv",
       "save": "Speichern",
       "saved": "Partner gespeichert",

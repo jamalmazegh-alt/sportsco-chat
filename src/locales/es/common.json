@@ -2088,6 +2088,7 @@
       "uploadError": "Error al subir",
       "unsupportedFormat": "Formato no compatible (PNG/JPG/WebP)",
       "ratioWarning": "El logo puede recortarse o estirarse, se recomienda 4:1.",
+      "logoContrastHint": "Logo legible sobre fondo claro (oscuro o de color, evita el blanco).",
       "active": "Activo",
       "save": "Guardar",
       "saved": "Socio guardado",
