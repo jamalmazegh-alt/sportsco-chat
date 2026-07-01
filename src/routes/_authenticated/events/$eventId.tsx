@@ -2147,12 +2147,6 @@ function EventDetail() {
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">{event.location}</p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    {event.convocation_time && (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
-                        <Clock className="h-3 w-3 text-[#1d7a45]" />
-                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
-                      </span>
-                    )}
                     <a
                       href={
                         event.location_url ??
@@ -2186,10 +2180,11 @@ function EventDetail() {
                   </p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                     {event.convocation_time && (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
-                        <Clock className="h-3 w-3 text-[#1d7a45]" />
-                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
-                      </span>
+                      <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[13px] font-extrabold text-emerald-700">
+                        <Clock className="h-4 w-4 text-[#1d7a45]" />
+                        <span>{t("events.convocationTime")}</span>
+                        <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
+                      </div>
                     )}
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
