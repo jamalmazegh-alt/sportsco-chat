@@ -311,7 +311,6 @@ function SponsorsSettingsPage() {
             >
               <div className="flex h-12 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
                 {s.logo_signed_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={s.logo_signed_url}
                     alt={s.name}
