@@ -580,7 +580,8 @@ function SponsorsSettingsPage() {
               disabled={
                 !editing ||
                 !editing.name.trim() ||
-                !/^https?:\/\//i.test(editing.targetUrl.trim()) ||
+                (editing.targetUrl.trim().length > 0 &&
+                  !/^https?:\/\//i.test(editing.targetUrl.trim())) ||
                 saveMutation.isPending
               }
             >
