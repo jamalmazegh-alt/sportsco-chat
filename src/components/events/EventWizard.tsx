@@ -1692,7 +1692,8 @@ function SummaryCard({
       {teamName && <div className="text-muted-foreground">{teamName}</div>}
       {state.startDate && (
         <div>
-          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.durationMin} min
+          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.durationMin}{" "}
+          min
         </div>
       )}
       {state.meetingPoint && (
@@ -1709,9 +1710,7 @@ function SummaryCard({
           {state.location}
         </div>
       )}
-      {!state.location && !state.meetingPoint && state.startTime && (
-        <div>🕒 {state.startTime}</div>
-      )}
+      {!state.location && !state.meetingPoint && state.startTime && <div>🕒 {state.startTime}</div>}
       {state.opponent && (
         <div>
           🆚 {state.opponent} ({state.isHome === "home" ? "🏠" : "🚌"})
