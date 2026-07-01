@@ -62,14 +62,32 @@ interface Props {
 }
 
 const SEV_RING: Record<UrgencySeverity, string> = {
-  critical: "border-[#dc2626]",
-  high: "border-[#f59e0b]",
-  medium: "border-[#fcd34d]",
+  critical: "border-[#fecaca]",
+  high: "border-[#fde68a]",
+  medium: "border-border",
+};
+
+const SEV_BAR: Record<UrgencySeverity, string> = {
+  critical: "bg-[#dc2626]",
+  high: "bg-[#f59e0b]",
+  medium: "bg-[#fcd34d]",
 };
 
 const SEV_TILE: Record<UrgencySeverity, string> = {
-  critical: "bg-[#fef2f2] text-[#dc2626]",
-  high: "bg-[#fffbeb] text-[#92400e]",
+  critical: "bg-[#fee2e2] text-[#dc2626]",
+  high: "bg-[#fef3c7] text-[#b45309]",
+  medium: "bg-[#fefce8] text-[#854d0e]",
+};
+
+const SEV_BADGE_LABEL: Record<UrgencySeverity, string> = {
+  critical: "urgency.badge.urgent",
+  high: "urgency.badge.important",
+  medium: "urgency.badge.info",
+};
+
+const SEV_BADGE_CLASS: Record<UrgencySeverity, string> = {
+  critical: "bg-[#fee2e2] text-[#b91c1c]",
+  high: "bg-[#fef3c7] text-[#92400e]",
   medium: "bg-[#fefce8] text-[#854d0e]",
 };
 
