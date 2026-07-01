@@ -1461,6 +1461,7 @@ const STEP_ICONS: Record<Step, LucideIcon> = {
   homeaway: Home,
   meetingpoint: MapPin,
   meetingtime: Clock,
+  places: MapPin,
   opponent: Shield,
   official: Trophy,
   location: MapPin,
