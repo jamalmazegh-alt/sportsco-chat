@@ -2059,11 +2059,13 @@
   "urgency": {
     "empty": {
       "title": "Alles onder controle",
-      "subtitle": "Geen dringende actie"
+      "subtitle": "Geen dringende actie",
+      "status": "Alles onder controle · geen dringende actie"
     },
     "error": {
       "title": "Urgentiecentrum niet beschikbaar",
-      "hint": "Signalen konden niet worden geladen. Probeer het zo opnieuw."
+      "hint": "Signalen konden niet worden geladen. Probeer het zo opnieuw.",
+      "checkFailed": "Kan meldingen niet controleren"
     },
     "partialError": "Sommige bronnen zijn niet beschikbaar, de lijst kan onvolledig zijn.",
     "cta": {

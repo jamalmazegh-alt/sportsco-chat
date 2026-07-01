@@ -2059,11 +2059,13 @@
   "urgency": {
     "empty": {
       "title": "All under control",
-      "subtitle": "No urgent action"
+      "subtitle": "No urgent action",
+      "status": "All under control · no urgent action"
     },
     "error": {
       "title": "Urgency center unavailable",
-      "hint": "Couldn't load signals. Try again in a moment."
+      "hint": "Couldn't load signals. Try again in a moment.",
+      "checkFailed": "Unable to check alerts"
     },
     "partialError": "Some sources are unavailable, the list may be incomplete.",
     "cta": {
