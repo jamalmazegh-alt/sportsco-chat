@@ -94,6 +94,14 @@ export function useAuthState(): AuthState {
           i18n.changeLanguage(lang);
         }
       });
+    // Auto-link parent memberships (matches player_parents by email) so a
+    // parent whose invite/link never created a club_members row still lands
+    // on their child's club instead of the "create a club" screen.
+    try {
+      await (supabase.rpc as any)("link_parent_memberships");
+    } catch (e) {
+      console.warn("link_parent_memberships failed:", e);
+    }
     const { data, error } = await supabase
       .from("club_members")
       .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
