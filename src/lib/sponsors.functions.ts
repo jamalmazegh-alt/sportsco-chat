@@ -45,7 +45,7 @@ export const getActiveSponsorsForHome = createServerFn({ method: "GET" })
       (rows ?? []).map(async (s) => ({
         id: s.id as string,
         name: s.name as string,
-        target_url: s.target_url as string,
+        target_url: (s.target_url as string | null) ?? null,
         logo_url: await signLogoUrl(s.logo_url as string | null),
       })),
     );
@@ -106,7 +106,7 @@ export const listClubSponsors = createServerFn({ method: "GET" })
 const SponsorCreateInput = z.object({
   clubId: z.string().uuid(),
   name: z.string().trim().min(1).max(120),
-  targetUrl: z.string().trim().min(1).max(2048),
+  targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
 });
@@ -115,7 +115,8 @@ export const createSponsor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SponsorCreateInput.parse(input))
   .handler(async ({ data, context }) => {
-    if (!isSafeHttpUrl(data.targetUrl)) throw new Error("invalid_target_url");
+    const normalizedUrl = data.targetUrl && data.targetUrl.length > 0 ? data.targetUrl : null;
+    if (normalizedUrl && !isSafeHttpUrl(normalizedUrl)) throw new Error("invalid_target_url");
     await assertClubRole({
       supabase: context.supabase,
       userId: context.userId,
@@ -130,7 +131,7 @@ export const createSponsor = createServerFn({ method: "POST" })
       .insert({
         club_id: data.clubId,
         name: data.name,
-        target_url: data.targetUrl,
+        target_url: normalizedUrl,
         logo_url: data.logoPath ?? null,
         is_active: data.isActive ?? true,
       })
@@ -144,7 +145,7 @@ const SponsorUpdateInput = z.object({
   sponsorId: z.string().uuid(),
   clubId: z.string().uuid(),
   name: z.string().trim().min(1).max(120).optional(),
-  targetUrl: z.string().trim().min(1).max(2048).optional(),
+  targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
 });
@@ -159,7 +160,13 @@ export const updateSponsor = createServerFn({ method: "POST" })
       clubId: data.clubId,
       allowedRoles: ["admin"],
     });
-    if (data.targetUrl !== undefined && !isSafeHttpUrl(data.targetUrl)) {
+    const normalizedUrl =
+      data.targetUrl === undefined
+        ? undefined
+        : data.targetUrl && data.targetUrl.length > 0
+          ? data.targetUrl
+          : null;
+    if (normalizedUrl && !isSafeHttpUrl(normalizedUrl)) {
       throw new Error("invalid_target_url");
     }
     if (data.logoPath && !data.logoPath.startsWith(`sponsors/${data.clubId}/`)) {
@@ -167,12 +174,12 @@ export const updateSponsor = createServerFn({ method: "POST" })
     }
     const patch: {
       name?: string;
-      target_url?: string;
+      target_url?: string | null;
       logo_url?: string | null;
       is_active?: boolean;
     } = {};
     if (data.name !== undefined) patch.name = data.name;
-    if (data.targetUrl !== undefined) patch.target_url = data.targetUrl;
+    if (normalizedUrl !== undefined) patch.target_url = normalizedUrl;
     if (data.logoPath !== undefined) patch.logo_url = data.logoPath;
     if (data.isActive !== undefined) patch.is_active = data.isActive;
     const { error } = await context.supabase

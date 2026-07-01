@@ -20,7 +20,7 @@ type Sponsor = {
   id: string;
   name: string;
   logo_url: string | null;
-  target_url: string;
+  target_url: string | null;
 };
 
 function isSafeHttpUrl(url: string): boolean {
@@ -123,7 +123,7 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
       return;
     }
     lastClickRef.current = now;
-    if (!isSafeHttpUrl(current.target_url)) {
+    if (!current.target_url || !isSafeHttpUrl(current.target_url)) {
       e.preventDefault();
       return;
     }
@@ -136,6 +136,31 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   if (!current) return null;
 
   const showTextFallback = !current.logo_url || imgFailed;
+  const hasLink = !!current.target_url && isSafeHttpUrl(current.target_url);
+
+  const inner = (
+    <>
+      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        {t("sponsor.thanksLabel")}
+      </span>
+      <span className="relative inline-flex max-w-full items-center justify-center overflow-visible transition-transform active:scale-[0.98] dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
+        {showTextFallback ? (
+          <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
+            {current.name}
+          </span>
+        ) : (
+          <img
+            src={current.logo_url!}
+            alt={current.name}
+            style={{ maxHeight: `${SPONSOR_LOGO_MAX_HEIGHT}px` }}
+            className="w-auto max-w-full object-contain"
+            onError={() => setImgFailed(true)}
+            loading="lazy"
+          />
+        )}
+      </span>
+    </>
+  );
 
   return (
     <div
@@ -143,34 +168,22 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
       className="w-full border-y border-border/60 bg-transparent"
       style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
     >
-      <a
-        href={isSafeHttpUrl(current.target_url) ? current.target_url : "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        aria-label={t("sponsor.visitExternalAria", { name: current.name })}
-        className="group flex w-full min-h-12 cursor-pointer flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center transition-opacity hover:opacity-95 active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-      >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {t("sponsor.thanksLabel")}
-        </span>
-        <span className="relative inline-flex max-w-full items-center justify-center overflow-visible transition-transform active:scale-[0.98] dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
-          {showTextFallback ? (
-            <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
-              {current.name}
-            </span>
-          ) : (
-            <img
-              src={current.logo_url!}
-              alt={current.name}
-              style={{ maxHeight: `${SPONSOR_LOGO_MAX_HEIGHT}px` }}
-              className="w-auto max-w-full object-contain"
-              onError={() => setImgFailed(true)}
-              loading="lazy"
-            />
-          )}
-        </span>
-      </a>
+      {hasLink ? (
+        <a
+          href={current.target_url!}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+          aria-label={t("sponsor.visitExternalAria", { name: current.name })}
+          className="group flex w-full min-h-12 cursor-pointer flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center transition-opacity hover:opacity-95 active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
+          {inner}
+        </a>
+      ) : (
+        <div className="group flex w-full min-h-12 flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center">
+          {inner}
+        </div>
+      )}
     </div>
   );
 }

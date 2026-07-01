@@ -289,7 +289,7 @@ function SponsorsSettingsPage() {
       <div className="flex justify-end">
         <Button
           onClick={() => {
-            setEditing({ name: "", targetUrl: "https://", logoPath: null, isActive: true });
+            setEditing({ name: "", targetUrl: "", logoPath: null, isActive: true });
             setDialogOpen(true);
           }}
         >
@@ -322,15 +322,21 @@ function SponsorsSettingsPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{s.name}</p>
-                <a
-                  href={s.target_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground hover:text-primary"
-                >
-                  {s.target_url}
-                  <ExternalLink className="h-3 w-3 shrink-0" />
-                </a>
+                {s.target_url ? (
+                  <a
+                    href={s.target_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground hover:text-primary"
+                  >
+                    {s.target_url}
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                  </a>
+                ) : (
+                  <p className="mt-0.5 truncate text-xs italic text-muted-foreground">
+                    {t("sponsor.admin.noUrl", { defaultValue: "Pas de lien" })}
+                  </p>
+                )}
               </div>
               <Switch
                 checked={s.is_active}
@@ -356,7 +362,7 @@ function SponsorsSettingsPage() {
                   setEditing({
                     id: s.id,
                     name: s.name,
-                    targetUrl: s.target_url,
+                    targetUrl: s.target_url ?? "",
                     logoPath: s.logo_url,
                     isActive: s.is_active,
                   });
@@ -529,7 +535,11 @@ function SponsorsSettingsPage() {
                 />
               </div>
               <div>
-                <Label>{t("sponsor.admin.targetUrl", { defaultValue: "URL du site" })}</Label>
+                <Label>
+                  {t("sponsor.admin.targetUrlOptional", {
+                    defaultValue: "URL du site (optionnel)",
+                  })}
+                </Label>
                 <Input
                   type="url"
                   value={editing.targetUrl}
@@ -574,7 +584,8 @@ function SponsorsSettingsPage() {
               disabled={
                 !editing ||
                 !editing.name.trim() ||
-                !/^https?:\/\//i.test(editing.targetUrl.trim()) ||
+                (editing.targetUrl.trim().length > 0 &&
+                  !/^https?:\/\//i.test(editing.targetUrl.trim())) ||
                 saveMutation.isPending
               }
             >
