@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { ExternalLink } from "lucide-react";
+
 import {
   getActiveSponsorsForHome,
   recordSponsorClick,
@@ -156,10 +156,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
           {t("sponsor.thanksLabel")}
         </span>
         <span className="relative inline-flex max-w-full items-center justify-center overflow-visible transition-transform active:scale-[0.98] dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
-          <ExternalLink
-            className="absolute -top-1.5 -right-1.5 h-3 w-3 text-muted-foreground dark:text-neutral-900"
-            aria-hidden="true"
-          />
           {showTextFallback ? (
             <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
               {current.name}
