@@ -2103,16 +2103,22 @@ function EventDetail() {
               <h1 className="text-[15px] font-extrabold tracking-[-0.3px] leading-[1.25] text-foreground">
                 {event.title}
               </h1>
-              <div className="mt-2 flex items-center gap-2">
-                <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[16px] font-extrabold text-emerald-700">
-                  <Clock className="h-5 w-5 text-[#1d7a45]" />
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {event.convocation_time && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60">
+                    <Clock className="h-3 w-3" />
+                    {t("events.convocationTimeShort")}{" "}
+                    <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                  <Clock className="h-3 w-3" />
+                  {t("events.matchTimeShort", { defaultValue: "Match" })}{" "}
                   <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
                   {event.ends_at && (
-                    <span className="text-emerald-600/70 font-semibold text-[13px]">
-                      → {fmt(event.ends_at, "HH:mm")}
-                    </span>
+                    <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
                   )}
-                </div>
+                </span>
               </div>
             </div>
           </div>
