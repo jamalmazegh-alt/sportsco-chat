@@ -88,6 +88,7 @@ type Step =
   | "homeaway"
   | "meetingpoint"
   | "meetingtime"
+  | "places"
   | "opponent"
   | "official"
   | "location"
