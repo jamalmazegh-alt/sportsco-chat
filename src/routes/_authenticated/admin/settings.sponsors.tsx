@@ -289,7 +289,7 @@ function SponsorsSettingsPage() {
       <div className="flex justify-end">
         <Button
           onClick={() => {
-            setEditing({ name: "", targetUrl: "https://", logoPath: null, isActive: true });
+            setEditing({ name: "", targetUrl: "", logoPath: null, isActive: true });
             setDialogOpen(true);
           }}
         >
