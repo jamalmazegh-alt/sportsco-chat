@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,9 +10,11 @@ import {
   CheckCircle2,
   ChevronRight,
   Loader2,
+  Sparkles,
   Users,
   X,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -201,7 +203,112 @@ export function UrgencyCenter({ className }: Props) {
   }
 
   return (
-    <section className={cn("space-y-2", className)}>
+    <UrgencyDeck
+      items={items}
+      hasFailures={hasFailures}
+      busyIds={busyIds}
+      onAction={handleAction}
+      onDismiss={(id) => {
+        dismissItem(id);
+      }}
+      className={className}
+    />
+  );
+}
+
+interface DeckProps {
+  items: UrgencyItem[];
+  hasFailures: boolean;
+  busyIds: Set<string>;
+  onAction: (item: UrgencyItem) => void | Promise<void>;
+  onDismiss: (id: string) => void;
+  className?: string;
+}
+
+const SWIPE_THRESHOLD = 90; // px
+
+function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, className }: DeckProps) {
+  const { t } = useTranslation();
+  const [topIdx, setTopIdx] = useState(0);
+  const [dragX, setDragX] = useState(0);
+  const [flyingOut, setFlyingOut] = useState<null | "left" | "right">(null);
+  const startX = useRef<number | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  // Clamp topIdx if items shrink (dismissal from elsewhere, resolved server-side, etc.)
+  useEffect(() => {
+    if (topIdx >= items.length) setTopIdx(Math.max(0, items.length - 1));
+  }, [items.length, topIdx]);
+
+  const remaining = items.slice(topIdx);
+  const current = remaining[0];
+
+  if (!current) {
+    // All local items consumed but parent still gave us items — should not happen after clamp,
+    // but render nothing rather than crash.
+    return null;
+  }
+
+  const deck = remaining.slice(0, 3); // top + 2 behind for depth
+  const total = items.length;
+  const position = topIdx + 1;
+
+  function endDrag(dx: number) {
+    startX.current = null;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) {
+      setDragX(0);
+      return;
+    }
+    const dir = dx > 0 ? "right" : "left";
+    setFlyingOut(dir);
+    // Animate out then advance
+    window.setTimeout(() => {
+      onDismiss(current.id);
+      setFlyingOut(null);
+      setDragX(0);
+      setTopIdx((i) => i + 1);
+    }, 180);
+  }
+
+  function onPointerDown(e: React.PointerEvent) {
+    if (flyingOut) return;
+    startX.current = e.clientX;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  }
+  function onPointerMove(e: React.PointerEvent) {
+    if (startX.current === null) return;
+    setDragX(e.clientX - startX.current);
+  }
+  function onPointerUp() {
+    if (startX.current === null) return;
+    endDrag(dragX);
+  }
+
+  return (
+    <section className={cn("space-y-2.5", className)}>
+      <div className="flex items-center justify-between px-0.5">
+        <div className="flex items-center gap-2">
+          <div
+            className="h-7 w-7 rounded-[8px] flex items-center justify-center shadow-[0_2px_6px_rgba(220,38,38,0.25)]"
+            style={{ background: "linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%)" }}
+          >
+            <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2.4} />
+          </div>
+          <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
+            {t("urgency.deck.title", { defaultValue: "Insights urgents" })}
+          </h2>
+          <span
+            className="text-[10px] font-black px-2 py-0.5 rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(220,38,38,0.3)]"
+            style={{ background: "linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%)" }}
+          >
+            {position}/{total}
+          </span>
+        </div>
+        <span className="text-[10px] font-semibold text-muted-foreground">
+          {t("urgency.deck.hint", { defaultValue: "Swipe pour passer" })}
+        </span>
+      </div>
+
       {hasFailures && (
         <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} />
@@ -210,66 +317,104 @@ export function UrgencyCenter({ className }: Props) {
           })}
         </div>
       )}
-      <ul className="space-y-2">
-        {items.map((item) => {
-          const busy = busyIds.has(item.id);
-          return (
-            <li
-              key={item.id}
-              className={cn(
-                "rounded-[14px] border-[1.5px] bg-card p-3 flex items-center gap-3",
-                SEV_RING[item.severity],
-              )}
-            >
+
+      <div className="relative select-none" style={{ height: 96 }}>
+        {deck
+          .map((item, i) => {
+            const depth = i; // 0 = top
+            const isTop = depth === 0;
+            const busy = busyIds.has(item.id);
+            const flying = isTop && flyingOut !== null;
+            const restingTransform = `translateY(${depth * 8}px) scale(${1 - depth * 0.05})`;
+            const dragTransform = flying
+              ? `translateX(${flyingOut === "right" ? 400 : -400}px) rotate(${
+                  flyingOut === "right" ? 18 : -18
+                }deg)`
+              : isTop
+                ? `translateX(${dragX}px) rotate(${dragX * 0.04}deg)`
+                : restingTransform;
+            const opacity = flying ? 0 : depth === 0 ? 1 : 0.55 - depth * 0.15;
+            return (
               <div
+                key={item.id}
+                ref={isTop ? cardRef : null}
+                onPointerDown={isTop ? onPointerDown : undefined}
+                onPointerMove={isTop ? onPointerMove : undefined}
+                onPointerUp={isTop ? onPointerUp : undefined}
+                onPointerCancel={isTop ? onPointerUp : undefined}
                 className={cn(
-                  "h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0",
-                  SEV_TILE[item.severity],
+                  "absolute inset-x-0 top-0 rounded-[14px] border-[1.5px] bg-card p-3 flex items-center gap-3 shadow-[0_2px_8px_rgba(15,40,24,0.06)]",
+                  SEV_RING[item.severity],
+                  isTop ? "touch-pan-y cursor-grab active:cursor-grabbing" : "pointer-events-none",
                 )}
-              >
-                <Users className="h-5 w-5" strokeWidth={2.4} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-foreground truncate">{item.title}</p>
-                <p className="text-[11px] text-muted-foreground font-medium truncate">
-                  {item.subtitle}
-                </p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleAction(item)}
-                disabled={busy}
-                className="shrink-0"
-              >
-                {busy ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <ActionIcon kind={item.primaryAction.kind} />
-                )}
-                {item.primaryAction.kind === "remind-all"
-                  ? t("attendance.remindAll", { defaultValue: "Tout relancer" })
-                  : item.primaryAction.kind === "respond"
-                    ? t("urgency.cta.respond", { defaultValue: "Répondre" })
-                    : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
-              </Button>
-              <button
-                type="button"
-                onClick={() => {
-                  dismissItem(item.id);
-                  toast.success(
-                    t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
-                  );
+                style={{
+                  transform: dragTransform,
+                  opacity,
+                  zIndex: 30 - depth,
+                  transition:
+                    isTop && startX.current === null
+                      ? "transform 180ms ease-out, opacity 180ms ease-out"
+                      : undefined,
                 }}
-                aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
-                className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               >
-                <X className="h-3.5 w-3.5" strokeWidth={2.4} />
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                <div
+                  className={cn(
+                    "h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0",
+                    SEV_TILE[item.severity],
+                  )}
+                >
+                  <Users className="h-5 w-5" strokeWidth={2.4} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-bold text-foreground truncate">{item.title}</p>
+                  <p className="text-[11px] text-muted-foreground font-medium truncate">
+                    {item.subtitle}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAction(item);
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  disabled={busy || !isTop}
+                  className="shrink-0"
+                >
+                  {busy ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <ActionIcon kind={item.primaryAction.kind} />
+                  )}
+                  {item.primaryAction.kind === "remind-all"
+                    ? t("attendance.remindAll", { defaultValue: "Tout relancer" })
+                    : item.primaryAction.kind === "respond"
+                      ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                      : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                </Button>
+                <button
+                  type="button"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDismiss(item.id);
+                    toast.success(
+                      t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
+                    );
+                    setTopIdx((idx) => idx + 1);
+                  }}
+                  aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
+                  className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" strokeWidth={2.4} />
+                </button>
+              </div>
+            );
+          })
+          .reverse() /* render deepest first so top card wins stacking */}
+      </div>
     </section>
   );
 }
+
