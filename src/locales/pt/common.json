@@ -2088,6 +2088,7 @@
       "uploadError": "Falha no carregamento",
       "unsupportedFormat": "Formato não suportado (PNG/JPG/WebP)",
       "ratioWarning": "O logótipo pode ser cortado ou esticado, 4:1 recomendado.",
+      "logoContrastHint": "Logótipo legível em fundo claro (escuro ou colorido, evite branco).",
       "active": "Ativo",
       "save": "Guardar",
       "saved": "Parceiro guardado",
