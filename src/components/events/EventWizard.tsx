@@ -1112,14 +1112,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "location" && (
-          <StepQuestion title={t("eventWizard.q.location", { defaultValue: "Où ?" })}>
+          <StepQuestion
+            title={
+              state.type === "match"
+                ? t("eventWizard.q.matchLocation", { defaultValue: "Lieu du match ?" })
+                : t("eventWizard.q.location", { defaultValue: "Où ?" })
+            }
+          >
             <LocationAutocomplete
               value={state.location ?? ""}
               onChange={(v) => patch("location", v)}
-              placeholder={t("eventWizard.locationPlaceholder", {
-                defaultValue: "Stade municipal",
-              })}
+              placeholder={
+                state.type === "match"
+                  ? t("eventWizard.matchLocationPlaceholder", {
+                      defaultValue: "Stade / adresse du match",
+                    })
+                  : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
+              }
             />
+
             <Button
               className="w-full mt-2"
               disabled={!state.location?.trim()}
