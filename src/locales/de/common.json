@@ -677,6 +677,7 @@
     "opponent": "Gegner",
     "startsAt": "Beginn",
     "endsAt": "Ende",
+    "matchTime": "Spielzeit",
     "convocationTime": "Meldezeitpunkt",
     "convocationDateTime": "Datum und Uhrzeit des Treffpunkts",
     "matchDateTime": "Spiel Datum und Uhrzeit",

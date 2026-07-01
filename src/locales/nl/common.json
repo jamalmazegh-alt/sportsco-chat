@@ -677,6 +677,7 @@
     "opponent": "Tegenstander",
     "startsAt": "Begint om",
     "endsAt": "Eindigt om",
+    "matchTime": "Wedstrijdtijd",
     "convocationTime": "Verzameltijd",
     "convocationDateTime": "Datum en tijd verzamelpunt",
     "matchDateTime": "Datum en tijd wedstrijd",
