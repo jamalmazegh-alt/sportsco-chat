@@ -9,9 +9,7 @@ import {
   BellRing,
   CheckCircle2,
   ChevronRight,
-  Clock,
   Loader2,
-  RefreshCw,
   Sparkles,
   X,
 } from "lucide-react";
@@ -61,34 +59,10 @@ interface Props {
   className?: string;
 }
 
-const SEV_RING: Record<UrgencySeverity, string> = {
-  critical: "border-[#fecaca]",
-  high: "border-[#fde68a]",
-  medium: "border-border",
-};
-
 const SEV_BAR: Record<UrgencySeverity, string> = {
   critical: "bg-[#dc2626]",
   high: "bg-[#f59e0b]",
   medium: "bg-[#fcd34d]",
-};
-
-const SEV_TILE: Record<UrgencySeverity, string> = {
-  critical: "bg-[#fee2e2] text-[#dc2626]",
-  high: "bg-[#fef3c7] text-[#b45309]",
-  medium: "bg-[#fefce8] text-[#854d0e]",
-};
-
-const SEV_BADGE_LABEL: Record<UrgencySeverity, string> = {
-  critical: "urgency.badge.urgent",
-  high: "urgency.badge.important",
-  medium: "urgency.badge.info",
-};
-
-const SEV_BADGE_CLASS: Record<UrgencySeverity, string> = {
-  critical: "bg-[#fee2e2] text-[#b91c1c]",
-  high: "bg-[#fef3c7] text-[#92400e]",
-  medium: "bg-[#fefce8] text-[#854d0e]",
 };
 
 function ActionIcon({ kind }: { kind: UrgencyAction["kind"] }) {
@@ -139,28 +113,21 @@ export function UrgencyCenter({ className }: Props) {
 
   if (surface === "error") {
     return (
-      <section
-        className={cn("rounded-[16px] border-[1.5px] border-[#fecaca] bg-[#fef2f2] p-4", className)}
-      >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-[#dc2626] shrink-0 mt-0.5" strokeWidth={2.4} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-bold text-[#7f1d1d]">
-              {t("urgency.error.title", { defaultValue: "Centre d'urgence indisponible" })}
-            </p>
-            <p className="text-[11px] text-[#991b1b] mt-0.5">
-              {t("urgency.error.hint", {
-                defaultValue: "Impossible de charger les signaux. Réessaie dans un instant.",
-              })}
-            </p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
+      <section className={cn("space-y-2", className)}>
+        <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-border bg-card px-3 py-2">
+          <div className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+          <p className="text-[11px] font-medium text-muted-foreground">
+            {t("urgency.error.checkFailed", {
+              defaultValue: "Impossible de vérifier les alertes",
+            })}
+          </p>
+          <button
+            type="button"
             onClick={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
+            className="ml-auto text-[11px] font-semibold text-primary hover:underline"
           >
             {t("common.retry", { defaultValue: "Réessayer" })}
-          </Button>
+          </button>
         </div>
       </section>
     );
@@ -168,30 +135,20 @@ export function UrgencyCenter({ className }: Props) {
 
   if (surface === "empty") {
     return (
-      <section
-        className={cn(
-          "relative overflow-hidden rounded-[16px] border-[1.5px] border-border bg-card p-4",
-          className,
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-[12px] bg-[#f0f9f3] ring-1 ring-[#bbf7d0] flex items-center justify-center shrink-0">
-            <CheckCircle2 className="h-5 w-5 text-[#2d9d5f]" strokeWidth={2.4} />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-[15px] font-black text-foreground leading-tight">
-              {t("urgency.empty.title", { defaultValue: "Tout est sous contrôle" })}
-            </h2>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mt-0.5">
-              {t("urgency.empty.subtitle", { defaultValue: "Aucune action urgente" })}
-            </p>
-          </div>
+      <section className={cn("space-y-2", className)}>
+        <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-border bg-card px-3 py-2">
+          <div className="h-2 w-2 rounded-full bg-[#2d9d5f] shrink-0" />
+          <p className="text-[11px] font-medium text-muted-foreground">
+            {t("urgency.empty.status", {
+              defaultValue: "Tout est sous contrôle · aucune action urgente",
+            })}
+          </p>
         </div>
       </section>
     );
   }
 
-  // 3 & 5. items présents — liste, avec liseré si erreur partielle.
+  // 4 & 5. items présents — deck, avec liseré latéral comme seul signal de sévérité.
   async function handleAction(item: UrgencyItem) {
     setBusyIds((s) => new Set(s).add(item.id));
     try {
@@ -230,7 +187,6 @@ export function UrgencyCenter({ className }: Props) {
       onDismiss={(id) => {
         dismissItem(id);
       }}
-      onRefresh={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
       className={className}
     />
   );
@@ -242,7 +198,6 @@ interface DeckProps {
   busyIds: Set<string>;
   onAction: (item: UrgencyItem) => void | Promise<void>;
   onDismiss: (id: string) => void;
-  onRefresh: () => void;
   className?: string;
 }
 
@@ -254,7 +209,6 @@ function UrgencyDeck({
   busyIds,
   onAction,
   onDismiss,
-  onRefresh,
   className,
 }: DeckProps) {
   const { t } = useTranslation();
@@ -262,7 +216,6 @@ function UrgencyDeck({
   const [dragX, setDragX] = useState(0);
   const [flyingOut, setFlyingOut] = useState<null | "left" | "right">(null);
   const startX = useRef<number | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
 
   // Clamp topIdx if items shrink (dismissal from elsewhere, resolved server-side, etc.)
   useEffect(() => {
@@ -315,7 +268,7 @@ function UrgencyDeck({
 
   return (
     <section className={cn("space-y-2.5", className)}>
-      <div className="flex items-center justify-between px-0.5">
+      <div className="flex items-center px-0.5">
         <div className="flex items-center gap-2">
           <div
             className="h-8 w-8 rounded-[10px] flex items-center justify-center shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
@@ -333,14 +286,6 @@ function UrgencyDeck({
             {total}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-1.5 hover:border-[#2d9d5f] hover:text-[#0f4a26] transition-colors"
-        >
-          <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
-          {t("common.refresh", { defaultValue: "Actualiser" })}
-        </button>
       </div>
 
       {hasFailures && (
@@ -352,7 +297,7 @@ function UrgencyDeck({
         </div>
       )}
 
-      <div className="relative select-none" style={{ minHeight: 128 }}>
+      <div className="relative select-none" style={{ minHeight: 88 }}>
         {
           deck
             .map((item, i) => {
@@ -372,14 +317,12 @@ function UrgencyDeck({
               return (
                 <div
                   key={item.id}
-                  ref={isTop ? cardRef : null}
                   onPointerDown={isTop ? onPointerDown : undefined}
                   onPointerMove={isTop ? onPointerMove : undefined}
                   onPointerUp={isTop ? onPointerUp : undefined}
                   onPointerCancel={isTop ? onPointerUp : undefined}
                   className={cn(
-                    "absolute inset-x-0 top-0 rounded-[16px] border-[1.5px] bg-card overflow-hidden shadow-[0_4px_14px_rgba(15,40,24,0.08)]",
-                    SEV_RING[item.severity],
+                    "absolute inset-x-0 top-0 rounded-[16px] border-[1.5px] border-border bg-card overflow-hidden shadow-[0_4px_14px_rgba(15,40,24,0.08)]",
                     isTop
                       ? "touch-pan-y cursor-grab active:cursor-grabbing"
                       : "pointer-events-none",
@@ -396,82 +339,61 @@ function UrgencyDeck({
                 >
                   <div className="flex items-stretch">
                     <div className={cn("w-1.5 shrink-0", SEV_BAR[item.severity])} />
-                    <div className="flex-1 min-w-0 p-3.5 flex items-start gap-3">
-                      <div
-                        className={cn(
-                          "h-11 w-11 rounded-[12px] flex items-center justify-center shrink-0",
-                          SEV_TILE[item.severity],
-                        )}
-                      >
-                        <Clock className="h-5 w-5" strokeWidth={2.4} />
-                      </div>
+                    <div className="flex-1 min-w-0 p-3 flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <span
-                          className={cn(
-                            "inline-block text-[10px] font-black uppercase tracking-[0.14em] px-2 py-0.5 rounded-md",
-                            SEV_BADGE_CLASS[item.severity],
-                          )}
-                        >
-                          {t(SEV_BADGE_LABEL[item.severity], {
-                            defaultValue:
-                              item.severity === "critical"
-                                ? "Urgent"
-                                : item.severity === "high"
-                                  ? "Important"
-                                  : "Info",
-                          })}
-                        </span>
-                        <p className="mt-1.5 text-[14px] font-bold text-foreground leading-snug">
-                          {item.title}
-                        </p>
-                        {item.subtitle && (
-                          <p className="text-[11px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
-                            {item.subtitle}
+                        <div className="flex items-center gap-2 truncate">
+                          <p className="text-[13px] font-bold text-foreground leading-snug truncate">
+                            {item.title}
                           </p>
-                        )}
-                        <div className="mt-2.5">
-                          <Button
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAction(item);
-                            }}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            disabled={busy || !isTop}
-                            className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
-                            style={{
-                              background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
-                            }}
-                          >
-                            {busy ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <ActionIcon kind={item.primaryAction.kind} />
-                            )}
-                            {item.primaryAction.kind === "remind-all"
-                              ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
-                              : item.primaryAction.kind === "respond"
-                                ? t("urgency.cta.respond", { defaultValue: "Répondre" })
-                                : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
-                          </Button>
+                          {item.subtitle && (
+                            <p className="text-[11px] text-muted-foreground font-medium truncate">
+                              · {item.subtitle}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDismiss(item.id);
-                          toast.success(
-                            t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
-                          );
-                          setTopIdx((idx) => idx + 1);
-                        }}
-                        aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
-                        className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      >
-                        <X className="h-4 w-4" strokeWidth={2.4} />
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onAction(item);
+                          }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          disabled={busy || !isTop}
+                          className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0 h-11 px-3"
+                          style={{
+                            background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                          }}
+                        >
+                          {busy ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <ActionIcon kind={item.primaryAction.kind} />
+                          )}
+                          {item.primaryAction.kind === "remind-all"
+                            ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
+                            : item.primaryAction.kind === "respond"
+                              ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                              : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                        </Button>
+                        <button
+                          type="button"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDismiss(item.id);
+                            toast.success(
+                              t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
+                            );
+                            setTopIdx((idx) => idx + 1);
+                          }}
+                          aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
+                          className="shrink-0 h-11 w-11 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        >
+                          <X className="h-4 w-4" strokeWidth={2.4} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
