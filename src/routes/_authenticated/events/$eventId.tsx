@@ -2104,11 +2104,11 @@ function EventDetail() {
                 {event.title}
               </h1>
               <div className="mt-2 flex items-center gap-2">
-                <div className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-sm font-extrabold text-emerald-700">
-                  <Clock className="h-4 w-4 text-[#1d7a45]" />
-                  {fmt(event.starts_at, "HH:mm")}
+                <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[16px] font-extrabold text-emerald-700">
+                  <Clock className="h-5 w-5 text-[#1d7a45]" />
+                  <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
                   {event.ends_at && (
-                    <span className="text-emerald-600/70 font-semibold">
+                    <span className="text-emerald-600/70 font-semibold text-[13px]">
                       → {fmt(event.ends_at, "HH:mm")}
                     </span>
                   )}
