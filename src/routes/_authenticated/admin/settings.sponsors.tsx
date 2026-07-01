@@ -5,7 +5,15 @@ import { useTranslation } from "react-i18next";
 import i18nInstance from "@/lib/i18n";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, Trash2, Download, ExternalLink, Image as ImageIcon } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  Pencil,
+  Trash2,
+  Download,
+  ExternalLink,
+  Image as ImageIcon,
+} from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
@@ -56,7 +64,11 @@ export const Route = createFileRoute("/_authenticated/admin/settings/sponsors")(
 
 type Range = "today" | "7d" | "30d" | "month" | "season" | "custom";
 
-function computeRange(range: Range, customFrom: string, customTo: string): { from: string; to: string; label: string } {
+function computeRange(
+  range: Range,
+  customFrom: string,
+  customTo: string,
+): { from: string; to: string; label: string } {
   const today = new Date();
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const fmt = (d: Date) => d.toLocaleDateString();
@@ -186,7 +198,11 @@ function SponsorsSettingsPage() {
     if (!editing || !activeClubId) return;
     const allowed = ["image/png", "image/jpeg", "image/webp"];
     if (!allowed.includes(file.type)) {
-      toast.error(t("sponsor.admin.unsupportedFormat", { defaultValue: "Format non supporté (PNG/JPG/WebP)" }));
+      toast.error(
+        t("sponsor.admin.unsupportedFormat", {
+          defaultValue: "Format non supporté (PNG/JPG/WebP)",
+        }),
+      );
       return;
     }
     // Ratio hint (non-blocking)
@@ -226,7 +242,8 @@ function SponsorsSettingsPage() {
       toast.success(t("sponsor.admin.logoUploaded", { defaultValue: "Logo téléversé" }));
     } catch (e: unknown) {
       toast.error(
-        (e as Error)?.message ?? t("sponsor.admin.uploadError", { defaultValue: "Échec du téléversement" }),
+        (e as Error)?.message ??
+          t("sponsor.admin.uploadError", { defaultValue: "Échec du téléversement" }),
       );
     }
   }
@@ -243,11 +260,17 @@ function SponsorsSettingsPage() {
     const csv = toCsv(rows, [
       { key: "sponsor", header: t("sponsor.admin.colSponsor", { defaultValue: "Sponsor" }) },
       { key: "period", header: t("sponsor.admin.colPeriod", { defaultValue: "Période" }) },
-      { key: "impressions", header: t("sponsor.admin.colImpressions", { defaultValue: "Impressions" }) },
+      {
+        key: "impressions",
+        header: t("sponsor.admin.colImpressions", { defaultValue: "Impressions" }),
+      },
       { key: "clicks", header: t("sponsor.admin.colClicks", { defaultValue: "Clics" }) },
       { key: "ctr", header: t("sponsor.admin.colCtr", { defaultValue: "Taux de clic (%)" }) },
     ]);
-    const slug = (club?.name ?? activeClubId ?? "club").toString().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const slug = (club?.name ?? activeClubId ?? "club")
+      .toString()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-");
     const yyyymmdd = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     downloadCsv(`clubero-sponsors-stats-${slug}-${yyyymmdd}.csv`, csv);
   }
@@ -288,8 +311,11 @@ function SponsorsSettingsPage() {
             >
               <div className="flex h-12 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
                 {s.logo_signed_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={s.logo_signed_url} alt={s.name} className="max-h-full max-w-full object-contain" />
+                  <img
+                    src={s.logo_signed_url}
+                    alt={s.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-muted-foreground" />
                 )}
@@ -343,7 +369,13 @@ function SponsorsSettingsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  if (confirm(t("sponsor.admin.confirmDelete", { defaultValue: "Supprimer ce partenaire ?" }))) {
+                  if (
+                    confirm(
+                      t("sponsor.admin.confirmDelete", {
+                        defaultValue: "Supprimer ce partenaire ?",
+                      }),
+                    )
+                  ) {
                     deleteMutation.mutate(s.id);
                   }
                 }}
@@ -398,16 +430,53 @@ function SponsorsSettingsPage() {
           </div>
         </div>
         {range === "custom" && (
-          <div className="flex gap-2">
-            <Input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} />
-            <Input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs text-muted-foreground" htmlFor="sponsor-from">
+                {t("sponsor.admin.fromDate", { defaultValue: "Du" })}
+              </Label>
+              <Input
+                id="sponsor-from"
+                type="date"
+                value={customFrom}
+                max={customTo || undefined}
+                onChange={(e) => {
+                  const from = e.target.value;
+                  setCustomFrom(from);
+                  if (customTo && from > customTo) {
+                    setCustomTo(from);
+                  }
+                }}
+              />
+            </div>
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs text-muted-foreground" htmlFor="sponsor-to">
+                {t("sponsor.admin.toDate", { defaultValue: "Au" })}
+              </Label>
+              <Input
+                id="sponsor-to"
+                type="date"
+                value={customTo}
+                min={customFrom || undefined}
+                onChange={(e) => {
+                  const to = e.target.value;
+                  if (customFrom && to < customFrom) {
+                    setCustomTo(customFrom);
+                  } else {
+                    setCustomTo(to);
+                  }
+                }}
+              />
+            </div>
           </div>
         )}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-muted-foreground">
-                <th className="py-2">{t("sponsor.admin.colSponsor", { defaultValue: "Sponsor" })}</th>
+                <th className="py-2">
+                  {t("sponsor.admin.colSponsor", { defaultValue: "Sponsor" })}
+                </th>
                 <th className="py-2 text-right">
                   {t("sponsor.admin.colImpressions", { defaultValue: "Impressions" })}
                 </th>
