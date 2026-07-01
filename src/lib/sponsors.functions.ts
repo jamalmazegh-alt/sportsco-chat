@@ -279,10 +279,7 @@ export const getSponsorStats = createServerFn({ method: "GET" })
     });
     // Fetch sponsor names + aggregated stats over range.
     const [sponsorsRes, statsRes] = await Promise.all([
-      context.supabase
-        .from("sponsors")
-        .select("id, name")
-        .eq("club_id", data.clubId),
+      context.supabase.from("sponsors").select("id, name").eq("club_id", data.clubId),
       context.supabase
         .from("sponsor_stats_daily")
         .select("sponsor_id, impressions, clicks")

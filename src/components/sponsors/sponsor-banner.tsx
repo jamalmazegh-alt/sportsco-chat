@@ -56,7 +56,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   useEffect(() => {
     if (list.length === 0) return;
     setIndex((prev) => (prev + 1) % list.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list.length]);
 
   const current = list.length > 0 ? list[index % list.length] : null;

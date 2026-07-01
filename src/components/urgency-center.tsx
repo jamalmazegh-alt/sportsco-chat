@@ -248,7 +248,15 @@ interface DeckProps {
 
 const SWIPE_THRESHOLD = 90; // px
 
-function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, onRefresh, className }: DeckProps) {
+function UrgencyDeck({
+  items,
+  hasFailures,
+  busyIds,
+  onAction,
+  onDismiss,
+  onRefresh,
+  className,
+}: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
   const [dragX, setDragX] = useState(0);
@@ -345,129 +353,132 @@ function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, onRefre
       )}
 
       <div className="relative select-none" style={{ minHeight: 128 }}>
-        {deck
-          .map((item, i) => {
-            const depth = i; // 0 = top
-            const isTop = depth === 0;
-            const busy = busyIds.has(item.id);
-            const flying = isTop && flyingOut !== null;
-            const restingTransform = `translateY(${depth * 8}px) scale(${1 - depth * 0.04})`;
-            const dragTransform = flying
-              ? `translateX(${flyingOut === "right" ? 400 : -400}px) rotate(${
-                  flyingOut === "right" ? 18 : -18
-                }deg)`
-              : isTop
-                ? `translateX(${dragX}px) rotate(${dragX * 0.04}deg)`
-                : restingTransform;
-            const opacity = flying ? 0 : depth === 0 ? 1 : 0.55 - depth * 0.15;
-            return (
-              <div
-                key={item.id}
-                ref={isTop ? cardRef : null}
-                onPointerDown={isTop ? onPointerDown : undefined}
-                onPointerMove={isTop ? onPointerMove : undefined}
-                onPointerUp={isTop ? onPointerUp : undefined}
-                onPointerCancel={isTop ? onPointerUp : undefined}
-                className={cn(
-                  "absolute inset-x-0 top-0 rounded-[16px] border-[1.5px] bg-card overflow-hidden shadow-[0_4px_14px_rgba(15,40,24,0.08)]",
-                  SEV_RING[item.severity],
-                  isTop ? "touch-pan-y cursor-grab active:cursor-grabbing" : "pointer-events-none",
-                )}
-                style={{
-                  transform: dragTransform,
-                  opacity,
-                  zIndex: 30 - depth,
-                  transition:
-                    isTop && startX.current === null
-                      ? "transform 180ms ease-out, opacity 180ms ease-out"
-                      : undefined,
-                }}
-              >
-                <div className="flex items-stretch">
-                  <div className={cn("w-1.5 shrink-0", SEV_BAR[item.severity])} />
-                  <div className="flex-1 min-w-0 p-3.5 flex items-start gap-3">
-                    <div
-                      className={cn(
-                        "h-11 w-11 rounded-[12px] flex items-center justify-center shrink-0",
-                        SEV_TILE[item.severity],
-                      )}
-                    >
-                      <Clock className="h-5 w-5" strokeWidth={2.4} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span
+        {
+          deck
+            .map((item, i) => {
+              const depth = i; // 0 = top
+              const isTop = depth === 0;
+              const busy = busyIds.has(item.id);
+              const flying = isTop && flyingOut !== null;
+              const restingTransform = `translateY(${depth * 8}px) scale(${1 - depth * 0.04})`;
+              const dragTransform = flying
+                ? `translateX(${flyingOut === "right" ? 400 : -400}px) rotate(${
+                    flyingOut === "right" ? 18 : -18
+                  }deg)`
+                : isTop
+                  ? `translateX(${dragX}px) rotate(${dragX * 0.04}deg)`
+                  : restingTransform;
+              const opacity = flying ? 0 : depth === 0 ? 1 : 0.55 - depth * 0.15;
+              return (
+                <div
+                  key={item.id}
+                  ref={isTop ? cardRef : null}
+                  onPointerDown={isTop ? onPointerDown : undefined}
+                  onPointerMove={isTop ? onPointerMove : undefined}
+                  onPointerUp={isTop ? onPointerUp : undefined}
+                  onPointerCancel={isTop ? onPointerUp : undefined}
+                  className={cn(
+                    "absolute inset-x-0 top-0 rounded-[16px] border-[1.5px] bg-card overflow-hidden shadow-[0_4px_14px_rgba(15,40,24,0.08)]",
+                    SEV_RING[item.severity],
+                    isTop
+                      ? "touch-pan-y cursor-grab active:cursor-grabbing"
+                      : "pointer-events-none",
+                  )}
+                  style={{
+                    transform: dragTransform,
+                    opacity,
+                    zIndex: 30 - depth,
+                    transition:
+                      isTop && startX.current === null
+                        ? "transform 180ms ease-out, opacity 180ms ease-out"
+                        : undefined,
+                  }}
+                >
+                  <div className="flex items-stretch">
+                    <div className={cn("w-1.5 shrink-0", SEV_BAR[item.severity])} />
+                    <div className="flex-1 min-w-0 p-3.5 flex items-start gap-3">
+                      <div
                         className={cn(
-                          "inline-block text-[10px] font-black uppercase tracking-[0.14em] px-2 py-0.5 rounded-md",
-                          SEV_BADGE_CLASS[item.severity],
+                          "h-11 w-11 rounded-[12px] flex items-center justify-center shrink-0",
+                          SEV_TILE[item.severity],
                         )}
                       >
-                        {t(SEV_BADGE_LABEL[item.severity], {
-                          defaultValue:
-                            item.severity === "critical"
-                              ? "Urgent"
-                              : item.severity === "high"
-                                ? "Important"
-                                : "Info",
-                        })}
-                      </span>
-                      <p className="mt-1.5 text-[14px] font-bold text-foreground leading-snug">
-                        {item.title}
-                      </p>
-                      {item.subtitle && (
-                        <p className="text-[11px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
-                          {item.subtitle}
-                        </p>
-                      )}
-                      <div className="mt-2.5">
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onAction(item);
-                          }}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          disabled={busy || !isTop}
-                          className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
-                          }}
-                        >
-                          {busy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <ActionIcon kind={item.primaryAction.kind} />
-                          )}
-                          {item.primaryAction.kind === "remind-all"
-                            ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
-                            : item.primaryAction.kind === "respond"
-                              ? t("urgency.cta.respond", { defaultValue: "Répondre" })
-                              : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
-                        </Button>
+                        <Clock className="h-5 w-5" strokeWidth={2.4} />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <span
+                          className={cn(
+                            "inline-block text-[10px] font-black uppercase tracking-[0.14em] px-2 py-0.5 rounded-md",
+                            SEV_BADGE_CLASS[item.severity],
+                          )}
+                        >
+                          {t(SEV_BADGE_LABEL[item.severity], {
+                            defaultValue:
+                              item.severity === "critical"
+                                ? "Urgent"
+                                : item.severity === "high"
+                                  ? "Important"
+                                  : "Info",
+                          })}
+                        </span>
+                        <p className="mt-1.5 text-[14px] font-bold text-foreground leading-snug">
+                          {item.title}
+                        </p>
+                        {item.subtitle && (
+                          <p className="text-[11px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
+                            {item.subtitle}
+                          </p>
+                        )}
+                        <div className="mt-2.5">
+                          <Button
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onAction(item);
+                            }}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            disabled={busy || !isTop}
+                            className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
+                            style={{
+                              background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                            }}
+                          >
+                            {busy ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <ActionIcon kind={item.primaryAction.kind} />
+                            )}
+                            {item.primaryAction.kind === "remind-all"
+                              ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
+                              : item.primaryAction.kind === "respond"
+                                ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                                : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                          </Button>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDismiss(item.id);
+                          toast.success(
+                            t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
+                          );
+                          setTopIdx((idx) => idx + 1);
+                        }}
+                        aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
+                        className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        <X className="h-4 w-4" strokeWidth={2.4} />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDismiss(item.id);
-                        toast.success(
-                          t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
-                        );
-                        setTopIdx((idx) => idx + 1);
-                      }}
-                      aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
-                      className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    >
-                      <X className="h-4 w-4" strokeWidth={2.4} />
-                    </button>
                   </div>
                 </div>
-              </div>
-            );
-          })
-          .reverse() /* render deepest first so top card wins stacking */}
+              );
+            })
+            .reverse() /* render deepest first so top card wins stacking */
+        }
       </div>
       {total > 1 && (
         <p className="text-center text-[10px] font-semibold text-muted-foreground">
@@ -477,4 +488,3 @@ function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, onRefre
     </section>
   );
 }
-
