@@ -167,26 +167,23 @@ export function UrgencyCenter({ className }: Props) {
   }
 
   if (surface === "empty") {
+    // Repli discret : pas de carte pleine, pas de fausse réassurance.
+    // Une simple ligne inline confirme qu'aucun signal actionnable n'est remonté
+    // par les sources qui ont répondu — sans affirmer que "tout va bien".
     return (
       <section
         className={cn(
-          "relative overflow-hidden rounded-[16px] border-[1.5px] border-border bg-card p-4",
+          "flex items-center gap-2 px-1 py-1.5 text-[11px] text-muted-foreground",
           className,
         )}
+        aria-live="polite"
       >
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-[12px] bg-[#f0f9f3] ring-1 ring-[#bbf7d0] flex items-center justify-center shrink-0">
-            <CheckCircle2 className="h-5 w-5 text-[#2d9d5f]" strokeWidth={2.4} />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-[15px] font-black text-foreground leading-tight">
-              {t("urgency.empty.title", { defaultValue: "Tout est sous contrôle" })}
-            </h2>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mt-0.5">
-              {t("urgency.empty.subtitle", { defaultValue: "Aucune action urgente" })}
-            </p>
-          </div>
-        </div>
+        <CheckCircle2 className="h-3.5 w-3.5 text-[#2d9d5f] shrink-0" strokeWidth={2.4} />
+        <span className="font-medium">
+          {t("urgency.empty.inline", {
+            defaultValue: "Aucun signal urgent pour le moment",
+          })}
+        </span>
       </section>
     );
   }
