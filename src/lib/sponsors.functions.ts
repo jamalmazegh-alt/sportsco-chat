@@ -165,7 +165,12 @@ export const updateSponsor = createServerFn({ method: "POST" })
     if (data.logoPath && !data.logoPath.startsWith(`sponsors/${data.clubId}/`)) {
       throw new Error("invalid_logo_path");
     }
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      name?: string;
+      target_url?: string;
+      logo_url?: string | null;
+      is_active?: boolean;
+    } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.targetUrl !== undefined) patch.target_url = data.targetUrl;
     if (data.logoPath !== undefined) patch.logo_url = data.logoPath;
