@@ -2146,7 +2146,13 @@ function EventDetail() {
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">{event.location}</p>
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    {event.convocation_time && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
+                        <Clock className="h-3 w-3 text-[#1d7a45]" />
+                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
+                      </span>
+                    )}
                     <a
                       href={
                         event.location_url ??
