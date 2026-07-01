@@ -203,9 +203,11 @@ function HomePage() {
     const byId = new Map<string, any>();
     for (const e of (upcoming ?? []) as any[]) byId.set(e.id, e);
     for (const e of (myConvocs ?? []) as any[]) byId.set(e.id, e);
-    return Array.from(byId.values()).sort(
-      (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-    );
+    return Array.from(byId.values())
+      .sort(
+        (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
+      )
+      .slice(0, 3);
   }, [upcoming, myConvocs]);
 
   const paymentSummary = useMemo(() => {
