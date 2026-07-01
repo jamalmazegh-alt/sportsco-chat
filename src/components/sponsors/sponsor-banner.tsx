@@ -116,16 +116,21 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   }, [list.length]);
 
   const lastClickRef = useRef(0);
-  const onClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!current) return;
     const now = Date.now();
-    if (now - lastClickRef.current < CLICK_DEBOUNCE_MS) return;
+    if (now - lastClickRef.current < CLICK_DEBOUNCE_MS) {
+      e.preventDefault();
+      return;
+    }
     lastClickRef.current = now;
-    if (!isSafeHttpUrl(current.target_url)) return;
+    if (!isSafeHttpUrl(current.target_url)) {
+      e.preventDefault();
+      return;
+    }
     if (shouldRecordClick(current.id)) {
       clickFn({ data: { sponsorId: current.id } }).catch(() => {});
     }
-    window.open(current.target_url, "_blank", "noopener,noreferrer");
   };
 
   // Nothing to show → render nothing (no separators, no layout shift).
