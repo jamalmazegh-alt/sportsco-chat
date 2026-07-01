@@ -2152,7 +2152,7 @@ function EventDetail() {
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">{event.location}</p>
-                  <div class‌Name="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                     <a
                       href={
                         event.location_url ??
