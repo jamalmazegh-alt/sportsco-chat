@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { ExternalLink } from "lucide-react";
 import {
   getActiveSponsorsForHome,
   recordSponsorClick,
@@ -115,16 +116,21 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   }, [list.length]);
 
   const lastClickRef = useRef(0);
-  const onClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!current) return;
     const now = Date.now();
-    if (now - lastClickRef.current < CLICK_DEBOUNCE_MS) return;
+    if (now - lastClickRef.current < CLICK_DEBOUNCE_MS) {
+      e.preventDefault();
+      return;
+    }
     lastClickRef.current = now;
-    if (!isSafeHttpUrl(current.target_url)) return;
+    if (!isSafeHttpUrl(current.target_url)) {
+      e.preventDefault();
+      return;
+    }
     if (shouldRecordClick(current.id)) {
       clickFn({ data: { sponsorId: current.id } }).catch(() => {});
     }
-    window.open(current.target_url, "_blank", "noopener,noreferrer");
   };
 
   // Nothing to show → render nothing (no separators, no layout shift).
@@ -138,16 +144,22 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
       className="w-full border-y border-border/60 bg-transparent"
       style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
     >
-      <button
-        type="button"
-        onClick={onClick}
-        aria-label={t("sponsor.visitAria", { name: current.name })}
-        className="flex w-full min-h-12 flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      <a
+        href={isSafeHttpUrl(current.target_url) ? current.target_url : "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleClick}
+        aria-label={t("sponsor.visitExternalAria", { name: current.name })}
+        className="group flex w-full min-h-12 cursor-pointer flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center transition-opacity hover:opacity-95 active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           {t("sponsor.thanksLabel")}
         </span>
-        <span className="inline-flex max-w-full items-center justify-center dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
+        <span className="relative inline-flex max-w-full items-center justify-center overflow-visible transition-transform active:scale-[0.98] dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
+          <ExternalLink
+            className="absolute -top-1.5 -right-1.5 h-3 w-3 text-muted-foreground dark:text-neutral-900"
+            aria-hidden="true"
+          />
           {showTextFallback ? (
             <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
               {current.name}
@@ -163,7 +175,7 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
             />
           )}
         </span>
-      </button>
+      </a>
     </div>
   );
 }

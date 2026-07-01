@@ -2088,6 +2088,7 @@
   "sponsor": {
     "thanksLabel": "Thanks to our partner",
     "visitAria": "Visit {{name}}'s website",
+    "visitExternalAria": "Visit {{name}}'s website (new tab)",
     "admin": {
       "title": "Sponsors",
       "subtitle": "Show your partners at the top of the home screen.",

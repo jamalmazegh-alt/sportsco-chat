@@ -2088,6 +2088,7 @@
   "sponsor": {
     "thanksLabel": "Danke an unseren Partner",
     "visitAria": "Website von {{name}} besuchen",
+    "visitExternalAria": "Website von {{name}} besuchen (neuer Tab)",
     "admin": {
       "title": "Sponsoren",
       "subtitle": "Zeige deine Partner ganz oben auf der Startseite.",
