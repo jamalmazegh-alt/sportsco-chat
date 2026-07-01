@@ -223,7 +223,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     s.push("when");
     if (state.type === "match") {
       s.push("halves", "gameformat", "homeaway");
-      if (state.isHome === "away") s.push("meetingpoint");
+      if (state.isHome === "away") s.push("places");
       s.push("opponent", "official");
     } else if (!isRecurring) {
       s.push("duration");
@@ -233,7 +233,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
-      if (state.type !== "match" || state.isHome === "away") s.push("location");
+      if (state.type !== "match") s.push("location");
       s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
