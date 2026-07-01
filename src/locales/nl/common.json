@@ -2088,6 +2088,7 @@
       "uploadError": "Upload mislukt",
       "unsupportedFormat": "Formaat niet ondersteund (PNG/JPG/WebP)",
       "ratioWarning": "Het logo kan bijgesneden of uitgerekt worden, 4:1 aanbevolen.",
+      "logoContrastHint": "Logo leesbaar op lichte achtergrond (donker of gekleurd, geen wit).",
       "active": "Actief",
       "save": "Opslaan",
       "saved": "Partner opgeslagen",
