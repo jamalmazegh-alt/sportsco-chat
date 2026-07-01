@@ -16,7 +16,7 @@ import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
 import { HomeSkeleton } from "@/components/skeletons";
-import { InsightsSection } from "@/components/insights-section";
+
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
@@ -429,8 +429,7 @@ function HomePage() {
         </section>
       )}
 
-      {/* Stats: insights + KPIs (admins/coaches) */}
-      {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
+      {/* KPIs (admins/coaches) — insights are now unified in UrgencyCenter deck above */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
 
       {/* Primary CTA + duo (quick cards) */}
