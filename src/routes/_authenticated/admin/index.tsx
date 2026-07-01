@@ -17,6 +17,7 @@ import {
   Share2,
   Receipt,
   TrendingUp,
+  Handshake,
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
