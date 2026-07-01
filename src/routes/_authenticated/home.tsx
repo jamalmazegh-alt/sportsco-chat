@@ -94,7 +94,7 @@ function HomePage() {
         .is("deleted_at", null)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
-        .limit(5);
+        .limit(3);
       if (error) throw error;
       return (data ?? []).map((e) => ({
         ...e,
