@@ -1133,7 +1133,9 @@
       "previewSecondary": "Secundario"
     },
     "promoteToClubMember": "Ascender a miembro del Club",
-    "rolesUpdated": "Roles actualizados"
+    "rolesUpdated": "Roles actualizados",
+    "hubSponsors": "Patrocinadores",
+    "hubSponsorsHint": "Muestra a tus socios en la parte superior del inicio"
   },
   "attachments": {
     "add": "Añadir archivo",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Enlace copiado",
     "qrCode": "Código QR",
     "trigger": "Compartir"
+  },
+  "sponsor": {
+    "thanksLabel": "Gracias a nuestro colaborador",
+    "visitAria": "Visitar el sitio de {{name}}",
+    "admin": {
+      "title": "Patrocinadores",
+      "subtitle": "Muestra a tus socios en la parte superior de la pantalla de inicio.",
+      "add": "Añadir un socio",
+      "addTitle": "Nuevo socio",
+      "editTitle": "Editar socio",
+      "name": "Nombre",
+      "targetUrl": "URL del sitio",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 recomendado)",
+      "logoUploaded": "Logo subido",
+      "uploadError": "Error al subir",
+      "unsupportedFormat": "Formato no compatible (PNG/JPG/WebP)",
+      "ratioWarning": "El logo puede recortarse o estirarse, se recomienda 4:1.",
+      "active": "Activo",
+      "save": "Guardar",
+      "saved": "Socio guardado",
+      "saveError": "Error al guardar",
+      "deleted": "Socio eliminado",
+      "confirmDelete": "¿Eliminar este socio?",
+      "empty": "Aún no hay socios.",
+      "statsTitle": "Estadísticas",
+      "noStats": "Sin datos en este período.",
+      "exportCsv": "Exportar (CSV)",
+      "rangeToday": "Hoy",
+      "range7d": "Últimos 7 días",
+      "range30d": "Últimos 30 días",
+      "rangeMonth": "Mes actual",
+      "rangeSeason": "Temporada actual",
+      "rangeCustom": "Período personalizado",
+      "colSponsor": "Patrocinador",
+      "colPeriod": "Período",
+      "colImpressions": "Impresiones",
+      "colClicks": "Clics",
+      "colCtr": "Tasa de clics (%)"
+    }
   }
 }

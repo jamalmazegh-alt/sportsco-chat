@@ -1133,7 +1133,9 @@
       "previewSecondary": "Secondary"
     },
     "promoteToClubMember": "Promote to club member",
-    "rolesUpdated": "Roles updated"
+    "rolesUpdated": "Roles updated",
+    "hubSponsors": "Sponsors",
+    "hubSponsorsHint": "Show your partners at the top of the home screen"
   },
   "attachments": {
     "add": "Add file",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Link copied",
     "qrCode": "QR code",
     "trigger": "Share"
+  },
+  "sponsor": {
+    "thanksLabel": "Thanks to our partner",
+    "visitAria": "Visit {{name}}'s website",
+    "admin": {
+      "title": "Sponsors",
+      "subtitle": "Show your partners at the top of the home screen.",
+      "add": "Add a partner",
+      "addTitle": "New partner",
+      "editTitle": "Edit partner",
+      "name": "Name",
+      "targetUrl": "Website URL",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 recommended)",
+      "logoUploaded": "Logo uploaded",
+      "uploadError": "Upload failed",
+      "unsupportedFormat": "Unsupported format (PNG/JPG/WebP)",
+      "ratioWarning": "The logo may be cropped or stretched, 4:1 ratio recommended.",
+      "active": "Active",
+      "save": "Save",
+      "saved": "Partner saved",
+      "saveError": "Failed to save",
+      "deleted": "Partner deleted",
+      "confirmDelete": "Delete this partner?",
+      "empty": "No partner yet.",
+      "statsTitle": "Statistics",
+      "noStats": "No data for this period.",
+      "exportCsv": "Export (CSV)",
+      "rangeToday": "Today",
+      "range7d": "Last 7 days",
+      "range30d": "Last 30 days",
+      "rangeMonth": "This month",
+      "rangeSeason": "Current season",
+      "rangeCustom": "Custom range",
+      "colSponsor": "Sponsor",
+      "colPeriod": "Period",
+      "colImpressions": "Impressions",
+      "colClicks": "Clicks",
+      "colCtr": "Click rate (%)"
+    }
   }
 }

@@ -1133,7 +1133,9 @@
       "previewSecondary": "Secondaire"
     },
     "promoteToClubMember": "Promouvoir membre du club",
-    "rolesUpdated": "Rôles mis à jour"
+    "rolesUpdated": "Rôles mis à jour",
+    "hubSponsors": "Sponsors",
+    "hubSponsorsHint": "Affichez vos partenaires en haut de la page d'accueil"
   },
   "attachments": {
     "add": "Ajouter un fichier",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Lien copié",
     "qrCode": "QR code",
     "trigger": "Partager"
+  },
+  "sponsor": {
+    "thanksLabel": "Merci à notre partenaire",
+    "visitAria": "Visiter le site de {{name}}",
+    "admin": {
+      "title": "Sponsors",
+      "subtitle": "Affichez vos partenaires en haut de la page d'accueil.",
+      "add": "Ajouter un partenaire",
+      "addTitle": "Nouveau partenaire",
+      "editTitle": "Modifier le partenaire",
+      "name": "Nom",
+      "targetUrl": "URL du site",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 recommandé)",
+      "logoUploaded": "Logo téléversé",
+      "uploadError": "Échec du téléversement",
+      "unsupportedFormat": "Format non supporté (PNG/JPG/WebP)",
+      "ratioWarning": "Le logo risque d'être rogné/étiré, format 4:1 recommandé.",
+      "active": "Actif",
+      "save": "Enregistrer",
+      "saved": "Partenaire enregistré",
+      "saveError": "Erreur lors de l'enregistrement",
+      "deleted": "Partenaire supprimé",
+      "confirmDelete": "Supprimer ce partenaire ?",
+      "empty": "Aucun partenaire pour le moment.",
+      "statsTitle": "Statistiques",
+      "noStats": "Aucune donnée sur la période.",
+      "exportCsv": "Exporter (CSV)",
+      "rangeToday": "Aujourd'hui",
+      "range7d": "7 derniers jours",
+      "range30d": "30 derniers jours",
+      "rangeMonth": "Mois en cours",
+      "rangeSeason": "Saison en cours",
+      "rangeCustom": "Période personnalisée",
+      "colSponsor": "Sponsor",
+      "colPeriod": "Période",
+      "colImpressions": "Impressions",
+      "colClicks": "Clics",
+      "colCtr": "Taux de clic (%)"
+    }
   }
 }

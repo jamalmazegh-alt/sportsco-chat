@@ -3203,6 +3203,86 @@ export type Database = {
           },
         ]
       }
+      sponsor_stats_daily: {
+        Row: {
+          clicks: number
+          club_id: string
+          day: string
+          impressions: number
+          sponsor_id: string
+        }
+        Insert: {
+          clicks?: number
+          club_id: string
+          day: string
+          impressions?: number
+          sponsor_id: string
+        }
+        Update: {
+          clicks?: number
+          club_id?: string
+          day?: string
+          impressions?: number
+          sponsor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_stats_daily_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_stats_daily_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsors: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          target_url: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          target_url: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          target_url?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsors_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_webhook_events: {
         Row: {
           event_id: string
@@ -5190,6 +5270,15 @@ export type Database = {
             }
             Returns: string
           }
+      get_active_sponsors_for_home: {
+        Args: { _club_id: string }
+        Returns: {
+          id: string
+          logo_url: string
+          name: string
+          target_url: string
+        }[]
+      }
       get_club_stripe_status: {
         Args: { _club_id: string }
         Returns: {
@@ -5374,6 +5463,14 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      record_sponsor_click: {
+        Args: { p_sponsor_id: string }
+        Returns: undefined
+      }
+      record_sponsor_impression: {
+        Args: { p_sponsor_id: string }
+        Returns: undefined
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
       redeem_member_invite: { Args: { _token: string }; Returns: string }

@@ -25,6 +25,7 @@ import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UrgencyCenter } from "@/components/urgency-center";
+import { SponsorBanner } from "@/components/sponsors/sponsor-banner";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -234,6 +235,7 @@ function HomePage() {
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">
+      {activeClubId && <SponsorBanner clubId={activeClubId} />}
       {/* Club hero */}
       <header className="relative overflow-hidden rounded-[20px] border-[1.5px] border-border bg-card p-5 shadow-sm">
         <svg

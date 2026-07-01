@@ -1133,7 +1133,9 @@
       "previewSecondary": "Sekundär"
     },
     "promoteToClubMember": "Zum Vereinsmitglied befördern",
-    "rolesUpdated": "Rollen aktualisiert"
+    "rolesUpdated": "Rollen aktualisiert",
+    "hubSponsors": "Sponsoren",
+    "hubSponsorsHint": "Zeige deine Partner ganz oben auf der Startseite"
   },
   "attachments": {
     "add": "Datei hinzufügen",
@@ -2069,5 +2071,44 @@
     "linkCopied": "Link kopiert",
     "qrCode": "QR-Code",
     "trigger": "Teilen"
+  },
+  "sponsor": {
+    "thanksLabel": "Danke an unseren Partner",
+    "visitAria": "Website von {{name}} besuchen",
+    "admin": {
+      "title": "Sponsoren",
+      "subtitle": "Zeige deine Partner ganz oben auf der Startseite.",
+      "add": "Partner hinzufügen",
+      "addTitle": "Neuer Partner",
+      "editTitle": "Partner bearbeiten",
+      "name": "Name",
+      "targetUrl": "Webseite",
+      "logo": "Logo (PNG/JPG/WebP, 4:1 empfohlen)",
+      "logoUploaded": "Logo hochgeladen",
+      "uploadError": "Upload fehlgeschlagen",
+      "unsupportedFormat": "Nicht unterstütztes Format (PNG/JPG/WebP)",
+      "ratioWarning": "Das Logo könnte beschnitten oder gestreckt werden, 4:1 empfohlen.",
+      "active": "Aktiv",
+      "save": "Speichern",
+      "saved": "Partner gespeichert",
+      "saveError": "Speichern fehlgeschlagen",
+      "deleted": "Partner gelöscht",
+      "confirmDelete": "Diesen Partner löschen?",
+      "empty": "Noch kein Partner.",
+      "statsTitle": "Statistiken",
+      "noStats": "Keine Daten im Zeitraum.",
+      "exportCsv": "Exportieren (CSV)",
+      "rangeToday": "Heute",
+      "range7d": "Letzte 7 Tage",
+      "range30d": "Letzte 30 Tage",
+      "rangeMonth": "Aktueller Monat",
+      "rangeSeason": "Aktuelle Saison",
+      "rangeCustom": "Individueller Zeitraum",
+      "colSponsor": "Sponsor",
+      "colPeriod": "Zeitraum",
+      "colImpressions": "Impressionen",
+      "colClicks": "Klicks",
+      "colCtr": "Klickrate (%)"
+    }
   }
 }

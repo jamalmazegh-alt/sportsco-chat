@@ -17,6 +17,7 @@ import {
   Share2,
   Receipt,
   TrendingUp,
+  Handshake,
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
@@ -154,6 +155,16 @@ function AdminSettingsPage() {
         defaultValue: "Couleur principale de l'app pour ton club",
       }),
       tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+      clubOnly: true,
+    },
+    {
+      to: "/admin/settings/sponsors",
+      icon: Handshake,
+      title: t("admin.hubSponsors", { defaultValue: "Sponsors" }),
+      hint: t("admin.hubSponsorsHint", {
+        defaultValue: "Affichez vos partenaires en haut de la page d'accueil",
+      }),
+      tone: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
       clubOnly: true,
     },
   ];
