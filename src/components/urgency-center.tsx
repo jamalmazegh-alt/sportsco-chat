@@ -230,6 +230,7 @@ export function UrgencyCenter({ className }: Props) {
       onDismiss={(id) => {
         dismissItem(id);
       }}
+      onRefresh={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
       className={className}
     />
   );
@@ -241,12 +242,13 @@ interface DeckProps {
   busyIds: Set<string>;
   onAction: (item: UrgencyItem) => void | Promise<void>;
   onDismiss: (id: string) => void;
+  onRefresh: () => void;
   className?: string;
 }
 
 const SWIPE_THRESHOLD = 90; // px
 
-function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, className }: DeckProps) {
+function UrgencyDeck({ items, hasFailures, busyIds, onAction, onDismiss, onRefresh, className }: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
   const [dragX, setDragX] = useState(0);
