@@ -1108,7 +1108,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
-
+        {current === "opponent" && (
           <StepQuestion
             title={t("eventWizard.q.opponent", { defaultValue: "Contre quelle équipe ?" })}
           >
