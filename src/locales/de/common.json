@@ -2059,11 +2059,13 @@
   "urgency": {
     "empty": {
       "title": "Alles unter Kontrolle",
-      "subtitle": "Keine dringende Aktion"
+      "subtitle": "Keine dringende Aktion",
+      "status": "Alles unter Kontrolle · keine dringende Aktion"
     },
     "error": {
       "title": "Notfallzentrum nicht verfügbar",
-      "hint": "Signale konnten nicht geladen werden. Bitte gleich erneut versuchen."
+      "hint": "Signale konnten nicht geladen werden. Bitte gleich erneut versuchen.",
+      "checkFailed": "Warnungen konnten nicht geprüft werden"
     },
     "partialError": "Einige Quellen sind nicht verfügbar, die Liste kann unvollständig sein.",
     "cta": {

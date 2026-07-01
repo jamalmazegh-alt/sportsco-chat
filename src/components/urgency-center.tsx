@@ -138,38 +138,38 @@ export function UrgencyCenter({ className }: Props) {
   }
 
   if (surface === "error") {
+    // Vérif échouée : repli discret, jamais "tout est sous contrôle".
     return (
       <section
-        className={cn("rounded-[16px] border-[1.5px] border-[#fecaca] bg-[#fef2f2] p-4", className)}
+        className={cn(
+          "flex items-center justify-between gap-3 px-1 py-1.5 text-[11px] text-muted-foreground",
+          className,
+        )}
+        aria-live="polite"
       >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-[#dc2626] shrink-0 mt-0.5" strokeWidth={2.4} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-bold text-[#7f1d1d]">
-              {t("urgency.error.title", { defaultValue: "Centre d'urgence indisponible" })}
-            </p>
-            <p className="text-[11px] text-[#991b1b] mt-0.5">
-              {t("urgency.error.hint", {
-                defaultValue: "Impossible de charger les signaux. Réessaie dans un instant.",
-              })}
-            </p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
-          >
-            {t("common.retry", { defaultValue: "Réessayer" })}
-          </Button>
+        <div className="flex items-center gap-2 min-w-0">
+          <AlertTriangle className="h-3.5 w-3.5 text-[#f59e0b] shrink-0" strokeWidth={2.4} />
+          <span className="font-medium truncate">
+            {t("urgency.error.checkFailed", {
+              defaultValue: "Impossible de vérifier les alertes",
+            })}
+          </span>
         </div>
+        <button
+          type="button"
+          onClick={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
+          className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-[#2d9d5f] transition-colors shrink-0"
+        >
+          <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
+          {t("common.retry", { defaultValue: "Réessayer" })}
+        </button>
       </section>
     );
   }
 
   if (surface === "empty") {
-    // Repli discret : pas de carte pleine, pas de fausse réassurance.
-    // Une simple ligne inline confirme qu'aucun signal actionnable n'est remonté
-    // par les sources qui ont répondu — sans affirmer que "tout va bien".
+    // Vide confirmé : ligne de statut sobre avec une pastille verte.
+    // Pas de carte pleine, pas de fausse réassurance.
     return (
       <section
         className={cn(
@@ -178,10 +178,10 @@ export function UrgencyCenter({ className }: Props) {
         )}
         aria-live="polite"
       >
-        <CheckCircle2 className="h-3.5 w-3.5 text-[#2d9d5f] shrink-0" strokeWidth={2.4} />
+        <span className="inline-flex h-2 w-2 rounded-full bg-[#2d9d5f]" aria-hidden />
         <span className="font-medium">
-          {t("urgency.empty.inline", {
-            defaultValue: "Aucun signal urgent pour le moment",
+          {t("urgency.empty.status", {
+            defaultValue: "Tout est sous contrôle · aucune action urgente",
           })}
         </span>
       </section>

@@ -2059,11 +2059,13 @@
   "urgency": {
     "empty": {
       "title": "Tutto sotto controllo",
-      "subtitle": "Nessuna azione urgente"
+      "subtitle": "Nessuna azione urgente",
+      "status": "Tutto sotto controllo · nessuna azione urgente"
     },
     "error": {
       "title": "Centro emergenze non disponibile",
-      "hint": "Impossibile caricare i segnali. Riprova tra un istante."
+      "hint": "Impossibile caricare i segnali. Riprova tra un istante.",
+      "checkFailed": "Impossibile verificare gli avvisi"
     },
     "partialError": "Alcune fonti non sono disponibili, l'elenco potrebbe essere incompleto.",
     "cta": {
