@@ -2088,6 +2088,7 @@
   "sponsor": {
     "thanksLabel": "Met dank aan onze partner",
     "visitAria": "Bezoek de website van {{name}}",
+    "visitExternalAria": "Bezoek de website van {{name}} (nieuw tabblad)",
     "admin": {
       "title": "Sponsors",
       "subtitle": "Toon je partners bovenaan het startscherm.",
