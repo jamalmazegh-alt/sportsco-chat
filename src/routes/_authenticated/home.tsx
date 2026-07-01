@@ -25,6 +25,7 @@ import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UrgencyCenter } from "@/components/urgency-center";
+import { SponsorBanner } from "@/components/sponsors/sponsor-banner";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
