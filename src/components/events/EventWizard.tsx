@@ -453,6 +453,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       text: t("eventWizard.qShort.meetingtime", { defaultValue: "Heure de RDV" }),
       mark: "?",
     },
+    places: {
+      text: t("eventWizard.qShort.places", { defaultValue: "Lieux" }),
+      mark: "?",
+    },
     opponent: { text: t("eventWizard.qShort.opponent", { defaultValue: "Contre qui" }), mark: "?" },
     official: { text: t("eventWizard.qShort.official", { defaultValue: "Officiel" }), mark: "?" },
     location: { text: t("eventWizard.qShort.location", { defaultValue: "Où" }), mark: "?" },
