@@ -5325,6 +5325,7 @@ export type Database = {
         Returns: boolean
       }
       is_v2: { Args: { _key: string }; Returns: boolean }
+      link_parent_memberships: { Args: never; Returns: number }
       list_public_players: {
         Args: {
           _club_id?: string
