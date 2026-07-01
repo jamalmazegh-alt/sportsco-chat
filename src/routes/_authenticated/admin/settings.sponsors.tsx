@@ -398,9 +398,44 @@ function SponsorsSettingsPage() {
           </div>
         </div>
         {range === "custom" && (
-          <div className="flex gap-2">
-            <Input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} />
-            <Input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs text-muted-foreground" htmlFor="sponsor-from">
+                {t("sponsor.admin.fromDate", { defaultValue: "Du" })}
+              </Label>
+              <Input
+                id="sponsor-from"
+                type="date"
+                value={customFrom}
+                max={customTo || undefined}
+                onChange={(e) => {
+                  const from = e.target.value;
+                  setCustomFrom(from);
+                  if (customTo && from > customTo) {
+                    setCustomTo(from);
+                  }
+                }}
+              />
+            </div>
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs text-muted-foreground" htmlFor="sponsor-to">
+                {t("sponsor.admin.toDate", { defaultValue: "Au" })}
+              </Label>
+              <Input
+                id="sponsor-to"
+                type="date"
+                value={customTo}
+                min={customFrom || undefined}
+                onChange={(e) => {
+                  const to = e.target.value;
+                  if (customFrom && to < customFrom) {
+                    setCustomTo(customFrom);
+                  } else {
+                    setCustomTo(to);
+                  }
+                }}
+              />
+            </div>
           </div>
         )}
         <div className="overflow-x-auto">
