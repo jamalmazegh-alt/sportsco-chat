@@ -94,7 +94,7 @@ function HomePage() {
         .is("deleted_at", null)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
-        .limit(5);
+        .limit(3);
       if (error) throw error;
       return (data ?? []).map((e) => ({
         ...e,
@@ -203,9 +203,11 @@ function HomePage() {
     const byId = new Map<string, any>();
     for (const e of (upcoming ?? []) as any[]) byId.set(e.id, e);
     for (const e of (myConvocs ?? []) as any[]) byId.set(e.id, e);
-    return Array.from(byId.values()).sort(
-      (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-    );
+    return Array.from(byId.values())
+      .sort(
+        (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
+      )
+      .slice(0, 3);
   }, [upcoming, myConvocs]);
 
   const paymentSummary = useMemo(() => {
