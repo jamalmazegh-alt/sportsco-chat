@@ -20,7 +20,7 @@ type Sponsor = {
   id: string;
   name: string;
   logo_url: string | null;
-  target_url: string;
+  target_url: string | null;
 };
 
 function isSafeHttpUrl(url: string): boolean {
