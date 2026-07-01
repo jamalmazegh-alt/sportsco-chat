@@ -535,7 +535,11 @@ function SponsorsSettingsPage() {
                 />
               </div>
               <div>
-                <Label>{t("sponsor.admin.targetUrl", { defaultValue: "URL du site" })}</Label>
+                <Label>
+                  {t("sponsor.admin.targetUrlOptional", {
+                    defaultValue: "URL du site (optionnel)",
+                  })}
+                </Label>
                 <Input
                   type="url"
                   value={editing.targetUrl}
