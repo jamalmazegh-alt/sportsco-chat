@@ -147,20 +147,22 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           {t("sponsor.thanksLabel")}
         </span>
-        {showTextFallback ? (
-          <span className="line-clamp-2 text-sm font-semibold text-foreground">
-            {current.name}
-          </span>
-        ) : (
-          <img
-            src={current.logo_url!}
-            alt={current.name}
-            style={{ maxHeight: `${SPONSOR_LOGO_MAX_HEIGHT}px` }}
-            className="w-auto max-w-full object-contain"
-            onError={() => setImgFailed(true)}
-            loading="lazy"
-          />
-        )}
+        <span className="inline-flex max-w-full items-center justify-center dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
+          {showTextFallback ? (
+            <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
+              {current.name}
+            </span>
+          ) : (
+            <img
+              src={current.logo_url!}
+              alt={current.name}
+              style={{ maxHeight: `${SPONSOR_LOGO_MAX_HEIGHT}px` }}
+              className="w-auto max-w-full object-contain"
+              onError={() => setImgFailed(true)}
+              loading="lazy"
+            />
+          )}
+        </span>
       </button>
     </div>
   );
