@@ -1613,11 +1613,26 @@ function SummaryCard({
       {teamName && <div className="text-muted-foreground">{teamName}</div>}
       {state.startDate && (
         <div>
-          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.startTime} ·{" "}
-          {state.durationMin} min
+          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.durationMin} min
         </div>
       )}
-      {state.location && <div>📍 {state.location}</div>}
+      {state.meetingPoint && (
+        <div>
+          👥 {t("eventWizard.summary.meeting", { defaultValue: "RDV" })} :{" "}
+          {state.meetingTime ? `${state.meetingTime} · ` : ""}
+          {state.meetingPoint}
+        </div>
+      )}
+      {state.location && (
+        <div>
+          📍 {t("eventWizard.summary.place", { defaultValue: "Lieu" })} :{" "}
+          {state.startTime ? `${state.startTime} · ` : ""}
+          {state.location}
+        </div>
+      )}
+      {!state.location && !state.meetingPoint && state.startTime && (
+        <div>🕒 {state.startTime}</div>
+      )}
       {state.opponent && (
         <div>
           🆚 {state.opponent} ({state.isHome === "home" ? "🏠" : "🚌"})
