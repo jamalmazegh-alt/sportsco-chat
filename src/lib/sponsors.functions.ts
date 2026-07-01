@@ -45,7 +45,7 @@ export const getActiveSponsorsForHome = createServerFn({ method: "GET" })
       (rows ?? []).map(async (s) => ({
         id: s.id as string,
         name: s.name as string,
-        target_url: s.target_url as string,
+        target_url: (s.target_url as string | null) ?? null,
         logo_url: await signLogoUrl(s.logo_url as string | null),
       })),
     );
