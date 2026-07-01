@@ -1947,7 +1947,8 @@
       "comment": "Anything to add? (optional)",
       "gameformat": "How many players on the pitch?",
       "halves": "Match time format.",
-      "meetingtime": "What time should players arrive?"
+      "meetingtime": "What time should players arrive?",
+      "places": "Meeting point and match venue."
     },
     "q": {
       "type": "What kind of event?",
@@ -1965,7 +1966,9 @@
       "comment": "Any message to add?",
       "gameformat": "Game format?",
       "halves": "Match format?",
-      "meetingtime": "Meeting time?"
+      "meetingtime": "Meeting time?",
+      "matchLocation": "Match venue?",
+      "places": "Meet-up and match venue"
     },
     "chip": {
       "tonight": "Tonight",
@@ -2038,9 +2041,19 @@
       "convocation": "Auto invite",
       "carpool": "Carpool",
       "comment": "A message",
-      "summary": "All set"
+      "summary": "All set",
+      "places": "Places"
     },
-    "skip": "Skip"
+    "skip": "Skip",
+    "summary": {
+      "meeting": "Meet-up",
+      "place": "Venue"
+    },
+    "matchLocationPlaceholder": "Stadium / match address",
+    "places": {
+      "meetingSection": "Meeting point",
+      "matchSection": "Match venue"
+    }
   },
   "urgency": {
     "empty": {
