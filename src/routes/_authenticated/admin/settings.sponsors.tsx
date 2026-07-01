@@ -549,6 +549,12 @@ function SponsorsSettingsPage() {
                     if (f) handleLogoFile(f);
                   }}
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("sponsor.admin.logoContrastHint", {
+                    defaultValue:
+                      "Logo lisible sur fond clair (foncé ou couleur, éviter le blanc).",
+                  })}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
