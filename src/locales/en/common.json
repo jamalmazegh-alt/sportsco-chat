@@ -2108,7 +2108,9 @@
       "colPeriod": "Period",
       "colImpressions": "Impressions",
       "colClicks": "Clicks",
-      "colCtr": "Click rate (%)"
+      "colCtr": "Click rate (%)",
+      "fromDate": "From",
+      "toDate": "To"
     }
   }
 }

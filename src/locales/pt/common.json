@@ -2108,7 +2108,9 @@
       "colPeriod": "Período",
       "colImpressions": "Impressões",
       "colClicks": "Cliques",
-      "colCtr": "Taxa de cliques (%)"
+      "colCtr": "Taxa de cliques (%)",
+      "fromDate": "De",
+      "toDate": "Até"
     }
   }
 }

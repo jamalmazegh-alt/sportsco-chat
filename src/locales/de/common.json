@@ -2108,7 +2108,9 @@
       "colPeriod": "Zeitraum",
       "colImpressions": "Impressionen",
       "colClicks": "Klicks",
-      "colCtr": "Klickrate (%)"
+      "colCtr": "Klickrate (%)",
+      "fromDate": "Von",
+      "toDate": "Bis"
     }
   }
 }

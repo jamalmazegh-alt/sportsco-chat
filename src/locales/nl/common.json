@@ -2108,7 +2108,9 @@
       "colPeriod": "Periode",
       "colImpressions": "Impressies",
       "colClicks": "Klikken",
-      "colCtr": "Klikratio (%)"
+      "colCtr": "Klikratio (%)",
+      "fromDate": "Van",
+      "toDate": "Tot"
     }
   }
 }

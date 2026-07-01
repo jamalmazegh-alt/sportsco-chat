@@ -2108,7 +2108,9 @@
       "colPeriod": "Periodo",
       "colImpressions": "Impressioni",
       "colClicks": "Clic",
-      "colCtr": "Tasso di clic (%)"
+      "colCtr": "Tasso di clic (%)",
+      "fromDate": "Dal",
+      "toDate": "Al"
     }
   }
 }
