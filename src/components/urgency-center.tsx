@@ -178,10 +178,7 @@ export function UrgencyCenter({ className }: Props) {
         )}
         aria-live="polite"
       >
-        <span
-          className="inline-flex h-2 w-2 rounded-full bg-[#2d9d5f]"
-          aria-hidden
-        />
+        <span className="inline-flex h-2 w-2 rounded-full bg-[#2d9d5f]" aria-hidden />
         <span className="font-medium">
           {t("urgency.empty.status", {
             defaultValue: "Tout est sous contrôle · aucune action urgente",
