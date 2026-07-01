@@ -2104,11 +2104,11 @@ function EventDetail() {
                 {event.title}
               </h1>
               <div className="mt-2 flex items-center gap-2">
-                <div className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-sm font-extrabold text-emerald-700">
-                  <Clock className="h-4 w-4 text-[#1d7a45]" />
-                  {fmt(event.starts_at, "HH:mm")}
+                <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[16px] font-extrabold text-emerald-700">
+                  <Clock className="h-5 w-5 text-[#1d7a45]" />
+                  <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
                   {event.ends_at && (
-                    <span className="text-emerald-600/70 font-semibold">
+                    <span className="text-emerald-600/70 font-semibold text-[13px]">
                       → {fmt(event.ends_at, "HH:mm")}
                     </span>
                   )}
@@ -2147,7 +2147,7 @@ function EventDetail() {
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">{event.location}</p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    {event.convocation_time && (
+                    {event.convocation_time && !(event.type === "match" && event.is_home === false && event.meeting_point) && (
                       <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
                         <Clock className="h-3 w-3 text-[#1d7a45]" />
                         {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
@@ -2186,10 +2186,11 @@ function EventDetail() {
                   </p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                     {event.convocation_time && (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-md px-2 py-0.5">
-                        <Clock className="h-3 w-3 text-[#1d7a45]" />
-                        {t("events.convocationTimeShort")} {fmt(event.convocation_time, "HH:mm")}
-                      </span>
+                      <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[13px] font-extrabold text-emerald-700">
+                        <Clock className="h-4 w-4 text-[#1d7a45]" />
+                        <span>{t("events.convocationTime")}</span>
+                        <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
+                      </div>
                     )}
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
