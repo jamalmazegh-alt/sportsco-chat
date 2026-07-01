@@ -2088,6 +2088,7 @@
       "uploadError": "Upload failed",
       "unsupportedFormat": "Unsupported format (PNG/JPG/WebP)",
       "ratioWarning": "The logo may be cropped or stretched, 4:1 ratio recommended.",
+      "logoContrastHint": "Logo readable on a light background (dark or colored, avoid white).",
       "active": "Active",
       "save": "Save",
       "saved": "Partner saved",
