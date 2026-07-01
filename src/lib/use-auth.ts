@@ -145,6 +145,10 @@ export function useAuthState(): AuthState {
       // TOKEN_REFRESHED can deliver a fresh session; never treat it as sign-out.
       if (event === "TOKEN_REFRESHED" && !newSession) return;
       setSession(newSession);
+      if (event === "SIGNED_IN") {
+        // Start a fresh sponsor-impressions session per sign-in.
+        import("@/lib/sponsor-session").then((m) => m.resetSponsorSession()).catch(() => {});
+      }
       if (newSession) {
         identifyPostHog(newSession.user.id, { email: newSession.user.email ?? null });
         setTimeout(() => {
