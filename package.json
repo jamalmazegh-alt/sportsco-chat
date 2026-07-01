@@ -142,5 +142,10 @@
     "overrides": {
       "entities": "4.5.0"
     }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,css}": [
+      "prettier --write"
+    ]
   }
 }
