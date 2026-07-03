@@ -53,7 +53,62 @@ function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
+function SponsorsFeatureSection() {
+  const { t } = useTranslation("marketing");
+  const bullets = [
+    t("features.sponsors.b1"),
+    t("features.sponsors.b2"),
+    t("features.sponsors.b3"),
+  ];
+  return (
+    <section className="border-b border-border/60 bg-muted/20">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-2 lg:items-center lg:px-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
+            {t("features.sponsors.kicker")}
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("features.sponsors.title")}
+          </h2>
+          <p className="mt-4 text-muted-foreground">{t("features.sponsors.body")}</p>
+          <ul className="mt-6 space-y-3">
+            {bullets.map((b) => (
+              <li key={b} className="flex items-start gap-3 text-sm">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span className="text-foreground/80">{b}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8">
+            <Button asChild size="lg" className="h-12 px-6">
+              <Link to="/pricing">
+                {t("features.sponsors.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+        <div className="relative">
+          <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
+            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <Megaphone className="h-4 w-4 text-primary" />
+              {t("features.sponsors.kicker")}
+            </div>
+            <div className="mt-6 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border/70 bg-background/60 px-6 py-8 text-center">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                {t("features.sponsors.kicker")}
+              </span>
+              <span className="text-lg font-bold text-foreground">Your Partner</span>
+              <span className="text-xs text-muted-foreground">clubero.app</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeaturesPage() {
+
   const { t } = useTranslation("marketing");
   const audiences = t("features.audiences", { returnObjects: true }) as {
     t: string;
