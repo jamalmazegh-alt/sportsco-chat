@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CheckCircle2, ArrowRight, Megaphone } from "lucide-react";
+import { CheckCircle2, ArrowRight, Megaphone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import {
@@ -10,9 +10,6 @@ import {
   WhatsAppHybrid,
   ClubWallSection,
   PlayerJournalSection,
-  PlayersSection,
-  CoachProfileSection,
-  NetworkSection,
 } from "./index";
 
 export const Route = createFileRoute("/features")({
