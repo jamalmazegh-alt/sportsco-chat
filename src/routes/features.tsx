@@ -100,6 +100,10 @@ function FeaturesPage() {
       <Anchor id="network">
         <NetworkSection />
       </Anchor>
+      <Anchor id="sponsors">
+        <SponsorsFeatureSection />
+      </Anchor>
+
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
