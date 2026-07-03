@@ -390,7 +390,9 @@
         "cta": "Club gratis aanmaken",
         "ctaDemo": "Bekijk een demo"
       }
-    }
+    },
+    "tile_sponsors_t": "Sponsors en partners",
+    "tile_sponsors_b": "Roterende sponsorbanner in de app om je abonnement terug te verdienen."
   },
   "whatsapp": {
     "chip": "Flexibele communicatie",

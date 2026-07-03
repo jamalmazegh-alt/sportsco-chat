@@ -390,7 +390,9 @@
         "cta": "Crear mi club gratis",
         "ctaDemo": "Ver una demo"
       }
-    }
+    },
+    "tile_sponsors_t": "Patrocinadores y socios",
+    "tile_sponsors_b": "Banner de patrocinador rotativo en la app para amortizar tu suscripción."
   },
   "whatsapp": {
     "chip": "Comunicación flexible",
