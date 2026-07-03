@@ -747,7 +747,16 @@
           "Profiel, foto en Statistieken"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Sponsors en partners",
+      "title": "Een sponsorbanner om je abonnement terug te verdienen.",
+      "body": "Laat lokale partners meedoen in de app van je club: een roterende sponsorbanner wordt aan je leden getoond, met tracking van impressies en klikken. Genoeg om je Clubero-abonnement te financieren — of zelfs winstgevend te maken.",
+      "b1": "Roterende sponsorbanner op de clubhome",
+      "b2": "Automatische tracking van impressies en klikken",
+      "b3": "Meerdere partners, volgorde en logo's beheerd vanuit de admin",
+      "cta": "Ontdek sponsorbeheer"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -1225,7 +1234,11 @@
         "b": "Finalerondes na een regulier seizoen."
       }
     ],
-    "formatsExtras": ["Automatische planning", "Veldtoewijzing", "Beheer van kwalificaties"],
+    "formatsExtras": [
+      "Automatische planning",
+      "Veldtoewijzing",
+      "Beheer van kwalificaties"
+    ],
     "mobileTitle": "Mobile first, direct op het veld.",
     "mobileSubtitle": "Gemaakt om met één hand te bedienen, tussen twee wedstrijden door.",
     "mobilePoints": [

@@ -747,7 +747,16 @@
           "Profil, Foto und Stats"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Sponsoren & Partner",
+      "title": "Ein Sponsoren-Banner, das Ihr Abo refinanziert.",
+      "body": "Binden Sie lokale Partner in die App Ihres Vereins ein: ein rotierendes Sponsoren-Banner wird Ihren Mitgliedern angezeigt, Impressionen und Klicks werden erfasst. Genug, um Ihr Clubero-Abo zu finanzieren – oder sogar zu übertreffen.",
+      "b1": "Rotierendes Sponsoren-Banner auf der Vereins-Startseite",
+      "b2": "Automatisches Impressions- und Klick-Tracking",
+      "b3": "Mehrere Partner, Reihenfolge und Logos im Admin verwaltet",
+      "cta": "Sponsorenverwaltung entdecken"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

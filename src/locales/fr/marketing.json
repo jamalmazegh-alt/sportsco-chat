@@ -747,7 +747,16 @@
           "Profil, photo et stats"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Sponsors & partenaires",
+      "title": "Un bandeau sponsor pour rembourser votre abonnement.",
+      "body": "Activez des partenaires locaux sur l'app de votre club : un bandeau sponsor rotatif s'affiche à vos membres, avec suivi des impressions et clics. De quoi financer — voire rentabiliser — votre abonnement Clubero.",
+      "b1": "Bandeau sponsor rotatif sur la page d'accueil du club",
+      "b2": "Suivi automatique des impressions et clics",
+      "b3": "Plusieurs partenaires, ordre et logos gérés depuis l'admin",
+      "cta": "Découvrir la gestion des sponsors"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

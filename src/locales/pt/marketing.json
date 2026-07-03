@@ -747,7 +747,16 @@
           "Perfil, foto e estatísticas"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Patrocinadores e parceiros",
+      "title": "Um banner de patrocinador para amortizar a sua subscrição.",
+      "body": "Integre parceiros locais na app do seu clube: um banner de patrocinador rotativo é mostrado aos seus membros, com acompanhamento de impressões e cliques. O suficiente para financiar — ou até rentabilizar — a sua subscrição Clubero.",
+      "b1": "Banner de patrocinador rotativo na página inicial do clube",
+      "b2": "Acompanhamento automático de impressões e cliques",
+      "b3": "Vários parceiros, ordem e logótipos geridos no admin",
+      "cta": "Descobrir a gestão de patrocinadores"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -1225,7 +1234,11 @@
         "b": "Fases finais após uma temporada regular."
       }
     ],
-    "formatsExtras": ["Programação automática", "Atribuição de campos", "Gestão de qualificações"],
+    "formatsExtras": [
+      "Programação automática",
+      "Atribuição de campos",
+      "Gestão de qualificações"
+    ],
     "mobileTitle": "Mobile first, diretamente no campo.",
     "mobileSubtitle": "Feito para ser usado com uma mão, entre dois jogos.",
     "mobilePoints": [
