@@ -109,8 +109,10 @@ function Landing() {
       <LandingConvocation />
       <LandingCommunication />
       <LandingTournament />
+      <LandingSponsors />
       <LandingComingSoon />
       <V2Waitlist />
+
     </MarketingLayout>
   );
 }
