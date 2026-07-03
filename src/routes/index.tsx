@@ -109,8 +109,10 @@ function Landing() {
       <LandingConvocation />
       <LandingCommunication />
       <LandingTournament />
+      <LandingSponsors />
       <LandingComingSoon />
       <V2Waitlist />
+
     </MarketingLayout>
   );
 }
@@ -339,6 +341,158 @@ function LandingTournament() {
     </section>
   );
 }
+
+function LandingSponsors() {
+  const { t } = useTranslation("marketing");
+  const sponsors = [
+    { name: "Nike", color: "#111111", accent: "#ff5a1f" },
+    { name: "Decathlon", color: "#0082C3", accent: "#ffffff" },
+    { name: "Adidas", color: "#000000", accent: "#ffffff" },
+    { name: "Boulangerie Martin", color: "#8b5a2b", accent: "#fde68a" },
+  ];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((v) => (v + 1) % sponsors.length), 2600);
+    return () => clearInterval(id);
+  }, [sponsors.length]);
+  const current = sponsors[i];
+  return (
+    <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-br from-amber-50/60 via-background to-orange-50/40 py-20 dark:from-amber-950/20 dark:to-orange-950/10 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <SectionBadge tone="amber">📣 {t("landing.sponsors.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.sponsors.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.sponsors.body")}
+            </p>
+            <div className="mt-7">
+              <Button asChild size="lg" className="h-12 rounded-full px-6">
+                <Link to="/features#sponsors">
+                  {t("landing.sponsors.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Animated phone mockup */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div
+                aria-hidden
+                className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-amber-300/30 via-orange-300/20 to-transparent blur-2xl"
+              />
+              <div className="relative mx-auto w-[280px] rounded-[2.5rem] border-[10px] border-slate-900 bg-slate-900 shadow-2xl sm:w-[320px]">
+                <div className="overflow-hidden rounded-[1.75rem] bg-[#f6f8fb]">
+                  {/* Notch */}
+                  <div className="flex justify-center pt-2">
+                    <div className="h-4 w-24 rounded-b-2xl bg-slate-900" />
+                  </div>
+                  {/* App header */}
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="h-7 w-7 rounded-full bg-slate-900" />
+                    <div className="flex items-center gap-1.5">
+                      <div className="grid h-5 w-5 place-items-center rounded-md bg-slate-900 text-[10px] font-bold text-white">
+                        C
+                      </div>
+                      <span className="text-xs font-semibold text-slate-900">Clubero</span>
+                    </div>
+                    <div className="h-4 w-4 rounded-full bg-slate-300" />
+                  </div>
+                  <div className="h-px w-full bg-slate-200" />
+
+                  {/* Sponsor banner (animated) */}
+                  <div className="border-y border-slate-200 px-4 py-4 text-center">
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {t("landing.sponsors.tag")}
+                    </div>
+                    <div className="mt-2 flex h-12 items-center justify-center">
+                      <div
+                        key={current.name}
+                        className="inline-flex animate-[sponsorFade_2.6s_ease-in-out_infinite] items-center justify-center rounded-md bg-white px-4 py-2 shadow-sm ring-1 ring-slate-200"
+                        style={{ color: current.color }}
+                      >
+                        <span
+                          className="font-display text-lg font-black italic tracking-tight"
+                          style={{ letterSpacing: "-0.02em" }}
+                        >
+                          {current.name}
+                        </span>
+                        <span
+                          className="ml-1 inline-block h-2 w-3 -translate-y-1 rotate-12 rounded-sm"
+                          style={{ background: current.accent }}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-2 flex justify-center gap-1">
+                      {sponsors.map((_, idx) => (
+                        <span
+                          key={idx}
+                          className={`h-1 rounded-full transition-all ${
+                            idx === i ? "w-4 bg-slate-900" : "w-1 bg-slate-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Welcome card */}
+                  <div className="p-3">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-900 to-slate-700" />
+                        <div className="flex-1">
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-emerald-600">
+                            USAG Uckange
+                          </div>
+                          <div className="mt-0.5 text-sm font-bold text-slate-900">
+                            Salut David 👋
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status card */}
+                    <div className="mt-2 rounded-2xl border border-slate-200 bg-white p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-100">
+                          <div className="h-4 w-4 rounded-full border-2 border-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-slate-900">
+                            Tout est sous contrôle
+                          </div>
+                          <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+                            Aucune action urgente
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating euro badge */}
+              <div className="absolute -right-3 -top-3 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg animate-bounce">
+                + € financé
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes sponsorFade {
+          0%, 100% { opacity: 0; transform: translateY(6px) scale(0.96); }
+          15%, 85% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+    </section>
+  );
+}
+
 
 function LandingComingSoon() {
   const { t } = useTranslation("marketing");
