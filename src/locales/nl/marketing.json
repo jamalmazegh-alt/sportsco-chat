@@ -1459,6 +1459,13 @@
       "headline": "De club van morgen begint vandaag.",
       "body": "Spelersnetwerk, openbare profielen, inzamelingen, meerdaagse competities — de volgende generatie Clubero komt eraan. Wees de eerste die het weet.",
       "img_alt": "Clubero-visie — verbonden en goed georganiseerde club"
+    },
+    "sponsors": {
+      "badge": "Sponsors & partners",
+      "headline": "Laat je sponsors je abonnement betalen",
+      "body": "Een discrete banner bovenaan de home toont je partners aan alle leden. Vertoningen en klikken automatisch geteld, rotatie beheerd door je admins. Genoeg om Clubero te dekken — en vaak meer.",
+      "tag": "Dank aan onze partner",
+      "cta": "Ontdek"
     }
   }
 }

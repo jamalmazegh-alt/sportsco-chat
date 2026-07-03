@@ -1459,6 +1459,13 @@
       "headline": "El club del mañana empieza hoy.",
       "body": "Red de jugadores, perfiles públicos, recaudaciones, ligas multi-jornadas — la próxima generación de Clubero está en camino. Sean los primeros en saberlo.",
       "img_alt": "Visión Clubero — club conectado y organizado"
+    },
+    "sponsors": {
+      "badge": "Patrocinadores y socios",
+      "headline": "Que tus patrocinadores paguen tu suscripción",
+      "body": "Un banner discreto en la parte superior del inicio destaca a tus socios ante todos los miembros. Impresiones y clics contados automáticamente, rotación gestionada por tus admins. Suficiente para cubrir Clubero — y a menudo más.",
+      "tag": "Gracias a nuestro socio",
+      "cta": "Descubrir"
     }
   }
 }

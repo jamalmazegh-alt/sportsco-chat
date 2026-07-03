@@ -1459,6 +1459,13 @@
       "headline": "Der Verein von morgen beginnt heute.",
       "body": "Spielernetzwerk, öffentliche Profile, Sammelaktionen, Meisterschaften über mehrere Spieltage — die nächste Clubero-Generation kommt. Seien Sie die Ersten, die es erfahren.",
       "img_alt": "Clubero-Vision — vernetzter, gut organisierter Verein"
+    },
+    "sponsors": {
+      "badge": "Sponsoren & Partner",
+      "headline": "Lassen Sie Ihre Sponsoren das Abo bezahlen",
+      "body": "Ein dezentes Banner oben auf der Startseite präsentiert Ihre Partner allen Mitgliedern. Impressions und Klicks automatisch gezählt, Rotation von Ihren Admins verwaltet. Genug, um Clubero zu finanzieren — oft sogar mehr.",
+      "tag": "Danke an unseren Partner",
+      "cta": "Mehr erfahren"
     }
   }
 }
