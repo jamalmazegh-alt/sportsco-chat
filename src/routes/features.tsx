@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CheckCircle2, ArrowRight, Megaphone } from "lucide-react";
+import { CheckCircle2, ArrowRight, Megaphone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import {
@@ -10,9 +10,6 @@ import {
   WhatsAppHybrid,
   ClubWallSection,
   PlayerJournalSection,
-  PlayersSection,
-  CoachProfileSection,
-  NetworkSection,
 } from "./index";
 
 export const Route = createFileRoute("/features")({
@@ -107,6 +104,41 @@ function SponsorsFeatureSection() {
   );
 }
 
+function FutureFeaturesSection() {
+  const { t } = useTranslation("marketing");
+  const items = [
+    t("features.future.i1"),
+    t("features.future.i2"),
+    t("features.future.i3"),
+  ];
+  return (
+    <section className="border-b border-border/60">
+      <div className="mx-auto max-w-4xl px-5 py-16 lg:px-8 lg:py-20">
+        <div className="rounded-3xl border border-dashed border-border bg-muted/20 p-8 sm:p-10">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+            <Clock className="h-3 w-3" />
+            {t("features.future.badge")}
+          </div>
+          <h2 className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+            {t("features.future.title")}
+          </h2>
+          <p className="mt-3 text-muted-foreground">{t("features.future.body")}</p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+            {items.map((it) => (
+              <li
+                key={it}
+                className="rounded-2xl border border-border bg-card p-4 text-sm font-medium text-foreground/80"
+              >
+                {it}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeaturesPage() {
 
   const { t } = useTranslation("marketing");
@@ -146,17 +178,11 @@ function FeaturesPage() {
       <Anchor id="player">
         <PlayerJournalSection />
       </Anchor>
-      <Anchor id="players">
-        <PlayersSection />
-      </Anchor>
-      <Anchor id="coach-profile">
-        <CoachProfileSection />
-      </Anchor>
-      <Anchor id="network">
-        <NetworkSection />
-      </Anchor>
       <Anchor id="sponsors">
         <SponsorsFeatureSection />
+      </Anchor>
+      <Anchor id="future">
+        <FutureFeaturesSection />
       </Anchor>
 
 

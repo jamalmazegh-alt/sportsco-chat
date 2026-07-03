@@ -758,6 +758,14 @@
       "b2": "Automatic impression & click tracking",
       "b3": "Multiple partners, order and logos managed from admin",
       "cta": "See sponsor management"
+    },
+    "future": {
+      "badge": "Coming soon",
+      "title": "Coming soon: the sports social network",
+      "body": "These features are landing after the beta. They are not available yet.",
+      "i1": "Shareable public player profiles",
+      "i2": "Coach pages & followers",
+      "i3": "Open network between clubs and players"
     }
   },
   "faq": {

@@ -758,6 +758,14 @@
       "b2": "Suivi automatique des impressions et clics",
       "b3": "Plusieurs partenaires, ordre et logos gérés depuis l'admin",
       "cta": "Découvrir la gestion des sponsors"
+    },
+    "future": {
+      "badge": "Bientôt",
+      "title": "Bientôt : réseau social du sport",
+      "body": "Ces fonctionnalités arrivent après la bêta. Elles ne sont pas encore disponibles.",
+      "i1": "Profils joueurs publics partageables",
+      "i2": "Pages coach & suivi followers",
+      "i3": "Réseau ouvert entre clubs et joueurs"
     }
   },
   "faq": {

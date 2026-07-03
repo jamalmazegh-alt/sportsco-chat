@@ -758,6 +758,14 @@
       "b2": "Automatische tracking van impressies en klikken",
       "b3": "Meerdere partners, volgorde en logo's beheerd vanuit de admin",
       "cta": "Ontdek sponsorbeheer"
+    },
+    "future": {
+      "badge": "Binnenkort",
+      "title": "Binnenkort: het sociale netwerk van de sport",
+      "body": "Deze functies komen na de bèta. Ze zijn nog niet beschikbaar.",
+      "i1": "Deelbare openbare spelersprofielen",
+      "i2": "Coachpagina's & volgers",
+      "i3": "Open netwerk tussen clubs en spelers"
     }
   },
   "faq": {

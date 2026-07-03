@@ -758,6 +758,14 @@
       "b2": "Acompanhamento automático de impressões e cliques",
       "b3": "Vários parceiros, ordem e logótipos geridos no admin",
       "cta": "Descobrir a gestão de patrocinadores"
+    },
+    "future": {
+      "badge": "Brevemente",
+      "title": "Em breve: a rede social do desporto",
+      "body": "Estas funcionalidades chegam depois da beta. Ainda não estão disponíveis.",
+      "i1": "Perfis públicos de jogadores partilháveis",
+      "i2": "Páginas de treinador e seguidores",
+      "i3": "Rede aberta entre clubes e jogadores"
     }
   },
   "faq": {
