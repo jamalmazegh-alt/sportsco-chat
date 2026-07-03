@@ -758,6 +758,14 @@
       "b2": "Automatisches Impressions- und Klick-Tracking",
       "b3": "Mehrere Partner, Reihenfolge und Logos im Admin verwaltet",
       "cta": "Sponsorenverwaltung entdecken"
+    },
+    "future": {
+      "badge": "Demnächst",
+      "title": "Bald verfügbar: das soziale Netzwerk des Sports",
+      "body": "Diese Funktionen kommen nach der Beta. Sie sind noch nicht verfügbar.",
+      "i1": "Öffentliche, teilbare Spielerprofile",
+      "i2": "Trainer-Seiten & Follower",
+      "i3": "Offenes Netzwerk zwischen Klubs und Spielern"
     }
   },
   "faq": {

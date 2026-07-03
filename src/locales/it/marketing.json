@@ -758,6 +758,14 @@
       "b2": "Tracciamento automatico di impressioni e clic",
       "b3": "Più partner, ordine e loghi gestiti dall'admin",
       "cta": "Scopri la gestione degli sponsor"
+    },
+    "future": {
+      "badge": "In arrivo",
+      "title": "In arrivo: il social network dello sport",
+      "body": "Queste funzionalità arriveranno dopo la beta. Non sono ancora disponibili.",
+      "i1": "Profili giocatore pubblici e condivisibili",
+      "i2": "Pagine allenatore e follower",
+      "i3": "Rete aperta tra club e giocatori"
     }
   },
   "faq": {

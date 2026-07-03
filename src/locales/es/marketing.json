@@ -758,6 +758,14 @@
       "b2": "Seguimiento automático de impresiones y clics",
       "b3": "Varios socios, orden y logos gestionados desde el admin",
       "cta": "Descubrir la gestión de patrocinadores"
+    },
+    "future": {
+      "badge": "Próximamente",
+      "title": "Próximamente: la red social del deporte",
+      "body": "Estas funciones llegarán después de la beta. Aún no están disponibles.",
+      "i1": "Perfiles públicos de jugadores compartibles",
+      "i2": "Páginas de entrenadores y seguidores",
+      "i3": "Red abierta entre clubes y jugadores"
     }
   },
   "faq": {
