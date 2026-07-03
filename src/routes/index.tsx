@@ -345,10 +345,10 @@ function LandingTournament() {
 function LandingSponsors() {
   const { t } = useTranslation("marketing");
   const sponsors = [
-    { name: "Nike", color: "#111111", accent: "#ff5a1f" },
-    { name: "Decathlon", color: "#0082C3", accent: "#ffffff" },
-    { name: "Adidas", color: "#000000", accent: "#ffffff" },
-    { name: "Boulangerie Martin", color: "#8b5a2b", accent: "#fde68a" },
+    { name: "SwiftRun", color: "#111111", accent: "#ff5a1f" },
+    { name: "SportSphere", color: "#0082C3", accent: "#ffffff" },
+    { name: "AeroTrack", color: "#000000", accent: "#ffffff" },
+    { name: "Boulangerie L'Épi d'Or", color: "#8b5a2b", accent: "#fde68a" },
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
