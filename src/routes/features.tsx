@@ -143,17 +143,11 @@ function FeaturesPage() {
       <Anchor id="player">
         <PlayerJournalSection />
       </Anchor>
-      <Anchor id="players">
-        <PlayersSection />
-      </Anchor>
-      <Anchor id="coach-profile">
-        <CoachProfileSection />
-      </Anchor>
-      <Anchor id="network">
-        <NetworkSection />
-      </Anchor>
       <Anchor id="sponsors">
         <SponsorsFeatureSection />
+      </Anchor>
+      <Anchor id="future">
+        <FutureFeaturesSection />
       </Anchor>
 
 
