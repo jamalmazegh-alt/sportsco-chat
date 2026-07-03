@@ -390,7 +390,9 @@
         "cta": "Verein kostenlos anlegen",
         "ctaDemo": "Demo ansehen"
       }
-    }
+    },
+    "tile_sponsors_t": "Sponsoren & Partner",
+    "tile_sponsors_b": "Rotierendes Sponsoren-Banner in der App zur Refinanzierung Ihres Abos."
   },
   "whatsapp": {
     "chip": "Flexible Kommunikation",

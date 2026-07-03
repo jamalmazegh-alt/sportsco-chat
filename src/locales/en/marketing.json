@@ -390,7 +390,9 @@
         "cta": "Create my club for free",
         "ctaDemo": "Watch a demo"
       }
-    }
+    },
+    "tile_sponsors_t": "Sponsors & partners",
+    "tile_sponsors_b": "Rotating sponsor banner in the app to pay back your subscription."
   },
   "whatsapp": {
     "chip": "Flexible communication",

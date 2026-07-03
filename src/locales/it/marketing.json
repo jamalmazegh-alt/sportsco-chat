@@ -390,7 +390,9 @@
         "cta": "Crea il mio club gratis",
         "ctaDemo": "Guarda una demo"
       }
-    }
+    },
+    "tile_sponsors_t": "Sponsor e partner",
+    "tile_sponsors_b": "Banner sponsor rotante nell'app per ripagare il tuo abbonamento."
   },
   "whatsapp": {
     "chip": "Comunicazione flessibile",

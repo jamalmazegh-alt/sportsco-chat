@@ -390,7 +390,9 @@
         "cta": "Créer mon club gratuitement",
         "ctaDemo": "Voir une démo"
       }
-    }
+    },
+    "tile_sponsors_t": "Sponsors & partenaires",
+    "tile_sponsors_b": "Bandeau sponsor rotatif dans l'app pour rembourser votre abonnement."
   },
   "whatsapp": {
     "chip": "Communication flexible",
