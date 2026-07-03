@@ -747,7 +747,16 @@
           "Perfil, foto y estadísticas"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Patrocinadores y socios",
+      "title": "Un banner de patrocinador para amortizar tu suscripción.",
+      "body": "Incorpora socios locales en la app de tu club: un banner rotativo se muestra a tus miembros, con seguimiento de impresiones y clics. Suficiente para financiar — o incluso rentabilizar — tu suscripción a Clubero.",
+      "b1": "Banner de patrocinador rotativo en el inicio del club",
+      "b2": "Seguimiento automático de impresiones y clics",
+      "b3": "Varios socios, orden y logos gestionados desde el admin",
+      "cta": "Descubrir la gestión de patrocinadores"
+    }
   },
   "faq": {
     "metaTitle": "Preguntas frecuentes — Clubero",

@@ -747,7 +747,16 @@
           "Profile, photo and stats"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Sponsors & partners",
+      "title": "A sponsor banner to pay back your subscription.",
+      "body": "Onboard local partners into your club's app: a rotating sponsor banner is shown to your members, with impressions and clicks tracked. Enough to fund — or even offset — your Clubero subscription.",
+      "b1": "Rotating sponsor banner on the club home",
+      "b2": "Automatic impression & click tracking",
+      "b3": "Multiple partners, order and logos managed from admin",
+      "cta": "See sponsor management"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -1225,7 +1234,11 @@
         "b": "Final phase after a regular season."
       }
     ],
-    "formatsExtras": ["Automatic scheduling", "Field assignment", "Qualification management"],
+    "formatsExtras": [
+      "Automatic scheduling",
+      "Field assignment",
+      "Qualification management"
+    ],
     "mobileTitle": "Mobile first, on the field.",
     "mobileSubtitle": "Designed to be used one-handed, between matches.",
     "mobilePoints": [

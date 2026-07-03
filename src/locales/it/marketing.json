@@ -747,7 +747,16 @@
           "Profilo, foto e statistiche"
         ]
       }
-    ]
+    ],
+    "sponsors": {
+      "kicker": "Sponsor e partner",
+      "title": "Un banner sponsor per ripagare il tuo abbonamento.",
+      "body": "Coinvolgi partner locali nell'app del tuo club: un banner sponsor rotante viene mostrato ai tuoi membri, con tracciamento di impressioni e clic. Abbastanza per finanziare — o persino rendere redditizio — il tuo abbonamento Clubero.",
+      "b1": "Banner sponsor rotante sulla home del club",
+      "b2": "Tracciamento automatico di impressioni e clic",
+      "b3": "Più partner, ordine e loghi gestiti dall'admin",
+      "cta": "Scopri la gestione degli sponsor"
+    }
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
