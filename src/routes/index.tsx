@@ -1295,7 +1295,15 @@ const HOME_TILES = [
     hash: "coach-ai",
     accent: "from-[color:var(--primary)] to-[color:var(--energy)]",
   },
+  {
+    key: "sponsors",
+    icon: Megaphone,
+    to: "/features",
+    hash: "sponsors",
+    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
+  },
 ] as const;
+
 
 function HomeFeatureTiles() {
   const { t } = useTranslation("marketing");
