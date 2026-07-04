@@ -21,6 +21,8 @@ import {
   MapPin,
   Camera,
   ImagePlus,
+  ExternalLink,
+  Tv,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/back-link";
