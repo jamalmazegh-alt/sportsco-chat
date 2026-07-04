@@ -686,18 +686,52 @@ function TournamentDetailPage() {
             {tournament.slug && (
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
-                  href={`/tournament/${tournament.slug}`}
+                  href={`${typeof window !== "undefined" ? window.location.origin : ""}/tournament/${tournament.slug}`}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer external"
+                  onClick={(e) => {
+                    const url = `${window.location.origin}/tournament/${tournament.slug}`;
+                    const standalone =
+                      // @ts-expect-error iOS Safari
+                      window.navigator?.standalone === true ||
+                      window.matchMedia?.("(display-mode: standalone)").matches;
+                    if (standalone) {
+                      e.preventDefault();
+                      navigator.clipboard?.writeText(url).catch(() => {});
+                      toast.success(
+                        t("detail.linkCopiedOpenBrowser", {
+                          defaultValue:
+                            "Lien copié — ouvre-le dans ton navigateur (Safari/Chrome).",
+                        }),
+                      );
+                    }
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   {t("detail.openPublic", { defaultValue: "Page publique" })}
                 </a>
                 <a
-                  href={`/tournament/${tournament.slug}/tv`}
+                  href={`${typeof window !== "undefined" ? window.location.origin : ""}/tournament/${tournament.slug}/tv`}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer external"
+                  onClick={(e) => {
+                    const url = `${window.location.origin}/tournament/${tournament.slug}/tv`;
+                    const standalone =
+                      // @ts-expect-error iOS Safari
+                      window.navigator?.standalone === true ||
+                      window.matchMedia?.("(display-mode: standalone)").matches;
+                    if (standalone) {
+                      e.preventDefault();
+                      navigator.clipboard?.writeText(url).catch(() => {});
+                      toast.success(
+                        t("detail.linkCopiedOpenBrowser", {
+                          defaultValue:
+                            "Lien copié — ouvre-le dans ton navigateur (Safari/Chrome).",
+                        }),
+                      );
+                    }
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
                 >
                   <Tv className="h-3.5 w-3.5" />
