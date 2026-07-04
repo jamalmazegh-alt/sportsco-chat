@@ -682,6 +682,29 @@ function TournamentDetailPage() {
               )}
               <StatusPillHero status={tournament.status} />
             </div>
+
+            {tournament.slug && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={`/tournament/${tournament.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  {t("detail.openPublic", { defaultValue: "Page publique" })}
+                </a>
+                <a
+                  href={`/tournament/${tournament.slug}/tv`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
+                >
+                  <Tv className="h-3.5 w-3.5" />
+                  {t("detail.openTv", { defaultValue: "Écran TV" })}
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
