@@ -96,6 +96,7 @@ function SectionTitle({
 }
 
 function TeamMatchStats({ teamId }: { teamId: string }) {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ["team-match-stats", teamId],
     queryFn: async () => {
