@@ -44,7 +44,7 @@ function EventChallengesPage() {
     | { kind: "list" }
     | { kind: "add" }
     | { kind: "entry"; challengeId: string }
-    | { kind: "ranking"; challengeId: string }
+    | { kind: "ranking"; challengeId: string; passageId?: string }
   >({ kind: "list" });
 
   // Event → team → club, plus team players.
