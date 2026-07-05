@@ -391,7 +391,7 @@ function EntryScreen({
     },
     onSuccess: () => {
       toast.success(t("entry.saved"));
-      onDone();
+      onDone(passage?.id);
     },
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
