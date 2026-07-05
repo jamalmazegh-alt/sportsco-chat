@@ -3,14 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Loader2, Trophy, Goal, BarChart3, Target } from "lucide-react";
+import { ArrowLeft, Loader2, Trophy, Goal, BarChart3, Target, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import {
   listChallenges,
   getChallengeRanking,
 } from "@/lib/challenges/challenges.functions";
+import { toCsv, downloadCsv } from "@/lib/csv";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/stats")({
