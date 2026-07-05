@@ -896,7 +896,21 @@
     "showRecordDetail": "Mostra dettagli",
     "hideRecordDetail": "Nascondi dettagli",
     "summaryAria": "Riepilogo stagione",
-    "showAttendance": "Mostra statistiche presenze"
+    "showAttendance": "Mostra statistiche presenze",
+    "teamStats": "Statistiche",
+    "attendanceSection": "Presenze",
+    "matchesSection": "Partite e gol",
+    "challengesSection": "Sfide",
+    "topScorers": "Migliori marcatori",
+    "noGoals": "Nessun gol registrato per ora.",
+    "noChallenges": "Nessuna sfida attiva per questa squadra.",
+    "noResults": "Ancora nessun risultato.",
+    "resultWin": "V",
+    "resultDraw": "P",
+    "resultLoss": "S",
+    "played": "Giocate",
+    "goalsFor": "Gol fatti",
+    "goalsAgainst": "Gol subiti"
   },
   "match": {
     "result": "Risultato partita",
