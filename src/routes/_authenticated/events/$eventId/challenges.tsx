@@ -44,7 +44,7 @@ function EventChallengesPage() {
     | { kind: "list" }
     | { kind: "add" }
     | { kind: "entry"; challengeId: string }
-    | { kind: "ranking"; challengeId: string }
+    | { kind: "ranking"; challengeId: string; passageId?: string }
   >({ kind: "list" });
 
   // Event → team → club, plus team players.
@@ -137,14 +137,14 @@ function EventChallengesPage() {
           challenge={challenges.find((c: any) => c.id === view.challengeId)}
           eventId={eventId}
           players={eventInfo.players}
-          onDone={() => {
+          onDone={(passageId) => {
             refetchCounts();
-            setView({ kind: "ranking", challengeId: view.challengeId });
+            setView({ kind: "ranking", challengeId: view.challengeId, passageId });
           }}
         />
       )}
       {view.kind === "ranking" && (
-        <RankingScreen challengeId={view.challengeId} />
+        <RankingScreen challengeId={view.challengeId} passageId={view.passageId} />
       )}
     </div>
   );
@@ -332,7 +332,7 @@ function EntryScreen({
   challenge: any;
   eventId: string;
   players: { id: string; first_name: string; last_name: string; photo_url?: string | null }[];
-  onDone: () => void;
+  onDone: (passageId?: string) => void;
 }) {
   const { t } = useTranslation("challenges");
   const getPassage = useServerFn(getOrCreatePassageForEvent);
@@ -391,7 +391,7 @@ function EntryScreen({
     },
     onSuccess: () => {
       toast.success(t("entry.saved"));
-      onDone();
+      onDone(passage?.id);
     },
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
@@ -507,14 +507,14 @@ function EntryScreen({
   );
 }
 
-function RankingScreen({ challengeId }: { challengeId: string }) {
+function RankingScreen({ challengeId, passageId }: { challengeId: string; passageId?: string }) {
   const { t } = useTranslation("challenges");
   const rank = useServerFn(getChallengeRanking);
   const toggleVis = useServerFn(updateChallengeVisibility);
   const qc = useQueryClient();
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["challenge-ranking", challengeId],
-    queryFn: () => rank({ data: { challengeId } }),
+    queryKey: ["challenge-ranking", challengeId, passageId],
+    queryFn: () => rank({ data: { challengeId, highlightPassageId: passageId } }),
   });
 
   const flip = useMutation({
@@ -581,6 +581,9 @@ function RankingScreen({ challengeId }: { challengeId: string }) {
                   ? `${row.player.first_name ?? ""} ${row.player.last_name ?? ""}`
                   : row.player_id.slice(0, 6)}
               </div>
+              {row.is_new_record && ch.aggregate === "record" && (
+                <NewRecordBadge value={row.score} />
+              )}
               <div className="text-right">
                 <div className="font-mono text-base font-bold">{row.score}</div>
                 <div className="text-[10px] text-muted-foreground">
