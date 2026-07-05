@@ -444,4 +444,93 @@ describe("RLS — challenges (defis & tests)", () => {
       expect(ids).not.toContain(fx.resultTestA_playerA2);
     });
   });
+
+  // ------------------------------------------------------------------
+  // Standalone passage (event_id NULL) — scope must derive from the
+  // challenge, not the event. Insert as service_role, then check RLS.
+  // ------------------------------------------------------------------
+  describe("standalone passage (event_id NULL)", () => {
+    let standalonePassageId: string;
+
+    beforeAll(async () => {
+      const { data, error } = await admin
+        .from("challenge_passages")
+        .insert({
+          challenge_id: fx.challengeChallengeA,
+          event_id: null,
+          passage_date: "2026-01-15",
+          created_by: fx.users.coachA.userId,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      standalonePassageId = data.id;
+    });
+
+    afterAll(async () => {
+      if (standalonePassageId) {
+        await admin.from("challenge_passages").delete().eq("id", standalonePassageId);
+      }
+    });
+
+    it("coachA (staff) reads the standalone passage", async () => {
+      const c = await signInAs("coachA");
+      const { data, error } = await c
+        .from("challenge_passages")
+        .select("id, event_id")
+        .eq("id", standalonePassageId)
+        .maybeSingle();
+      expect(error).toBeNull();
+      expect(data?.id).toBe(standalonePassageId);
+      expect(data?.event_id).toBeNull();
+    });
+
+    it("coachA (staff) can insert a result on the standalone passage", async () => {
+      const c = await signInAs("coachA");
+      const { data, error } = await c
+        .from("challenge_results")
+        .insert({
+          passage_id: standalonePassageId,
+          player_id: fx.playerA,
+          value: 7,
+          created_by: fx.users.coachA.userId,
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      expect(data?.id).toBeTruthy();
+      if (data?.id) {
+        await admin.from("challenge_results").delete().eq("id", data.id);
+      }
+    });
+
+    it("playerB (other club) reads NOTHING", async () => {
+      const c = await signInAs("playerB");
+      const { data } = await c
+        .from("challenge_passages")
+        .select("id")
+        .eq("id", standalonePassageId);
+      expect((data ?? []).length).toBe(0);
+    });
+
+    it("adminB (other club) reads NOTHING", async () => {
+      const c = await signInAs("adminB");
+      const { data } = await c
+        .from("challenge_passages")
+        .select("id")
+        .eq("id", standalonePassageId);
+      expect((data ?? []).length).toBe(0);
+    });
+
+    it("partial unique index: two standalone rows on same (challenge, date) rejected", async () => {
+      const { error } = await admin.from("challenge_passages").insert({
+        challenge_id: fx.challengeChallengeA,
+        event_id: null,
+        passage_date: "2026-01-15",
+        created_by: fx.users.coachA.userId,
+      });
+      expect(error).not.toBeNull();
+    });
+  });
 });
+
