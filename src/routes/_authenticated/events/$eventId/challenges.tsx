@@ -137,14 +137,14 @@ function EventChallengesPage() {
           challenge={challenges.find((c: any) => c.id === view.challengeId)}
           eventId={eventId}
           players={eventInfo.players}
-          onDone={() => {
+          onDone={(passageId) => {
             refetchCounts();
-            setView({ kind: "ranking", challengeId: view.challengeId });
+            setView({ kind: "ranking", challengeId: view.challengeId, passageId });
           }}
         />
       )}
       {view.kind === "ranking" && (
-        <RankingScreen challengeId={view.challengeId} />
+        <RankingScreen challengeId={view.challengeId} passageId={view.passageId} />
       )}
     </div>
   );
