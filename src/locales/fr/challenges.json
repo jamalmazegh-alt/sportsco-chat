@@ -12,7 +12,8 @@
     "count": "unités",
     "time_seconds": "secondes",
     "distance_meters": "mètres",
-    "stage": "palier"
+    "stage": "palier",
+    "score": "points"
   },
   "aggregates": {
     "cumulative": "Total saison",
