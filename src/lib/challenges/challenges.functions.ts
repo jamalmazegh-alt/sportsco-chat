@@ -151,7 +151,9 @@ export const createChallengeFromTemplate = createServerFn({ method: "POST" })
     if (!tpl) throw new Response("Unknown template", { status: 400 });
 
     const visibility: Visibility =
-      tpl.kind === "physical_test" ? "staff" : (data.ranking_visibility ?? tpl.ranking_visibility);
+      tpl.kind === "physical_test"
+        ? "staff"
+        : ((data.ranking_visibility ?? tpl.ranking_visibility) as Visibility);
 
     const { data: row, error } = await context.supabase
       .from("challenges")
