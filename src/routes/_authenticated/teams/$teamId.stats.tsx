@@ -173,25 +173,25 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
     <div className="space-y-3">
       <Card>
         <CardContent className="grid grid-cols-3 gap-2 p-4 text-center">
-          <StatBlock label="V" value={totals.W} color="text-emerald-600" />
-          <StatBlock label="N" value={totals.D} color="text-amber-600" />
-          <StatBlock label="D" value={totals.L} color="text-rose-600" />
-          <StatBlock label="Joués" value={totals.played} />
-          <StatBlock label="Buts pour" value={totals.gf} />
-          <StatBlock label="Buts contre" value={totals.ga} />
+          <StatBlock label={t("stats.resultWin")} value={totals.W} color="text-emerald-600" />
+          <StatBlock label={t("stats.resultDraw")} value={totals.D} color="text-amber-600" />
+          <StatBlock label={t("stats.resultLoss")} value={totals.L} color="text-rose-600" />
+          <StatBlock label={t("stats.played")} value={totals.played} />
+          <StatBlock label={t("stats.goalsFor")} value={totals.gf} />
+          <StatBlock label={t("stats.goalsAgainst")} value={totals.ga} />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm">
-            <Target className="h-4 w-4" /> Meilleurs buteurs
+            <Target className="h-4 w-4" /> {t("stats.topScorers")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 pt-0">
           {scorers.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              Aucun but enregistré pour l'instant.
+              {t("stats.noGoals")}
             </p>
           ) : (
             scorers.map((s, i) => (
