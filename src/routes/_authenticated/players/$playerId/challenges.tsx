@@ -47,6 +47,15 @@ function PlayerChallengesTab() {
         <h1 className="text-xl font-semibold">{t("player_stats.title")}</h1>
       </div>
 
+      <div className="mb-4 space-y-3">
+        <PlayerAttendanceStats playerId={playerId} />
+        <AttendanceHeatmap playerId={playerId} />
+      </div>
+
+      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        {t("list.title")}
+      </h2>
+
       {items.length === 0 && (
         <Card>
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
