@@ -1,0 +1,1 @@
+ALTER TYPE public.challenge_unit ADD VALUE IF NOT EXISTS 'score';

@@ -413,7 +413,7 @@ function EntryScreen({
     );
   }
 
-  const isStepper = challenge.unit === "count" || challenge.unit === "stage";
+  const isStepper = challenge.unit === "count" || challenge.unit === "stage" || challenge.unit === "score";
   const stepSize =
     challenge.unit === "distance_meters" ? 10 : challenge.unit === "time_seconds" ? 0.1 : 1;
   const decimals = challenge.unit === "time_seconds" ? 2 : 0;

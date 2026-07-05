@@ -12,7 +12,8 @@
     "count": "Einheiten",
     "time_seconds": "Sekunden",
     "distance_meters": "Meter",
-    "stage": "Stufe"
+    "stage": "Stufe",
+    "score": "points"
   },
   "aggregates": {
     "cumulative": "Saison gesamt",
@@ -97,6 +98,46 @@
     "movementSpeed": {
       "name": "Movement speed",
       "description": "Timed movement course — lowest time wins."
+    },
+    "shotAccuracy": {
+      "name": "Shot accuracy",
+      "description": "Shots on target zones — cumulative score."
+    },
+    "handballShotAccuracy": {
+      "name": "Shot accuracy",
+      "description": "Shots on target zones — cumulative score."
+    },
+    "passingAccuracy": {
+      "name": "Passing accuracy",
+      "description": "Passes made on targets — cumulative score."
+    },
+    "rugbyPassingAccuracy": {
+      "name": "Passing accuracy",
+      "description": "Passes made on targets — cumulative score."
+    },
+    "pushPower": {
+      "name": "Scrum push power",
+      "description": "Measured pushing force — score."
+    },
+    "serveAccuracy": {
+      "name": "Serve accuracy",
+      "description": "Serves placed on zones — cumulative score."
+    },
+    "receptionControl": {
+      "name": "Reception control",
+      "description": "Reception quality rated by staff — score."
+    },
+    "attackAccuracy": {
+      "name": "Attack accuracy",
+      "description": "Attacks placed on zones — cumulative score."
+    },
+    "tennisServeAccuracy": {
+      "name": "Serve accuracy",
+      "description": "Serves placed on zones — cumulative score."
+    },
+    "targetShots": {
+      "name": "Target shots",
+      "description": "Balls placed on targets — cumulative score."
     }
   },
   "list": {

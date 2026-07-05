@@ -21,7 +21,7 @@ type Visibility = Database["public"]["Enums"]["challenge_visibility"];
 type Recurrence = Database["public"]["Enums"]["challenge_recurrence"];
 
 const kindEnum = z.enum(["challenge", "physical_test"]) satisfies z.ZodType<Kind>;
-const unitEnum = z.enum(["count", "time_seconds", "distance_meters", "stage"]) satisfies z.ZodType<Unit>;
+const unitEnum = z.enum(["count", "time_seconds", "distance_meters", "stage", "score"]) satisfies z.ZodType<Unit>;
 const dirEnum = z.enum(["higher_better", "lower_better"]) satisfies z.ZodType<Direction>;
 const aggEnum = z.enum(["cumulative", "record"]) satisfies z.ZodType<Aggregate>;
 const visEnum = z.enum(["staff", "category"]) satisfies z.ZodType<Visibility>;
