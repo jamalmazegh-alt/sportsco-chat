@@ -198,9 +198,11 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
             </p>
           ) : (
             scorers.map((s, i) => (
-              <div
+              <Link
                 key={s.id}
-                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm"
+                to="/players/$playerId"
+                params={{ playerId: s.id }}
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors"
               >
                 <span className="w-6 text-center font-bold text-muted-foreground">
                   #{i + 1}
@@ -211,7 +213,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
                     : s.id.slice(0, 6)}
                 </span>
                 <span className="font-mono font-bold tabular-nums">{s.count}</span>
-              </div>
+              </Link>
             ))
           )}
         </CardContent>
