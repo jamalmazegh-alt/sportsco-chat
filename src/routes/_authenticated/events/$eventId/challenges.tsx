@@ -242,16 +242,20 @@ function VisibilityBadge({ visibility }: { visibility: "staff" | "category" }) {
 function AddChallenge({
   clubId,
   teamId,
+  sport,
   onDone,
 }: {
   clubId: string;
   teamId: string;
+  sport: string | null;
   onDone: () => void;
 }) {
   const { t } = useTranslation("challenges");
   const fromTpl = useServerFn(createChallengeFromTemplate);
   const [selected, setSelected] = useState<string | null>(null);
   const [name, setName] = useState("");
+
+  const templates = useMemo(() => getTemplatesForSport(sport), [sport]);
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
@@ -275,7 +279,7 @@ function AddChallenge({
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
       <div className="space-y-2">
         <p className="text-sm font-medium">{t("add.pick_template")}</p>
-        {CHALLENGE_TEMPLATES.map((tpl) => (
+        {templates.map((tpl) => (
           <Card
             key={tpl.key}
             className={
@@ -302,6 +306,7 @@ function AddChallenge({
           </Card>
         ))}
       </div>
+
       {selected && (
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("add.custom_name_label")}</label>
