@@ -113,6 +113,7 @@ function EventChallengesPage() {
         <ChallengesList
           eventId={eventId}
           challenges={challenges}
+          entryCounts={entryCounts}
           onAdd={() => setView({ kind: "add" })}
           onEntry={(id) => setView({ kind: "entry", challengeId: id })}
           onRanking={(id) => setView({ kind: "ranking", challengeId: id })}
