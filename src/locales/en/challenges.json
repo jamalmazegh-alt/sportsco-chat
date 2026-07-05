@@ -90,5 +90,8 @@
   "errors": {
     "forbidden": "Staff-only action.",
     "generic": "Something went wrong."
+  },
+  "records": {
+    "new": "New record!"
   }
 }
