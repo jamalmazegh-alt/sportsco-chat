@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -70,6 +70,8 @@ function TeamDetail() {
   const isCoach =
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isStatsRoute = pathname.endsWith("/stats");
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
@@ -615,6 +617,8 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     toast.success(t("teams.addPlayer"));
   }
+
+  if (isStatsRoute) return <Outlet />;
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
