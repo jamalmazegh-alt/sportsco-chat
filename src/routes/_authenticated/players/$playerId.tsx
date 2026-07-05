@@ -657,6 +657,19 @@ function PlayerProfile() {
                 </>
               )}
               <Link
+                to="/players/$playerId/challenges"
+                params={{ playerId }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                  isChallenges
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Trophy className="h-3.5 w-3.5" />
+                {t("challenges:player_stats.title", { defaultValue: "Défis" })}
+              </Link>
+              <Link
                 to="/players/$playerId/feedback"
                 params={{ playerId }}
                 className={cn(
