@@ -1,0 +1,513 @@
+/**
+ * Server functions — Défis & Tests.
+ *
+ * All calls go through `requireSupabaseAuth`. RLS remains the primary security
+ * boundary; guards here add:
+ *   - server-side computation of VO₂ (`derived_value` never trusted from client)
+ *   - explicit projection of safe columns for public/category rankings
+ *   - masking of `derived_value` for non-staff readers, even when the parent
+ *     policy would otherwise permit reading the row (defense in depth).
+ */
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { CHALLENGE_TEMPLATES, findTemplate } from "./templates";
+import {
+  ageFromBirthDate,
+  vo2AgeFactor,
+  vo2Cooper,
+  vo2Leger,
+} from "./vo2";
+import type { Database } from "@/integrations/supabase/types";
+
+type Kind = Database["public"]["Enums"]["challenge_kind"];
+type Unit = Database["public"]["Enums"]["challenge_unit"];
+type Direction = Database["public"]["Enums"]["challenge_direction"];
+type Aggregate = Database["public"]["Enums"]["challenge_aggregate"];
+type Derived = Database["public"]["Enums"]["challenge_derived"];
+type Visibility = Database["public"]["Enums"]["challenge_visibility"];
+type Recurrence = Database["public"]["Enums"]["challenge_recurrence"];
+
+const kindEnum = z.enum(["challenge", "physical_test"]) satisfies z.ZodType<Kind>;
+const unitEnum = z.enum(["count", "time_seconds", "distance_meters", "stage"]) satisfies z.ZodType<Unit>;
+const dirEnum = z.enum(["higher_better", "lower_better"]) satisfies z.ZodType<Direction>;
+const aggEnum = z.enum(["cumulative", "record"]) satisfies z.ZodType<Aggregate>;
+const derEnum = z.enum(["none", "vo2_leger", "vo2_cooper"]) satisfies z.ZodType<Derived>;
+const visEnum = z.enum(["staff", "category"]) satisfies z.ZodType<Visibility>;
+const recEnum = z.enum(["season", "half_season", "punctual"]) satisfies z.ZodType<Recurrence>;
+
+async function assertClubStaff(
+  supabase: any,
+  userId: string,
+  clubId: string,
+): Promise<void> {
+  const { data, error } = await supabase.rpc("is_club_staff", {
+    _user_id: userId,
+    _club_id: clubId,
+  });
+  if (error) throw new Response(error.message, { status: 500 });
+  if (!data) throw new Response("Forbidden", { status: 403 });
+}
+
+// ---------- list challenges (for a team / season)
+
+export const listChallenges = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
+        seasonId: z.string().uuid().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    let q = context.supabase
+      .from("challenges")
+      .select("*")
+      .eq("club_id", data.clubId)
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+    if (data.teamId) q = q.eq("team_id", data.teamId);
+    if (data.seasonId) q = q.eq("season_id", data.seasonId);
+    const { data: rows, error } = await q;
+    if (error) throw new Response(error.message, { status: 400 });
+    return { challenges: rows ?? [] };
+  });
+
+// ---------- create challenge (from template or custom)
+
+export const createChallenge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        team_id: z.string().uuid().nullable().optional(),
+        season_id: z.string().uuid().nullable().optional(),
+        name: z.string().trim().min(1).max(80),
+        icon: z.string().trim().max(8).nullable().optional(),
+        kind: kindEnum,
+        unit: unitEnum,
+        direction: dirEnum,
+        aggregate: aggEnum,
+        derived: derEnum,
+        recurrence: recEnum,
+        ranking_visibility: visEnum,
+        template_key: z.string().max(60).nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertClubStaff(context.supabase, context.userId, data.club_id);
+
+    // Physical tests are always staff-only, no matter what the client sent.
+    const visibility: Visibility =
+      data.kind === "physical_test" ? "staff" : data.ranking_visibility;
+
+    const { data: row, error } = await context.supabase
+      .from("challenges")
+      .insert({
+        club_id: data.club_id,
+        team_id: data.team_id ?? null,
+        season_id: data.season_id ?? null,
+        name: data.name,
+        icon: data.icon ?? null,
+        kind: data.kind,
+        unit: data.unit,
+        direction: data.direction,
+        aggregate: data.aggregate,
+        derived: data.derived,
+        recurrence: data.recurrence,
+        ranking_visibility: visibility,
+        template_key: data.template_key ?? null,
+        created_by: context.userId,
+      })
+      .select()
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { challenge: row };
+  });
+
+export const createChallengeFromTemplate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        team_id: z.string().uuid().nullable().optional(),
+        season_id: z.string().uuid().nullable().optional(),
+        template_key: z.string(),
+        // Optional overrides for the coach — name + visibility only.
+        name: z.string().trim().min(1).max(80),
+        ranking_visibility: visEnum.optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertClubStaff(context.supabase, context.userId, data.club_id);
+    const tpl = findTemplate(data.template_key);
+    if (!tpl) throw new Response("Unknown template", { status: 400 });
+
+    const visibility: Visibility =
+      tpl.kind === "physical_test"
+        ? "staff"
+        : ((data.ranking_visibility ?? tpl.ranking_visibility) as Visibility);
+
+    const { data: row, error } = await context.supabase
+      .from("challenges")
+      .insert({
+        club_id: data.club_id,
+        team_id: data.team_id ?? null,
+        season_id: data.season_id ?? null,
+        name: data.name,
+        icon: tpl.icon,
+        kind: tpl.kind,
+        unit: tpl.unit,
+        direction: tpl.direction,
+        aggregate: tpl.aggregate,
+        derived: tpl.derived,
+        recurrence: tpl.recurrence,
+        ranking_visibility: visibility,
+        template_key: tpl.key,
+        created_by: context.userId,
+      })
+      .select()
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { challenge: row };
+  });
+
+export const updateChallengeVisibility = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ challengeId: z.string().uuid(), ranking_visibility: visEnum }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: ch } = await context.supabase
+      .from("challenges")
+      .select("club_id, kind")
+      .eq("id", data.challengeId)
+      .single();
+    if (!ch) throw new Response("Not found", { status: 404 });
+    if (ch.kind === "physical_test" && data.ranking_visibility === "category") {
+      throw new Response("Physical tests are always staff-only", { status: 400 });
+    }
+    await assertClubStaff(context.supabase, context.userId, ch.club_id);
+    const { error } = await context.supabase
+      .from("challenges")
+      .update({ ranking_visibility: data.ranking_visibility })
+      .eq("id", data.challengeId);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const archiveChallenge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ challengeId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: ch } = await context.supabase
+      .from("challenges")
+      .select("club_id")
+      .eq("id", data.challengeId)
+      .single();
+    if (!ch) throw new Response("Not found", { status: 404 });
+    await assertClubStaff(context.supabase, context.userId, ch.club_id);
+    const { error } = await context.supabase
+      .from("challenges")
+      .update({ is_active: false })
+      .eq("id", data.challengeId);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+// ---------- passages
+
+export const listPassages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ challengeId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("challenge_passages")
+      .select("*")
+      .eq("challenge_id", data.challengeId)
+      .order("passage_date", { ascending: false });
+    if (error) throw new Response(error.message, { status: 400 });
+    return { passages: rows ?? [] };
+  });
+
+export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ challengeId: z.string().uuid(), eventId: z.string().uuid() })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: ch } = await context.supabase
+      .from("challenges")
+      .select("club_id")
+      .eq("id", data.challengeId)
+      .single();
+    if (!ch) throw new Response("Not found", { status: 404 });
+    await assertClubStaff(context.supabase, context.userId, ch.club_id);
+
+    const { data: existing } = await context.supabase
+      .from("challenge_passages")
+      .select("*")
+      .eq("challenge_id", data.challengeId)
+      .eq("event_id", data.eventId)
+      .maybeSingle();
+    if (existing) return { passage: existing };
+
+    const { data: row, error } = await context.supabase
+      .from("challenge_passages")
+      .insert({
+        challenge_id: data.challengeId,
+        event_id: data.eventId,
+        created_by: context.userId,
+      })
+      .select()
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { passage: row };
+  });
+
+// ---------- results (upsert + ranking)
+
+const entrySchema = z.object({
+  player_id: z.string().uuid(),
+  value: z.number().finite().nonnegative(),
+});
+
+export const upsertResults = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        passageId: z.string().uuid(),
+        entries: z.array(entrySchema).min(1).max(100),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    // Load passage + challenge to authorize + compute derived
+    const { data: passage } = await context.supabase
+      .from("challenge_passages")
+      .select("id, challenge_id, challenges:challenge_id (id, club_id, derived, unit)")
+      .eq("id", data.passageId)
+      .single();
+    if (!passage) throw new Response("Not found", { status: 404 });
+    const ch = (passage as any).challenges as {
+      id: string;
+      club_id: string;
+      derived: Derived;
+      unit: Unit;
+    };
+    await assertClubStaff(context.supabase, context.userId, ch.club_id);
+
+    // Load birthdates only for derived tests (age correction).
+    let ages = new Map<string, number | null>();
+    if (ch.derived !== "none") {
+      const ids = data.entries.map((e) => e.player_id);
+      const { data: players } = await context.supabase
+        .from("players")
+        .select("id, birth_date")
+        .in("id", ids);
+      const now = new Date();
+      for (const p of players ?? []) {
+        ages.set(p.id as string, ageFromBirthDate(p.birth_date as string | null, now));
+      }
+    }
+
+    const rows = data.entries.map((e) => {
+      let derived_value: number | null = null;
+      if (ch.derived === "vo2_leger" && ch.unit === "stage") {
+        derived_value = round2(vo2Leger(e.value) * vo2AgeFactor(ages.get(e.player_id)));
+      } else if (ch.derived === "vo2_cooper" && ch.unit === "distance_meters") {
+        derived_value = round2(vo2Cooper(e.value) * vo2AgeFactor(ages.get(e.player_id)));
+      }
+      return {
+        passage_id: data.passageId,
+        player_id: e.player_id,
+        value: e.value,
+        derived_value,
+        created_by: context.userId,
+      };
+    });
+
+    const { error } = await context.supabase
+      .from("challenge_results")
+      .upsert(rows, { onConflict: "passage_id,player_id" });
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true, count: rows.length };
+  });
+
+/**
+ * Ranking for a challenge, aggregated per player over the whole set of
+ * passages the caller can read. Server-side masks `derived_value` unless the
+ * caller is staff — even when the row itself is visible (defense in depth).
+ */
+export const getChallengeRanking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ challengeId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: ch, error: chErr } = await context.supabase
+      .from("challenges")
+      .select("*")
+      .eq("id", data.challengeId)
+      .single();
+    if (chErr || !ch) throw new Response("Not found", { status: 404 });
+
+    // RLS filters passages the caller can see.
+    const { data: passages } = await context.supabase
+      .from("challenge_passages")
+      .select("id, passage_date")
+      .eq("challenge_id", data.challengeId);
+    const passageIds = (passages ?? []).map((p) => p.id as string);
+    if (passageIds.length === 0) {
+      return { challenge: ch, isStaff: false, ranking: [] as any[] };
+    }
+
+    const { data: results } = await context.supabase
+      .from("challenge_results")
+      .select("passage_id, player_id, value, derived_value")
+      .in("passage_id", passageIds);
+
+    // Determine staff status (for masking derived_value).
+    const { data: isStaff } = await context.supabase.rpc("is_club_staff", {
+      _user_id: context.userId,
+      _club_id: ch.club_id,
+    });
+
+    // Enrich with player display info (RLS applies again).
+    const playerIds = Array.from(new Set((results ?? []).map((r) => r.player_id as string)));
+    const { data: players } = await context.supabase
+      .from("players")
+      .select("id, first_name, last_name, photo_url")
+      .in("id", playerIds);
+    const pMap = new Map((players ?? []).map((p) => [p.id as string, p]));
+
+    // Aggregate
+    const grouped = new Map<string, { values: number[]; derived: (number | null)[] }>();
+    for (const r of results ?? []) {
+      const g = grouped.get(r.player_id as string) ?? { values: [], derived: [] };
+      g.values.push(Number(r.value));
+      g.derived.push(r.derived_value == null ? null : Number(r.derived_value));
+      grouped.set(r.player_id as string, g);
+    }
+
+    const higher = ch.direction === "higher_better";
+    const ranking = Array.from(grouped.entries())
+      .map(([player_id, { values, derived }]) => {
+        const score =
+          ch.aggregate === "cumulative"
+            ? values.reduce((s, v) => s + v, 0)
+            : higher
+              ? Math.max(...values)
+              : Math.min(...values);
+        // Best derived (VO2) — record only
+        const derivedBest =
+          isStaff && ch.derived !== "none"
+            ? higher
+              ? Math.max(...(derived.filter((d) => d != null) as number[]), Number.NEGATIVE_INFINITY)
+              : Math.min(...(derived.filter((d) => d != null) as number[]), Number.POSITIVE_INFINITY)
+            : null;
+        return {
+          player_id,
+          player: pMap.get(player_id) ?? null,
+          score: round2(score),
+          count: values.length,
+          derived_best:
+            derivedBest == null || !Number.isFinite(derivedBest) ? null : round2(derivedBest),
+        };
+      })
+      .sort((a, b) => (higher ? b.score - a.score : a.score - b.score));
+
+    return { challenge: ch, isStaff: !!isStaff, ranking };
+  });
+
+// ---------- Player stats (per-challenge timeline + aggregate)
+
+export const getPlayerChallengeStats = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ playerId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    // RLS enforces visibility: staff, the player himself, or a linked parent.
+    const { data: results, error } = await context.supabase
+      .from("challenge_results")
+      .select(
+        "id, value, derived_value, created_at, passage_id, challenge_passages!inner(passage_date, challenge_id, challenges!inner(id, club_id, name, icon, kind, unit, direction, aggregate, derived, ranking_visibility))",
+      )
+      .eq("player_id", data.playerId)
+      .order("created_at", { ascending: true });
+    if (error) throw new Response(error.message, { status: 400 });
+
+    // Determine which challenges the caller is staff on (mask derived for others).
+    const staffClubs = new Set<string>();
+    const rowsAny = (results ?? []) as any[];
+    const clubIds = Array.from(new Set(rowsAny.map((r) => r.challenge_passages.challenges.club_id)));
+    for (const clubId of clubIds) {
+      const { data: ok } = await context.supabase.rpc("is_club_staff", {
+        _user_id: context.userId,
+        _club_id: clubId,
+      });
+      if (ok) staffClubs.add(clubId);
+    }
+
+    const perChallenge = new Map<
+      string,
+      { challenge: any; points: { date: string; value: number; derived: number | null }[] }
+    >();
+    for (const r of rowsAny) {
+      const ch = r.challenge_passages.challenges;
+      const isStaff = staffClubs.has(ch.club_id);
+      const entry = perChallenge.get(ch.id) ?? { challenge: ch, points: [] };
+      entry.points.push({
+        date: r.challenge_passages.passage_date,
+        value: Number(r.value),
+        derived: isStaff && r.derived_value != null ? Number(r.derived_value) : null,
+      });
+      perChallenge.set(ch.id, entry);
+    }
+
+    const items = Array.from(perChallenge.values()).map(({ challenge, points }) => {
+      const higher = challenge.direction === "higher_better";
+      const aggregate =
+        challenge.aggregate === "cumulative"
+          ? points.reduce((s, p) => s + p.value, 0)
+          : higher
+            ? Math.max(...points.map((p) => p.value))
+            : Math.min(...points.map((p) => p.value));
+      const isStaff = staffClubs.has(challenge.club_id);
+      const derivedBest =
+        isStaff && challenge.derived !== "none"
+          ? higher
+            ? Math.max(...points.map((p) => p.derived ?? Number.NEGATIVE_INFINITY))
+            : Math.min(...points.map((p) => p.derived ?? Number.POSITIVE_INFINITY))
+          : null;
+      return {
+        challenge,
+        points,
+        aggregate: round2(aggregate),
+        derived_best:
+          derivedBest == null || !Number.isFinite(derivedBest) ? null : round2(derivedBest),
+        isStaff,
+      };
+    });
+
+    return { items };
+  });
+
+// ---------- templates (client-safe helper)
+
+export const listChallengeTemplates = createServerFn({ method: "GET" }).handler(async () => {
+  return { templates: CHALLENGE_TEMPLATES };
+});
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}

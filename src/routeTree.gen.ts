@@ -126,10 +126,12 @@ import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './ro
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
 import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
+import { Route as AuthenticatedPlayersPlayerIdChallengesRouteImport } from './routes/_authenticated/players/$playerId/challenges'
 import { Route as AuthenticatedPlayersPlayerIdAvailabilityRouteImport } from './routes/_authenticated/players/$playerId/availability'
 import { Route as AuthenticatedPlayersPlayerIdAchievementsRouteImport } from './routes/_authenticated/players/$playerId/achievements'
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
+import { Route as AuthenticatedEventsEventIdChallengesRouteImport } from './routes/_authenticated/events/$eventId/challenges'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
 import { Route as AuthenticatedAdminSettingsSponsorsRouteImport } from './routes/_authenticated/admin/settings.sponsors'
 import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
@@ -768,6 +770,12 @@ const AuthenticatedPlayersPlayerIdFeedbackRoute =
     path: '/feedback',
     getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
   } as any)
+const AuthenticatedPlayersPlayerIdChallengesRoute =
+  AuthenticatedPlayersPlayerIdChallengesRouteImport.update({
+    id: '/challenges',
+    path: '/challenges',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdAvailabilityRoute =
   AuthenticatedPlayersPlayerIdAvailabilityRouteImport.update({
     id: '/availability',
@@ -790,6 +798,12 @@ const AuthenticatedEventsEventIdFeedbackRoute =
   AuthenticatedEventsEventIdFeedbackRouteImport.update({
     id: '/feedback',
     path: '/feedback',
+    getParentRoute: () => AuthenticatedEventsEventIdRoute,
+  } as any)
+const AuthenticatedEventsEventIdChallengesRoute =
+  AuthenticatedEventsEventIdChallengesRouteImport.update({
+    id: '/challenges',
+    path: '/challenges',
     getParentRoute: () => AuthenticatedEventsEventIdRoute,
   } as any)
 const AuthenticatedAdminUsersUserIdRoute =
@@ -970,10 +984,12 @@ export interface FileRoutesByFullPath {
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/players/$playerId/challenges': typeof AuthenticatedPlayersPlayerIdChallengesRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
@@ -1100,10 +1116,12 @@ export interface FileRoutesByTo {
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/players/$playerId/challenges': typeof AuthenticatedPlayersPlayerIdChallengesRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
@@ -1236,10 +1254,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/_authenticated/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/_authenticated/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/_authenticated/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/_authenticated/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/_authenticated/players/$playerId/challenges': typeof AuthenticatedPlayersPlayerIdChallengesRoute
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
@@ -1372,10 +1392,12 @@ export interface FileRouteTypes {
     | '/admin/settings/social'
     | '/admin/settings/sponsors'
     | '/admin/users/$userId'
+    | '/events/$eventId/challenges'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
     | '/players/$playerId/achievements'
     | '/players/$playerId/availability'
+    | '/players/$playerId/challenges'
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
@@ -1502,10 +1524,12 @@ export interface FileRouteTypes {
     | '/admin/settings/social'
     | '/admin/settings/sponsors'
     | '/admin/users/$userId'
+    | '/events/$eventId/challenges'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
     | '/players/$playerId/achievements'
     | '/players/$playerId/availability'
+    | '/players/$playerId/challenges'
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
@@ -1637,10 +1661,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings/social'
     | '/_authenticated/admin/settings/sponsors'
     | '/_authenticated/admin/users/$userId'
+    | '/_authenticated/events/$eventId/challenges'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
     | '/_authenticated/players/$playerId/achievements'
     | '/_authenticated/players/$playerId/availability'
+    | '/_authenticated/players/$playerId/challenges'
     | '/_authenticated/players/$playerId/feedback'
     | '/_authenticated/players/$playerId/seasons'
     | '/_authenticated/players/$playerId/timeline'
@@ -2559,6 +2585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRouteImport
       parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
     }
+    '/_authenticated/players/$playerId/challenges': {
+      id: '/_authenticated/players/$playerId/challenges'
+      path: '/challenges'
+      fullPath: '/players/$playerId/challenges'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdChallengesRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
     '/_authenticated/players/$playerId/availability': {
       id: '/_authenticated/players/$playerId/availability'
       path: '/availability'
@@ -2585,6 +2618,13 @@ declare module '@tanstack/react-router' {
       path: '/feedback'
       fullPath: '/events/$eventId/feedback'
       preLoaderRoute: typeof AuthenticatedEventsEventIdFeedbackRouteImport
+      parentRoute: typeof AuthenticatedEventsEventIdRoute
+    }
+    '/_authenticated/events/$eventId/challenges': {
+      id: '/_authenticated/events/$eventId/challenges'
+      path: '/challenges'
+      fullPath: '/events/$eventId/challenges'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdChallengesRouteImport
       parentRoute: typeof AuthenticatedEventsEventIdRoute
     }
     '/_authenticated/admin/users/$userId': {
@@ -2720,12 +2760,15 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedEventsEventIdRouteChildren {
+  AuthenticatedEventsEventIdChallengesRoute: typeof AuthenticatedEventsEventIdChallengesRoute
   AuthenticatedEventsEventIdFeedbackRoute: typeof AuthenticatedEventsEventIdFeedbackRoute
   AuthenticatedEventsEventIdLineupRoute: typeof AuthenticatedEventsEventIdLineupRoute
 }
 
 const AuthenticatedEventsEventIdRouteChildren: AuthenticatedEventsEventIdRouteChildren =
   {
+    AuthenticatedEventsEventIdChallengesRoute:
+      AuthenticatedEventsEventIdChallengesRoute,
     AuthenticatedEventsEventIdFeedbackRoute:
       AuthenticatedEventsEventIdFeedbackRoute,
     AuthenticatedEventsEventIdLineupRoute:
@@ -2841,6 +2884,7 @@ const AuthenticatedTournamentsRouteWithChildren =
 interface AuthenticatedPlayersPlayerIdRouteChildren {
   AuthenticatedPlayersPlayerIdAchievementsRoute: typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   AuthenticatedPlayersPlayerIdAvailabilityRoute: typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  AuthenticatedPlayersPlayerIdChallengesRoute: typeof AuthenticatedPlayersPlayerIdChallengesRoute
   AuthenticatedPlayersPlayerIdFeedbackRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   AuthenticatedPlayersPlayerIdSeasonsRoute: typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   AuthenticatedPlayersPlayerIdTimelineRoute: typeof AuthenticatedPlayersPlayerIdTimelineRoute
@@ -2852,6 +2896,8 @@ const AuthenticatedPlayersPlayerIdRouteChildren: AuthenticatedPlayersPlayerIdRou
       AuthenticatedPlayersPlayerIdAchievementsRoute,
     AuthenticatedPlayersPlayerIdAvailabilityRoute:
       AuthenticatedPlayersPlayerIdAvailabilityRoute,
+    AuthenticatedPlayersPlayerIdChallengesRoute:
+      AuthenticatedPlayersPlayerIdChallengesRoute,
     AuthenticatedPlayersPlayerIdFeedbackRoute:
       AuthenticatedPlayersPlayerIdFeedbackRoute,
     AuthenticatedPlayersPlayerIdSeasonsRoute:

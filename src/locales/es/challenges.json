@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Challenges & tests | Clubero",
+    "description": "Run a challenge or a physical test during a training session, log results and track progress."
+  },
+  "types": {
+    "challenge": "Challenge",
+    "physical_test": "Physical test",
+    "activity": "Activity"
+  },
+  "units": {
+    "count": "units",
+    "time_seconds": "seconds",
+    "distance_meters": "meters",
+    "stage": "stage"
+  },
+  "aggregates": {
+    "cumulative": "Season total",
+    "record": "Record"
+  },
+  "visibility": {
+    "staff": "Staff only",
+    "category": "Visible to the category",
+    "staff_short": "Staff",
+    "category_short": "Category",
+    "toggle_hint": "Physical test rankings are always staff-only."
+  },
+  "templates": {
+    "crossbar": { "name": "Cross Bar", "description": "Hit the crossbar — cumulative over the season." },
+    "juggling": { "name": "Juggling", "description": "Longest streak of ball juggles — record." },
+    "leger": { "name": "Léger shuttle", "description": "20 m shuttle test — estimated VO₂ max." },
+    "cooper": { "name": "Cooper 12 min", "description": "Distance in 12 minutes — estimated VO₂ max." },
+    "sprint20m": { "name": "20 m sprint", "description": "Time on 20 m — lowest wins." }
+  },
+  "list": {
+    "title": "Challenges & activities",
+    "empty": "No challenge yet.",
+    "empty_hint": "Add a challenge or a test to this session.",
+    "add": "Add an activity",
+    "back": "Back to training"
+  },
+  "add": {
+    "title": "Add an activity",
+    "pick_template": "Pick a template",
+    "or_custom": "Custom",
+    "custom_name_label": "Name",
+    "custom_name_placeholder": "e.g. Long pass accuracy",
+    "create": "Create",
+    "creating": "Creating…"
+  },
+  "entry": {
+    "title": "Log results",
+    "counter": "{{present}} present · {{done}} logged",
+    "save": "Save",
+    "saved": "Results saved",
+    "no_players": "No players present for this session.",
+    "value_placeholder": "Value"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "view": "View ranking",
+    "no_results": "No results yet.",
+    "position": "#{{n}}",
+    "attempts_one": "{{count}} attempt",
+    "attempts_other": "{{count}} attempts",
+    "vo2_max": "VO₂ max"
+  },
+  "player_stats": {
+    "title": "Stats & challenges",
+    "no_data": "No results logged yet for this player.",
+    "aggregate_cumulative": "Season total",
+    "aggregate_record": "Record",
+    "staff_only": "Staff only",
+    "vo2_hint": "VO₂ max — staff-only data"
+  },
+  "errors": {
+    "forbidden": "Staff-only action.",
+    "generic": "Something went wrong."
+  }
+}
