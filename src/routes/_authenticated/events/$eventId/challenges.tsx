@@ -314,6 +314,7 @@ function EntryScreen({
   const { t } = useTranslation("challenges");
   const getPassage = useServerFn(getOrCreatePassageForEvent);
   const upsert = useServerFn(upsertResults);
+  const loadResults = useServerFn(getPassageResults);
 
   const { data: passageData, isLoading } = useQuery({
     queryKey: ["challenge-passage", challengeId, eventId],
@@ -321,7 +322,22 @@ function EntryScreen({
   });
   const passage = passageData?.passage;
 
+  const { data: existingData, isLoading: loadingExisting } = useQuery({
+    queryKey: ["challenge-passage-results", passage?.id],
+    enabled: !!passage?.id,
+    queryFn: () => loadResults({ data: { passageId: passage!.id } }),
+  });
+
   const [values, setValues] = useState<Record<string, number | "">>({});
+  const [hydrated, setHydrated] = useState(false);
+
+  // Pre-fill saved values once existing results arrive.
+  if (!hydrated && existingData?.results) {
+    const seed: Record<string, number | ""> = {};
+    for (const r of existingData.results) seed[r.player_id] = Number(r.value);
+    if (Object.keys(seed).length > 0) setValues(seed);
+    setHydrated(true);
+  }
 
   const done = useMemo(
     () => Object.values(values).filter((v) => v !== "" && v != null).length,
@@ -344,7 +360,7 @@ function EntryScreen({
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
 
-  if (isLoading || !challenge) return <FullscreenLoader />;
+  if (isLoading || loadingExisting || !challenge) return <FullscreenLoader />;
 
   if (players.length === 0) {
     return (
