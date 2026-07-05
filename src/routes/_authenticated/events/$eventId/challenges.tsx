@@ -417,37 +417,57 @@ function EntryScreen({
         </p>
       </div>
       <div className="space-y-2">
-        {players.map((p) => (
-          <Card key={p.id}>
-            <CardContent className="flex items-center gap-3 p-3">
-              <div className="min-w-0 flex-1 truncate text-sm font-medium">
-                {p.first_name} {p.last_name}
-              </div>
-              {isStepper ? (
-                <ScoreStepper
-                  value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
-                  onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
-                  size="sm"
-                />
-              ) : (
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  className="w-24 text-right"
-                  placeholder={t("entry.value_placeholder")}
-                  value={values[p.id] ?? ""}
-                  onChange={(e) =>
-                    setValues((s) => ({
-                      ...s,
-                      [p.id]: e.target.value === "" ? "" : Number(e.target.value),
-                    }))
-                  }
-                />
-              )}
-            </CardContent>
-          </Card>
-        ))}
+        {players.map((p) => {
+          const current = values[p.id];
+          const prevBest = bestsData?.bests?.[p.id];
+          const isRecordChallenge = challenge.aggregate === "record";
+          const higher = challenge.direction === "higher_better";
+          const hasNumericValue = typeof current === "number" && !Number.isNaN(current) && current !== 0;
+          const beatsPrev =
+            isRecordChallenge &&
+            hasNumericValue &&
+            (prevBest == null
+              ? hasNumericValue
+              : higher
+                ? (current as number) > prevBest
+                : (current as number) < prevBest);
+          return (
+            <Card key={p.id}>
+              <CardContent className="flex flex-wrap items-center gap-3 p-3">
+                <div className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {p.first_name} {p.last_name}
+                </div>
+                {isStepper ? (
+                  <ScoreStepper
+                    value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
+                    onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
+                    size="sm"
+                  />
+                ) : (
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    className="w-24 text-right"
+                    placeholder={t("entry.value_placeholder")}
+                    value={values[p.id] ?? ""}
+                    onChange={(e) =>
+                      setValues((s) => ({
+                        ...s,
+                        [p.id]: e.target.value === "" ? "" : Number(e.target.value),
+                      }))
+                    }
+                  />
+                )}
+                {beatsPrev && (
+                  <div className="w-full">
+                    <NewRecordBadge value={current as number} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
       <Button className="w-full" disabled={save.isPending || done === 0} onClick={() => save.mutate()}>
         {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("entry.save")}
