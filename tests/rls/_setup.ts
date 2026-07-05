@@ -55,7 +55,18 @@ export interface Fixtures {
   obligationB: string; // clubB
   transactionA: string;
   paymentSettingsA: string; // = clubA (PK is club_id)
+  // Challenges & Tests
+  playerA2: string; // second Team A player, no linked user
+  challengeChallengeA: string; // kind='challenge', ranking_visibility='staff'
+  challengeTestA: string; // kind='physical_test', derived='vo2_leger'
+  passageChallengeA: string;
+  passageTestA: string;
+  resultChallengeA_playerA: string;
+  resultChallengeA_playerA2: string;
+  resultTestA_playerA: string;
+  resultTestA_playerA2: string;
 }
+
 
 const FIXTURES_FILE = join(tmpdir(), "clubero-rls-fixtures.json");
 
