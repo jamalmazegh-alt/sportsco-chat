@@ -896,7 +896,21 @@
     "showRecordDetail": "Ver detalhes",
     "hideRecordDetail": "Ocultar detalhes",
     "summaryAria": "Resumo da época",
-    "showAttendance": "Ver estatísticas de presenças"
+    "showAttendance": "Ver estatísticas de presenças",
+    "teamStats": "Estatísticas",
+    "attendanceSection": "Presenças",
+    "matchesSection": "Jogos e golos",
+    "challengesSection": "Desafios",
+    "topScorers": "Melhores marcadores",
+    "noGoals": "Ainda sem golos registados.",
+    "noChallenges": "Sem desafios ativos para esta equipa.",
+    "noResults": "Ainda sem resultados.",
+    "resultWin": "V",
+    "resultDraw": "E",
+    "resultLoss": "D",
+    "played": "Jogados",
+    "goalsFor": "Golos marcados",
+    "goalsAgainst": "Golos sofridos"
   },
   "match": {
     "result": "Resultado do jogo",

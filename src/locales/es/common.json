@@ -896,7 +896,21 @@
     "showRecordDetail": "Ver detalles",
     "hideRecordDetail": "Ocultar detalles",
     "summaryAria": "Resumen de la temporada",
-    "showAttendance": "Ver estadísticas de asistencia"
+    "showAttendance": "Ver estadísticas de asistencia",
+    "teamStats": "Estadísticas",
+    "attendanceSection": "Asistencia",
+    "matchesSection": "Partidos y goles",
+    "challengesSection": "Desafíos",
+    "topScorers": "Máximos goleadores",
+    "noGoals": "Aún no hay goles registrados.",
+    "noChallenges": "No hay desafíos activos para este equipo.",
+    "noResults": "Aún sin resultados.",
+    "resultWin": "G",
+    "resultDraw": "E",
+    "resultLoss": "P",
+    "played": "Jugados",
+    "goalsFor": "Goles a favor",
+    "goalsAgainst": "Goles en contra"
   },
   "match": {
     "result": "Resultado del partido",

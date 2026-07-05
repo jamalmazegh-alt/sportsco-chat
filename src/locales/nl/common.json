@@ -896,7 +896,21 @@
     "showRecordDetail": "Details bekijken",
     "hideRecordDetail": "Details verbergen",
     "summaryAria": "Seizoenoverzicht",
-    "showAttendance": "Aanwezigheidsstatistieken bekijken"
+    "showAttendance": "Aanwezigheidsstatistieken bekijken",
+    "teamStats": "Statistieken",
+    "attendanceSection": "Aanwezigheid",
+    "matchesSection": "Wedstrijden en doelpunten",
+    "challengesSection": "Uitdagingen",
+    "topScorers": "Topscorers",
+    "noGoals": "Nog geen doelpunten geregistreerd.",
+    "noChallenges": "Geen actieve uitdagingen voor dit team.",
+    "noResults": "Nog geen resultaten.",
+    "resultWin": "W",
+    "resultDraw": "G",
+    "resultLoss": "V",
+    "played": "Gespeeld",
+    "goalsFor": "Doelpunten voor",
+    "goalsAgainst": "Doelpunten tegen"
   },
   "match": {
     "result": "Wedstrijdresultaat",

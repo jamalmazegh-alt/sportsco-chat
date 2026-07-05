@@ -896,7 +896,21 @@
     "showRecordDetail": "Show details",
     "hideRecordDetail": "Hide details",
     "summaryAria": "Season summary",
-    "showAttendance": "Show attendance statistics"
+    "showAttendance": "Show attendance statistics",
+    "teamStats": "Statistics",
+    "attendanceSection": "Attendance",
+    "matchesSection": "Matches & goals",
+    "challengesSection": "Challenges",
+    "topScorers": "Top scorers",
+    "noGoals": "No goals recorded yet.",
+    "noChallenges": "No active challenges for this team.",
+    "noResults": "No results yet.",
+    "resultWin": "W",
+    "resultDraw": "D",
+    "resultLoss": "L",
+    "played": "Played",
+    "goalsFor": "Goals for",
+    "goalsAgainst": "Goals against"
   },
   "match": {
     "result": "Match result",
