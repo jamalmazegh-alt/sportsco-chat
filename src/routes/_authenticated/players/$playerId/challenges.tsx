@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Award, Loader2, Trophy } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,9 @@ function PlayerChallengesTab() {
       )}
 
       <div className="space-y-3">
-        {items.map(({ challenge, points, aggregate }) => (
+        {items.map(({ challenge, points, aggregate }) => {
+          const uniqueDates = new Set(points.map((p) => p.date)).size;
+          return (
           <Card key={challenge.id}>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -77,17 +79,45 @@ function PlayerChallengesTab() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-xs uppercase text-muted-foreground">
-                    {challenge.aggregate === "cumulative"
-                      ? t("player_stats.aggregate_cumulative")
-                      : t("player_stats.aggregate_record")}
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                    {challenge.aggregate === "cumulative" ? (
+                      <Trophy className="h-5 w-5" />
+                    ) : (
+                      <Award className="h-5 w-5" />
+                    )}
                   </div>
-                  <div className="text-2xl font-bold tabular-nums">{aggregate}</div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase text-muted-foreground">
+                      {challenge.aggregate === "cumulative"
+                        ? t("player_stats.aggregate_cumulative")
+                        : t("player_stats.aggregate_record")}
+                    </div>
+                    <div className="text-3xl font-black leading-none tabular-nums text-primary">
+                      {aggregate}
+                    </div>
+                  </div>
                 </div>
               </div>
-              {points.length > 1 && (
+
+              {points.length > 0 && uniqueDates < 2 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {points.slice(-3).map((point, index) => (
+                    <div
+                      key={`${point.date}-${index}`}
+                      className="rounded-lg bg-muted px-2.5 py-1.5 text-xs"
+                    >
+                      <span className="font-semibold tabular-nums">{point.value}</span>
+                      <span className="ml-2 text-muted-foreground">
+                        {formatChallengeDate(point.date)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {points.length > 1 && uniqueDates > 1 && (
                 <div className="h-40 w-full">
                   <ResponsiveContainer>
                     <LineChart
@@ -129,8 +159,15 @@ function PlayerChallengesTab() {
               )}
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
+}
+
+function formatChallengeDate(value: string): string {
+  if (!value) return "";
+  const [, month, day] = value.split("-");
+  return day && month ? `${day}/${month}` : value;
 }
