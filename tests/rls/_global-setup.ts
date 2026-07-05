@@ -424,7 +424,7 @@ async function seedAll(): Promise<Fixtures> {
   if (pA2Err || !playerA2Row) throw new Error(`playerA2 insert: ${pA2Err?.message}`);
   const playerA2 = playerA2Row.id;
 
-  // Give playerA a birth_date too, so VO2 derivation has an age.
+  // Give playerA a birth_date too (used by other fixtures/queries).
   await admin.from("players").update({ birth_date: "2005-03-10" }).eq("id", playerA);
 
   // team_members entry for playerA2 (no user_id — pure roster row)
