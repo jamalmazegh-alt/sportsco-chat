@@ -35,6 +35,7 @@ import {
   Trash2,
   Download,
   Upload,
+  BarChart3,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
@@ -727,7 +728,28 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      {isCoach && <CollapsibleTeamStats teamId={teamId} defaultOpen={false} />}
+      {isCoach && (
+        <Link
+          to="/teams/$teamId/stats"
+          params={{ teamId }}
+          className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 active:scale-[0.99] transition-transform hover:bg-accent/40"
+        >
+          <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <BarChart3 className="h-4 w-4 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">
+              {t("stats.teamStats", { defaultValue: "Statistiques de l'équipe" })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t("stats.teamStatsHint", {
+                defaultValue: "Présence, buts, défis",
+              })}
+            </p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+        </Link>
+      )}
 
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
 

@@ -1,6 +1,4 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
-import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { PlayerSuspensions } from "@/components/player-suspensions";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
@@ -864,8 +862,6 @@ function PlayerProfile() {
           {isCoach && player.club_id && (
             <PlayerSuspensions playerId={player.id} clubId={player.club_id} />
           )}
-          {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
-          {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
 
           {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
           {minor && (isParentOfThisPlayer || isCoach) && (

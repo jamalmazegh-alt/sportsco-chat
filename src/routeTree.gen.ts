@@ -123,6 +123,7 @@ import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
 import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
+import { Route as AuthenticatedTeamsTeamIdStatsRouteImport } from './routes/_authenticated/teams/$teamId.stats'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
 import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
@@ -752,6 +753,12 @@ const AuthenticatedTournamentsPricingSuccessRoute =
     path: '/success',
     getParentRoute: () => AuthenticatedTournamentsPricingRoute,
   } as any)
+const AuthenticatedTeamsTeamIdStatsRoute =
+  AuthenticatedTeamsTeamIdStatsRouteImport.update({
+    id: '/stats',
+    path: '/stats',
+    getParentRoute: () => AuthenticatedTeamsTeamIdRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdTimelineRoute =
   AuthenticatedPlayersPlayerIdTimelineRouteImport.update({
     id: '/timeline',
@@ -945,7 +952,7 @@ export interface FileRoutesByFullPath {
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
-  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
@@ -993,6 +1000,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1077,7 +1085,7 @@ export interface FileRoutesByTo {
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
-  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
@@ -1125,6 +1133,7 @@ export interface FileRoutesByTo {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1215,7 +1224,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
-  '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/_authenticated/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
@@ -1263,6 +1272,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/_authenticated/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/_authenticated/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1401,6 +1411,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -1533,6 +1544,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -1670,6 +1682,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId/feedback'
     | '/_authenticated/players/$playerId/seasons'
     | '/_authenticated/players/$playerId/timeline'
+    | '/_authenticated/teams/$teamId/stats'
     | '/_authenticated/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -2564,6 +2577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTournamentsPricingSuccessRouteImport
       parentRoute: typeof AuthenticatedTournamentsPricingRoute
     }
+    '/_authenticated/teams/$teamId/stats': {
+      id: '/_authenticated/teams/$teamId/stats'
+      path: '/stats'
+      fullPath: '/teams/$teamId/stats'
+      preLoaderRoute: typeof AuthenticatedTeamsTeamIdStatsRouteImport
+      parentRoute: typeof AuthenticatedTeamsTeamIdRoute
+    }
     '/_authenticated/players/$playerId/timeline': {
       id: '/_authenticated/players/$playerId/timeline'
       path: '/timeline'
@@ -2834,12 +2854,26 @@ const AuthenticatedSupportRouteChildren: AuthenticatedSupportRouteChildren = {
 const AuthenticatedSupportRouteWithChildren =
   AuthenticatedSupportRoute._addFileChildren(AuthenticatedSupportRouteChildren)
 
+interface AuthenticatedTeamsTeamIdRouteChildren {
+  AuthenticatedTeamsTeamIdStatsRoute: typeof AuthenticatedTeamsTeamIdStatsRoute
+}
+
+const AuthenticatedTeamsTeamIdRouteChildren: AuthenticatedTeamsTeamIdRouteChildren =
+  {
+    AuthenticatedTeamsTeamIdStatsRoute: AuthenticatedTeamsTeamIdStatsRoute,
+  }
+
+const AuthenticatedTeamsTeamIdRouteWithChildren =
+  AuthenticatedTeamsTeamIdRoute._addFileChildren(
+    AuthenticatedTeamsTeamIdRouteChildren,
+  )
+
 interface AuthenticatedTeamsRouteChildren {
-  AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
+  AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRouteWithChildren
 }
 
 const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
-  AuthenticatedTeamsTeamIdRoute: AuthenticatedTeamsTeamIdRoute,
+  AuthenticatedTeamsTeamIdRoute: AuthenticatedTeamsTeamIdRouteWithChildren,
 }
 
 const AuthenticatedTeamsRouteWithChildren =
