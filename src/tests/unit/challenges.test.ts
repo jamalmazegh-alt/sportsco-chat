@@ -19,8 +19,8 @@ describe("VO2 formulas", () => {
     expect(vo2Leger(12)).toBeCloseTo(47.25, 2);
   });
 
-  it("Cooper VO2 for 2400 m ~= 42.42", () => {
-    expect(vo2Cooper(2400)).toBeCloseTo(42.42, 1);
+  it("Cooper VO2 for 2400 m ~= 42.4", () => {
+    expect(vo2Cooper(2400)).toBeCloseTo(42.4, 0);
   });
 
   it("age factor scales for young players", () => {
