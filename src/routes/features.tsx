@@ -52,7 +52,52 @@ function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
+function ChallengesFeatureSection() {
+  const { t } = useTranslation("marketing");
+  const bullets = [
+    t("features.challenges.b1"),
+    t("features.challenges.b2"),
+    t("features.challenges.b3"),
+    t("features.challenges.b4"),
+  ];
+  return (
+    <section className="border-b border-border/60">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 lg:grid-cols-2 lg:items-center lg:px-8">
+        <div>
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-600">
+            <Trophy className="h-3.5 w-3.5" />
+            {t("features.challenges.kicker")}
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("features.challenges.title")}
+          </h2>
+          <p className="mt-4 text-muted-foreground">{t("features.challenges.body")}</p>
+          <ul className="mt-6 space-y-3">
+            {bullets.map((b) => (
+              <li key={b} className="flex items-start gap-3 text-sm">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span className="text-foreground/80">{b}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8">
+            <Button asChild size="lg" className="h-12 px-6">
+              <Link to="/demo">
+                {t("features.challenges.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <ChallengesShowcase />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SponsorsFeatureSection() {
+
   const { t } = useTranslation("marketing");
   const bullets = [
     t("features.sponsors.b1"),
