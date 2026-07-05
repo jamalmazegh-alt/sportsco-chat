@@ -108,6 +108,7 @@ function Landing() {
       <LandingWizard />
       <LandingConvocation />
       <LandingCommunication />
+      <LandingChallenges />
       <LandingTournament />
       <LandingSponsors />
       <LandingComingSoon />
