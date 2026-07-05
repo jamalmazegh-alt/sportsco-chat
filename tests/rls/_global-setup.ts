@@ -577,7 +577,17 @@ async function seedAll(): Promise<Fixtures> {
     obligationB,
     transactionA,
     paymentSettingsA,
+    playerA2,
+    challengeChallengeA,
+    challengeTestA,
+    passageChallengeA,
+    passageTestA,
+    resultChallengeA_playerA,
+    resultChallengeA_playerA2,
+    resultTestA_playerA,
+    resultTestA_playerA2,
   };
+
 }
 
 async function teardownAll(fx: Fixtures) {
