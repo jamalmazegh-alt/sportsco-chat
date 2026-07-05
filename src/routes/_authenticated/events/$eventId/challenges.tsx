@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Plus, Trophy, Users, Lock, Eye } from "lucide-react";
@@ -329,15 +329,18 @@ function EntryScreen({
   });
 
   const [values, setValues] = useState<Record<string, number | "">>({});
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedPassageId, setHydratedPassageId] = useState<string | null>(null);
 
-  // Pre-fill saved values once existing results arrive.
-  if (!hydrated && existingData?.results) {
+  // Pre-fill saved values once existing results arrive, and reset correctly
+  // when switching to another challenge/passage.
+  useEffect(() => {
+    if (!passage?.id || hydratedPassageId === passage.id || !existingData?.results) return;
+
     const seed: Record<string, number | ""> = {};
     for (const r of existingData.results) seed[r.player_id] = Number(r.value);
-    if (Object.keys(seed).length > 0) setValues(seed);
-    setHydrated(true);
-  }
+    setValues(seed);
+    setHydratedPassageId(passage.id);
+  }, [existingData?.results, hydratedPassageId, passage?.id]);
 
   const done = useMemo(
     () => Object.values(values).filter((v) => v !== "" && v != null).length,
