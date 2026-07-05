@@ -446,7 +446,7 @@ async function seedAll(): Promise<Fixtures> {
       unit: "count",
       direction: "higher_better",
       aggregate: "cumulative",
-      derived: "none",
+      recurrence: "season",
       recurrence: "season",
       ranking_visibility: "staff",
       created_by: users.coachA.userId,
