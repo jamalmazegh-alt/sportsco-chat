@@ -1476,6 +1476,20 @@
       "body": "Un bandeau discret en haut de l’accueil met vos partenaires en valeur devant tous vos membres. Impressions et clics comptabilisés automatiquement, rotation gérée par vos admins. De quoi rembourser Clubero — et parfois plus.",
       "tag": "Merci à notre partenaire",
       "cta": "Découvrir"
+    },
+    "challenges": {
+      "badge": "Défis & classements",
+      "headline": "Transformez chaque séance en défi collectif.",
+      "body": "Précision de passes, tirs cadrés, aces au service… Créez des défis pendant vos entraînements et matchs, saisissez les scores en direct et regardez le classement grimper en temps réel. Vos joueurs se prennent au jeu — et progressent.",
+      "cta": "Voir les défis",
+      "img_alt": "Classement animé de défis Clubero avec podium et médailles",
+      "live": "En direct",
+      "challenge_label": "Défi",
+      "challenge_name": "Précision de passes",
+      "players_count": "12 joueurs",
+      "updated_now": "Mis à jour à l'instant",
+      "new_record": "★ Nouveau record",
+      "floating_badge": "🏆 +1 record"
     }
   }
 }
