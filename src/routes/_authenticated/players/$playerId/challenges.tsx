@@ -77,11 +77,28 @@ function PlayerChallengesTab() {
                 </div>
               </div>
               {points.length > 1 && (
-                <div className="h-32 w-full">
+                <div className="h-40 w-full">
                   <ResponsiveContainer>
-                    <LineChart data={points}>
-                      <XAxis dataKey="date" hide />
-                      <YAxis hide domain={["auto", "auto"]} />
+                    <LineChart
+                      data={points}
+                      margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        tickFormatter={(v: string) => {
+                          if (!v) return "";
+                          const [, m, d] = v.split("-");
+                          return `${d}/${m}`;
+                        }}
+                        minTickGap={16}
+                      />
+                      <YAxis
+                        width={28}
+                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        domain={["auto", "auto"]}
+                      />
                       <Tooltip
                         contentStyle={{ fontSize: 12 }}
                         labelFormatter={(l) => String(l)}
@@ -91,7 +108,9 @@ function PlayerChallengesTab() {
                         dataKey="value"
                         stroke="hsl(var(--primary))"
                         strokeWidth={2}
-                        dot
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
+                        isAnimationActive={false}
                       />
                     </LineChart>
                   </ResponsiveContainer>
