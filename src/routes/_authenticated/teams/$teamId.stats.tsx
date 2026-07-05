@@ -263,6 +263,7 @@ function TeamChallengesRankings({ clubId, teamId }: { clubId: string; teamId: st
 }
 
 function ChallengeRankingCard({ challenge }: { challenge: any }) {
+  const { t } = useTranslation();
   const rank = useServerFn(getChallengeRanking);
   const { data, isLoading } = useQuery({
     queryKey: ["challenge-ranking", challenge.id],
