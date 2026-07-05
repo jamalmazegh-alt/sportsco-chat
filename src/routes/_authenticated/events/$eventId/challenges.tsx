@@ -338,6 +338,7 @@ function EntryScreen({
   const getPassage = useServerFn(getOrCreatePassageForEvent);
   const upsert = useServerFn(upsertResults);
   const loadResults = useServerFn(getPassageResults);
+  const loadBests = useServerFn(getChallengePlayerBests);
 
   const { data: passageData, isLoading } = useQuery({
     queryKey: ["challenge-passage", challengeId, eventId],
@@ -349,6 +350,15 @@ function EntryScreen({
     queryKey: ["challenge-passage-results", passage?.id],
     enabled: !!passage?.id,
     queryFn: () => loadResults({ data: { passageId: passage!.id } }),
+  });
+
+  const { data: bestsData } = useQuery({
+    queryKey: ["challenge-player-bests", challengeId, passage?.id],
+    enabled: !!passage?.id && challenge?.aggregate === "record",
+    queryFn: () =>
+      loadBests({
+        data: { challengeId, excludePassageId: passage!.id },
+      }),
   });
 
   const [values, setValues] = useState<Record<string, number | "">>({});
