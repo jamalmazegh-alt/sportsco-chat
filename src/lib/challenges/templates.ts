@@ -101,7 +101,9 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     kind: "challenge",
     unit: "count",
     direction: "higher_better",
-    aggregate: "cumulative",
+    // Best score in a single session — record so a new personal best
+    // triggers the "Nouveau record" badge in the leaderboard.
+    aggregate: "record",
     recurrence: "season",
     ranking_visibility: "category",
   },
@@ -380,7 +382,11 @@ export function findTemplate(key: string | null | undefined): ChallengeTemplate 
 export function getTemplatesForSport(
   sport: string | null | undefined,
 ): ChallengeTemplate[] {
+  // Normalize case: some teams historically stored the sport with a
+  // capital first letter (e.g. "Football" instead of "football"), which
+  // otherwise hides sport-scoped templates like crossbar / juggling.
+  const norm = typeof sport === "string" ? sport.trim().toLowerCase() : "";
   return CHALLENGE_TEMPLATES.filter(
-    (t) => t.sport === "generic" || (!!sport && t.sport === sport),
+    (t) => t.sport === "generic" || (!!norm && t.sport === norm),
   );
 }
