@@ -207,7 +207,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
                 <span className="w-6 text-center font-bold text-muted-foreground">
                   #{i + 1}
                 </span>
-                <span className="flex-1 truncate">
+                <span className="flex-1 truncate underline underline-offset-2">
                   {s.player
                     ? `${s.player.first_name ?? ""} ${s.player.last_name ?? ""}`
                     : s.id.slice(0, 6)}
@@ -329,7 +329,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
                 <span className="w-6 text-center font-bold text-muted-foreground">
                   #{i + 1}
                 </span>
-                <span className="flex-1 truncate">{name}</span>
+                <span className="flex-1 truncate underline underline-offset-2">{name}</span>
                 <span className="font-mono font-bold tabular-nums">{row.score}</span>
               </>
             );
