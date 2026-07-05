@@ -1,11 +1,10 @@
 /**
  * RLS end-to-end suite — Défis & Tests.
  *
- * Matrix (from prompt-lovable-rls-defis.md):
+ * Matrix:
  *   1. staff_A (coachA) reads AND writes challenges/passages/results of Team A
  *   2. player_A: `challenge` ranking not readable while ranking_visibility='staff'
  *   3. player_A: ranking readable ONLY if visibility='category' AND kind='challenge'
- *      → verified with a live toggle staff → category (via updateVisibility path)
  *   4. player_A: physical_test ranking NEVER readable, even if visibility=category
  *   5. player_A reads their own results; never reads another player's result
  *   6. parent_linked_A reads only allowed results of player_A
@@ -13,9 +12,9 @@
  *   8. player_B (other club/category) reads NOTHING of Team A
  *   + anon: no access at all
  *
- * Plus a `derived_value` (VO₂) defense-in-depth block: for every non-staff role,
- * physical_test rows must not appear at all, and any challenge_result column
- * projection must never surface derived_value for non-staff.
+ * Note: la VO₂ max a été retirée. Les tests physiques (Léger palier, Cooper
+ * distance) restent staff-only, mais il n'y a plus de colonne `derived_value`
+ * ni d'invariant DB associé.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { admin } from "./_admin";
@@ -25,7 +24,6 @@ import { getFixtures } from "./_setup";
 describe("RLS — challenges (defis & tests)", () => {
   const fx = getFixtures();
 
-  // Ensure the visibility is reset to 'staff' before running (idempotency between reruns)
   beforeAll(async () => {
     await admin
       .from("challenges")
@@ -55,7 +53,7 @@ describe("RLS — challenges (defis & tests)", () => {
       );
     });
 
-    it("reads all passages and results (including derived_value on physical_test)", async () => {
+    it("reads all passages and results", async () => {
       const c = await signInAs("coachA");
       const { data: passages } = await c
         .from("challenge_passages")
@@ -65,12 +63,9 @@ describe("RLS — challenges (defis & tests)", () => {
 
       const { data: results } = await c
         .from("challenge_results")
-        .select("id, derived_value, passage_id")
+        .select("id, passage_id")
         .in("passage_id", [fx.passageChallengeA, fx.passageTestA]);
       expect((results ?? []).length).toBe(4);
-      const testResults = (results ?? []).filter((r) => r.passage_id === fx.passageTestA);
-      // Staff DOES see derived_value on the physical_test.
-      expect(testResults.every((r) => r.derived_value != null)).toBe(true);
     });
 
     it("can INSERT a new passage + result on Team A", async () => {
@@ -99,7 +94,6 @@ describe("RLS — challenges (defis & tests)", () => {
       expect(rErr).toBeNull();
       expect(newResult?.id).toBeTruthy();
 
-      // cleanup
       await admin.from("challenge_results").delete().eq("id", newResult!.id);
       await admin.from("challenge_passages").delete().eq("id", newPassage!.id);
     });
@@ -115,7 +109,6 @@ describe("RLS — challenges (defis & tests)", () => {
         .from("challenges")
         .select("id")
         .eq("id", fx.challengeChallengeA);
-      // Row absent (not just filtered): length must be exactly 0.
       expect((data ?? []).length).toBe(0);
     });
 
@@ -135,7 +128,6 @@ describe("RLS — challenges (defis & tests)", () => {
         .select("id, player_id")
         .eq("passage_id", fx.passageChallengeA);
       const ids = (data ?? []).map((r) => r.id);
-      // player_belongs_to_user grants own result; peer must be absent.
       expect(ids).toContain(fx.resultChallengeA_playerA);
       expect(ids).not.toContain(fx.resultChallengeA_playerA2);
     });
@@ -157,7 +149,6 @@ describe("RLS — challenges (defis & tests)", () => {
     });
 
     it("AFTER toggle to 'category': challenge visible + peer results visible (ranking)", async () => {
-      // Staff toggles via authenticated client (proves RLS UPDATE allowed for staff too).
       const staff = await signInAs("coachA");
       const { error: updErr } = await staff
         .from("challenges")
@@ -171,12 +162,10 @@ describe("RLS — challenges (defis & tests)", () => {
 
       const { data: results } = await c
         .from("challenge_results")
-        .select("id, player_id, derived_value")
+        .select("id, player_id")
         .eq("passage_id", fx.passageChallengeA);
       const ids = (results ?? []).map((r) => r.id).sort();
       expect(ids).toEqual([fx.resultChallengeA_playerA, fx.resultChallengeA_playerA2].sort());
-      // Defense in depth: this `challenge` has derived='none', so derived_value stays null.
-      expect((results ?? []).every((r) => r.derived_value == null)).toBe(true);
     });
 
     it("REVERT to 'staff': player_A loses visibility again", async () => {
@@ -200,21 +189,18 @@ describe("RLS — challenges (defis & tests)", () => {
   // ------------------------------------------------------------------
   describe("case 4: player_A — physical_test never readable via category visibility", () => {
     it("forcing visibility='category' on a physical_test does NOT open reads", async () => {
-      // Bypass the server-side guard with admin to prove the DB policy itself blocks reads.
       await admin
         .from("challenges")
         .update({ ranking_visibility: "category" })
         .eq("id", fx.challengeTestA);
       try {
         const c = await signInAs("playerA");
-        // Challenge row itself — policy requires kind='challenge' for category access
         const { data: ch } = await c
           .from("challenges")
           .select("id")
           .eq("id", fx.challengeTestA);
         expect((ch ?? []).length).toBe(0);
 
-        // Peer's physical_test result must stay hidden.
         const { data: peer } = await c
           .from("challenge_results")
           .select("id")
@@ -242,17 +228,13 @@ describe("RLS — challenges (defis & tests)", () => {
       expect((data ?? []).length).toBe(1);
     });
 
-    it("own physical_test result: readable (own row) BUT via server function derived_value must be masked (checked in defense block)", async () => {
+    it("own physical_test result: readable (own row)", async () => {
       const c = await signInAs("playerA");
       const { data } = await c
         .from("challenge_results")
-        .select("id, derived_value")
+        .select("id")
         .eq("id", fx.resultTestA_playerA);
-      // Row itself is readable because player_belongs_to_user grants access.
       expect((data ?? []).length).toBe(1);
-      // At the raw table level RLS is row-level, so derived_value column IS
-      // returned here. The server function `getPlayerChallengeStats` is what
-      // strips it for non-staff — enforced in code + covered by the unit tests.
     });
 
     it("peer's physical_test result: hidden", async () => {
@@ -366,7 +348,6 @@ describe("RLS — challenges (defis & tests)", () => {
           unit: "count",
           direction: "higher_better",
           aggregate: "cumulative",
-          derived: "none",
           recurrence: "season",
           ranking_visibility: "staff",
           created_by: fx.users.playerB.userId,
@@ -385,63 +366,9 @@ describe("RLS — challenges (defis & tests)", () => {
       const c = anonClient();
       for (const table of ["challenges", "challenge_passages", "challenge_results"] as const) {
         const { data, error } = await c.from(table).select("id").limit(1);
-        // RLS blocks silently or errors — either counts as no access.
         const blocked = !!error || !data || data.length === 0;
         expect(blocked, `anon should not read ${table}`).toBe(true);
       }
-    });
-  });
-
-  // ------------------------------------------------------------------
-  // Defense in depth — VO₂ / derived_value must not leak
-  // ------------------------------------------------------------------
-  describe("defense in depth — derived_value / physical_test never leaks to non-staff", () => {
-    it("player_A: no physical_test peer row surfaces via any predicate", async () => {
-      const c = await signInAs("playerA");
-      // Broad scan across the passage — peer must be absent even without id filter.
-      const { data } = await c
-        .from("challenge_results")
-        .select("id, player_id, derived_value")
-        .eq("passage_id", fx.passageTestA);
-      const ids = (data ?? []).map((r) => r.id);
-      expect(ids).not.toContain(fx.resultTestA_playerA2);
-      // Only the player's own row (if any) may appear.
-      for (const r of data ?? []) {
-        expect(r.player_id).toBe(fx.playerA);
-      }
-    });
-
-    it("player_B: no physical_test row appears (broad scan)", async () => {
-      const c = await signInAs("playerB");
-      const { data } = await c
-        .from("challenge_results")
-        .select("id, derived_value")
-        .eq("passage_id", fx.passageTestA);
-      expect((data ?? []).length).toBe(0);
-    });
-
-    it("parent_unlinked: physical_test scan returns empty", async () => {
-      const c = await signInAs("parentUnlinkedA");
-      const { data } = await c
-        .from("challenge_results")
-        .select("id, derived_value")
-        .eq("passage_id", fx.passageTestA);
-      expect((data ?? []).length).toBe(0);
-    });
-
-    it("parent_linked_A: sees only linked child's physical_test row, never peer's derived_value", async () => {
-      const c = await signInAs("parentA");
-      const { data } = await c
-        .from("challenge_results")
-        .select("id, player_id, derived_value")
-        .eq("passage_id", fx.passageTestA);
-      const rows = data ?? [];
-      // Only playerA's row is allowed.
-      for (const r of rows) {
-        expect(r.player_id).toBe(fx.playerA);
-      }
-      const ids = rows.map((r) => r.id);
-      expect(ids).not.toContain(fx.resultTestA_playerA2);
     });
   });
 
@@ -532,87 +459,4 @@ describe("RLS — challenges (defis & tests)", () => {
       expect(error).not.toBeNull();
     });
   });
-
-  // ------------------------------------------------------------------
-  // DB invariant: derived_value only on physical_test challenges.
-  // Trigger challenge_results_check_derived_trg — INSERT and UPDATE.
-  // ------------------------------------------------------------------
-  describe("invariant: derived_value ⇒ physical_test only", () => {
-    it("INSERT with derived_value on a `challenge` kind is rejected", async () => {
-      const { error } = await admin.from("challenge_results").insert({
-        passage_id: fx.passageChallengeA,
-        player_id: fx.playerA2,
-        value: 5,
-        derived_value: 42,
-        created_by: fx.users.coachA.userId,
-      });
-      expect(error).not.toBeNull();
-      expect(error?.message ?? "").toMatch(/derived_value/i);
-    });
-
-    it("INSERT with derived_value on a physical_test is accepted", async () => {
-      await admin
-        .from("challenge_results")
-        .delete()
-        .eq("passage_id", fx.passageTestA)
-        .eq("player_id", fx.playerA2);
-      const { data, error } = await admin
-        .from("challenge_results")
-        .insert({
-          passage_id: fx.passageTestA,
-          player_id: fx.playerA2,
-          value: 10,
-          derived_value: 50,
-          created_by: fx.users.coachA.userId,
-        })
-        .select("id")
-        .single();
-      expect(error).toBeNull();
-      if (data?.id) {
-        await admin.from("challenge_results").delete().eq("id", data.id);
-      }
-    });
-
-    it("INSERT with derived_value=NULL on a `challenge` kind is accepted (no false positive)", async () => {
-      await admin
-        .from("challenge_results")
-        .delete()
-        .eq("passage_id", fx.passageChallengeA)
-        .eq("player_id", fx.playerA2);
-      const { data, error } = await admin
-        .from("challenge_results")
-        .insert({
-          passage_id: fx.passageChallengeA,
-          player_id: fx.playerA2,
-          value: 3,
-          derived_value: null,
-          created_by: fx.users.coachA.userId,
-        })
-        .select("id")
-        .single();
-      expect(error).toBeNull();
-      if (data?.id) {
-        await admin.from("challenge_results").delete().eq("id", data.id);
-      }
-    });
-
-
-    it("UPDATE that sets derived_value on a `challenge` kind result is rejected", async () => {
-      const { error } = await admin
-        .from("challenge_results")
-        .update({ derived_value: 99 })
-        .eq("id", fx.resultChallengeA_playerA);
-      expect(error).not.toBeNull();
-      expect(error?.message ?? "").toMatch(/derived_value/i);
-
-      const { data } = await admin
-        .from("challenge_results")
-        .select("derived_value")
-        .eq("id", fx.resultChallengeA_playerA)
-        .single();
-      expect(data?.derived_value).toBeNull();
-    });
-  });
 });
-
-

@@ -26,11 +26,26 @@
     "toggle_hint": "Le classement des tests physiques reste toujours réservé au staff."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Toucher la barre transversale — cumul saison." },
-    "juggling": { "name": "Jonglerie", "description": "Nombre max de jongles d'affilée — record." },
-    "leger": { "name": "Luc Léger", "description": "Test navette 20 m — VO₂ max estimée." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distance parcourue en 12 min — VO₂ max estimée." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Temps sur 20 m — le plus petit gagne." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Toucher la barre transversale — cumul saison."
+    },
+    "juggling": {
+      "name": "Jonglerie",
+      "description": "Nombre max de jongles d'affilée — record."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "Test navette 20 m — palier atteint."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Distance parcourue en 12 min — record."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Temps sur 20 m — le plus petit gagne."
+    }
   },
   "list": {
     "title": "Défis & activités",
@@ -62,16 +77,14 @@
     "no_results": "Pas encore de résultats.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} passage",
-    "attempts_other": "{{count}} passages",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} passages"
   },
   "player_stats": {
     "title": "Stats & défis",
     "no_data": "Aucun résultat enregistré pour ce joueur.",
     "aggregate_cumulative": "Total saison",
     "aggregate_record": "Record",
-    "staff_only": "Réservé au staff",
-    "vo2_hint": "VO₂ max — donnée staff"
+    "staff_only": "Réservé au staff"
   },
   "errors": {
     "forbidden": "Action réservée au staff.",

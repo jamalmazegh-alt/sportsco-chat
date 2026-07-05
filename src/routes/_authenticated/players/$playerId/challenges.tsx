@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Loader2, Lock } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ function PlayerChallengesTab() {
       )}
 
       <div className="space-y-3">
-        {items.map(({ challenge, points, aggregate, derived_best, isStaff }) => (
+        {items.map(({ challenge, points, aggregate }) => (
           <Card key={challenge.id}>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -75,15 +75,6 @@ function PlayerChallengesTab() {
                   </div>
                   <div className="text-2xl font-bold tabular-nums">{aggregate}</div>
                 </div>
-                {derived_best != null && (
-                  <div className="text-right">
-                    <div className="text-[10px] uppercase text-muted-foreground">
-                      <Lock className="mr-1 inline h-3 w-3" />
-                      {t("player_stats.vo2_hint")}
-                    </div>
-                    <div className="text-lg font-semibold tabular-nums">{derived_best}</div>
-                  </div>
-                )}
               </div>
               {points.length > 1 && (
                 <div className="h-32 w-full">
@@ -105,11 +96,6 @@ function PlayerChallengesTab() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-              )}
-              {!isStaff && challenge.derived !== "none" && (
-                <p className="text-[11px] italic text-muted-foreground">
-                  {t("player_stats.staff_only")}
-                </p>
               )}
             </CardContent>
           </Card>

@@ -26,11 +26,26 @@
     "toggle_hint": "La clasificación de las pruebas físicas queda siempre reservada al cuerpo técnico."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Dar al larguero — total de la temporada." },
-    "juggling": { "name": "Toques", "description": "Máximo de toques seguidos — récord." },
-    "leger": { "name": "Luc Léger", "description": "Test de ida y vuelta de 20 m — VO₂ máx. estimada." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distancia recorrida en 12 min — VO₂ máx. estimada." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Tiempo en 20 m — gana el más rápido." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Dar al larguero — total de la temporada."
+    },
+    "juggling": {
+      "name": "Toques",
+      "description": "Máximo de toques seguidos — récord."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "Test de ida y vuelta de 20 m — nivel alcanzado."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Distancia recorrida en 12 min — récord."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Tiempo en 20 m — gana el más rápido."
+    }
   },
   "list": {
     "title": "Retos y actividades",
@@ -62,16 +77,14 @@
     "no_results": "Todavía no hay resultados.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} intento",
-    "attempts_other": "{{count}} intentos",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} intentos"
   },
   "player_stats": {
     "title": "Estadísticas y retos",
     "no_data": "No hay resultados registrados para este jugador.",
     "aggregate_cumulative": "Total temporada",
     "aggregate_record": "Récord",
-    "staff_only": "Reservado al cuerpo técnico",
-    "vo2_hint": "VO₂ máx. — dato del cuerpo técnico"
+    "staff_only": "Reservado al cuerpo técnico"
   },
   "errors": {
     "forbidden": "Acción reservada al cuerpo técnico.",

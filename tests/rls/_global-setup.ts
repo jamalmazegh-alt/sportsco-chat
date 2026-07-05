@@ -408,7 +408,7 @@ async function seedAll(): Promise<Fixtures> {
 
   // 20. Challenges & Tests fixtures — Team A
   // - a "challenge" (Cross Bar-like), ranking_visibility initially 'staff'
-  // - a "physical_test" (Luc Léger), derived vo2_leger, staff-only always
+  // - a "physical_test" (Luc Léger, palier), staff-only always
   // - a second Team A player, unlinked to any user, to test peer-visibility
   //   (playerA must never see playerA2's individual result)
   const { data: playerA2Row, error: pA2Err } = await admin
@@ -424,7 +424,7 @@ async function seedAll(): Promise<Fixtures> {
   if (pA2Err || !playerA2Row) throw new Error(`playerA2 insert: ${pA2Err?.message}`);
   const playerA2 = playerA2Row.id;
 
-  // Give playerA a birth_date too, so VO2 derivation has an age.
+  // Give playerA a birth_date too (used by other fixtures/queries).
   await admin.from("players").update({ birth_date: "2005-03-10" }).eq("id", playerA);
 
   // team_members entry for playerA2 (no user_id — pure roster row)
@@ -446,7 +446,6 @@ async function seedAll(): Promise<Fixtures> {
       unit: "count",
       direction: "higher_better",
       aggregate: "cumulative",
-      derived: "none",
       recurrence: "season",
       ranking_visibility: "staff",
       created_by: users.coachA.userId,
@@ -467,7 +466,6 @@ async function seedAll(): Promise<Fixtures> {
       unit: "stage",
       direction: "higher_better",
       aggregate: "record",
-      derived: "vo2_leger",
       recurrence: "season",
       ranking_visibility: "staff",
       created_by: users.coachA.userId,
@@ -502,7 +500,7 @@ async function seedAll(): Promise<Fixtures> {
   if (pTErr || !passageT) throw new Error(`passage (test) insert: ${pTErr?.message}`);
   const passageTestA = passageT.id;
 
-  // Results — 2 players per passage. Physical-test results carry derived_value.
+  // Results — 2 players per passage.
   const { data: rowsCh, error: rChErr } = await admin
     .from("challenge_results")
     .insert([
@@ -531,14 +529,12 @@ async function seedAll(): Promise<Fixtures> {
         passage_id: passageTestA,
         player_id: playerA,
         value: 8, // stage
-        derived_value: 42.5, // VO2 (populated to test masking)
         created_by: users.coachA.userId,
       },
       {
         passage_id: passageTestA,
         player_id: playerA2,
         value: 9,
-        derived_value: 45.9,
         created_by: users.coachA.userId,
       },
     ])

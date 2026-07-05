@@ -26,11 +26,26 @@
     "toggle_hint": "Die Rangliste von Fitnesstests bleibt immer dem Trainerteam vorbehalten."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Die Latte treffen — Saison gesamt." },
-    "juggling": { "name": "Jonglieren", "description": "Höchste Anzahl an Ballkontakten in Folge — Rekord." },
-    "leger": { "name": "Luc Léger", "description": "20-m-Shuttle-Test — geschätzte VO₂ max." },
-    "cooper": { "name": "Cooper 12 min", "description": "In 12 Minuten zurückgelegte Distanz — geschätzte VO₂ max." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Zeit über 20 m — die schnellste Zeit gewinnt." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Die Latte treffen — Saison gesamt."
+    },
+    "juggling": {
+      "name": "Jonglieren",
+      "description": "Höchste Anzahl an Ballkontakten in Folge — Rekord."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "20-m-Shuttle-Test — erreichte Stufe."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "In 12 Minuten zurückgelegte Distanz — Rekord."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Zeit über 20 m — die schnellste Zeit gewinnt."
+    }
   },
   "list": {
     "title": "Challenges & Aktivitäten",
@@ -62,16 +77,14 @@
     "no_results": "Noch keine Ergebnisse.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} Durchgang",
-    "attempts_other": "{{count}} Durchgänge",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} Durchgänge"
   },
   "player_stats": {
     "title": "Statistiken & Challenges",
     "no_data": "Für diesen Spieler sind keine Ergebnisse erfasst.",
     "aggregate_cumulative": "Saison gesamt",
     "aggregate_record": "Rekord",
-    "staff_only": "Nur für das Trainerteam",
-    "vo2_hint": "VO₂ max — Daten fürs Trainerteam"
+    "staff_only": "Nur für das Trainerteam"
   },
   "errors": {
     "forbidden": "Aktion nur für das Trainerteam.",

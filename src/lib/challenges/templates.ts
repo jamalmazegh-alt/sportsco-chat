@@ -16,7 +16,6 @@ export type ChallengeTemplate = {
   unit: ChallengeInsert["unit"];
   direction: ChallengeInsert["direction"];
   aggregate: ChallengeInsert["aggregate"];
-  derived: ChallengeInsert["derived"];
   recurrence: ChallengeInsert["recurrence"];
   /** Default visibility for the ranking. Physical tests are always staff-only. */
   ranking_visibility: ChallengeInsert["ranking_visibility"];
@@ -30,7 +29,6 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     unit: "count",
     direction: "higher_better",
     aggregate: "cumulative",
-    derived: "none",
     recurrence: "season",
     ranking_visibility: "category",
   },
@@ -41,7 +39,6 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     unit: "count",
     direction: "higher_better",
     aggregate: "record",
-    derived: "none",
     recurrence: "season",
     ranking_visibility: "category",
   },
@@ -52,7 +49,6 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     unit: "stage",
     direction: "higher_better",
     aggregate: "record",
-    derived: "vo2_leger",
     recurrence: "half_season",
     ranking_visibility: "staff",
   },
@@ -63,7 +59,6 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     unit: "distance_meters",
     direction: "higher_better",
     aggregate: "record",
-    derived: "vo2_cooper",
     recurrence: "half_season",
     ranking_visibility: "staff",
   },
@@ -74,7 +69,6 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     unit: "time_seconds",
     direction: "lower_better",
     aggregate: "record",
-    derived: "none",
     recurrence: "season",
     ranking_visibility: "category",
   },

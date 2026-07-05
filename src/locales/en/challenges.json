@@ -26,11 +26,26 @@
     "toggle_hint": "Physical test rankings are always staff-only."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Hit the crossbar — cumulative over the season." },
-    "juggling": { "name": "Juggling", "description": "Longest streak of ball juggles — record." },
-    "leger": { "name": "Léger shuttle", "description": "20 m shuttle test — estimated VO₂ max." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distance in 12 minutes — estimated VO₂ max." },
-    "sprint20m": { "name": "20 m sprint", "description": "Time on 20 m — lowest wins." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Hit the crossbar — cumulative over the season."
+    },
+    "juggling": {
+      "name": "Juggling",
+      "description": "Longest streak of ball juggles — record."
+    },
+    "leger": {
+      "name": "Léger shuttle",
+      "description": "20 m shuttle run — stage reached."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Distance covered in 12 min — record."
+    },
+    "sprint20m": {
+      "name": "20 m sprint",
+      "description": "Time on 20 m — lowest wins."
+    }
   },
   "list": {
     "title": "Challenges & activities",
@@ -62,16 +77,14 @@
     "no_results": "No results yet.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} attempt",
-    "attempts_other": "{{count}} attempts",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} attempts"
   },
   "player_stats": {
     "title": "Stats & challenges",
     "no_data": "No results logged yet for this player.",
     "aggregate_cumulative": "Season total",
     "aggregate_record": "Record",
-    "staff_only": "Staff only",
-    "vo2_hint": "VO₂ max — staff-only data"
+    "staff_only": "Staff only"
   },
   "errors": {
     "forbidden": "Staff-only action.",

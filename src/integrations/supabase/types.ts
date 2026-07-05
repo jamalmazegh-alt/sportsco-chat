@@ -267,7 +267,6 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
-          derived_value: number | null
           id: string
           passage_id: string
           player_id: string
@@ -277,7 +276,6 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
-          derived_value?: number | null
           id?: string
           passage_id: string
           player_id: string
@@ -287,7 +285,6 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
-          derived_value?: number | null
           id?: string
           passage_id?: string
           player_id?: string
@@ -317,7 +314,6 @@ export type Database = {
           club_id: string
           created_at: string
           created_by: string
-          derived: Database["public"]["Enums"]["challenge_derived"]
           direction: Database["public"]["Enums"]["challenge_direction"]
           icon: string | null
           id: string
@@ -337,7 +333,6 @@ export type Database = {
           club_id: string
           created_at?: string
           created_by: string
-          derived?: Database["public"]["Enums"]["challenge_derived"]
           direction?: Database["public"]["Enums"]["challenge_direction"]
           icon?: string | null
           id?: string
@@ -357,7 +352,6 @@ export type Database = {
           club_id?: string
           created_at?: string
           created_by?: string
-          derived?: Database["public"]["Enums"]["challenge_derived"]
           direction?: Database["public"]["Enums"]["challenge_direction"]
           icon?: string | null
           id?: string
@@ -5777,9 +5771,6 @@ export type Database = {
         Returns: boolean
       }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
-      vo2_age_factor: { Args: { _age: number }; Returns: number }
-      vo2_cooper: { Args: { _distance_m: number }; Returns: number }
-      vo2_leger: { Args: { _stage: number }; Returns: number }
     }
     Enums: {
       app_role:
@@ -5791,7 +5782,6 @@ export type Database = {
         | "financial_admin"
       attendance_status: "present" | "absent" | "uncertain" | "pending"
       challenge_aggregate: "cumulative" | "record"
-      challenge_derived: "none" | "vo2_leger" | "vo2_cooper"
       challenge_direction: "higher_better" | "lower_better"
       challenge_kind: "challenge" | "physical_test"
       challenge_recurrence: "season" | "half_season" | "punctual"
@@ -6060,7 +6050,6 @@ export const Constants = {
       ],
       attendance_status: ["present", "absent", "uncertain", "pending"],
       challenge_aggregate: ["cumulative", "record"],
-      challenge_derived: ["none", "vo2_leger", "vo2_cooper"],
       challenge_direction: ["higher_better", "lower_better"],
       challenge_kind: ["challenge", "physical_test"],
       challenge_recurrence: ["season", "half_season", "punctual"],

@@ -479,11 +479,6 @@ function RankingScreen({ challengeId }: { challengeId: string }) {
               </div>
               <div className="text-right">
                 <div className="font-mono text-base font-bold">{row.score}</div>
-                {row.derived_best != null && (
-                  <div className="text-[10px] text-muted-foreground">
-                    {t("ranking.vo2_max")} {row.derived_best}
-                  </div>
-                )}
                 <div className="text-[10px] text-muted-foreground">
                   {row.count === 1
                     ? t("ranking.attempts_one", { count: row.count })

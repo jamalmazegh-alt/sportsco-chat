@@ -26,11 +26,26 @@
     "toggle_hint": "De ranglijst van fysieke tests blijft altijd voorbehouden aan de staf."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "De lat raken — seizoenstotaal." },
-    "juggling": { "name": "Hooghouden", "description": "Meeste keer hooghouden op rij — record." },
-    "leger": { "name": "Luc Léger", "description": "20 m-shuttleloop — geschatte VO₂ max." },
-    "cooper": { "name": "Cooper 12 min", "description": "Afgelegde afstand in 12 min — geschatte VO₂ max." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Tijd over 20 m — de snelste tijd wint." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "De lat raken — seizoenstotaal."
+    },
+    "juggling": {
+      "name": "Hooghouden",
+      "description": "Meeste keer hooghouden op rij — record."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "20 m-shuttleloop — bereikt niveau."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Afgelegde afstand in 12 min — record."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Tijd over 20 m — de snelste tijd wint."
+    }
   },
   "list": {
     "title": "Uitdagingen en activiteiten",
@@ -62,16 +77,14 @@
     "no_results": "Nog geen resultaten.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} poging",
-    "attempts_other": "{{count}} pogingen",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} pogingen"
   },
   "player_stats": {
     "title": "Statistieken en uitdagingen",
     "no_data": "Geen resultaten geregistreerd voor deze speler.",
     "aggregate_cumulative": "Seizoenstotaal",
     "aggregate_record": "Record",
-    "staff_only": "Alleen voor de staf",
-    "vo2_hint": "VO₂ max — gegevens voor de staf"
+    "staff_only": "Alleen voor de staf"
   },
   "errors": {
     "forbidden": "Actie voorbehouden aan de staf.",

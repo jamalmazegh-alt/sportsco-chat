@@ -58,7 +58,7 @@ export interface Fixtures {
   // Challenges & Tests
   playerA2: string; // second Team A player, no linked user
   challengeChallengeA: string; // kind='challenge', ranking_visibility='staff'
-  challengeTestA: string; // kind='physical_test', derived='vo2_leger'
+  challengeTestA: string; // kind='physical_test' (Luc Léger, palier)
   passageChallengeA: string;
   passageTestA: string;
   resultChallengeA_playerA: string;

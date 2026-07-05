@@ -26,11 +26,26 @@
     "toggle_hint": "La classifica dei test fisici resta sempre riservata allo staff."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Colpire la traversa — totale stagione." },
-    "juggling": { "name": "Palleggi", "description": "Numero massimo di palleggi di fila — record." },
-    "leger": { "name": "Luc Léger", "description": "Test navetta 20 m — VO₂ max stimata." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distanza percorsa in 12 min — VO₂ max stimata." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Tempo sui 20 m — vince il più veloce." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Colpire la traversa — totale stagione."
+    },
+    "juggling": {
+      "name": "Palleggi",
+      "description": "Numero massimo di palleggi di fila — record."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "Test navetta 20 m — livello raggiunto."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Distanza percorsa in 12 min — record."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Tempo sui 20 m — vince il più veloce."
+    }
   },
   "list": {
     "title": "Sfide e attività",
@@ -62,16 +77,14 @@
     "no_results": "Ancora nessun risultato.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} tentativo",
-    "attempts_other": "{{count}} tentativi",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} tentativi"
   },
   "player_stats": {
     "title": "Statistiche e sfide",
     "no_data": "Nessun risultato registrato per questo giocatore.",
     "aggregate_cumulative": "Totale stagione",
     "aggregate_record": "Record",
-    "staff_only": "Riservato allo staff",
-    "vo2_hint": "VO₂ max — dato riservato allo staff"
+    "staff_only": "Riservato allo staff"
   },
   "errors": {
     "forbidden": "Azione riservata allo staff.",
