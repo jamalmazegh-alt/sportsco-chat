@@ -291,6 +291,13 @@ function AddChallenge({
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
       <div className="space-y-2">
         <p className="text-sm font-medium">{t("add.pick_template")}</p>
+        {templates.length === 0 && (
+          <Card>
+            <CardContent className="p-6 text-center text-sm text-muted-foreground">
+              {t("add.all_added", { defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe." })}
+            </CardContent>
+          </Card>
+        )}
         {templates.map((tpl) => (
           <Card
             key={tpl.key}
@@ -318,6 +325,7 @@ function AddChallenge({
           </Card>
         ))}
       </div>
+
 
       {selected && (
         <div className="space-y-2">
