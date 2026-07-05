@@ -15,7 +15,7 @@ describe("RLS smoke — infrastructure", () => {
     expect(fx.runId).toBeTruthy();
     expect(fx.clubA).toBeTruthy();
     expect(fx.clubB).toBeTruthy();
-    expect(Object.keys(fx.users)).toHaveLength(8);
+    expect(Object.keys(fx.users)).toHaveLength(9);
   });
 
   it("adminA can sign in", async () => {
