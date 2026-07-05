@@ -529,7 +529,6 @@ async function seedAll(): Promise<Fixtures> {
         passage_id: passageTestA,
         player_id: playerA,
         value: 8, // stage
-        derived_value: 42.5, // VO2 (populated to test masking)
         created_by: users.coachA.userId,
       },
       {
