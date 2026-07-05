@@ -6,6 +6,8 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
+import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { getPlayerChallengeStats } from "@/lib/challenges/challenges.functions";
 import i18n from "@/lib/i18n";
 
