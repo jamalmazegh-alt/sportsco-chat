@@ -10,7 +10,7 @@ import {
   WhatsAppHybrid,
   ClubWallSection,
   PlayerJournalSection,
-  ChallengesShowcase,
+  ChallengesVisual,
 } from "./index";
 
 export const Route = createFileRoute("/features")({
@@ -89,7 +89,7 @@ function ChallengesFeatureSection() {
           </div>
         </div>
         <div className="flex justify-center">
-          <ChallengesShowcase />
+          <ChallengesVisual />
         </div>
       </div>
     </section>

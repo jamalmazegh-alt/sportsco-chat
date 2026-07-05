@@ -343,7 +343,53 @@ function LandingTournament() {
   );
 }
 
+import challengesCrossbarImg from "@/assets/challenges-crossbar.jpg";
+
+export function ChallengesVisual() {
+  const { t } = useTranslation("marketing");
+  return (
+    <div className="relative mx-auto w-full max-w-xl">
+      <div
+        aria-hidden
+        className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-amber-300/30 via-orange-200/20 to-emerald-200/20 blur-2xl"
+      />
+      <div
+        className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl"
+        style={{ animation: "challengesFloat 6s ease-in-out infinite" }}
+      >
+        <img
+          src={challengesCrossbarImg}
+          alt={t("landing.challenges.img_alt")}
+          loading="lazy"
+          decoding="async"
+          width={1536}
+          height={1024}
+          className="h-auto w-full object-cover"
+        />
+      </div>
+      <div
+        className="absolute -left-3 top-6 rounded-full bg-emerald-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg"
+        style={{ animation: "challengesPulse 2s ease-in-out infinite" }}
+      >
+        ● {t("landing.challenges.live")}
+      </div>
+      <div
+        className="absolute -right-3 -top-3 rotate-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-1.5 text-xs font-black text-white shadow-lg"
+        style={{ animation: "challengesBounce 2.4s ease-in-out infinite" }}
+      >
+        {t("landing.challenges.floating_badge")}
+      </div>
+      <style>{`
+        @keyframes challengesFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes challengesBounce { 0%, 100% { transform: rotate(6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-6px); } }
+        @keyframes challengesPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.06); filter: brightness(1.15); } }
+      `}</style>
+    </div>
+  );
+}
+
 export function ChallengesShowcase() {
+
   const { t } = useTranslation("marketing");
   const rows = [
     { name: "Léa M.", score: 92, delta: "+3", medal: "🥇", isNew: true, w: "100%" },
@@ -467,8 +513,9 @@ function LandingChallenges() {
             </div>
           </div>
           <div className="flex justify-center">
-            <ChallengesShowcase />
+            <ChallengesVisual />
           </div>
+
         </div>
       </div>
     </section>
