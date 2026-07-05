@@ -45,6 +45,58 @@
     "sprint20m": {
       "name": "Sprint 20 m",
       "description": "Tempo nos 20 m — vence o mais rápido."
+    },
+    "plankHold": {
+      "name": "Plank hold",
+      "description": "Hold a plank — best duration record."
+    },
+    "shuttleRun": {
+      "name": "Shuttle run",
+      "description": "Timed back-and-forth run — lowest time wins."
+    },
+    "slalomBall": {
+      "name": "Ball slalom",
+      "description": "Timed dribbling slalom — lowest time wins."
+    },
+    "freeThrows": {
+      "name": "Free throws",
+      "description": "Free throws made out of a series — record."
+    },
+    "threePointShots": {
+      "name": "Three-point shots",
+      "description": "Three-point shots made out of a series — record."
+    },
+    "dribbleCourse": {
+      "name": "Dribble course",
+      "description": "Timed dribbling course — lowest time wins."
+    },
+    "layupSeries": {
+      "name": "Layup series",
+      "description": "Layups made out of a series — record."
+    },
+    "handballDribbleSlalom": {
+      "name": "Dribble slalom",
+      "description": "Timed dribbling slalom — lowest time wins."
+    },
+    "sprint40m": {
+      "name": "40 m sprint",
+      "description": "Time on 40 m — lowest wins."
+    },
+    "agilityRunRugby": {
+      "name": "Agility run",
+      "description": "Timed evasion course — lowest time wins."
+    },
+    "successfulPasses": {
+      "name": "Successful passes",
+      "description": "Longest streak of successful passes — record."
+    },
+    "rallyConsistency": {
+      "name": "Rally consistency",
+      "description": "Longest error-free rally — record."
+    },
+    "movementSpeed": {
+      "name": "Movement speed",
+      "description": "Timed movement course — lowest time wins."
     }
   },
   "list": {
