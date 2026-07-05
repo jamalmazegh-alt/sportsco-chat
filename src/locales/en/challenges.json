@@ -12,7 +12,8 @@
     "count": "units",
     "time_seconds": "seconds",
     "distance_meters": "meters",
-    "stage": "stage"
+    "stage": "stage",
+    "score": "points"
   },
   "aggregates": {
     "cumulative": "Season total",
