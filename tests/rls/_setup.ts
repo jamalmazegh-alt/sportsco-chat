@@ -13,10 +13,12 @@ export type Role =
   | "coachA"
   | "playerA"
   | "parentA"
+  | "parentUnlinkedA"
   | "adminB"
   | "coachB"
   | "playerB"
   | "superadmin";
+
 
 export interface UserFixture {
   email: string;
