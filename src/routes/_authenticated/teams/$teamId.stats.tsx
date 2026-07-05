@@ -3,14 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Loader2, Trophy, Goal, BarChart3, Target } from "lucide-react";
+import { ArrowLeft, Loader2, Trophy, Goal, BarChart3, Target, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import {
   listChallenges,
   getChallengeRanking,
 } from "@/lib/challenges/challenges.functions";
+import { toCsv, downloadCsv } from "@/lib/csv";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/stats")({
@@ -196,9 +198,11 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
             </p>
           ) : (
             scorers.map((s, i) => (
-              <div
+              <Link
                 key={s.id}
-                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm"
+                to="/players/$playerId"
+                params={{ playerId: s.id }}
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors"
               >
                 <span className="w-6 text-center font-bold text-muted-foreground">
                   #{i + 1}
@@ -209,7 +213,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
                     : s.id.slice(0, 6)}
                 </span>
                 <span className="font-mono font-bold tabular-nums">{s.count}</span>
-              </div>
+              </Link>
             ))
           )}
         </CardContent>
@@ -269,7 +273,25 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
     queryKey: ["challenge-ranking", challenge.id],
     queryFn: () => rank({ data: { challengeId: challenge.id } }),
   });
-  const top = useMemo(() => (data?.ranking ?? []).slice(0, 5), [data]);
+  const ranking = data?.ranking ?? [];
+  const top = useMemo(() => ranking.slice(0, 5), [ranking]);
+
+  const handleExport = () => {
+    const rows = ranking.map((row: any, i: number) => ({
+      rank: i + 1,
+      player: row.player
+        ? `${row.player.first_name ?? ""} ${row.player.last_name ?? ""}`.trim()
+        : row.player_id,
+      score: row.score,
+    }));
+    const csv = toCsv(rows, [
+      { key: "rank", header: "#" },
+      { key: "player", header: t("stats.player", { defaultValue: "Joueur" }) },
+      { key: "score", header: t("stats.score", { defaultValue: "Score" }) },
+    ]);
+    const safe = (challenge.name ?? "challenge").replace(/[^a-z0-9-_]+/gi, "_");
+    downloadCsv(`ranking_${safe}.csv`, csv);
+  };
 
   return (
     <Card>
@@ -277,6 +299,17 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
         <CardTitle className="flex items-center gap-2 text-base">
           <span>{challenge.icon ?? "🎯"}</span>
           <span className="flex-1 truncate">{challenge.name}</span>
+          {ranking.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 px-2 text-xs"
+              onClick={handleExport}
+            >
+              <Download className="h-3.5 w-3.5" />
+              CSV
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-1 pt-0">
@@ -287,22 +320,37 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
             {t("stats.noResults")}
           </p>
         ) : (
-          top.map((row: any, i: number) => (
-            <div
-              key={row.player_id}
-              className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm"
-            >
-              <span className="w-6 text-center font-bold text-muted-foreground">
-                #{i + 1}
-              </span>
-              <span className="flex-1 truncate">
-                {row.player
-                  ? `${row.player.first_name ?? ""} ${row.player.last_name ?? ""}`
-                  : row.player_id.slice(0, 6)}
-              </span>
-              <span className="font-mono font-bold tabular-nums">{row.score}</span>
-            </div>
-          ))
+          top.map((row: any, i: number) => {
+            const name = row.player
+              ? `${row.player.first_name ?? ""} ${row.player.last_name ?? ""}`
+              : row.player_id.slice(0, 6);
+            const content = (
+              <>
+                <span className="w-6 text-center font-bold text-muted-foreground">
+                  #{i + 1}
+                </span>
+                <span className="flex-1 truncate">{name}</span>
+                <span className="font-mono font-bold tabular-nums">{row.score}</span>
+              </>
+            );
+            return row.player_id ? (
+              <Link
+                key={row.player_id}
+                to="/players/$playerId"
+                params={{ playerId: row.player_id }}
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+              >
+                {content}
+              </Link>
+            ) : (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm"
+              >
+                {content}
+              </div>
+            );
+          })
         )}
       </CardContent>
     </Card>

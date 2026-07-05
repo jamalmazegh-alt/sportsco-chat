@@ -101,10 +101,10 @@ function PlayerChallengesTab() {
                       data={points}
                       margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                         tickFormatter={(v: string) => {
                           if (!v) return "";
                           const [, m, d] = v.split("-");
@@ -114,7 +114,7 @@ function PlayerChallengesTab() {
                       />
                       <YAxis
                         width={28}
-                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                         domain={["auto", "auto"]}
                       />
                       <Tooltip
@@ -124,7 +124,7 @@ function PlayerChallengesTab() {
                       <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="hsl(var(--primary))"
+                        stroke="var(--primary)"
                         strokeWidth={2}
                         dot={{ r: 4 }}
                         activeDot={{ r: 6 }}
