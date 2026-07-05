@@ -236,6 +236,7 @@ function StatBlock({
 }
 
 function TeamChallengesRankings({ clubId, teamId }: { clubId: string; teamId: string }) {
+  const { t } = useTranslation();
   const list = useServerFn(listChallenges);
   const { data, isLoading } = useQuery({
     queryKey: ["challenges", clubId, teamId],
@@ -247,7 +248,7 @@ function TeamChallengesRankings({ clubId, teamId }: { clubId: string; teamId: st
     return (
       <Card>
         <CardContent className="p-6 text-center text-sm text-muted-foreground">
-          Aucun défi actif pour cette équipe.
+          {t("stats.noChallenges")}
         </CardContent>
       </Card>
     );
