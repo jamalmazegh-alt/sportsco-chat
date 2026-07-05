@@ -343,7 +343,7 @@ function LandingTournament() {
   );
 }
 
-import challengesCrossbarImg from "@/assets/challenges-crossbar.jpg";
+import challengesCrossbarAsset from "@/assets/challenges-crossbar.jpg.asset.json";
 
 export function ChallengesVisual() {
   const { t } = useTranslation("marketing");
@@ -358,7 +358,7 @@ export function ChallengesVisual() {
         style={{ animation: "challengesFloat 6s ease-in-out infinite" }}
       >
         <img
-          src={challengesCrossbarImg}
+          src={challengesCrossbarAsset.url}
           alt={t("landing.challenges.img_alt")}
           loading="lazy"
           decoding="async"
