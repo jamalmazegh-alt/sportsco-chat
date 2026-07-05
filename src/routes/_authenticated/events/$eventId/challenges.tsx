@@ -128,12 +128,14 @@ function EventChallengesPage() {
           clubId={eventInfo.clubId}
           teamId={eventInfo.teamId}
           sport={eventInfo.sport}
+          existingChallenges={challenges}
           onDone={() => {
             refetchChallenges();
             setView({ kind: "list" });
           }}
         />
       )}
+
 
       {view.kind === "entry" && (
         <EntryScreen
@@ -243,11 +245,13 @@ function AddChallenge({
   clubId,
   teamId,
   sport,
+  existingChallenges,
   onDone,
 }: {
   clubId: string;
   teamId: string;
   sport: string | null;
+  existingChallenges: any[];
   onDone: () => void;
 }) {
   const { t } = useTranslation("challenges");
@@ -255,7 +259,15 @@ function AddChallenge({
   const [selected, setSelected] = useState<string | null>(null);
   const [name, setName] = useState("");
 
-  const templates = useMemo(() => getTemplatesForSport(sport), [sport]);
+  const templates = useMemo(() => {
+    const usedKeys = new Set(
+      (existingChallenges ?? [])
+        .map((c) => c?.template_key)
+        .filter((k): k is string => !!k),
+    );
+    return getTemplatesForSport(sport).filter((tpl) => !usedKeys.has(tpl.key));
+  }, [sport, existingChallenges]);
+
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
@@ -279,6 +291,13 @@ function AddChallenge({
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
       <div className="space-y-2">
         <p className="text-sm font-medium">{t("add.pick_template")}</p>
+        {templates.length === 0 && (
+          <Card>
+            <CardContent className="p-6 text-center text-sm text-muted-foreground">
+              {t("add.all_added", { defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe." })}
+            </CardContent>
+          </Card>
+        )}
         {templates.map((tpl) => (
           <Card
             key={tpl.key}
@@ -306,6 +325,7 @@ function AddChallenge({
           </Card>
         ))}
       </div>
+
 
       {selected && (
         <div className="space-y-2">
@@ -366,9 +386,10 @@ function EntryScreen({
     enabled: !!passage?.id && challenge?.aggregate === "record",
     queryFn: () =>
       loadBests({
-        data: { challengeId, excludePassageId: passage!.id },
+        data: { challengeId },
       }),
   });
+
 
   const [values, setValues] = useState<Record<string, number | "">>({});
   const [hydratedPassageId, setHydratedPassageId] = useState<string | null>(null);
