@@ -284,7 +284,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
           <LoaderRow />
         ) : top.length === 0 ? (
           <p className="py-3 text-center text-sm text-muted-foreground">
-            Pas encore de résultats.
+            {t("stats.noResults")}
           </p>
         ) : (
           top.map((row: any, i: number) => (
