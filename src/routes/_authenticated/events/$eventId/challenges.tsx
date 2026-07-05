@@ -507,14 +507,14 @@ function EntryScreen({
   );
 }
 
-function RankingScreen({ challengeId }: { challengeId: string }) {
+function RankingScreen({ challengeId, passageId }: { challengeId: string; passageId?: string }) {
   const { t } = useTranslation("challenges");
   const rank = useServerFn(getChallengeRanking);
   const toggleVis = useServerFn(updateChallengeVisibility);
   const qc = useQueryClient();
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["challenge-ranking", challengeId],
-    queryFn: () => rank({ data: { challengeId } }),
+    queryKey: ["challenge-ranking", challengeId, passageId],
+    queryFn: () => rank({ data: { challengeId, highlightPassageId: passageId } }),
   });
 
   const flip = useMutation({
@@ -581,6 +581,9 @@ function RankingScreen({ challengeId }: { challengeId: string }) {
                   ? `${row.player.first_name ?? ""} ${row.player.last_name ?? ""}`
                   : row.player_id.slice(0, 6)}
               </div>
+              {row.is_new_record && ch.aggregate === "record" && (
+                <NewRecordBadge value={row.score} />
+              )}
               <div className="text-right">
                 <div className="font-mono text-base font-bold">{row.score}</div>
                 <div className="text-[10px] text-muted-foreground">
