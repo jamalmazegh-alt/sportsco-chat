@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Défis & tests | Clubero",
+    "description": "Lance un défi ou un test physique pendant un entraînement, saisis les résultats et suis la progression."
+  },
+  "types": {
+    "challenge": "Défi",
+    "physical_test": "Test physique",
+    "activity": "Activité"
+  },
+  "units": {
+    "count": "unités",
+    "time_seconds": "secondes",
+    "distance_meters": "mètres",
+    "stage": "palier"
+  },
+  "aggregates": {
+    "cumulative": "Total saison",
+    "record": "Record"
+  },
+  "visibility": {
+    "staff": "Visible du staff uniquement",
+    "category": "Visible de la catégorie",
+    "staff_short": "Staff",
+    "category_short": "Catégorie",
+    "toggle_hint": "Le classement des tests physiques reste toujours réservé au staff."
+  },
+  "templates": {
+    "crossbar": { "name": "Cross Bar", "description": "Toucher la barre transversale — cumul saison." },
+    "juggling": { "name": "Jonglerie", "description": "Nombre max de jongles d'affilée — record." },
+    "leger": { "name": "Luc Léger", "description": "Test navette 20 m — VO₂ max estimée." },
+    "cooper": { "name": "Cooper 12 min", "description": "Distance parcourue en 12 min — VO₂ max estimée." },
+    "sprint20m": { "name": "Sprint 20 m", "description": "Temps sur 20 m — le plus petit gagne." }
+  },
+  "list": {
+    "title": "Défis & activités",
+    "empty": "Aucun défi pour l'instant.",
+    "empty_hint": "Ajoute un défi ou un test à cette séance.",
+    "add": "Ajouter une activité",
+    "back": "Retour à l'entraînement"
+  },
+  "add": {
+    "title": "Ajouter une activité",
+    "pick_template": "Choisir un modèle",
+    "or_custom": "Créer sur mesure",
+    "custom_name_label": "Nom",
+    "custom_name_placeholder": "Ex. Précision passe longue",
+    "create": "Créer",
+    "creating": "Création…"
+  },
+  "entry": {
+    "title": "Saisie",
+    "counter": "{{present}} présent·es · {{done}} saisi·es",
+    "save": "Enregistrer",
+    "saved": "Résultats enregistrés",
+    "no_players": "Aucun joueur présent à cette séance.",
+    "value_placeholder": "Valeur"
+  },
+  "ranking": {
+    "title": "Classement",
+    "view": "Voir le classement",
+    "no_results": "Pas encore de résultats.",
+    "position": "#{{n}}",
+    "attempts_one": "{{count}} passage",
+    "attempts_other": "{{count}} passages",
+    "vo2_max": "VO₂ max"
+  },
+  "player_stats": {
+    "title": "Stats & défis",
+    "no_data": "Aucun résultat enregistré pour ce joueur.",
+    "aggregate_cumulative": "Total saison",
+    "aggregate_record": "Record",
+    "staff_only": "Réservé au staff",
+    "vo2_hint": "VO₂ max — donnée staff"
+  },
+  "errors": {
+    "forbidden": "Action réservée au staff.",
+    "generic": "Une erreur est survenue."
+  }
+}
