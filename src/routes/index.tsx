@@ -467,8 +467,9 @@ function LandingChallenges() {
             </div>
           </div>
           <div className="flex justify-center">
-            <ChallengesShowcase />
+            <ChallengesVisual />
           </div>
+
         </div>
       </div>
     </section>
