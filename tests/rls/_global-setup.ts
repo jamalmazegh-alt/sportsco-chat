@@ -535,7 +535,6 @@ async function seedAll(): Promise<Fixtures> {
         passage_id: passageTestA,
         player_id: playerA2,
         value: 9,
-        derived_value: 45.9,
         created_by: users.coachA.userId,
       },
     ])
