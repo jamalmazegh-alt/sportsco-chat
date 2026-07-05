@@ -243,7 +243,12 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ challengeId: z.string().uuid(), eventId: z.string().uuid() })
+      .object({
+        challengeId: z.string().uuid(),
+        eventId: z.string().uuid().nullish(),
+        // ISO date (YYYY-MM-DD). Used only when eventId is absent; defaults to today.
+        passageDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -255,11 +260,40 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
     if (!ch) throw new Response("Not found", { status: 404 });
     await assertClubStaff(context.supabase, context.userId, ch.club_id);
 
+    const eventId = data.eventId ?? null;
+
+    if (eventId) {
+      const { data: existing } = await context.supabase
+        .from("challenge_passages")
+        .select("*")
+        .eq("challenge_id", data.challengeId)
+        .eq("event_id", eventId)
+        .maybeSingle();
+      if (existing) return { passage: existing };
+
+      const { data: row, error } = await context.supabase
+        .from("challenge_passages")
+        .insert({
+          challenge_id: data.challengeId,
+          event_id: eventId,
+          created_by: context.userId,
+        })
+        .select()
+        .single();
+      if (error) throw new Response(error.message, { status: 400 });
+      return { passage: row };
+    }
+
+    // Standalone passage: unique per (challenge_id, passage_date) via partial index.
+    const today = new Date().toISOString().slice(0, 10);
+    const passageDate = data.passageDate ?? today;
+
     const { data: existing } = await context.supabase
       .from("challenge_passages")
       .select("*")
       .eq("challenge_id", data.challengeId)
-      .eq("event_id", data.eventId)
+      .is("event_id", null)
+      .eq("passage_date", passageDate)
       .maybeSingle();
     if (existing) return { passage: existing };
 
@@ -267,7 +301,8 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
       .from("challenge_passages")
       .insert({
         challenge_id: data.challengeId,
-        event_id: data.eventId,
+        event_id: null,
+        passage_date: passageDate,
         created_by: context.userId,
       })
       .select()
@@ -275,6 +310,7 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { passage: row };
   });
+
 
 // ---------- results (upsert + ranking)
 
