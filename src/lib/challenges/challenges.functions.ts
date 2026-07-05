@@ -456,10 +456,14 @@ export const getChallengePlayerBests = createServerFn({ method: "POST" })
 /**
  * Ranking for a challenge, aggregated per player over the whole set of
  * passages the caller can read.
+ * Optionally, pass `highlightPassageId` to mark rows whose value in that
+ * passage is a new personal record (only meaningful for `record` challenges).
  */
 export const getChallengeRanking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ challengeId: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ challengeId: z.string().uuid(), highlightPassageId: z.string().uuid().optional() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     const { data: ch, error: chErr } = await context.supabase
       .from("challenges")
@@ -506,6 +510,30 @@ export const getChallengeRanking = createServerFn({ method: "POST" })
     }
 
     const higher = ch.direction === "higher_better";
+
+    // New-record detection for a highlighted passage.
+    const isRecordChallenge = ch.aggregate === "record";
+    let newRecordPlayerIds = new Set<string>();
+    if (isRecordChallenge && data.highlightPassageId && passageIds.includes(data.highlightPassageId)) {
+      const historical = new Map<string, number>();
+      for (const r of (results ?? []) as any[]) {
+        if (r.passage_id === data.highlightPassageId) continue;
+        const v = Number(r.value);
+        const cur = historical.get(r.player_id as string);
+        if (cur == null || (higher ? v > cur : v < cur)) {
+          historical.set(r.player_id as string, v);
+        }
+      }
+      for (const r of (results ?? []) as any[]) {
+        if (r.passage_id !== data.highlightPassageId) continue;
+        const v = Number(r.value);
+        const prev = historical.get(r.player_id as string);
+        if (prev == null || (higher ? v > prev : v < prev)) {
+          newRecordPlayerIds.add(r.player_id as string);
+        }
+      }
+    }
+
     const ranking = Array.from(grouped.entries())
       .map(([player_id, { values }]) => {
         const score =
@@ -519,6 +547,7 @@ export const getChallengeRanking = createServerFn({ method: "POST" })
           player: pMap.get(player_id) ?? null,
           score: round2(score),
           count: values.length,
+          is_new_record: newRecordPlayerIds.has(player_id),
         };
       })
       .sort((a, b) => (higher ? b.score - a.score : a.score - b.score));
