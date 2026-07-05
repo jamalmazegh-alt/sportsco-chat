@@ -52,7 +52,8 @@
     "empty": "Noch keine Challenges.",
     "empty_hint": "Füge diesem Training eine Challenge oder einen Test hinzu.",
     "add": "Aktivität hinzufügen",
-    "back": "Zurück zum Training"
+    "back": "Zurück zum Training",
+    "edit": "Bearbeiten"
   },
   "add": {
     "title": "Aktivität hinzufügen",

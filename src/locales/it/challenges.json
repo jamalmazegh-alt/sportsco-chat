@@ -52,7 +52,8 @@
     "empty": "Ancora nessuna sfida.",
     "empty_hint": "Aggiungi una sfida o un test a questa seduta.",
     "add": "Aggiungi attività",
-    "back": "Torna all'allenamento"
+    "back": "Torna all'allenamento",
+    "edit": "Modifica"
   },
   "add": {
     "title": "Aggiungi attività",

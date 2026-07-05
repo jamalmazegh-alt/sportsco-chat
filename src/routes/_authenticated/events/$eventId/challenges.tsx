@@ -20,6 +20,7 @@ import {
   getChallengeRanking,
   updateChallengeVisibility,
   getPassageResults,
+  getEventChallengesEntryCounts,
 } from "@/lib/challenges/challenges.functions";
 import i18n from "@/lib/i18n";
 
@@ -78,12 +79,19 @@ function EventChallengesPage() {
       list({ data: { clubId: eventInfo!.clubId, teamId: eventInfo!.teamId } }),
   });
 
+  const loadCounts = useServerFn(getEventChallengesEntryCounts);
+  const { data: countsData, refetch: refetchCounts } = useQuery({
+    queryKey: ["event-challenge-entry-counts", eventId],
+    queryFn: () => loadCounts({ data: { eventId } }),
+  });
+
   if (loadingEvent) {
     return <FullscreenLoader />;
   }
   if (!eventInfo) return <div className="p-4 text-sm text-muted-foreground">Event not found.</div>;
 
   const challenges = challengesData?.challenges ?? [];
+  const entryCounts = countsData?.counts ?? {};
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-4">
@@ -105,6 +113,7 @@ function EventChallengesPage() {
         <ChallengesList
           eventId={eventId}
           challenges={challenges}
+          entryCounts={entryCounts}
           onAdd={() => setView({ kind: "add" })}
           onEntry={(id) => setView({ kind: "entry", challengeId: id })}
           onRanking={(id) => setView({ kind: "ranking", challengeId: id })}
@@ -126,7 +135,10 @@ function EventChallengesPage() {
           challenge={challenges.find((c: any) => c.id === view.challengeId)}
           eventId={eventId}
           players={eventInfo.players}
-          onDone={() => setView({ kind: "ranking", challengeId: view.challengeId })}
+          onDone={() => {
+            refetchCounts();
+            setView({ kind: "ranking", challengeId: view.challengeId });
+          }}
         />
       )}
       {view.kind === "ranking" && (
@@ -146,12 +158,14 @@ function FullscreenLoader() {
 
 function ChallengesList({
   challenges,
+  entryCounts,
   onAdd,
   onEntry,
   onRanking,
 }: {
   eventId: string;
   challenges: any[];
+  entryCounts: Record<string, number>;
   onAdd: () => void;
   onEntry: (id: string) => void;
   onRanking: (id: string) => void;
@@ -173,7 +187,9 @@ function ChallengesList({
           </CardContent>
         </Card>
       )}
-      {challenges.map((c) => (
+      {challenges.map((c) => {
+        const hasEntries = (entryCounts[c.id] ?? 0) > 0;
+        return (
         <Card key={c.id}>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
@@ -190,13 +206,18 @@ function ChallengesList({
               <Button size="sm" variant="outline" onClick={() => onRanking(c.id)}>
                 <Trophy className="h-4 w-4" />
               </Button>
-              <Button size="sm" onClick={() => onEntry(c.id)}>
-                {t("entry.title")}
+              <Button
+                size="sm"
+                variant={hasEntries ? "outline" : "default"}
+                onClick={() => onEntry(c.id)}
+              >
+                {hasEntries ? t("list.edit") : t("entry.title")}
               </Button>
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }

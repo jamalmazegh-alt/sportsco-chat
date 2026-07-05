@@ -66,7 +66,6 @@ function PlayerChallengesTab() {
 
       <div className="space-y-3">
         {items.map(({ challenge, points, aggregate }) => {
-          const uniqueDates = new Set(points.map((p) => p.date)).size;
           return (
           <Card key={challenge.id}>
             <CardHeader className="pb-2">
@@ -101,23 +100,7 @@ function PlayerChallengesTab() {
                 </div>
               </div>
 
-              {points.length > 0 && uniqueDates < 2 && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {points.slice(-3).map((point, index) => (
-                    <div
-                      key={`${point.date}-${index}`}
-                      className="rounded-lg bg-muted px-2.5 py-1.5 text-xs"
-                    >
-                      <span className="font-semibold tabular-nums">{point.value}</span>
-                      <span className="ml-2 text-muted-foreground">
-                        {formatChallengeDate(point.date)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {points.length > 1 && uniqueDates > 1 && (
+              {points.length > 0 && (
                 <div className="h-40 w-full">
                   <ResponsiveContainer>
                     <LineChart
@@ -149,8 +132,8 @@ function PlayerChallengesTab() {
                         dataKey="value"
                         stroke="hsl(var(--primary))"
                         strokeWidth={2}
-                        dot={{ r: 3 }}
-                        activeDot={{ r: 5 }}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
                         isAnimationActive={false}
                       />
                     </LineChart>
@@ -164,10 +147,4 @@ function PlayerChallengesTab() {
       </div>
     </div>
   );
-}
-
-function formatChallengeDate(value: string): string {
-  if (!value) return "";
-  const [, month, day] = value.split("-");
-  return day && month ? `${day}/${month}` : value;
 }

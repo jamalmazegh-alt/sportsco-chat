@@ -365,6 +365,39 @@ export const getPassageResults = createServerFn({ method: "POST" })
   });
 
 /**
+ * Count of results per challenge for a given event.
+ * Used by the event challenges list to switch the CTA from "Saisir" to
+ * "Éditer" when data has already been recorded.
+ */
+export const getEventChallengesEntryCounts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ eventId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: passages, error } = await context.supabase
+      .from("challenge_passages")
+      .select("id, challenge_id")
+      .eq("event_id", data.eventId);
+    if (error) throw new Response(error.message, { status: 400 });
+    const rows = (passages ?? []) as { id: string; challenge_id: string }[];
+    if (rows.length === 0) return { counts: {} as Record<string, number> };
+    const { data: results } = await context.supabase
+      .from("challenge_results")
+      .select("passage_id")
+      .in("passage_id", rows.map((r) => r.id));
+    const byPassage = new Map<string, number>();
+    for (const r of (results ?? []) as { passage_id: string }[]) {
+      byPassage.set(r.passage_id, (byPassage.get(r.passage_id) ?? 0) + 1);
+    }
+    const counts: Record<string, number> = {};
+    for (const p of rows) {
+      counts[p.challenge_id] = (counts[p.challenge_id] ?? 0) + (byPassage.get(p.id) ?? 0);
+    }
+    return { counts };
+  });
+
+/**
  * Ranking for a challenge, aggregated per player over the whole set of
  * passages the caller can read.
  */
