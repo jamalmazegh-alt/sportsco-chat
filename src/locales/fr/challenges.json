@@ -45,8 +45,22 @@
     "sprint20m": {
       "name": "Sprint 20 m",
       "description": "Temps sur 20 m — le plus petit gagne."
-    }
+    },
+    "plankHold": { "name": "Gainage", "description": "Tenir la position de gainage — record de durée." },
+    "shuttleRun": { "name": "Navette", "description": "Aller-retour chronométré — le plus petit temps gagne." },
+    "slalomBall": { "name": "Slalom balle au pied", "description": "Slalom chronométré balle au pied — le plus petit temps gagne." },
+    "freeThrows": { "name": "Lancers francs", "description": "Lancers francs réussis sur une série — record." },
+    "threePointShots": { "name": "Tirs à 3 points", "description": "Tirs à 3 points réussis sur une série — record." },
+    "dribbleCourse": { "name": "Parcours de dribble", "description": "Parcours chronométré en dribble — le plus petit temps gagne." },
+    "layupSeries": { "name": "Série de layups", "description": "Layups réussis sur une série — record." },
+    "handballDribbleSlalom": { "name": "Slalom en dribble", "description": "Parcours chronométré en dribble — le plus petit temps gagne." },
+    "sprint40m": { "name": "Sprint 40 m", "description": "Temps sur 40 m — le plus petit gagne." },
+    "agilityRunRugby": { "name": "Parcours d'agilité", "description": "Parcours chronométré d'évitement — le plus petit temps gagne." },
+    "successfulPasses": { "name": "Passes réussies", "description": "Passes réussies d'affilée — record." },
+    "rallyConsistency": { "name": "Régularité en échange", "description": "Coups échangés sans faute — record." },
+    "movementSpeed": { "name": "Vitesse de déplacement", "description": "Parcours de déplacement chronométré — le plus petit temps gagne." }
   },
+
   "list": {
     "title": "Défis & activités",
     "empty": "Aucun défi pour l'instant.",
