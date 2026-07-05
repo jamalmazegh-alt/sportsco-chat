@@ -378,9 +378,10 @@ function EntryScreen({
     enabled: !!passage?.id && challenge?.aggregate === "record",
     queryFn: () =>
       loadBests({
-        data: { challengeId, excludePassageId: passage!.id },
+        data: { challengeId },
       }),
   });
+
 
   const [values, setValues] = useState<Record<string, number | "">>({});
   const [hydratedPassageId, setHydratedPassageId] = useState<string | null>(null);
