@@ -127,12 +127,14 @@ function EventChallengesPage() {
         <AddChallenge
           clubId={eventInfo.clubId}
           teamId={eventInfo.teamId}
+          sport={eventInfo.sport}
           onDone={() => {
             refetchChallenges();
             setView({ kind: "list" });
           }}
         />
       )}
+
       {view.kind === "entry" && (
         <EntryScreen
           challengeId={view.challengeId}
