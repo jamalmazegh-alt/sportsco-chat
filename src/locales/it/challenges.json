@@ -90,5 +90,8 @@
   "errors": {
     "forbidden": "Azione riservata allo staff.",
     "generic": "Si è verificato un errore."
+  },
+  "records": {
+    "new": "Nuovo record!"
   }
 }

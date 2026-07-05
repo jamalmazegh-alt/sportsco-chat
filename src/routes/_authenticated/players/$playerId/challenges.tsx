@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Award, Loader2, Trophy } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { AggregateBadge } from "@/components/challenge-badges";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,19 +75,10 @@ function PlayerChallengesTab() {
                 <span className="flex-1 truncate">{challenge.name}</span>
               </CardTitle>
               <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 font-medium text-primary">
-                  {challenge.aggregate === "cumulative" ? (
-                    <Trophy className="h-3 w-3" />
-                  ) : (
-                    <Award className="h-3 w-3" />
-                  )}
-                  <span className="uppercase tracking-wide text-[10px]">
-                    {challenge.aggregate === "cumulative"
-                      ? t("player_stats.aggregate_cumulative")
-                      : t("player_stats.aggregate_record")}
-                  </span>
-                  <span className="tabular-nums font-bold">{aggregate}</span>
-                </span>
+                <AggregateBadge
+                  type={challenge.aggregate === "cumulative" ? "cumulative" : "record"}
+                  value={aggregate}
+                />
                 <span>·</span>
                 <span>{t(`types.${challenge.kind}`)}</span>
               </div>

@@ -90,5 +90,8 @@
   "errors": {
     "forbidden": "Acción reservada al cuerpo técnico.",
     "generic": "Se ha producido un error."
+  },
+  "records": {
+    "new": "¡Nuevo récord!"
   }
 }

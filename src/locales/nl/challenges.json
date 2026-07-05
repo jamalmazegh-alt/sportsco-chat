@@ -90,5 +90,8 @@
   "errors": {
     "forbidden": "Actie voorbehouden aan de staf.",
     "generic": "Er is een fout opgetreden."
+  },
+  "records": {
+    "new": "Nieuw record!"
   }
 }

@@ -398,6 +398,62 @@ export const getEventChallengesEntryCounts = createServerFn({ method: "POST" })
   });
 
 /**
+ * Previous best value per player for a `record` challenge, EXCLUDING the given
+ * passage. Used to detect "new record" moments on the entry screen.
+ */
+export const getChallengePlayerBests = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        challengeId: z.string().uuid(),
+        excludePassageId: z.string().uuid().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: ch, error: chErr } = await context.supabase
+      .from("challenges")
+      .select("id, aggregate, direction")
+      .eq("id", data.challengeId)
+      .single();
+    if (chErr || !ch) throw new Response("Not found", { status: 404 });
+
+    const { data: passages } = await context.supabase
+      .from("challenge_passages")
+      .select("id")
+      .eq("challenge_id", data.challengeId);
+    let passageIds = ((passages ?? []) as { id: string }[]).map((p) => p.id);
+    if (data.excludePassageId) {
+      passageIds = passageIds.filter((id) => id !== data.excludePassageId);
+    }
+    if (passageIds.length === 0) {
+      return {
+        aggregate: ch.aggregate as Aggregate,
+        direction: ch.direction as Direction,
+        bests: {} as Record<string, number>,
+      };
+    }
+    const { data: rows } = await context.supabase
+      .from("challenge_results")
+      .select("player_id, value")
+      .in("passage_id", passageIds);
+
+    const higher = ch.direction === "higher_better";
+    const bests: Record<string, number> = {};
+    for (const r of (rows ?? []) as { player_id: string; value: number }[]) {
+      const v = Number(r.value);
+      const cur = bests[r.player_id];
+      if (cur == null || (higher ? v > cur : v < cur)) bests[r.player_id] = v;
+    }
+    return {
+      aggregate: ch.aggregate as Aggregate,
+      direction: ch.direction as Direction,
+      bests,
+    };
+  });
+
+/**
  * Ranking for a challenge, aggregated per player over the whole set of
  * passages the caller can read.
  */

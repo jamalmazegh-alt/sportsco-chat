@@ -90,5 +90,8 @@
   "errors": {
     "forbidden": "Aktion nur für das Trainerteam.",
     "generic": "Ein Fehler ist aufgetreten."
+  },
+  "records": {
+    "new": "Neuer Rekord!"
   }
 }

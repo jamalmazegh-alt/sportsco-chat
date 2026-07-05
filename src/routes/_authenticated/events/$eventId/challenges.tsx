@@ -21,7 +21,9 @@ import {
   updateChallengeVisibility,
   getPassageResults,
   getEventChallengesEntryCounts,
+  getChallengePlayerBests,
 } from "@/lib/challenges/challenges.functions";
+import { NewRecordBadge } from "@/components/challenge-badges";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/challenges")({
@@ -336,6 +338,7 @@ function EntryScreen({
   const getPassage = useServerFn(getOrCreatePassageForEvent);
   const upsert = useServerFn(upsertResults);
   const loadResults = useServerFn(getPassageResults);
+  const loadBests = useServerFn(getChallengePlayerBests);
 
   const { data: passageData, isLoading } = useQuery({
     queryKey: ["challenge-passage", challengeId, eventId],
@@ -347,6 +350,15 @@ function EntryScreen({
     queryKey: ["challenge-passage-results", passage?.id],
     enabled: !!passage?.id,
     queryFn: () => loadResults({ data: { passageId: passage!.id } }),
+  });
+
+  const { data: bestsData } = useQuery({
+    queryKey: ["challenge-player-bests", challengeId, passage?.id],
+    enabled: !!passage?.id && challenge?.aggregate === "record",
+    queryFn: () =>
+      loadBests({
+        data: { challengeId, excludePassageId: passage!.id },
+      }),
   });
 
   const [values, setValues] = useState<Record<string, number | "">>({});
@@ -405,37 +417,57 @@ function EntryScreen({
         </p>
       </div>
       <div className="space-y-2">
-        {players.map((p) => (
-          <Card key={p.id}>
-            <CardContent className="flex items-center gap-3 p-3">
-              <div className="min-w-0 flex-1 truncate text-sm font-medium">
-                {p.first_name} {p.last_name}
-              </div>
-              {isStepper ? (
-                <ScoreStepper
-                  value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
-                  onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
-                  size="sm"
-                />
-              ) : (
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  className="w-24 text-right"
-                  placeholder={t("entry.value_placeholder")}
-                  value={values[p.id] ?? ""}
-                  onChange={(e) =>
-                    setValues((s) => ({
-                      ...s,
-                      [p.id]: e.target.value === "" ? "" : Number(e.target.value),
-                    }))
-                  }
-                />
-              )}
-            </CardContent>
-          </Card>
-        ))}
+        {players.map((p) => {
+          const current = values[p.id];
+          const prevBest = bestsData?.bests?.[p.id];
+          const isRecordChallenge = challenge.aggregate === "record";
+          const higher = challenge.direction === "higher_better";
+          const hasNumericValue = typeof current === "number" && !Number.isNaN(current) && current !== 0;
+          const beatsPrev =
+            isRecordChallenge &&
+            hasNumericValue &&
+            (prevBest == null
+              ? hasNumericValue
+              : higher
+                ? (current as number) > prevBest
+                : (current as number) < prevBest);
+          return (
+            <Card key={p.id}>
+              <CardContent className="flex flex-wrap items-center gap-3 p-3">
+                <div className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {p.first_name} {p.last_name}
+                </div>
+                {isStepper ? (
+                  <ScoreStepper
+                    value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
+                    onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
+                    size="sm"
+                  />
+                ) : (
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    className="w-24 text-right"
+                    placeholder={t("entry.value_placeholder")}
+                    value={values[p.id] ?? ""}
+                    onChange={(e) =>
+                      setValues((s) => ({
+                        ...s,
+                        [p.id]: e.target.value === "" ? "" : Number(e.target.value),
+                      }))
+                    }
+                  />
+                )}
+                {beatsPrev && (
+                  <div className="w-full">
+                    <NewRecordBadge value={current as number} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
       <Button className="w-full" disabled={save.isPending || done === 0} onClick={() => save.mutate()}>
         {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("entry.save")}
