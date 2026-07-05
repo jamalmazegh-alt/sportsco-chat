@@ -72,33 +72,27 @@ function PlayerChallengesTab() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <span>{challenge.icon}</span>
                 <span className="flex-1 truncate">{challenge.name}</span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {t(`types.${challenge.kind}`)}
-                </span>
               </CardTitle>
+              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 font-medium text-primary">
+                  {challenge.aggregate === "cumulative" ? (
+                    <Trophy className="h-3 w-3" />
+                  ) : (
+                    <Award className="h-3 w-3" />
+                  )}
+                  <span className="uppercase tracking-wide text-[10px]">
+                    {challenge.aggregate === "cumulative"
+                      ? t("player_stats.aggregate_cumulative")
+                      : t("player_stats.aggregate_record")}
+                  </span>
+                  <span className="tabular-nums font-bold">{aggregate}</span>
+                </span>
+                <span>·</span>
+                <span>{t(`types.${challenge.kind}`)}</span>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-                    {challenge.aggregate === "cumulative" ? (
-                      <Trophy className="h-5 w-5" />
-                    ) : (
-                      <Award className="h-5 w-5" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold uppercase text-muted-foreground">
-                      {challenge.aggregate === "cumulative"
-                        ? t("player_stats.aggregate_cumulative")
-                        : t("player_stats.aggregate_record")}
-                    </div>
-                    <div className="text-3xl font-black leading-none tabular-nums text-primary">
-                      {aggregate}
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               {points.length > 0 && (
                 <div className="h-40 w-full">
