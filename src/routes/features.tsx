@@ -10,7 +10,7 @@ import {
   WhatsAppHybrid,
   ClubWallSection,
   PlayerJournalSection,
-  ChallengesShowcase,
+  ChallengesVisual,
 } from "./index";
 
 export const Route = createFileRoute("/features")({
