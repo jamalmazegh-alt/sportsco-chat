@@ -59,7 +59,17 @@
     "agilityRunRugby": { "name": "Parcours d'agilité", "description": "Parcours chronométré d'évitement — le plus petit temps gagne." },
     "successfulPasses": { "name": "Passes réussies", "description": "Passes réussies d'affilée — record." },
     "rallyConsistency": { "name": "Régularité en échange", "description": "Coups échangés sans faute — record." },
-    "movementSpeed": { "name": "Vitesse de déplacement", "description": "Parcours de déplacement chronométré — le plus petit temps gagne." }
+    "movementSpeed": { "name": "Vitesse de déplacement", "description": "Parcours de déplacement chronométré — le plus petit temps gagne." },
+    "shotAccuracy": { "name": "Précision de tir", "description": "Tirs cadrés sur zones — score cumulé." },
+    "handballShotAccuracy": { "name": "Précision de tir", "description": "Tirs cadrés sur zones — score cumulé." },
+    "passingAccuracy": { "name": "Précision de passe", "description": "Passes réussies sur cibles — score cumulé." },
+    "rugbyPassingAccuracy": { "name": "Précision de passe", "description": "Passes réussies sur cibles — score cumulé." },
+    "pushPower": { "name": "Poussée en mêlée", "description": "Force de poussée mesurée — score." },
+    "serveAccuracy": { "name": "Précision au service", "description": "Services placés sur zones — score cumulé." },
+    "receptionControl": { "name": "Contrôle en réception", "description": "Qualité de réception évaluée par le staff — score." },
+    "attackAccuracy": { "name": "Précision à l'attaque", "description": "Attaques placées sur zones — score cumulé." },
+    "tennisServeAccuracy": { "name": "Précision au service", "description": "Services placés sur zones — score cumulé." },
+    "targetShots": { "name": "Frappes sur cibles", "description": "Balles placées sur cibles — score cumulé." }
   },
 
   "list": {
