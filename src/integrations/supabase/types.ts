@@ -221,6 +221,181 @@ export type Database = {
           },
         ]
       }
+      challenge_passages: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          created_by: string
+          event_id: string | null
+          id: string
+          passage_date: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          created_by: string
+          event_id?: string | null
+          id?: string
+          passage_date?: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          created_by?: string
+          event_id?: string | null
+          id?: string
+          passage_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_passages_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_passages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_results: {
+        Row: {
+          created_at: string
+          created_by: string
+          derived_value: number | null
+          id: string
+          passage_id: string
+          player_id: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          derived_value?: number | null
+          id?: string
+          passage_id: string
+          player_id: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          derived_value?: number | null
+          id?: string
+          passage_id?: string
+          player_id?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_results_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_passages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_results_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          aggregate: Database["public"]["Enums"]["challenge_aggregate"]
+          club_id: string
+          created_at: string
+          created_by: string
+          derived: Database["public"]["Enums"]["challenge_derived"]
+          direction: Database["public"]["Enums"]["challenge_direction"]
+          icon: string | null
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["challenge_kind"]
+          name: string
+          ranking_visibility: Database["public"]["Enums"]["challenge_visibility"]
+          recurrence: Database["public"]["Enums"]["challenge_recurrence"]
+          season_id: string | null
+          team_id: string | null
+          template_key: string | null
+          unit: Database["public"]["Enums"]["challenge_unit"]
+          updated_at: string
+        }
+        Insert: {
+          aggregate?: Database["public"]["Enums"]["challenge_aggregate"]
+          club_id: string
+          created_at?: string
+          created_by: string
+          derived?: Database["public"]["Enums"]["challenge_derived"]
+          direction?: Database["public"]["Enums"]["challenge_direction"]
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["challenge_kind"]
+          name: string
+          ranking_visibility?: Database["public"]["Enums"]["challenge_visibility"]
+          recurrence?: Database["public"]["Enums"]["challenge_recurrence"]
+          season_id?: string | null
+          team_id?: string | null
+          template_key?: string | null
+          unit: Database["public"]["Enums"]["challenge_unit"]
+          updated_at?: string
+        }
+        Update: {
+          aggregate?: Database["public"]["Enums"]["challenge_aggregate"]
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          derived?: Database["public"]["Enums"]["challenge_derived"]
+          direction?: Database["public"]["Enums"]["challenge_direction"]
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["challenge_kind"]
+          name?: string
+          ranking_visibility?: Database["public"]["Enums"]["challenge_visibility"]
+          recurrence?: Database["public"]["Enums"]["challenge_recurrence"]
+          season_id?: string | null
+          team_id?: string | null
+          template_key?: string | null
+          unit?: Database["public"]["Enums"]["challenge_unit"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_invites: {
         Row: {
           club_id: string
@@ -5165,6 +5340,10 @@ export type Database = {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
+      can_read_challenge: {
+        Args: { _challenge_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_respond_for_player: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
@@ -5373,6 +5552,10 @@ export type Database = {
         Args: { _club_id: string; _user_id: string }
         Returns: boolean
       }
+      is_club_staff: {
+        Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_match_referee: {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
@@ -5453,6 +5636,10 @@ export type Database = {
         Returns: number
       }
       next_receipt_number: { Args: { _club_id: string }; Returns: number }
+      player_belongs_to_user: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
       player_is_minor: { Args: { _player_id: string }; Returns: boolean }
       privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }
       purge_soft_deleted: { Args: never; Returns: undefined }
@@ -5585,7 +5772,14 @@ export type Database = {
         Args: { _post_id: string; _user: string }
         Returns: boolean
       }
+      user_is_in_team: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
+      vo2_age_factor: { Args: { _age: number }; Returns: number }
+      vo2_cooper: { Args: { _distance_m: number }; Returns: number }
+      vo2_leger: { Args: { _stage: number }; Returns: number }
     }
     Enums: {
       app_role:
@@ -5596,6 +5790,13 @@ export type Database = {
         | "dirigeant"
         | "financial_admin"
       attendance_status: "present" | "absent" | "uncertain" | "pending"
+      challenge_aggregate: "cumulative" | "record"
+      challenge_derived: "none" | "vo2_leger" | "vo2_cooper"
+      challenge_direction: "higher_better" | "lower_better"
+      challenge_kind: "challenge" | "physical_test"
+      challenge_recurrence: "season" | "half_season" | "punctual"
+      challenge_unit: "count" | "time_seconds" | "distance_meters" | "stage"
+      challenge_visibility: "staff" | "category"
       consent_kind:
         | "terms"
         | "privacy"
@@ -5858,6 +6059,13 @@ export const Constants = {
         "financial_admin",
       ],
       attendance_status: ["present", "absent", "uncertain", "pending"],
+      challenge_aggregate: ["cumulative", "record"],
+      challenge_derived: ["none", "vo2_leger", "vo2_cooper"],
+      challenge_direction: ["higher_better", "lower_better"],
+      challenge_kind: ["challenge", "physical_test"],
+      challenge_recurrence: ["season", "half_season", "punctual"],
+      challenge_unit: ["count", "time_seconds", "distance_meters", "stage"],
+      challenge_visibility: ["staff", "category"],
       consent_kind: [
         "terms",
         "privacy",
