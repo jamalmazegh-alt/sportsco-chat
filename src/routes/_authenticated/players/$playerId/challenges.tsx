@@ -66,7 +66,6 @@ function PlayerChallengesTab() {
 
       <div className="space-y-3">
         {items.map(({ challenge, points, aggregate }) => {
-          const uniqueDates = new Set(points.map((p) => p.date)).size;
           return (
           <Card key={challenge.id}>
             <CardHeader className="pb-2">
