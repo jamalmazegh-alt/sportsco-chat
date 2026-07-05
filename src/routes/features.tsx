@@ -225,6 +225,9 @@ function FeaturesPage() {
       <Anchor id="player">
         <PlayerJournalSection />
       </Anchor>
+      <Anchor id="challenges">
+        <ChallengesFeatureSection />
+      </Anchor>
       <Anchor id="sponsors">
         <SponsorsFeatureSection />
       </Anchor>
