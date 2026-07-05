@@ -7,6 +7,7 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { defineConfig as defineLovableConfig } from "@lovable.dev/vite-tanstack-config";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 import { loadEnv, type ConfigEnv } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,7 @@ export default async function config(env: ConfigEnv) {
       server: { entry: "server" },
     },
     vite: {
+      plugins: [mcpPlugin()],
       resolve: {
         alias: {
           "entities/decode": path.resolve(__dirname, "node_modules/entities/lib/esm/decode.js"),

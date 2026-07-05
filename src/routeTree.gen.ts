@@ -19,6 +19,7 @@ import { Route as PlayersRouteImport } from './routes/players'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
@@ -66,6 +67,8 @@ import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
@@ -103,6 +106,7 @@ import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authe
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
@@ -194,6 +198,11 @@ const OfflineRoute = OfflineRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -431,6 +440,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuperadminSupportTicketsIndexRoute =
   SuperadminSupportTicketsIndexRouteImport.update({
     id: '/support-tickets/',
@@ -637,6 +658,12 @@ const AuthenticatedAdminBillingRoute =
     id: '/billing',
     path: '/billing',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedAdminUsersIndexRoute =
   AuthenticatedAdminUsersIndexRouteImport.update({
@@ -895,6 +922,7 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
@@ -905,6 +933,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
@@ -943,6 +973,7 @@ export interface FileRoutesByFullPath {
   '/tournaments/start': typeof TournamentsStartRoute
   '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin/': typeof SuperadminIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
@@ -1032,6 +1063,7 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
@@ -1041,6 +1073,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
@@ -1076,6 +1110,7 @@ export interface FileRoutesByTo {
   '/tournaments/start': typeof TournamentsStartRoute
   '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin': typeof SuperadminIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
@@ -1167,6 +1202,7 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
@@ -1177,6 +1213,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
@@ -1215,6 +1253,7 @@ export interface FileRoutesById {
   '/tournaments/start': typeof TournamentsStartRoute
   '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin/': typeof SuperadminIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
@@ -1306,6 +1345,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/mcp'
     | '/notifications'
     | '/offline'
     | '/onboarding'
@@ -1316,6 +1356,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/superadmin'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/assistant'
     | '/events'
@@ -1354,6 +1396,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/webhooks/stripe'
     | '/superadmin/'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
@@ -1443,6 +1486,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/mcp'
     | '/notifications'
     | '/offline'
     | '/onboarding'
@@ -1452,6 +1496,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/assistant'
     | '/events'
     | '/follow-ups'
@@ -1487,6 +1533,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/webhooks/stripe'
     | '/superadmin'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
@@ -1577,6 +1624,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/mcp'
     | '/notifications'
     | '/offline'
     | '/onboarding'
@@ -1587,6 +1635,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/superadmin'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/_authenticated/assistant'
     | '/_authenticated/events'
@@ -1625,6 +1675,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/webhooks/stripe'
     | '/superadmin/'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/billing'
     | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
@@ -1716,6 +1767,7 @@ export interface RootRouteChildren {
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   NotificationsRoute: typeof NotificationsRoute
   OfflineRoute: typeof OfflineRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -1726,6 +1778,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatRoute: typeof ApiChatRoute
   ClubCreateRoute: typeof ClubCreateRoute
   CoachSlugRoute: typeof CoachSlugRoute
@@ -1745,6 +1799,7 @@ export interface RootRouteChildren {
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
   WebhooksStripeRoute: typeof WebhooksStripeRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -1847,6 +1902,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -2178,6 +2240,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superadmin/support-tickets/': {
       id: '/superadmin/support-tickets/'
       path: '/support-tickets'
@@ -2436,6 +2512,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/billing'
       preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users/': {
       id: '/_authenticated/admin/users/'
@@ -3068,6 +3151,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   NotificationsRoute: NotificationsRoute,
   OfflineRoute: OfflineRoute,
   OnboardingRoute: OnboardingRoute,
@@ -3078,6 +3162,9 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiChatRoute: ApiChatRoute,
   ClubCreateRoute: ClubCreateRoute,
   CoachSlugRoute: CoachSlugRoute,
@@ -3097,6 +3184,7 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
   WebhooksStripeRoute: WebhooksStripeRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
@@ -3132,3 +3220,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
