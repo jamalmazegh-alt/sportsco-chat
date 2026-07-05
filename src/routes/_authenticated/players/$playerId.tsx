@@ -130,7 +130,8 @@ function PlayerProfile() {
   const isSeasons = pathname === `/players/${playerId}/seasons`;
   const isTimeline = pathname === `/players/${playerId}/timeline`;
   const isAvailability = pathname === `/players/${playerId}/availability`;
-  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability;
+  const isChallenges = pathname === `/players/${playerId}/challenges`;
+  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability || isChallenges;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
