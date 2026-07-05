@@ -766,6 +766,16 @@
       "i1": "Profils joueurs publics partageables",
       "i2": "Pages coach & suivi followers",
       "i3": "Réseau ouvert entre clubs et joueurs"
+    },
+    "challenges": {
+      "kicker": "Défis & classements",
+      "title": "Des défis adaptés à votre sport",
+      "body": "Un catalogue de défis prêts à l'emploi par sport (football, handball, rugby, volley, tennis…), avec les bonnes unités : nombre, précision, cumul ou record. Les coachs peuvent aussi créer leurs propres défis. Les joueurs suivent le classement en direct, avec un badge qui signale chaque nouveau record.",
+      "b1": "Catalogue par sport — passes, tirs, aces, plaquages, contrôles…",
+      "b2": "Saisie rapide au stepper, score cumulé ou record",
+      "b3": "Classement live avec podium et badge « Nouveau record »",
+      "b4": "Défis personnalisés créés par le coach en 30 secondes",
+      "cta": "Voir les défis"
     }
   },
   "faq": {
