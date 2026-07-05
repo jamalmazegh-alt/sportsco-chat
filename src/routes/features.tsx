@@ -89,7 +89,7 @@ function ChallengesFeatureSection() {
           </div>
         </div>
         <div className="flex justify-center">
-          <ChallengesShowcase />
+          <ChallengesVisual />
         </div>
       </div>
     </section>
