@@ -406,6 +406,149 @@ async function seedAll(): Promise<Fixtures> {
   }
   const paymentSettingsA = clubA;
 
+  // 20. Challenges & Tests fixtures — Team A
+  // - a "challenge" (Cross Bar-like), ranking_visibility initially 'staff'
+  // - a "physical_test" (Luc Léger), derived vo2_leger, staff-only always
+  // - a second Team A player, unlinked to any user, to test peer-visibility
+  //   (playerA must never see playerA2's individual result)
+  const { data: playerA2Row, error: pA2Err } = await admin
+    .from("players")
+    .insert({
+      club_id: clubA,
+      first_name: "Player",
+      last_name: "A2",
+      birth_date: "2005-06-15",
+    })
+    .select("id")
+    .single();
+  if (pA2Err || !playerA2Row) throw new Error(`playerA2 insert: ${pA2Err?.message}`);
+  const playerA2 = playerA2Row.id;
+
+  // Give playerA a birth_date too, so VO2 derivation has an age.
+  await admin.from("players").update({ birth_date: "2005-03-10" }).eq("id", playerA);
+
+  // team_members entry for playerA2 (no user_id — pure roster row)
+  {
+    const { error } = await admin
+      .from("team_members")
+      .insert({ team_id: teamA, player_id: playerA2, role: "player" });
+    if (error) throw new Error(`team_members playerA2 insert: ${error.message}`);
+  }
+
+  const { data: challChallenge, error: cChErr } = await admin
+    .from("challenges")
+    .insert({
+      club_id: clubA,
+      team_id: teamA,
+      season_id: seasonA,
+      name: `${PREFIX}_cross_bar`,
+      kind: "challenge",
+      unit: "count",
+      direction: "higher_better",
+      aggregate: "cumulative",
+      derived: "none",
+      recurrence: "season",
+      ranking_visibility: "staff",
+      created_by: users.coachA.userId,
+    })
+    .select("id")
+    .single();
+  if (cChErr || !challChallenge) throw new Error(`challenges (challenge) insert: ${cChErr?.message}`);
+  const challengeChallengeA = challChallenge.id;
+
+  const { data: challTest, error: cTErr } = await admin
+    .from("challenges")
+    .insert({
+      club_id: clubA,
+      team_id: teamA,
+      season_id: seasonA,
+      name: `${PREFIX}_luc_leger`,
+      kind: "physical_test",
+      unit: "stage",
+      direction: "higher_better",
+      aggregate: "record",
+      derived: "vo2_leger",
+      recurrence: "season",
+      ranking_visibility: "staff",
+      created_by: users.coachA.userId,
+    })
+    .select("id")
+    .single();
+  if (cTErr || !challTest) throw new Error(`challenges (physical_test) insert: ${cTErr?.message}`);
+  const challengeTestA = challTest.id;
+
+  // Passages
+  const { data: passageCh, error: pChErr } = await admin
+    .from("challenge_passages")
+    .insert({
+      challenge_id: challengeChallengeA,
+      event_id: eventA,
+      created_by: users.coachA.userId,
+    })
+    .select("id")
+    .single();
+  if (pChErr || !passageCh) throw new Error(`passage (challenge) insert: ${pChErr?.message}`);
+  const passageChallengeA = passageCh.id;
+
+  const { data: passageT, error: pTErr } = await admin
+    .from("challenge_passages")
+    .insert({
+      challenge_id: challengeTestA,
+      event_id: null,
+      created_by: users.coachA.userId,
+    })
+    .select("id")
+    .single();
+  if (pTErr || !passageT) throw new Error(`passage (test) insert: ${pTErr?.message}`);
+  const passageTestA = passageT.id;
+
+  // Results — 2 players per passage. Physical-test results carry derived_value.
+  const { data: rowsCh, error: rChErr } = await admin
+    .from("challenge_results")
+    .insert([
+      {
+        passage_id: passageChallengeA,
+        player_id: playerA,
+        value: 5,
+        created_by: users.coachA.userId,
+      },
+      {
+        passage_id: passageChallengeA,
+        player_id: playerA2,
+        value: 8,
+        created_by: users.coachA.userId,
+      },
+    ])
+    .select("id, player_id");
+  if (rChErr || !rowsCh) throw new Error(`challenge_results (challenge) insert: ${rChErr?.message}`);
+  const resultChallengeA_playerA = rowsCh.find((r) => r.player_id === playerA)!.id;
+  const resultChallengeA_playerA2 = rowsCh.find((r) => r.player_id === playerA2)!.id;
+
+  const { data: rowsT, error: rTErr } = await admin
+    .from("challenge_results")
+    .insert([
+      {
+        passage_id: passageTestA,
+        player_id: playerA,
+        value: 8, // stage
+        derived_value: 42.5, // VO2 (populated to test masking)
+        created_by: users.coachA.userId,
+      },
+      {
+        passage_id: passageTestA,
+        player_id: playerA2,
+        value: 9,
+        derived_value: 45.9,
+        created_by: users.coachA.userId,
+      },
+    ])
+    .select("id, player_id");
+  if (rTErr || !rowsT) throw new Error(`challenge_results (test) insert: ${rTErr?.message}`);
+  const resultTestA_playerA = rowsT.find((r) => r.player_id === playerA)!.id;
+  const resultTestA_playerA2 = rowsT.find((r) => r.player_id === playerA2)!.id;
+
+
+
   return {
     runId: RUN_ID,
     users: users as Fixtures["users"],
