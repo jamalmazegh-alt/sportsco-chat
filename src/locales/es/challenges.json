@@ -52,7 +52,8 @@
     "empty": "Todavía no hay retos.",
     "empty_hint": "Añade un reto o una prueba a esta sesión.",
     "add": "Añadir actividad",
-    "back": "Volver al entrenamiento"
+    "back": "Volver al entrenamiento",
+    "edit": "Editar"
   },
   "add": {
     "title": "Añadir actividad",

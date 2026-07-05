@@ -52,7 +52,8 @@
     "empty": "Ainda não há desafios.",
     "empty_hint": "Adiciona um desafio ou um teste a esta sessão.",
     "add": "Adicionar atividade",
-    "back": "Voltar ao treino"
+    "back": "Voltar ao treino",
+    "edit": "Editar"
   },
   "add": {
     "title": "Adicionar atividade",

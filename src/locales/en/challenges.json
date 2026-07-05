@@ -52,7 +52,8 @@
     "empty": "No challenge yet.",
     "empty_hint": "Add a challenge or a test to this session.",
     "add": "Add an activity",
-    "back": "Back to training"
+    "back": "Back to training",
+    "edit": "Edit"
   },
   "add": {
     "title": "Add an activity",

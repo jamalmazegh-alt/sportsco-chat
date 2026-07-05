@@ -52,7 +52,8 @@
     "empty": "Aucun défi pour l'instant.",
     "empty_hint": "Ajoute un défi ou un test à cette séance.",
     "add": "Ajouter une activité",
-    "back": "Retour à l'entraînement"
+    "back": "Retour à l'entraînement",
+    "edit": "Éditer"
   },
   "add": {
     "title": "Ajouter une activité",
