@@ -346,6 +346,25 @@ export const upsertResults = createServerFn({ method: "POST" })
   });
 
 /**
+ * Load existing results for a given passage so the entry screen can
+ * pre-fill values (used to edit / correct a previously saved score).
+ * Staff-only: RLS on challenge_results filters non-staff callers.
+ */
+export const getPassageResults = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ passageId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("challenge_results")
+      .select("player_id, value")
+      .eq("passage_id", data.passageId);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { results: (rows ?? []) as { player_id: string; value: number }[] };
+  });
+
+/**
  * Ranking for a challenge, aggregated per player over the whole set of
  * passages the caller can read.
  */
