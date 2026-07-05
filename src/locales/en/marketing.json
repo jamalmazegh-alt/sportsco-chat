@@ -1476,6 +1476,20 @@
       "body": "A discreet banner at the top of the home screen showcases your partners to every member. Impressions and clicks tracked automatically, rotation managed by your admins. Enough to cover Clubero — and often more.",
       "tag": "Thanks to our partner",
       "cta": "Learn more"
+    },
+    "challenges": {
+      "badge": "Challenges & leaderboards",
+      "headline": "Turn every session into a friendly competition.",
+      "body": "Passing accuracy, shots on target, aces at serve… create challenges during your training sessions and matches, log scores live and watch a real-time leaderboard climb. Your players get hooked — and get better.",
+      "cta": "See the challenges",
+      "img_alt": "Animated Clubero challenge leaderboard with podium and medals",
+      "live": "Live",
+      "challenge_label": "Challenge",
+      "challenge_name": "Passing accuracy",
+      "players_count": "12 players",
+      "updated_now": "Updated just now",
+      "new_record": "★ New record",
+      "floating_badge": "🏆 +1 record"
     }
   }
 }
