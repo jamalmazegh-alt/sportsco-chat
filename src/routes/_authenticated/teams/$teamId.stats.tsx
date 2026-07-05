@@ -329,7 +329,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
                 <span className="w-6 text-center font-bold text-muted-foreground">
                   #{i + 1}
                 </span>
-                <span className="flex-1 truncate">{name}</span>
+                <span className="flex-1 truncate underline underline-offset-2">{name}</span>
                 <span className="font-mono font-bold tabular-nums">{row.score}</span>
               </>
             );
