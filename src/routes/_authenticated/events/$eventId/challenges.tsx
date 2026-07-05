@@ -135,7 +135,10 @@ function EventChallengesPage() {
           challenge={challenges.find((c: any) => c.id === view.challengeId)}
           eventId={eventId}
           players={eventInfo.players}
-          onDone={() => setView({ kind: "ranking", challengeId: view.challengeId })}
+          onDone={() => {
+            refetchCounts();
+            setView({ kind: "ranking", challengeId: view.challengeId });
+          }}
         />
       )}
       {view.kind === "ranking" && (
