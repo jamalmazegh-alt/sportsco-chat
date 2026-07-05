@@ -500,7 +500,7 @@ async function seedAll(): Promise<Fixtures> {
   if (pTErr || !passageT) throw new Error(`passage (test) insert: ${pTErr?.message}`);
   const passageTestA = passageT.id;
 
-  // Results — 2 players per passage. Physical-test results carry derived_value.
+  // Results — 2 players per passage.
   const { data: rowsCh, error: rChErr } = await admin
     .from("challenge_results")
     .insert([
