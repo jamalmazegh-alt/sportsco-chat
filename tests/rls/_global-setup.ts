@@ -605,7 +605,10 @@ async function teardownAll(fx: Fixtures) {
   await admin.from("events").delete().in("id", [fx.eventA, fx.eventB]);
   await admin.from("team_members").delete().in("team_id", [fx.teamA, fx.teamB]);
   await admin.from("player_parents").delete().eq("parent_user_id", fx.users.parentA.userId);
-  await admin.from("players").delete().in("id", [fx.playerA, fx.playerB]);
+  // Challenges cascade to passages + results; delete challenges first.
+  await admin.from("challenges").delete().in("id", [fx.challengeChallengeA, fx.challengeTestA]);
+  await admin.from("players").delete().in("id", [fx.playerA, fx.playerA2, fx.playerB]);
+
   await admin.from("teams").delete().in("id", [fx.teamA, fx.teamB]);
   await admin.from("club_members").delete().in("club_id", [fx.clubA, fx.clubB]);
   await admin.from("clubs").delete().in("id", [fx.clubA, fx.clubB]);
