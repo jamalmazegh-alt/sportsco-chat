@@ -15,7 +15,9 @@ export function MarketingFooter() {
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center" aria-label="Clubero">
-              <img src={logo} alt="Clubero" className="h-11 w-auto object-contain" />
+              <span className="flex h-11 items-center justify-center rounded-lg dark:bg-white dark:px-1.5 dark:py-1">
+                <img src={logo} alt="Clubero" className="h-auto max-h-full w-auto object-contain" />
+              </span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">{t("footer.tagline")}</p>
           </div>
