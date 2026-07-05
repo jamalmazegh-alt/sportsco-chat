@@ -2227,6 +2227,20 @@ function EventDetail() {
                   <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
                 </Link>
               )}
+              {isCoach && event.type === "training" && (
+                <Link
+                  to="/events/$eventId/challenges"
+                  params={{ eventId }}
+                  className={cn(
+                    buttonVariants({ variant: "secondary", size: "sm" }),
+                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
+                  )}
+                  title={t("challenges:list.title", { defaultValue: "Défis" })}
+                >
+                  <Trophy className="h-4 w-4" />
+                  <span>{t("challenges:list.title", { defaultValue: "Défis" })}</span>
+                </Link>
+              )}
               {showFeedbackButton && (
                 <Link
                   to="/events/$eventId/feedback"
