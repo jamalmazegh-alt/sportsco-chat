@@ -20,11 +20,13 @@ const ROLES: Role[] = [
   "coachA",
   "playerA",
   "parentA",
+  "parentUnlinkedA",
   "adminB",
   "coachB",
   "playerB",
   "superadmin",
 ];
+
 
 async function createUser(role: Role): Promise<UserFixture> {
   const email = `${PREFIX}_${role}@clubero-rls.test`;
