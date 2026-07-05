@@ -21,7 +21,9 @@ import {
   updateChallengeVisibility,
   getPassageResults,
   getEventChallengesEntryCounts,
+  getChallengePlayerBests,
 } from "@/lib/challenges/challenges.functions";
+import { NewRecordBadge } from "@/components/challenge-badges";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/challenges")({
