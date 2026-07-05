@@ -245,11 +245,13 @@ function AddChallenge({
   clubId,
   teamId,
   sport,
+  existingChallenges,
   onDone,
 }: {
   clubId: string;
   teamId: string;
   sport: string | null;
+  existingChallenges: any[];
   onDone: () => void;
 }) {
   const { t } = useTranslation("challenges");
@@ -257,7 +259,15 @@ function AddChallenge({
   const [selected, setSelected] = useState<string | null>(null);
   const [name, setName] = useState("");
 
-  const templates = useMemo(() => getTemplatesForSport(sport), [sport]);
+  const templates = useMemo(() => {
+    const usedKeys = new Set(
+      (existingChallenges ?? [])
+        .map((c) => c?.template_key)
+        .filter((k): k is string => !!k),
+    );
+    return getTemplatesForSport(sport).filter((tpl) => !usedKeys.has(tpl.key));
+  }, [sport, existingChallenges]);
+
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
