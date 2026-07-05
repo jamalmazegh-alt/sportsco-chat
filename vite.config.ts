@@ -7,6 +7,7 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { defineConfig as defineLovableConfig } from "@lovable.dev/vite-tanstack-config";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 import { loadEnv, type ConfigEnv } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
