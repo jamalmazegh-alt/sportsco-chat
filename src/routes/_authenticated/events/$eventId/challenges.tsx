@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreStepper } from "@/components/score-stepper";
-import { CHALLENGE_TEMPLATES } from "@/lib/challenges/templates";
+import { getTemplatesForSport } from "@/lib/challenges/templates";
 import {
   listChallenges,
   createChallengeFromTemplate,
@@ -53,12 +53,13 @@ function EventChallengesPage() {
     queryFn: async () => {
       const { data: ev } = await supabase
         .from("events")
-        .select("id, team_id, title, teams:team_id (id, name, club_id)")
+        .select("id, team_id, title, teams:team_id (id, name, club_id, sport)")
         .eq("id", eventId)
         .single();
       if (!ev) return null;
       const teamId = ev.team_id as string;
       const clubId = (ev.teams as any)?.club_id as string;
+      const sport = ((ev.teams as any)?.sport ?? null) as string | null;
       const { data: members } = await supabase
         .from("team_members")
         .select("player_id, players:player_id (id, first_name, last_name, photo_url)")
@@ -69,7 +70,8 @@ function EventChallengesPage() {
           .map((m: any) => m.players)
           .filter(Boolean)
           .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? "")) ?? [];
-      return { event: ev, teamId, clubId, players };
+      return { event: ev, teamId, clubId, sport, players };
+
     },
   });
 
@@ -125,12 +127,14 @@ function EventChallengesPage() {
         <AddChallenge
           clubId={eventInfo.clubId}
           teamId={eventInfo.teamId}
+          sport={eventInfo.sport}
           onDone={() => {
             refetchChallenges();
             setView({ kind: "list" });
           }}
         />
       )}
+
       {view.kind === "entry" && (
         <EntryScreen
           challengeId={view.challengeId}
@@ -238,16 +242,20 @@ function VisibilityBadge({ visibility }: { visibility: "staff" | "category" }) {
 function AddChallenge({
   clubId,
   teamId,
+  sport,
   onDone,
 }: {
   clubId: string;
   teamId: string;
+  sport: string | null;
   onDone: () => void;
 }) {
   const { t } = useTranslation("challenges");
   const fromTpl = useServerFn(createChallengeFromTemplate);
   const [selected, setSelected] = useState<string | null>(null);
   const [name, setName] = useState("");
+
+  const templates = useMemo(() => getTemplatesForSport(sport), [sport]);
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
@@ -271,7 +279,7 @@ function AddChallenge({
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
       <div className="space-y-2">
         <p className="text-sm font-medium">{t("add.pick_template")}</p>
-        {CHALLENGE_TEMPLATES.map((tpl) => (
+        {templates.map((tpl) => (
           <Card
             key={tpl.key}
             className={
@@ -298,6 +306,7 @@ function AddChallenge({
           </Card>
         ))}
       </div>
+
       {selected && (
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("add.custom_name_label")}</label>
