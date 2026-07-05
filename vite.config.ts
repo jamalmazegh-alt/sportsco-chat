@@ -23,6 +23,7 @@ export default async function config(env: ConfigEnv) {
       server: { entry: "server" },
     },
     vite: {
+      plugins: [mcpPlugin()],
       resolve: {
         alias: {
           "entities/decode": path.resolve(__dirname, "node_modules/entities/lib/esm/decode.js"),
