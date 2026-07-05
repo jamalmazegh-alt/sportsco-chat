@@ -532,5 +532,87 @@ describe("RLS — challenges (defis & tests)", () => {
       expect(error).not.toBeNull();
     });
   });
+
+  // ------------------------------------------------------------------
+  // DB invariant: derived_value only on physical_test challenges.
+  // Trigger challenge_results_check_derived_trg — INSERT and UPDATE.
+  // ------------------------------------------------------------------
+  describe("invariant: derived_value ⇒ physical_test only", () => {
+    it("INSERT with derived_value on a `challenge` kind is rejected", async () => {
+      const { error } = await admin.from("challenge_results").insert({
+        passage_id: fx.passageChallengeA,
+        player_id: fx.playerA2,
+        value: 5,
+        derived_value: 42,
+        created_by: fx.users.coachA.userId,
+      });
+      expect(error).not.toBeNull();
+      expect(error?.message ?? "").toMatch(/derived_value/i);
+    });
+
+    it("INSERT with derived_value on a physical_test is accepted", async () => {
+      await admin
+        .from("challenge_results")
+        .delete()
+        .eq("passage_id", fx.passageTestA)
+        .eq("player_id", fx.playerA2);
+      const { data, error } = await admin
+        .from("challenge_results")
+        .insert({
+          passage_id: fx.passageTestA,
+          player_id: fx.playerA2,
+          value: 10,
+          derived_value: 50,
+          created_by: fx.users.coachA.userId,
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      if (data?.id) {
+        await admin.from("challenge_results").delete().eq("id", data.id);
+      }
+    });
+
+    it("INSERT with derived_value=NULL on a `challenge` kind is accepted (no false positive)", async () => {
+      await admin
+        .from("challenge_results")
+        .delete()
+        .eq("passage_id", fx.passageChallengeA)
+        .eq("player_id", fx.playerA2);
+      const { data, error } = await admin
+        .from("challenge_results")
+        .insert({
+          passage_id: fx.passageChallengeA,
+          player_id: fx.playerA2,
+          value: 3,
+          derived_value: null,
+          created_by: fx.users.coachA.userId,
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      if (data?.id) {
+        await admin.from("challenge_results").delete().eq("id", data.id);
+      }
+    });
+
+
+    it("UPDATE that sets derived_value on a `challenge` kind result is rejected", async () => {
+      const { error } = await admin
+        .from("challenge_results")
+        .update({ derived_value: 99 })
+        .eq("id", fx.resultChallengeA_playerA);
+      expect(error).not.toBeNull();
+      expect(error?.message ?? "").toMatch(/derived_value/i);
+
+      const { data } = await admin
+        .from("challenge_results")
+        .select("derived_value")
+        .eq("id", fx.resultChallengeA_playerA)
+        .single();
+      expect(data?.derived_value).toBeNull();
+    });
+  });
 });
+
 
