@@ -551,6 +551,11 @@ describe("RLS — challenges (defis & tests)", () => {
     });
 
     it("INSERT with derived_value on a physical_test is accepted", async () => {
+      await admin
+        .from("challenge_results")
+        .delete()
+        .eq("passage_id", fx.passageTestA)
+        .eq("player_id", fx.playerA2);
       const { data, error } = await admin
         .from("challenge_results")
         .insert({
@@ -569,6 +574,11 @@ describe("RLS — challenges (defis & tests)", () => {
     });
 
     it("INSERT with derived_value=NULL on a `challenge` kind is accepted (no false positive)", async () => {
+      await admin
+        .from("challenge_results")
+        .delete()
+        .eq("passage_id", fx.passageChallengeA)
+        .eq("player_id", fx.playerA2);
       const { data, error } = await admin
         .from("challenge_results")
         .insert({
@@ -585,6 +595,7 @@ describe("RLS — challenges (defis & tests)", () => {
         await admin.from("challenge_results").delete().eq("id", data.id);
       }
     });
+
 
     it("UPDATE that sets derived_value on a `challenge` kind result is rejected", async () => {
       const { error } = await admin
