@@ -332,7 +332,7 @@ function EntryScreen({
   challenge: any;
   eventId: string;
   players: { id: string; first_name: string; last_name: string; photo_url?: string | null }[];
-  onDone: () => void;
+  onDone: (passageId?: string) => void;
 }) {
   const { t } = useTranslation("challenges");
   const getPassage = useServerFn(getOrCreatePassageForEvent);
