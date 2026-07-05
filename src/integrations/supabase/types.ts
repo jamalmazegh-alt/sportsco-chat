@@ -5785,7 +5785,12 @@ export type Database = {
       challenge_direction: "higher_better" | "lower_better"
       challenge_kind: "challenge" | "physical_test"
       challenge_recurrence: "season" | "half_season" | "punctual"
-      challenge_unit: "count" | "time_seconds" | "distance_meters" | "stage"
+      challenge_unit:
+        | "count"
+        | "time_seconds"
+        | "distance_meters"
+        | "stage"
+        | "score"
       challenge_visibility: "staff" | "category"
       consent_kind:
         | "terms"
@@ -6053,7 +6058,13 @@ export const Constants = {
       challenge_direction: ["higher_better", "lower_better"],
       challenge_kind: ["challenge", "physical_test"],
       challenge_recurrence: ["season", "half_season", "punctual"],
-      challenge_unit: ["count", "time_seconds", "distance_meters", "stage"],
+      challenge_unit: [
+        "count",
+        "time_seconds",
+        "distance_meters",
+        "stage",
+        "score",
+      ],
       challenge_visibility: ["staff", "category"],
       consent_kind: [
         "terms",
