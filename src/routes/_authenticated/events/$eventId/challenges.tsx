@@ -405,6 +405,15 @@ function EntryScreen({
   }
 
   const isStepper = challenge.unit === "count" || challenge.unit === "stage";
+  const stepSize =
+    challenge.unit === "distance_meters" ? 10 : challenge.unit === "time_seconds" ? 0.1 : 1;
+  const decimals = challenge.unit === "time_seconds" ? 2 : 0;
+  const bump = (id: string, delta: number) =>
+    setValues((s) => {
+      const cur = typeof s[id] === "number" ? (s[id] as number) : 0;
+      const next = Math.max(0, Number((cur + delta).toFixed(decimals)));
+      return { ...s, [id]: next };
+    });
 
   return (
     <div className="space-y-3">
