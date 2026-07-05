@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreStepper } from "@/components/score-stepper";
-import { CHALLENGE_TEMPLATES } from "@/lib/challenges/templates";
+import { CHALLENGE_TEMPLATES, getTemplatesForSport } from "@/lib/challenges/templates";
 import {
   listChallenges,
   createChallengeFromTemplate,
