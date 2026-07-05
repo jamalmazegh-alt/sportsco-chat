@@ -79,12 +79,19 @@ function EventChallengesPage() {
       list({ data: { clubId: eventInfo!.clubId, teamId: eventInfo!.teamId } }),
   });
 
+  const loadCounts = useServerFn(getEventChallengesEntryCounts);
+  const { data: countsData, refetch: refetchCounts } = useQuery({
+    queryKey: ["event-challenge-entry-counts", eventId],
+    queryFn: () => loadCounts({ data: { eventId } }),
+  });
+
   if (loadingEvent) {
     return <FullscreenLoader />;
   }
   if (!eventInfo) return <div className="p-4 text-sm text-muted-foreground">Event not found.</div>;
 
   const challenges = challengesData?.challenges ?? [];
+  const entryCounts = countsData?.counts ?? {};
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-4">
