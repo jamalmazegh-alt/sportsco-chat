@@ -408,7 +408,7 @@ async function seedAll(): Promise<Fixtures> {
 
   // 20. Challenges & Tests fixtures — Team A
   // - a "challenge" (Cross Bar-like), ranking_visibility initially 'staff'
-  // - a "physical_test" (Luc Léger), derived vo2_leger, staff-only always
+  // - a "physical_test" (Luc Léger, palier), staff-only always
   // - a second Team A player, unlinked to any user, to test peer-visibility
   //   (playerA must never see playerA2's individual result)
   const { data: playerA2Row, error: pA2Err } = await admin
