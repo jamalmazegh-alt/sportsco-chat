@@ -53,12 +53,13 @@ function EventChallengesPage() {
     queryFn: async () => {
       const { data: ev } = await supabase
         .from("events")
-        .select("id, team_id, title, teams:team_id (id, name, club_id)")
+        .select("id, team_id, title, teams:team_id (id, name, club_id, sport)")
         .eq("id", eventId)
         .single();
       if (!ev) return null;
       const teamId = ev.team_id as string;
       const clubId = (ev.teams as any)?.club_id as string;
+      const sport = ((ev.teams as any)?.sport ?? null) as string | null;
       const { data: members } = await supabase
         .from("team_members")
         .select("player_id, players:player_id (id, first_name, last_name, photo_url)")
@@ -69,7 +70,8 @@ function EventChallengesPage() {
           .map((m: any) => m.players)
           .filter(Boolean)
           .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? "")) ?? [];
-      return { event: ev, teamId, clubId, players };
+      return { event: ev, teamId, clubId, sport, players };
+
     },
   });
 
