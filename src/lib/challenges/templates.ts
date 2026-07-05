@@ -101,7 +101,9 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     kind: "challenge",
     unit: "count",
     direction: "higher_better",
-    aggregate: "cumulative",
+    // Best score in a single session — record so a new personal best
+    // triggers the "Nouveau record" badge in the leaderboard.
+    aggregate: "record",
     recurrence: "season",
     ranking_visibility: "category",
   },
