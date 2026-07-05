@@ -460,7 +460,7 @@ function LandingChallenges() {
             </p>
             <div className="mt-7">
               <Button asChild size="lg" className="h-12 rounded-full px-6">
-                <Link to="/features" hash="challenges">
+                <Link to="/features#challenges">
                   {t("landing.challenges.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
