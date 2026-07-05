@@ -96,7 +96,9 @@ export function MarketingHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 lg:px-8">
         <Link to="/" className="flex items-center" aria-label="Clubero">
-          <img src={logo} alt="Clubero" className="h-14 w-auto object-contain" />
+          <span className="flex h-14 items-center justify-center rounded-lg dark:bg-white dark:px-2 dark:py-1">
+            <img src={logo} alt="Clubero" className="h-auto max-h-full w-auto object-contain" />
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
