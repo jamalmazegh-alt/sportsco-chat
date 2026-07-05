@@ -1,80 +1,80 @@
 {
   "meta": {
-    "title": "Challenges & tests | Clubero",
-    "description": "Run a challenge or a physical test during a training session, log results and track progress."
+    "title": "Uitdagingen en tests | Clubero",
+    "description": "Start tijdens een training een uitdaging of een fysieke test, voer de resultaten in en volg de progressie."
   },
   "types": {
-    "challenge": "Challenge",
-    "physical_test": "Physical test",
-    "activity": "Activity"
+    "challenge": "Uitdaging",
+    "physical_test": "Fysieke test",
+    "activity": "Activiteit"
   },
   "units": {
-    "count": "units",
-    "time_seconds": "seconds",
-    "distance_meters": "meters",
-    "stage": "stage"
+    "count": "eenheden",
+    "time_seconds": "seconden",
+    "distance_meters": "meter",
+    "stage": "niveau"
   },
   "aggregates": {
-    "cumulative": "Season total",
+    "cumulative": "Seizoenstotaal",
     "record": "Record"
   },
   "visibility": {
-    "staff": "Staff only",
-    "category": "Visible to the category",
+    "staff": "Alleen zichtbaar voor de staf",
+    "category": "Zichtbaar voor de categorie",
     "staff_short": "Staff",
-    "category_short": "Category",
-    "toggle_hint": "Physical test rankings are always staff-only."
+    "category_short": "Categorie",
+    "toggle_hint": "De ranglijst van fysieke tests blijft altijd voorbehouden aan de staf."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Hit the crossbar — cumulative over the season." },
-    "juggling": { "name": "Juggling", "description": "Longest streak of ball juggles — record." },
-    "leger": { "name": "Léger shuttle", "description": "20 m shuttle test — estimated VO₂ max." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distance in 12 minutes — estimated VO₂ max." },
-    "sprint20m": { "name": "20 m sprint", "description": "Time on 20 m — lowest wins." }
+    "crossbar": { "name": "Cross Bar", "description": "De lat raken — seizoenstotaal." },
+    "juggling": { "name": "Hooghouden", "description": "Meeste keer hooghouden op rij — record." },
+    "leger": { "name": "Luc Léger", "description": "20 m-shuttleloop — geschatte VO₂ max." },
+    "cooper": { "name": "Cooper 12 min", "description": "Afgelegde afstand in 12 min — geschatte VO₂ max." },
+    "sprint20m": { "name": "Sprint 20 m", "description": "Tijd over 20 m — de snelste tijd wint." }
   },
   "list": {
-    "title": "Challenges & activities",
-    "empty": "No challenge yet.",
-    "empty_hint": "Add a challenge or a test to this session.",
-    "add": "Add an activity",
-    "back": "Back to training"
+    "title": "Uitdagingen en activiteiten",
+    "empty": "Nog geen uitdagingen.",
+    "empty_hint": "Voeg een uitdaging of test toe aan deze training.",
+    "add": "Activiteit toevoegen",
+    "back": "Terug naar training"
   },
   "add": {
-    "title": "Add an activity",
-    "pick_template": "Pick a template",
-    "or_custom": "Custom",
-    "custom_name_label": "Name",
-    "custom_name_placeholder": "e.g. Long pass accuracy",
-    "create": "Create",
-    "creating": "Creating…"
+    "title": "Activiteit toevoegen",
+    "pick_template": "Kies een sjabloon",
+    "or_custom": "Zelf maken",
+    "custom_name_label": "Naam",
+    "custom_name_placeholder": "Bijv. Precisie lange pass",
+    "create": "Maken",
+    "creating": "Bezig met maken…"
   },
   "entry": {
-    "title": "Log results",
-    "counter": "{{present}} present · {{done}} logged",
-    "save": "Save",
-    "saved": "Results saved",
-    "no_players": "No players present for this session.",
-    "value_placeholder": "Value"
+    "title": "Invoer",
+    "counter": "{{present}} aanwezig · {{done}} ingevoerd",
+    "save": "Opslaan",
+    "saved": "Resultaten opgeslagen",
+    "no_players": "Geen spelers aanwezig bij deze training.",
+    "value_placeholder": "Waarde"
   },
   "ranking": {
-    "title": "Ranking",
-    "view": "View ranking",
-    "no_results": "No results yet.",
+    "title": "Ranglijst",
+    "view": "Ranglijst bekijken",
+    "no_results": "Nog geen resultaten.",
     "position": "#{{n}}",
-    "attempts_one": "{{count}} attempt",
-    "attempts_other": "{{count}} attempts",
+    "attempts_one": "{{count}} poging",
+    "attempts_other": "{{count}} pogingen",
     "vo2_max": "VO₂ max"
   },
   "player_stats": {
-    "title": "Stats & challenges",
-    "no_data": "No results logged yet for this player.",
-    "aggregate_cumulative": "Season total",
+    "title": "Statistieken en uitdagingen",
+    "no_data": "Geen resultaten geregistreerd voor deze speler.",
+    "aggregate_cumulative": "Seizoenstotaal",
     "aggregate_record": "Record",
-    "staff_only": "Staff only",
-    "vo2_hint": "VO₂ max — staff-only data"
+    "staff_only": "Alleen voor de staf",
+    "vo2_hint": "VO₂ max — gegevens voor de staf"
   },
   "errors": {
-    "forbidden": "Staff-only action.",
-    "generic": "Something went wrong."
+    "forbidden": "Actie voorbehouden aan de staf.",
+    "generic": "Er is een fout opgetreden."
   }
 }

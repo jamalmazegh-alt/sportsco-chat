@@ -1,80 +1,80 @@
 {
   "meta": {
-    "title": "Challenges & tests | Clubero",
-    "description": "Run a challenge or a physical test during a training session, log results and track progress."
+    "title": "Desafios e testes | Clubero",
+    "description": "Lança um desafio ou um teste físico durante um treino, regista os resultados e acompanha a progressão."
   },
   "types": {
-    "challenge": "Challenge",
-    "physical_test": "Physical test",
-    "activity": "Activity"
+    "challenge": "Desafio",
+    "physical_test": "Teste físico",
+    "activity": "Atividade"
   },
   "units": {
-    "count": "units",
-    "time_seconds": "seconds",
-    "distance_meters": "meters",
-    "stage": "stage"
+    "count": "unidades",
+    "time_seconds": "segundos",
+    "distance_meters": "metros",
+    "stage": "nível"
   },
   "aggregates": {
-    "cumulative": "Season total",
-    "record": "Record"
+    "cumulative": "Total da época",
+    "record": "Recorde"
   },
   "visibility": {
-    "staff": "Staff only",
-    "category": "Visible to the category",
+    "staff": "Visível apenas para a equipa técnica",
+    "category": "Visível para a categoria",
     "staff_short": "Staff",
-    "category_short": "Category",
-    "toggle_hint": "Physical test rankings are always staff-only."
+    "category_short": "Categoria",
+    "toggle_hint": "A classificação dos testes físicos fica sempre reservada à equipa técnica."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Hit the crossbar — cumulative over the season." },
-    "juggling": { "name": "Juggling", "description": "Longest streak of ball juggles — record." },
-    "leger": { "name": "Léger shuttle", "description": "20 m shuttle test — estimated VO₂ max." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distance in 12 minutes — estimated VO₂ max." },
-    "sprint20m": { "name": "20 m sprint", "description": "Time on 20 m — lowest wins." }
+    "crossbar": { "name": "Cross Bar", "description": "Acertar no travessão — total da época." },
+    "juggling": { "name": "Embaixadas", "description": "Número máximo de embaixadas seguidas — recorde." },
+    "leger": { "name": "Luc Léger", "description": "Teste vaivém 20 m — VO₂ máx. estimada." },
+    "cooper": { "name": "Cooper 12 min", "description": "Distância percorrida em 12 min — VO₂ máx. estimada." },
+    "sprint20m": { "name": "Sprint 20 m", "description": "Tempo nos 20 m — vence o mais rápido." }
   },
   "list": {
-    "title": "Challenges & activities",
-    "empty": "No challenge yet.",
-    "empty_hint": "Add a challenge or a test to this session.",
-    "add": "Add an activity",
-    "back": "Back to training"
+    "title": "Desafios e atividades",
+    "empty": "Ainda não há desafios.",
+    "empty_hint": "Adiciona um desafio ou um teste a esta sessão.",
+    "add": "Adicionar atividade",
+    "back": "Voltar ao treino"
   },
   "add": {
-    "title": "Add an activity",
-    "pick_template": "Pick a template",
-    "or_custom": "Custom",
-    "custom_name_label": "Name",
-    "custom_name_placeholder": "e.g. Long pass accuracy",
-    "create": "Create",
-    "creating": "Creating…"
+    "title": "Adicionar atividade",
+    "pick_template": "Escolher um modelo",
+    "or_custom": "Criar personalizado",
+    "custom_name_label": "Nome",
+    "custom_name_placeholder": "Ex. Precisão de passe longo",
+    "create": "Criar",
+    "creating": "A criar…"
   },
   "entry": {
-    "title": "Log results",
-    "counter": "{{present}} present · {{done}} logged",
-    "save": "Save",
-    "saved": "Results saved",
-    "no_players": "No players present for this session.",
-    "value_placeholder": "Value"
+    "title": "Registo",
+    "counter": "{{present}} presentes · {{done}} registados",
+    "save": "Guardar",
+    "saved": "Resultados guardados",
+    "no_players": "Nenhum jogador presente nesta sessão.",
+    "value_placeholder": "Valor"
   },
   "ranking": {
-    "title": "Ranking",
-    "view": "View ranking",
-    "no_results": "No results yet.",
+    "title": "Classificação",
+    "view": "Ver classificação",
+    "no_results": "Ainda não há resultados.",
     "position": "#{{n}}",
-    "attempts_one": "{{count}} attempt",
-    "attempts_other": "{{count}} attempts",
+    "attempts_one": "{{count}} tentativa",
+    "attempts_other": "{{count}} tentativas",
     "vo2_max": "VO₂ max"
   },
   "player_stats": {
-    "title": "Stats & challenges",
-    "no_data": "No results logged yet for this player.",
-    "aggregate_cumulative": "Season total",
-    "aggregate_record": "Record",
-    "staff_only": "Staff only",
-    "vo2_hint": "VO₂ max — staff-only data"
+    "title": "Estatísticas e desafios",
+    "no_data": "Nenhum resultado registado para este jogador.",
+    "aggregate_cumulative": "Total da época",
+    "aggregate_record": "Recorde",
+    "staff_only": "Reservado à equipa técnica",
+    "vo2_hint": "VO₂ máx. — dado da equipa técnica"
   },
   "errors": {
-    "forbidden": "Staff-only action.",
-    "generic": "Something went wrong."
+    "forbidden": "Ação reservada à equipa técnica.",
+    "generic": "Ocorreu um erro."
   }
 }
