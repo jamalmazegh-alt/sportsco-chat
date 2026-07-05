@@ -155,12 +155,14 @@ function FullscreenLoader() {
 
 function ChallengesList({
   challenges,
+  entryCounts,
   onAdd,
   onEntry,
   onRanking,
 }: {
   eventId: string;
   challenges: any[];
+  entryCounts: Record<string, number>;
   onAdd: () => void;
   onEntry: (id: string) => void;
   onRanking: (id: string) => void;
@@ -182,7 +184,9 @@ function ChallengesList({
           </CardContent>
         </Card>
       )}
-      {challenges.map((c) => (
+      {challenges.map((c) => {
+        const hasEntries = (entryCounts[c.id] ?? 0) > 0;
+        return (
         <Card key={c.id}>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
@@ -199,13 +203,18 @@ function ChallengesList({
               <Button size="sm" variant="outline" onClick={() => onRanking(c.id)}>
                 <Trophy className="h-4 w-4" />
               </Button>
-              <Button size="sm" onClick={() => onEntry(c.id)}>
-                {t("entry.title")}
+              <Button
+                size="sm"
+                variant={hasEntries ? "outline" : "default"}
+                onClick={() => onEntry(c.id)}
+              >
+                {hasEntries ? t("list.edit") : t("entry.title")}
               </Button>
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
