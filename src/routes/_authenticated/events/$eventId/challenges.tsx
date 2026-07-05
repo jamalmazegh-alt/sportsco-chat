@@ -453,20 +453,42 @@ function EntryScreen({
                     size="sm"
                   />
                 ) : (
-                  <Input
-                    type="number"
-                    inputMode="decimal"
-                    step="0.01"
-                    className="w-24 text-right"
-                    placeholder={t("entry.value_placeholder")}
-                    value={values[p.id] ?? ""}
-                    onChange={(e) =>
-                      setValues((s) => ({
-                        ...s,
-                        [p.id]: e.target.value === "" ? "" : Number(e.target.value),
-                      }))
-                    }
-                  />
+                  <div className="inline-flex items-center gap-1">
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => bump(p.id, -stepSize)}
+                      aria-label="−"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step={stepSize}
+                      className="w-20 text-center"
+                      placeholder={t("entry.value_placeholder")}
+                      value={values[p.id] ?? ""}
+                      onChange={(e) =>
+                        setValues((s) => ({
+                          ...s,
+                          [p.id]: e.target.value === "" ? "" : Number(e.target.value),
+                        }))
+                      }
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => bump(p.id, stepSize)}
+                      aria-label="+"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
                 {beatsPrev && (
                   <div className="w-full">
