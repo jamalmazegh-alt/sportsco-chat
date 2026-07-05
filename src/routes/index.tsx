@@ -343,6 +343,140 @@ function LandingTournament() {
   );
 }
 
+export function ChallengesShowcase() {
+  const { t } = useTranslation("marketing");
+  const rows = [
+    { name: "Léa M.", score: 92, delta: "+3", medal: "🥇", isNew: true, w: "100%" },
+    { name: "Yanis B.", score: 88, delta: "+1", medal: "🥈", isNew: false, w: "92%" },
+    { name: "Chloé D.", score: 84, delta: "+2", medal: "🥉", isNew: false, w: "86%" },
+    { name: "Mehdi R.", score: 76, delta: "+4", medal: "4", isNew: false, w: "74%" },
+  ];
+  return (
+    <div className="relative mx-auto w-full max-w-md">
+      <div
+        aria-hidden
+        className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-amber-300/30 via-orange-200/20 to-transparent blur-2xl"
+      />
+      <div className="rounded-3xl border border-border bg-card p-5 shadow-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-amber-500/15 text-amber-600">
+              <Trophy className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("landing.challenges.challenge_label")}
+              </div>
+              <div className="text-sm font-bold text-foreground">
+                {t("landing.challenges.challenge_name")}
+              </div>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            {t("landing.challenges.live")}
+          </span>
+        </div>
+        <div className="mt-4 space-y-2.5">
+          {rows.map((r, i) => (
+            <div
+              key={r.name}
+              className="relative overflow-hidden rounded-xl border border-border bg-background/60 p-2.5"
+              style={{ animation: `challengeRowIn 0.6s ease-out ${i * 0.15}s both` }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-bold">
+                  {r.medal}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="truncate text-sm font-semibold text-foreground">{r.name}</span>
+                    {r.isNew && (
+                      <span
+                        className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm"
+                        style={{ animation: "challengePulse 1.6s ease-in-out infinite" }}
+                      >
+                        {t("landing.challenges.new_record")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600"
+                      style={{
+                        width: r.w,
+                        animation: `challengeBar 1.2s ease-out ${0.3 + i * 0.15}s both`,
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-black tabular-nums text-foreground">{r.score}</div>
+                  <div className="text-[10px] font-bold text-emerald-600">{r.delta}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("landing.challenges.players_count")}
+          </span>
+          <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-amber-500 animate-pulse" />
+            {t("landing.challenges.updated_now")}
+          </div>
+        </div>
+      </div>
+      <div
+        className="absolute -right-3 -top-3 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-1.5 text-xs font-black text-white shadow-lg"
+        style={{ animation: "challengeBounce 2.4s ease-in-out infinite" }}
+      >
+        {t("landing.challenges.floating_badge")}
+      </div>
+      <style>{`
+        @keyframes challengeRowIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes challengeBar { from { width: 0; } }
+        @keyframes challengeBounce { 0%, 100% { transform: rotate(6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-6px); } }
+        @keyframes challengePulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.06); filter: brightness(1.15); } }
+      `}</style>
+    </div>
+  );
+}
+
+function LandingChallenges() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-border/60 bg-gradient-to-br from-amber-50/60 via-background to-emerald-50/40 py-20 dark:from-amber-950/20 dark:to-emerald-950/10 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <SectionBadge tone="amber">🏅 {t("landing.challenges.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.challenges.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.challenges.body")}
+            </p>
+            <div className="mt-7">
+              <Button asChild size="lg" className="h-12 rounded-full px-6">
+                <Link to="/features" hash="challenges">
+                  {t("landing.challenges.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <ChallengesShowcase />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+
 function LandingSponsors() {
   const { t } = useTranslation("marketing");
   const sponsors = [
