@@ -26,11 +26,26 @@
     "toggle_hint": "A classificação dos testes físicos fica sempre reservada à equipa técnica."
   },
   "templates": {
-    "crossbar": { "name": "Cross Bar", "description": "Acertar no travessão — total da época." },
-    "juggling": { "name": "Embaixadas", "description": "Número máximo de embaixadas seguidas — recorde." },
-    "leger": { "name": "Luc Léger", "description": "Teste vaivém 20 m — VO₂ máx. estimada." },
-    "cooper": { "name": "Cooper 12 min", "description": "Distância percorrida em 12 min — VO₂ máx. estimada." },
-    "sprint20m": { "name": "Sprint 20 m", "description": "Tempo nos 20 m — vence o mais rápido." }
+    "crossbar": {
+      "name": "Cross Bar",
+      "description": "Acertar no travessão — total da época."
+    },
+    "juggling": {
+      "name": "Embaixadas",
+      "description": "Número máximo de embaixadas seguidas — recorde."
+    },
+    "leger": {
+      "name": "Luc Léger",
+      "description": "Teste vaivém 20 m — nível alcançado."
+    },
+    "cooper": {
+      "name": "Cooper 12 min",
+      "description": "Distância percorrida em 12 min — recorde."
+    },
+    "sprint20m": {
+      "name": "Sprint 20 m",
+      "description": "Tempo nos 20 m — vence o mais rápido."
+    }
   },
   "list": {
     "title": "Desafios e atividades",
@@ -62,16 +77,14 @@
     "no_results": "Ainda não há resultados.",
     "position": "#{{n}}",
     "attempts_one": "{{count}} tentativa",
-    "attempts_other": "{{count}} tentativas",
-    "vo2_max": "VO₂ max"
+    "attempts_other": "{{count}} tentativas"
   },
   "player_stats": {
     "title": "Estatísticas e desafios",
     "no_data": "Nenhum resultado registado para este jogador.",
     "aggregate_cumulative": "Total da época",
     "aggregate_record": "Recorde",
-    "staff_only": "Reservado à equipa técnica",
-    "vo2_hint": "VO₂ máx. — dado da equipa técnica"
+    "staff_only": "Reservado à equipa técnica"
   },
   "errors": {
     "forbidden": "Ação reservada à equipa técnica.",
