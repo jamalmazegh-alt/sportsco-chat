@@ -148,9 +148,3 @@ function PlayerChallengesTab() {
     </div>
   );
 }
-
-function formatChallengeDate(value: string): string {
-  if (!value) return "";
-  const [, month, day] = value.split("-");
-  return day && month ? `${day}/${month}` : value;
-}
