@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId/challenges
 function EventChallengesPage() {
   const { eventId } = Route.useParams();
   const { t } = useTranslation("challenges");
-  const { user } = useAuth();
+  const { user, memberships } = useAuth();
   const [view, setView] = useState<
     | { kind: "list" }
     | { kind: "add" }
@@ -74,6 +74,12 @@ function EventChallengesPage() {
 
     },
   });
+
+  const eventClubRoles = memberships.find((m) => m.club_id === eventInfo?.clubId)?.roles ?? [];
+  const isStaff =
+    eventClubRoles.includes("admin") ||
+    eventClubRoles.includes("coach") ||
+    eventClubRoles.includes("assistant_coach");
 
   const list = useServerFn(listChallenges);
   const { data: challengesData, refetch: refetchChallenges } = useQuery({
@@ -118,6 +124,7 @@ function EventChallengesPage() {
           eventId={eventId}
           challenges={challenges}
           entryCounts={entryCounts}
+          isStaff={isStaff}
           onAdd={() => setView({ kind: "add" })}
           onEntry={(id) => setView({ kind: "entry", challengeId: id })}
           onRanking={(id) => setView({ kind: "ranking", challengeId: id })}
