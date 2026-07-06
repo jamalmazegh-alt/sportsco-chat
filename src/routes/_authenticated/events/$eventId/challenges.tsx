@@ -295,12 +295,16 @@ function AddChallenge({
   teamId,
   sport,
   existingChallenges,
+  entryCounts,
+  onPickExisting,
   onDone,
 }: {
   clubId: string;
   teamId: string;
   sport: string | null;
   existingChallenges: any[];
+  entryCounts: Record<string, number>;
+  onPickExisting: (challengeId: string) => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation("challenges");
@@ -308,6 +312,13 @@ function AddChallenge({
   const [selected, setSelected] = useState<string | null>(null);
   const [name, setName] = useState("");
 
+  // Existing team challenges that have NO entries on this session yet — the
+  // coach can reuse them (crossbar, juggling, etc.) instead of re-creating.
+  const reusable = useMemo(() => {
+    return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) === 0);
+  }, [existingChallenges, entryCounts]);
+
+  // Templates whose team-challenge doesn't exist yet: brand-new activities.
   const templates = useMemo(() => {
     const usedKeys = new Set(
       (existingChallenges ?? [])
@@ -338,9 +349,38 @@ function AddChallenge({
   return (
     <div className="space-y-3">
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
+
+      {reusable.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium">
+            {t("add.reuse_existing", { defaultValue: "Défis déjà créés pour l'équipe" })}
+          </p>
+          {reusable.map((c) => (
+            <Card
+              key={c.id}
+              className="cursor-pointer transition hover:border-muted-foreground/40"
+              onClick={() => onPickExisting(c.id)}
+            >
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
+                <div className="flex-1">
+                  <div className="font-medium">{c.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {t(`types.${c.kind}`)} · {t(`aggregates.${c.aggregate}`)}
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase text-muted-foreground">
+                  {t("add.reuse_action", { defaultValue: "Saisir" })}
+                </span>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
         <p className="text-sm font-medium">{t("add.pick_template")}</p>
-        {templates.length === 0 && (
+        {templates.length === 0 && reusable.length === 0 && (
           <Card>
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
               {t("add.all_added", { defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe." })}
@@ -398,6 +438,7 @@ function AddChallenge({
     </div>
   );
 }
+
 
 function EntryScreen({
   challengeId,
