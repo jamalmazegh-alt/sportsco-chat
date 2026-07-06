@@ -76,6 +76,10 @@
     "title": "Défis & activités",
     "empty": "Aucun défi pour l'instant.",
     "empty_hint": "Ajoute un défi ou un test à cette séance.",
+    "no_active": "Aucune activité n'a encore été utilisée pour cette séance.",
+    "show_all_hint": "Affiche toutes les activités de l'équipe pour en saisir une.",
+    "active_only": "Actifs",
+    "show_all": "Tout voir",
     "add": "Ajouter une activité",
     "back": "Retour à l'entraînement",
     "edit": "Éditer"
