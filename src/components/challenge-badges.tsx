@@ -2,14 +2,14 @@ import { useTranslation } from "react-i18next";
 
 type AggregateType = "record" | "cumulative";
 
-const StarSvg = ({ color = "white" }: { color?: string }) => (
-  <svg viewBox="0 0 24 24" width={15} height={15} fill={color} aria-hidden="true">
+const StarSvg = ({ color = "white", size = 15 }: { color?: string; size?: number }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill={color} aria-hidden="true">
     <path d="M12 2l2.9 6.2 6.6.7-4.9 4.5 1.3 6.6L12 17.8 6.1 20l1.3-6.6L2.5 8.9l6.6-.7z" />
   </svg>
 );
 
-const TrophySvg = ({ color = "white" }: { color?: string }) => (
-  <svg viewBox="0 0 24 24" width={15} height={15} fill={color} aria-hidden="true">
+const TrophySvg = ({ color = "white", size = 15 }: { color?: string; size?: number }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill={color} aria-hidden="true">
     <path d="M6 4h12v2h2v3a4 4 0 0 1-4 4h-.4A4 4 0 0 1 13 15.9V18h3v2H8v-2h3v-2.1A4 4 0 0 1 8.4 13H8a4 4 0 0 1-4-4V6h2z" />
   </svg>
 );
