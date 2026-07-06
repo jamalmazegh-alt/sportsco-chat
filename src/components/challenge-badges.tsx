@@ -105,33 +105,33 @@ export function NewRecordBadge({ value }: { value: number | string }) {
       role="status"
       aria-label={`${t("records.new")} ${value}`}
       style={{
-        gap: 9,
-        padding: "7px 15px 7px 7px",
+        gap: 6,
+        padding: "5px 11px 5px 5px",
         borderRadius: 999,
         background: "linear-gradient(135deg,#F8D06A,#E7A11B 55%,#B4771A)",
-        boxShadow: "0 6px 16px -4px rgba(199,136,20,.55)",
+        boxShadow: "0 3px 8px -2px rgba(199,136,20,.55)",
       }}
     >
       <span className="new-record-shine" aria-hidden="true" />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ top: 4, right: 10, animationDelay: "0s" }}
+        style={{ top: 3, right: 8, animationDelay: "0s" }}
       />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ bottom: 5, right: 22, animationDelay: "0.7s" }}
+        style={{ bottom: 4, right: 18, animationDelay: "0.7s" }}
       />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ top: 8, right: 34, animationDelay: "1.3s" }}
+        style={{ top: 6, right: 28, animationDelay: "1.3s" }}
       />
       <span
         style={{
-          width: 28,
-          height: 28,
+          width: 20,
+          height: 20,
           borderRadius: "50%",
           display: "inline-flex",
           alignItems: "center",
@@ -141,13 +141,13 @@ export function NewRecordBadge({ value }: { value: number | string }) {
           boxShadow: "inset 0 1px 1px rgba(255,255,255,.7)",
         }}
       >
-        <StarSvg color="var(--gold-deep)" />
+        <StarSvg color="var(--gold-deep)" size={12} />
       </span>
-      <span style={{ display: "inline-flex", alignItems: "baseline", gap: 6 }}>
+      <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}>
         <span
           style={{
-            fontSize: 10.5,
-            letterSpacing: "0.6px",
+            fontSize: 9,
+            letterSpacing: "0.5px",
             textTransform: "uppercase",
           }}
         >
@@ -155,8 +155,8 @@ export function NewRecordBadge({ value }: { value: number | string }) {
         </span>
         <span
           style={{
-            fontSize: 16,
-            letterSpacing: "-0.3px",
+            fontSize: 13,
+            letterSpacing: "-0.2px",
             fontVariantNumeric: "tabular-nums",
           }}
         >
