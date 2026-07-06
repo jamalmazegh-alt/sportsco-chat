@@ -346,74 +346,88 @@ function AddChallenge({
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
 
+  // Unified list: reusable existing challenges first (marked "Populaire"),
+  // then brand-new templates. One consistent card style, no section split.
+  type Item =
+    | { kind: "existing"; id: string; name: string; icon: string; typeLabel: string; popular: true }
+    | { kind: "template"; key: string; name: string; icon: string; description: string; typeLabel: string; popular: boolean };
+
+  const items: Item[] = useMemo(() => {
+    const existing: Item[] = reusable.map((c) => ({
+      kind: "existing" as const,
+      id: c.id,
+      name: c.name,
+      icon: c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯"),
+      typeLabel: t(`types.${c.kind}`),
+      popular: true,
+    }));
+    const tpls: Item[] = templates.map((tpl) => ({
+      kind: "template" as const,
+      key: tpl.key,
+      name: t(`templates.${tpl.key}.name`),
+      icon: tpl.icon,
+      description: t(`templates.${tpl.key}.description`),
+      typeLabel: t(`types.${tpl.kind}`),
+      popular: false,
+    }));
+    return [...existing, ...tpls];
+  }, [reusable, templates, t]);
+
   return (
     <div className="space-y-3">
       <h1 className="text-xl font-semibold">{t("add.title")}</h1>
 
-      {reusable.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-medium">
-            {t("add.reuse_existing", { defaultValue: "Défis déjà créés pour l'équipe" })}
-          </p>
-          {reusable.map((c) => (
-            <Card
-              key={c.id}
-              className="cursor-pointer transition hover:border-muted-foreground/40"
-              onClick={() => onPickExisting(c.id)}
-            >
-              <CardContent className="flex items-center gap-3 p-4">
-                <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
-                <div className="flex-1">
-                  <div className="font-medium">{c.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {t(`types.${c.kind}`)} · {t(`aggregates.${c.aggregate}`)}
-                  </div>
-                </div>
-                <span className="text-[10px] uppercase text-muted-foreground">
-                  {t("add.reuse_action", { defaultValue: "Saisir" })}
-                </span>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
       <div className="space-y-2">
-        <p className="text-sm font-medium">{t("add.pick_template")}</p>
-        {templates.length === 0 && reusable.length === 0 && (
+        {items.length === 0 && (
           <Card>
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
               {t("add.all_added", { defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe." })}
             </CardContent>
           </Card>
         )}
-        {templates.map((tpl) => (
-          <Card
-            key={tpl.key}
-            className={
-              "cursor-pointer transition " +
-              (selected === tpl.key ? "border-primary" : "hover:border-muted-foreground/40")
-            }
-            onClick={() => {
-              setSelected(tpl.key);
-              setName(t(`templates.${tpl.key}.name`));
-            }}
-          >
-            <CardContent className="flex items-center gap-3 p-4">
-              <div className="text-2xl">{tpl.icon}</div>
-              <div className="flex-1">
-                <div className="font-medium">{t(`templates.${tpl.key}.name`)}</div>
-                <div className="text-xs text-muted-foreground">
-                  {t(`templates.${tpl.key}.description`)}
+        {items.map((it) => {
+          const key = it.kind === "existing" ? `e-${it.id}` : `t-${it.key}`;
+          const isSelected = it.kind === "template" && selected === it.key;
+          return (
+            <Card
+              key={key}
+              className={
+                "cursor-pointer transition " +
+                (isSelected ? "border-primary" : "hover:border-muted-foreground/40")
+              }
+              onClick={() => {
+                if (it.kind === "existing") {
+                  onPickExisting(it.id);
+                } else {
+                  setSelected(it.key);
+                  setName(it.name);
+                }
+              }}
+            >
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="text-2xl">{it.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="font-medium">{it.name}</div>
+                    {it.popular && (
+                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                        {t("add.popular", { defaultValue: "Populaire" })}
+                      </span>
+                    )}
+                  </div>
+                  {it.kind === "template" && (
+                    <div className="text-xs text-muted-foreground">{it.description}</div>
+                  )}
                 </div>
-              </div>
-              <span className="text-[10px] uppercase text-muted-foreground">
-                {t(`types.${tpl.kind}`)}
-              </span>
-            </CardContent>
-          </Card>
-        ))}
+                <span className="text-[10px] uppercase text-muted-foreground shrink-0">
+                  {it.typeLabel}
+                </span>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
+
 
 
       {selected && (
