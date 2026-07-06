@@ -758,6 +758,11 @@ function TeamDetail() {
 
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
 
+      {isCoach && (players ?? []).length > 0 && (
+        <TeamAbsencesTable teamId={teamId} players={players as any} />
+      )}
+
+
       <TeamCoaches
         teamId={teamId}
         clubId={(team as any)?.club_id}
