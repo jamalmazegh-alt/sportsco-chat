@@ -136,12 +136,15 @@ function EventChallengesPage() {
           teamId={eventInfo.teamId}
           sport={eventInfo.sport}
           existingChallenges={challenges}
+          entryCounts={entryCounts}
+          onPickExisting={(id) => setView({ kind: "entry", challengeId: id })}
           onDone={() => {
             refetchChallenges();
             setView({ kind: "list" });
           }}
         />
       )}
+
 
 
       {view.kind === "entry" && (
