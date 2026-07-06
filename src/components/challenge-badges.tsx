@@ -2,14 +2,14 @@ import { useTranslation } from "react-i18next";
 
 type AggregateType = "record" | "cumulative";
 
-const StarSvg = ({ color = "white" }: { color?: string }) => (
-  <svg viewBox="0 0 24 24" width={15} height={15} fill={color} aria-hidden="true">
+const StarSvg = ({ color = "white", size = 15 }: { color?: string; size?: number }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill={color} aria-hidden="true">
     <path d="M12 2l2.9 6.2 6.6.7-4.9 4.5 1.3 6.6L12 17.8 6.1 20l1.3-6.6L2.5 8.9l6.6-.7z" />
   </svg>
 );
 
-const TrophySvg = ({ color = "white" }: { color?: string }) => (
-  <svg viewBox="0 0 24 24" width={15} height={15} fill={color} aria-hidden="true">
+const TrophySvg = ({ color = "white", size = 15 }: { color?: string; size?: number }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill={color} aria-hidden="true">
     <path d="M6 4h12v2h2v3a4 4 0 0 1-4 4h-.4A4 4 0 0 1 13 15.9V18h3v2H8v-2h3v-2.1A4 4 0 0 1 8.4 13H8a4 4 0 0 1-4-4V6h2z" />
   </svg>
 );
@@ -105,33 +105,33 @@ export function NewRecordBadge({ value }: { value: number | string }) {
       role="status"
       aria-label={`${t("records.new")} ${value}`}
       style={{
-        gap: 9,
-        padding: "7px 15px 7px 7px",
+        gap: 6,
+        padding: "5px 11px 5px 5px",
         borderRadius: 999,
         background: "linear-gradient(135deg,#F8D06A,#E7A11B 55%,#B4771A)",
-        boxShadow: "0 6px 16px -4px rgba(199,136,20,.55)",
+        boxShadow: "0 3px 8px -2px rgba(199,136,20,.55)",
       }}
     >
       <span className="new-record-shine" aria-hidden="true" />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ top: 4, right: 10, animationDelay: "0s" }}
+        style={{ top: 3, right: 8, animationDelay: "0s" }}
       />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ bottom: 5, right: 22, animationDelay: "0.7s" }}
+        style={{ bottom: 4, right: 18, animationDelay: "0.7s" }}
       />
       <span
         className="new-record-sparkle"
         aria-hidden="true"
-        style={{ top: 8, right: 34, animationDelay: "1.3s" }}
+        style={{ top: 6, right: 28, animationDelay: "1.3s" }}
       />
       <span
         style={{
-          width: 28,
-          height: 28,
+          width: 20,
+          height: 20,
           borderRadius: "50%",
           display: "inline-flex",
           alignItems: "center",
@@ -141,13 +141,13 @@ export function NewRecordBadge({ value }: { value: number | string }) {
           boxShadow: "inset 0 1px 1px rgba(255,255,255,.7)",
         }}
       >
-        <StarSvg color="var(--gold-deep)" />
+        <StarSvg color="var(--gold-deep)" size={12} />
       </span>
-      <span style={{ display: "inline-flex", alignItems: "baseline", gap: 6 }}>
+      <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}>
         <span
           style={{
-            fontSize: 10.5,
-            letterSpacing: "0.6px",
+            fontSize: 9,
+            letterSpacing: "0.5px",
             textTransform: "uppercase",
           }}
         >
@@ -155,8 +155,8 @@ export function NewRecordBadge({ value }: { value: number | string }) {
         </span>
         <span
           style={{
-            fontSize: 16,
-            letterSpacing: "-0.3px",
+            fontSize: 13,
+            letterSpacing: "-0.2px",
             fontVariantNumeric: "tabular-nums",
           }}
         >

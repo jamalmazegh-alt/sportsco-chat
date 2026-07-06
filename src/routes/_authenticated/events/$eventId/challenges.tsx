@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId/challenges
 function EventChallengesPage() {
   const { eventId } = Route.useParams();
   const { t } = useTranslation("challenges");
-  const { user } = useAuth();
+  const { user, memberships } = useAuth();
   const [view, setView] = useState<
     | { kind: "list" }
     | { kind: "add" }
@@ -74,6 +74,12 @@ function EventChallengesPage() {
 
     },
   });
+
+  const eventClubRoles = memberships.find((m) => m.club_id === eventInfo?.clubId)?.roles ?? [];
+  const isStaff =
+    eventClubRoles.includes("admin") ||
+    eventClubRoles.includes("coach") ||
+    eventClubRoles.includes("assistant_coach");
 
   const list = useServerFn(listChallenges);
   const { data: challengesData, refetch: refetchChallenges } = useQuery({
@@ -118,6 +124,7 @@ function EventChallengesPage() {
           eventId={eventId}
           challenges={challenges}
           entryCounts={entryCounts}
+          isStaff={isStaff}
           onAdd={() => setView({ kind: "add" })}
           onEntry={(id) => setView({ kind: "entry", challengeId: id })}
           onRanking={(id) => setView({ kind: "ranking", challengeId: id })}
@@ -167,6 +174,7 @@ function FullscreenLoader() {
 function ChallengesList({
   challenges,
   entryCounts,
+  isStaff,
   onAdd,
   onEntry,
   onRanking,
@@ -174,28 +182,64 @@ function ChallengesList({
   eventId: string;
   challenges: any[];
   entryCounts: Record<string, number>;
+  isStaff: boolean;
   onAdd: () => void;
   onEntry: (id: string) => void;
   onRanking: (id: string) => void;
 }) {
   const { t } = useTranslation("challenges");
+  const [showAll, setShowAll] = useState(false);
+
+  const sorted = useMemo(() => {
+    return [...challenges].sort((a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0));
+  }, [challenges, entryCounts]);
+
+  const displayed = useMemo(() => {
+    return showAll ? sorted : sorted.filter((c) => (entryCounts[c.id] ?? 0) > 0);
+  }, [sorted, showAll, entryCounts]);
+
+  const hasHidden = displayed.length < sorted.length;
+
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t("list.title")}</h1>
-        <Button size="sm" onClick={onAdd}>
-          <Plus className="h-4 w-4" /> {t("list.add")}
-        </Button>
+        <div className="flex items-center gap-1.5">
+          {hasHidden && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAll((s) => !s)}
+              className="h-8 px-2 text-xs"
+            >
+              {showAll ? t("list.active_only", { defaultValue: "Actifs" }) : t("list.show_all", { defaultValue: "Tout voir" })}
+            </Button>
+          )}
+          {isStaff && (
+            <Button size="sm" onClick={onAdd}>
+              <Plus className="h-4 w-4" /> {t("list.add")}
+            </Button>
+          )}
+        </div>
       </div>
-      {challenges.length === 0 && (
+      {displayed.length === 0 && (
         <Card>
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            <p>{t("list.empty")}</p>
-            <p className="mt-1">{t("list.empty_hint")}</p>
+            <p>
+              {showAll
+                ? t("list.empty", { defaultValue: "Aucun défi pour l'instant." })
+                : t("list.no_active", { defaultValue: "Aucune activité n'a encore été utilisée pour cette séance." })}
+            </p>
+            {!showAll && hasHidden && (
+              <p className="mt-1">{t("list.show_all_hint", { defaultValue: "Affiche toutes les activités de l'équipe pour en saisir une." })}</p>
+            )}
+            {showAll && isStaff && (
+              <p className="mt-1">{t("list.empty_hint", { defaultValue: "Ajoute un défi ou un test à cette séance." })}</p>
+            )}
           </CardContent>
         </Card>
       )}
-      {challenges.map((c) => {
+      {displayed.map((c) => {
         const hasEntries = (entryCounts[c.id] ?? 0) > 0;
         return (
         <Card key={c.id}>
@@ -214,13 +258,15 @@ function ChallengesList({
               <Button size="sm" variant="outline" onClick={() => onRanking(c.id)}>
                 <Trophy className="h-4 w-4" />
               </Button>
-              <Button
-                size="sm"
-                variant={hasEntries ? "outline" : "default"}
-                onClick={() => onEntry(c.id)}
-              >
-                {hasEntries ? t("list.edit") : t("entry.title")}
-              </Button>
+              {isStaff && (
+                <Button
+                  size="sm"
+                  variant={hasEntries ? "outline" : "default"}
+                  onClick={() => onEntry(c.id)}
+                >
+                  {hasEntries ? t("list.edit") : t("entry.title")}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
