@@ -44,6 +44,8 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { TeamAbsencesTable } from "@/components/team-absences-table";
+
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -755,6 +757,11 @@ function TeamDetail() {
 
 
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
+
+      {isCoach && (players ?? []).length > 0 && (
+        <TeamAbsencesTable teamId={teamId} players={players as any} />
+      )}
+
 
       <TeamCoaches
         teamId={teamId}
