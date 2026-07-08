@@ -789,6 +789,24 @@ function DoneScreen({
             <span>{t("done.form.beta")}</span>
           </label>
           <p className="text-xs text-[#5C6AA6]">{t("done.form.consentHint")}</p>
+          <p className="text-xs text-[#93A0D4]">
+            <Trans
+              i18nKey="done.privacy.notice"
+              t={t}
+              components={{
+                link: (
+                  <a
+                    href="/legal/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 hover:text-white"
+                  >
+                    {t("done.privacy.linkText")}
+                  </a>
+                ),
+              }}
+            />
+          </p>
         </div>
 
         {err && (
