@@ -1,9 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import type { AnswersMap, ContactPayload, Question } from "./build-clubero-config";
 import { parseUtm } from "./build-clubero-config";
 
 const STORAGE_KEY = "clubero:build-clubero:v1";
+const API_BASE = "/api/public/build-clubero";
+
+async function postJson(path: string, payload: unknown): Promise<{ ok: boolean; status: number; body: unknown }>
+{
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      credentials: "same-origin",
+    });
+    let body: unknown = null;
+    try { body = await res.json(); } catch { /* no body */ }
+    return { ok: res.ok, status: res.status, body };
+  } catch (err) {
+    return { ok: false, status: 0, body: { error: err instanceof Error ? err.message : "network_error" } };
+  }
+}
 
 interface Persisted {
   session_id: string;
