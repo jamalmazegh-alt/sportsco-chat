@@ -236,7 +236,8 @@
       "ranking": "Classement moyen (1 = plus utile)",
       "numeric": "Valeurs numériques",
       "verbatims": "Verbatims libres",
-      "leads": "Contacts collectés"
+      "leads": "Contacts collectés",
+      "responses": "Réponses par utilisateur"
     },
     "leads": {
       "firstName": "Prénom",
@@ -249,11 +250,28 @@
       "exportCsv": "Exporter CSV"
     },
     "empty": "Aucune donnée pour le moment.",
-    "loadError": "Impossible de charger le tableau de bord."
+    "loadError": "Impossible de charger le tableau de bord.",
+    "responses": {
+      "title": "Réponses par utilisateur",
+      "empty": "Aucune session pour le moment.",
+      "status": "Statut",
+      "completedStatus": "Terminée",
+      "inProgressStatus": "En cours",
+      "started": "Démarrée",
+      "completed": "Terminée",
+      "anonymous": "Anonyme",
+      "viewAnswers": "Voir les réponses",
+      "hideAnswers": "Masquer",
+      "noAnswer": "—"
+    }
   },
   "rank": {
-    "hint": "Classe de la plus prioritaire (en haut) à la moins prioritaire (en bas).",
+    "hint": "Choisis les fonctionnalités dans l'ordre où elles comptent pour toi : clique pour ajouter, réordonne avec ▲/▼.",
     "moveUp": "Monter {{item}} d'un rang",
-    "moveDown": "Descendre {{item}} d'un rang"
+    "moveDown": "Descendre {{item}} d'un rang",
+    "available": "À ajouter à ton classement",
+    "add": "Ajouter {{item}} au classement",
+    "remove": "Retirer {{item}} du classement",
+    "emptyState": "Ton classement est vide — clique une option ci-dessous pour l'ajouter en premier."
   }
 }

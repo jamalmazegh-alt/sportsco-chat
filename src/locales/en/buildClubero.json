@@ -236,7 +236,8 @@
       "ranking": "Average ranking (1 = most useful)",
       "numeric": "Numeric values",
       "verbatims": "Free-text verbatims",
-      "leads": "Collected contacts"
+      "leads": "Collected contacts",
+      "responses": "Answers by user"
     },
     "leads": {
       "firstName": "First name",
@@ -249,11 +250,28 @@
       "exportCsv": "Export CSV"
     },
     "empty": "No data yet.",
-    "loadError": "Could not load the dashboard."
+    "loadError": "Could not load the dashboard.",
+    "responses": {
+      "title": "Answers by user",
+      "empty": "No sessions yet.",
+      "status": "Status",
+      "completedStatus": "Completed",
+      "inProgressStatus": "In progress",
+      "started": "Started",
+      "completed": "Completed",
+      "anonymous": "Anonymous",
+      "viewAnswers": "View answers",
+      "hideAnswers": "Hide",
+      "noAnswer": "—"
+    }
   },
   "rank": {
-    "hint": "Rank from highest priority (top) to lowest (bottom).",
+    "hint": "Pick features in the order that matters to you: tap to add, reorder with ▲/▼.",
     "moveUp": "Move {{item}} up one rank",
-    "moveDown": "Move {{item}} down one rank"
+    "moveDown": "Move {{item}} down one rank",
+    "available": "Add to your ranking",
+    "add": "Add {{item}} to ranking",
+    "remove": "Remove {{item}} from ranking",
+    "emptyState": "Your ranking is empty — tap an option below to place it first."
   }
 }

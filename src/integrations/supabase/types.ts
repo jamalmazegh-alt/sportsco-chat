@@ -5519,6 +5519,7 @@ export type Database = {
         Returns: string
       }
       admin_build_clubero_dashboard: { Args: never; Returns: Json }
+      admin_build_clubero_responses: { Args: never; Returns: Json }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean

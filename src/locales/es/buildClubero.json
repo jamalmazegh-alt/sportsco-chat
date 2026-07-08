@@ -236,7 +236,8 @@
       "ranking": "Rango medio (1 = más útil)",
       "numeric": "Valores numéricos",
       "verbatims": "Verbatims libres",
-      "leads": "Contactos recogidos"
+      "leads": "Contactos recogidos",
+      "responses": "Respuestas por usuario"
     },
     "leads": {
       "firstName": "Nombre",
@@ -249,11 +250,28 @@
       "exportCsv": "Exportar CSV"
     },
     "empty": "Aún no hay datos.",
-    "loadError": "No se pudo cargar el panel."
+    "loadError": "No se pudo cargar el panel.",
+    "responses": {
+      "title": "Respuestas por usuario",
+      "empty": "Aún no hay sesiones.",
+      "status": "Estado",
+      "completedStatus": "Completada",
+      "inProgressStatus": "En curso",
+      "started": "Iniciada",
+      "completed": "Completada",
+      "anonymous": "Anónimo",
+      "viewAnswers": "Ver respuestas",
+      "hideAnswers": "Ocultar",
+      "noAnswer": "—"
+    }
   },
   "rank": {
-    "hint": "Ordena de mayor prioridad (arriba) a menor (abajo).",
+    "hint": "Elige las funciones en tu orden de prioridad: pulsa para añadir, reordena con ▲/▼.",
     "moveUp": "Subir {{item}} una posición",
-    "moveDown": "Bajar {{item}} una posición"
+    "moveDown": "Bajar {{item}} una posición",
+    "available": "Añadir a tu clasificación",
+    "add": "Añadir {{item}} a la clasificación",
+    "remove": "Quitar {{item}} de la clasificación",
+    "emptyState": "Tu clasificación está vacía — pulsa una opción abajo para ponerla primera."
   }
 }

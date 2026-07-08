@@ -295,7 +295,7 @@ function QuestionRenderer({
     case "slider":
       return <SliderInput q={q} value={value as number | undefined} onChange={onChange} />;
     case "rank":
-      return <RankList q={q} value={(value as string[]) ?? q.options.map((o) => o.id)} onChange={onChange} />;
+      return <RankList q={q} value={(value as string[]) ?? []} onChange={onChange} />;
     case "text":
       return <TextArea q={q} value={(value as string) ?? ""} onChange={onChange} />;
   }
@@ -530,88 +530,148 @@ function RankList({
   onChange: (v: unknown) => void;
 }) {
   const { t } = useTranslation("buildClubero");
-  const order = value.length === q.options.length ? value : q.options.map((o) => o.id);
+  // User builds the ranking themselves — no preselected order.
+  const order = value.filter((id) => q.options.some((o) => o.id === id));
+  const pool = q.options.filter((o) => !order.includes(o.id));
+
   const move = (from: number, to: number) => {
     if (to < 0 || to >= order.length) return;
     onChange(reorder(order, from, to));
   };
-  useEffect(() => {
-    if (value.length !== q.options.length) onChange(order);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const liveText = order
-    .map((id, i) => `${i + 1}. ${t(`questions.${q.key}.options.${id}.label`)}`)
-    .join(", ");
+  const addToRanking = (id: string) => {
+    if (order.includes(id)) return;
+    onChange([...order, id]);
+  };
+  const removeFromRanking = (id: string) => {
+    onChange(order.filter((x) => x !== id));
+  };
+
+  const liveText = order.length
+    ? order
+        .map((id, i) => `${i + 1}. ${t(`questions.${q.key}.options.${id}.label`)}`)
+        .join(", ")
+    : t("rank.emptyState");
+
   return (
     <div>
       <p className="mb-2.5 text-[13px] text-[#9ec8b8]">{t("rank.hint")}</p>
-      <ol
-        className="flex flex-col gap-2.5"
-        aria-label={t(`questions.${q.key}.title`)}
-        data-testid="rank-list"
-      >
-        {order.map((id, i) => {
-          const opt = q.options.find((o) => o.id === id);
-          if (!opt) return null;
-          const label = t(`questions.${q.key}.options.${id}.label`);
-          const description = t(`questions.${q.key}.options.${id}.description`, {
-            defaultValue: "",
-          });
-          const isFirst = i === 0;
-          const isLast = i === order.length - 1;
-          return (
-            <li
-              key={id}
-              data-rank-item={id}
-              className="flex items-center gap-3 rounded-2xl border-[1.5px] border-white/10 bg-white/[0.06] px-3 py-3 transition-[transform,background-color] duration-200"
-            >
-              <GripVertical
-                size={16}
-                className="flex-none text-white/30"
-                aria-hidden="true"
-              />
-              <span className="grid h-8 w-8 flex-none place-items-center rounded-lg bg-gradient-to-br from-[#10B981] to-[#6EE7B7] text-[14px] font-extrabold text-[#052e26]">
-                {i + 1}
-              </span>
-              <span className="text-xl" aria-hidden="true">
-                {opt.emoji}
-              </span>
-              <span className="flex-1 min-w-0">
-                <span className="block text-[14.5px] font-semibold leading-tight">{label}</span>
-                {description ? (
-                  <span className="mt-0.5 block text-[12.5px] leading-snug text-[#9ec8b8]">
-                    {description}
-                  </span>
-                ) : null}
-              </span>
-              <div className="flex flex-col gap-1">
+
+      {/* Ranked list (top) */}
+      {order.length === 0 ? (
+        <div
+          className="mb-4 rounded-2xl border-[1.5px] border-dashed border-white/15 bg-white/[0.03] px-4 py-6 text-center text-[13px] text-[#9ec8b8]"
+          data-testid="rank-empty"
+        >
+          {t("rank.emptyState")}
+        </div>
+      ) : (
+        <ol
+          className="mb-4 flex flex-col gap-2.5"
+          aria-label={t(`questions.${q.key}.title`)}
+          data-testid="rank-list"
+        >
+          {order.map((id, i) => {
+            const opt = q.options.find((o) => o.id === id);
+            if (!opt) return null;
+            const label = t(`questions.${q.key}.options.${id}.label`);
+            const description = t(`questions.${q.key}.options.${id}.description`, {
+              defaultValue: "",
+            });
+            const isFirst = i === 0;
+            const isLast = i === order.length - 1;
+            return (
+              <li
+                key={id}
+                data-rank-item={id}
+                className="flex items-center gap-3 rounded-2xl border-[1.5px] border-white/10 bg-white/[0.06] px-3 py-3 transition-[transform,background-color] duration-200"
+              >
+                <GripVertical
+                  size={16}
+                  className="flex-none text-white/30"
+                  aria-hidden="true"
+                />
+                <span className="grid h-8 w-8 flex-none place-items-center rounded-lg bg-gradient-to-br from-[#10B981] to-[#6EE7B7] text-[14px] font-extrabold text-[#052e26]">
+                  {i + 1}
+                </span>
+                <span className="text-xl" aria-hidden="true">
+                  {opt.emoji}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[14.5px] font-semibold leading-tight">{label}</span>
+                  {description ? (
+                    <span className="mt-0.5 block text-[12.5px] leading-snug text-[#9ec8b8]">
+                      {description}
+                    </span>
+                  ) : null}
+                </span>
+                <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => move(i, i - 1)}
+                    disabled={isFirst}
+                    aria-disabled={isFirst}
+                    aria-label={t("rank.moveUp", { item: label })}
+                    data-testid={`rank-up-${id}`}
+                    className="grid h-11 w-11 place-items-center rounded-lg border border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-25"
+                  >
+                    <ChevronUp size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(i, i + 1)}
+                    disabled={isLast}
+                    aria-disabled={isLast}
+                    aria-label={t("rank.moveDown", { item: label })}
+                    data-testid={`rank-down-${id}`}
+                    className="grid h-11 w-11 place-items-center rounded-lg border border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-25"
+                  >
+                    <ChevronDown size={20} />
+                  </button>
+                </div>
                 <button
                   type="button"
-                  onClick={() => move(i, i - 1)}
-                  disabled={isFirst}
-                  aria-disabled={isFirst}
-                  aria-label={t("rank.moveUp", { item: label })}
-                  data-testid={`rank-up-${id}`}
-                  className="grid h-11 w-11 place-items-center rounded-lg border border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-25"
+                  onClick={() => removeFromRanking(id)}
+                  aria-label={t("rank.remove", { item: label })}
+                  data-testid={`rank-remove-${id}`}
+                  className="ml-1 grid h-11 w-11 flex-none place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition-colors hover:bg-white/15 hover:text-white"
                 >
-                  <ChevronUp size={20} />
+                  ×
                 </button>
-                <button
-                  type="button"
-                  onClick={() => move(i, i + 1)}
-                  disabled={isLast}
-                  aria-disabled={isLast}
-                  aria-label={t("rank.moveDown", { item: label })}
-                  data-testid={`rank-down-${id}`}
-                  className="grid h-11 w-11 place-items-center rounded-lg border border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-25"
-                >
-                  <ChevronDown size={20} />
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
+      {/* Available pool */}
+      {pool.length > 0 && (
+        <div>
+          <p className="mb-2 text-[12px] font-medium uppercase tracking-wide text-[#9ec8b8]">
+            {t("rank.available")}
+          </p>
+          <ul className="flex flex-wrap gap-2" data-testid="rank-pool">
+            {pool.map((opt) => {
+              const label = t(`questions.${q.key}.options.${opt.id}.label`);
+              return (
+                <li key={opt.id}>
+                  <button
+                    type="button"
+                    onClick={() => addToRanking(opt.id)}
+                    aria-label={t("rank.add", { item: label })}
+                    data-testid={`rank-add-${opt.id}`}
+                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-white/15 bg-white/[0.04] px-3 py-2 text-[13.5px] text-white transition-colors hover:border-[#34D399]/60 hover:bg-[#10B981]/10"
+                  >
+                    <span className="text-base" aria-hidden="true">{opt.emoji}</span>
+                    <span>{label}</span>
+                    <span className="text-[#6EE7B7]">＋</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       <div className="sr-only" role="status" aria-live="polite">
         {liveText}
       </div>

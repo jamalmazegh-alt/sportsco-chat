@@ -65,6 +65,26 @@ interface LeadRow {
   beta_consent_at: string | null;
   completed_at: string | null;
 }
+interface AnswerRow {
+  question_key: string;
+  question_type: string;
+  value: unknown;
+  created_at: string;
+}
+interface ResponseRow {
+  id: string;
+  session_id: string;
+  status: "in_progress" | "completed";
+  locale: string;
+  first_name: string | null;
+  email: string | null;
+  club: string | null;
+  newsletter_opt_in: boolean;
+  beta_opt_in: boolean;
+  started_at: string;
+  completed_at: string | null;
+  answers: AnswerRow[];
+}
 interface Dashboard {
   overview: OverviewRow | null;
   options: OptionRow[];
@@ -72,6 +92,7 @@ interface Dashboard {
   numeric: NumericRow[];
   verbatims: VerbatimRow[];
   leads: LeadRow[];
+  responses: ResponseRow[];
 }
 
 function BuildCluberoDashboard() {
@@ -83,14 +104,17 @@ function BuildCluberoDashboard() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data: raw, error } = await supabase.rpc(
-        "admin_build_clubero_dashboard" as never,
-      );
+      const [{ data: raw, error }, { data: rawResp, error: errResp }] = await Promise.all([
+        supabase.rpc("admin_build_clubero_dashboard" as never),
+        supabase.rpc("admin_build_clubero_responses" as never),
+      ]);
       if (cancelled) return;
       if (error) {
         setErr(t("admin.loadError"));
       } else {
-        setData(raw as unknown as Dashboard);
+        const base = raw as unknown as Omit<Dashboard, "responses">;
+        const responses = (!errResp && Array.isArray(rawResp) ? (rawResp as ResponseRow[]) : []);
+        setData({ ...base, responses });
       }
       setLoading(false);
     })();
@@ -142,6 +166,10 @@ function BuildCluberoDashboard() {
 
       <Section title={t("admin.sections.leads")}>
         <LeadsTable leads={data.leads} />
+      </Section>
+
+      <Section title={t("admin.responses.title")}>
+        <ResponsesList responses={data.responses} />
       </Section>
     </div>
   );
@@ -420,4 +448,100 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
       <span className="hidden">{QUESTIONS.length}</span>
     </div>
   );
+}
+
+function ResponsesList({ responses }: { responses: ResponseRow[] }) {
+  const { t } = useTranslation("buildClubero");
+  const [openId, setOpenId] = useState<string | null>(null);
+  if (!responses.length) {
+    return <p className="text-sm text-muted-foreground">{t("admin.responses.empty")}</p>;
+  }
+  return (
+    <div className="space-y-2">
+      {responses.map((r) => {
+        const isOpen = openId === r.id;
+        const identity =
+          r.first_name || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+        return (
+          <div key={r.id} className="rounded-xl border border-border bg-card">
+            <button
+              type="button"
+              onClick={() => setOpenId(isOpen ? null : r.id)}
+              className="flex w-full items-center gap-3 p-3 text-left hover:bg-muted/40"
+            >
+              <span
+                className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-[11px] font-semibold ${
+                  r.status === "completed"
+                    ? "bg-emerald-500/15 text-emerald-500"
+                    : "bg-amber-500/15 text-amber-500"
+                }`}
+              >
+                {r.status === "completed"
+                  ? t("admin.responses.completedStatus")
+                  : t("admin.responses.inProgressStatus")}
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block truncate text-sm font-medium">{identity}</span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {r.email ?? "—"} {r.club ? `· ${r.club}` : ""}
+                </span>
+              </span>
+              <span className="hidden text-xs text-muted-foreground md:block">
+                {t("admin.responses.started")}: {new Date(r.started_at).toLocaleString()}
+              </span>
+              <span className="text-xs text-primary">
+                {isOpen ? t("admin.responses.hideAnswers") : t("admin.responses.viewAnswers")}
+              </span>
+            </button>
+            {isOpen && (
+              <div className="border-t border-border/60 p-3">
+                {r.answers.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">{t("admin.empty")}</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {r.answers.map((a) => (
+                      <li
+                        key={a.question_key}
+                        className="rounded-lg bg-muted/40 p-2 text-sm"
+                      >
+                        <div className="text-xs font-medium text-muted-foreground">
+                          {t(`questions.${a.question_key}.title`, {
+                            defaultValue: a.question_key,
+                          })}
+                          <span className="ml-2 opacity-60">[{a.question_type}]</span>
+                        </div>
+                        <div className="mt-1 whitespace-pre-wrap break-words">
+                          {formatAnswerValue(a.question_key, a.question_type, a.value, t)}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function formatAnswerValue(
+  qkey: string,
+  qtype: string,
+  value: unknown,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string {
+  const optLabel = (id: string) =>
+    t(`questions.${qkey}.options.${id}.label`, { defaultValue: id });
+  if (value == null) return "—";
+  if (qtype === "rank" || qtype === "multi") {
+    if (!Array.isArray(value)) return String(value);
+    if (qtype === "rank") return value.map((id, i) => `${i + 1}. ${optLabel(String(id))}`).join(" · ");
+    return value.map((id) => optLabel(String(id))).join(", ");
+  }
+  if (qtype === "single" || qtype === "icon") return optLabel(String(value));
+  if (qtype === "text") return String(value);
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
 }
