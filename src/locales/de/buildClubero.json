@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Vereinspinnwand"
+        },
+        "player_social_network": {
+          "label": "Soziales Netzwerk für Spieler",
+          "description": "Mit Spielern aus anderen Vereinen vernetzen"
+        },
+        "public_player_profiles": {
+          "label": "Öffentliche Spielerprofile",
+          "description": "Eine öffentliche Profilseite – wie ein LinkedIn für den Sport"
+        },
+        "payments_dues": {
+          "label": "Zahlungen & Beiträge",
+          "description": "Mitgliedsbeiträge online zahlen und einziehen"
+        },
+        "fundraising": {
+          "label": "Sammelaktionen & Spenden",
+          "description": "Sammelaktionen für Verein oder Mannschaft starten"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Noch keine Daten.",
     "loadError": "Dashboard konnte nicht geladen werden."
+  },
+  "rank": {
+    "hint": "Ordne von höchster Priorität (oben) bis niedrigster (unten).",
+    "moveUp": "{{item}} einen Rang nach oben verschieben",
+    "moveDown": "{{item}} einen Rang nach unten verschieben"
   }
 }

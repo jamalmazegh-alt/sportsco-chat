@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Muro de anuncios del club"
+        },
+        "player_social_network": {
+          "label": "Red social de jugadores",
+          "description": "Conecta con jugadores de otros clubes"
+        },
+        "public_player_profiles": {
+          "label": "Perfiles públicos de jugadores",
+          "description": "Una página de perfil pública, tipo LinkedIn del deporte"
+        },
+        "payments_dues": {
+          "label": "Pagos y cuotas",
+          "description": "Paga y cobra las cuotas en línea"
+        },
+        "fundraising": {
+          "label": "Botes y colectas",
+          "description": "Crea botes para el club o el equipo"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Aún no hay datos.",
     "loadError": "No se pudo cargar el panel."
+  },
+  "rank": {
+    "hint": "Ordena de mayor prioridad (arriba) a menor (abajo).",
+    "moveUp": "Subir {{item}} una posición",
+    "moveDown": "Bajar {{item}} una posición"
   }
 }

@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Mural do clube"
+        },
+        "player_social_network": {
+          "label": "Rede social de jogadores",
+          "description": "Liga-te a jogadores de outros clubes"
+        },
+        "public_player_profiles": {
+          "label": "Perfis públicos de jogadores",
+          "description": "Uma página de perfil pública, tipo LinkedIn do desporto"
+        },
+        "payments_dues": {
+          "label": "Pagamentos e quotas",
+          "description": "Paga e cobra as quotas online"
+        },
+        "fundraising": {
+          "label": "Angariações de fundos",
+          "description": "Cria angariações para o clube ou a equipa"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Ainda sem dados.",
     "loadError": "Não foi possível carregar o painel."
+  },
+  "rank": {
+    "hint": "Ordena da prioridade mais alta (em cima) para a mais baixa (em baixo).",
+    "moveUp": "Subir {{item}} uma posição",
+    "moveDown": "Descer {{item}} uma posição"
   }
 }

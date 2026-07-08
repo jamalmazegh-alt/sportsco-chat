@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Mur d'annonces du club"
+        },
+        "player_social_network": {
+          "label": "Réseau social joueurs",
+          "description": "Se connecter avec des joueurs d'autres clubs"
+        },
+        "public_player_profiles": {
+          "label": "Profils publics de joueurs",
+          "description": "Une page profil publique, façon LinkedIn du sport"
+        },
+        "payments_dues": {
+          "label": "Paiements & cotisations",
+          "description": "Régler et collecter les cotisations en ligne"
+        },
+        "fundraising": {
+          "label": "Cagnottes & collectes",
+          "description": "Lancer des cagnottes pour le club ou l'équipe"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Aucune donnée pour le moment.",
     "loadError": "Impossible de charger le tableau de bord."
+  },
+  "rank": {
+    "hint": "Classe de la plus prioritaire (en haut) à la moins prioritaire (en bas).",
+    "moveUp": "Monter {{item}} d'un rang",
+    "moveDown": "Descendre {{item}} d'un rang"
   }
 }
