@@ -1,117 +1,98 @@
-# Feature « Défis & Tests » — Plan MVP
+## Objectif
+Intégrer en production la page publique `/build-clubero` (questionnaire feedback), avec collecte anonyme, contacts opt-in séparés (newsletter / bêta), dashboard superadmin de lecture. Pas de worker, pas d'email, pas d'architecture parallèle.
 
-## Décisions cadrées
+## 1. Base de données (migration Supabase)
 
-- **Périmètre** : MVP complet (schéma + RLS + tests RLS + UI saisie/classement + onglet Stats joueur + i18n).
-- **Rattachement séance** : pas de table `training_sessions` dédiée. Les séances sont des lignes de `events` (type=`training`). Le champ sera `event_id UUID NULL` (référence à `events.id`).
-- **VO₂ avec correction âge** : formules paramétrées, lues via `players.birth_date` (déjà présent).
-- **UI** : design system Clubero (tokens sémantiques, shadcn), inspiration de la maquette pour la hiérarchie visuelle.
+Une seule migration qui applique le SQL fourni, avec 3 adaptations projet:
 
-## Modèle de données
+- **`is_superadmin()`** → remplacé par un check via la table `super_admins` déjà existante (même pattern que le reste du projet — `has_role` / `super_admins` selon ce qui est utilisé pour `exempt_from_billing`). Vérification sur `auth.uid()`.
+- **Rate-limit** → dans `start_build_clubero_response` et `save_build_clubero_answer`, appel de la fonction `increment_rate_limit` existante (bucket horaire, limite raisonnable type 60/h) via un wrapper qui prend l'IP en paramètre depuis l'appelant. Comme les RPC n'ont pas accès à l'IP directement, on passe `p_ip text` optionnel depuis le client (best-effort, non bloquant si null).
+- **Tables `build_clubero_responses` / `build_clubero_answers`** créées avec RLS activé et **zéro policy** (deny-all). Aucun GRANT SELECT/INSERT sur les tables. Uniquement `GRANT EXECUTE` sur les 3 RPC publics + 1 RPC admin. Les vues restent lisibles uniquement par `service_role` (usage interne de `admin_build_clubero_dashboard`).
 
-Nommage anglais, cohérent avec le schéma existant.
+## 2. Route publique `/build-clubero`
 
-```text
-challenges                      -- définition réutilisable
-  id, club_id (FK clubs), team_id (FK teams, NULL = tout le club),
-  season_id (FK seasons, NULL = permanent), created_by (FK auth.users),
-  name, icon,
-  kind         enum('challenge','physical_test'),
-  unit         enum('count','time_seconds','distance_meters','stage'),
-  direction    enum('higher_better','lower_better'),
-  aggregate    enum('cumulative','record'),
-  derived      enum('none','vo2_leger','vo2_cooper'),
-  recurrence   enum('season','half_season','punctual'),
-  ranking_visibility enum('staff','category'),  -- category = joueurs de la team
-  template_key text NULL,
-  is_active bool default true,
-  created_at, updated_at
+Fichier `src/routes/build-clubero.tsx` (route publique, SSR par défaut, `head()` avec titre + description + og:title/description en FR).
 
-challenge_passages              -- une exécution datée
-  id, challenge_id (FK), event_id (FK events NULL),
-  passage_date date not null default current_date,
-  created_by, created_at
-  -- guard trigger: si event_id set, events.team_id doit matcher challenges.team_id (ou club)
+Conversion du prototype en `.tsx` production:
+- Types stricts (`Question`, `Answer`, `ContactPayload`, discriminated union par `type`).
+- Config `QUESTIONS` déplacée dans `src/lib/build-clubero-config.ts`: `question_key` et `option.id` **immuables**, seuls titles/subtitles/labels/hints/scales/placeholders lus via `t('buildClubero.questions.<key>.…')`.
+- Suppression du `<style>` injecté et de l'`@import` Google Fonts → réécriture avec Tailwind + tokens design system Clubero. Garde l'esprit visuel (dégradés bleu/cyan, animations shimmer, cartes glass) mais via classes Tailwind + variables CSS existantes. Respect `prefers-reduced-motion` (déjà géré via classes conditionnelles).
+- Composants extraits: `Logo`, `ProgressBar`, `SingleChoice`, `MultiChoice`, `IconGrid`, `Rating`, `Slider`, `Rank`, `TextArea`, `WelcomeScreen`, `DoneScreen`, `ContactForm`.
+- Accessibilité: aria-labels sur boutons rank monter/descendre, focus visibles, contrastes AA, parcours clavier.
 
-challenge_results               -- 1 ligne par joueur/passage
-  id, passage_id (FK cascade), player_id (FK cascade),
-  value numeric CHECK (value >= 0),
-  derived_value numeric NULL,   -- VO2 calculée serveur
-  created_by, created_at, updated_at
-  UNIQUE (passage_id, player_id)
+## 3. Persistance & autosave
+
+Hook `useBuildCluberoSession` (dans `src/lib/build-clubero-session.ts`):
+- Génère `session_id` (uuid v4) au mount, persiste en `localStorage` sous `clubero:build-clubero:session`.
+- Au mount: lit `localStorage` (réponses + index courant), puis appelle `start_build_clubero_response` avec `session_id`, `locale` (i18n courant), `utm` (parsés depuis `window.location.search`), `device` (`window.innerWidth < 768 ? 'mobile' : 'desktop'`).
+- Chaque changement de réponse: `setState` local + persist localStorage immédiat + appel debounced 600ms de `save_build_clubero_answer`.
+- Flush sur `visibilitychange` (hidden) et `pagehide` → annule le debounce et appelle la RPC immédiatement (via `supabase.rpc` — pas de `keepalive` nécessaire, `fetch` classique tient dans le délai de `pagehide` la plupart du temps; acceptable, best-effort documenté).
+- Serveur = source de vérité: dès qu'une RPC répond OK, on ne re-flush pas cette réponse tant qu'elle n'a pas changé.
+
+## 4. Finalisation
+
+Sur clic "Envoyer" à l'écran final:
+- État `loading`, désactive le bouton.
+- Détermine `contact`:
+  - Ni newsletter ni bêta cochés → `contact = null`.
+  - Sinon → validation email (`emailOk`) obligatoire, sinon erreur inline non-bloquante pour le reste des champs. Payload: `{ first_name, email, phone, club, newsletter, beta }`.
+- Appel `complete_build_clubero_response(session_id, contact)`.
+- Sur succès: écran "merci" + purge localStorage (garde `session_id` pour éviter double envoi si retour).
+- Sur erreur: garde l'état, message d'erreur i18n, permet de rejouer.
+
+## 5. Section superadmin
+
+Route `src/routes/superadmin/build-clubero.tsx` + entrée dans la sidebar `NAV` de `src/routes/superadmin.tsx` (label "Construisons Clubero", icône `MessageCircleHeart` ou similaire).
+
+Chargement via TanStack Query:
+```ts
+supabase.rpc('admin_build_clubero_dashboard')
 ```
 
-Index : `(club_id)`, `(team_id, season_id)` sur challenges, `(challenge_id, passage_date)` sur passages, `(passage_id)`, `(player_id, created_at DESC)` sur results, `(event_id)` sur passages.
+Affichage:
+- **Overview**: 5 stats cards (sessions, terminées, leads newsletter, leads bêta, durée moyenne).
+- **Options** & **Ranking**: `BarChart` Recharts par `question_key` (déjà utilisé dans le projet).
+- **Numeric**: cards par `question_key` (moyenne, médiane, min/max, n).
+- **Verbatims**: liste scrollable avec `question_key` + texte + club + date.
+- **Leads**: table avec colonnes séparées ✅ Newsletter / ✅ Bêta, dates de consentement séparées, bouton "Export CSV" via `downloadCsv` de `src/lib/csv.ts`.
 
-Formules VO₂ (fonction SQL immuable) :
-- Léger : `vo2 = 3.5 * paliers_kmh(stage)` où `paliers_kmh(n) = 8 + 0.5*(n-1)`.
-- Cooper : `vo2 = (distance_m - 504.9) / 44.73`.
-- Correction âge (U13 et moins) : `vo2_ajustee = vo2 * age_factor(age)` — table de facteurs paramétrable (`age_factor` fonction).
+## 6. i18n
 
-## RLS et sécurité
+Namespace `buildClubero` créé pour les 7 langues (`fr`, `en`, `de`, `es`, `it`, `nl`, `pt`) dans `src/locales/<lang>/buildClubero.json`. Ajout au `resources` de `src/lib/i18n.ts` et au tableau `ns`.
 
-- Toutes tables : RLS ON, `GRANT SELECT/INSERT/UPDATE/DELETE ... TO authenticated`, `GRANT ALL ... TO service_role`. Pas de `TO anon`.
-- Helper existant réutilisé : `has_club_role(uid, club_id, role)`.
-- Nouveau helper `public.can_read_challenge(uid, challenge_id)` (SECURITY DEFINER) qui centralise :
-  - staff (admin/coach/dirigeant du club) → true ;
-  - joueur/parent de la team + `ranking_visibility='category'` + `kind='challenge'` → true ;
-  - sinon false.
+Contenu: `hero.*`, `questions.<key>.title/subtitle/placeholder`, `questions.<key>.options.<id>.label/hint`, `questions.<key>.scale.<v>.label`, `nav.next/back/send/skip`, `save.saving/saved`, `contact.*`, `errors.*`, `done.*`.
 
-Policies :
+FR = source, autres langues traduites (ton coach/humain). Script check-i18n confirmera la parité.
 
-| Table | Action | Qui |
-|---|---|---|
-| challenges | SELECT | staff du club, ou membre catégorie si visibilité ouverte |
-| challenges | INS/UPD/DEL | staff (admin/coach) du club_id |
-| challenge_passages | SELECT | via `can_read_challenge(challenge_id)` |
-| challenge_passages | INS/UPD/DEL | staff du club |
-| challenge_results | SELECT | staff **OU** (le joueur lui-même) **OU** (parent lié via `player_parents.parent_user_id`) **OU** (autre joueur de la team si visibilité `category` ET `kind='challenge'`) |
-| challenge_results | INS/UPD/DEL | staff uniquement |
+## 7. Tests
 
-**Verrous absolus** : `kind='physical_test'` ⇒ résultats jamais lisibles hors staff / joueur concerné / parent lié. `derived_value` (VO₂) filtrée en vue applicative : ne sort jamais dans un payload lisible par d'autres joueurs, même en cumul.
+Nouveaux tests dans `src/tests/unit/`:
+- `build-clubero-config.test.ts`: `isAnswered()` par type, `emailOk()`, `reorder()`.
+- `build-clubero-session.test.ts`: debounce, flush sur visibilitychange/pagehide (mock `document.dispatchEvent`), reprise après reload (mock localStorage), dérivation contact null vs newsletter vs bêta vs both.
 
-## Modèles prêts à l'emploi
+Tests RLS dans `tests/rls/build-clubero.rls.ts`:
+- Anon `SELECT` sur `build_clubero_responses` / `build_clubero_answers` → refusé.
+- Anon `INSERT` direct → refusé.
+- Anon `rpc('start_build_clubero_response')` → OK, retourne un uuid.
+- Anon `rpc('save_build_clubero_answer')` → OK.
+- Anon `rpc('complete_build_clubero_response')` avec contact newsletter+beta → OK, vérif via service_role que `newsletter_consent_at` ET `beta_consent_at` sont timestampés séparément.
+- Non-superadmin authentifié `rpc('admin_build_clubero_dashboard')` → `42501 forbidden`.
+- Superadmin authentifié → OK, retourne l'objet jsonb complet.
 
-Seed statique côté code (`src/lib/challenges/templates.ts`, i18n keys pour name/icon) — pas en DB, pour rester éditable. Modèles : Cross Bar (cumul), Jonglerie (record), Luc Léger (test, VO₂), Cooper 12 min (test, VO₂), Sprint 20 m (record, lower_better).
+Script `bun run check:i18n` pour garantir aucune clé manquante sur les 7 langues.
 
-## Server functions (`src/modules/challenges/`)
+Lancement: `bun run test`, `bun run test:rls`, `bun run check:i18n`, `bun run check:guards`.
 
-- `challenges.functions.ts` : `listChallenges({ teamId, seasonId })`, `createChallenge`, `updateChallenge`, `archiveChallenge`.
-- `passages.functions.ts` : `createPassage({ challengeId, eventId? })`, `listPassages({ challengeId })`.
-- `results.functions.ts` : `upsertResults({ passageId, entries: [{player_id, value}] })` — calcule `derived_value` côté serveur si `derived != 'none'` en lisant `players.birth_date`. `getRanking({ challengeId, seasonId })` — renvoie cumul ou record selon `aggregate`, filtre `derived_value` selon le lecteur (via middleware auth + `has_club_role`).
-- `player-stats.functions.ts` : `getPlayerChallengeStats({ playerId })` — regroupe par challenge, retourne série temporelle + agrégat ; masque VO₂ si lecteur non-staff.
+## Fichiers créés/modifiés
+- **Migration**: `supabase/migrations/<ts>_build_clubero.sql`
+- **Route publique**: `src/routes/build-clubero.tsx`
+- **Route superadmin**: `src/routes/superadmin/build-clubero.tsx` + sidebar update dans `src/routes/superadmin.tsx`
+- **Config & hooks**: `src/lib/build-clubero-config.ts`, `src/lib/build-clubero-session.ts`
+- **Composants**: `src/components/build-clubero/*.tsx` (un fichier par composant complexe)
+- **i18n**: 7× `src/locales/<lang>/buildClubero.json` + `src/lib/i18n.ts`
+- **Tests**: 2 fichiers unit + 1 fichier RLS
 
-Toutes sous `.middleware([requireSupabaseAuth])`. Guards : `assertClubRole` réutilisé pour écritures.
-
-## UI
-
-- **Page événement (entraînement)** : bouton *Ajouter une activité* → sheet avec 3 groupes (Exercice · Défi · Test). Sélection modèle ou création sur mesure. Liste des activités rattachées à la séance avec bouton *Saisir*.
-- **Écran saisie** (`/_authenticated/events/$eventId/challenge/$passageId.tsx`) : liste des présents (via `player_availabilities`), `ScoreStepper` (composant existant) pour count/stage, input numérique pour time/distance. Compteur X présents · Y saisis. CTA « Voir le classement ».
-- **Écran classement** : podium + liste. Badge visibilité. Toggle staff pour ouvrir/fermer.
-- **Onglet Stats joueur** (`/_authenticated/players/$playerId/challenges.tsx`, ou intégré dans l'onglet stats existant) : cartes par challenge, mini-graphe (recharts déjà dispo), agrégat explicite « Total saison » ou « Record ». Section « Suivi du staff » verrouillée si lecteur non-staff.
-
-## i18n
-
-Nouveau namespace `challenges` dans les 7 langues (fr/en/de/es/it/nl/pt). Aucun texte en dur. Termes produit : Défi / Test physique / Activité / Total saison / Record / Visible du staff / Visible de la catégorie.
-
-## Tests
-
-- **Unit** (`src/tests/unit/challenges-vo2.test.ts`, `challenges-ranking.test.ts`) : formules VO₂ (± age factor), agrégats cumul vs record, direction lower/higher.
-- **RLS** (`tests/rls/challenges.rls.ts`) : les 8 cas listés dans le brief (staff écrit/lit, joueur bloqué en `staff`, joueur lit en `category`, jamais test physique, jamais stats d'un autre, parent lié = OK, parent non lié = KO, autre catégorie = KO, coach eval + VO₂ toujours staff-only).
-
-## Découpage de livraison
-
-1. **Migration** (tables, enums, indexes, contraintes, GRANTs, RLS, `can_read_challenge`, `vo2_leger/vo2_cooper/age_factor`, trigger cohérence `event_id`).
-2. **Templates + server functions + guards**.
-3. **UI saisie + classement** depuis la page événement.
-4. **Onglet Stats joueur**.
-5. **i18n 7 langues** (script sync existant).
-6. **Tests unit + RLS**, `bun run test` + `bun run test:rls`.
-
-## Hors scope (rappel)
-
-Accès parent frontend complet, badges, comparaison inter-saisons, IA bilan hebdo, objectifs équipe, export.
-
----
-
-Approuve pour que je démarre par la migration.
+## Points d'attention
+- La RPC `is_superadmin()` sera implémentée en tant que wrapper vers le vrai check du projet — je vais vérifier `super_admins` table et le pattern exact avant migration.
+- Rate-limit IP: le client ne connaît pas son IP publique fiable → on branche `increment_rate_limit` côté serveur uniquement dans les routes `/api/public/*`. Comme ici on appelle les RPC en direct depuis le client Supabase, le rate-limit reste **best-effort** avec un TODO clair. Alternative si tu préfères : passer par un endpoint TanStack `src/routes/api/public/build-clubero/*.ts` proxifiant les RPC → là on a l'IP via `getClientIp()`. Dis-moi si tu veux cette variante (plus coûteux mais rate-limit dur).
+- Pas de worker, pas d'email — la finalisation ne déclenche **aucun** side-effect au-delà de l'update DB.
