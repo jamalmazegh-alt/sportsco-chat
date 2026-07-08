@@ -800,9 +800,7 @@ function DoneScreen({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline underline-offset-2 hover:text-white"
-                  >
-                    {t("done.privacy.linkText")}
-                  </a>
+                  />
                 ),
               }}
             />
