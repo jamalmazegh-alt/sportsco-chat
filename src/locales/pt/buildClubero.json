@@ -11,70 +11,163 @@
     "meta": "Anónimo por defeito · As respostas ficam na Europa",
     "cta": "Começar"
   },
-  "progress": { "question": "Pergunta {{current}} / {{total}}", "percent": "{{pct}}%" },
-  "save": { "saving": "A guardar…", "saved": "Guardado", "error": "Guardado pendente" },
-  "nav": {
-    "next": "Continuar", "back": "Voltar", "send": "Enviar respostas",
-    "sending": "A enviar…", "skip": "Saltar", "rankUp": "Subir", "rankDown": "Descer"
+  "progress": {
+    "question": "Pergunta {{current}} / {{total}}",
+    "percent": "{{pct}}%"
   },
-  "slider": { "value": "{{value}} h", "valueMax": "15 h e mais" },
-  "text": { "count": "{{count}} / {{max}}" },
-  "hints": { "multiMax": "Até {{max}} respostas" },
+  "save": {
+    "saving": "A guardar…",
+    "saved": "Guardado",
+    "error": "Guardado pendente"
+  },
+  "nav": {
+    "next": "Continuar",
+    "back": "Voltar",
+    "send": "Enviar respostas",
+    "sending": "A enviar…",
+    "skip": "Saltar",
+    "rankUp": "Subir",
+    "rankDown": "Descer"
+  },
+  "slider": {
+    "value": "{{value}} h",
+    "valueMax": "15 h e mais"
+  },
+  "text": {
+    "count": "{{count}} / {{max}}"
+  },
+  "hints": {
+    "multiMax": "Até {{max}} respostas"
+  },
   "questions": {
     "audience": {
       "title": "Treinas sobretudo…",
       "subtitle": "Para adaptar o Clubero à tua realidade.",
       "options": {
-        "kids": { "label": "Crianças", "hint": "U6 – U11" },
-        "teens": { "label": "Adolescentes", "hint": "U12 – U18" },
-        "adults": { "label": "Adultos", "hint": "Sénior, lazer" },
-        "mix": { "label": "Um pouco de tudo", "hint": "Várias categorias" }
+        "kids": {
+          "label": "Crianças",
+          "hint": "U6 – U11"
+        },
+        "teens": {
+          "label": "Adolescentes",
+          "hint": "U12 – U18"
+        },
+        "adults": {
+          "label": "Adultos",
+          "hint": "Sénior, lazer"
+        },
+        "mix": {
+          "label": "Um pouco de tudo",
+          "hint": "Várias categorias"
+        }
       }
     },
     "sport": {
-      "title": "Que desporto acompanhas?", "subtitle": "Escolhe o principal.",
+      "title": "Que desporto acompanhas?",
+      "subtitle": "Escolhe o principal.",
       "options": {
-        "football": { "label": "Futebol" }, "basket": { "label": "Basquetebol" },
-        "hand": { "label": "Andebol" }, "volley": { "label": "Voleibol" },
-        "rugby": { "label": "Râguebi" }, "other": { "label": "Outro" }
+        "football": {
+          "label": "Futebol"
+        },
+        "basket": {
+          "label": "Basquetebol"
+        },
+        "hand": {
+          "label": "Andebol"
+        },
+        "volley": {
+          "label": "Voleibol"
+        },
+        "rugby": {
+          "label": "Râguebi"
+        },
+        "other": {
+          "label": "Outro"
+        }
       }
     },
     "timesinks": {
       "title": "O que te tira mais tempo?",
       "subtitle": "Várias respostas — até 3.",
       "options": {
-        "convocations": { "label": "Convocatórias" }, "presence": { "label": "Presenças" },
-        "parents": { "label": "Comunicação com pais" }, "payments": { "label": "Pagamentos e quotas" },
-        "planning": { "label": "Planeamento" }, "results": { "label": "Resultados e estatísticas" }
+        "convocations": {
+          "label": "Convocatórias"
+        },
+        "presence": {
+          "label": "Presenças"
+        },
+        "parents": {
+          "label": "Comunicação com pais"
+        },
+        "payments": {
+          "label": "Pagamentos e quotas"
+        },
+        "planning": {
+          "label": "Planeamento"
+        },
+        "results": {
+          "label": "Resultados e estatísticas"
+        }
       }
     },
     "hours": {
       "title": "Quantas horas de organização por semana?",
-      "subtitle": "Sem contar o tempo no terreno.", "min": "0 h", "max": "15 h +"
+      "subtitle": "Sem contar o tempo no terreno.",
+      "min": "0 h",
+      "max": "15 h +"
     },
     "satisfaction": {
       "title": "Hoje, gerir a tua equipa é…",
       "subtitle": "Sê honesto, fica entre nós.",
-      "scale": { "1": "Uma dor de cabeça", "2": "Cansativo", "3": "Aceitável", "4": "Bastante fluido", "5": "Um prazer" }
+      "scale": {
+        "1": "Uma dor de cabeça",
+        "2": "Cansativo",
+        "3": "Aceitável",
+        "4": "Bastante fluido",
+        "5": "Um prazer"
+      }
     },
     "priorities": {
       "title": "Ordena estas ideias, da mais útil à menos útil.",
       "subtitle": "Topo = mais útil. Usa as setas para reordenar.",
       "options": {
-        "ai_report": { "label": "Resumo semanal inteligente" },
-        "challenges": { "label": "Desafios e testes físicos" },
-        "matchday": { "label": "Organização de jogos" },
-        "funding": { "label": "Bolo e financiamento" },
-        "wall": { "label": "Mural do clube" }
+        "ai_report": {
+          "label": "Resumo semanal inteligente"
+        },
+        "challenges": {
+          "label": "Desafios e testes físicos"
+        },
+        "matchday": {
+          "label": "Organização de jogos"
+        },
+        "funding": {
+          "label": "Bolo e financiamento"
+        },
+        "wall": {
+          "label": "Mural do clube"
+        }
       }
     },
     "currenttool": {
-      "title": "Hoje geres tudo isto com…", "subtitle": "",
+      "title": "Hoje geres tudo isto com…",
+      "subtitle": "",
       "options": {
-        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Grupos, mensagens" },
-        "excel":    { "label": "Excel / papel", "hint": "Folhas, caderno" },
-        "app":      { "label": "Outra app", "hint": "TeamSnap, Spond…" },
-        "nothing":  { "label": "Nada estruturado", "hint": "No instinto" }
+        "whatsapp": {
+          "label": "WhatsApp / SMS",
+          "hint": "Grupos, mensagens"
+        },
+        "excel": {
+          "label": "Excel / papel",
+          "hint": "Folhas, caderno"
+        },
+        "app": {
+          "label": "Outra app",
+          "hint": "TeamSnap, Spond…"
+        },
+        "nothing": {
+          "label": "Nada estruturado",
+          "hint": "No instinto"
+        }
       }
     },
     "onewish": {
@@ -84,35 +177,61 @@
     }
   },
   "done": {
-    "emoji": "🎉", "title": "Obrigado, a tua voz conta.",
+    "emoji": "🎉",
+    "title": "Obrigado, a tua voz conta.",
     "body": "Cada resposta empurra o Clubero na direção certa. Queres que fiquemos em contacto?",
     "contactTitle": "Fica em contacto (opcional)",
     "form": {
-      "firstName": "Nome", "email": "Email", "emailRequired": "Email (obrigatório)",
-      "phone": "Telefone", "club": "Nome do clube",
+      "firstName": "Nome",
+      "email": "Email",
+      "emailRequired": "Email (obrigatório)",
+      "phone": "Telefone",
+      "club": "Nome do clube",
       "newsletter": "Quero receber novidades Clubero por email",
       "beta": "Quero testar o Clubero em antecipação (beta)",
       "consentHint": "Consentimentos guardados separadamente. Cancelar em 1 clique.",
       "errorEmail": "Email inválido"
     },
-    "send": "Enviar", "skip": "Terminar sem deixar contacto",
-    "thanksTitle": "Enviado!", "thanksBody": "Obrigado pelo tempo. Até breve no Clubero."
+    "send": "Enviar",
+    "skip": "Terminar sem deixar contacto",
+    "thanksTitle": "Enviado!",
+    "thanksBody": "Obrigado pelo tempo. Até breve no Clubero.",
+    "privacy": {
+      "notice": "Ao marcar, autoriza a Clubero a conservar estes dados para o contactar. Veja a nossa {{link}}.",
+      "linkText": "política de privacidade"
+    }
   },
-  "errors": { "submit": "Não foi possível enviar. Verifica a ligação." },
+  "errors": {
+    "submit": "Não foi possível enviar. Verifica a ligação."
+  },
   "admin": {
-    "title": "Build Clubero", "subtitle": "Feedback público recolhido em /build-clubero",
+    "title": "Build Clubero",
+    "subtitle": "Feedback público recolhido em /build-clubero",
     "stats": {
-      "sessions": "Sessões iniciadas", "completed": "Sessões concluídas",
-      "newsletter": "Leads newsletter", "beta": "Leads beta", "duration": "Duração média (min)"
+      "sessions": "Sessões iniciadas",
+      "completed": "Sessões concluídas",
+      "newsletter": "Leads newsletter",
+      "beta": "Leads beta",
+      "duration": "Duração média (min)"
     },
     "sections": {
-      "options": "Distribuição de respostas", "ranking": "Ranking médio (1 = mais útil)",
-      "numeric": "Valores numéricos", "verbatims": "Verbatims livres", "leads": "Contactos recolhidos"
+      "options": "Distribuição de respostas",
+      "ranking": "Ranking médio (1 = mais útil)",
+      "numeric": "Valores numéricos",
+      "verbatims": "Verbatims livres",
+      "leads": "Contactos recolhidos"
     },
     "leads": {
-      "firstName": "Nome", "email": "Email", "phone": "Telefone", "club": "Clube",
-      "newsletter": "Newsletter", "beta": "Beta", "date": "Concluída em", "exportCsv": "Exportar CSV"
+      "firstName": "Nome",
+      "email": "Email",
+      "phone": "Telefone",
+      "club": "Clube",
+      "newsletter": "Newsletter",
+      "beta": "Beta",
+      "date": "Concluída em",
+      "exportCsv": "Exportar CSV"
     },
-    "empty": "Ainda sem dados.", "loadError": "Não foi possível carregar o painel."
+    "empty": "Ainda sem dados.",
+    "loadError": "Não foi possível carregar o painel."
   }
 }

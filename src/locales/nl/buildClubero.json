@@ -11,70 +11,163 @@
     "meta": "Standaard anoniem · Antwoorden blijven in Europa",
     "cta": "Ik begin"
   },
-  "progress": { "question": "Vraag {{current}} / {{total}}", "percent": "{{pct}}%" },
-  "save": { "saving": "Opslaan…", "saved": "Opgeslagen", "error": "Opslag hangend" },
-  "nav": {
-    "next": "Doorgaan", "back": "Terug", "send": "Antwoorden versturen",
-    "sending": "Verzenden…", "skip": "Overslaan", "rankUp": "Omhoog", "rankDown": "Omlaag"
+  "progress": {
+    "question": "Vraag {{current}} / {{total}}",
+    "percent": "{{pct}}%"
   },
-  "slider": { "value": "{{value}} u", "valueMax": "15 u en meer" },
-  "text": { "count": "{{count}} / {{max}}" },
-  "hints": { "multiMax": "Tot {{max}} antwoorden" },
+  "save": {
+    "saving": "Opslaan…",
+    "saved": "Opgeslagen",
+    "error": "Opslag hangend"
+  },
+  "nav": {
+    "next": "Doorgaan",
+    "back": "Terug",
+    "send": "Antwoorden versturen",
+    "sending": "Verzenden…",
+    "skip": "Overslaan",
+    "rankUp": "Omhoog",
+    "rankDown": "Omlaag"
+  },
+  "slider": {
+    "value": "{{value}} u",
+    "valueMax": "15 u en meer"
+  },
+  "text": {
+    "count": "{{count}} / {{max}}"
+  },
+  "hints": {
+    "multiMax": "Tot {{max}} antwoorden"
+  },
   "questions": {
     "audience": {
       "title": "Je traint vooral…",
       "subtitle": "Zodat we Clubero aan jouw realiteit aanpassen.",
       "options": {
-        "kids": { "label": "Kinderen", "hint": "U6 – U11" },
-        "teens": { "label": "Tieners", "hint": "U12 – U18" },
-        "adults": { "label": "Volwassenen", "hint": "Senioren, recreatief" },
-        "mix": { "label": "Van alles wat", "hint": "Meerdere categorieën" }
+        "kids": {
+          "label": "Kinderen",
+          "hint": "U6 – U11"
+        },
+        "teens": {
+          "label": "Tieners",
+          "hint": "U12 – U18"
+        },
+        "adults": {
+          "label": "Volwassenen",
+          "hint": "Senioren, recreatief"
+        },
+        "mix": {
+          "label": "Van alles wat",
+          "hint": "Meerdere categorieën"
+        }
       }
     },
     "sport": {
-      "title": "Welke sport doe je?", "subtitle": "Kies de belangrijkste.",
+      "title": "Welke sport doe je?",
+      "subtitle": "Kies de belangrijkste.",
       "options": {
-        "football": { "label": "Voetbal" }, "basket": { "label": "Basketbal" },
-        "hand": { "label": "Handbal" }, "volley": { "label": "Volleybal" },
-        "rugby": { "label": "Rugby" }, "other": { "label": "Andere" }
+        "football": {
+          "label": "Voetbal"
+        },
+        "basket": {
+          "label": "Basketbal"
+        },
+        "hand": {
+          "label": "Handbal"
+        },
+        "volley": {
+          "label": "Volleybal"
+        },
+        "rugby": {
+          "label": "Rugby"
+        },
+        "other": {
+          "label": "Andere"
+        }
       }
     },
     "timesinks": {
       "title": "Wat kost jou de meeste tijd?",
       "subtitle": "Meerdere antwoorden — tot 3.",
       "options": {
-        "convocations": { "label": "Opstellingen" }, "presence": { "label": "Aanwezigheden" },
-        "parents": { "label": "Communicatie met ouders" }, "payments": { "label": "Betalingen & contributie" },
-        "planning": { "label": "Planning" }, "results": { "label": "Resultaten & stats" }
+        "convocations": {
+          "label": "Opstellingen"
+        },
+        "presence": {
+          "label": "Aanwezigheden"
+        },
+        "parents": {
+          "label": "Communicatie met ouders"
+        },
+        "payments": {
+          "label": "Betalingen & contributie"
+        },
+        "planning": {
+          "label": "Planning"
+        },
+        "results": {
+          "label": "Resultaten & stats"
+        }
       }
     },
     "hours": {
       "title": "Hoeveel uur organisatie per week?",
-      "subtitle": "Exclusief tijd op het veld.", "min": "0 u", "max": "15 u +"
+      "subtitle": "Exclusief tijd op het veld.",
+      "min": "0 u",
+      "max": "15 u +"
     },
     "satisfaction": {
       "title": "Vandaag is je team beheren…",
       "subtitle": "Wees eerlijk, blijft tussen ons.",
-      "scale": { "1": "Een hoofdpijndossier", "2": "Vermoeiend", "3": "Oké", "4": "Vrij vlot", "5": "Een plezier" }
+      "scale": {
+        "1": "Een hoofdpijndossier",
+        "2": "Vermoeiend",
+        "3": "Oké",
+        "4": "Vrij vlot",
+        "5": "Een plezier"
+      }
     },
     "priorities": {
       "title": "Rangschik deze ideeën van meest naar minst nuttig.",
       "subtitle": "Bovenaan = het nuttigst. Gebruik de pijltjes.",
       "options": {
-        "ai_report": { "label": "Slim weekoverzicht" },
-        "challenges": { "label": "Challenges & fysieke tests" },
-        "matchday": { "label": "Wedstrijdorganisatie" },
-        "funding": { "label": "Kas & fondsenwerving" },
-        "wall": { "label": "Clubprikbord" }
+        "ai_report": {
+          "label": "Slim weekoverzicht"
+        },
+        "challenges": {
+          "label": "Challenges & fysieke tests"
+        },
+        "matchday": {
+          "label": "Wedstrijdorganisatie"
+        },
+        "funding": {
+          "label": "Kas & fondsenwerving"
+        },
+        "wall": {
+          "label": "Clubprikbord"
+        }
       }
     },
     "currenttool": {
-      "title": "Vandaag beheer je dit met…", "subtitle": "",
+      "title": "Vandaag beheer je dit met…",
+      "subtitle": "",
       "options": {
-        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Groepen, berichten" },
-        "excel":    { "label": "Excel / papier", "hint": "Sheets, notitieboek" },
-        "app":      { "label": "Andere app", "hint": "TeamSnap, Spond…" },
-        "nothing":  { "label": "Niets gestructureerds", "hint": "Op gevoel" }
+        "whatsapp": {
+          "label": "WhatsApp / SMS",
+          "hint": "Groepen, berichten"
+        },
+        "excel": {
+          "label": "Excel / papier",
+          "hint": "Sheets, notitieboek"
+        },
+        "app": {
+          "label": "Andere app",
+          "hint": "TeamSnap, Spond…"
+        },
+        "nothing": {
+          "label": "Niets gestructureerds",
+          "hint": "Op gevoel"
+        }
       }
     },
     "onewish": {
@@ -84,35 +177,61 @@
     }
   },
   "done": {
-    "emoji": "🎉", "title": "Bedankt, je stem telt.",
+    "emoji": "🎉",
+    "title": "Bedankt, je stem telt.",
     "body": "Elk antwoord duwt Clubero in de goede richting. Blijven we in contact?",
     "contactTitle": "Blijf in contact (optioneel)",
     "form": {
-      "firstName": "Voornaam", "email": "E-mail", "emailRequired": "E-mail (vereist)",
-      "phone": "Telefoon", "club": "Clubnaam",
+      "firstName": "Voornaam",
+      "email": "E-mail",
+      "emailRequired": "E-mail (vereist)",
+      "phone": "Telefoon",
+      "club": "Clubnaam",
       "newsletter": "Ik wil Clubero-nieuws per e-mail ontvangen",
       "beta": "Ik wil Clubero vervroegd testen (bèta)",
       "consentHint": "Toestemmingen apart opgeslagen. Uitschrijven in 1 klik.",
       "errorEmail": "Ongeldige e-mail"
     },
-    "send": "Versturen", "skip": "Afronden zonder contact",
-    "thanksTitle": "Verzonden!", "thanksBody": "Bedankt voor je tijd. Tot snel in Clubero."
+    "send": "Versturen",
+    "skip": "Afronden zonder contact",
+    "thanksTitle": "Verzonden!",
+    "thanksBody": "Bedankt voor je tijd. Tot snel in Clubero.",
+    "privacy": {
+      "notice": "Door aan te vinken geeft u Clubero toestemming om deze gegevens te bewaren om contact op te nemen. Zie ons {{link}}.",
+      "linkText": "privacybeleid"
+    }
   },
-  "errors": { "submit": "Verzenden mislukt. Controleer je verbinding." },
+  "errors": {
+    "submit": "Verzenden mislukt. Controleer je verbinding."
+  },
   "admin": {
-    "title": "Build Clubero", "subtitle": "Publieke feedback verzameld op /build-clubero",
+    "title": "Build Clubero",
+    "subtitle": "Publieke feedback verzameld op /build-clubero",
     "stats": {
-      "sessions": "Sessies gestart", "completed": "Sessies voltooid",
-      "newsletter": "Newsletter leads", "beta": "Beta leads", "duration": "Gem. duur (min)"
+      "sessions": "Sessies gestart",
+      "completed": "Sessies voltooid",
+      "newsletter": "Newsletter leads",
+      "beta": "Beta leads",
+      "duration": "Gem. duur (min)"
     },
     "sections": {
-      "options": "Antwoordverdeling", "ranking": "Gem. rang (1 = nuttigst)",
-      "numeric": "Numerieke waarden", "verbatims": "Vrije verbatims", "leads": "Verzamelde contacten"
+      "options": "Antwoordverdeling",
+      "ranking": "Gem. rang (1 = nuttigst)",
+      "numeric": "Numerieke waarden",
+      "verbatims": "Vrije verbatims",
+      "leads": "Verzamelde contacten"
     },
     "leads": {
-      "firstName": "Voornaam", "email": "E-mail", "phone": "Telefoon", "club": "Club",
-      "newsletter": "Newsletter", "beta": "Beta", "date": "Voltooid op", "exportCsv": "CSV exporteren"
+      "firstName": "Voornaam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "club": "Club",
+      "newsletter": "Newsletter",
+      "beta": "Beta",
+      "date": "Voltooid op",
+      "exportCsv": "CSV exporteren"
     },
-    "empty": "Nog geen data.", "loadError": "Dashboard kon niet geladen worden."
+    "empty": "Nog geen data.",
+    "loadError": "Dashboard kon niet geladen worden."
   }
 }

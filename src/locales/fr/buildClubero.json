@@ -44,34 +44,70 @@
       "title": "Vous entraînez plutôt…",
       "subtitle": "Pour adapter Clubero à votre réalité de terrain.",
       "options": {
-        "kids":   { "label": "Des enfants", "hint": "U6 – U11" },
-        "teens":  { "label": "Des ados", "hint": "U12 – U18" },
-        "adults": { "label": "Des adultes", "hint": "Séniors, loisirs" },
-        "mix":    { "label": "Un peu de tout", "hint": "Plusieurs catégories" }
+        "kids": {
+          "label": "Des enfants",
+          "hint": "U6 – U11"
+        },
+        "teens": {
+          "label": "Des ados",
+          "hint": "U12 – U18"
+        },
+        "adults": {
+          "label": "Des adultes",
+          "hint": "Séniors, loisirs"
+        },
+        "mix": {
+          "label": "Un peu de tout",
+          "hint": "Plusieurs catégories"
+        }
       }
     },
     "sport": {
       "title": "Quel sport faites-vous vivre ?",
       "subtitle": "Choisissez le principal.",
       "options": {
-        "football": { "label": "Football" },
-        "basket":   { "label": "Basketball" },
-        "hand":     { "label": "Handball" },
-        "volley":   { "label": "Volleyball" },
-        "rugby":    { "label": "Rugby" },
-        "other":    { "label": "Autre" }
+        "football": {
+          "label": "Football"
+        },
+        "basket": {
+          "label": "Basketball"
+        },
+        "hand": {
+          "label": "Handball"
+        },
+        "volley": {
+          "label": "Volleyball"
+        },
+        "rugby": {
+          "label": "Rugby"
+        },
+        "other": {
+          "label": "Autre"
+        }
       }
     },
     "timesinks": {
       "title": "Qu'est-ce qui vous mange le plus de temps ?",
       "subtitle": "Plusieurs réponses possibles — jusqu'à 3.",
       "options": {
-        "convocations": { "label": "Les convocations" },
-        "presence":     { "label": "Le suivi des présences" },
-        "parents":      { "label": "La communication parents" },
-        "payments":     { "label": "Les paiements & cotisations" },
-        "planning":     { "label": "La planification" },
-        "results":      { "label": "Les résultats & stats" }
+        "convocations": {
+          "label": "Les convocations"
+        },
+        "presence": {
+          "label": "Le suivi des présences"
+        },
+        "parents": {
+          "label": "La communication parents"
+        },
+        "payments": {
+          "label": "Les paiements & cotisations"
+        },
+        "planning": {
+          "label": "La planification"
+        },
+        "results": {
+          "label": "Les résultats & stats"
+        }
       }
     },
     "hours": {
@@ -95,21 +131,43 @@
       "title": "Classez ces idées, de la plus utile à la moins utile.",
       "subtitle": "Le haut = le plus utile. Utilisez les flèches pour réordonner.",
       "options": {
-        "ai_report":  { "label": "Bilan hebdo intelligent" },
-        "challenges": { "label": "Défis & tests physiques" },
-        "matchday":   { "label": "Organisation des matchs" },
-        "funding":    { "label": "Cagnotte & financement" },
-        "wall":       { "label": "Mur d'annonces du club" }
+        "ai_report": {
+          "label": "Bilan hebdo intelligent"
+        },
+        "challenges": {
+          "label": "Défis & tests physiques"
+        },
+        "matchday": {
+          "label": "Organisation des matchs"
+        },
+        "funding": {
+          "label": "Cagnotte & financement"
+        },
+        "wall": {
+          "label": "Mur d'annonces du club"
+        }
       }
     },
     "currenttool": {
       "title": "Aujourd'hui, vous gérez tout ça avec…",
       "subtitle": "",
       "options": {
-        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Groupes, messages" },
-        "excel":    { "label": "Excel / papier", "hint": "Feuilles, carnet" },
-        "app":      { "label": "Une autre appli", "hint": "TeamSnap, Spond…" },
-        "nothing":  { "label": "Rien de structuré", "hint": "À l'instinct" }
+        "whatsapp": {
+          "label": "WhatsApp / SMS",
+          "hint": "Groupes, messages"
+        },
+        "excel": {
+          "label": "Excel / papier",
+          "hint": "Feuilles, carnet"
+        },
+        "app": {
+          "label": "Une autre appli",
+          "hint": "TeamSnap, Spond…"
+        },
+        "nothing": {
+          "label": "Rien de structuré",
+          "hint": "À l'instinct"
+        }
       }
     },
     "onewish": {
@@ -137,7 +195,11 @@
     "send": "Envoyer",
     "skip": "Terminer sans laisser de contact",
     "thanksTitle": "C'est envoyé !",
-    "thanksBody": "Merci d'avoir pris le temps. À très vite dans Clubero."
+    "thanksBody": "Merci d'avoir pris le temps. À très vite dans Clubero.",
+    "privacy": {
+      "notice": "En cochant, vous acceptez que Clubero conserve ces informations pour vous recontacter. Voir notre {{link}}.",
+      "linkText": "politique de confidentialité"
+    }
   },
   "errors": {
     "submit": "Impossible d'envoyer. Vérifiez votre connexion et réessayez."
