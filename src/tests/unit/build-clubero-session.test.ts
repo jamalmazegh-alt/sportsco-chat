@@ -1,14 +1,13 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+import { describe, expect, it, beforeEach } from "vitest";
 import { __test } from "@/lib/build-clubero-session";
 
-/**
- * The session hook is heavily bound to React and Supabase. Here we cover the
- * pure persistence helpers; interactive tests would need a full render harness.
- */
 describe("build-clubero-session persistence", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it("read/write/clear roundtrip", () => {
-    // JSDOM provides localStorage
-    __test.clearPersisted();
     expect(__test.readPersisted()).toBeNull();
 
     __test.writePersisted({
@@ -18,7 +17,7 @@ describe("build-clubero-session persistence", () => {
     });
     const back = __test.readPersisted();
     expect(back?.session_id).toBe("sess-123");
-    expect(back?.answers.audience).toBe("kids");
+    expect((back?.answers as any).audience).toBe("kids");
     expect(back?.index).toBe(3);
 
     __test.clearPersisted();
@@ -30,6 +29,5 @@ describe("build-clubero-session persistence", () => {
     expect(__test.readPersisted()).toBeNull();
     window.localStorage.setItem(__test.STORAGE_KEY, JSON.stringify({ nope: 1 }));
     expect(__test.readPersisted()).toBeNull();
-    __test.clearPersisted();
   });
 });
