@@ -222,7 +222,6 @@ export function useBuildCluberoSession({
       setSaveState("error");
       console.warn("[build-clubero] save failed", key, res.status, bodyErr);
     },
-    },
     [questionByKey, scheduleFlush, sessionId],
   );
 
