@@ -15,7 +15,7 @@ import itLocale from "@/locales/it/buildClubero.json";
 import nl from "@/locales/nl/buildClubero.json";
 import pt from "@/locales/pt/buildClubero.json";
 
-const LOCALES = { fr, en, de, es, it, nl, pt } as const;
+const LOCALES = { fr, en, de, es, it: itLocale, nl, pt } as const;
 const NEW_OPTS = [
   "player_social_network",
   "public_player_profiles",
