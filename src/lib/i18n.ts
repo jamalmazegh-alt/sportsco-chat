@@ -6,6 +6,7 @@ import enMarketing from "@/locales/en/marketing.json";
 import enSupport from "@/locales/en/support.json";
 import enTournaments from "@/locales/en/tournaments.json";
 import enChallenges from "@/locales/en/challenges.json";
+import enBuildClubero from "@/locales/en/buildClubero.json";
 
 import frCommon from "@/locales/fr/common.json";
 import frMarketing from "@/locales/fr/marketing.json";
