@@ -27,6 +27,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import cluberoLogo from "@/assets/clubero-logo.png";
 
 export const Route = createFileRoute("/build-clubero")({
   head: () => ({
