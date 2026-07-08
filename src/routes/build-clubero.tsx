@@ -27,6 +27,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import cluberoLogo from "@/assets/clubero-logo.png";
 
 export const Route = createFileRoute("/build-clubero")({
   head: () => ({
@@ -92,7 +93,7 @@ function BuildCluberoPage() {
               <div
                 key={index}
                 className={cn(
-                  "rounded-[26px] border border-white/10 bg-gradient-to-b from-[rgba(23,34,92,0.66)] to-[rgba(17,26,70,0.72)] p-6 shadow-[0_24px_60px_-28px_rgba(0,0,10,0.9)] backdrop-blur",
+                  "rounded-[26px] border border-white/10 bg-gradient-to-b from-[rgba(6,44,34,0.72)] to-[rgba(4,28,22,0.78)] p-6 shadow-[0_24px_60px_-28px_rgba(0,10,6,0.9)] backdrop-blur",
                   direction === "fwd" ? "animate-in slide-in-from-right-4 fade-in" : "animate-in slide-in-from-left-4 fade-in",
                 )}
               >
@@ -100,7 +101,7 @@ function BuildCluberoPage() {
                 <h2 className="mb-1.5 font-semibold text-[23px] leading-tight tracking-tight">
                   {t(`questions.${currentQ.key}.title`)}
                 </h2>
-                <p className="mb-5 text-[14.5px] leading-snug text-[#93A0D4]">
+                <p className="mb-5 text-[14.5px] leading-snug text-[#9ec8b8]">
                   {t(`questions.${currentQ.key}.subtitle`)}
                 </p>
                 <QuestionRenderer
@@ -145,7 +146,7 @@ function BackgroundAura() {
       className="pointer-events-none fixed inset-0 z-0 opacity-70"
       style={{
         background:
-          "radial-gradient(60% 45% at 82% -8%, rgba(55,225,255,.16), transparent 60%),radial-gradient(55% 40% at 8% 6%, rgba(61,107,255,.22), transparent 62%),linear-gradient(180deg, #0B1030, #070A1F 60%)",
+          "radial-gradient(60% 45% at 82% -8%, rgba(110,231,183,.18), transparent 60%),radial-gradient(55% 40% at 8% 6%, rgba(16,185,129,.22), transparent 62%),linear-gradient(180deg, #06231C, #03130F 60%)",
       }}
     />
   );
@@ -154,13 +155,14 @@ function BackgroundAura() {
 function TopBar() {
   return (
     <header className="flex items-center justify-between py-4">
-      <div className="flex items-center gap-2 font-bold tracking-tight">
-        <span className="grid h-[26px] w-[26px] place-items-center rounded-lg bg-gradient-to-br from-[#3D6BFF] to-[#37E1FF] shadow-[0_6px_18px_rgba(55,120,255,0.45)]">
-          <Sparkles size={15} strokeWidth={2.5} className="text-[#06122e]" />
-        </span>
-        Clubero
-      </div>
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-[#93A0D4]">
+      <a href="/" className="flex items-center gap-2" aria-label="Clubero">
+        <img
+          src={cluberoLogo}
+          alt="Clubero"
+          className="h-8 w-auto object-contain drop-shadow-[0_6px_18px_rgba(16,185,129,0.35)]"
+        />
+      </a>
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-[#9ec8b8]">
         <Clock size={12} />
         {useTranslation("buildClubero").t("hero.badge")}
       </span>
@@ -173,7 +175,7 @@ function ProgressBar({ index }: { index: number }) {
   const pct = Math.round((index / TOTAL_QUESTIONS) * 100);
   return (
     <div className="pt-2 pb-1">
-      <div className="mb-2 flex justify-between text-xs font-semibold text-[#93A0D4]">
+      <div className="mb-2 flex justify-between text-xs font-semibold text-[#9ec8b8]">
         <span>
           {t("progress.question", {
             current: Math.min(index + 1, TOTAL_QUESTIONS),
@@ -184,7 +186,7 @@ function ProgressBar({ index }: { index: number }) {
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#3D6BFF] to-[#37E1FF] shadow-[0_0_16px_rgba(55,180,255,0.55)] transition-[width] duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-[#10B981] to-[#6EE7B7] shadow-[0_0_16px_rgba(52,211,153,0.55)] transition-[width] duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -194,7 +196,7 @@ function ProgressBar({ index }: { index: number }) {
 
 function QuestionEyebrow({ index }: { index: number }) {
   return (
-    <div className="mb-3 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#37E1FF]">
+    <div className="mb-3 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#6EE7B7]">
       <Sparkles size={12} />
       {String(index + 1).padStart(2, "0")}
     </div>
@@ -222,7 +224,7 @@ function NavBar({
         type="button"
         onClick={onBack}
         aria-label={t("nav.back")}
-        className="flex h-[54px] w-[54px] items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-[#93A0D4] transition hover:text-white"
+        className="flex h-[54px] w-[54px] items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-[#9ec8b8] transition hover:text-white"
       >
         <ArrowLeft size={20} />
       </button>
@@ -230,7 +232,7 @@ function NavBar({
         type="button"
         onClick={onNext}
         disabled={!canNext}
-        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#5B8CFF] to-[#37E1FF] px-5 py-4 font-bold text-[#06122e] shadow-[0_14px_34px_-12px_rgba(55,150,255,0.85)] transition disabled:cursor-not-allowed disabled:opacity-40 disabled:grayscale"
+        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#34D399] to-[#6EE7B7] px-5 py-4 font-bold text-[#052e26] shadow-[0_14px_34px_-12px_rgba(16,185,129,0.85)] transition disabled:cursor-not-allowed disabled:opacity-40 disabled:grayscale"
       >
         {t("nav.next")}
         <ArrowRight size={18} />
@@ -238,7 +240,7 @@ function NavBar({
       <span
         className={cn(
           "hidden text-[11px] font-semibold transition-opacity sm:inline-flex sm:items-center sm:gap-1",
-          saveState === "retrying" ? "text-[#FFD27A]" : "text-[#37E1FF]",
+          saveState === "retrying" ? "text-[#FFD27A]" : "text-[#6EE7B7]",
           saveState === "saved" || saveState === "saving" || saveState === "retrying"
             ? "opacity-100"
             : "opacity-0",
@@ -322,13 +324,13 @@ function SingleChoice({
             className={cn(
               "flex w-full items-center gap-3 rounded-2xl border-[1.5px] px-4 py-3.5 text-left font-semibold transition",
               sel
-                ? "border-[#5B8CFF] bg-gradient-to-b from-[rgba(61,107,255,0.22)] to-[rgba(55,225,255,0.10)] shadow-[0_0_0_3px_rgba(61,107,255,0.18)]"
+                ? "border-[#34D399] bg-gradient-to-b from-[rgba(16,185,129,0.22)] to-[rgba(110,231,183,0.12)] shadow-[0_0_0_3px_rgba(16,185,129,0.20)]"
                 : "border-white/10 bg-white/[0.04] hover:border-white/25",
             )}
           >
             <div className="flex-1">
               <div className="text-[15.5px]">{t(`questions.${q.key}.options.${o.id}.label`)}</div>
-              {hint && <div className="mt-0.5 text-xs font-medium text-[#93A0D4]">{hint}</div>}
+              {hint && <div className="mt-0.5 text-xs font-medium text-[#9ec8b8]">{hint}</div>}
             </div>
             <Tick selected={sel} />
           </button>
@@ -358,7 +360,7 @@ function MultiChoice({
   return (
     <div className="flex flex-col gap-2.5">
       {q.max && (
-        <p className="text-xs text-[#93A0D4]">{t("hints.multiMax", { max: q.max })}</p>
+        <p className="text-xs text-[#9ec8b8]">{t("hints.multiMax", { max: q.max })}</p>
       )}
       {q.options.map((o) => {
         const sel = value.includes(o.id);
@@ -371,7 +373,7 @@ function MultiChoice({
             className={cn(
               "flex w-full items-center gap-3 rounded-2xl border-[1.5px] px-4 py-3.5 text-left text-[15.5px] font-semibold transition",
               sel
-                ? "border-[#5B8CFF] bg-gradient-to-b from-[rgba(61,107,255,0.22)] to-[rgba(55,225,255,0.10)] shadow-[0_0_0_3px_rgba(61,107,255,0.18)]"
+                ? "border-[#34D399] bg-gradient-to-b from-[rgba(16,185,129,0.22)] to-[rgba(110,231,183,0.12)] shadow-[0_0_0_3px_rgba(16,185,129,0.20)]"
                 : "border-white/10 bg-white/[0.04] hover:border-white/25",
             )}
           >
@@ -407,7 +409,7 @@ function IconGrid({
             className={cn(
               "flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] text-[13px] font-semibold transition",
               sel
-                ? "-translate-y-0.5 border-[#5B8CFF] bg-gradient-to-b from-[rgba(61,107,255,0.24)] to-[rgba(55,225,255,0.10)] shadow-[0_0_0_3px_rgba(61,107,255,0.18)]"
+                ? "-translate-y-0.5 border-[#34D399] bg-gradient-to-b from-[rgba(16,185,129,0.26)] to-[rgba(110,231,183,0.12)] shadow-[0_0_0_3px_rgba(16,185,129,0.20)]"
                 : "border-white/10 bg-white/[0.04] hover:border-white/25",
             )}
           >
@@ -491,7 +493,7 @@ function SliderInput({
   const label = v >= q.max ? t("slider.valueMax") : t("slider.value", { value: v });
   return (
     <div>
-      <div className="mb-4 bg-gradient-to-br from-[#5B8CFF] to-[#37E1FF] bg-clip-text text-center text-[44px] font-extrabold tracking-tight text-transparent">
+      <div className="mb-4 bg-gradient-to-br from-[#34D399] to-[#6EE7B7] bg-clip-text text-center text-[44px] font-extrabold tracking-tight text-transparent">
         {label}
       </div>
       <input
@@ -504,12 +506,12 @@ function SliderInput({
         aria-label={t(`questions.${q.key}.title`)}
         className="h-2.5 w-full cursor-pointer appearance-none rounded-full border border-white/10 outline-none"
         style={{
-          background: `linear-gradient(90deg, #3D6BFF, #37E1FF) no-repeat`,
+          background: `linear-gradient(90deg, #10B981, #6EE7B7) no-repeat`,
           backgroundSize: `${pct}% 100%`,
           backgroundColor: "rgba(125,150,255,0.15)",
         }}
       />
-      <div className="mt-3 flex justify-between text-xs font-semibold text-[#93A0D4]">
+      <div className="mt-3 flex justify-between text-xs font-semibold text-[#9ec8b8]">
         <span>{t(`questions.${q.key}.min`)}</span>
         <span>{t(`questions.${q.key}.max`)}</span>
       </div>
@@ -546,7 +548,7 @@ function RankList({
             key={id}
             className="flex items-center gap-3 rounded-2xl border-[1.5px] border-white/10 bg-white/[0.06] px-3 py-3"
           >
-            <span className="grid h-6 w-6 flex-none place-items-center rounded-lg bg-gradient-to-br from-[#3D6BFF] to-[#37E1FF] text-[13px] font-extrabold text-[#06122e]">
+            <span className="grid h-6 w-6 flex-none place-items-center rounded-lg bg-gradient-to-br from-[#10B981] to-[#6EE7B7] text-[13px] font-extrabold text-[#052e26]">
               {i + 1}
             </span>
             <span className="text-xl">{opt.emoji}</span>
@@ -559,7 +561,7 @@ function RankList({
                 onClick={() => move(i, i - 1)}
                 disabled={i === 0}
                 aria-label={t("nav.rankUp")}
-                className="grid h-5 w-[26px] place-items-center rounded-md border border-white/10 bg-white/10 text-[#93A0D4] disabled:opacity-30"
+                className="grid h-5 w-[26px] place-items-center rounded-md border border-white/10 bg-white/10 text-[#9ec8b8] disabled:opacity-30"
               >
                 <ChevronUp size={14} />
               </button>
@@ -568,7 +570,7 @@ function RankList({
                 onClick={() => move(i, i + 1)}
                 disabled={i === order.length - 1}
                 aria-label={t("nav.rankDown")}
-                className="grid h-5 w-[26px] place-items-center rounded-md border border-white/10 bg-white/10 text-[#93A0D4] disabled:opacity-30"
+                className="grid h-5 w-[26px] place-items-center rounded-md border border-white/10 bg-white/10 text-[#9ec8b8] disabled:opacity-30"
               >
                 <ChevronDown size={14} />
               </button>
@@ -597,9 +599,9 @@ function TextArea({
         onChange={(e) => onChange(e.target.value.slice(0, q.maxLength))}
         placeholder={t(`questions.${q.key}.placeholder`)}
         maxLength={q.maxLength}
-        className="min-h-[120px] w-full resize-none rounded-2xl border-[1.5px] border-white/10 bg-white/[0.04] px-4 py-3.5 text-base leading-relaxed text-white outline-none transition focus:border-[#5B8CFF] focus:ring-[3px] focus:ring-[#3D6BFF]/20"
+        className="min-h-[120px] w-full resize-none rounded-2xl border-[1.5px] border-white/10 bg-white/[0.04] px-4 py-3.5 text-base leading-relaxed text-white outline-none transition focus:border-[#34D399] focus:ring-[3px] focus:ring-[#10B981]/20"
       />
-      <div className="mt-2 text-right text-xs text-[#93A0D4]">
+      <div className="mt-2 text-right text-xs text-[#9ec8b8]">
         {t("text.count", { count: value.length, max: q.maxLength })}
       </div>
     </div>
@@ -613,14 +615,14 @@ function Tick({ selected, square }: { selected: boolean; square?: boolean }) {
         "grid h-6 w-6 flex-none place-items-center border-[1.5px] transition",
         square ? "rounded-md" : "rounded-full",
         selected
-          ? "border-transparent bg-gradient-to-br from-[#3D6BFF] to-[#37E1FF]"
+          ? "border-transparent bg-gradient-to-br from-[#10B981] to-[#6EE7B7]"
           : "border-white/25",
       )}
     >
       <Check
         size={14}
         className={cn(
-          "text-[#06122e] transition",
+          "text-[#052e26] transition",
           selected ? "scale-100 opacity-100" : "scale-50 opacity-0",
         )}
       />
@@ -634,7 +636,7 @@ function WelcomeScreen({ onStart }: { onStart: () => void }) {
   const { t } = useTranslation("buildClubero");
   return (
     <section className="flex flex-1 flex-col justify-center py-6">
-      <span className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#37E1FF]/25 bg-[#37E1FF]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#37E1FF]">
+      <span className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#6EE7B7]/25 bg-[#6EE7B7]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#6EE7B7]">
         <Sparkles size={12} />
         {t("hero.badge")}
       </span>
@@ -644,21 +646,21 @@ function WelcomeScreen({ onStart }: { onStart: () => void }) {
           ns="buildClubero"
           components={{
             accent: (
-              <span className="bg-gradient-to-r from-[#5B8CFF] to-[#37E1FF] bg-clip-text text-transparent" />
+              <span className="bg-gradient-to-r from-[#34D399] to-[#6EE7B7] bg-clip-text text-transparent" />
             ),
           }}
         />
       </h1>
       <p className="mb-3 text-base font-semibold leading-relaxed">{t("hero.lead")}</p>
-      <p className="mb-5 text-base leading-relaxed text-[#93A0D4]">{t("hero.body")}</p>
-      <p className="mb-6 flex items-center gap-2 text-[13.5px] font-semibold text-[#93A0D4]">
+      <p className="mb-5 text-base leading-relaxed text-[#9ec8b8]">{t("hero.body")}</p>
+      <p className="mb-6 flex items-center gap-2 text-[13.5px] font-semibold text-[#9ec8b8]">
         <ShieldCheck size={14} />
         {t("hero.meta")}
       </p>
       <button
         type="button"
         onClick={onStart}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#5B8CFF] to-[#37E1FF] px-6 py-4 text-base font-bold text-[#06122e] shadow-[0_14px_34px_-12px_rgba(55,150,255,0.85)]"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#34D399] to-[#6EE7B7] px-6 py-4 text-base font-bold text-[#052e26] shadow-[0_14px_34px_-12px_rgba(16,185,129,0.85)]"
       >
         {t("hero.cta")}
         <ArrowRight size={18} />
@@ -712,11 +714,11 @@ function DoneScreen({
   if (sent) {
     return (
       <section className="flex flex-1 flex-col justify-center py-8 text-center">
-        <div className="mx-auto mb-4 grid h-[76px] w-[76px] place-items-center rounded-full bg-gradient-to-br from-[#3D6BFF] to-[#37E1FF] shadow-[0_16px_40px_-12px_rgba(55,150,255,0.8)]">
-          <Check size={32} className="text-[#06122e]" strokeWidth={3} />
+        <div className="mx-auto mb-4 grid h-[76px] w-[76px] place-items-center rounded-full bg-gradient-to-br from-[#10B981] to-[#6EE7B7] shadow-[0_16px_40px_-12px_rgba(16,185,129,0.8)]">
+          <Check size={32} className="text-[#052e26]" strokeWidth={3} />
         </div>
         <h1 className="mb-3 text-[28px] font-extrabold tracking-tight">{t("done.thanksTitle")}</h1>
-        <p className="mx-auto max-w-[340px] text-[15px] leading-relaxed text-[#93A0D4]">
+        <p className="mx-auto max-w-[340px] text-[15px] leading-relaxed text-[#9ec8b8]">
           {t("done.thanksBody")}
         </p>
       </section>
@@ -729,12 +731,12 @@ function DoneScreen({
       <h1 className="mb-3 text-center text-[28px] font-extrabold tracking-tight">
         {t("done.title")}
       </h1>
-      <p className="mx-auto mb-6 max-w-[340px] text-center text-[15px] leading-relaxed text-[#93A0D4]">
+      <p className="mx-auto mb-6 max-w-[340px] text-center text-[15px] leading-relaxed text-[#9ec8b8]">
         {t("done.body")}
       </p>
 
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[rgba(23,34,92,0.66)] to-[rgba(17,26,70,0.72)] p-6">
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#37E1FF]">
+      <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[rgba(6,44,34,0.72)] to-[rgba(4,28,22,0.78)] p-6">
+        <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#6EE7B7]">
           {t("done.contactTitle")}
         </h2>
         <div className="flex flex-col gap-3">
@@ -783,7 +785,7 @@ function DoneScreen({
               type="checkbox"
               checked={values.newsletter}
               onChange={(e) => setValues((v) => ({ ...v, newsletter: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 flex-none accent-[#37E1FF]"
+              className="mt-0.5 h-4 w-4 flex-none accent-[#6EE7B7]"
             />
             <span>{t("done.form.newsletter")}</span>
           </label>
@@ -792,12 +794,12 @@ function DoneScreen({
               type="checkbox"
               checked={values.beta}
               onChange={(e) => setValues((v) => ({ ...v, beta: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 flex-none accent-[#37E1FF]"
+              className="mt-0.5 h-4 w-4 flex-none accent-[#6EE7B7]"
             />
             <span>{t("done.form.beta")}</span>
           </label>
           <p className="text-xs text-[#5C6AA6]">{t("done.form.consentHint")}</p>
-          <p className="text-xs text-[#93A0D4]">
+          <p className="text-xs text-[#9ec8b8]">
             <Trans
               i18nKey="done.privacy.notice"
               t={t}
@@ -825,7 +827,7 @@ function DoneScreen({
           type="button"
           onClick={() => submit(true)}
           disabled={!canSubmit}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#5B8CFF] to-[#37E1FF] px-5 py-4 font-bold text-[#06122e] shadow-[0_14px_34px_-12px_rgba(55,150,255,0.85)] transition disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#34D399] to-[#6EE7B7] px-5 py-4 font-bold text-[#052e26] shadow-[0_14px_34px_-12px_rgba(16,185,129,0.85)] transition disabled:cursor-not-allowed disabled:opacity-40"
         >
           {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
           {sending ? t("nav.sending") : t("done.send")}
@@ -835,7 +837,7 @@ function DoneScreen({
           type="button"
           onClick={() => submit(false)}
           disabled={sending}
-          className="mx-auto mt-2 block text-sm font-semibold text-[#93A0D4] underline underline-offset-4 hover:text-white"
+          className="mx-auto mt-2 block text-sm font-semibold text-[#9ec8b8] underline underline-offset-4 hover:text-white"
         >
           {t("done.skip")}
         </button>
@@ -855,7 +857,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[12.5px] font-bold tracking-wide text-[#93A0D4]">
+      <label className="mb-1.5 block text-[12.5px] font-bold tracking-wide text-[#9ec8b8]">
         {label}
       </label>
       {children}
