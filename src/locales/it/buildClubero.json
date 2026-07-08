@@ -236,7 +236,8 @@
       "ranking": "Ranking medio (1 = più utile)",
       "numeric": "Valori numerici",
       "verbatims": "Verbatim liberi",
-      "leads": "Contatti raccolti"
+      "leads": "Contatti raccolti",
+      "responses": "Risposte per utente"
     },
     "leads": {
       "firstName": "Nome",
@@ -249,7 +250,20 @@
       "exportCsv": "Esporta CSV"
     },
     "empty": "Nessun dato al momento.",
-    "loadError": "Impossibile caricare la dashboard."
+    "loadError": "Impossibile caricare la dashboard.",
+    "responses": {
+      "title": "Risposte per utente",
+      "empty": "Nessuna sessione al momento.",
+      "status": "Stato",
+      "completedStatus": "Completata",
+      "inProgressStatus": "In corso",
+      "started": "Iniziata",
+      "completed": "Completata",
+      "anonymous": "Anonimo",
+      "viewAnswers": "Vedi le risposte",
+      "hideAnswers": "Nascondi",
+      "noAnswer": "—"
+    }
   },
   "rank": {
     "hint": "Scegli le funzionalità nell'ordine che conta per te: tocca per aggiungere, riordina con ▲/▼.",

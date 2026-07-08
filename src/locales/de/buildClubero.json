@@ -236,7 +236,8 @@
       "ranking": "Durchschnittsrang (1 = am nützlichsten)",
       "numeric": "Zahlenwerte",
       "verbatims": "Freitext-Verbatims",
-      "leads": "Gesammelte Kontakte"
+      "leads": "Gesammelte Kontakte",
+      "responses": "Antworten pro Nutzer"
     },
     "leads": {
       "firstName": "Vorname",
@@ -249,7 +250,20 @@
       "exportCsv": "CSV exportieren"
     },
     "empty": "Noch keine Daten.",
-    "loadError": "Dashboard konnte nicht geladen werden."
+    "loadError": "Dashboard konnte nicht geladen werden.",
+    "responses": {
+      "title": "Antworten pro Nutzer",
+      "empty": "Noch keine Sessions.",
+      "status": "Status",
+      "completedStatus": "Abgeschlossen",
+      "inProgressStatus": "Läuft",
+      "started": "Gestartet",
+      "completed": "Abgeschlossen",
+      "anonymous": "Anonym",
+      "viewAnswers": "Antworten ansehen",
+      "hideAnswers": "Ausblenden",
+      "noAnswer": "—"
+    }
   },
   "rank": {
     "hint": "Wähle Funktionen in deiner Reihenfolge: antippen zum Hinzufügen, mit ▲/▼ neu anordnen.",

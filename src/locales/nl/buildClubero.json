@@ -236,7 +236,8 @@
       "ranking": "Gem. rang (1 = nuttigst)",
       "numeric": "Numerieke waarden",
       "verbatims": "Vrije verbatims",
-      "leads": "Verzamelde contacten"
+      "leads": "Verzamelde contacten",
+      "responses": "Antwoorden per gebruiker"
     },
     "leads": {
       "firstName": "Voornaam",
@@ -249,7 +250,20 @@
       "exportCsv": "CSV exporteren"
     },
     "empty": "Nog geen data.",
-    "loadError": "Dashboard kon niet geladen worden."
+    "loadError": "Dashboard kon niet geladen worden.",
+    "responses": {
+      "title": "Antwoorden per gebruiker",
+      "empty": "Nog geen sessies.",
+      "status": "Status",
+      "completedStatus": "Afgerond",
+      "inProgressStatus": "Loopt",
+      "started": "Gestart",
+      "completed": "Afgerond",
+      "anonymous": "Anoniem",
+      "viewAnswers": "Antwoorden bekijken",
+      "hideAnswers": "Verbergen",
+      "noAnswer": "—"
+    }
   },
   "rank": {
     "hint": "Kies functies in jouw volgorde: tik om toe te voegen, herschik met ▲/▼.",
