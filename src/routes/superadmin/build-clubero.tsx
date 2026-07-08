@@ -104,14 +104,17 @@ function BuildCluberoDashboard() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data: raw, error } = await supabase.rpc(
-        "admin_build_clubero_dashboard" as never,
-      );
+      const [{ data: raw, error }, { data: rawResp, error: errResp }] = await Promise.all([
+        supabase.rpc("admin_build_clubero_dashboard" as never),
+        supabase.rpc("admin_build_clubero_responses" as never),
+      ]);
       if (cancelled) return;
       if (error) {
         setErr(t("admin.loadError"));
       } else {
-        setData(raw as unknown as Dashboard);
+        const base = raw as unknown as Omit<Dashboard, "responses">;
+        const responses = (!errResp && Array.isArray(rawResp) ? (rawResp as ResponseRow[]) : []);
+        setData({ ...base, responses });
       }
       setLoading(false);
     })();
