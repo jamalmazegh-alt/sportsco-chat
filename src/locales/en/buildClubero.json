@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Club announcement wall"
+        },
+        "player_social_network": {
+          "label": "Player social network",
+          "description": "Connect with players from other clubs"
+        },
+        "public_player_profiles": {
+          "label": "Public player profiles",
+          "description": "A public profile page, like a sports LinkedIn"
+        },
+        "payments_dues": {
+          "label": "Payments & dues",
+          "description": "Pay and collect membership dues online"
+        },
+        "fundraising": {
+          "label": "Fundraisers & collections",
+          "description": "Start fundraisers for the club or team"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "No data yet.",
     "loadError": "Could not load the dashboard."
+  },
+  "rank": {
+    "hint": "Rank from highest priority (top) to lowest (bottom).",
+    "moveUp": "Move {{item}} up one rank",
+    "moveDown": "Move {{item}} down one rank"
   }
 }

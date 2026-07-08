@@ -130,6 +130,10 @@ export const QUESTIONS: Question[] = [
       { id: "matchday", emoji: "🤝" },
       { id: "funding", emoji: "💰" },
       { id: "wall", emoji: "📣" },
+      { id: "player_social_network", emoji: "🌐" },
+      { id: "public_player_profiles", emoji: "👤" },
+      { id: "payments_dues", emoji: "💳" },
+      { id: "fundraising", emoji: "🎁" },
     ],
   },
   {

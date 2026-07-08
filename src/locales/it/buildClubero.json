@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Bacheca del club"
+        },
+        "player_social_network": {
+          "label": "Rete sociale dei giocatori",
+          "description": "Connettiti con giocatori di altri club"
+        },
+        "public_player_profiles": {
+          "label": "Profili pubblici dei giocatori",
+          "description": "Una pagina profilo pubblica, come un LinkedIn dello sport"
+        },
+        "payments_dues": {
+          "label": "Pagamenti e quote",
+          "description": "Paga e incassa le quote online"
+        },
+        "fundraising": {
+          "label": "Raccolte fondi",
+          "description": "Avvia raccolte fondi per il club o la squadra"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Nessun dato al momento.",
     "loadError": "Impossibile caricare la dashboard."
+  },
+  "rank": {
+    "hint": "Ordina dalla priorità più alta (in alto) alla più bassa (in basso).",
+    "moveUp": "Sposta {{item}} su di una posizione",
+    "moveDown": "Sposta {{item}} giù di una posizione"
   }
 }

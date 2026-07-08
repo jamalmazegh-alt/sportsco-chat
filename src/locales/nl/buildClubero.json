@@ -146,6 +146,22 @@
         },
         "wall": {
           "label": "Clubprikbord"
+        },
+        "player_social_network": {
+          "label": "Sociaal netwerk voor spelers",
+          "description": "Maak contact met spelers van andere clubs"
+        },
+        "public_player_profiles": {
+          "label": "Openbare spelersprofielen",
+          "description": "Een openbare profielpagina, zoals een LinkedIn voor sport"
+        },
+        "payments_dues": {
+          "label": "Betalingen & contributie",
+          "description": "Contributie online betalen en innen"
+        },
+        "fundraising": {
+          "label": "Inzamelingen & potjes",
+          "description": "Start inzamelingen voor de club of het team"
         }
       }
     },
@@ -234,5 +250,10 @@
     },
     "empty": "Nog geen data.",
     "loadError": "Dashboard kon niet geladen worden."
+  },
+  "rank": {
+    "hint": "Rangschik van hoogste prioriteit (boven) naar laagste (onder).",
+    "moveUp": "{{item}} één plaats omhoog verplaatsen",
+    "moveDown": "{{item}} één plaats omlaag verplaatsen"
   }
 }
