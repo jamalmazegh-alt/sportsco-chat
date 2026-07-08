@@ -177,7 +177,9 @@ export function useBuildCluberoSession({
         return;
       }
       const bodyErr = (res.body as { error?: string } | null)?.error;
-      // Terminal: session already completed server-side. Stop autosave for good.
+      // Terminal: session already completed server-side. Stop autosave for good
+      // and clear the local mirror so a reload starts a fresh session instead
+      // of re-hitting 409 (case: completion came from another tab).
       if (res.status === 409 && bodyErr === "response_completed") {
         closedRef.current = true;
         dirtyKeys.current.clear();
@@ -185,16 +187,30 @@ export function useBuildCluberoSession({
           clearTimeout(flushTimer.current);
           flushTimer.current = null;
         }
+        clearPersisted();
         setSaveState("closed");
         console.info("[build-clubero] session already completed, autosave stopped");
         return;
       }
-      // Retryable: rate-limited or transient. Apply exponential backoff w/ jitter
-      // and re-queue this key so no data is lost.
+      // Retryable: rate-limited or transient. Re-queue the key (never dropped)
+      // and back off exponentially with jitter. After MAX_ATTEMPTS we stop
+      // auto-scheduling but KEEP the key in the dirty set + localStorage so a
+      // natural trigger (visibilitychange, pagehide, next setAnswer, reload)
+      // will replay it. Losing the user's typed answer is worse than waiting.
       if (res.status === 429 || res.status === 0 || res.status >= 500) {
+        const MAX_ATTEMPTS = 5;
         dirtyKeys.current.add(key);
-        const attempt = Math.min(backoffAttemptRef.current + 1, 5);
+        const attempt = backoffAttemptRef.current + 1;
         backoffAttemptRef.current = attempt;
+        if (attempt >= MAX_ATTEMPTS) {
+          backoffUntilRef.current = 0;
+          setSaveState("error");
+          console.warn(
+            "[build-clubero] save retry budget exhausted, keeping pending in localStorage",
+            key,
+          );
+          return;
+        }
         const base = Math.min(1000 * 2 ** (attempt - 1), 15000);
         const jitter = Math.floor(Math.random() * 400);
         const delay = base + jitter;
@@ -205,6 +221,7 @@ export function useBuildCluberoSession({
       }
       setSaveState("error");
       console.warn("[build-clubero] save failed", key, res.status, bodyErr);
+    },
     },
     [questionByKey, scheduleFlush, sessionId],
   );
