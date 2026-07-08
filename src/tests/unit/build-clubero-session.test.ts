@@ -1,10 +1,24 @@
-// @vitest-environment jsdom
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeAll, beforeEach } from "vitest";
 import { __test } from "@/lib/build-clubero-session";
+
+// Minimal localStorage polyfill so the persistence helpers can run in node env.
+beforeAll(() => {
+  if (typeof (globalThis as any).window === "undefined") {
+    const store = new Map<string, string>();
+    (globalThis as any).window = {
+      localStorage: {
+        getItem: (k: string) => (store.has(k) ? store.get(k)! : null),
+        setItem: (k: string, v: string) => void store.set(k, String(v)),
+        removeItem: (k: string) => void store.delete(k),
+        clear: () => store.clear(),
+      },
+    };
+  }
+});
 
 describe("build-clubero-session persistence", () => {
   beforeEach(() => {
-    window.localStorage.clear();
+    (globalThis as any).window.localStorage.clear();
   });
 
   it("read/write/clear roundtrip", () => {
@@ -25,9 +39,12 @@ describe("build-clubero-session persistence", () => {
   });
 
   it("ignores corrupted payloads", () => {
-    window.localStorage.setItem(__test.STORAGE_KEY, "not-json");
+    (globalThis as any).window.localStorage.setItem(__test.STORAGE_KEY, "not-json");
     expect(__test.readPersisted()).toBeNull();
-    window.localStorage.setItem(__test.STORAGE_KEY, JSON.stringify({ nope: 1 }));
+    (globalThis as any).window.localStorage.setItem(
+      __test.STORAGE_KEY,
+      JSON.stringify({ nope: 1 }),
+    );
     expect(__test.readPersisted()).toBeNull();
   });
 });
