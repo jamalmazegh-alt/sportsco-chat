@@ -295,7 +295,7 @@ function QuestionRenderer({
     case "slider":
       return <SliderInput q={q} value={value as number | undefined} onChange={onChange} />;
     case "rank":
-      return <RankList q={q} value={(value as string[]) ?? q.options.map((o) => o.id)} onChange={onChange} />;
+      return <RankList q={q} value={(value as string[]) ?? []} onChange={onChange} />;
     case "text":
       return <TextArea q={q} value={(value as string) ?? ""} onChange={onChange} />;
   }
