@@ -11,7 +11,7 @@ import fr from "@/locales/fr/buildClubero.json";
 import en from "@/locales/en/buildClubero.json";
 import de from "@/locales/de/buildClubero.json";
 import es from "@/locales/es/buildClubero.json";
-import it from "@/locales/it/buildClubero.json";
+import itLocale from "@/locales/it/buildClubero.json";
 import nl from "@/locales/nl/buildClubero.json";
 import pt from "@/locales/pt/buildClubero.json";
 
