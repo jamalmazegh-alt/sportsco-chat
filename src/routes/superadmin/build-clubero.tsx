@@ -65,6 +65,26 @@ interface LeadRow {
   beta_consent_at: string | null;
   completed_at: string | null;
 }
+interface AnswerRow {
+  question_key: string;
+  question_type: string;
+  value: unknown;
+  created_at: string;
+}
+interface ResponseRow {
+  id: string;
+  session_id: string;
+  status: "in_progress" | "completed";
+  locale: string;
+  first_name: string | null;
+  email: string | null;
+  club: string | null;
+  newsletter_opt_in: boolean;
+  beta_opt_in: boolean;
+  started_at: string;
+  completed_at: string | null;
+  answers: AnswerRow[];
+}
 interface Dashboard {
   overview: OverviewRow | null;
   options: OptionRow[];
@@ -72,6 +92,7 @@ interface Dashboard {
   numeric: NumericRow[];
   verbatims: VerbatimRow[];
   leads: LeadRow[];
+  responses: ResponseRow[];
 }
 
 function BuildCluberoDashboard() {
