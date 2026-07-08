@@ -87,8 +87,15 @@ export function useBuildCluberoSession({
   });
   const [answers, setAnswers] = useState<AnswersMap>(() => readPersisted()?.answers ?? {});
   const [index, setIndex] = useState<number>(() => readPersisted()?.index ?? 0);
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error" | "retrying" | "closed">("idle");
   const [started, setStarted] = useState(false);
+  // Terminal flag: once the session is server-side completed we must stop
+  // autosaving to avoid an infinite 409 retry loop against a closed session.
+  const closedRef = useRef(false);
+  // Simple exponential backoff (with jitter) shared by all pending saves so
+  // that repeated 429s do not turn every keystroke into a new burst.
+  const backoffUntilRef = useRef<number>(0);
+  const backoffAttemptRef = useRef<number>(0);
 
   const questionByKey = useMemo(() => {
     const m = new Map<string, Question>();
