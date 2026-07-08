@@ -290,6 +290,21 @@ export function useBuildCluberoSession({
         const err = (res.body as { error?: string } | null)?.error ?? `http_${res.status}`;
         throw new Error(err);
       }
+      // Proactive terminal state on success: a trailing debounced save (a
+      // keystroke ~600ms before the "finish" click) would otherwise fire
+      // post-complete and hit 409. Shut autosave down here so the 409
+      // handler in saveAnswer is only defense-in-depth for the cross-tab
+      // case. clearPersisted() also means a reload starts fresh — accepted
+      // trade-off for a one-shot public feedback form (DoneScreen is driven
+      // by in-memory React state, not by localStorage).
+      closedRef.current = true;
+      dirtyKeys.current.clear();
+      if (flushTimer.current) {
+        clearTimeout(flushTimer.current);
+        flushTimer.current = null;
+      }
+      clearPersisted();
+      setSaveState("closed");
     },
     [flush, sessionId],
   );
