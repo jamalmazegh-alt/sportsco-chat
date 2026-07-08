@@ -252,8 +252,12 @@
     "loadError": "Impossible de charger le tableau de bord."
   },
   "rank": {
-    "hint": "Classe de la plus prioritaire (en haut) à la moins prioritaire (en bas).",
+    "hint": "Choisis les fonctionnalités dans l'ordre où elles comptent pour toi : clique pour ajouter, réordonne avec ▲/▼.",
     "moveUp": "Monter {{item}} d'un rang",
-    "moveDown": "Descendre {{item}} d'un rang"
+    "moveDown": "Descendre {{item}} d'un rang",
+    "available": "À ajouter à ton classement",
+    "add": "Ajouter {{item}} au classement",
+    "remove": "Retirer {{item}} du classement",
+    "emptyState": "Ton classement est vide — clique une option ci-dessous pour l'ajouter en premier."
   }
 }

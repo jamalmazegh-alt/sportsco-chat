@@ -252,8 +252,12 @@
     "loadError": "Não foi possível carregar o painel."
   },
   "rank": {
-    "hint": "Ordena da prioridade mais alta (em cima) para a mais baixa (em baixo).",
+    "hint": "Escolhe as funcionalidades pela ordem que te importa: toca para adicionar, reordena com ▲/▼.",
     "moveUp": "Subir {{item}} uma posição",
-    "moveDown": "Descer {{item}} uma posição"
+    "moveDown": "Descer {{item}} uma posição",
+    "available": "Adicionar à tua classificação",
+    "add": "Adicionar {{item}} à classificação",
+    "remove": "Remover {{item}} da classificação",
+    "emptyState": "A tua classificação está vazia — toca numa opção abaixo para colocá-la em primeiro."
   }
 }

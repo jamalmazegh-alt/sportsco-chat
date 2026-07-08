@@ -252,8 +252,12 @@
     "loadError": "No se pudo cargar el panel."
   },
   "rank": {
-    "hint": "Ordena de mayor prioridad (arriba) a menor (abajo).",
+    "hint": "Elige las funciones en tu orden de prioridad: pulsa para añadir, reordena con ▲/▼.",
     "moveUp": "Subir {{item}} una posición",
-    "moveDown": "Bajar {{item}} una posición"
+    "moveDown": "Bajar {{item}} una posición",
+    "available": "Añadir a tu clasificación",
+    "add": "Añadir {{item}} a la clasificación",
+    "remove": "Quitar {{item}} de la clasificación",
+    "emptyState": "Tu clasificación está vacía — pulsa una opción abajo para ponerla primera."
   }
 }

@@ -252,8 +252,12 @@
     "loadError": "Dashboard konnte nicht geladen werden."
   },
   "rank": {
-    "hint": "Ordne von höchster Priorität (oben) bis niedrigster (unten).",
+    "hint": "Wähle Funktionen in deiner Reihenfolge: antippen zum Hinzufügen, mit ▲/▼ neu anordnen.",
     "moveUp": "{{item}} einen Rang nach oben verschieben",
-    "moveDown": "{{item}} einen Rang nach unten verschieben"
+    "moveDown": "{{item}} einen Rang nach unten verschieben",
+    "available": "Zu deinem Ranking hinzufügen",
+    "add": "{{item}} zum Ranking hinzufügen",
+    "remove": "{{item}} aus dem Ranking entfernen",
+    "emptyState": "Dein Ranking ist leer — tippe unten eine Option an, um sie an erste Stelle zu setzen."
   }
 }
