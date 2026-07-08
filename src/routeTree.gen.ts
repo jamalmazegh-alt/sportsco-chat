@@ -129,6 +129,7 @@ import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
 import { Route as ApiPublicBuildCluberoStartRouteImport } from './routes/api/public/build-clubero/start'
+import { Route as ApiPublicBuildCluberoSaveRouteImport } from './routes/api/public/build-clubero/save'
 import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
 import { Route as AuthenticatedTeamsTeamIdStatsRouteImport } from './routes/_authenticated/teams/$teamId.stats'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
@@ -793,6 +794,12 @@ const ApiPublicBuildCluberoStartRoute =
     path: '/api/public/build-clubero/start',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicBuildCluberoSaveRoute =
+  ApiPublicBuildCluberoSaveRouteImport.update({
+    id: '/api/public/build-clubero/save',
+    path: '/api/public/build-clubero/save',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedTournamentsPricingSuccessRoute =
   AuthenticatedTournamentsPricingSuccessRouteImport.update({
     id: '/success',
@@ -1054,6 +1061,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
+  '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1194,6 +1202,7 @@ export interface FileRoutesByTo {
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
+  '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1340,6 +1349,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/_authenticated/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/_authenticated/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
+  '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
@@ -1486,6 +1496,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/timeline'
     | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
+    | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -1626,6 +1637,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/timeline'
     | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
+    | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -1771,6 +1783,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId/timeline'
     | '/_authenticated/teams/$teamId/stats'
     | '/_authenticated/tournaments/pricing/success'
+    | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
@@ -1851,6 +1864,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
+  ApiPublicBuildCluberoSaveRoute: typeof ApiPublicBuildCluberoSaveRoute
   ApiPublicBuildCluberoStartRoute: typeof ApiPublicBuildCluberoStartRoute
   ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
@@ -2713,6 +2727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBuildCluberoStartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/build-clubero/save': {
+      id: '/api/public/build-clubero/save'
+      path: '/api/public/build-clubero/save'
+      fullPath: '/api/public/build-clubero/save'
+      preLoaderRoute: typeof ApiPublicBuildCluberoSaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tournaments/pricing/success': {
       id: '/_authenticated/tournaments/pricing/success'
       path: '/success'
@@ -3261,6 +3282,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
+  ApiPublicBuildCluberoSaveRoute: ApiPublicBuildCluberoSaveRoute,
   ApiPublicBuildCluberoStartRoute: ApiPublicBuildCluberoStartRoute,
   ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
