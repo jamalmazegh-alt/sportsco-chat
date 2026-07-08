@@ -18,7 +18,8 @@
   "save": {
     "saving": "A guardar…",
     "saved": "Guardado",
-    "error": "Guardado pendente"
+    "error": "Guardado pendente",
+    "retrying": "Guardar temporariamente indisponível, a tentar novamente…"
   },
   "nav": {
     "next": "Continuar",
@@ -197,7 +198,7 @@
     "thanksTitle": "Enviado!",
     "thanksBody": "Obrigado pelo tempo. Até breve no Clubero.",
     "privacy": {
-      "notice": "Ao marcar, autoriza a Clubero a conservar estes dados para o contactar. Veja a nossa <link>política de privacidade</link>.",
+      "notice": "Estes dados são usados apenas para lhe enviar a newsletter e/ou o acesso beta se marcar as caixas correspondentes. Veja a nossa <link>política de privacidade</link>.",
       "linkText": "política de privacidade"
     }
   },

@@ -18,7 +18,8 @@
   "save": {
     "saving": "Enregistrement…",
     "saved": "Enregistré",
-    "error": "Sauvegarde en attente"
+    "error": "Sauvegarde en attente",
+    "retrying": "Sauvegarde temporairement indisponible, nouvelle tentative en cours…"
   },
   "nav": {
     "next": "Continuer",
@@ -197,7 +198,7 @@
     "thanksTitle": "C'est envoyé !",
     "thanksBody": "Merci d'avoir pris le temps. À très vite dans Clubero.",
     "privacy": {
-      "notice": "En cochant, vous acceptez que Clubero conserve ces informations pour vous recontacter. Voir notre <link>politique de confidentialité</link>.",
+      "notice": "Ces informations servent uniquement à vous envoyer la newsletter et/ou l'accès bêta si vous cochez les cases correspondantes. Voir notre <link>politique de confidentialité</link>.",
       "linkText": "politique de confidentialité"
     }
   },

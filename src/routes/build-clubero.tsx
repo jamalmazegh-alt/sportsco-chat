@@ -237,8 +237,11 @@ function NavBar({
       </button>
       <span
         className={cn(
-          "hidden text-[11px] font-semibold text-[#37E1FF] transition-opacity sm:inline-flex sm:items-center sm:gap-1",
-          saveState === "saved" || saveState === "saving" ? "opacity-100" : "opacity-0",
+          "hidden text-[11px] font-semibold transition-opacity sm:inline-flex sm:items-center sm:gap-1",
+          saveState === "retrying" ? "text-[#FFD27A]" : "text-[#37E1FF]",
+          saveState === "saved" || saveState === "saving" || saveState === "retrying"
+            ? "opacity-100"
+            : "opacity-0",
         )}
         aria-live="polite"
       >
@@ -246,6 +249,11 @@ function NavBar({
           <>
             <Loader2 size={11} className="animate-spin" />
             {t("save.saving")}
+          </>
+        ) : saveState === "retrying" ? (
+          <>
+            <Loader2 size={11} className="animate-spin" />
+            {t("save.retrying")}
           </>
         ) : (
           <>

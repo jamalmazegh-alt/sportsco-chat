@@ -18,7 +18,8 @@
   "save": {
     "saving": "Opslaan…",
     "saved": "Opgeslagen",
-    "error": "Opslag hangend"
+    "error": "Opslag hangend",
+    "retrying": "Opslaan tijdelijk niet beschikbaar, nieuwe poging…"
   },
   "nav": {
     "next": "Doorgaan",
@@ -197,7 +198,7 @@
     "thanksTitle": "Verzonden!",
     "thanksBody": "Bedankt voor je tijd. Tot snel in Clubero.",
     "privacy": {
-      "notice": "Door aan te vinken geeft u Clubero toestemming om deze gegevens te bewaren om contact op te nemen. Zie ons <link>privacybeleid</link>.",
+      "notice": "Deze gegevens gebruiken we alleen om u de nieuwsbrief en/of bèta-toegang te sturen als u de bijbehorende vakjes aanvinkt. Zie ons <link>privacybeleid</link>.",
       "linkText": "privacybeleid"
     }
   },

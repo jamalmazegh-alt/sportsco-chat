@@ -87,8 +87,15 @@ export function useBuildCluberoSession({
   });
   const [answers, setAnswers] = useState<AnswersMap>(() => readPersisted()?.answers ?? {});
   const [index, setIndex] = useState<number>(() => readPersisted()?.index ?? 0);
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error" | "retrying" | "closed">("idle");
   const [started, setStarted] = useState(false);
+  // Terminal flag: once the session is server-side completed we must stop
+  // autosaving to avoid an infinite 409 retry loop against a closed session.
+  const closedRef = useRef(false);
+  // Simple exponential backoff (with jitter) shared by all pending saves so
+  // that repeated 429s do not turn every keystroke into a new burst.
+  const backoffUntilRef = useRef<number>(0);
+  const backoffAttemptRef = useRef<number>(0);
 
   const questionByKey = useMemo(() => {
     const m = new Map<string, Question>();
@@ -136,8 +143,22 @@ export function useBuildCluberoSession({
     writePersisted({ session_id: sessionId, answers, index });
   }, [sessionId, answers, index]);
 
+  const scheduleFlush = useCallback(
+    (delay: number) => {
+      if (closedRef.current) return;
+      if (flushTimer.current) clearTimeout(flushTimer.current);
+      flushTimer.current = setTimeout(() => {
+        void flush();
+      }, delay);
+    },
+    // flush is defined below; safe circular via ref pattern
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   const saveAnswer = useCallback(
     async (key: string) => {
+      if (closedRef.current) return;
       const q = questionByKey.get(key);
       if (!q) return;
       const value = answersRef.current[key];
@@ -149,21 +170,56 @@ export function useBuildCluberoSession({
         question_type: q.type,
         value,
       });
-      if (!res.ok) {
-        setSaveState("error");
-        if (res.status === 429) {
-          console.warn("[build-clubero] save rate-limited, will retry on next flush");
-        } else {
-          console.warn("[build-clubero] save failed", key, res.status);
-        }
-      } else {
+      if (res.ok) {
+        backoffAttemptRef.current = 0;
+        backoffUntilRef.current = 0;
         setSaveState("saved");
+        return;
       }
+      const bodyErr = (res.body as { error?: string } | null)?.error;
+      // Terminal: session already completed server-side. Stop autosave for good.
+      if (res.status === 409 && bodyErr === "response_completed") {
+        closedRef.current = true;
+        dirtyKeys.current.clear();
+        if (flushTimer.current) {
+          clearTimeout(flushTimer.current);
+          flushTimer.current = null;
+        }
+        setSaveState("closed");
+        console.info("[build-clubero] session already completed, autosave stopped");
+        return;
+      }
+      // Retryable: rate-limited or transient. Apply exponential backoff w/ jitter
+      // and re-queue this key so no data is lost.
+      if (res.status === 429 || res.status === 0 || res.status >= 500) {
+        dirtyKeys.current.add(key);
+        const attempt = Math.min(backoffAttemptRef.current + 1, 5);
+        backoffAttemptRef.current = attempt;
+        const base = Math.min(1000 * 2 ** (attempt - 1), 15000);
+        const jitter = Math.floor(Math.random() * 400);
+        const delay = base + jitter;
+        backoffUntilRef.current = Date.now() + delay;
+        setSaveState("retrying");
+        scheduleFlush(delay);
+        return;
+      }
+      setSaveState("error");
+      console.warn("[build-clubero] save failed", key, res.status, bodyErr);
     },
-    [questionByKey, sessionId],
+    [questionByKey, scheduleFlush, sessionId],
   );
 
   const flush = useCallback(async () => {
+    if (closedRef.current) {
+      dirtyKeys.current.clear();
+      return;
+    }
+    // Honour outstanding backoff window: reschedule instead of hammering.
+    const wait = backoffUntilRef.current - Date.now();
+    if (wait > 0) {
+      scheduleFlush(wait);
+      return;
+    }
     if (flushTimer.current) {
       clearTimeout(flushTimer.current);
       flushTimer.current = null;
@@ -174,20 +230,22 @@ export function useBuildCluberoSession({
       // Sequential to avoid overwhelming; questions are small.
       // eslint-disable-next-line no-await-in-loop
       await saveAnswer(k);
+      if (closedRef.current) return;
     }
-  }, [saveAnswer]);
+  }, [saveAnswer, scheduleFlush]);
 
   const setAnswer = useCallback(
     (key: string, value: unknown) => {
       setAnswers((prev) => ({ ...prev, [key]: value }));
+      if (closedRef.current) return;
       dirtyKeys.current.add(key);
-      setSaveState("saving");
-      if (flushTimer.current) clearTimeout(flushTimer.current);
-      flushTimer.current = setTimeout(() => {
-        void flush();
-      }, autosaveDelayMs);
+      // If we are inside a backoff window, keep the retrying state and let the
+      // pending timer fire — do NOT reset it to a shorter debounce.
+      const wait = Math.max(backoffUntilRef.current - Date.now(), autosaveDelayMs);
+      setSaveState((s) => (s === "retrying" ? s : "saving"));
+      scheduleFlush(wait);
     },
-    [autosaveDelayMs, flush],
+    [autosaveDelayMs, scheduleFlush],
   );
 
   // Flush on visibility hidden / pagehide
