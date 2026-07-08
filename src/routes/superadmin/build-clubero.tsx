@@ -167,6 +167,10 @@ function BuildCluberoDashboard() {
       <Section title={t("admin.sections.leads")}>
         <LeadsTable leads={data.leads} />
       </Section>
+
+      <Section title={t("admin.responses.title")}>
+        <ResponsesList responses={data.responses} />
+      </Section>
     </div>
   );
 }
