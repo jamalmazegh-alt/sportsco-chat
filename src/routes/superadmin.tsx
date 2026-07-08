@@ -54,6 +54,7 @@ const NAV: NavItem[] = [
   { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
   { to: "/superadmin/support", label: "Support hub", icon: LifeBuoy },
   { to: "/superadmin/support-tickets", label: "Tickets", icon: LifeBuoy },
+  { to: "/superadmin/build-clubero", label: "Construisons Clubero", icon: MessageCircleHeart },
   { to: "/superadmin/settings", label: "Settings", icon: Settings },
 ];
 
