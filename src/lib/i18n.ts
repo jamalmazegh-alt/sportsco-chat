@@ -13,36 +13,42 @@ import frMarketing from "@/locales/fr/marketing.json";
 import frSupport from "@/locales/fr/support.json";
 import frTournaments from "@/locales/fr/tournaments.json";
 import frChallenges from "@/locales/fr/challenges.json";
+import frBuildClubero from "@/locales/fr/buildClubero.json";
 
 import deCommon from "@/locales/de/common.json";
 import deMarketing from "@/locales/de/marketing.json";
 import deSupport from "@/locales/de/support.json";
 import deTournaments from "@/locales/de/tournaments.json";
 import deChallenges from "@/locales/de/challenges.json";
+import deBuildClubero from "@/locales/de/buildClubero.json";
 
 import esCommon from "@/locales/es/common.json";
 import esMarketing from "@/locales/es/marketing.json";
 import esSupport from "@/locales/es/support.json";
 import esTournaments from "@/locales/es/tournaments.json";
 import esChallenges from "@/locales/es/challenges.json";
+import esBuildClubero from "@/locales/es/buildClubero.json";
 
 import ptCommon from "@/locales/pt/common.json";
 import ptMarketing from "@/locales/pt/marketing.json";
 import ptSupport from "@/locales/pt/support.json";
 import ptTournaments from "@/locales/pt/tournaments.json";
 import ptChallenges from "@/locales/pt/challenges.json";
+import ptBuildClubero from "@/locales/pt/buildClubero.json";
 
 import itCommon from "@/locales/it/common.json";
 import itMarketing from "@/locales/it/marketing.json";
 import itSupport from "@/locales/it/support.json";
 import itTournaments from "@/locales/it/tournaments.json";
 import itChallenges from "@/locales/it/challenges.json";
+import itBuildClubero from "@/locales/it/buildClubero.json";
 
 import nlCommon from "@/locales/nl/common.json";
 import nlMarketing from "@/locales/nl/marketing.json";
 import nlSupport from "@/locales/nl/support.json";
 import nlTournaments from "@/locales/nl/tournaments.json";
 import nlChallenges from "@/locales/nl/challenges.json";
+import nlBuildClubero from "@/locales/nl/buildClubero.json";
 
 export const SUPPORTED_LANGS = ["en", "fr", "de", "es", "pt", "it", "nl"] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
