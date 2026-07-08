@@ -1,9 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import type { AnswersMap, ContactPayload, Question } from "./build-clubero-config";
 import { parseUtm } from "./build-clubero-config";
 
 const STORAGE_KEY = "clubero:build-clubero:v1";
+const API_BASE = "/api/public/build-clubero";
+
+async function postJson(path: string, payload: unknown): Promise<{ ok: boolean; status: number; body: unknown }>
+{
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      credentials: "same-origin",
+    });
+    let body: unknown = null;
+    try { body = await res.json(); } catch { /* no body */ }
+    return { ok: res.ok, status: res.status, body };
+  } catch (err) {
+    return { ok: false, status: 0, body: { error: err instanceof Error ? err.message : "network_error" } };
+  }
+}
 
 interface Persisted {
   session_id: string;
@@ -95,17 +112,16 @@ export function useBuildCluberoSession({
       const utm = typeof window !== "undefined" ? parseUtm(window.location.search) : null;
       const device =
         typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "desktop";
-      const { error } = await supabase.rpc("start_build_clubero_response" as never, {
-        p_session_id: sessionId,
-        p_locale: locale,
-        p_utm: utm,
-        p_device: device,
-      } as never);
+      const res = await postJson("/start", {
+        session_id: sessionId,
+        locale,
+        utm,
+        device,
+      });
       if (!cancelled) {
         setStarted(true);
-        if (error) {
-          // Non-fatal: user can still fill in, we'll retry on next save.
-          console.warn("[build-clubero] start failed", error.message);
+        if (!res.ok) {
+          console.warn("[build-clubero] start failed", res.status);
         }
       }
     })();
@@ -127,15 +143,19 @@ export function useBuildCluberoSession({
       const value = answersRef.current[key];
       if (value === undefined || value === null || value === "") return;
       setSaveState("saving");
-      const { error } = await supabase.rpc("save_build_clubero_answer" as never, {
-        p_session_id: sessionId,
-        p_question_key: key,
-        p_question_type: q.type,
-        p_value: value as never,
-      } as never);
-      if (error) {
+      const res = await postJson("/save", {
+        session_id: sessionId,
+        question_key: key,
+        question_type: q.type,
+        value,
+      });
+      if (!res.ok) {
         setSaveState("error");
-        console.warn("[build-clubero] save failed", key, error.message);
+        if (res.status === 429) {
+          console.warn("[build-clubero] save rate-limited, will retry on next flush");
+        } else {
+          console.warn("[build-clubero] save failed", key, res.status);
+        }
       } else {
         setSaveState("saved");
       }
@@ -188,11 +208,14 @@ export function useBuildCluberoSession({
   const complete = useCallback(
     async (contact: ContactPayload) => {
       await flush();
-      const { error } = await supabase.rpc("complete_build_clubero_response" as never, {
-        p_session_id: sessionId,
-        p_contact: (contact ?? null) as never,
-      } as never);
-      if (error) throw new Error(error.message);
+      const res = await postJson("/complete", {
+        session_id: sessionId,
+        contact,
+      });
+      if (!res.ok) {
+        const err = (res.body as { error?: string } | null)?.error ?? `http_${res.status}`;
+        throw new Error(err);
+      }
     },
     [flush, sessionId],
   );

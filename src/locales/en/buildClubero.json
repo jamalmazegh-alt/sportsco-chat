@@ -44,34 +44,70 @@
       "title": "You mostly coach…",
       "subtitle": "So we can tailor Clubero to your reality.",
       "options": {
-        "kids":   { "label": "Kids", "hint": "U6 – U11" },
-        "teens":  { "label": "Teens", "hint": "U12 – U18" },
-        "adults": { "label": "Adults", "hint": "Seniors, leisure" },
-        "mix":    { "label": "A bit of everything", "hint": "Multiple categories" }
+        "kids": {
+          "label": "Kids",
+          "hint": "U6 – U11"
+        },
+        "teens": {
+          "label": "Teens",
+          "hint": "U12 – U18"
+        },
+        "adults": {
+          "label": "Adults",
+          "hint": "Seniors, leisure"
+        },
+        "mix": {
+          "label": "A bit of everything",
+          "hint": "Multiple categories"
+        }
       }
     },
     "sport": {
       "title": "Which sport do you run?",
       "subtitle": "Pick the main one.",
       "options": {
-        "football": { "label": "Football" },
-        "basket":   { "label": "Basketball" },
-        "hand":     { "label": "Handball" },
-        "volley":   { "label": "Volleyball" },
-        "rugby":    { "label": "Rugby" },
-        "other":    { "label": "Other" }
+        "football": {
+          "label": "Football"
+        },
+        "basket": {
+          "label": "Basketball"
+        },
+        "hand": {
+          "label": "Handball"
+        },
+        "volley": {
+          "label": "Volleyball"
+        },
+        "rugby": {
+          "label": "Rugby"
+        },
+        "other": {
+          "label": "Other"
+        }
       }
     },
     "timesinks": {
       "title": "What eats up most of your time?",
       "subtitle": "Multiple answers allowed — up to 3.",
       "options": {
-        "convocations": { "label": "Call-ups" },
-        "presence":     { "label": "Attendance tracking" },
-        "parents":      { "label": "Parent communication" },
-        "payments":     { "label": "Payments & fees" },
-        "planning":     { "label": "Planning" },
-        "results":      { "label": "Results & stats" }
+        "convocations": {
+          "label": "Call-ups"
+        },
+        "presence": {
+          "label": "Attendance tracking"
+        },
+        "parents": {
+          "label": "Parent communication"
+        },
+        "payments": {
+          "label": "Payments & fees"
+        },
+        "planning": {
+          "label": "Planning"
+        },
+        "results": {
+          "label": "Results & stats"
+        }
       }
     },
     "hours": {
@@ -95,21 +131,43 @@
       "title": "Rank these ideas, most useful first.",
       "subtitle": "Top = most useful. Use the arrows to reorder.",
       "options": {
-        "ai_report":  { "label": "Smart weekly recap" },
-        "challenges": { "label": "Challenges & physical tests" },
-        "matchday":   { "label": "Match day organisation" },
-        "funding":    { "label": "Fundraising & pot" },
-        "wall":       { "label": "Club announcement wall" }
+        "ai_report": {
+          "label": "Smart weekly recap"
+        },
+        "challenges": {
+          "label": "Challenges & physical tests"
+        },
+        "matchday": {
+          "label": "Match day organisation"
+        },
+        "funding": {
+          "label": "Fundraising & pot"
+        },
+        "wall": {
+          "label": "Club announcement wall"
+        }
       }
     },
     "currenttool": {
       "title": "Today, you juggle all this with…",
       "subtitle": "",
       "options": {
-        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Groups, messages" },
-        "excel":    { "label": "Excel / paper", "hint": "Sheets, notebook" },
-        "app":      { "label": "Another app", "hint": "TeamSnap, Spond…" },
-        "nothing":  { "label": "Nothing structured", "hint": "Just winging it" }
+        "whatsapp": {
+          "label": "WhatsApp / SMS",
+          "hint": "Groups, messages"
+        },
+        "excel": {
+          "label": "Excel / paper",
+          "hint": "Sheets, notebook"
+        },
+        "app": {
+          "label": "Another app",
+          "hint": "TeamSnap, Spond…"
+        },
+        "nothing": {
+          "label": "Nothing structured",
+          "hint": "Just winging it"
+        }
       }
     },
     "onewish": {
@@ -137,7 +195,11 @@
     "send": "Send",
     "skip": "Finish without leaving contact",
     "thanksTitle": "Sent!",
-    "thanksBody": "Thanks for taking the time. See you very soon on Clubero."
+    "thanksBody": "Thanks for taking the time. See you very soon on Clubero.",
+    "privacy": {
+      "notice": "By opting in, you allow Clubero to keep this info to contact you. See our <link>privacy policy</link>.",
+      "linkText": "privacy policy"
+    }
   },
   "errors": {
     "submit": "Could not send. Check your connection and try again."
