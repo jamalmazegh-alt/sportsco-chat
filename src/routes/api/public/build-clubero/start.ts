@@ -13,7 +13,7 @@ const LIMIT_START_PER_HOUR = 30;
 const StartSchema = z.object({
   session_id: z.string().min(8).max(80),
   locale: z.string().min(2).max(8).optional(),
-  utm: z.record(z.string()).nullable().optional(),
+  utm: z.record(z.string(), z.string()).nullable().optional(),
   device: z.enum(["mobile", "desktop"]).nullable().optional(),
 });
 
