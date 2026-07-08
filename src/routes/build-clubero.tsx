@@ -154,12 +154,13 @@ function BackgroundAura() {
 function TopBar() {
   return (
     <header className="flex items-center justify-between py-4">
-      <div className="flex items-center gap-2 font-bold tracking-tight">
-        <span className="grid h-[26px] w-[26px] place-items-center rounded-lg bg-gradient-to-br from-[#10B981] to-[#6EE7B7] shadow-[0_6px_18px_rgba(16,185,129,0.45)]">
-          <Sparkles size={15} strokeWidth={2.5} className="text-[#052e26]" />
-        </span>
-        Clubero
-      </div>
+      <a href="/" className="flex items-center gap-2" aria-label="Clubero">
+        <img
+          src={cluberoLogo}
+          alt="Clubero"
+          className="h-8 w-auto object-contain drop-shadow-[0_6px_18px_rgba(16,185,129,0.35)]"
+        />
+      </a>
       <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-[#9ec8b8]">
         <Clock size={12} />
         {useTranslation("buildClubero").t("hero.badge")}
