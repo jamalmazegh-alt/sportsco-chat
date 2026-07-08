@@ -113,6 +113,123 @@ export type Database = {
         }
         Relationships: []
       }
+      build_clubero_answers: {
+        Row: {
+          answer_number: number | null
+          answer_options: string[] | null
+          answer_ranking: string[] | null
+          answer_text: string | null
+          created_at: string
+          id: string
+          question_key: string
+          question_type: string
+          response_id: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          answer_number?: number | null
+          answer_options?: string[] | null
+          answer_ranking?: string[] | null
+          answer_text?: string | null
+          created_at?: string
+          id?: string
+          question_key: string
+          question_type: string
+          response_id: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          answer_number?: number | null
+          answer_options?: string[] | null
+          answer_ranking?: string[] | null
+          answer_text?: string | null
+          created_at?: string
+          id?: string
+          question_key?: string
+          question_type?: string
+          response_id?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "build_clubero_answers_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "build_clubero_responses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "build_clubero_answers_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "v_build_clubero_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      build_clubero_responses: {
+        Row: {
+          beta_consent_at: string | null
+          beta_opt_in: boolean
+          club: string | null
+          completed_at: string | null
+          device: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          locale: string
+          newsletter_consent_at: string | null
+          newsletter_opt_in: boolean
+          phone: string | null
+          session_id: string
+          started_at: string
+          status: string
+          updated_at: string
+          utm: Json | null
+        }
+        Insert: {
+          beta_consent_at?: string | null
+          beta_opt_in?: boolean
+          club?: string | null
+          completed_at?: string | null
+          device?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          locale?: string
+          newsletter_consent_at?: string | null
+          newsletter_opt_in?: boolean
+          phone?: string | null
+          session_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          utm?: Json | null
+        }
+        Update: {
+          beta_consent_at?: string | null
+          beta_opt_in?: boolean
+          club?: string | null
+          completed_at?: string | null
+          device?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          locale?: string
+          newsletter_consent_at?: string | null
+          newsletter_opt_in?: boolean
+          phone?: string | null
+          session_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          utm?: Json | null
+        }
+        Relationships: []
+      }
       carpool_needs: {
         Row: {
           created_at: string
@@ -5306,6 +5423,94 @@ export type Database = {
           },
         ]
       }
+      v_build_clubero_funnel: {
+        Row: {
+          beta_leads: number | null
+          duree_min_moyenne: number | null
+          newsletter_leads: number | null
+          sessions: number | null
+          terminees: number | null
+        }
+        Relationships: []
+      }
+      v_build_clubero_leads: {
+        Row: {
+          beta_consent_at: string | null
+          beta_opt_in: boolean | null
+          club: string | null
+          completed_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          newsletter_consent_at: string | null
+          newsletter_opt_in: boolean | null
+          phone: string | null
+        }
+        Insert: {
+          beta_consent_at?: string | null
+          beta_opt_in?: boolean | null
+          club?: string | null
+          completed_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          newsletter_consent_at?: string | null
+          newsletter_opt_in?: boolean | null
+          phone?: string | null
+        }
+        Update: {
+          beta_consent_at?: string | null
+          beta_opt_in?: boolean | null
+          club?: string | null
+          completed_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          newsletter_consent_at?: string | null
+          newsletter_opt_in?: boolean | null
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      v_build_clubero_numeric: {
+        Row: {
+          max: number | null
+          mediane: number | null
+          min: number | null
+          moyenne: number | null
+          n: number | null
+          question_key: string | null
+          question_type: string | null
+        }
+        Relationships: []
+      }
+      v_build_clubero_options: {
+        Row: {
+          n: number | null
+          option_key: string | null
+          question_key: string | null
+          question_type: string | null
+        }
+        Relationships: []
+      }
+      v_build_clubero_ranking: {
+        Row: {
+          avg_position: number | null
+          option_key: string | null
+          question_key: string | null
+          votes: number | null
+        }
+        Relationships: []
+      }
+      v_build_clubero_verbatims: {
+        Row: {
+          answer_text: string | null
+          club: string | null
+          created_at: string | null
+          question_key: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_tournament_invite: { Args: { _token: string }; Returns: Json }
@@ -5313,6 +5518,7 @@ export type Database = {
         Args: { _token: string; _user_id: string }
         Returns: string
       }
+      admin_build_clubero_dashboard: { Args: never; Returns: Json }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
@@ -5382,6 +5588,10 @@ export type Database = {
           payment_item_id: string
           player_id: string
         }[]
+      }
+      complete_build_clubero_response: {
+        Args: { p_contact?: Json; p_session_id: string }
+        Returns: undefined
       }
       compute_season_label: { Args: { _dt: string }; Returns: string }
       consume_single_entitlement: {
@@ -5667,6 +5877,15 @@ export type Database = {
         Args: { _id: string; _kind: string }
         Returns: undefined
       }
+      save_build_clubero_answer: {
+        Args: {
+          p_question_key: string
+          p_question_type: string
+          p_session_id: string
+          p_value: Json
+        }
+        Returns: undefined
+      }
       save_player_feedback: {
         Args: {
           _comment: string
@@ -5738,6 +5957,15 @@ export type Database = {
       soft_delete_entity: {
         Args: { _id: string; _kind: string }
         Returns: undefined
+      }
+      start_build_clubero_response: {
+        Args: {
+          p_device?: string
+          p_locale?: string
+          p_session_id: string
+          p_utm?: Json
+        }
+        Returns: string
       }
       unaccent_compat: { Args: { t: string }; Returns: string }
       update_player_review_content: {

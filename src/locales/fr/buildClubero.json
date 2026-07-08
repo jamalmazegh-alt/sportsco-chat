@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "title": "Construisons Clubero ensemble",
+    "description": "Aidez-nous à façonner Clubero : 3 minutes de questions pour dessiner l'app qui vous facilite vraiment la vie."
+  },
+  "hero": {
+    "badge": "≈ 3 minutes",
+    "title": "Construisons <accent>Clubero</accent> ensemble.",
+    "lead": "Vous êtes coach, dirigeant, parent bénévole. Vous savez ce qui vous fait perdre du temps et ce qui vous rendrait fier de votre équipe.",
+    "body": "Répondez à quelques questions rapides — sans jargon, sans engagement. Chaque réponse pèse dans les prochaines fonctionnalités.",
+    "meta": "Anonyme par défaut · Vos réponses restent en Europe",
+    "cta": "Je commence"
+  },
+  "progress": {
+    "question": "Question {{current}} / {{total}}",
+    "percent": "{{pct}}%"
+  },
+  "save": {
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "error": "Sauvegarde en attente"
+  },
+  "nav": {
+    "next": "Continuer",
+    "back": "Précédent",
+    "send": "Envoyer mes réponses",
+    "sending": "Envoi…",
+    "skip": "Passer",
+    "rankUp": "Monter",
+    "rankDown": "Descendre"
+  },
+  "slider": {
+    "value": "{{value}} h",
+    "valueMax": "15 h et +"
+  },
+  "text": {
+    "count": "{{count}} / {{max}}"
+  },
+  "hints": {
+    "multiMax": "Jusqu'à {{max}} réponses"
+  },
+  "questions": {
+    "audience": {
+      "title": "Vous entraînez plutôt…",
+      "subtitle": "Pour adapter Clubero à votre réalité de terrain.",
+      "options": {
+        "kids":   { "label": "Des enfants", "hint": "U6 – U11" },
+        "teens":  { "label": "Des ados", "hint": "U12 – U18" },
+        "adults": { "label": "Des adultes", "hint": "Séniors, loisirs" },
+        "mix":    { "label": "Un peu de tout", "hint": "Plusieurs catégories" }
+      }
+    },
+    "sport": {
+      "title": "Quel sport faites-vous vivre ?",
+      "subtitle": "Choisissez le principal.",
+      "options": {
+        "football": { "label": "Football" },
+        "basket":   { "label": "Basketball" },
+        "hand":     { "label": "Handball" },
+        "volley":   { "label": "Volleyball" },
+        "rugby":    { "label": "Rugby" },
+        "other":    { "label": "Autre" }
+      }
+    },
+    "timesinks": {
+      "title": "Qu'est-ce qui vous mange le plus de temps ?",
+      "subtitle": "Plusieurs réponses possibles — jusqu'à 3.",
+      "options": {
+        "convocations": { "label": "Les convocations" },
+        "presence":     { "label": "Le suivi des présences" },
+        "parents":      { "label": "La communication parents" },
+        "payments":     { "label": "Les paiements & cotisations" },
+        "planning":     { "label": "La planification" },
+        "results":      { "label": "Les résultats & stats" }
+      }
+    },
+    "hours": {
+      "title": "Combien d'heures d'organisation par semaine ?",
+      "subtitle": "Hors temps passé sur le terrain.",
+      "min": "0 h",
+      "max": "15 h +"
+    },
+    "satisfaction": {
+      "title": "Aujourd'hui, gérer votre équipe, c'est…",
+      "subtitle": "Soyez honnête, ça reste entre nous.",
+      "scale": {
+        "1": "Un casse-tête",
+        "2": "Fatigant",
+        "3": "Correct",
+        "4": "Plutôt fluide",
+        "5": "Un vrai plaisir"
+      }
+    },
+    "priorities": {
+      "title": "Classez ces idées, de la plus utile à la moins utile.",
+      "subtitle": "Le haut = le plus utile. Utilisez les flèches pour réordonner.",
+      "options": {
+        "ai_report":  { "label": "Bilan hebdo intelligent" },
+        "challenges": { "label": "Défis & tests physiques" },
+        "matchday":   { "label": "Organisation des matchs" },
+        "funding":    { "label": "Cagnotte & financement" },
+        "wall":       { "label": "Mur d'annonces du club" }
+      }
+    },
+    "currenttool": {
+      "title": "Aujourd'hui, vous gérez tout ça avec…",
+      "subtitle": "",
+      "options": {
+        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Groupes, messages" },
+        "excel":    { "label": "Excel / papier", "hint": "Feuilles, carnet" },
+        "app":      { "label": "Une autre appli", "hint": "TeamSnap, Spond…" },
+        "nothing":  { "label": "Rien de structuré", "hint": "À l'instinct" }
+      }
+    },
+    "onewish": {
+      "title": "Si Clubero pouvait vous enlever UNE corvée demain…",
+      "subtitle": "En une phrase, sans filtre.",
+      "placeholder": "Ex. : ne plus courir après les présences le samedi matin."
+    }
+  },
+  "done": {
+    "emoji": "🎉",
+    "title": "Merci, votre voix compte.",
+    "body": "Chaque réponse fait bouger Clubero dans la bonne direction. Voulez-vous que l'on garde le contact ?",
+    "contactTitle": "Restons en contact (optionnel)",
+    "form": {
+      "firstName": "Prénom",
+      "email": "Email",
+      "emailRequired": "Email (requis)",
+      "phone": "Téléphone",
+      "club": "Nom du club",
+      "newsletter": "Je veux recevoir les nouveautés Clubero par email",
+      "beta": "Je souhaite tester Clubero en avant-première (bêta)",
+      "consentHint": "Consentements enregistrés séparément. Désinscription en 1 clic.",
+      "errorEmail": "Email invalide"
+    },
+    "send": "Envoyer",
+    "skip": "Terminer sans laisser de contact",
+    "thanksTitle": "C'est envoyé !",
+    "thanksBody": "Merci d'avoir pris le temps. À très vite dans Clubero."
+  },
+  "errors": {
+    "submit": "Impossible d'envoyer. Vérifiez votre connexion et réessayez."
+  },
+  "admin": {
+    "title": "Construisons Clubero",
+    "subtitle": "Feedback public collecté sur /build-clubero",
+    "stats": {
+      "sessions": "Sessions démarrées",
+      "completed": "Sessions terminées",
+      "newsletter": "Leads newsletter",
+      "beta": "Leads bêta",
+      "duration": "Durée moyenne (min)"
+    },
+    "sections": {
+      "options": "Répartition des choix",
+      "ranking": "Classement moyen (1 = plus utile)",
+      "numeric": "Valeurs numériques",
+      "verbatims": "Verbatims libres",
+      "leads": "Contacts collectés"
+    },
+    "leads": {
+      "firstName": "Prénom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "club": "Club",
+      "newsletter": "Newsletter",
+      "beta": "Bêta",
+      "date": "Terminée le",
+      "exportCsv": "Exporter CSV"
+    },
+    "empty": "Aucune donnée pour le moment.",
+    "loadError": "Impossible de charger le tableau de bord."
+  }
+}

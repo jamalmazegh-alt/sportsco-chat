@@ -27,6 +27,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DnsCheckRouteImport } from './routes/dns-check'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BuildCluberoRouteImport } from './routes/build-clubero'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
@@ -40,6 +41,7 @@ import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
+import { Route as SuperadminBuildCluberoRouteImport } from './routes/superadmin/build-clubero'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
 import { Route as RegisterPlayerRouteImport } from './routes/register_.player'
 import { Route as RTokenRouteImport } from './routes/r.$token'
@@ -240,6 +242,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuildCluberoRoute = BuildCluberoRouteImport.update({
+  id: '/build-clubero',
+  path: '/build-clubero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -302,6 +309,11 @@ const SuperadminSettingsRoute = SuperadminSettingsRouteImport.update({
 const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminBuildCluberoRoute = SuperadminBuildCluberoRouteImport.update({
+  id: '/build-clubero',
+  path: '/build-clubero',
   getParentRoute: () => SuperadminRoute,
 } as any)
 const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
@@ -915,6 +927,7 @@ const ApiPublicTournamentIdRegulationsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -962,6 +975,7 @@ export interface FileRoutesByFullPath {
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1056,6 +1070,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -1099,6 +1114,7 @@ export interface FileRoutesByTo {
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1195,6 +1211,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -1242,6 +1259,7 @@ export interface FileRoutesById {
   '/r/$token': typeof RTokenRoute
   '/register_/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1338,6 +1356,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1385,6 +1404,7 @@ export interface FileRouteTypes {
     | '/r/$token'
     | '/register/player'
     | '/superadmin/billing'
+    | '/superadmin/build-clubero'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -1479,6 +1499,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1522,6 +1543,7 @@ export interface FileRouteTypes {
     | '/r/$token'
     | '/register/player'
     | '/superadmin/billing'
+    | '/superadmin/build-clubero'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -1617,6 +1639,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1664,6 +1687,7 @@ export interface FileRouteTypes {
     | '/r/$token'
     | '/register_/player'
     | '/superadmin/billing'
+    | '/superadmin/build-clubero'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -1760,6 +1784,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  BuildCluberoRoute: typeof BuildCluberoRoute
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
   DnsCheckRoute: typeof DnsCheckRoute
@@ -1960,6 +1985,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/build-clubero': {
+      id: '/build-clubero'
+      path: '/build-clubero'
+      fullPath: '/build-clubero'
+      preLoaderRoute: typeof BuildCluberoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -2049,6 +2081,13 @@ declare module '@tanstack/react-router' {
       path: '/logs'
       fullPath: '/superadmin/logs'
       preLoaderRoute: typeof SuperadminLogsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/build-clubero': {
+      id: '/superadmin/build-clubero'
+      path: '/build-clubero'
+      fullPath: '/superadmin/build-clubero'
+      preLoaderRoute: typeof SuperadminBuildCluberoRouteImport
       parentRoute: typeof SuperadminRoute
     }
     '/superadmin/billing': {
@@ -3083,6 +3122,7 @@ const SuperadminUsersRouteWithChildren = SuperadminUsersRoute._addFileChildren(
 
 interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
+  SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
@@ -3097,6 +3137,7 @@ interface SuperadminRouteChildren {
 
 const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminBillingRoute: SuperadminBillingRoute,
+  SuperadminBuildCluberoRoute: SuperadminBuildCluberoRoute,
   SuperadminLogsRoute: SuperadminLogsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
@@ -3144,6 +3185,7 @@ const TournamentSlugRegisterRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  BuildCluberoRoute: BuildCluberoRoute,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
   DnsCheckRoute: DnsCheckRoute,
