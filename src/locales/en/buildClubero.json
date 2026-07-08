@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "title": "Let's build Clubero together",
+    "description": "Help us shape Clubero — 3 minutes of questions to design the app that will actually make your life easier."
+  },
+  "hero": {
+    "badge": "≈ 3 minutes",
+    "title": "Let's build <accent>Clubero</accent> together.",
+    "lead": "You're a coach, a manager, a volunteering parent. You know what wastes your time and what would make you proud of your team.",
+    "body": "Answer a few quick questions — no jargon, no commitment. Every answer shapes the next features.",
+    "meta": "Anonymous by default · Your answers stay in Europe",
+    "cta": "Let's start"
+  },
+  "progress": {
+    "question": "Question {{current}} / {{total}}",
+    "percent": "{{pct}}%"
+  },
+  "save": {
+    "saving": "Saving…",
+    "saved": "Saved",
+    "error": "Save pending"
+  },
+  "nav": {
+    "next": "Continue",
+    "back": "Back",
+    "send": "Send my answers",
+    "sending": "Sending…",
+    "skip": "Skip",
+    "rankUp": "Move up",
+    "rankDown": "Move down"
+  },
+  "slider": {
+    "value": "{{value}} h",
+    "valueMax": "15 h and more"
+  },
+  "text": {
+    "count": "{{count}} / {{max}}"
+  },
+  "hints": {
+    "multiMax": "Up to {{max}} answers"
+  },
+  "questions": {
+    "audience": {
+      "title": "You mostly coach…",
+      "subtitle": "So we can tailor Clubero to your reality.",
+      "options": {
+        "kids":   { "label": "Kids", "hint": "U6 – U11" },
+        "teens":  { "label": "Teens", "hint": "U12 – U18" },
+        "adults": { "label": "Adults", "hint": "Seniors, leisure" },
+        "mix":    { "label": "A bit of everything", "hint": "Multiple categories" }
+      }
+    },
+    "sport": {
+      "title": "Which sport do you run?",
+      "subtitle": "Pick the main one.",
+      "options": {
+        "football": { "label": "Football" },
+        "basket":   { "label": "Basketball" },
+        "hand":     { "label": "Handball" },
+        "volley":   { "label": "Volleyball" },
+        "rugby":    { "label": "Rugby" },
+        "other":    { "label": "Other" }
+      }
+    },
+    "timesinks": {
+      "title": "What eats up most of your time?",
+      "subtitle": "Multiple answers allowed — up to 3.",
+      "options": {
+        "convocations": { "label": "Call-ups" },
+        "presence":     { "label": "Attendance tracking" },
+        "parents":      { "label": "Parent communication" },
+        "payments":     { "label": "Payments & fees" },
+        "planning":     { "label": "Planning" },
+        "results":      { "label": "Results & stats" }
+      }
+    },
+    "hours": {
+      "title": "How many admin hours per week?",
+      "subtitle": "Outside actual time on the pitch.",
+      "min": "0 h",
+      "max": "15 h +"
+    },
+    "satisfaction": {
+      "title": "Today, managing your team is…",
+      "subtitle": "Be honest, this stays between us.",
+      "scale": {
+        "1": "A headache",
+        "2": "Exhausting",
+        "3": "Okay",
+        "4": "Fairly smooth",
+        "5": "A real pleasure"
+      }
+    },
+    "priorities": {
+      "title": "Rank these ideas, most useful first.",
+      "subtitle": "Top = most useful. Use the arrows to reorder.",
+      "options": {
+        "ai_report":  { "label": "Smart weekly recap" },
+        "challenges": { "label": "Challenges & physical tests" },
+        "matchday":   { "label": "Match day organisation" },
+        "funding":    { "label": "Fundraising & pot" },
+        "wall":       { "label": "Club announcement wall" }
+      }
+    },
+    "currenttool": {
+      "title": "Today, you juggle all this with…",
+      "subtitle": "",
+      "options": {
+        "whatsapp": { "label": "WhatsApp / SMS", "hint": "Groups, messages" },
+        "excel":    { "label": "Excel / paper", "hint": "Sheets, notebook" },
+        "app":      { "label": "Another app", "hint": "TeamSnap, Spond…" },
+        "nothing":  { "label": "Nothing structured", "hint": "Just winging it" }
+      }
+    },
+    "onewish": {
+      "title": "If Clubero could take ONE chore off your plate tomorrow…",
+      "subtitle": "One sentence, no filter.",
+      "placeholder": "e.g. no more chasing attendance on Saturday mornings."
+    }
+  },
+  "done": {
+    "emoji": "🎉",
+    "title": "Thanks, your voice matters.",
+    "body": "Every answer pushes Clubero in the right direction. Want us to keep in touch?",
+    "contactTitle": "Stay in touch (optional)",
+    "form": {
+      "firstName": "First name",
+      "email": "Email",
+      "emailRequired": "Email (required)",
+      "phone": "Phone",
+      "club": "Club name",
+      "newsletter": "Send me Clubero news by email",
+      "beta": "I want to try Clubero in early access (beta)",
+      "consentHint": "Consents stored separately. One-click unsubscribe.",
+      "errorEmail": "Invalid email"
+    },
+    "send": "Send",
+    "skip": "Finish without leaving contact",
+    "thanksTitle": "Sent!",
+    "thanksBody": "Thanks for taking the time. See you very soon on Clubero."
+  },
+  "errors": {
+    "submit": "Could not send. Check your connection and try again."
+  },
+  "admin": {
+    "title": "Build Clubero",
+    "subtitle": "Public feedback collected at /build-clubero",
+    "stats": {
+      "sessions": "Sessions started",
+      "completed": "Sessions completed",
+      "newsletter": "Newsletter leads",
+      "beta": "Beta leads",
+      "duration": "Avg duration (min)"
+    },
+    "sections": {
+      "options": "Answer distribution",
+      "ranking": "Average ranking (1 = most useful)",
+      "numeric": "Numeric values",
+      "verbatims": "Free-text verbatims",
+      "leads": "Collected contacts"
+    },
+    "leads": {
+      "firstName": "First name",
+      "email": "Email",
+      "phone": "Phone",
+      "club": "Club",
+      "newsletter": "Newsletter",
+      "beta": "Beta",
+      "date": "Completed on",
+      "exportCsv": "Export CSV"
+    },
+    "empty": "No data yet.",
+    "loadError": "Could not load the dashboard."
+  }
+}
