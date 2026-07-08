@@ -18,7 +18,8 @@
   "save": {
     "saving": "Salvataggio…",
     "saved": "Salvato",
-    "error": "Salvataggio in sospeso"
+    "error": "Salvataggio in sospeso",
+    "retrying": "Salvataggio temporaneamente non disponibile, nuovo tentativo…"
   },
   "nav": {
     "next": "Continua",
@@ -197,7 +198,7 @@
     "thanksTitle": "Inviato!",
     "thanksBody": "Grazie per il tempo. A presto su Clubero.",
     "privacy": {
-      "notice": "Selezionando, consenti a Clubero di conservare questi dati per ricontattarti. Vedi la nostra <link>informativa sulla privacy</link>.",
+      "notice": "Questi dati vengono usati solo per inviarti la newsletter e/o l'accesso beta se selezioni le caselle corrispondenti. Vedi la nostra <link>informativa sulla privacy</link>.",
       "linkText": "informativa sulla privacy"
     }
   },
