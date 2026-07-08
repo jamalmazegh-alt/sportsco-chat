@@ -208,11 +208,14 @@ export function useBuildCluberoSession({
   const complete = useCallback(
     async (contact: ContactPayload) => {
       await flush();
-      const { error } = await supabase.rpc("complete_build_clubero_response" as never, {
-        p_session_id: sessionId,
-        p_contact: (contact ?? null) as never,
-      } as never);
-      if (error) throw new Error(error.message);
+      const res = await postJson("/complete", {
+        session_id: sessionId,
+        contact,
+      });
+      if (!res.ok) {
+        const err = (res.body as { error?: string } | null)?.error ?? `http_${res.status}`;
+        throw new Error(err);
+      }
     },
     [flush, sessionId],
   );
