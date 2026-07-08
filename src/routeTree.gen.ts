@@ -27,6 +27,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DnsCheckRouteImport } from './routes/dns-check'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BuildCluberoRouteImport } from './routes/build-clubero'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
@@ -238,6 +239,11 @@ const DemoRoute = DemoRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildCluberoRoute = BuildCluberoRouteImport.update({
+  id: '/build-clubero',
+  path: '/build-clubero',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -915,6 +921,7 @@ const ApiPublicTournamentIdRegulationsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -1056,6 +1063,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -1195,6 +1203,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/build-clubero': typeof BuildCluberoRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -1338,6 +1347,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1479,6 +1489,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1617,6 +1628,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/build-clubero'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1760,6 +1772,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  BuildCluberoRoute: typeof BuildCluberoRoute
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
   DnsCheckRoute: typeof DnsCheckRoute
@@ -1958,6 +1971,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/build-clubero': {
+      id: '/build-clubero'
+      path: '/build-clubero'
+      fullPath: '/build-clubero'
+      preLoaderRoute: typeof BuildCluberoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -3144,6 +3164,7 @@ const TournamentSlugRegisterRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  BuildCluberoRoute: BuildCluberoRoute,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
   DnsCheckRoute: DnsCheckRoute,
