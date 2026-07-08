@@ -197,7 +197,7 @@
     "thanksTitle": "¡Enviado!",
     "thanksBody": "Gracias por tu tiempo. Hasta pronto en Clubero.",
     "privacy": {
-      "notice": "Al marcar, autoriza a Clubero a conservar estos datos para contactarle. Vea nuestra {{link}}.",
+      "notice": "Al marcar, autoriza a Clubero a conservar estos datos para contactarle. Vea nuestra <link>política de privacidad</link>.",
       "linkText": "política de privacidad"
     }
   },

@@ -197,7 +197,7 @@
     "thanksTitle": "Verzonden!",
     "thanksBody": "Bedankt voor je tijd. Tot snel in Clubero.",
     "privacy": {
-      "notice": "Door aan te vinken geeft u Clubero toestemming om deze gegevens te bewaren om contact op te nemen. Zie ons {{link}}.",
+      "notice": "Door aan te vinken geeft u Clubero toestemming om deze gegevens te bewaren om contact op te nemen. Zie ons <link>privacybeleid</link>.",
       "linkText": "privacybeleid"
     }
   },
