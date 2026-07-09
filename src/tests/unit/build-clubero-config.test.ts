@@ -67,15 +67,31 @@ describe("build-clubero-config", () => {
   describe("contact payload", () => {
     const base: ContactFormValues = {
       first_name: "Alice",
+      last_name: "Martin",
       email: "a@b.co",
       phone: "",
-      club: "",
+      club: "FC Test",
       newsletter: false,
       beta: false,
     };
 
-    it("returns null when no opt-in", () => {
-      expect(buildContactPayload(base)).toBeNull();
+    it("returns null when identity is incomplete", () => {
+      expect(buildContactPayload({ ...base, first_name: "" })).toBeNull();
+      expect(buildContactPayload({ ...base, last_name: "" })).toBeNull();
+      expect(buildContactPayload({ ...base, club: "" })).toBeNull();
+      expect(isContactValid({ ...base, first_name: "" })).toBe(false);
+      expect(isContactValid({ ...base, last_name: "" })).toBe(false);
+      expect(isContactValid({ ...base, club: "" })).toBe(false);
+    });
+
+    it("returns payload when identity is complete (no opt-in)", () => {
+      const p = buildContactPayload(base);
+      expect(p).not.toBeNull();
+      expect(p?.first_name).toBe("Alice");
+      expect(p?.last_name).toBe("Martin");
+      expect(p?.club).toBe("FC Test");
+      expect(p?.newsletter).toBe(false);
+      expect(p?.beta).toBe(false);
       expect(isContactValid(base)).toBe(true);
     });
 
@@ -98,13 +114,14 @@ describe("build-clubero-config", () => {
       expect(p?.beta).toBe(true);
     });
 
-    it("email required only when consent", () => {
+    it("email required and valid when consent + identity ok", () => {
       expect(isContactValid({ ...base, email: "invalid" })).toBe(true); // no consent
       expect(isContactValid({ ...base, newsletter: true, email: "invalid" })).toBe(false);
       expect(isContactValid({ ...base, beta: true, email: "" })).toBe(false);
       expect(isContactValid({ ...base, newsletter: true, email: "ok@x.io" })).toBe(true);
     });
   });
+
 
   it("parseUtm extracts utm params", () => {
     expect(parseUtm("")).toBeNull();
