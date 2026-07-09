@@ -20,6 +20,7 @@ const NAV_LEFT = [
 const NAV_RIGHT = [
   { to: "/faq", key: "faq" },
   { to: "/contact", key: "contact" },
+  { to: "/build-clubero", key: "buildClubero" },
 ] as const;
 
 const LOCALIZED_NAV = {
