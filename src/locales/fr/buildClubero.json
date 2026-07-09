@@ -207,7 +207,12 @@
       "newsletter": "Je veux recevoir les nouveautés Clubero par email",
       "beta": "Je souhaite tester Clubero en avant-première (bêta)",
       "consentHint": "Consentements enregistrés séparément. Désinscription en 1 clic.",
-      "errorEmail": "Email invalide"
+      "errorEmail": "Email invalide",
+      "lastName": "Nom",
+      "firstNameRequired": "Prénom (requis)",
+      "lastNameRequired": "Nom (requis)",
+      "clubRequired": "Nom du club (requis)",
+      "errorRequired": "Champ requis"
     },
     "send": "Envoyer",
     "skip": "Terminer sans laisser de contact",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Bêta",
       "date": "Terminée le",
-      "exportCsv": "Exporter CSV"
+      "exportCsv": "Exporter CSV",
+      "lastName": "Nom"
     },
     "empty": "Aucune donnée pour le moment.",
     "loadError": "Impossible de charger le tableau de bord.",

@@ -776,6 +776,7 @@ function DoneScreen({
   const { t } = useTranslation("buildClubero");
   const [values, setValues] = useState<ContactFormValues>({
     first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     club: "",
@@ -786,16 +787,25 @@ function DoneScreen({
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [emailTouched, setEmailTouched] = useState(false);
+  const [identityTouched, setIdentityTouched] = useState(false);
 
   const contactRequested = values.newsletter || values.beta;
   const emailInvalid = contactRequested && emailTouched && !emailOk(values.email);
+  const firstNameInvalid = identityTouched && values.first_name.trim().length === 0;
+  const lastNameInvalid = identityTouched && values.last_name.trim().length === 0;
+  const clubInvalid = identityTouched && values.club.trim().length === 0;
   const canSubmit = !sending && isContactValid(values);
+
 
   const submit = async (withContact: boolean) => {
     setErr(null);
-    if (withContact) setEmailTouched(true);
+    if (withContact) {
+      setEmailTouched(true);
+      setIdentityTouched(true);
+    }
     const payload = withContact ? buildContactPayload(values) : null;
     if (withContact && !isContactValid(values)) return;
+
     setSending(true);
     try {
       await onComplete(payload);
@@ -837,12 +847,40 @@ function DoneScreen({
           {t("done.contactTitle")}
         </h2>
         <div className="flex flex-col gap-3">
-          <Field label={t("done.form.firstName")}>
+          <Field
+            label={t("done.form.firstNameRequired")}
+            error={firstNameInvalid ? t("done.form.errorRequired") : null}
+          >
             <input
               type="text"
               value={values.first_name}
               onChange={(e) => setValues((v) => ({ ...v, first_name: e.target.value }))}
-              className="bc-input"
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", firstNameInvalid && "border-[#ff6b81]")}
+            />
+          </Field>
+          <Field
+            label={t("done.form.lastNameRequired")}
+            error={lastNameInvalid ? t("done.form.errorRequired") : null}
+          >
+            <input
+              type="text"
+              value={values.last_name}
+              onChange={(e) => setValues((v) => ({ ...v, last_name: e.target.value }))}
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", lastNameInvalid && "border-[#ff6b81]")}
+            />
+          </Field>
+          <Field
+            label={t("done.form.clubRequired")}
+            error={clubInvalid ? t("done.form.errorRequired") : null}
+          >
+            <input
+              type="text"
+              value={values.club}
+              onChange={(e) => setValues((v) => ({ ...v, club: e.target.value }))}
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", clubInvalid && "border-[#ff6b81]")}
             />
           </Field>
           <Field
@@ -869,14 +907,7 @@ function DoneScreen({
               className="bc-input"
             />
           </Field>
-          <Field label={t("done.form.club")}>
-            <input
-              type="text"
-              value={values.club}
-              onChange={(e) => setValues((v) => ({ ...v, club: e.target.value }))}
-              className="bc-input"
-            />
-          </Field>
+
           <label className="mt-2 flex items-start gap-3 text-sm text-white/80">
             <input
               type="checkbox"

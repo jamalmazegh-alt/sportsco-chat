@@ -207,7 +207,12 @@
       "newsletter": "Ik wil Clubero-nieuws per e-mail ontvangen",
       "beta": "Ik wil Clubero vervroegd testen (bèta)",
       "consentHint": "Toestemmingen apart opgeslagen. Uitschrijven in 1 klik.",
-      "errorEmail": "Ongeldige e-mail"
+      "errorEmail": "Ongeldige e-mail",
+      "lastName": "Achternaam",
+      "firstNameRequired": "Voornaam (vereist)",
+      "lastNameRequired": "Achternaam (vereist)",
+      "clubRequired": "Clubnaam (vereist)",
+      "errorRequired": "Verplicht"
     },
     "send": "Versturen",
     "skip": "Afronden zonder contact",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Voltooid op",
-      "exportCsv": "CSV exporteren"
+      "exportCsv": "CSV exporteren",
+      "lastName": "Achternaam"
     },
     "empty": "Nog geen data.",
     "loadError": "Dashboard kon niet geladen worden.",

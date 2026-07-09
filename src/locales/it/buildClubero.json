@@ -207,7 +207,12 @@
       "newsletter": "Voglio ricevere le novità Clubero via email",
       "beta": "Voglio provare Clubero in anteprima (beta)",
       "consentHint": "Consensi registrati separatamente. Disiscrizione in 1 click.",
-      "errorEmail": "Email non valida"
+      "errorEmail": "Email non valida",
+      "lastName": "Cognome",
+      "firstNameRequired": "Nome (obbligatorio)",
+      "lastNameRequired": "Cognome (obbligatorio)",
+      "clubRequired": "Nome del club (obbligatorio)",
+      "errorRequired": "Obbligatorio"
     },
     "send": "Invia",
     "skip": "Termina senza lasciare contatti",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Completata il",
-      "exportCsv": "Esporta CSV"
+      "exportCsv": "Esporta CSV",
+      "lastName": "Cognome"
     },
     "empty": "Nessun dato al momento.",
     "loadError": "Impossibile caricare la dashboard.",

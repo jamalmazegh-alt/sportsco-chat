@@ -207,7 +207,12 @@
       "newsletter": "Ich möchte Clubero-News per E-Mail erhalten",
       "beta": "Ich möchte Clubero im Beta testen",
       "consentHint": "Einwilligungen werden separat gespeichert. Abbestellen mit einem Klick.",
-      "errorEmail": "Ungültige E-Mail"
+      "errorEmail": "Ungültige E-Mail",
+      "lastName": "Nachname",
+      "firstNameRequired": "Vorname (erforderlich)",
+      "lastNameRequired": "Nachname (erforderlich)",
+      "clubRequired": "Vereinsname (erforderlich)",
+      "errorRequired": "Pflichtfeld"
     },
     "send": "Senden",
     "skip": "Beenden ohne Kontakt zu hinterlassen",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Abgeschlossen am",
-      "exportCsv": "CSV exportieren"
+      "exportCsv": "CSV exportieren",
+      "lastName": "Nachname"
     },
     "empty": "Noch keine Daten.",
     "loadError": "Dashboard konnte nicht geladen werden.",

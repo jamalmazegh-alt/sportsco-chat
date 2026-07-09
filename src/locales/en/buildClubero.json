@@ -207,7 +207,12 @@
       "newsletter": "Send me Clubero news by email",
       "beta": "I want to try Clubero in early access (beta)",
       "consentHint": "Consents stored separately. One-click unsubscribe.",
-      "errorEmail": "Invalid email"
+      "errorEmail": "Invalid email",
+      "lastName": "Last name",
+      "firstNameRequired": "First name (required)",
+      "lastNameRequired": "Last name (required)",
+      "clubRequired": "Club name (required)",
+      "errorRequired": "Required"
     },
     "send": "Send",
     "skip": "Finish without leaving contact",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Completed on",
-      "exportCsv": "Export CSV"
+      "exportCsv": "Export CSV",
+      "lastName": "Last name"
     },
     "empty": "No data yet.",
     "loadError": "Could not load the dashboard.",

@@ -192,6 +192,7 @@ export type AnswersMap = Record<string, unknown>;
 
 export type ContactPayload = {
   first_name: string | null;
+  last_name: string | null;
   email: string | null;
   phone: string | null;
   club: string | null;
@@ -201,6 +202,7 @@ export type ContactPayload = {
 
 export interface ContactFormValues {
   first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   club: string;
@@ -208,11 +210,22 @@ export interface ContactFormValues {
   beta: boolean;
 }
 
-/** Retourne le payload à envoyer à `complete_build_clubero_response`. */
+/** Champs d'identification obligatoires pour envoyer le contact. */
+export function hasRequiredIdentity(v: ContactFormValues): boolean {
+  return (
+    v.first_name.trim().length > 0 &&
+    v.last_name.trim().length > 0 &&
+    v.club.trim().length > 0
+  );
+}
+
+/** Retourne le payload à envoyer à `complete_build_clubero_response`.
+ * Renvoie null tant que les champs identité obligatoires ne sont pas remplis. */
 export function buildContactPayload(v: ContactFormValues): ContactPayload {
-  if (!v.newsletter && !v.beta) return null;
+  if (!hasRequiredIdentity(v)) return null;
   return {
     first_name: v.first_name.trim() || null,
+    last_name: v.last_name.trim() || null,
     email: v.email.trim() || null,
     phone: v.phone.trim() || null,
     club: v.club.trim() || null,
@@ -221,11 +234,15 @@ export function buildContactPayload(v: ContactFormValues): ContactPayload {
   };
 }
 
-/** true si l'email est requis (au moins un opt-in coché) et valide. */
+/** true si le formulaire contact peut être soumis:
+ * - identité (prénom, nom, club) requise
+ * - email requis + valide si opt-in newsletter/beta */
 export function isContactValid(v: ContactFormValues): boolean {
-  if (!v.newsletter && !v.beta) return true;
-  return emailOk(v.email);
+  if (!hasRequiredIdentity(v)) return false;
+  if (v.newsletter || v.beta) return emailOk(v.email);
+  return true;
 }
+
 
 /** UTM basiques à envoyer au backend (JSONB). */
 export function parseUtm(search: string): Record<string, string> | null {

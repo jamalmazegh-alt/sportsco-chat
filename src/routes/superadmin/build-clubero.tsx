@@ -56,6 +56,7 @@ interface VerbatimRow {
 interface LeadRow {
   id: string;
   first_name: string | null;
+  last_name: string | null;
   email: string | null;
   phone: string | null;
   club: string | null;
@@ -77,7 +78,9 @@ interface ResponseRow {
   status: "in_progress" | "completed";
   locale: string;
   first_name: string | null;
+  last_name: string | null;
   email: string | null;
+  phone: string | null;
   club: string | null;
   newsletter_opt_in: boolean;
   beta_opt_in: boolean;
@@ -85,6 +88,7 @@ interface ResponseRow {
   completed_at: string | null;
   answers: AnswerRow[];
 }
+
 interface Dashboard {
   overview: OverviewRow | null;
   options: OptionRow[];
@@ -361,6 +365,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
     const csv = toCsv(
       leads.map((l) => ({
         first_name: l.first_name ?? "",
+        last_name: l.last_name ?? "",
         email: l.email ?? "",
         phone: l.phone ?? "",
         club: l.club ?? "",
@@ -372,6 +377,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
       })),
       [
         { key: "first_name", header: t("admin.leads.firstName") },
+        { key: "last_name", header: t("admin.leads.lastName") },
         { key: "email", header: t("admin.leads.email") },
         { key: "phone", header: t("admin.leads.phone") },
         { key: "club", header: t("admin.leads.club") },
@@ -403,6 +409,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
               <th className="p-2">{t("admin.leads.firstName")}</th>
+              <th className="p-2">{t("admin.leads.lastName")}</th>
               <th className="p-2">{t("admin.leads.email")}</th>
               <th className="p-2">{t("admin.leads.phone")}</th>
               <th className="p-2">{t("admin.leads.club")}</th>
@@ -415,6 +422,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
             {leads.map((l) => (
               <tr key={l.id} className="border-t border-border/60">
                 <td className="p-2">{l.first_name ?? "—"}</td>
+                <td className="p-2">{l.last_name ?? "—"}</td>
                 <td className="p-2 font-mono text-xs">{l.email ?? "—"}</td>
                 <td className="p-2">{l.phone ?? "—"}</td>
                 <td className="p-2">{l.club ?? "—"}</td>
@@ -444,6 +452,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
           </tbody>
         </table>
       </div>
+
       {/* keep bundle import used */}
       <span className="hidden">{QUESTIONS.length}</span>
     </div>
@@ -460,8 +469,10 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
     <div className="space-y-2">
       {responses.map((r) => {
         const isOpen = openId === r.id;
+        const fullName = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
         const identity =
-          r.first_name || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+          fullName || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+
         return (
           <div key={r.id} className="rounded-xl border border-border bg-card">
             <button

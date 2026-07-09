@@ -180,6 +180,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          last_name: string | null
           locale: string
           newsletter_consent_at: string | null
           newsletter_opt_in: boolean
@@ -199,6 +200,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          last_name?: string | null
           locale?: string
           newsletter_consent_at?: string | null
           newsletter_opt_in?: boolean
@@ -218,6 +220,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          last_name?: string | null
           locale?: string
           newsletter_consent_at?: string | null
           newsletter_opt_in?: boolean
@@ -5442,6 +5445,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string | null
+          last_name: string | null
           newsletter_consent_at: string | null
           newsletter_opt_in: boolean | null
           phone: string | null
@@ -5454,6 +5458,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string | null
+          last_name?: string | null
           newsletter_consent_at?: string | null
           newsletter_opt_in?: boolean | null
           phone?: string | null
@@ -5466,6 +5471,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string | null
+          last_name?: string | null
           newsletter_consent_at?: string | null
           newsletter_opt_in?: boolean | null
           phone?: string | null
