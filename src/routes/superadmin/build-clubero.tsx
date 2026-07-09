@@ -498,7 +498,7 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
           <div key={r.id} className="rounded-xl border border-border bg-card">
             <button
               type="button"
-              onClick={() => setOpenId(isOpen ? null : r.id)}
+              onClick={() => toggle(r.id)}
               className="flex w-full items-center gap-3 p-3 text-left hover:bg-muted/40"
             >
               <span
