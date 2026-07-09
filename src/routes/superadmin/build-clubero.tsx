@@ -56,6 +56,7 @@ interface VerbatimRow {
 interface LeadRow {
   id: string;
   first_name: string | null;
+  last_name: string | null;
   email: string | null;
   phone: string | null;
   club: string | null;
@@ -77,7 +78,9 @@ interface ResponseRow {
   status: "in_progress" | "completed";
   locale: string;
   first_name: string | null;
+  last_name: string | null;
   email: string | null;
+  phone: string | null;
   club: string | null;
   newsletter_opt_in: boolean;
   beta_opt_in: boolean;
@@ -85,6 +88,7 @@ interface ResponseRow {
   completed_at: string | null;
   answers: AnswerRow[];
 }
+
 interface Dashboard {
   overview: OverviewRow | null;
   options: OptionRow[];
