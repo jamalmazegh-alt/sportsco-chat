@@ -105,6 +105,8 @@ function BuildCluberoDashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [responsesErr, setResponsesErr] = useState<string | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -117,7 +119,15 @@ function BuildCluberoDashboard() {
         setErr(t("admin.loadError"));
       } else {
         const base = raw as unknown as Omit<Dashboard, "responses">;
-        const responses = (!errResp && Array.isArray(rawResp) ? (rawResp as ResponseRow[]) : []);
+        let parsed: unknown = rawResp;
+        if (typeof parsed === "string") {
+          try { parsed = JSON.parse(parsed); } catch { /* ignore */ }
+        }
+        const responses = Array.isArray(parsed) ? (parsed as ResponseRow[]) : [];
+        if (errResp) {
+          console.warn("[build-clubero admin] responses RPC error", errResp);
+          setResponsesErr(errResp.message ?? "error");
+        }
         setData({ ...base, responses });
       }
       setLoading(false);
