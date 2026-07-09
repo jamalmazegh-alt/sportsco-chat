@@ -183,7 +183,11 @@ function BuildCluberoDashboard() {
       </Section>
 
       <Section title={t("admin.responses.title")}>
-        <ResponsesList responses={data.responses} />
+        {responsesErr ? (
+          <p className="text-sm text-destructive">{responsesErr}</p>
+        ) : (
+          <ResponsesList responses={data.responses} />
+        )}
       </Section>
     </div>
   );
