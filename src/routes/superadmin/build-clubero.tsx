@@ -469,8 +469,10 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
     <div className="space-y-2">
       {responses.map((r) => {
         const isOpen = openId === r.id;
+        const fullName = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
         const identity =
-          r.first_name || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+          fullName || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+
         return (
           <div key={r.id} className="rounded-xl border border-border bg-card">
             <button
