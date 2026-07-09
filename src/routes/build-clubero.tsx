@@ -776,6 +776,7 @@ function DoneScreen({
   const { t } = useTranslation("buildClubero");
   const [values, setValues] = useState<ContactFormValues>({
     first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     club: "",
@@ -786,10 +787,15 @@ function DoneScreen({
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [emailTouched, setEmailTouched] = useState(false);
+  const [identityTouched, setIdentityTouched] = useState(false);
 
   const contactRequested = values.newsletter || values.beta;
   const emailInvalid = contactRequested && emailTouched && !emailOk(values.email);
+  const firstNameInvalid = identityTouched && values.first_name.trim().length === 0;
+  const lastNameInvalid = identityTouched && values.last_name.trim().length === 0;
+  const clubInvalid = identityTouched && values.club.trim().length === 0;
   const canSubmit = !sending && isContactValid(values);
+
 
   const submit = async (withContact: boolean) => {
     setErr(null);
