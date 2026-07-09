@@ -162,6 +162,18 @@ function BuildCluberoDashboard() {
 
       <StatsGrid overview={data.overview} />
 
+      <Section title={t("admin.responses.title")}>
+        {responsesErr ? (
+          <p className="text-sm text-destructive">{responsesErr}</p>
+        ) : (
+          <ResponsesList responses={data.responses} />
+        )}
+      </Section>
+
+      <Section title={t("admin.sections.leads")}>
+        <LeadsTable leads={data.leads} />
+      </Section>
+
       <Section title={t("admin.sections.options")}>
         <OptionsCharts options={data.options} />
       </Section>
@@ -176,18 +188,6 @@ function BuildCluberoDashboard() {
 
       <Section title={t("admin.sections.verbatims")}>
         <VerbatimsList items={data.verbatims} />
-      </Section>
-
-      <Section title={t("admin.sections.leads")}>
-        <LeadsTable leads={data.leads} />
-      </Section>
-
-      <Section title={t("admin.responses.title")}>
-        {responsesErr ? (
-          <p className="text-sm text-destructive">{responsesErr}</p>
-        ) : (
-          <ResponsesList responses={data.responses} />
-        )}
       </Section>
     </div>
   );
