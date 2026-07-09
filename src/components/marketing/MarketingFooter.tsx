@@ -75,6 +75,11 @@ export function MarketingFooter() {
                   {t("nav.contact")}
                 </Link>
               </li>
+              <li>
+                <Link to="/build-clubero" className="hover:text-foreground">
+                  {t("nav.buildClubero")}
+                </Link>
+              </li>
             </ul>
           </div>
 
