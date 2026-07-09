@@ -475,14 +475,21 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
 
 function ResponsesList({ responses }: { responses: ResponseRow[] }) {
   const { t } = useTranslation("buildClubero");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
   if (!responses.length) {
     return <p className="text-sm text-muted-foreground">{t("admin.responses.empty")}</p>;
   }
+  const toggle = (id: string) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
   return (
     <div className="space-y-2">
       {responses.map((r) => {
-        const isOpen = openId === r.id;
+        const isOpen = !collapsedIds.has(r.id);
         const fullName = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
         const identity =
           fullName || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
