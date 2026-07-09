@@ -105,6 +105,8 @@ function BuildCluberoDashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [responsesErr, setResponsesErr] = useState<string | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -117,7 +119,15 @@ function BuildCluberoDashboard() {
         setErr(t("admin.loadError"));
       } else {
         const base = raw as unknown as Omit<Dashboard, "responses">;
-        const responses = (!errResp && Array.isArray(rawResp) ? (rawResp as ResponseRow[]) : []);
+        let parsed: unknown = rawResp;
+        if (typeof parsed === "string") {
+          try { parsed = JSON.parse(parsed); } catch { /* ignore */ }
+        }
+        const responses = Array.isArray(parsed) ? (parsed as ResponseRow[]) : [];
+        if (errResp) {
+          console.warn("[build-clubero admin] responses RPC error", errResp);
+          setResponsesErr(errResp.message ?? "error");
+        }
         setData({ ...base, responses });
       }
       setLoading(false);
@@ -152,6 +162,18 @@ function BuildCluberoDashboard() {
 
       <StatsGrid overview={data.overview} />
 
+      <Section title={t("admin.responses.title")}>
+        {responsesErr ? (
+          <p className="text-sm text-destructive">{responsesErr}</p>
+        ) : (
+          <ResponsesList responses={data.responses} />
+        )}
+      </Section>
+
+      <Section title={t("admin.sections.leads")}>
+        <LeadsTable leads={data.leads} />
+      </Section>
+
       <Section title={t("admin.sections.options")}>
         <OptionsCharts options={data.options} />
       </Section>
@@ -166,14 +188,6 @@ function BuildCluberoDashboard() {
 
       <Section title={t("admin.sections.verbatims")}>
         <VerbatimsList items={data.verbatims} />
-      </Section>
-
-      <Section title={t("admin.sections.leads")}>
-        <LeadsTable leads={data.leads} />
-      </Section>
-
-      <Section title={t("admin.responses.title")}>
-        <ResponsesList responses={data.responses} />
       </Section>
     </div>
   );
@@ -461,14 +475,21 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
 
 function ResponsesList({ responses }: { responses: ResponseRow[] }) {
   const { t } = useTranslation("buildClubero");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
   if (!responses.length) {
     return <p className="text-sm text-muted-foreground">{t("admin.responses.empty")}</p>;
   }
+  const toggle = (id: string) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
   return (
     <div className="space-y-2">
       {responses.map((r) => {
-        const isOpen = openId === r.id;
+        const isOpen = !collapsedIds.has(r.id);
         const fullName = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
         const identity =
           fullName || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
@@ -477,7 +498,7 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
           <div key={r.id} className="rounded-xl border border-border bg-card">
             <button
               type="button"
-              onClick={() => setOpenId(isOpen ? null : r.id)}
+              onClick={() => toggle(r.id)}
               className="flex w-full items-center gap-3 p-3 text-left hover:bg-muted/40"
             >
               <span
