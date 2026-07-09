@@ -799,9 +799,13 @@ function DoneScreen({
 
   const submit = async (withContact: boolean) => {
     setErr(null);
-    if (withContact) setEmailTouched(true);
+    if (withContact) {
+      setEmailTouched(true);
+      setIdentityTouched(true);
+    }
     const payload = withContact ? buildContactPayload(values) : null;
     if (withContact && !isContactValid(values)) return;
+
     setSending(true);
     try {
       await onComplete(payload);
