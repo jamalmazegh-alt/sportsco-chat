@@ -9,7 +9,8 @@
     "lead": "You're a coach, a manager, a volunteering parent. You know what wastes your time and what would make you proud of your team.",
     "body": "Answer a few quick questions — no jargon, no commitment. Every answer shapes the next features.",
     "meta": "Anonymous by default · Your answers stay in Europe",
-    "cta": "Let's start"
+    "cta": "Let's start",
+    "backToSite": "Back to site"
   },
   "progress": {
     "question": "Question {{current}} / {{total}}",

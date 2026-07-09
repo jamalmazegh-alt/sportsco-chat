@@ -9,7 +9,8 @@
     "lead": "Eres entrenador, dirigente o padre voluntario. Sabes lo que te hace perder el tiempo y lo que te enorgullecería de tu equipo.",
     "body": "Responde a unas preguntas rápidas — sin jerga, sin compromiso. Cada respuesta cuenta.",
     "meta": "Anónimo por defecto · Tus respuestas se quedan en Europa",
-    "cta": "Empiezo"
+    "cta": "Empiezo",
+    "backToSite": "Volver al sitio"
   },
   "progress": {
     "question": "Pregunta {{current}} / {{total}}",
