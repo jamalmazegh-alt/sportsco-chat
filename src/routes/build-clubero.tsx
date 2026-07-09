@@ -847,12 +847,40 @@ function DoneScreen({
           {t("done.contactTitle")}
         </h2>
         <div className="flex flex-col gap-3">
-          <Field label={t("done.form.firstName")}>
+          <Field
+            label={t("done.form.firstNameRequired")}
+            error={firstNameInvalid ? t("done.form.errorRequired") : null}
+          >
             <input
               type="text"
               value={values.first_name}
               onChange={(e) => setValues((v) => ({ ...v, first_name: e.target.value }))}
-              className="bc-input"
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", firstNameInvalid && "border-[#ff6b81]")}
+            />
+          </Field>
+          <Field
+            label={t("done.form.lastNameRequired")}
+            error={lastNameInvalid ? t("done.form.errorRequired") : null}
+          >
+            <input
+              type="text"
+              value={values.last_name}
+              onChange={(e) => setValues((v) => ({ ...v, last_name: e.target.value }))}
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", lastNameInvalid && "border-[#ff6b81]")}
+            />
+          </Field>
+          <Field
+            label={t("done.form.clubRequired")}
+            error={clubInvalid ? t("done.form.errorRequired") : null}
+          >
+            <input
+              type="text"
+              value={values.club}
+              onChange={(e) => setValues((v) => ({ ...v, club: e.target.value }))}
+              onBlur={() => setIdentityTouched(true)}
+              className={cn("bc-input", clubInvalid && "border-[#ff6b81]")}
             />
           </Field>
           <Field
@@ -879,14 +907,7 @@ function DoneScreen({
               className="bc-input"
             />
           </Field>
-          <Field label={t("done.form.club")}>
-            <input
-              type="text"
-              value={values.club}
-              onChange={(e) => setValues((v) => ({ ...v, club: e.target.value }))}
-              className="bc-input"
-            />
-          </Field>
+
           <label className="mt-2 flex items-start gap-3 text-sm text-white/80">
             <input
               type="checkbox"
