@@ -365,6 +365,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
     const csv = toCsv(
       leads.map((l) => ({
         first_name: l.first_name ?? "",
+        last_name: l.last_name ?? "",
         email: l.email ?? "",
         phone: l.phone ?? "",
         club: l.club ?? "",
@@ -376,6 +377,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
       })),
       [
         { key: "first_name", header: t("admin.leads.firstName") },
+        { key: "last_name", header: t("admin.leads.lastName") },
         { key: "email", header: t("admin.leads.email") },
         { key: "phone", header: t("admin.leads.phone") },
         { key: "club", header: t("admin.leads.club") },
@@ -407,6 +409,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
               <th className="p-2">{t("admin.leads.firstName")}</th>
+              <th className="p-2">{t("admin.leads.lastName")}</th>
               <th className="p-2">{t("admin.leads.email")}</th>
               <th className="p-2">{t("admin.leads.phone")}</th>
               <th className="p-2">{t("admin.leads.club")}</th>
@@ -419,6 +422,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
             {leads.map((l) => (
               <tr key={l.id} className="border-t border-border/60">
                 <td className="p-2">{l.first_name ?? "—"}</td>
+                <td className="p-2">{l.last_name ?? "—"}</td>
                 <td className="p-2 font-mono text-xs">{l.email ?? "—"}</td>
                 <td className="p-2">{l.phone ?? "—"}</td>
                 <td className="p-2">{l.club ?? "—"}</td>
@@ -448,6 +452,7 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
           </tbody>
         </table>
       </div>
+
       {/* keep bundle import used */}
       <span className="hidden">{QUESTIONS.length}</span>
     </div>
