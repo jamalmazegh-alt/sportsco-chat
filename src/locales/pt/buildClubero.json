@@ -207,7 +207,12 @@
       "newsletter": "Quero receber novidades Clubero por email",
       "beta": "Quero testar o Clubero em antecipação (beta)",
       "consentHint": "Consentimentos guardados separadamente. Cancelar em 1 clique.",
-      "errorEmail": "Email inválido"
+      "errorEmail": "Email inválido",
+      "lastName": "Apelido",
+      "firstNameRequired": "Nome (obrigatório)",
+      "lastNameRequired": "Apelido (obrigatório)",
+      "clubRequired": "Nome do clube (obrigatório)",
+      "errorRequired": "Obrigatório"
     },
     "send": "Enviar",
     "skip": "Terminar sem deixar contacto",
@@ -247,7 +252,8 @@
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Concluída em",
-      "exportCsv": "Exportar CSV"
+      "exportCsv": "Exportar CSV",
+      "lastName": "Apelido"
     },
     "empty": "Ainda sem dados.",
     "loadError": "Não foi possível carregar o painel.",
