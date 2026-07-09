@@ -9,7 +9,8 @@
     "lead": "Vous êtes coach, dirigeant, parent bénévole. Vous savez ce qui vous fait perdre du temps et ce qui vous rendrait fier de votre équipe.",
     "body": "Répondez à quelques questions rapides — sans jargon, sans engagement. Chaque réponse pèse dans les prochaines fonctionnalités.",
     "meta": "Anonyme par défaut · Vos réponses restent en Europe",
-    "cta": "Je commence"
+    "cta": "Je commence",
+    "backToSite": "Retour au site"
   },
   "progress": {
     "question": "Question {{current}} / {{total}}",

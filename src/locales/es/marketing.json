@@ -13,7 +13,9 @@
     "contact": "Contacto",
     "login": "Iniciar sesión",
     "signup": "Registrar club",
-    "demo": "Solicitar demo"
+    "demo": "Solicitar demo",
+    "buildClubero": "Danos tu opinión",
+    "backToSite": "Volver al sitio"
   },
   "footer": {
     "tagline": "Coordinación de equipos, simplificada para clubes deportivos.",
@@ -33,7 +35,8 @@
       "subAccent": "hoy.",
       "follow": "Síguenos",
       "contact": "Contacto"
-    }
+    },
+    "buildClubero": "Danos tu opinión"
   },
   "home": {
     "badge": "La plataforma para clubes deportivos amateur",

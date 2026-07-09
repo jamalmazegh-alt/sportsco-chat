@@ -9,7 +9,8 @@
     "lead": "Du bist Trainer, Vorstand oder engagierter Elternteil. Du weißt, was Zeit frisst und was dein Team richtig gut macht.",
     "body": "Beantworte ein paar kurze Fragen – ohne Fachjargon, ohne Verpflichtung. Jede Antwort prägt die nächsten Funktionen.",
     "meta": "Standardmäßig anonym · Antworten bleiben in Europa",
-    "cta": "Los geht's"
+    "cta": "Los geht's",
+    "backToSite": "Zurück zur Website"
   },
   "progress": {
     "question": "Frage {{current}} / {{total}}",

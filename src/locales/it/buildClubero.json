@@ -9,7 +9,8 @@
     "lead": "Sei allenatore, dirigente o genitore volontario. Sai cosa ti fa perdere tempo e cosa renderebbe orgogliosa la tua squadra.",
     "body": "Rispondi a qualche domanda rapida — senza gerghi, senza impegno. Ogni risposta guida le prossime funzionalità.",
     "meta": "Anonimo di default · Le risposte restano in Europa",
-    "cta": "Inizio"
+    "cta": "Inizio",
+    "backToSite": "Torna al sito"
   },
   "progress": {
     "question": "Domanda {{current}} / {{total}}",

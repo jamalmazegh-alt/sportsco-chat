@@ -9,7 +9,8 @@
     "lead": "Je bent coach, bestuurder of vrijwillige ouder. Jij weet wat tijd kost en waar je team trots op zou zijn.",
     "body": "Beantwoord een paar snelle vragen — zonder jargon, zonder verplichting. Elk antwoord telt.",
     "meta": "Standaard anoniem · Antwoorden blijven in Europa",
-    "cta": "Ik begin"
+    "cta": "Ik begin",
+    "backToSite": "Terug naar site"
   },
   "progress": {
     "question": "Vraag {{current}} / {{total}}",
