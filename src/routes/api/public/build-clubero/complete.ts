@@ -14,6 +14,7 @@ const LIMIT_COMPLETE_PER_HOUR = 30;
 const ContactSchema = z
   .object({
     first_name: z.string().max(80).nullable().optional(),
+    last_name: z.string().max(80).nullable().optional(),
     email: z.string().max(255).nullable().optional(),
     phone: z.string().max(40).nullable().optional(),
     club: z.string().max(120).nullable().optional(),
@@ -21,6 +22,7 @@ const ContactSchema = z
     beta: z.boolean().default(false),
   })
   .nullable();
+
 
 const CompleteSchema = z.object({
   session_id: z.string().min(8).max(80),
