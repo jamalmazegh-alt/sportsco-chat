@@ -13,7 +13,9 @@
     "contact": "Contact",
     "login": "Aanmelden",
     "signup": "Club registreren",
-    "demo": "Demo aanvragen"
+    "demo": "Demo aanvragen",
+    "buildClubero": "Geef je mening",
+    "backToSite": "Terug naar site"
   },
   "footer": {
     "tagline": "Teamcoördinatie, eenvoudig gemaakt voor sportclubs.",
@@ -33,7 +35,8 @@
       "subAccent": "vandaag.",
       "follow": "Volg ons",
       "contact": "Contact"
-    }
+    },
+    "buildClubero": "Geef je mening"
   },
   "home": {
     "badge": "Het platform voor amateur sportclubs",

@@ -13,7 +13,9 @@
     "contact": "Contact",
     "login": "Log in",
     "signup": "Register your club",
-    "demo": "Request a demo"
+    "demo": "Request a demo",
+    "buildClubero": "Give your feedback",
+    "backToSite": "Back to site"
   },
   "footer": {
     "tagline": "Team coordination, simplified for sports clubs.",
@@ -33,7 +35,8 @@
       "subAccent": "today.",
       "follow": "Follow us",
       "contact": "Contact us"
-    }
+    },
+    "buildClubero": "Give your feedback"
   },
   "home": {
     "badge": "The platform for amateur sports clubs",

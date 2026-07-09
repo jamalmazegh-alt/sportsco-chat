@@ -13,7 +13,9 @@
     "contact": "Kontakt",
     "login": "Anmelden",
     "signup": "Verein registrieren",
-    "demo": "Demo anfragen"
+    "demo": "Demo anfragen",
+    "buildClubero": "Feedback geben",
+    "backToSite": "Zurück zur Website"
   },
   "footer": {
     "tagline": "Teamkoordination, vereinfacht für Sportvereine.",
@@ -33,7 +35,8 @@
       "subAccent": "heute.",
       "follow": "Folgen Sie uns",
       "contact": "Kontakt"
-    }
+    },
+    "buildClubero": "Feedback geben"
   },
   "home": {
     "badge": "Die Plattform für Amateursportvereine",

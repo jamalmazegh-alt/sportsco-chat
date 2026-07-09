@@ -13,7 +13,9 @@
     "contact": "Contatti",
     "login": "Accedi",
     "signup": "Registra il tuo Club",
-    "demo": "Richiedi una demo"
+    "demo": "Richiedi una demo",
+    "buildClubero": "Dai la tua opinione",
+    "backToSite": "Torna al sito"
   },
   "footer": {
     "tagline": "La gestione della squadra, semplificata per i club sportivi.",
@@ -33,7 +35,8 @@
       "subAccent": "oggi.",
       "follow": "Seguici",
       "contact": "Contattaci"
-    }
+    },
+    "buildClubero": "Dai la tua opinione"
   },
   "home": {
     "badge": "La piattaforma per le società sportive dilettantistiche",
