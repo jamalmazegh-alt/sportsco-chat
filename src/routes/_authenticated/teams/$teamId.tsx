@@ -45,6 +45,7 @@ import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamAbsencesTable } from "@/components/team-absences-table";
+import { TeamChampionshipsSection } from "@/components/team-championships-section";
 
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
@@ -249,7 +250,7 @@ function TeamDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
   const [editAge, setEditAge] = useState("");
-  const [editChamp, setEditChamp] = useState("");
+  // editChamp removed — championships are managed via TeamChampionshipsSection.
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editSport, setEditSport] = useState("");
@@ -260,7 +261,7 @@ function TeamDetail() {
   function openEdit() {
     setEditName(team?.name ?? "");
     setEditAge(team?.age_group ?? "");
-    setEditChamp(team?.championship ?? "");
+    // championship handled by TeamChampionshipsSection (teams.championship deprecated)
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditSport(team?.sport ?? "");
@@ -278,12 +279,13 @@ function TeamDetail() {
   async function onSaveTeam(e: FormEvent) {
     e.preventDefault();
     setEditBusy(true);
+    // NOTE: teams.championship is deprecated (kept for backward compatibility).
+    // New writes go to team_championships via TeamChampionshipsSection.
     const { error } = await supabase
       .from("teams")
       .update({
         name: editName,
         age_group: editAge || null,
-        championship: editChamp || null,
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
@@ -658,6 +660,10 @@ function TeamDetail() {
         </div>
       </div>
 
+      <TeamChampionshipsSection teamId={teamId} canManage={isCoach} />
+
+
+
       {isCoach && (
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           <SheetContent side="bottom" className="rounded-t-3xl">
@@ -673,10 +679,7 @@ function TeamDetail() {
                 <Label>{t("teams.ageGroup")}</Label>
                 <Input value={editAge} onChange={(e) => setEditAge(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
-                <Label>{t("teams.championship")}</Label>
-                <Input value={editChamp} onChange={(e) => setEditChamp(e.target.value)} />
-              </div>
+              {/* teams.championship is deprecated — see the Championnats section on the team page. */}
               <div className="space-y-2">
                 <Label>{t("teams.competitions")}</Label>
                 <div className="grid grid-cols-3 gap-2">

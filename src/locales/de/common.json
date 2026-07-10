@@ -541,6 +541,35 @@
     "downloadPoster": "PDF-Plakat herunterladen",
     "posterReady": "Plakat bereit"
   },
+  "championships": {
+    "title": "Meisterschaften",
+    "championship": "Meisterschaft",
+    "add": "Meisterschaft hinzufügen",
+    "name": "Name der Meisterschaft",
+    "season": "Saison",
+    "seasonOptional": "optional",
+    "rename": "Umbenennen",
+    "archive": "Archivieren",
+    "reactivate": "Reaktivieren",
+    "delete": "Löschen",
+    "confirmDelete": "Diese Meisterschaft löschen?",
+    "archived": "Archivierte Meisterschaft",
+    "activeSection": "Aktive Meisterschaften",
+    "archivedSection": "Archivierte Meisterschaften",
+    "showArchived": "Archivierte Meisterschaften anzeigen ({{n}})",
+    "emptyActive": "Keine aktive Meisterschaft für dieses Team",
+    "emptyAll": "Keine Meisterschaft konfiguriert",
+    "noneActive": "Keine aktive Meisterschaft für dieses Team",
+    "ctaAddToTeam": "Meisterschaft zu diesem Team hinzufügen",
+    "select": "Meisterschaft auswählen",
+    "historical": "Historische Meisterschaft",
+    "notActive": "Diese Meisterschaft ist nicht mehr aktiv",
+    "errors": {
+      "required": "Eine Meisterschaft ist für ein Meisterschaftsspiel erforderlich",
+      "duplicate": "Diese Meisterschaft ist bereits für dieses Team konfiguriert",
+      "inUse": "Diese Meisterschaft kann nicht gelöscht werden, da sie von Spielen verwendet wird. Archivieren Sie sie, um sie aus neuen Ereignissen zu entfernen."
+    }
+  },
   "club": {
     "logo": "Vereinslogo",
     "uploadLogo": "Logo hinzufügen",

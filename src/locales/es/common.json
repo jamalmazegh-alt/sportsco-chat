@@ -541,6 +541,35 @@
     "downloadPoster": "Descargar póster PDF",
     "posterReady": "Póster listo"
   },
+  "championships": {
+    "title": "Campeonatos",
+    "championship": "Campeonato",
+    "add": "Añadir campeonato",
+    "name": "Nombre del campeonato",
+    "season": "Temporada",
+    "seasonOptional": "opcional",
+    "rename": "Renombrar",
+    "archive": "Archivar",
+    "reactivate": "Reactivar",
+    "delete": "Eliminar",
+    "confirmDelete": "¿Eliminar este campeonato?",
+    "archived": "Campeonato archivado",
+    "activeSection": "Campeonatos activos",
+    "archivedSection": "Campeonatos archivados",
+    "showArchived": "Ver campeonatos archivados ({{n}})",
+    "emptyActive": "Ningún campeonato activo para este equipo",
+    "emptyAll": "Ningún campeonato configurado",
+    "noneActive": "Ningún campeonato activo para este equipo",
+    "ctaAddToTeam": "Añadir un campeonato a este equipo",
+    "select": "Seleccionar un campeonato",
+    "historical": "Campeonato histórico",
+    "notActive": "Este campeonato ya no está activo",
+    "errors": {
+      "required": "El campeonato es obligatorio para un partido de campeonato",
+      "duplicate": "Este campeonato ya está configurado para este equipo",
+      "inUse": "No se puede eliminar este campeonato porque está siendo usado por partidos. Archívalo para retirarlo de los nuevos eventos."
+    }
+  },
   "club": {
     "logo": "Logo del Club",
     "uploadLogo": "Añadir logo",

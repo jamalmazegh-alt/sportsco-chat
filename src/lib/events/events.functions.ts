@@ -13,6 +13,7 @@ const CreateEventSchema = z.object({
   opponent: z.string().max(255).nullable().optional(),
   competitionType: z.enum(["friendly", "championship", "cup"]).nullable().optional(),
   competitionName: z.string().max(255).nullable().optional(),
+  championshipId: z.string().uuid().nullable().optional(),
   isHome: z.boolean().nullable().optional(),
   meetingPoint: z.string().max(255).nullable().optional(),
   startsAt: z.string().min(1),
@@ -38,6 +39,29 @@ export const createEvent = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     const payload = buildEventPayload(data as BuildEventPayloadInput);
+
+    // Server-side championship validation. When the match is a championship,
+    // championship_id is REQUIRED and must belong to the same team+club.
+    // We overwrite competition_name with the current championship name
+    // (client-provided value is never trusted as source of truth here).
+    if (payload.type === "match" && payload.competition_type === "championship") {
+      const champId = payload.championship_id;
+      if (!champId) throw new Error("championship-required");
+      const { data: champ, error: champErr } = await supabase
+        .from("team_championships" as never)
+        .select("id, name, team_id, is_active")
+        .eq("id", champId)
+        .single();
+      if (champErr || !champ) throw new Error("championship-not-found");
+      const c = champ as { id: string; name: string; team_id: string; is_active: boolean };
+      if (c.team_id !== payload.team_id) throw new Error("championship-team-mismatch");
+      if (!c.is_active) throw new Error("championship-archived");
+      // Snapshot the name at creation time — never overwritten later on rename.
+      payload.competition_name = c.name;
+    } else {
+      // Non-championship matches must not carry a championship_id.
+      payload.championship_id = null;
+    }
 
     // Duplicate guard: same team + type + start time (mirrors EventFormSheet).
     const { data: dupes } = await supabase

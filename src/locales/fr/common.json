@@ -541,6 +541,35 @@
     "downloadPoster": "Télécharger l'affiche PDF",
     "posterReady": "Affiche prête"
   },
+  "championships": {
+    "title": "Championnats",
+    "championship": "Championnat",
+    "add": "Ajouter un championnat",
+    "name": "Nom du championnat",
+    "season": "Saison",
+    "seasonOptional": "facultative",
+    "rename": "Renommer",
+    "archive": "Archiver",
+    "reactivate": "Réactiver",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer ce championnat ?",
+    "archived": "Championnat archivé",
+    "activeSection": "Championnats actifs",
+    "archivedSection": "Championnats archivés",
+    "showArchived": "Voir les championnats archivés ({{n}})",
+    "emptyActive": "Aucun championnat actif pour cette équipe",
+    "emptyAll": "Aucun championnat configuré",
+    "noneActive": "Aucun championnat actif pour cette équipe",
+    "ctaAddToTeam": "Ajouter un championnat à cette équipe",
+    "select": "Sélectionner un championnat",
+    "historical": "Championnat historique",
+    "notActive": "Ce championnat n'est plus actif",
+    "errors": {
+      "required": "Le championnat est obligatoire pour un match de championnat",
+      "duplicate": "Ce championnat est déjà configuré pour cette équipe",
+      "inUse": "Impossible de supprimer ce championnat car il est utilisé par des matchs. Archivez-le pour le retirer des nouveaux événements."
+    }
+  },
   "club": {
     "logo": "Logo du club",
     "uploadLogo": "Ajouter le logo",

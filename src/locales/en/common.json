@@ -541,6 +541,35 @@
     "downloadPoster": "Download PDF poster",
     "posterReady": "Poster ready"
   },
+  "championships": {
+    "title": "Championships",
+    "championship": "Championship",
+    "add": "Add championship",
+    "name": "Championship name",
+    "season": "Season",
+    "seasonOptional": "optional",
+    "rename": "Rename",
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "delete": "Delete",
+    "confirmDelete": "Delete this championship?",
+    "archived": "Archived championship",
+    "activeSection": "Active championships",
+    "archivedSection": "Archived championships",
+    "showArchived": "Show archived championships ({{n}})",
+    "emptyActive": "No active championship for this team",
+    "emptyAll": "No championship configured",
+    "noneActive": "No active championship for this team",
+    "ctaAddToTeam": "Add a championship to this team",
+    "select": "Select a championship",
+    "historical": "Historical championship",
+    "notActive": "This championship is no longer active",
+    "errors": {
+      "required": "A championship is required for a championship match",
+      "duplicate": "This championship is already configured for this team",
+      "inUse": "Cannot delete this championship because it is used by matches. Archive it to remove it from new events."
+    }
+  },
   "club": {
     "logo": "Club logo",
     "uploadLogo": "Upload club logo",

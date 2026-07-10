@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
 import { format, addDays, startOfWeek, nextSaturday } from "date-fns";
@@ -40,7 +40,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
@@ -260,6 +268,36 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
+
+  // Active championships for the current team (championship match dropdown).
+  const { data: championships = [], isLoading: champsLoading } = useQuery({
+    queryKey: ["team-championships", state.teamId, "active"],
+    enabled: Boolean(state.teamId) && state.type === "match",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_championships" as never)
+        .select("id, name, season_label")
+        .eq("team_id", state.teamId)
+        .eq("is_active", true)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; name: string; season_label: string | null }>;
+    },
+  });
+
+  // If the currently selected championship no longer belongs to the selected
+  // team (e.g. user changed team), clear it.
+  useEffect(() => {
+    if (
+      state.competitionType === "championship" &&
+      state.championshipId &&
+      championships.length > 0 &&
+      !championships.some((c) => c.id === state.championshipId)
+    ) {
+      setState((s) => ({ ...s, championshipId: null, competitionName: undefined }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.teamId, championships.length]);
 
   function answer<K extends keyof EventWizardState>(k: K, v: EventWizardState[K]) {
     setState((s) => ({ ...s, [k]: v, step: s.step + 1 }));
@@ -1153,8 +1191,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 markTouched("official");
                 patch("isOfficial", true);
                 patch("competitionType", "championship");
-                const fromTeam = selectedTeam?.championship;
-                if (!state.competitionName && fromTeam) patch("competitionName", fromTeam);
+                // Auto-select if there's exactly one active championship.
+                if (!state.championshipId && championships.length === 1) {
+                  patch("championshipId", championships[0].id);
+                }
               }}
             />
             <DoorButton
@@ -1167,9 +1207,71 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 markTouched("official");
                 patch("isOfficial", true);
                 patch("competitionType", "cup");
+                patch("championshipId", null);
               }}
             />
-            {(state.competitionType === "championship" || state.competitionType === "cup") && (
+            {state.competitionType === "championship" && (
+              <div className="mt-2 space-y-1.5">
+                <Label className="text-xs">
+                  {t("championships.championship", { defaultValue: "Championnat" })}
+                </Label>
+                {champsLoading ? (
+                  <div className="text-xs text-muted-foreground">
+                    {t("common.loading", { defaultValue: "Chargement…" })}
+                  </div>
+                ) : championships.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("championships.noneActive", {
+                        defaultValue: "Aucun championnat actif pour cette équipe",
+                      })}
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        writeDraft(state);
+                        if (state.teamId) {
+                          navigate({
+                            to: "/teams/$teamId",
+                            params: { teamId: state.teamId },
+                          });
+                          onClose();
+                        }
+                      }}
+                    >
+                      {t("championships.ctaAddToTeam", {
+                        defaultValue: "Ajouter un championnat à cette équipe",
+                      })}
+                    </Button>
+                  </div>
+                ) : (
+                  <Select
+                    value={state.championshipId ?? ""}
+                    onValueChange={(v) => patch("championshipId", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("championships.select", {
+                          defaultValue: "Sélectionner un championnat",
+                        })}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {championships.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                          {c.season_label ? ` · ${c.season_label}` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            )}
+            {state.competitionType === "cup" && (
               <div className="mt-2 space-y-1.5">
                 <Label className="text-xs">
                   {t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}
@@ -1178,12 +1280,19 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   value={state.competitionName ?? ""}
                   onChange={(e) => patch("competitionName", e.target.value)}
                   placeholder={t("eventWizard.competitionNamePlaceholder", {
-                    defaultValue: "Ex: U15 D2, Coupe régionale…",
+                    defaultValue: "Ex: Coupe régionale…",
                   })}
                 />
               </div>
             )}
-            <Button className="w-full mt-2" disabled={!state.competitionType} onClick={() => go(1)}>
+            <Button
+              className="w-full mt-2"
+              disabled={
+                !state.competitionType ||
+                (state.competitionType === "championship" && !state.championshipId)
+              }
+              onClick={() => go(1)}
+            >
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
             </Button>
           </StepQuestion>

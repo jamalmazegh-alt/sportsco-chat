@@ -26,6 +26,8 @@ export interface BuildEventPayloadInput {
   opponent?: string | null;
   competitionType?: CompetitionTypeValue | null;
   competitionName?: string | null;
+  /** Stable link to team_championships (championship type only). */
+  championshipId?: string | null;
   /** true = home, false = away, null/undefined = not a match. */
   isHome?: boolean | null;
   meetingPoint?: string | null;
@@ -59,6 +61,7 @@ export interface EventRowPayload {
   is_official: boolean;
   carpool_enabled?: boolean;
   series_id?: string;
+  championship_id?: string | null;
   attachments?: EventAttachment[] | null;
 }
 
@@ -97,6 +100,15 @@ export function buildEventPayload(input: BuildEventPayloadInput): EventRowPayloa
     convocation_time: input.convocationTime ?? null,
     is_official: isMatch ? true : Boolean(input.isOfficial),
   };
+
+  // championship_id is only meaningful for a "championship" match.
+  // Other types explicitly clear it, so switching type away from championship
+  // never keeps a stale link.
+  if (isMatch && input.competitionType === "championship") {
+    row.championship_id = input.championshipId ?? null;
+  } else {
+    row.championship_id = null;
+  }
 
   // Only persist carpool when the caller actually decided it; otherwise let the
   // DB default + away-match trigger apply.
