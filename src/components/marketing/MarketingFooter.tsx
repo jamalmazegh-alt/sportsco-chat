@@ -77,7 +77,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link to="/build-clubero" className="hover:text-foreground">
-                  {t("nav.buildClubero")}
+                  {t("footer.buildClubero")}
                 </Link>
               </li>
             </ul>
