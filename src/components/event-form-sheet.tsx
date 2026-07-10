@@ -85,6 +85,7 @@ export type EventFormValues = {
   opponent: string | null;
   competition_type: CompetitionType | null;
   competition_name: string | null;
+  championship_id?: string | null;
   is_home: boolean | null;
   meeting_point: string | null;
   starts_at: string; // ISO
@@ -419,6 +420,19 @@ export function EventFormSheet({
     (initial?.competition_type as CompetitionType) ?? "friendly",
   );
   const [competitionName, setCompetitionName] = useState(initial?.competition_name ?? "");
+  const [championshipId, setChampionshipId] = useState<string | null>(
+    initial?.championship_id ?? null,
+  );
+  // Snapshot of the historical championship link (name at creation time), used
+  // when editing an event whose championship was archived or deleted, so the
+  // user still sees what the event was tied to.
+  const historicalChampionship = useMemo(
+    () =>
+      initial?.competition_type === "championship" && initial?.competition_name
+        ? { id: initial?.championship_id ?? "", name: initial?.competition_name ?? null }
+        : null,
+    [initial?.competition_type, initial?.competition_name, initial?.championship_id],
+  );
   const [isHome, setIsHome] = useState<"home" | "away">(
     initial?.is_home === false ? "away" : "home",
   );
@@ -462,6 +476,7 @@ export function EventFormSheet({
     setOpponent(getInitialOpponent(initial));
     setCompetitionType((initial?.competition_type as CompetitionType) ?? "friendly");
     setCompetitionName(initial?.competition_name ?? "");
+    setChampionshipId(initial?.championship_id ?? null);
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
     setIsOfficial(initial?.is_official ?? (initial?.type as EventType) === "match");
