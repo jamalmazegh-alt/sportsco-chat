@@ -45,6 +45,7 @@ import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamAbsencesTable } from "@/components/team-absences-table";
+import { TeamChampionshipsSection } from "@/components/team-championships-section";
 
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
