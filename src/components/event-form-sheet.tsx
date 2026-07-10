@@ -502,12 +502,46 @@ export function EventFormSheet({
     }
   }, [availableCompetitionTypes, competitionType]);
 
+  // When the source team changes, drop any stale championship link. The picker
+  // itself also clears when the current id is not in the fetched list, but doing
+  // it here removes the transient inconsistency between the two states.
+  const previousTeamRef = useRef(teamId);
+  useEffect(() => {
+    if (previousTeamRef.current !== teamId) {
+      previousTeamRef.current = teamId;
+      setChampionshipId(null);
+    }
+  }, [teamId]);
+
   useEffect(() => {
     if (!open) return;
     fetchGoogleMapsKey().then((key) => {
       loadGoogleMapsPlaces(key)?.catch(() => undefined);
     });
   }, [open]);
+
+  const createEventFn = useServerFn(createEvent);
+  const updateEventFn = useServerFn(updateEvent);
+  const queryClient = useQueryClient();
+
+  function translateError(msg: string): string {
+    switch (msg) {
+      case "championship_required":
+        return t("championships.errors.required");
+      case "championship_team_mismatch":
+        return t("championships.errors.teamMismatch");
+      case "championship_club_mismatch":
+        return t("championships.errors.clubMismatch");
+      case "championship_archived":
+        return t("championships.errors.archived");
+      case "championship_not_found":
+        return t("championships.errors.notFound");
+      case "duplicate":
+        return t("events.duplicateExists");
+      default:
+        return msg;
+    }
+  }
 
   const titleMissing = type !== "match" && !title.trim();
 
