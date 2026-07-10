@@ -46,6 +46,7 @@ function EventChallengesPage() {
     | { kind: "entry"; challengeId: string }
     | { kind: "ranking"; challengeId: string; passageId?: string }
   >({ kind: "list" });
+  const [showAll, setShowAll] = useState(false);
 
   // Event → team → club, plus team players.
   const { data: eventInfo, isLoading: loadingEvent } = useQuery({
