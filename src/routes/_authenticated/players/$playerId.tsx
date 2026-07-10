@@ -572,7 +572,25 @@ function PlayerProfile() {
               </span>
             )}
           </div>
+          {playerTeams && playerTeams.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground self-center">
+                {t("players.teamsLabel")}
+              </span>
+              {playerTeams.map((tm) => (
+                <Link
+                  key={tm.id}
+                  to="/teams/$teamId"
+                  params={{ teamId: tm.id }}
+                  className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                >
+                  {tm.name}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
+
         {isCoach && (
           <Button
             size="icon"
