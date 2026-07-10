@@ -65,7 +65,15 @@ function splitLine(line: string): string[] {
   return out;
 }
 
-function parseCsv(text: string): ParsedRow[] {
+function normHeader(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\s._-]+/g, "");
+}
+
+function parseCsv(text: string, extraAliases: Record<string, (typeof HEADERS)[number]> = {}): ParsedRow[] {
   const lines = text
     .split(/\r?\n/)
     .map((l) => l.trim())
