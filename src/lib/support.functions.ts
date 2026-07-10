@@ -24,8 +24,9 @@ const PUSH_STRINGS = {
     },
     status: {
       title: (id: string) => `Ticket #${id} updated`,
-      body: (status: string) => `New status: ${status}`,
+      body: (status: string, subject: string) => `${subject} — New status: ${status}`,
     },
+
   },
 } as const;
 
