@@ -332,9 +332,11 @@ export function ImportPlayersCsvDialog({
           <p className="text-xs text-muted-foreground">
             {t("players.import.intro", {
               defaultValue:
-                "Importez votre liste depuis un fichier CSV. Colonnes attendues : first_name, last_name, jersey, position, license, birth_date, email, phone, parent_first, parent_last, parent_email, parent_phone.",
+                "Importez votre liste depuis un fichier CSV. Colonnes attendues : {{cols}}.",
+              cols: localizedHeaders.join(", "),
             })}
           </p>
+
           <Button
             type="button"
             variant="ghost"
