@@ -580,15 +580,14 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
       const locale = pickLocale(profile?.preferred_language);
-      const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
-      const statusLabel =
-        STATUS_LABELS[locale as "fr" | "en"]?.[patch.status] ?? patch.status;
+      const pushStrings = PUSH_STRINGS[locale];
+      const statusLabel = STATUS_LABELS[locale][patch.status] ?? patch.status;
 
       await supabaseAdmin.from("notifications").insert({
         user_id: before.user_id,
         type: "support_status",
         title: before.subject,
-        body: locale === "en" ? `New status: ${statusLabel}` : `Nouveau statut : ${statusLabel}`,
+        body: pushStrings.status.inAppBody(statusLabel),
         link: `/support/${data.ticket_id}`,
       });
       await sendPushToUser(before.user_id, {
