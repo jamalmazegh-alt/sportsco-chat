@@ -587,16 +587,17 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       await supabaseAdmin.from("notifications").insert({
         user_id: before.user_id,
         type: "support_status",
-        title: before.subject,
-        body: pushStrings.status.inAppBody(statusLabel),
+        title: pushStrings.status.title(shortId(data.ticket_id)),
+        body: pushStrings.status.inAppBody(before.subject, statusLabel),
         link: `/support/${data.ticket_id}`,
       });
       await sendPushToUser(before.user_id, {
-        title: pushStrings.status.title(before.subject),
-        body: pushStrings.status.body(statusLabel),
+        title: pushStrings.status.title(shortId(data.ticket_id)),
+        body: pushStrings.status.body(before.subject, statusLabel),
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
+
 
 
       if (email) {
