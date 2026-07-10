@@ -117,7 +117,9 @@ function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}${nextPath}`,
+        emailRedirectTo: hasInvite
+          ? `${window.location.origin}/login?invite=${encodeURIComponent(inviteToken)}`
+          : `${window.location.origin}${nextPath}`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
