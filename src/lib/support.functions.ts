@@ -13,8 +13,9 @@ const PUSH_STRINGS = {
     },
     status: {
       title: (id: string) => `Ticket #${id} mis à jour`,
-      body: (status: string) => `Nouveau statut : ${status}`,
+      body: (status: string, subject: string) => `${subject} — Nouveau statut : ${status}`,
     },
+
   },
   en: {
     reply: {
@@ -23,8 +24,9 @@ const PUSH_STRINGS = {
     },
     status: {
       title: (id: string) => `Ticket #${id} updated`,
-      body: (status: string) => `New status: ${status}`,
+      body: (status: string, subject: string) => `${subject} — New status: ${status}`,
     },
+
   },
 } as const;
 
@@ -482,7 +484,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
       await sendPushToUser(before.user_id, {
         title: pushStrings.status.title(shortId(data.ticket_id)),
-        body: pushStrings.status.body(patch.status),
+        body: pushStrings.status.body(patch.status, before.subject),
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
