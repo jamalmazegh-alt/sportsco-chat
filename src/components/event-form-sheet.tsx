@@ -25,8 +25,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
-import { buildEventPayload, type EventAttachment } from "@/lib/events/event-payload";
+import { type EventAttachment } from "@/lib/events/event-payload";
+import {
+  createEvent,
+  updateEvent,
+  type CreateEventInput,
+} from "@/lib/events/events.functions";
+import { ChampionshipPicker } from "@/components/events/championship-picker";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
