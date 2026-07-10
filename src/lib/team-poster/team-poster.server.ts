@@ -298,9 +298,6 @@ export interface BuildTeamPosterInput {
 
 const CLUBERO_LOGO_URL = "https://clubero.app/clubero-logo.png";
 
-import { FIGURE_LEFT_B64, FIGURE_LEFT_W, FIGURE_LEFT_H } from "./figure-left.b64";
-import { FIGURE_RIGHT_B64, FIGURE_RIGHT_W, FIGURE_RIGHT_H } from "./figure-right.b64";
-import { FIGURE_BOTTOM_B64, FIGURE_BOTTOM_W, FIGURE_BOTTOM_H } from "./figure-bottom.b64";
 
 export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<Uint8Array> {
   const t = STRINGS[input.lang];
