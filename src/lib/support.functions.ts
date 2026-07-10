@@ -70,7 +70,7 @@ const PUSH_STRINGS: Record<
   {
     reply: { title: (id: string) => string; body: (subject: string) => string };
     status: {
-      title: (id: string) => string;
+      title: (id: string, statusLabel: string) => string;
       body: (subject: string, statusLabel: string) => string;
       inAppBody: (subject: string, statusLabel: string) => string;
     };
@@ -79,7 +79,7 @@ const PUSH_STRINGS: Record<
   fr: {
     reply: { title: (id) => `Réponse à votre ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Changement de statut de votre ticket #${id}`,
+      title: (id, l) => `Ticket #${id} : ${l}`,
       body: (s, l) => `${s} — Nouveau statut : ${l}`,
       inAppBody: (s, l) => `${s} — Nouveau statut : ${l}`,
     },
@@ -87,7 +87,7 @@ const PUSH_STRINGS: Record<
   en: {
     reply: { title: (id) => `Reply to your ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Status change on your ticket #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — New status: ${l}`,
       inAppBody: (s, l) => `${s} — New status: ${l}`,
     },
@@ -95,7 +95,7 @@ const PUSH_STRINGS: Record<
   de: {
     reply: { title: (id) => `Antwort auf Ihr Ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Statusänderung Ihres Tickets #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — Neuer Status: ${l}`,
       inAppBody: (s, l) => `${s} — Neuer Status: ${l}`,
     },
@@ -103,7 +103,7 @@ const PUSH_STRINGS: Record<
   es: {
     reply: { title: (id) => `Respuesta a tu ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Cambio de estado de tu ticket #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — Nuevo estado: ${l}`,
       inAppBody: (s, l) => `${s} — Nuevo estado: ${l}`,
     },
@@ -111,7 +111,7 @@ const PUSH_STRINGS: Record<
   it: {
     reply: { title: (id) => `Risposta al tuo ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Cambio di stato del tuo ticket #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — Nuovo stato: ${l}`,
       inAppBody: (s, l) => `${s} — Nuovo stato: ${l}`,
     },
@@ -119,7 +119,7 @@ const PUSH_STRINGS: Record<
   nl: {
     reply: { title: (id) => `Antwoord op je ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Statuswijziging van je ticket #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — Nieuwe status: ${l}`,
       inAppBody: (s, l) => `${s} — Nieuwe status: ${l}`,
     },
@@ -127,12 +127,13 @@ const PUSH_STRINGS: Record<
   pt: {
     reply: { title: (id) => `Resposta ao seu ticket #${id}`, body: (s) => s },
     status: {
-      title: (id) => `Alteração de estado do seu ticket #${id}`,
+      title: (id, l) => `Ticket #${id}: ${l}`,
       body: (s, l) => `${s} — Novo estado: ${l}`,
       inAppBody: (s, l) => `${s} — Novo estado: ${l}`,
     },
   },
 };
+
 
 
 
