@@ -652,7 +652,18 @@
     "childAccessNeedsEmail": "Füge dem Kind zuerst eine E-Mail-Adresse hinzu, um den Zugang zu aktivieren.",
     "account": "Konto",
     "removeConfirm": "{{name}} aus dem Team entfernen?",
-    "removed": "Spieler aus dem Team entfernt"
+    "removed": "Spieler aus dem Team entfernt",
+    "tabNew": "Neu",
+    "tabExisting": "Vorhandener Spieler",
+    "existingTitle": "Vorhandenen Spieler hinzufügen",
+    "existingHint": "Ordne einen bereits im Verein vorhandenen Spieler diesem Team zu.",
+    "existingEmpty": "Kein Spieler verfügbar",
+    "existingAlreadyIn": "Bereits in",
+    "existingAttach": "Zum Team hinzufügen",
+    "existingAttached_one": "{{count}} Spieler hinzugefügt",
+    "existingAttached_other": "{{count}} Spieler hinzugefügt",
+    "alreadyInTeam": "Dieser Spieler ist bereits in diesem Team",
+    "teamsLabel": "Teams"
   },
   "events": {
     "isOfficial": "Pflichtspiel",

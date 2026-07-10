@@ -652,7 +652,18 @@
     "childAccessNeedsEmail": "Voeg eerst een e-mailadres toe aan het kind om toegang te activeren.",
     "account": "Account",
     "removeConfirm": "{{name}} uit het Team verwijderen?",
-    "removed": "Speler uit het Team verwijderd"
+    "removed": "Speler uit het Team verwijderd",
+    "tabNew": "Nieuw",
+    "tabExisting": "Bestaande speler",
+    "existingTitle": "Bestaande speler toevoegen",
+    "existingHint": "Voeg een speler die al in de club zit toe aan dit team.",
+    "existingEmpty": "Geen speler beschikbaar",
+    "existingAlreadyIn": "Al in",
+    "existingAttach": "Aan team toevoegen",
+    "existingAttached_one": "{{count}} speler toegevoegd",
+    "existingAttached_other": "{{count}} spelers toegevoegd",
+    "alreadyInTeam": "Deze speler zit al in dit team",
+    "teamsLabel": "Teams"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
