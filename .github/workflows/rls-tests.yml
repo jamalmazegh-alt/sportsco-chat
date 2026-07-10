@@ -10,6 +10,10 @@ on:
         required: false
         default: "Test RLS à la demande"
 
+permissions:
+  contents: read
+  issues: write
+
 concurrency:
   group: rls-tests
   cancel-in-progress: false
