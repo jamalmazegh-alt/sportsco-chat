@@ -545,6 +545,8 @@
     "title": "Championships",
     "championship": "Championship",
     "add": "Add championship",
+    "editHint": "Championships are managed in a dedicated section on the team page (multiple championships supported, with archiving).",
+    "manage": "Manage championships",
     "name": "Championship name",
     "season": "Season",
     "seasonOptional": "optional",

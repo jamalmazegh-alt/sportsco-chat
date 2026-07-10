@@ -36,6 +36,7 @@ import {
   Download,
   Upload,
   BarChart3,
+  Trophy,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
@@ -679,7 +680,34 @@ function TeamDetail() {
                 <Label>{t("teams.ageGroup")}</Label>
                 <Input value={editAge} onChange={(e) => setEditAge(e.target.value)} />
               </div>
-              {/* teams.championship is deprecated — see the Championnats section on the team page. */}
+              {/* teams.championship is deprecated — championships now live in TeamChampionshipsSection. */}
+              <div className="space-y-1.5 rounded-xl border border-dashed border-border bg-muted/30 p-3">
+                <Label className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
+                  {t("championships.title", { defaultValue: "Championnats" })}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t("championships.editHint", {
+                    defaultValue:
+                      "Les championnats sont gérés dans une section dédiée sur la page de l'équipe (plusieurs championnats possibles, avec archivage).",
+                  })}
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setEditOpen(false);
+                    setTimeout(() => {
+                      document
+                        .getElementById("team-championships-section")
+                        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 150);
+                  }}
+                >
+                  {t("championships.manage", { defaultValue: "Gérer les championnats" })}
+                </Button>
+              </div>
               <div className="space-y-2">
                 <Label>{t("teams.competitions")}</Label>
                 <div className="grid grid-cols-3 gap-2">

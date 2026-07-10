@@ -545,6 +545,8 @@
     "title": "Campeonatos",
     "championship": "Campeonato",
     "add": "Adicionar campeonato",
+    "editHint": "Los campeonatos se gestionan en una sección dedicada de la página del equipo (varios campeonatos posibles, con archivo).",
+    "manage": "Gestionar campeonatos",
     "name": "Nome do campeonato",
     "season": "Temporada",
     "seasonOptional": "opcional",

@@ -545,6 +545,8 @@
     "title": "Competities",
     "championship": "Competitie",
     "add": "Competitie toevoegen",
+    "editHint": "Los campeonatos se gestionan en una sección dedicada de la página del equipo (varios campeonatos posibles, con archivo).",
+    "manage": "Gestionar campeonatos",
     "name": "Naam van de competitie",
     "season": "Seizoen",
     "seasonOptional": "optioneel",
