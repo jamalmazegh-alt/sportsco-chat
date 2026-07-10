@@ -5,6 +5,23 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { sendPushToUser } from "@/lib/push-send.server";
 
+const STATUS_LABELS = {
+  fr: {
+    open: "Ouvert",
+    in_progress: "En cours",
+    waiting_user: "En attente de votre réponse",
+    resolved: "Résolu",
+    closed: "Clôturé",
+  },
+  en: {
+    open: "Open",
+    in_progress: "In progress",
+    waiting_user: "Waiting for your reply",
+    resolved: "Resolved",
+    closed: "Closed",
+  },
+} as const;
+
 const PUSH_STRINGS = {
   fr: {
     reply: {
@@ -12,10 +29,9 @@ const PUSH_STRINGS = {
       body: (subject: string) => subject,
     },
     status: {
-      title: (id: string) => `Ticket #${id} mis à jour`,
-      body: (status: string, subject: string) => `${subject} — Nouveau statut : ${status}`,
+      title: (subject: string) => subject,
+      body: (statusLabel: string) => `Nouveau statut : ${statusLabel}`,
     },
-
   },
   en: {
     reply: {
@@ -23,12 +39,12 @@ const PUSH_STRINGS = {
       body: (subject: string) => subject,
     },
     status: {
-      title: (id: string) => `Ticket #${id} updated`,
-      body: (status: string, subject: string) => `${subject} — New status: ${status}`,
+      title: (subject: string) => subject,
+      body: (statusLabel: string) => `New status: ${statusLabel}`,
     },
-
   },
 } as const;
+
 
 const CATEGORIES = [
   "bug",
