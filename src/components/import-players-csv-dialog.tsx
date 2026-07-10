@@ -274,7 +274,11 @@ export function ImportPlayersCsvDialog({
         .insert({ team_id: teamId, player_id: player.id, role: "player" });
       if (tmErr) {
         failed++;
-        errors.push(`${r.first_name} ${r.last_name}: ${tmErr.message}`);
+        const msg =
+          (tmErr as any).code === "23505"
+            ? t("players.alreadyInTeam", { defaultValue: "Ce joueur est déjà dans cette équipe" })
+            : tmErr.message;
+        errors.push(`${r.first_name} ${r.last_name}: ${msg}`);
         setProgress({ done: i + 1, total: rows.length });
         continue;
       }
