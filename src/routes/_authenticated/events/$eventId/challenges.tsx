@@ -182,6 +182,8 @@ function ChallengesList({
   challenges,
   entryCounts,
   isStaff,
+  showAll,
+  onToggleShowAll,
   onAdd,
   onEntry,
   onRanking,
@@ -190,12 +192,13 @@ function ChallengesList({
   challenges: any[];
   entryCounts: Record<string, number>;
   isStaff: boolean;
+  showAll: boolean;
+  onToggleShowAll: () => void;
   onAdd: () => void;
   onEntry: (id: string) => void;
   onRanking: (id: string) => void;
 }) {
   const { t } = useTranslation("challenges");
-  const [showAll, setShowAll] = useState(false);
 
   const sorted = useMemo(() => {
     return [...challenges].sort((a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0));
