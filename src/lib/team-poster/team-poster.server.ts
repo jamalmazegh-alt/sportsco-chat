@@ -392,10 +392,10 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   drawCenteredText(page, t.title1, W / 2, H - 160, 44, bold, white);
   drawCenteredText(page, t.title2, W / 2, H - 202, 34, bold, emerald);
 
-  // ── Subtitle + body
-  drawCenteredText(page, t.subtitle, W / 2, H - 236, 12, font, textMuted);
-  drawCenteredText(page, t.bodyP1, W / 2, H - 256, 10, font, textMuted);
-  drawCenteredText(page, t.bodyP2, W / 2, H - 270, 10, font, textMuted);
+  // ── Subtitle + body (clear line break, well centred above QR card)
+  drawCenteredText(page, t.subtitle, W / 2, H - 250, 12, font, textMuted);
+  drawCenteredText(page, t.bodyP1, W / 2, H - 276, 10, font, textMuted);
+  drawCenteredText(page, t.bodyP2, W / 2, H - 296, 10, font, textMuted);
 
   // ── QR Card (light card floating on dark bg)
   const cardW = 320;
