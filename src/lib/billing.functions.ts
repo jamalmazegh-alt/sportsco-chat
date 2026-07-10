@@ -122,6 +122,32 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     // Reuse customer or create new one
     let customerId = existingSub?.stripe_customer_id ?? undefined;
+
+    // Verify the customer still exists in the current Stripe account.
+    // If the Stripe account changed (e.g. test↔live keys swapped, or
+    // customer was deleted), the stored ID no longer resolves and we must
+    // create a fresh one instead of failing with "No such customer".
+    if (customerId) {
+      try {
+        const existing = await stripe.customers.retrieve(customerId);
+        if ((existing as { deleted?: boolean }).deleted) {
+          customerId = undefined;
+        }
+      } catch (err) {
+        const code = (err as { code?: string; statusCode?: number })?.code;
+        const status = (err as { statusCode?: number })?.statusCode;
+        if (code === "resource_missing" || status === 404) {
+          log.warn("stripe_customer_missing_recreating", {
+            club_id: data.clubId,
+            stale_customer_id: customerId,
+          });
+          customerId = undefined;
+        } else {
+          throw err;
+        }
+      }
+    }
+
     if (!customerId) {
       const {
         data: { user },
@@ -134,10 +160,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       customerId = customer.id;
 
       // Persist customer id immediately (preserve trial_end / status if it exists)
+      // and clear any stale stripe_subscription_id / price / plan from the old account.
       await supabaseAdmin.from("subscriptions").upsert(
         {
           club_id: club.id,
           stripe_customer_id: customerId,
+          stripe_subscription_id: null,
+          stripe_price_id: null,
+          plan: null,
           status: existingSub?.status ?? "incomplete",
           trial_end: existingSub?.trial_end ?? null,
         },
@@ -150,6 +180,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       status: "all",
       limit: 20,
     });
+
     const existingManageableSub = existingStripeSubs.data
       .filter((sub) => isManageableStripeStatus(sub.status))
       .sort((a, b) => b.created - a.created)[0];
