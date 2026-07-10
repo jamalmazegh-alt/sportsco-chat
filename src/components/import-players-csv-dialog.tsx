@@ -359,7 +359,7 @@ export function ImportPlayersCsvDialog({
             onChange={(e) => setText(e.target.value)}
             rows={8}
             className="font-mono text-xs"
-            placeholder="first_name,last_name,jersey,position,license,birth_date,email,phone"
+            placeholder={localizedHeaders.join(",")}
           />
         </div>
         {progress && (
