@@ -150,9 +150,13 @@ function RegisterPage() {
       (navigate as any)({ to: nextPath });
       return;
     }
-    // No session: email confirmation is required. For invited users the
-    // invite link is proof of email ownership, so auto-confirm and sign them in.
-    if (hasInvite) {
+    // No session: email confirmation is required.
+    // Only MEMBER invites (email-bound, sent directly to a known address) are
+    // proof of email ownership → we can auto-confirm + sign in.
+    // CLUB invites are link-based (QR / shared URL, anyone can use them) and
+    // are NOT proof of ownership → go through the standard email-confirmation
+    // flow like a regular signup.
+    if (hasInvite && inviteKind !== "club") {
       try {
         await confirmInvitedEmail({ data: { token: inviteToken, email } });
         const { error: signInErr } = await supabase.auth.signInWithPassword({
@@ -177,6 +181,9 @@ function RegisterPage() {
         return;
       }
     }
+    // Club invite (or no invite): standard email-confirmation flow.
+    // The redeem step will run automatically after the user confirms and lands
+    // back on /register with the token still in the URL (emailRedirectTo above).
     setBusy(false);
     toast.success(t("auth.checkEmail"), { duration: 8000 });
     navigate({ to: "/login" });
