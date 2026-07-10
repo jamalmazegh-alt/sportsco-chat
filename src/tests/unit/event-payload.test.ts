@@ -126,4 +126,54 @@ describe("buildEventPayload — single source of truth", () => {
     };
     expect(buildEventPayload(fromWizard)).toEqual(buildEventPayload(fromForm));
   });
+
+  describe("championship_id policy", () => {
+    it("carries championship_id only for championship matches", () => {
+      const p = buildEventPayload({
+        teamId: TEAM,
+        type: "match",
+        title: "M",
+        startsAt: START,
+        competitionType: "championship",
+        championshipId: "11111111-1111-1111-1111-111111111111",
+      });
+      expect(p.championship_id).toBe("11111111-1111-1111-1111-111111111111");
+    });
+
+    it("drops championship_id for friendly matches", () => {
+      const p = buildEventPayload({
+        teamId: TEAM,
+        type: "match",
+        title: "M",
+        startsAt: START,
+        competitionType: "friendly",
+        championshipId: "11111111-1111-1111-1111-111111111111",
+      });
+      expect(p.championship_id).toBeNull();
+    });
+
+    it("drops championship_id for cup matches", () => {
+      const p = buildEventPayload({
+        teamId: TEAM,
+        type: "match",
+        title: "M",
+        startsAt: START,
+        competitionType: "cup",
+        championshipId: "11111111-1111-1111-1111-111111111111",
+      });
+      expect(p.championship_id).toBeNull();
+    });
+
+    it("drops championship_id for non-match events", () => {
+      const p = buildEventPayload({
+        teamId: TEAM,
+        type: "training",
+        title: "T",
+        startsAt: START,
+        championshipId: "11111111-1111-1111-1111-111111111111",
+      });
+      expect(p.championship_id).toBeNull();
+    });
+  });
 });
+
