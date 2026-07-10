@@ -83,15 +83,19 @@ function parseCsv(text: string, extraAliases: Record<string, (typeof HEADERS)[nu
   // Detect header line
   let startIdx = 0;
   let headerMap: Record<string, number> | null = null;
-  const firstParts = splitLine(lines[0]).map((s) => s.toLowerCase());
-  const looksLikeHeader = firstParts.some((p) =>
-    /^(first_?name|prenom|prénom|last_?name|nom)$/i.test(p),
-  );
+  const firstParts = splitLine(lines[0]);
+  const firstLower = firstParts.map((s) => s.toLowerCase());
+  const looksLikeHeader =
+    firstLower.some((p) => /^(first_?name|prenom|prénom|last_?name|nom)$/i.test(p)) ||
+    firstParts.some((p) => extraAliases[normHeader(p)]);
   if (looksLikeHeader) {
     headerMap = {};
-    firstParts.forEach((p, idx) => {
+    firstParts.forEach((raw, idx) => {
+      const p = raw.toLowerCase();
       const norm = p.replace(/\s+/g, "_");
       headerMap![norm] = idx;
+      const aliasKey = extraAliases[normHeader(raw)];
+      if (aliasKey) headerMap![aliasKey] = idx;
       if (norm === "prenom" || norm === "prénom" || norm === "firstname")
         headerMap!.first_name = idx;
       if (norm === "nom" || norm === "lastname") headerMap!.last_name = idx;
@@ -106,6 +110,7 @@ function parseCsv(text: string, extraAliases: Record<string, (typeof HEADERS)[nu
     });
     startIdx = 1;
   }
+
 
   const get = (parts: string[], key: string, fallbackIdx: number) => {
     const idx = headerMap ? headerMap[key] : fallbackIdx;
