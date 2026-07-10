@@ -219,7 +219,7 @@ function ChallengesList({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowAll((s) => !s)}
+              onClick={onToggleShowAll}
               className="h-8 px-2 text-xs"
             >
               {showAll ? t("list.active_only", { defaultValue: "Actifs" }) : t("list.show_all", { defaultValue: "Tout voir" })}
