@@ -813,6 +813,7 @@
     "nextMatch": "Partido siguiente",
     "allMatchesEntered": "Todos los partidos están registrados.",
     "errorGeneric": "Error",
+    "progressionFailedCommitted": "Resultado guardado. No se pudo finalizar la progresión del cuadro — contacte a un administrador antes de continuar.",
     "validate": "Validar resultado",
     "unvalidate": "Deshacer validación",
     "unvalidateToEdit": "Deshacer validación para editar",

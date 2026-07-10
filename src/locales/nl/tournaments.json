@@ -813,6 +813,7 @@
     "nextMatch": "Volgende wedstrijd",
     "allMatchesEntered": "Alle wedstrijden zijn ingevoerd.",
     "errorGeneric": "Fout",
+    "progressionFailedCommitted": "Resultaat opgeslagen. De bracketvoortgang kon niet worden voltooid — neem contact op met een beheerder voordat u verdergaat.",
     "validate": "Resultaat bevestigen",
     "unvalidate": "Bevestiging ongedaan maken",
     "unvalidateToEdit": "Bevestiging ongedaan maken om te bewerken",

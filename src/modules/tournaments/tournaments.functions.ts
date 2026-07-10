@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createLogger } from "@/lib/logger.server";
 import { slugify, uniqueTournamentSlug } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
 import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
@@ -11,6 +13,9 @@ import { selectQualified } from "./lib/qualification";
 import { computeProgressionUpdates } from "./lib/progression";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { assertTournamentMutable } from "@/lib/tournament-guards.server";
+import { serverFnError } from "@/lib/server-fn-error";
+
+const log = createLogger("tournaments");
 
 /**
  * B2 — propage les vainqueurs/perdants dans tous les brackets (KO + flights)
@@ -18,34 +23,38 @@ import { assertTournamentMutable } from "@/lib/tournament-guards.server";
  * écriture de score / statut / (dé)validation. Utilise le client admin
  * (déjà autorisé par assertCanManage en amont) pour mettre à jour les matchs
  * avals sans se heurter au RLS.
+ *
+ * Exported for tests only — never call outside authorized match flows
+ * (bypasses can_validate_match). Production call sites: recordMatchScore,
+ * setMatchStatus, validateMatchHandler (via validateMatchBracketHooks).
  */
-async function applyBracketProgression(tournamentId: string): Promise<void> {
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: matches } = await supabaseAdmin
+export async function applyBracketProgression(tournamentId: string): Promise<void> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: matches } = await supabaseAdmin
+    .from("tournament_matches")
+    .select(
+      "id, flight_id, round, match_number, team_a_id, team_b_id, team_a_source, team_b_source, score_a, score_b, penalty_score_a, penalty_score_b, status, winner_team_id",
+    )
+    .eq("tournament_id", tournamentId);
+  if (!matches || matches.length === 0) return;
+  const updates = computeProgressionUpdates(matches as never);
+  for (const u of updates) {
+    await supabaseAdmin
       .from("tournament_matches")
-      .select(
-        "id, flight_id, round, match_number, team_a_id, team_b_id, team_a_source, team_b_source, score_a, score_b, penalty_score_a, penalty_score_b, status, winner_team_id",
-      )
+      .update({
+        team_a_id: u.team_a_id,
+        team_b_id: u.team_b_id,
+        winner_team_id: u.winner_team_id,
+      } as never)
+      .eq("id", u.id)
       .eq("tournament_id", tournamentId);
-    if (!matches || matches.length === 0) return;
-    const updates = computeProgressionUpdates(matches as never);
-    for (const u of updates) {
-      await supabaseAdmin
-        .from("tournament_matches")
-        .update({
-          team_a_id: u.team_a_id,
-          team_b_id: u.team_b_id,
-          winner_team_id: u.winner_team_id,
-        } as never)
-        .eq("id", u.id)
-        .eq("tournament_id", tournamentId);
-    }
-  } catch (e) {
-    // La propagation ne doit jamais faire échouer l'écriture du score elle-même.
-    console.warn("[bracket] progression failed", e);
   }
 }
+
+/** Runtime hook so validateMatch tests can spy on progression invocation. */
+export const validateMatchBracketHooks = {
+  applyBracketProgression,
+};
 
 // ---------- Schemas
 
@@ -1468,68 +1477,94 @@ export const updateTournamentSponsors = createServerFn({ method: "POST" })
 
 // ---------- Match validation & dispute
 
-export const validateMatch = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z
-      .object({
-        tournament_id: z.string().uuid(),
-        match_id: z.string().uuid(),
-        validated: z.boolean(),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    // Allow organizer, co-organizer OR assigned referee for this match.
-    const { data: canValidate } = await (supabase as any).rpc("can_validate_match", {
-      _user_id: userId,
-      _match_id: data.match_id,
-    });
-    if (!canValidate) throw new Response("Forbidden", { status: 403 });
+const validateMatchInputSchema = z.object({
+  /** @deprecated Derived from the authorized match row — tolerated if equal, rejected if divergent. */
+  tournament_id: z.string().uuid().optional(),
+  match_id: z.string().uuid(),
+  validated: z.boolean(),
+});
 
-    // When devalidating, ensure no later match involving either team is already validated.
-    if (!data.validated) {
-      const { data: current } = await supabase
+export type ValidateMatchInput = z.infer<typeof validateMatchInputSchema>;
+
+export async function validateMatchHandler(opts: {
+  data: ValidateMatchInput;
+  context: { supabase: SupabaseClient; userId: string };
+}): Promise<{ ok: true }> {
+  const { data, context } = opts;
+  const { supabase, userId } = context;
+
+  const { data: canValidate } = await supabase.rpc("can_validate_match", {
+    _user_id: userId,
+    _match_id: data.match_id,
+  });
+  if (!canValidate) throw new Response("Forbidden", { status: 403 });
+
+  const { data: match, error: matchErr } = await supabase
+    .from("tournament_matches")
+    .select("id, tournament_id, match_number, team_a_id, team_b_id")
+    .eq("id", data.match_id)
+    .maybeSingle();
+  if (matchErr || !match) throw new Response("Not found", { status: 404 });
+
+  const derivedTournamentId = match.tournament_id;
+  if (data.tournament_id != null && data.tournament_id !== derivedTournamentId) {
+    log.warn("validateMatch tournament_mismatch", {
+      matchId: match.id,
+      derivedTournamentId,
+    });
+    throw new Response("tournament_mismatch", { status: 400 });
+  }
+  if (data.tournament_id != null) {
+    log.info("validateMatch legacy tournament_id param still sent", { matchId: match.id });
+  }
+
+  if (!data.validated) {
+    const teamIds = [match.team_a_id, match.team_b_id].filter(Boolean) as string[];
+    if (teamIds.length > 0 && match.match_number != null) {
+      const { data: later } = await supabase
         .from("tournament_matches")
-        .select("match_number, team_a_id, team_b_id")
-        .eq("id", data.match_id)
-        .eq("tournament_id", data.tournament_id)
-        .maybeSingle();
-      if (current) {
-        const teamIds = [current.team_a_id, current.team_b_id].filter(Boolean) as string[];
-        if (teamIds.length > 0 && current.match_number != null) {
-          const { data: later } = await supabase
-            .from("tournament_matches")
-            .select("match_number")
-            .eq("tournament_id", data.tournament_id)
-            .not("validated_at", "is", null)
-            .gt("match_number", current.match_number)
-            .or(teamIds.map((id) => `team_a_id.eq.${id},team_b_id.eq.${id}`).join(","))
-            .limit(1);
-          if (later && later.length > 0) {
-            throw new Response(
-              "Impossible de dévalider : un match suivant impliquant une de ces équipes est déjà validé. Dévalidez d'abord le match suivant.",
-              { status: 400 },
-            );
-          }
-        }
+        .select("match_number")
+        .eq("tournament_id", derivedTournamentId)
+        .not("validated_at", "is", null)
+        .gt("match_number", match.match_number)
+        .or(teamIds.map((id) => `team_a_id.eq.${id},team_b_id.eq.${id}`).join(","))
+        .limit(1);
+      if (later && later.length > 0) {
+        throw new Response(
+          "Impossible de dévalider : un match suivant impliquant une de ces équipes est déjà validé. Dévalidez d'abord le match suivant.",
+          { status: 400 },
+        );
       }
     }
+  }
 
-    const { error } = await supabase
-      .from("tournament_matches")
-      .update({
-        validated_at: data.validated ? new Date().toISOString() : null,
-        validated_by: data.validated ? userId : null,
-      })
-      .eq("id", data.match_id)
-      .eq("tournament_id", data.tournament_id);
-    if (error) throw new Response(error.message, { status: 400 });
-    // B2 — (dé)validation : recalcule la progression du bracket.
-    await applyBracketProgression(data.tournament_id);
-    return { ok: true };
-  });
+  const { error } = await supabase
+    .from("tournament_matches")
+    .update({
+      validated_at: data.validated ? new Date().toISOString() : null,
+      validated_by: data.validated ? userId : null,
+    })
+    .eq("id", data.match_id)
+    .eq("tournament_id", derivedTournamentId);
+  if (error) throw new Response(error.message, { status: 400 });
+
+  try {
+    await validateMatchBracketHooks.applyBracketProgression(derivedTournamentId);
+  } catch (e) {
+    log.error("validateMatch bracket_progression_failed", {
+      matchId: match.id,
+      tournamentId: derivedTournamentId,
+      err: e,
+    });
+    throw serverFnError("bracket_progression_failed", 500);
+  }
+  return { ok: true };
+}
+
+export const validateMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => validateMatchInputSchema.parse(input))
+  .handler(async ({ data, context }) => validateMatchHandler({ data, context }));
 
 export const setMatchDispute = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

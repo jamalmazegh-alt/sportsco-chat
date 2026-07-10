@@ -813,6 +813,7 @@
     "nextMatch": "Match suivant",
     "allMatchesEntered": "Tous les matchs sont saisis.",
     "errorGeneric": "Erreur",
+    "progressionFailedCommitted": "Résultat enregistré. La progression du tableau n'a pas pu être finalisée — contactez un administrateur avant de continuer.",
     "validate": "Valider le score",
     "unvalidate": "Dévalider",
     "unvalidateToEdit": "Dévalider pour modifier",
