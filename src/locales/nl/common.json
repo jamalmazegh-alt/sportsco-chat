@@ -541,6 +541,35 @@
     "downloadPoster": "PDF-poster downloaden",
     "posterReady": "Poster klaar"
   },
+  "championships": {
+    "title": "Competities",
+    "championship": "Competitie",
+    "add": "Competitie toevoegen",
+    "name": "Naam van de competitie",
+    "season": "Seizoen",
+    "seasonOptional": "optioneel",
+    "rename": "Hernoemen",
+    "archive": "Archiveren",
+    "reactivate": "Heractiveren",
+    "delete": "Verwijderen",
+    "confirmDelete": "Deze competitie verwijderen?",
+    "archived": "Gearchiveerde competitie",
+    "activeSection": "Actieve competities",
+    "archivedSection": "Gearchiveerde competities",
+    "showArchived": "Gearchiveerde competities tonen ({{n}})",
+    "emptyActive": "Geen actieve competitie voor dit team",
+    "emptyAll": "Geen competitie geconfigureerd",
+    "noneActive": "Geen actieve competitie voor dit team",
+    "ctaAddToTeam": "Een competitie aan dit team toevoegen",
+    "select": "Een competitie selecteren",
+    "historical": "Historische competitie",
+    "notActive": "Deze competitie is niet meer actief",
+    "errors": {
+      "required": "Een competitie is verplicht voor een competitiewedstrijd",
+      "duplicate": "Deze competitie is al geconfigureerd voor dit team",
+      "inUse": "Deze competitie kan niet worden verwijderd omdat er wedstrijden aan gekoppeld zijn. Archiveer deze om hem uit nieuwe evenementen te verwijderen."
+    }
+  },
   "club": {
     "logo": "Clublogo",
     "uploadLogo": "Logo toevoegen",
