@@ -16,23 +16,6 @@ const TeamImagePathInput = z.object({
   path: z.string().min(1).max(500),
 });
 
-function safeImageExtension(fileName: string, contentType: string) {
-  const fromName = fileName
-    .split(".")
-    .pop()
-    ?.toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-  if (fromName && ["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"].includes(fromName)) {
-    return fromName === "jpeg" ? "jpg" : fromName;
-  }
-  if (contentType === "image/png") return "png";
-  if (contentType === "image/webp") return "webp";
-  if (contentType === "image/gif") return "gif";
-  if (contentType === "image/heic") return "heic";
-  if (contentType === "image/heif") return "heif";
-  return "jpg";
-}
-
 export const createSignedTeamImageUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => TeamImageUploadInput.parse(input))
@@ -61,7 +44,27 @@ export const createSignedTeamImageUpload = createServerFn({ method: "POST" })
     });
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const ext = safeImageExtension(data.fileName, data.contentType);
+    const fromName = data.fileName
+      .split(".")
+      .pop()
+      ?.toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    const ext =
+      fromName && ["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"].includes(fromName)
+        ? fromName === "jpeg"
+          ? "jpg"
+          : fromName
+        : data.contentType === "image/png"
+          ? "png"
+          : data.contentType === "image/webp"
+            ? "webp"
+            : data.contentType === "image/gif"
+              ? "gif"
+              : data.contentType === "image/heic"
+                ? "heic"
+                : data.contentType === "image/heif"
+                  ? "heif"
+                  : "jpg";
     const path = `${data.clubId}/${data.teamId}-${Date.now()}-${globalThis.crypto.randomUUID()}.${ext}`;
     const { data: signed, error } = await supabaseAdmin.storage
       .from("team-images")
