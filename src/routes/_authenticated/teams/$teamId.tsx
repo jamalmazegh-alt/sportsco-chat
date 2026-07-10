@@ -675,10 +675,7 @@ function TeamDetail() {
                 <Label>{t("teams.ageGroup")}</Label>
                 <Input value={editAge} onChange={(e) => setEditAge(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
-                <Label>{t("teams.championship")}</Label>
-                <Input value={editChamp} onChange={(e) => setEditChamp(e.target.value)} />
-              </div>
+              {/* teams.championship is deprecated — see the Championnats section on the team page. */}
               <div className="space-y-2">
                 <Label>{t("teams.competitions")}</Label>
                 <div className="grid grid-cols-3 gap-2">
