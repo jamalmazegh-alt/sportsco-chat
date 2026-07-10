@@ -545,6 +545,8 @@
     "title": "Championnats",
     "championship": "Championnat",
     "add": "Ajouter un championnat",
+    "editHint": "Les championnats sont gérés dans une section dédiée sur la page de l'équipe (plusieurs championnats possibles, avec archivage).",
+    "manage": "Gérer les championnats",
     "name": "Nom du championnat",
     "season": "Saison",
     "seasonOptional": "facultative",
