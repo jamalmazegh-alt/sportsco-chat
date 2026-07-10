@@ -42,6 +42,8 @@ export interface EventWizardState {
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
   competitionName?: string;
+  /** Selected championship (championship type only). */
+  championshipId?: string | null;
   location?: string;
   locationUrl?: string | null;
   description?: string; // free comment added by the user
@@ -182,6 +184,8 @@ export function toEventPayloadInput(
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
     competitionName: state.competitionName?.trim() ? state.competitionName.trim() : null,
+    championshipId:
+      state.competitionType === "championship" ? (state.championshipId ?? null) : null,
     isHome: isMatch ? state.isHome === "home" : null,
     meetingPoint: isAwayMatch ? (state.meetingPoint ?? null) : null,
     startsAt: startsIso,

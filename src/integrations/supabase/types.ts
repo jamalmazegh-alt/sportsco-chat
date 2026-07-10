@@ -1421,6 +1421,7 @@ export type Database = {
           cancellation_reason: string | null
           cancelled_at: string | null
           carpool_enabled: boolean
+          championship_id: string | null
           competition_name: string | null
           competition_type: string | null
           convocation_last_sent_at: string | null
@@ -1454,6 +1455,7 @@ export type Database = {
           cancellation_reason?: string | null
           cancelled_at?: string | null
           carpool_enabled?: boolean
+          championship_id?: string | null
           competition_name?: string | null
           competition_type?: string | null
           convocation_last_sent_at?: string | null
@@ -1487,6 +1489,7 @@ export type Database = {
           cancellation_reason?: string | null
           cancelled_at?: string | null
           carpool_enabled?: boolean
+          championship_id?: string | null
           competition_name?: string | null
           competition_type?: string | null
           convocation_last_sent_at?: string | null
@@ -1516,6 +1519,13 @@ export type Database = {
           type?: Database["public"]["Enums"]["event_type"]
         }
         Relationships: [
+          {
+            foreignKeyName: "events_championship_id_fkey"
+            columns: ["championship_id"]
+            isOneToOne: false
+            referencedRelation: "team_championships"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "events_series_id_fkey"
             columns: ["series_id"]
@@ -3906,6 +3916,54 @@ export type Database = {
           reason?: string
         }
         Relationships: []
+      }
+      team_championships: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          season_label: string | null
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          season_label?: string | null
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          season_label?: string | null
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_championships_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_championships_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       team_members: {
         Row: {
