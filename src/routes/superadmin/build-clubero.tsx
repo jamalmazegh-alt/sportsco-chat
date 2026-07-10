@@ -512,7 +512,9 @@ function LeadsTable({ leads }: { leads: LeadRow[] }) {
 
 function ResponsesList({ responses }: { responses: ResponseRow[] }) {
   const { t } = useTranslation("buildClubero");
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
+    () => new Set(responses.map((r) => r.id)),
+  );
   if (!responses.length) {
     return <p className="text-sm text-muted-foreground">{t("admin.responses.empty")}</p>;
   }
