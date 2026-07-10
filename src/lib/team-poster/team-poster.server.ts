@@ -494,39 +494,75 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   );
 
   // ── Benefits pills on dark bg — ghost pills with emerald dot
-  const benY = 100;
-  const pillH = 24;
-  const pillGap = 6;
   const labels = t.benefits;
-  const sizes = labels.map((l) => font.widthOfTextAtSize(l, 7.5) + 20);
-  const totalW = sizes.reduce((a, b) => a + b, 0) + pillGap * (labels.length - 1);
-  let px = (W - totalW) / 2;
-  labels.forEach((label, i) => {
-    const w = sizes[i];
-    page.drawRectangle({
-      x: px,
-      y: benY,
-      width: w,
-      height: pillH,
-      color: bgSoft,
-      borderColor: hairline,
-      borderWidth: 0.8,
+  const pillH = 22;
+  const pillGap = 6;
+  const sideMargin = 36;
+  const maxRowW = W - sideMargin * 2;
+
+  // Try to fit all pills on one line, shrinking font if needed
+  let fontSize = 7.5;
+  const minFontSize = 5.5;
+  let sizes: number[];
+  let totalW: number;
+  const measure = (size: number) => {
+    const pad = 16;
+    const s = labels.map((l) => bold.widthOfTextAtSize(l, size) + pad);
+    const t = s.reduce((a, b) => a + b, 0) + pillGap * (labels.length - 1);
+    return { sizes: s, totalW: t };
+  };
+  while (true) {
+    const m = measure(fontSize);
+    sizes = m.sizes;
+    totalW = m.totalW;
+    if (totalW <= maxRowW || fontSize <= minFontSize) break;
+    fontSize -= 0.5;
+  }
+
+  const drawRow = (rowLabels: string[], rowSizes: number[], y: number) => {
+    const rowW = rowSizes.reduce((a, b) => a + b, 0) + pillGap * (rowLabels.length - 1);
+    let px = (W - rowW) / 2;
+    rowLabels.forEach((label, i) => {
+      const w = rowSizes[i];
+      page.drawRectangle({
+        x: px,
+        y: y,
+        width: w,
+        height: pillH,
+        color: bgSoft,
+        borderColor: hairline,
+        borderWidth: 0.8,
+      });
+      page.drawCircle({
+        x: px + 8,
+        y: y + pillH / 2,
+        size: 2.6,
+        color: emerald,
+      });
+      const textW = bold.widthOfTextAtSize(label, fontSize);
+      page.drawText(label, {
+        x: px + (w - textW) / 2,
+        y: y + (pillH - fontSize) / 2 - 1,
+        size: fontSize,
+        font: bold,
+        color: white,
+      });
+      px += w + pillGap;
     });
-    page.drawCircle({
-      x: px + 10,
-      y: benY + pillH / 2,
-      size: 3,
-      color: emerald,
-    });
-    page.drawText(label, {
-      x: px + 17,
-      y: benY + 8,
-      size: 7.5,
-      font: bold,
-      color: white,
-    });
-    px += w + pillGap;
-  });
+  };
+
+  if (totalW <= maxRowW) {
+    drawRow(labels, sizes, 100);
+  } else {
+    // Split into two balanced rows so pills never overlap
+    const split = Math.ceil(labels.length / 2);
+    const row1Labels = labels.slice(0, split);
+    const row2Labels = labels.slice(split);
+    const row1Sizes = row1Labels.map((l) => bold.widthOfTextAtSize(l, fontSize) + 16);
+    const row2Sizes = row2Labels.map((l) => bold.widthOfTextAtSize(l, fontSize) + 16);
+    drawRow(row1Labels, row1Sizes, 116);
+    drawRow(row2Labels, row2Sizes, 88);
+  }
 
   // ── Footer band (emerald)
   const fH = 60;
