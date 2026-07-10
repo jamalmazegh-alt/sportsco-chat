@@ -591,7 +591,11 @@ function TeamDetail() {
       .insert({ team_id: teamId, player_id: player.id, role: "player" });
     if (tmErr) {
       setBusy(false);
-      toast.error(tmErr.message);
+      if ((tmErr as any).code === "23505") {
+        toast.error(t("players.alreadyInTeam"));
+      } else {
+        toast.error(tmErr.message);
+      }
       return;
     }
 
