@@ -70,69 +70,70 @@ const PUSH_STRINGS: Record<
   {
     reply: { title: (id: string) => string; body: (subject: string) => string };
     status: {
-      title: (subject: string) => string;
-      body: (statusLabel: string) => string;
-      inAppBody: (statusLabel: string) => string;
+      title: (id: string) => string;
+      body: (subject: string, statusLabel: string) => string;
+      inAppBody: (subject: string, statusLabel: string) => string;
     };
   }
 > = {
   fr: {
     reply: { title: (id) => `Réponse à votre ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Nouveau statut : ${l}`,
-      inAppBody: (l) => `Nouveau statut : ${l}`,
+      title: (id) => `Changement de statut de votre ticket #${id}`,
+      body: (s, l) => `${s} — Nouveau statut : ${l}`,
+      inAppBody: (s, l) => `${s} — Nouveau statut : ${l}`,
     },
   },
   en: {
     reply: { title: (id) => `Reply to your ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `New status: ${l}`,
-      inAppBody: (l) => `New status: ${l}`,
+      title: (id) => `Status change on your ticket #${id}`,
+      body: (s, l) => `${s} — New status: ${l}`,
+      inAppBody: (s, l) => `${s} — New status: ${l}`,
     },
   },
   de: {
     reply: { title: (id) => `Antwort auf Ihr Ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Neuer Status: ${l}`,
-      inAppBody: (l) => `Neuer Status: ${l}`,
+      title: (id) => `Statusänderung Ihres Tickets #${id}`,
+      body: (s, l) => `${s} — Neuer Status: ${l}`,
+      inAppBody: (s, l) => `${s} — Neuer Status: ${l}`,
     },
   },
   es: {
     reply: { title: (id) => `Respuesta a tu ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Nuevo estado: ${l}`,
-      inAppBody: (l) => `Nuevo estado: ${l}`,
+      title: (id) => `Cambio de estado de tu ticket #${id}`,
+      body: (s, l) => `${s} — Nuevo estado: ${l}`,
+      inAppBody: (s, l) => `${s} — Nuevo estado: ${l}`,
     },
   },
   it: {
     reply: { title: (id) => `Risposta al tuo ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Nuovo stato: ${l}`,
-      inAppBody: (l) => `Nuovo stato: ${l}`,
+      title: (id) => `Cambio di stato del tuo ticket #${id}`,
+      body: (s, l) => `${s} — Nuovo stato: ${l}`,
+      inAppBody: (s, l) => `${s} — Nuovo stato: ${l}`,
     },
   },
   nl: {
     reply: { title: (id) => `Antwoord op je ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Nieuwe status: ${l}`,
-      inAppBody: (l) => `Nieuwe status: ${l}`,
+      title: (id) => `Statuswijziging van je ticket #${id}`,
+      body: (s, l) => `${s} — Nieuwe status: ${l}`,
+      inAppBody: (s, l) => `${s} — Nieuwe status: ${l}`,
     },
   },
   pt: {
     reply: { title: (id) => `Resposta ao seu ticket #${id}`, body: (s) => s },
     status: {
-      title: (s) => s,
-      body: (l) => `Novo estado: ${l}`,
-      inAppBody: (l) => `Novo estado: ${l}`,
+      title: (id) => `Alteração de estado do seu ticket #${id}`,
+      body: (s, l) => `${s} — Novo estado: ${l}`,
+      inAppBody: (s, l) => `${s} — Novo estado: ${l}`,
     },
   },
 };
+
 
 
 
@@ -586,16 +587,17 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       await supabaseAdmin.from("notifications").insert({
         user_id: before.user_id,
         type: "support_status",
-        title: before.subject,
-        body: pushStrings.status.inAppBody(statusLabel),
+        title: pushStrings.status.title(shortId(data.ticket_id)),
+        body: pushStrings.status.inAppBody(before.subject, statusLabel),
         link: `/support/${data.ticket_id}`,
       });
       await sendPushToUser(before.user_id, {
-        title: pushStrings.status.title(before.subject),
-        body: pushStrings.status.body(statusLabel),
+        title: pushStrings.status.title(shortId(data.ticket_id)),
+        body: pushStrings.status.body(before.subject, statusLabel),
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
+
 
 
       if (email) {
