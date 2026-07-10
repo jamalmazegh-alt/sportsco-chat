@@ -169,8 +169,23 @@ export function InsightsSection({ clubId }: { clubId: string }) {
 
   if (!insights || insights.length === 0) return null;
 
-  const handleAction = (ins: InsightRow) => {
+  const handleAction = async (ins: InsightRow) => {
     const ap = (ins.action_payload ?? {}) as { event_id?: string; player_id?: string };
+
+    // Optimistically remove the card immediately for snappy UX.
+    qc.setQueryData<InsightRow[] | undefined>(["coach-insights", clubId, user?.id], (old) =>
+      old?.filter((i) => i.id !== ins.id),
+    );
+
+    // Persist the dismissal BEFORE navigating — otherwise the component
+    // unmounts, the in-flight RPC is aborted, and the insight reappears
+    // on next visit because `dismissed_by` was never written.
+    try {
+      await dismissInsight({ data: { insightId: ins.id } });
+    } catch {
+      qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
+    }
+
     if (ins.action_type === "send_reminder" && ap.event_id) {
       navigate({
         to: "/events/$eventId",
@@ -182,14 +197,8 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     } else if (ins.action_type === "view_player" && ap.player_id) {
       navigate({ to: "/players/$playerId", params: { playerId: ap.player_id } });
     }
-    // Optimistically remove the card and persist the dismissal so it doesn't reappear.
-    qc.setQueryData<InsightRow[] | undefined>(["coach-insights", clubId, user?.id], (old) =>
-      old?.filter((i) => i.id !== ins.id),
-    );
-    dismissInsight({ data: { insightId: ins.id } }).catch(() => {
-      qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
-    });
   };
+
 
 
   const confirmDismiss = async () => {
