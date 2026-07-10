@@ -269,6 +269,36 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
 
+  // Active championships for the current team (championship match dropdown).
+  const { data: championships = [], isLoading: champsLoading } = useQuery({
+    queryKey: ["team-championships", state.teamId, "active"],
+    enabled: Boolean(state.teamId) && state.type === "match",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_championships" as never)
+        .select("id, name, season_label")
+        .eq("team_id", state.teamId)
+        .eq("is_active", true)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; name: string; season_label: string | null }>;
+    },
+  });
+
+  // If the currently selected championship no longer belongs to the selected
+  // team (e.g. user changed team), clear it.
+  useEffect(() => {
+    if (
+      state.competitionType === "championship" &&
+      state.championshipId &&
+      championships.length > 0 &&
+      !championships.some((c) => c.id === state.championshipId)
+    ) {
+      setState((s) => ({ ...s, championshipId: null, competitionName: undefined }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.teamId, championships.length]);
+
   function answer<K extends keyof EventWizardState>(k: K, v: EventWizardState[K]) {
     setState((s) => ({ ...s, [k]: v, step: s.step + 1 }));
   }
