@@ -173,28 +173,24 @@ export function ImportPlayersCsvDialog({
   clubId: string;
   onDone: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
-  const HEADER_DEFAULTS: Record<(typeof HEADERS)[number], string> = {
-    first_name: "Prénom",
-    last_name: "Nom",
-    jersey: "Numéro",
-    position: "Poste",
-    license: "Licence",
-    birth_date: "Date de naissance",
-    email: "Email",
-    phone: "Téléphone",
-    parent_first: "Prénom parent",
-    parent_last: "Nom parent",
-    parent_email: "Email parent",
-    parent_phone: "Téléphone parent",
+  const HEADER_TRANSLATIONS: Record<string, Record<(typeof HEADERS)[number], string>> = {
+    fr: { first_name: "Prénom", last_name: "Nom", jersey: "Numéro", position: "Poste", license: "Licence", birth_date: "Date de naissance", email: "Email", phone: "Téléphone", parent_first: "Prénom parent", parent_last: "Nom parent", parent_email: "Email parent", parent_phone: "Téléphone parent" },
+    en: { first_name: "First name", last_name: "Last name", jersey: "Number", position: "Position", license: "License", birth_date: "Date of birth", email: "Email", phone: "Phone", parent_first: "Parent first name", parent_last: "Parent last name", parent_email: "Parent email", parent_phone: "Parent phone" },
+    es: { first_name: "Nombre", last_name: "Apellido", jersey: "Número", position: "Posición", license: "Licencia", birth_date: "Fecha de nacimiento", email: "Correo", phone: "Teléfono", parent_first: "Nombre del padre", parent_last: "Apellido del padre", parent_email: "Correo del padre", parent_phone: "Teléfono del padre" },
+    de: { first_name: "Vorname", last_name: "Nachname", jersey: "Nummer", position: "Position", license: "Lizenz", birth_date: "Geburtsdatum", email: "E-Mail", phone: "Telefon", parent_first: "Vorname Elternteil", parent_last: "Nachname Elternteil", parent_email: "E-Mail Elternteil", parent_phone: "Telefon Elternteil" },
+    it: { first_name: "Nome", last_name: "Cognome", jersey: "Numero", position: "Ruolo", license: "Licenza", birth_date: "Data di nascita", email: "Email", phone: "Telefono", parent_first: "Nome genitore", parent_last: "Cognome genitore", parent_email: "Email genitore", parent_phone: "Telefono genitore" },
+    nl: { first_name: "Voornaam", last_name: "Achternaam", jersey: "Nummer", position: "Positie", license: "Licentie", birth_date: "Geboortedatum", email: "E-mail", phone: "Telefoon", parent_first: "Voornaam ouder", parent_last: "Achternaam ouder", parent_email: "E-mail ouder", parent_phone: "Telefoon ouder" },
+    pt: { first_name: "Nome", last_name: "Sobrenome", jersey: "Número", position: "Posição", license: "Licença", birth_date: "Data de nascimento", email: "E-mail", phone: "Telefone", parent_first: "Nome do responsável", parent_last: "Sobrenome do responsável", parent_email: "E-mail do responsável", parent_phone: "Telefone do responsável" },
   };
-  const localizedHeaders = HEADERS.map((k) =>
-    t(`players.import.headers.${k}`, { defaultValue: HEADER_DEFAULTS[k] }),
-  );
+  const lang = (i18n.language || "fr").slice(0, 2).toLowerCase();
+  const HEADER_LABELS = HEADER_TRANSLATIONS[lang] ?? HEADER_TRANSLATIONS.fr;
+  const localizedHeaders = HEADERS.map((k) => HEADER_LABELS[k]);
+
 
   function onFile(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
