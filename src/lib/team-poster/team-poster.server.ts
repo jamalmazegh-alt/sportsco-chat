@@ -310,40 +310,51 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   const font = await doc.embedFont(regularBytes(), { subset: true });
   const bold = await doc.embedFont(boldBytes(), { subset: true });
 
-  // Brand palette
-  const ink = rgb(0.06, 0.09, 0.16); // deep navy
-  const muted = rgb(0.46, 0.52, 0.62);
-  const teal = rgb(0.169, 0.733, 0.627); // #2BBBA0
-  const tealSoft = rgb(0.85, 0.95, 0.92);
-  const lavender = rgb(0.91, 0.9, 0.97);
-  const surface = rgb(0.973, 0.98, 0.984);
+  // Brand palette — aligned with clubero.app marketing site
+  const bg = rgb(0.043, 0.067, 0.094);        // deep navy #0B1118
+  const bgSoft = rgb(0.075, 0.106, 0.145);    // panel navy #131B25
+  const ink = rgb(0.06, 0.09, 0.16);          // for QR on white
   const white = rgb(1, 1, 1);
+  const textMuted = rgb(0.62, 0.68, 0.76);    // slate on dark
+  const emerald = rgb(0.157, 0.827, 0.443);   // #28D371 CTA green
+  const emeraldDeep = rgb(0.09, 0.6, 0.35);
+  const hairline = rgb(0.15, 0.2, 0.27);
 
   const W = 595.28;
   const H = 841.89;
   const page = doc.addPage([W, H]);
 
-  // ── Background canvas (very light surface)
-  page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: surface });
+  // ── Dark background canvas
+  page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: bg });
 
-  // Decorative pastel blobs (geometric, vector — no AI vibe)
-  page.drawCircle({ x: -40, y: H - 60, size: 140, color: tealSoft });
-  page.drawCircle({ x: W + 40, y: H - 180, size: 130, color: lavender });
-  page.drawCircle({ x: -30, y: H / 2 - 50, size: 90, color: lavender });
-  page.drawCircle({ x: W + 30, y: 320, size: 110, color: tealSoft });
-  // Subtle dot grid (top-right)
+  // Subtle emerald glow accents (layered translucent circles)
+  const glow = (cx: number, cy: number, r: number, alpha: number) => {
+    for (let i = 4; i >= 1; i--) {
+      page.drawCircle({
+        x: cx,
+        y: cy,
+        size: r * (i / 4),
+        color: emerald,
+        opacity: (alpha * (5 - i)) / 12,
+      });
+    }
+  };
+  glow(-30, H - 40, 180, 0.35);
+  glow(W + 20, 260, 200, 0.28);
+
+  // Faint dot grid (top-right)
   for (let i = 0; i < 6; i++) {
     for (let j = 0; j < 4; j++) {
       page.drawCircle({
         x: W - 60 - i * 8,
         y: H - 130 - j * 8,
         size: 1.1,
-        color: rgb(0.78, 0.85, 0.83),
+        color: rgb(0.25, 0.32, 0.4),
       });
     }
   }
 
-  // ── Header (logos prominently sized)
+  // ── Header
   const headerCenterY = H - 60;
   const clubero = await embed(doc, await fetchImage(CLUBERO_LOGO_URL));
   if (clubero) {
@@ -354,7 +365,7 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     page.drawImage(clubero, { x: 40, y: headerCenterY - h / 2, width: w, height: h });
   }
 
-  // Club logo (right) — larger, clearly legible
+  // Club logo (right)
   const clubLogo = input.clubLogoUrl ? await embed(doc, await fetchImage(input.clubLogoUrl)) : null;
   if (clubLogo) {
     const max = 95;
@@ -370,110 +381,75 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
       y: headerCenterY - 6,
       size: f.size,
       font: bold,
-      color: ink,
+      color: white,
     });
   }
 
-  // Brand tagline tiny (under right logo)
-  drawCenteredText(page, t.brandTag, W - 110, headerCenterY - 60, 6.5, bold, teal);
+  // Brand tagline tiny
+  drawCenteredText(page, t.brandTag, W - 110, headerCenterY - 60, 6.5, bold, emerald);
 
-  // ── Big title — moved up, just below header
-  drawCenteredText(page, t.title1, W / 2, H - 160, 42, bold, ink);
-  drawCenteredText(page, t.title2, W / 2, H - 200, 32, bold, teal);
+  // ── Big title — white with emerald highlight
+  drawCenteredText(page, t.title1, W / 2, H - 160, 44, bold, white);
+  drawCenteredText(page, t.title2, W / 2, H - 202, 34, bold, emerald);
 
-  // ── Subtitle + body — fully above the QR card
-  drawCenteredText(page, t.subtitle, W / 2, H - 232, 12, font, muted);
-  drawCenteredText(page, t.bodyP1, W / 2, H - 252, 10, font, muted);
-  drawCenteredText(page, t.bodyP2, W / 2, H - 266, 10, font, muted);
+  // ── Subtitle + body
+  drawCenteredText(page, t.subtitle, W / 2, H - 236, 12, font, textMuted);
+  drawCenteredText(page, t.bodyP1, W / 2, H - 256, 10, font, textMuted);
+  drawCenteredText(page, t.bodyP2, W / 2, H - 270, 10, font, textMuted);
 
-  // ── Editorial geometric decoration (no illustrations — sober, adult look).
-  // Thin concentric rings left/right of the QR card, plus discreet accents.
-  const ringColor = rgb(0.82, 0.88, 0.92);
-  const ringColorSoft = rgb(0.88, 0.92, 0.95);
-  // Left cluster
-  page.drawCircle({ x: 70, y: 380, size: 44, borderColor: ringColor, borderWidth: 1 });
-  page.drawCircle({ x: 70, y: 380, size: 30, borderColor: ringColorSoft, borderWidth: 1 });
-  page.drawCircle({ x: 70, y: 380, size: 6, color: teal, opacity: 0.85 });
-  // Right cluster
-  page.drawCircle({ x: W - 70, y: 320, size: 52, borderColor: ringColor, borderWidth: 1 });
-  page.drawCircle({ x: W - 70, y: 320, size: 34, borderColor: ringColorSoft, borderWidth: 1 });
-  page.drawCircle({ x: W - 70, y: 320, size: 5, color: rgb(0.98, 0.74, 0.31), opacity: 0.75 });
-  // Discreet dot grid bottom-left
-  for (let i = 0; i < 5; i++) {
-    for (let j = 0; j < 3; j++) {
-      page.drawCircle({
-        x: 48 + i * 9,
-        y: 200 + j * 9,
-        size: 1.1,
-        color: rgb(0.78, 0.85, 0.83),
-      });
-    }
-  }
-  // Thin horizontal rule between QR card zone and benefits pills
-  page.drawLine({
-    start: { x: W / 2 - 40, y: 205 },
-    end: { x: W / 2 + 40, y: 205 },
-    thickness: 0.6,
-    color: rgb(0.82, 0.86, 0.9),
-  });
-
-  // ── QR Card (centered, prominent)
+  // ── QR Card (light card floating on dark bg)
   const cardW = 320;
   const cardH = 340;
   const cardX = (W - cardW) / 2;
   const cardY = 230;
 
-  // Soft drop shadow
-  page.drawRectangle({
-    x: cardX + 4,
-    y: cardY - 6,
-    width: cardW,
-    height: cardH,
-    color: rgb(0.85, 0.88, 0.92),
-    opacity: 0.5,
-  });
-  // Card background
+  // Emerald glow behind card
+  glow(W / 2, cardY + cardH / 2, 260, 0.4);
+
+  // Card background (white)
   page.drawRectangle({
     x: cardX,
     y: cardY,
     width: cardW,
     height: cardH,
     color: white,
-    borderColor: rgb(0.9, 0.93, 0.96),
-    borderWidth: 1,
+  });
+  // Emerald top accent bar
+  page.drawRectangle({
+    x: cardX,
+    y: cardY + cardH - 5,
+    width: cardW,
+    height: 5,
+    color: emerald,
   });
 
-  // Badge "TEAM / ÉQUIPE"
+  // Badge "TEAM / ÉQUIPE" — pill style like marketing CTA
   const badgeText = t.teamBadge;
   const badgeFontSize = 9;
-  const badgePadX = 12;
+  const badgePadX = 14;
   const badgeW = bold.widthOfTextAtSize(badgeText, badgeFontSize) + badgePadX * 2;
-  const badgeH = 20;
+  const badgeH = 22;
   const badgeX = cardX + (cardW - badgeW) / 2;
-  const badgeY = cardY + cardH - badgeH - 18;
-  page.drawRectangle({
-    x: badgeX,
-    y: badgeY,
-    width: badgeW,
-    height: badgeH,
-    color: teal,
-  });
+  const badgeY = cardY + cardH - badgeH - 24;
+  page.drawRectangle({ x: badgeX, y: badgeY, width: badgeW, height: badgeH, color: emerald });
+  page.drawCircle({ x: badgeX, y: badgeY + badgeH / 2, size: badgeH / 2, color: emerald });
+  page.drawCircle({ x: badgeX + badgeW, y: badgeY + badgeH / 2, size: badgeH / 2, color: emerald });
   page.drawText(badgeText, {
     x: badgeX + badgePadX,
-    y: badgeY + 6,
+    y: badgeY + 7,
     size: badgeFontSize,
     font: bold,
     color: white,
   });
 
-  // Team name (centered, fitted)
+  // Team name
   const nameMaxW = cardW - 32;
   const teamFitted = fitText(input.teamName, bold, 22, nameMaxW);
   drawCenteredText(
     page,
     teamFitted.text,
     cardX + cardW / 2,
-    badgeY - 26,
+    badgeY - 28,
     teamFitted.size,
     bold,
     ink,
@@ -485,7 +461,6 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   const cell = qrAreaSize / qr.size;
   const qrX = cardX + (cardW - qrAreaSize) / 2;
   const qrY = cardY + 50;
-  // Quiet zone background
   page.drawRectangle({
     x: qrX - 8,
     y: qrY - 8,
@@ -507,17 +482,25 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     }
   }
 
-  // Scan hint
-  drawCenteredText(page, t.scanHint, cardX + cardW / 2, cardY + 20, 9.5, font, muted);
+  // Scan hint (on white card)
+  drawCenteredText(
+    page,
+    t.scanHint,
+    cardX + cardW / 2,
+    cardY + 20,
+    9.5,
+    font,
+    rgb(0.4, 0.46, 0.55),
+  );
 
-  const benY = 92;
-  const pillH = 22;
+  // ── Benefits pills on dark bg — ghost pills with emerald dot
+  const benY = 100;
+  const pillH = 24;
   const pillGap = 6;
   const labels = t.benefits;
-  const sizes = labels.map((l) => font.widthOfTextAtSize(l, 7.5) + 18);
+  const sizes = labels.map((l) => font.widthOfTextAtSize(l, 7.5) + 20);
   const totalW = sizes.reduce((a, b) => a + b, 0) + pillGap * (labels.length - 1);
   let px = (W - totalW) / 2;
-  const dotColors = [teal, rgb(0.73, 0.62, 0.95), rgb(0.98, 0.74, 0.31), rgb(0.4, 0.65, 1), teal];
   labels.forEach((label, i) => {
     const w = sizes[i];
     page.drawRectangle({
@@ -525,31 +508,32 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
       y: benY,
       width: w,
       height: pillH,
-      color: white,
-      borderColor: rgb(0.92, 0.94, 0.96),
+      color: bgSoft,
+      borderColor: hairline,
       borderWidth: 0.8,
     });
     page.drawCircle({
-      x: px + 9,
+      x: px + 10,
       y: benY + pillH / 2,
       size: 3,
-      color: dotColors[i % dotColors.length],
+      color: emerald,
     });
     page.drawText(label, {
-      x: px + 16,
-      y: benY + 7,
+      x: px + 17,
+      y: benY + 8,
       size: 7.5,
       font: bold,
-      color: ink,
+      color: white,
     });
     px += w + pillGap;
   });
 
-  // ── Footer band (teal)
-  const fH = 56;
-  page.drawRectangle({ x: 0, y: 0, width: W, height: fH, color: teal });
-  drawCenteredText(page, t.footerLine, W / 2, fH - 22, 10.5, bold, white);
-  drawCenteredText(page, t.footerSite, W / 2, fH - 40, 9, font, white);
+  // ── Footer band (emerald)
+  const fH = 60;
+  page.drawRectangle({ x: 0, y: 0, width: W, height: fH, color: emerald });
+  page.drawRectangle({ x: 0, y: fH, width: W, height: 2, color: emeraldDeep });
+  drawCenteredText(page, t.footerLine, W / 2, fH - 24, 11, bold, white);
+  drawCenteredText(page, t.footerSite, W / 2, fH - 42, 9, font, rgb(0.92, 1, 0.96));
 
   return await doc.save();
 }
