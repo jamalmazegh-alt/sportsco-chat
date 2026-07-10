@@ -218,9 +218,14 @@ export function ImportPlayersCsvDialog({
     downloadCsv("players-template.csv", csv);
   }
 
+  const aliasMap: Record<string, (typeof HEADERS)[number]> = {};
+  HEADERS.forEach((k, i) => {
+    aliasMap[normHeader(localizedHeaders[i])] = k;
+  });
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const rows = parseCsv(text);
+    const rows = parseCsv(text, aliasMap);
     if (rows.length === 0) {
       toast.error(
         t("players.import.noneDetected", {
