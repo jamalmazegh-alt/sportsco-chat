@@ -28,10 +28,27 @@ const CreateEventSchema = z.object({
 export type CreateEventInput = z.infer<typeof CreateEventSchema>;
 
 /**
- * Shared single-event creation. The wizard and any future caller MUST go through
- * this (never a local insert), so the `events` row is always assembled by
- * `buildEventPayload`.
+ * Championship rule (existence, same team, same club, is_active on INSERT, snapshot
+ * of competition_name) lives ENTIRELY in the DB trigger
+ * `enforce_event_championship_trg` — single source of truth for all write paths
+ * (this server fn, direct client inserts, imports, series generator, future RPCs).
+ *
+ * The server functions here only translate the trigger's raw SQL exception into
+ * a stable, i18n-friendly error code. They MUST NOT re-implement the rule.
  */
+export function translateEventDbError(err: {
+  message?: string | null;
+  code?: string | null;
+} | null): string {
+  const msg = err?.message ?? "";
+  if (msg.includes("championship_required")) return "championship_required";
+  if (msg.includes("championship_not_found")) return "championship_not_found";
+  if (msg.includes("championship_team_mismatch")) return "championship_team_mismatch";
+  if (msg.includes("championship_club_mismatch")) return "championship_club_mismatch";
+  if (msg.includes("championship_archived")) return "championship_archived";
+  return msg || "db_error";
+}
+
 export const createEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => CreateEventSchema.parse(data))
@@ -40,30 +57,7 @@ export const createEvent = createServerFn({ method: "POST" })
 
     const payload = buildEventPayload(data as BuildEventPayloadInput);
 
-    // Server-side championship validation. When the match is a championship,
-    // championship_id is REQUIRED and must belong to the same team+club.
-    // We overwrite competition_name with the current championship name
-    // (client-provided value is never trusted as source of truth here).
-    if (payload.type === "match" && payload.competition_type === "championship") {
-      const champId = payload.championship_id;
-      if (!champId) throw new Error("championship-required");
-      const { data: champ, error: champErr } = await supabase
-        .from("team_championships" as never)
-        .select("id, name, team_id, is_active")
-        .eq("id", champId)
-        .single();
-      if (champErr || !champ) throw new Error("championship-not-found");
-      const c = champ as { id: string; name: string; team_id: string; is_active: boolean };
-      if (c.team_id !== payload.team_id) throw new Error("championship-team-mismatch");
-      if (!c.is_active) throw new Error("championship-archived");
-      // Snapshot the name at creation time — never overwritten later on rename.
-      payload.competition_name = c.name;
-    } else {
-      // Non-championship matches must not carry a championship_id.
-      payload.championship_id = null;
-    }
-
-    // Duplicate guard: same team + type + start time (mirrors EventFormSheet).
+    // Duplicate guard: same team + type + start time.
     const { data: dupes } = await supabase
       .from("events")
       .select("id")
@@ -86,7 +80,35 @@ export const createEvent = createServerFn({ method: "POST" })
       } as never)
       .select("id")
       .single();
-    if (error || !row) throw new Error(error?.message ?? "insert-failed");
+    if (error || !row) {
+      throw new Error(translateEventDbError(error));
+    }
 
     return { id: row.id as string };
+  });
+
+const UpdateEventSchema = CreateEventSchema.extend({
+  id: z.string().uuid(),
+});
+
+export type UpdateEventInput = z.infer<typeof UpdateEventSchema>;
+
+export const updateEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => UpdateEventSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { id, ...rest } = data;
+
+    const payload = buildEventPayload(rest as BuildEventPayloadInput);
+
+    const { error } = await supabase
+      .from("events")
+      .update(payload as never)
+      .eq("id", id);
+    if (error) {
+      throw new Error(translateEventDbError(error));
+    }
+
+    return { id };
   });
