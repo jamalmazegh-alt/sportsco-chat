@@ -660,6 +660,10 @@ function TeamDetail() {
         </div>
       </div>
 
+      <TeamChampionshipsSection teamId={teamId} canManage={isCoach} />
+
+
+
       {isCoach && (
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           <SheetContent side="bottom" className="rounded-t-3xl">
