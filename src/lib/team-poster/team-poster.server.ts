@@ -362,7 +362,18 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
     const r = Math.min(max / clubero.width, max / clubero.height);
     const w = clubero.width * r;
     const h = clubero.height * r;
-    page.drawImage(clubero, { x: 40, y: headerCenterY - h / 2, width: w, height: h });
+    const logoX = 40;
+    const logoY = headerCenterY - h / 2;
+    // White badge so the Clubero logo always sits on a clean light background
+    const pad = 14;
+    page.drawRectangle({
+      x: logoX - pad,
+      y: logoY - pad,
+      width: w + pad * 2,
+      height: h + pad * 2,
+      color: white,
+    });
+    page.drawImage(clubero, { x: logoX, y: logoY, width: w, height: h });
   }
 
   // Club logo (right)
