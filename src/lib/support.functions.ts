@@ -487,23 +487,27 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
 
     // Notify ticket owner on status change
     if (before && patch.status !== undefined && patch.status !== before.status && before.user_id) {
-      await supabaseAdmin.from("notifications").insert({
-        user_id: before.user_id,
-        type: "support_status",
-        title: `Mise à jour #${shortId(data.ticket_id)}`,
-        body: `Statut : ${patch.status}`,
-        link: `/support/${data.ticket_id}`,
-      });
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
       const locale = profile?.preferred_language === "en" ? "en" : "fr";
       const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
+      const statusLabel =
+        STATUS_LABELS[locale as "fr" | "en"]?.[patch.status] ?? patch.status;
+
+      await supabaseAdmin.from("notifications").insert({
+        user_id: before.user_id,
+        type: "support_status",
+        title: before.subject,
+        body: locale === "en" ? `New status: ${statusLabel}` : `Nouveau statut : ${statusLabel}`,
+        link: `/support/${data.ticket_id}`,
+      });
       await sendPushToUser(before.user_id, {
-        title: pushStrings.status.title(shortId(data.ticket_id)),
-        body: pushStrings.status.body(patch.status, before.subject),
+        title: pushStrings.status.title(before.subject),
+        body: pushStrings.status.body(statusLabel),
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
+
 
       if (email) {
         await enqueueTransactionalEmailServer({
