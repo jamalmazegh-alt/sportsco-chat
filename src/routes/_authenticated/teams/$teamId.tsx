@@ -21,6 +21,7 @@ import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
+import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronRight,
@@ -1392,6 +1393,8 @@ function TeamImage({
 }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
+  const createImageUpload = useServerFn(createSignedTeamImageUpload);
+  const updateTeamImage = useServerFn(updateTeamImageFromUpload);
 
   async function onPick(file: File) {
     if (!team?.club_id) return;
@@ -1404,28 +1407,31 @@ function TeamImage({
       return;
     }
     setBusy(true);
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${team.club_id}/${team.id}-${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from("team-images")
-      .upload(path, file, { upsert: true, contentType: file.type });
-    if (upErr) {
+    try {
+      const signed = await createImageUpload({
+        data: {
+          clubId: team.club_id,
+          teamId: team.id,
+          fileName: file.name,
+          contentType: file.type || "image/jpeg",
+          size: file.size,
+        },
+      });
+      const { error: upErr } = await supabase.storage
+        .from("team-images")
+        .uploadToSignedUrl(signed.path, signed.token, file, {
+          contentType: file.type || "image/jpeg",
+        });
+      if (upErr) throw upErr;
+      await updateTeamImage({ data: { clubId: team.club_id, teamId: team.id, path: signed.path } });
+      onUploaded();
+      toast.success(t("common.saved"));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : null;
+      toast.error(message ?? t("common.error", { defaultValue: "Erreur" }));
+    } finally {
       setBusy(false);
-      toast.error(upErr.message);
-      return;
     }
-    const { data: pub } = supabase.storage.from("team-images").getPublicUrl(path);
-    const { error: updErr } = await supabase
-      .from("teams")
-      .update({ image_url: pub.publicUrl })
-      .eq("id", team.id);
-    setBusy(false);
-    if (updErr) {
-      toast.error(updErr.message);
-      return;
-    }
-    onUploaded();
-    toast.success(t("common.saved"));
   }
 
   const inner = team?.image_url ? (
