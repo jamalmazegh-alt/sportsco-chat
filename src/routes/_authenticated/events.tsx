@@ -369,7 +369,7 @@ function EventsPage() {
               )}
               {e.type === "match" && e.competition_name && (
                 <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground truncate">
-                  · {e.competition_name}
+                  {e.competition_name}
                 </span>
               )}
             </div>
