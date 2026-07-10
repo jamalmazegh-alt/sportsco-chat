@@ -250,7 +250,7 @@ function TeamDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
   const [editAge, setEditAge] = useState("");
-  const [editChamp, setEditChamp] = useState("");
+  // editChamp removed — championships are managed via TeamChampionshipsSection.
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editSport, setEditSport] = useState("");
