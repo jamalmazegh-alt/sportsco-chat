@@ -537,7 +537,8 @@ function EntryScreen({
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
 
-  if (isLoading || loadingExisting || !challenge) return <FullscreenLoader />;
+  if (isLoading || loadingExisting || !challenge || !passage || !existingData) return <FullscreenLoader />;
+  if (passage.id !== hydratedPassageId) return <FullscreenLoader />;
 
   if (players.length === 0) {
     return (
