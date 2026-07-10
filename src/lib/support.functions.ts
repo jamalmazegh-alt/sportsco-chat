@@ -277,7 +277,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
 
     // Confirmation email to the user
     if (email) {
-      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const locale = pickLocale(profile?.preferred_language);
       await enqueueTransactionalEmailServer({
         templateName: "support-ticket-created",
         recipientEmail: email,
@@ -411,7 +411,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       });
       const profile = await getUserProfile(ticket.user_id);
       const email = await getUserEmail(ticket.user_id);
-      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const locale = pickLocale(profile?.preferred_language);
       const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
       await sendPushToUser(ticket.user_id, {
         title: pushStrings.reply.title(shortId(ticket.id)),
@@ -579,7 +579,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (before && patch.status !== undefined && patch.status !== before.status && before.user_id) {
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
-      const locale = profile?.preferred_language === "en" ? "en" : "fr";
+      const locale = pickLocale(profile?.preferred_language);
       const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
       const statusLabel =
         STATUS_LABELS[locale as "fr" | "en"]?.[patch.status] ?? patch.status;
