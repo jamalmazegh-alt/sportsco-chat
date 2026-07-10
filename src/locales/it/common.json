@@ -565,9 +565,13 @@
     "historical": "Campionato storico",
     "notActive": "Questo campionato non è più attivo",
     "errors": {
-      "required": "Il campionato è obbligatorio per una partita di campionato",
+      "required": "Seleziona un campionato",
       "duplicate": "Questo campionato è già configurato per questa squadra",
-      "inUse": "Impossibile eliminare questo campionato perché è utilizzato da partite. Archivialo per rimuoverlo dai nuovi eventi."
+      "inUse": "Impossibile eliminare questo campionato perché è utilizzato da partite. Archivialo per rimuoverlo dai nuovi eventi.",
+      "teamMismatch": "Questo campionato non appartiene a questa squadra",
+      "clubMismatch": "Questo campionato non appartiene a questo club",
+      "archived": "Questo campionato è archiviato",
+      "notFound": "Campionato non trovato"
     }
   },
   "club": {

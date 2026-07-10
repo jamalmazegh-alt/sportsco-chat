@@ -565,9 +565,13 @@
     "historical": "Historische Meisterschaft",
     "notActive": "Diese Meisterschaft ist nicht mehr aktiv",
     "errors": {
-      "required": "Eine Meisterschaft ist für ein Meisterschaftsspiel erforderlich",
+      "required": "Meisterschaft auswählen",
       "duplicate": "Diese Meisterschaft ist bereits für dieses Team konfiguriert",
-      "inUse": "Diese Meisterschaft kann nicht gelöscht werden, da sie von Spielen verwendet wird. Archivieren Sie sie, um sie aus neuen Ereignissen zu entfernen."
+      "inUse": "Diese Meisterschaft kann nicht gelöscht werden, da sie von Spielen verwendet wird. Archivieren Sie sie, um sie aus neuen Ereignissen zu entfernen.",
+      "teamMismatch": "Diese Meisterschaft gehört nicht zu diesem Team",
+      "clubMismatch": "Diese Meisterschaft gehört nicht zu diesem Verein",
+      "archived": "Diese Meisterschaft ist archiviert",
+      "notFound": "Meisterschaft nicht gefunden"
     }
   },
   "club": {

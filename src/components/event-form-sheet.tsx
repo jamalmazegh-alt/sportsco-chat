@@ -25,8 +25,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
-import { buildEventPayload, type EventAttachment } from "@/lib/events/event-payload";
+import { type EventAttachment } from "@/lib/events/event-payload";
+import {
+  createEvent,
+  updateEvent,
+  type CreateEventInput,
+} from "@/lib/events/events.functions";
+import { ChampionshipPicker } from "@/components/events/championship-picker";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -77,6 +85,7 @@ export type EventFormValues = {
   opponent: string | null;
   competition_type: CompetitionType | null;
   competition_name: string | null;
+  championship_id?: string | null;
   is_home: boolean | null;
   meeting_point: string | null;
   starts_at: string; // ISO
@@ -411,6 +420,19 @@ export function EventFormSheet({
     (initial?.competition_type as CompetitionType) ?? "friendly",
   );
   const [competitionName, setCompetitionName] = useState(initial?.competition_name ?? "");
+  const [championshipId, setChampionshipId] = useState<string | null>(
+    initial?.championship_id ?? null,
+  );
+  // Snapshot of the historical championship link (name at creation time), used
+  // when editing an event whose championship was archived or deleted, so the
+  // user still sees what the event was tied to.
+  const historicalChampionship = useMemo(
+    () =>
+      initial?.competition_type === "championship" && initial?.competition_name
+        ? { id: initial?.championship_id ?? "", name: initial?.competition_name ?? null }
+        : null,
+    [initial?.competition_type, initial?.competition_name, initial?.championship_id],
+  );
   const [isHome, setIsHome] = useState<"home" | "away">(
     initial?.is_home === false ? "away" : "home",
   );
@@ -454,6 +476,7 @@ export function EventFormSheet({
     setOpponent(getInitialOpponent(initial));
     setCompetitionType((initial?.competition_type as CompetitionType) ?? "friendly");
     setCompetitionName(initial?.competition_name ?? "");
+    setChampionshipId(initial?.championship_id ?? null);
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
     setIsOfficial(initial?.is_official ?? (initial?.type as EventType) === "match");
@@ -479,12 +502,46 @@ export function EventFormSheet({
     }
   }, [availableCompetitionTypes, competitionType]);
 
+  // When the source team changes, drop any stale championship link. The picker
+  // itself also clears when the current id is not in the fetched list, but doing
+  // it here removes the transient inconsistency between the two states.
+  const previousTeamRef = useRef(teamId);
+  useEffect(() => {
+    if (previousTeamRef.current !== teamId) {
+      previousTeamRef.current = teamId;
+      setChampionshipId(null);
+    }
+  }, [teamId]);
+
   useEffect(() => {
     if (!open) return;
     fetchGoogleMapsKey().then((key) => {
       loadGoogleMapsPlaces(key)?.catch(() => undefined);
     });
   }, [open]);
+
+  const createEventFn = useServerFn(createEvent);
+  const updateEventFn = useServerFn(updateEvent);
+  const queryClient = useQueryClient();
+
+  function translateError(msg: string): string {
+    switch (msg) {
+      case "championship_required":
+        return t("championships.errors.required");
+      case "championship_team_mismatch":
+        return t("championships.errors.teamMismatch");
+      case "championship_club_mismatch":
+        return t("championships.errors.clubMismatch");
+      case "championship_archived":
+        return t("championships.errors.archived");
+      case "championship_not_found":
+        return t("championships.errors.notFound");
+      case "duplicate":
+        return t("events.duplicateExists");
+      default:
+        return msg;
+    }
+  }
 
   const titleMissing = type !== "match" && !title.trim();
 
@@ -519,139 +576,121 @@ export function EventFormSheet({
         ? combineDateTime(startDate, convocTime)
         : combineDateTime(convocDate ?? startDate, convocTime);
 
-    const payload = buildEventPayload({
+    // Championship UI guard (server + DB trigger are the actual source of truth,
+    // but this saves a round-trip when we know the user hasn't picked one).
+    if (type === "match" && competitionType === "championship" && !championshipId) {
+      setBusy(false);
+      toast.error(t("championships.errors.required"));
+      return;
+    }
+
+    const baseInput: CreateEventInput = {
       teamId,
       type,
       title: finalTitle,
       description: description || null,
       location: location || null,
       locationUrl: finalLocationUrl,
-      opponent,
+      opponent: opponent || null,
       competitionType,
       competitionName: competitionName || null,
-      isHome: isHome === "home",
+      championshipId: competitionType === "championship" ? championshipId : null,
+      isHome: type === "match" ? isHome === "home" : null,
       meetingPoint: meetingPoint || null,
       startsAt: startsIso,
       endsAt: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocationTime: eventConvocationTime,
       isOfficial: type === "tournament" ? isOfficial : false,
-      attachments: attachments as unknown as EventAttachment[],
-    });
+      attachments: attachments as unknown as Record<string, unknown>[],
+    };
 
-    if (mode === "create") {
-      const shouldRepeat = type === "training" && repeatWeeks > 1;
-      if (shouldRepeat) {
-        const rows = [] as (typeof payload)[];
-        for (let i = 0; i < repeatWeeks; i++) {
-          const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
-          const shifted = {
-            ...payload,
-            starts_at: new Date(new Date(payload.starts_at).getTime() + offsetMs).toISOString(),
-            ends_at: payload.ends_at
-              ? new Date(new Date(payload.ends_at).getTime() + offsetMs).toISOString()
-              : null,
-            convocation_time: payload.convocation_time
-              ? new Date(new Date(payload.convocation_time).getTime() + offsetMs).toISOString()
-              : null,
-          };
-          rows.push(shifted);
-        }
-        // Duplicate check: skip rows that already exist (same team + type + starts_at)
-        const { data: existing } = await supabase
-          .from("events")
-          .select("starts_at")
-          .eq("team_id", teamId)
-          .eq("type", type)
-          .in(
-            "starts_at",
-            rows.map((r) => r.starts_at),
-          )
-          .is("deleted_at", null);
-        const existingSet = new Set(
-          (existing ?? []).map((e) => new Date(e.starts_at).toISOString()),
-        );
-        const toInsert = rows.filter((r) => !existingSet.has(r.starts_at));
-        if (toInsert.length === 0) {
+    function invalidateEventsCaches() {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["upcoming"] });
+    }
+
+    try {
+      if (mode === "create") {
+        const shouldRepeat = type === "training" && repeatWeeks > 1;
+        if (shouldRepeat) {
+          let created = 0;
+          let skipped = 0;
+          let firstId: string | null = null;
+          for (let i = 0; i < repeatWeeks; i++) {
+            const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
+            const shiftedStarts = new Date(
+              new Date(baseInput.startsAt).getTime() + offsetMs,
+            ).toISOString();
+            const shiftedEnds = baseInput.endsAt
+              ? new Date(new Date(baseInput.endsAt).getTime() + offsetMs).toISOString()
+              : null;
+            const shiftedConvoc = baseInput.convocationTime
+              ? new Date(new Date(baseInput.convocationTime).getTime() + offsetMs).toISOString()
+              : null;
+            try {
+              const res = await createEventFn({
+                data: {
+                  ...baseInput,
+                  startsAt: shiftedStarts,
+                  endsAt: shiftedEnds,
+                  convocationTime: shiftedConvoc,
+                },
+              });
+              created += 1;
+              if (!firstId) firstId = res.id;
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : String(err);
+              if (msg === "duplicate") {
+                skipped += 1;
+                continue;
+              }
+              setBusy(false);
+              toast.error(translateError(msg));
+              return;
+            }
+          }
           setBusy(false);
-          toast.error(t("events.duplicateExists"));
+          if (created === 0) {
+            toast.error(t("events.duplicateExists"));
+            return;
+          }
+          if (skipped > 0) {
+            toast.info(t("events.someDuplicatesSkipped", { count: skipped }));
+          }
+          toast.success(t("events.repeatCreated", { count: created }));
+          invalidateEventsCaches();
+          onOpenChange(false);
+          if (firstId) onSaved(firstId);
           return;
         }
-        const { data, error } = await supabase
-          .from("events")
-          .insert(
-            toInsert.map((r) => ({
-              ...r,
-              status: "published",
-              created_by: userId,
-              convocations_sent: false,
-            })) as never,
-          )
-          .select("id");
+
+        const { id } = await createEventFn({ data: baseInput });
         setBusy(false);
-        if (error || !data || data.length === 0) {
-          toast.error(error?.message ?? "Failed");
-          return;
-        }
-        if (existingSet.size > 0) {
-          toast.info(t("events.someDuplicatesSkipped", { count: existingSet.size }));
-        }
-        toast.success(t("events.repeatCreated", { count: data.length }));
+        toast.success(t("events.publish"));
+        invalidateEventsCaches();
         onOpenChange(false);
-        onSaved(data[0].id);
-        return;
-      }
-      // Duplicate check for single create
-      const { data: dupes } = await supabase
-        .from("events")
-        .select("id")
-        .eq("team_id", teamId)
-        .eq("type", type)
-        .eq("starts_at", payload.starts_at)
-        .is("deleted_at", null)
-        .limit(1);
-      if (dupes && dupes.length > 0) {
-        setBusy(false);
-        toast.error(t("events.duplicateExists"));
-        return;
-      }
-      const { data, error } = await supabase
-        .from("events")
-        .insert({
-          ...payload,
-          status: "published",
-          created_by: userId,
-          convocations_sent: false,
-        } as never)
-        .select("id")
-        .single();
-      setBusy(false);
-      if (error || !data) {
-        toast.error(error?.message ?? "Failed");
-        return;
-      }
-      toast.success(t("events.publish"));
-      onOpenChange(false);
-      onSaved(data.id);
-      if (sendNow && type !== "meeting") {
-        navigate({
-          to: "/events/$eventId",
-          params: { eventId: data.id },
-          search: { send: 1 } as any,
+        onSaved(id);
+        if (sendNow && type !== "meeting") {
+          navigate({
+            to: "/events/$eventId",
+            params: { eventId: id },
+            search: { send: 1 } as any,
+          });
+        }
+      } else {
+        const { id } = await updateEventFn({
+          data: { ...baseInput, id: initial!.id! },
         });
+        setBusy(false);
+        toast.success(t("common.saved"));
+        invalidateEventsCaches();
+        onOpenChange(false);
+        onSaved(id);
       }
-    } else {
-      const { error } = await supabase
-        .from("events")
-        .update(payload as never)
-        .eq("id", initial!.id!);
+    } catch (err) {
       setBusy(false);
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      toast.success(t("common.saved"));
-      onOpenChange(false);
-      onSaved(initial!.id!);
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(translateError(msg));
     }
   }
 
@@ -736,7 +775,11 @@ export function EventFormSheet({
               <Label>{t("events.competitionType")}</Label>
               <Select
                 value={competitionType}
-                onValueChange={(v) => setCompetitionType(v as CompetitionType)}
+                onValueChange={(v) => {
+                  const next = v as CompetitionType;
+                  setCompetitionType(next);
+                  if (next !== "championship") setChampionshipId(null);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -750,6 +793,26 @@ export function EventFormSheet({
                 </SelectContent>
               </Select>
             </div>
+            {competitionType === "championship" && teamId && (
+              <ChampionshipPicker
+                teamId={teamId}
+                value={championshipId}
+                onChange={setChampionshipId}
+                historical={historicalChampionship}
+              />
+            )}
+            {competitionType === "cup" && (
+              <div className="space-y-1.5">
+                <Label>{t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}</Label>
+                <Input
+                  value={competitionName ?? ""}
+                  onChange={(e) => setCompetitionName(e.target.value)}
+                  placeholder={t("eventWizard.competitionNamePlaceholder", {
+                    defaultValue: "Ex: Coupe régionale…",
+                  })}
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>{t("events.opponent")}</Label>
               <Input

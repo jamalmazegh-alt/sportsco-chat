@@ -565,9 +565,13 @@
     "historical": "Championnat historique",
     "notActive": "Ce championnat n'est plus actif",
     "errors": {
-      "required": "Le championnat est obligatoire pour un match de championnat",
+      "required": "Sélectionnez un championnat",
       "duplicate": "Ce championnat est déjà configuré pour cette équipe",
-      "inUse": "Impossible de supprimer ce championnat car il est utilisé par des matchs. Archivez-le pour le retirer des nouveaux événements."
+      "inUse": "Impossible de supprimer ce championnat car il est utilisé par des matchs. Archivez-le pour le retirer des nouveaux événements.",
+      "teamMismatch": "Ce championnat n'appartient pas à cette équipe",
+      "clubMismatch": "Ce championnat n'appartient pas à ce club",
+      "archived": "Ce championnat est archivé",
+      "notFound": "Championnat introuvable"
     }
   },
   "club": {

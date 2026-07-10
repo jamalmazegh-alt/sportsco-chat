@@ -565,9 +565,13 @@
     "historical": "Historical championship",
     "notActive": "This championship is no longer active",
     "errors": {
-      "required": "A championship is required for a championship match",
+      "required": "Select a championship",
       "duplicate": "This championship is already configured for this team",
-      "inUse": "Cannot delete this championship because it is used by matches. Archive it to remove it from new events."
+      "inUse": "Cannot delete this championship because it is used by matches. Archive it to remove it from new events.",
+      "teamMismatch": "This championship does not belong to this team",
+      "clubMismatch": "This championship does not belong to this club",
+      "archived": "This championship is archived",
+      "notFound": "Championship not found"
     }
   },
   "club": {

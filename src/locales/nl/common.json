@@ -565,9 +565,13 @@
     "historical": "Historische competitie",
     "notActive": "Deze competitie is niet meer actief",
     "errors": {
-      "required": "Een competitie is verplicht voor een competitiewedstrijd",
+      "required": "Selecteer een competitie",
       "duplicate": "Deze competitie is al geconfigureerd voor dit team",
-      "inUse": "Deze competitie kan niet worden verwijderd omdat er wedstrijden aan gekoppeld zijn. Archiveer deze om hem uit nieuwe evenementen te verwijderen."
+      "inUse": "Deze competitie kan niet worden verwijderd omdat er wedstrijden aan gekoppeld zijn. Archiveer deze om hem uit nieuwe evenementen te verwijderen.",
+      "teamMismatch": "Deze competitie hoort niet bij dit team",
+      "clubMismatch": "Deze competitie hoort niet bij deze club",
+      "archived": "Deze competitie is gearchiveerd",
+      "notFound": "Competitie niet gevonden"
     }
   },
   "club": {
