@@ -261,7 +261,7 @@ function TeamDetail() {
   function openEdit() {
     setEditName(team?.name ?? "");
     setEditAge(team?.age_group ?? "");
-    setEditChamp(team?.championship ?? "");
+    // championship handled by TeamChampionshipsSection (teams.championship deprecated)
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditSport(team?.sport ?? "");
