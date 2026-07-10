@@ -234,6 +234,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function CollapsibleSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <section className="rounded-xl border border-border bg-card">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 p-4 text-left hover:bg-muted/40"
+      >
+        <h2 className="text-sm font-semibold text-muted-foreground">{title}</h2>
+        {open ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+      {open && <div className="border-t border-border/60 p-4">{children}</div>}
+    </section>
+  );
+}
+
 function OptionsCharts({ options }: { options: OptionRow[] }) {
   const { t } = useTranslation("buildClubero");
   const byQ = useMemo(() => {
