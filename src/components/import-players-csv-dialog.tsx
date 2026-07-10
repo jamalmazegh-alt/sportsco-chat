@@ -165,6 +165,24 @@ export function ImportPlayersCsvDialog({
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
+  const HEADER_DEFAULTS: Record<(typeof HEADERS)[number], string> = {
+    first_name: "Prénom",
+    last_name: "Nom",
+    jersey: "Numéro",
+    position: "Poste",
+    license: "Licence",
+    birth_date: "Date de naissance",
+    email: "Email",
+    phone: "Téléphone",
+    parent_first: "Prénom parent",
+    parent_last: "Nom parent",
+    parent_email: "Email parent",
+    parent_phone: "Téléphone parent",
+  };
+  const localizedHeaders = HEADERS.map((k) =>
+    t(`players.import.headers.${k}`, { defaultValue: HEADER_DEFAULTS[k] }),
+  );
+
   function onFile(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -174,9 +192,13 @@ export function ImportPlayersCsvDialog({
     e.target.value = "";
   }
 
+  function csvEscape(v: string) {
+    return /[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  }
+
   function onDownloadTemplate() {
     const csv =
-      HEADERS.join(",") +
+      localizedHeaders.map(csvEscape).join(",") +
       "\r\n" +
       "Léa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000\r\n" +
       "Paul,Dupont,10,ATT,,2003-09-01,paul@example.com,+33600000001,,,,";
