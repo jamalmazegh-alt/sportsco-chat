@@ -412,7 +412,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       const profile = await getUserProfile(ticket.user_id);
       const email = await getUserEmail(ticket.user_id);
       const locale = pickLocale(profile?.preferred_language);
-      const pushStrings = PUSH_STRINGS[locale as "fr" | "en"] ?? PUSH_STRINGS.fr;
+      const pushStrings = PUSH_STRINGS[locale];
       await sendPushToUser(ticket.user_id, {
         title: pushStrings.reply.title(shortId(ticket.id)),
         body: pushStrings.reply.body(ticket.subject),
