@@ -298,9 +298,6 @@ export interface BuildTeamPosterInput {
 
 const CLUBERO_LOGO_URL = "https://clubero.app/clubero-logo.png";
 
-import { FIGURE_LEFT_B64, FIGURE_LEFT_W, FIGURE_LEFT_H } from "./figure-left.b64";
-import { FIGURE_RIGHT_B64, FIGURE_RIGHT_W, FIGURE_RIGHT_H } from "./figure-right.b64";
-import { FIGURE_BOTTOM_B64, FIGURE_BOTTOM_W, FIGURE_BOTTOM_H } from "./figure-bottom.b64";
 
 export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<Uint8Array> {
   const t = STRINGS[input.lang];
@@ -389,36 +386,36 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   drawCenteredText(page, t.bodyP1, W / 2, H - 252, 10, font, muted);
   drawCenteredText(page, t.bodyP2, W / 2, H - 266, 10, font, muted);
 
-  // ── Scattered illustrations BEFORE the card so the card sits on top.
-  // Place individual figures around the page (not a bottom band).
-  // ── Individual scattered figures (one per location, no clustering)
-  const figLeft = await embed(doc, { kind: "png", bytes: decode(FIGURE_LEFT_B64) });
-  const figRight = await embed(doc, { kind: "png", bytes: decode(FIGURE_RIGHT_B64) });
-  const figBottom = await embed(doc, { kind: "png", bytes: decode(FIGURE_BOTTOM_B64) });
-
-  if (figLeft) {
-    const targetH = 180;
-    const r = targetH / FIGURE_LEFT_H;
-    const w = FIGURE_LEFT_W * r;
-    page.drawImage(figLeft, { x: 8, y: 200, width: w, height: targetH, opacity: 0.95 });
+  // ── Editorial geometric decoration (no illustrations — sober, adult look).
+  // Thin concentric rings left/right of the QR card, plus discreet accents.
+  const ringColor = rgb(0.82, 0.88, 0.92);
+  const ringColorSoft = rgb(0.88, 0.92, 0.95);
+  // Left cluster
+  page.drawCircle({ x: 70, y: 380, size: 44, borderColor: ringColor, borderWidth: 1 });
+  page.drawCircle({ x: 70, y: 380, size: 30, borderColor: ringColorSoft, borderWidth: 1 });
+  page.drawCircle({ x: 70, y: 380, size: 6, color: teal, opacity: 0.85 });
+  // Right cluster
+  page.drawCircle({ x: W - 70, y: 320, size: 52, borderColor: ringColor, borderWidth: 1 });
+  page.drawCircle({ x: W - 70, y: 320, size: 34, borderColor: ringColorSoft, borderWidth: 1 });
+  page.drawCircle({ x: W - 70, y: 320, size: 5, color: rgb(0.98, 0.74, 0.31), opacity: 0.75 });
+  // Discreet dot grid bottom-left
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 3; j++) {
+      page.drawCircle({
+        x: 48 + i * 9,
+        y: 200 + j * 9,
+        size: 1.1,
+        color: rgb(0.78, 0.85, 0.83),
+      });
+    }
   }
-  if (figRight) {
-    const targetH = 180;
-    const r = targetH / FIGURE_RIGHT_H;
-    const w = FIGURE_RIGHT_W * r;
-    page.drawImage(figRight, { x: W - w - 8, y: 200, width: w, height: targetH, opacity: 0.95 });
-  }
-  if (figBottom) {
-    // Sits in the gap between QR card bottom (y=230) and benefits pills top (y=114)
-    const targetH = 96;
-    const r = targetH / FIGURE_BOTTOM_H;
-    const w = FIGURE_BOTTOM_W * r;
-    page.drawImage(figBottom, { x: (W - w) / 2, y: 122, width: w, height: targetH, opacity: 0.9 });
-  }
-
-  // Decorative ball accents
-  page.drawCircle({ x: 60, y: 360, size: 12, color: rgb(0.98, 0.74, 0.31), opacity: 0.55 });
-  page.drawCircle({ x: W - 60, y: 410, size: 10, color: lavender });
+  // Thin horizontal rule between QR card zone and benefits pills
+  page.drawLine({
+    start: { x: W / 2 - 40, y: 205 },
+    end: { x: W / 2 + 40, y: 205 },
+    thickness: 0.6,
+    color: rgb(0.82, 0.86, 0.9),
+  });
 
   // ── QR Card (centered, prominent)
   const cardW = 320;
