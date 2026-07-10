@@ -168,8 +168,9 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
   const signature = request.headers.get("stripe-signature");
   const platformSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const platformSecretTest = process.env.STRIPE_WEBHOOK_SECRET_TEST;
+  const platformSecretTestLegacy = process.env.STRIPE_WEBHOOK_SECRET_TEST_LEGACY;
   const connectSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
-  if (!signature || (!platformSecret && !platformSecretTest && !connectSecret)) {
+  if (!signature || (!platformSecret && !platformSecretTest && !platformSecretTestLegacy && !connectSecret)) {
     return new Response("Missing signature or secret", { status: 400 });
   }
 
@@ -177,7 +178,9 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
   const stripe = getStripe();
 
   let event: Stripe.Event | null = null;
-  const secrets = [platformSecret, platformSecretTest, connectSecret].filter(Boolean) as string[];
+  const secrets = [platformSecret, platformSecretTest, platformSecretTestLegacy, connectSecret].filter(
+    Boolean,
+  ) as string[];
   let lastErr: unknown = null;
   for (const secret of secrets) {
     try {
