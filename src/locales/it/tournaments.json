@@ -813,6 +813,7 @@
     "nextMatch": "Partita successiva",
     "allMatchesEntered": "Tutte le partite sono state inserite.",
     "errorGeneric": "Errore",
+    "progressionFailedCommitted": "Risultato registrato. La progressione del tabellone non è stata completata — contattare un amministratore prima di continuare.",
     "validate": "Conferma risultato",
     "unvalidate": "Annulla conferma",
     "unvalidateToEdit": "Annulla conferma per modificare",

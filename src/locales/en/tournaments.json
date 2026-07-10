@@ -813,6 +813,7 @@
     "nextMatch": "Next match",
     "allMatchesEntered": "All matches have been entered.",
     "errorGeneric": "Error",
+    "progressionFailedCommitted": "Result saved. Bracket progression could not be completed — contact an administrator before continuing.",
     "validate": "Validate score",
     "unvalidate": "Unvalidate",
     "unvalidateToEdit": "Unvalidate to edit",

@@ -813,6 +813,7 @@
     "nextMatch": "Nächstes Spiel",
     "allMatchesEntered": "Alle Spiele wurden erfasst.",
     "errorGeneric": "Fehler",
+    "progressionFailedCommitted": "Ergebnis gespeichert. Die Turnierbaum-Fortschreibung konnte nicht abgeschlossen werden — wenden Sie sich an einen Administrator, bevor Sie fortfahren.",
     "validate": "Ergebnis bestätigen",
     "unvalidate": "Bestätigung aufheben",
     "unvalidateToEdit": "Zum Bearbeiten Bestätigung aufheben",

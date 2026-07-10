@@ -47,6 +47,7 @@ import {
 import { ScoreStepper } from "@/components/score-stepper";
 
 import { toast } from "sonner";
+import { getServerFnErrorCode } from "@/lib/server-fn-error";
 import {
   recordMatchScore,
   updateMatchSchedule,
@@ -774,7 +775,13 @@ function MatchCard({
       toast.success(t("matches.statusUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
+    onError: (e: unknown) => {
+      if (getServerFnErrorCode(e) === "bracket_progression_failed") {
+        toast.error(t("matches.progressionFailedCommitted"));
+        return;
+      }
+      toast.error((e as { message?: string })?.message ?? t("matches.errorGeneric"));
+    },
   });
 
   const disputeM = useMutation({
