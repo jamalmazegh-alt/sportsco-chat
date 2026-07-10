@@ -40,7 +40,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
