@@ -2,7 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Loader2, MessageCircleHeart, Download, Star, Flame } from "lucide-react";
+import {
+  Loader2,
+  MessageCircleHeart,
+  Download,
+  Star,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -162,14 +170,6 @@ function BuildCluberoDashboard() {
 
       <StatsGrid overview={data.overview} />
 
-      <Section title={t("admin.responses.title")}>
-        {responsesErr ? (
-          <p className="text-sm text-destructive">{responsesErr}</p>
-        ) : (
-          <ResponsesList responses={data.responses} />
-        )}
-      </Section>
-
       <Section title={t("admin.sections.leads")}>
         <LeadsTable leads={data.leads} />
       </Section>
@@ -189,6 +189,14 @@ function BuildCluberoDashboard() {
       <Section title={t("admin.sections.verbatims")}>
         <VerbatimsList items={data.verbatims} />
       </Section>
+
+      <CollapsibleSection title={t("admin.responses.title")} defaultOpen={false}>
+        {responsesErr ? (
+          <p className="text-sm text-destructive">{responsesErr}</p>
+        ) : (
+          <ResponsesList responses={data.responses} />
+        )}
+      </CollapsibleSection>
     </div>
   );
 }
@@ -222,6 +230,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <section className="space-y-3">
       <h2 className="text-sm font-semibold text-muted-foreground">{title}</h2>
       {children}
+    </section>
+  );
+}
+
+function CollapsibleSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <section className="rounded-xl border border-border bg-card">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 p-4 text-left hover:bg-muted/40"
+      >
+        <h2 className="text-sm font-semibold text-muted-foreground">{title}</h2>
+        {open ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+      {open && <div className="border-t border-border/60 p-4">{children}</div>}
     </section>
   );
 }
