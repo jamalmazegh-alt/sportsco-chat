@@ -775,7 +775,11 @@ export function EventFormSheet({
               <Label>{t("events.competitionType")}</Label>
               <Select
                 value={competitionType}
-                onValueChange={(v) => setCompetitionType(v as CompetitionType)}
+                onValueChange={(v) => {
+                  const next = v as CompetitionType;
+                  setCompetitionType(next);
+                  if (next !== "championship") setChampionshipId(null);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -789,6 +793,26 @@ export function EventFormSheet({
                 </SelectContent>
               </Select>
             </div>
+            {competitionType === "championship" && teamId && (
+              <ChampionshipPicker
+                teamId={teamId}
+                value={championshipId}
+                onChange={setChampionshipId}
+                historical={historicalChampionship}
+              />
+            )}
+            {competitionType === "cup" && (
+              <div className="space-y-1.5">
+                <Label>{t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}</Label>
+                <Input
+                  value={competitionName ?? ""}
+                  onChange={(e) => setCompetitionName(e.target.value)}
+                  placeholder={t("eventWizard.competitionNamePlaceholder", {
+                    defaultValue: "Ex: Coupe régionale…",
+                  })}
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>{t("events.opponent")}</Label>
               <Input
