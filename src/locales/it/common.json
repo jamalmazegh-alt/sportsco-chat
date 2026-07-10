@@ -652,7 +652,18 @@
     "childAccessNeedsEmail": "Aggiungi prima un indirizzo e-mail al bambino per attivare l'accesso.",
     "account": "Account",
     "removeConfirm": "Rimuovere {{name}} dalla Squadra?",
-    "removed": "Giocatore rimosso dalla Squadra"
+    "removed": "Giocatore rimosso dalla Squadra",
+    "tabNew": "Nuovo",
+    "tabExisting": "Giocatore esistente",
+    "existingTitle": "Aggiungi un giocatore esistente",
+    "existingHint": "Aggiungi a questa squadra un giocatore già presente nel club.",
+    "existingEmpty": "Nessun giocatore disponibile",
+    "existingAlreadyIn": "Già in",
+    "existingAttach": "Aggiungi alla squadra",
+    "existingAttached_one": "{{count}} giocatore aggiunto",
+    "existingAttached_other": "{{count}} giocatori aggiunti",
+    "alreadyInTeam": "Questo giocatore è già in questa squadra",
+    "teamsLabel": "Squadre"
   },
   "events": {
     "isOfficial": "Ufficiale",

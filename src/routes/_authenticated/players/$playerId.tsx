@@ -273,18 +273,24 @@ function PlayerProfile() {
 
   // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
-  const { data: playerSport } = useQuery({
-    queryKey: ["player-primary-sport", playerId],
+  const { data: playerTeams } = useQuery({
+    queryKey: ["player-teams", playerId],
     queryFn: async () => {
       const { data } = await supabase
         .from("team_members")
-        .select("teams:team_id(sport)")
+        .select("teams:team_id(id, name, sport)")
         .eq("player_id", playerId)
-        .limit(5);
-      const sports = (data ?? []).map((r: any) => r?.teams?.sport).filter(Boolean) as string[];
-      return sports[0] ?? null;
+        .eq("role", "player");
+      const teams = (data ?? [])
+        .map((r: any) => r?.teams)
+        .filter(Boolean) as { id: string; name: string; sport: string | null }[];
+      // De-dup by id in case of ambiguous joins.
+      const seen = new Set<string>();
+      return teams.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true)));
     },
   });
+  const playerSport = playerTeams?.[0]?.sport ?? null;
+
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -566,7 +572,25 @@ function PlayerProfile() {
               </span>
             )}
           </div>
+          {playerTeams && playerTeams.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground self-center">
+                {t("players.teamsLabel")}
+              </span>
+              {playerTeams.map((tm) => (
+                <Link
+                  key={tm.id}
+                  to="/teams/$teamId"
+                  params={{ teamId: tm.id }}
+                  className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                >
+                  {tm.name}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
+
         {isCoach && (
           <Button
             size="icon"

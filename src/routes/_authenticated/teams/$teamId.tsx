@@ -41,6 +41,7 @@ import {
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
+import { ExistingPlayerPicker } from "@/components/existing-player-picker";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
@@ -239,6 +240,7 @@ function TeamDetail() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
+  const [addMode, setAddMode] = useState<"new" | "existing">("new");
 
   const minor = (() => {
     if (!birthDate) return false;
@@ -589,7 +591,11 @@ function TeamDetail() {
       .insert({ team_id: teamId, player_id: player.id, role: "player" });
     if (tmErr) {
       setBusy(false);
-      toast.error(tmErr.message);
+      if ((tmErr as any).code === "23505") {
+        toast.error(t("players.alreadyInTeam"));
+      } else {
+        toast.error(tmErr.message);
+      }
       return;
     }
 
@@ -911,7 +917,10 @@ function TeamDetail() {
                   open={open}
                   onOpenChange={(o) => {
                     setOpen(o);
-                    if (!o) reset();
+                    if (!o) {
+                      reset();
+                      setAddMode("new");
+                    }
                   }}
                 >
                   <SheetTrigger asChild>
@@ -924,9 +933,48 @@ function TeamDetail() {
                     <SheetHeader>
                       <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
                     </SheetHeader>
+                    <div className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+                      <button
+                        type="button"
+                        onClick={() => setAddMode("new")}
+                        className={cn(
+                          "text-sm font-medium py-2 rounded-lg transition-colors",
+                          addMode === "new"
+                            ? "bg-card shadow-sm text-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {t("players.tabNew")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAddMode("existing")}
+                        className={cn(
+                          "text-sm font-medium py-2 rounded-lg transition-colors",
+                          addMode === "existing"
+                            ? "bg-card shadow-sm text-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {t("players.tabExisting")}
+                      </button>
+                    </div>
+                    {addMode === "existing" && activeClubId ? (
+                      <div className="mt-4 pb-8">
+                        <ExistingPlayerPicker
+                          clubId={activeClubId}
+                          teamId={teamId}
+                          onDone={() => {
+                            setOpen(false);
+                            setAddMode("new");
+                          }}
+                        />
+                      </div>
+                    ) : (
                     <form onSubmit={onAdd} className="space-y-4 mt-4 pb-8">
                       {/* Photo */}
                       <div className="space-y-1.5">
+
                         <Label>{t("players.photo")}</Label>
                         <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
                           <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center overflow-hidden">
@@ -1094,6 +1142,7 @@ function TeamDetail() {
                         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.save")}
                       </Button>
                     </form>
+                    )}
                   </SheetContent>
                 </Sheet>
                 {activeClubId && (

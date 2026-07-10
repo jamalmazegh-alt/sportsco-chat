@@ -652,7 +652,18 @@
     "childAccessNeedsEmail": "Add an email to the child first to enable access.",
     "account": "Account",
     "removeConfirm": "Remove {{name}} from the team?",
-    "removed": "Player removed from the team"
+    "removed": "Player removed from the team",
+    "tabNew": "New",
+    "tabExisting": "Existing player",
+    "existingTitle": "Add an existing player",
+    "existingHint": "Attach a player already in the club to this team.",
+    "existingEmpty": "No player available to add",
+    "existingAlreadyIn": "Already in",
+    "existingAttach": "Add to team",
+    "existingAttached_one": "{{count}} player added",
+    "existingAttached_other": "{{count}} players added",
+    "alreadyInTeam": "This player is already in this team",
+    "teamsLabel": "Teams"
   },
   "events": {
     "isOfficial": "Official match",
