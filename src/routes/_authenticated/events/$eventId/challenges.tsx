@@ -126,6 +126,8 @@ function EventChallengesPage() {
           challenges={challenges}
           entryCounts={entryCounts}
           isStaff={isStaff}
+          showAll={showAll}
+          onToggleShowAll={() => setShowAll((s) => !s)}
           onAdd={() => setView({ kind: "add" })}
           onEntry={(id) => setView({ kind: "entry", challengeId: id })}
           onRanking={(id) => setView({ kind: "ranking", challengeId: id })}
@@ -141,6 +143,7 @@ function EventChallengesPage() {
           onPickExisting={(id) => setView({ kind: "entry", challengeId: id })}
           onDone={() => {
             refetchChallenges();
+            setShowAll(true);
             setView({ kind: "list" });
           }}
         />
