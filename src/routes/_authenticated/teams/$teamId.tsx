@@ -279,12 +279,13 @@ function TeamDetail() {
   async function onSaveTeam(e: FormEvent) {
     e.preventDefault();
     setEditBusy(true);
+    // NOTE: teams.championship is deprecated (kept for backward compatibility).
+    // New writes go to team_championships via TeamChampionshipsSection.
     const { error } = await supabase
       .from("teams")
       .update({
         name: editName,
         age_group: editAge || null,
-        championship: editChamp || null,
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
