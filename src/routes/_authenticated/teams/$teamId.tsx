@@ -240,6 +240,7 @@ function TeamDetail() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
+  const [addMode, setAddMode] = useState<"new" | "existing">("new");
 
   const minor = (() => {
     if (!birthDate) return false;
