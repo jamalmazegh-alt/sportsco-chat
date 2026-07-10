@@ -917,7 +917,10 @@ function TeamDetail() {
                   open={open}
                   onOpenChange={(o) => {
                     setOpen(o);
-                    if (!o) reset();
+                    if (!o) {
+                      reset();
+                      setAddMode("new");
+                    }
                   }}
                 >
                   <SheetTrigger asChild>
@@ -930,9 +933,48 @@ function TeamDetail() {
                     <SheetHeader>
                       <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
                     </SheetHeader>
+                    <div className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+                      <button
+                        type="button"
+                        onClick={() => setAddMode("new")}
+                        className={cn(
+                          "text-sm font-medium py-2 rounded-lg transition-colors",
+                          addMode === "new"
+                            ? "bg-card shadow-sm text-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {t("players.tabNew")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAddMode("existing")}
+                        className={cn(
+                          "text-sm font-medium py-2 rounded-lg transition-colors",
+                          addMode === "existing"
+                            ? "bg-card shadow-sm text-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {t("players.tabExisting")}
+                      </button>
+                    </div>
+                    {addMode === "existing" && activeClubId ? (
+                      <div className="mt-4 pb-8">
+                        <ExistingPlayerPicker
+                          clubId={activeClubId}
+                          teamId={teamId}
+                          onDone={() => {
+                            setOpen(false);
+                            setAddMode("new");
+                          }}
+                        />
+                      </div>
+                    ) : (
                     <form onSubmit={onAdd} className="space-y-4 mt-4 pb-8">
                       {/* Photo */}
                       <div className="space-y-1.5">
+
                         <Label>{t("players.photo")}</Label>
                         <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
                           <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center overflow-hidden">
