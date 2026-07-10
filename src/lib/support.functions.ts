@@ -5,7 +5,15 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { sendPushToUser } from "@/lib/push-send.server";
 
-const STATUS_LABELS = {
+const SUPPORTED_LOCALES = ["fr", "en", "de", "es", "it", "nl", "pt"] as const;
+type SupportLocale = (typeof SUPPORTED_LOCALES)[number];
+
+function pickLocale(pref?: string | null): SupportLocale {
+  const l = (pref ?? "").toLowerCase().slice(0, 2);
+  return (SUPPORTED_LOCALES as readonly string[]).includes(l) ? (l as SupportLocale) : "fr";
+}
+
+const STATUS_LABELS: Record<SupportLocale, Record<string, string>> = {
   fr: {
     open: "Ouvert",
     in_progress: "En cours",
@@ -20,30 +28,112 @@ const STATUS_LABELS = {
     resolved: "Resolved",
     closed: "Closed",
   },
-} as const;
+  de: {
+    open: "Offen",
+    in_progress: "In Bearbeitung",
+    waiting_user: "Warten auf Ihre Antwort",
+    resolved: "Gelöst",
+    closed: "Geschlossen",
+  },
+  es: {
+    open: "Abierto",
+    in_progress: "En curso",
+    waiting_user: "Esperando tu respuesta",
+    resolved: "Resuelto",
+    closed: "Cerrado",
+  },
+  it: {
+    open: "Aperto",
+    in_progress: "In corso",
+    waiting_user: "In attesa della tua risposta",
+    resolved: "Risolto",
+    closed: "Chiuso",
+  },
+  nl: {
+    open: "Open",
+    in_progress: "In behandeling",
+    waiting_user: "Wachten op je antwoord",
+    resolved: "Opgelost",
+    closed: "Gesloten",
+  },
+  pt: {
+    open: "Aberto",
+    in_progress: "Em curso",
+    waiting_user: "A aguardar a sua resposta",
+    resolved: "Resolvido",
+    closed: "Fechado",
+  },
+};
 
-const PUSH_STRINGS = {
-  fr: {
-    reply: {
-      title: (id: string) => `Réponse à votre ticket #${id}`,
-      body: (subject: string) => subject,
-    },
+const PUSH_STRINGS: Record<
+  SupportLocale,
+  {
+    reply: { title: (id: string) => string; body: (subject: string) => string };
     status: {
-      title: (subject: string) => subject,
-      body: (statusLabel: string) => `Nouveau statut : ${statusLabel}`,
+      title: (subject: string) => string;
+      body: (statusLabel: string) => string;
+      inAppBody: (statusLabel: string) => string;
+    };
+  }
+> = {
+  fr: {
+    reply: { title: (id) => `Réponse à votre ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Nouveau statut : ${l}`,
+      inAppBody: (l) => `Nouveau statut : ${l}`,
     },
   },
   en: {
-    reply: {
-      title: (id: string) => `Reply to your ticket #${id}`,
-      body: (subject: string) => subject,
-    },
+    reply: { title: (id) => `Reply to your ticket #${id}`, body: (s) => s },
     status: {
-      title: (subject: string) => subject,
-      body: (statusLabel: string) => `New status: ${statusLabel}`,
+      title: (s) => s,
+      body: (l) => `New status: ${l}`,
+      inAppBody: (l) => `New status: ${l}`,
     },
   },
-} as const;
+  de: {
+    reply: { title: (id) => `Antwort auf Ihr Ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Neuer Status: ${l}`,
+      inAppBody: (l) => `Neuer Status: ${l}`,
+    },
+  },
+  es: {
+    reply: { title: (id) => `Respuesta a tu ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Nuevo estado: ${l}`,
+      inAppBody: (l) => `Nuevo estado: ${l}`,
+    },
+  },
+  it: {
+    reply: { title: (id) => `Risposta al tuo ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Nuovo stato: ${l}`,
+      inAppBody: (l) => `Nuovo stato: ${l}`,
+    },
+  },
+  nl: {
+    reply: { title: (id) => `Antwoord op je ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Nieuwe status: ${l}`,
+      inAppBody: (l) => `Nieuwe status: ${l}`,
+    },
+  },
+  pt: {
+    reply: { title: (id) => `Resposta ao seu ticket #${id}`, body: (s) => s },
+    status: {
+      title: (s) => s,
+      body: (l) => `Novo estado: ${l}`,
+      inAppBody: (l) => `Novo estado: ${l}`,
+    },
+  },
+};
+
 
 
 const CATEGORIES = [
