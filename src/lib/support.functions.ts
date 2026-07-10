@@ -13,8 +13,9 @@ const PUSH_STRINGS = {
     },
     status: {
       title: (id: string) => `Ticket #${id} mis à jour`,
-      body: (status: string) => `Nouveau statut : ${status}`,
+      body: (status: string, subject: string) => `${subject} — Nouveau statut : ${status}`,
     },
+
   },
   en: {
     reply: {
