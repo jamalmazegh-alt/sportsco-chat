@@ -112,6 +112,7 @@ const SponsorCreateInput = z.object({
   targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
+  logoScale: z.number().min(0.75).max(1.3).optional(),
 });
 
 export const createSponsor = createServerFn({ method: "POST" })
@@ -137,6 +138,7 @@ export const createSponsor = createServerFn({ method: "POST" })
         target_url: normalizedUrl,
         logo_url: data.logoPath ?? null,
         is_active: data.isActive ?? true,
+        logo_scale: data.logoScale ?? 1,
       })
       .select("id")
       .single();
