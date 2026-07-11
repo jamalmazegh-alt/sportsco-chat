@@ -80,6 +80,7 @@ function CampEditPage() {
   const closeFn = useServerFn(closeClubCamp);
   const archiveFn = useServerFn(archiveClubCamp);
   const deleteFn = useServerFn(deleteClubCamp);
+  const duplicateFn = useServerFn(duplicateClubCamp);
 
   const { data: camp, isLoading } = useQuery({
     queryKey: ["club-camp", campId],
