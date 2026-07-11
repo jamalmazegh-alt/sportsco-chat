@@ -13,8 +13,14 @@ import { shouldRecordClick, shouldRecordImpression } from "@/lib/sponsor-session
 const ROTATION_MS = 12_000;
 const IMPRESSION_VISIBLE_MS = 1_000;
 const CLICK_DEBOUNCE_MS = 500;
-/** Visibility knob — max rendered height of the logo (object-contain). */
-const SPONSOR_LOGO_MAX_HEIGHT = 40;
+/**
+ * Dynamic sizing bounds — the actual rendered height is derived from the
+ * logo's aspect ratio so wide banner-style logos (e.g. 16:9 with fine text)
+ * stay legible while square/tall marks stay compact.
+ */
+const SPONSOR_LOGO_MIN_HEIGHT = 40;
+const SPONSOR_LOGO_MAX_HEIGHT = 96;
+const SPONSOR_LOGO_MAX_WIDTH = 320;
 
 type Sponsor = {
   id: string;
