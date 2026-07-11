@@ -1,98 +1,74 @@
-## Objectif
-Intégrer en production la page publique `/build-clubero` (questionnaire feedback), avec collecte anonyme, contacts opt-in séparés (newsletter / bêta), dashboard superadmin de lecture. Pas de worker, pas d'email, pas d'architecture parallèle.
+# Suppression et archivage des équipes
 
-## 1. Base de données (migration Supabase)
+## 1. Migration DB (additive)
 
-Une seule migration qui applique le SQL fourni, avec 3 adaptations projet:
+- `ALTER TABLE public.teams ADD COLUMN archived_at timestamptz;`
+- Index partiel `idx_teams_archived_at ... WHERE archived_at IS NOT NULL`.
+- 4 RPC `SECURITY DEFINER` sous `SET search_path = public`, réutilisant `has_club_role(_, _, 'admin')` :
+  - `team_has_history(_id uuid) RETURNS boolean` — `EXISTS` sur : `events` (deleted_at IS NULL), `convocations` (via events de l'équipe), `challenges`, `training_series`, `coach_insights`, `player_feedback`, `player_suspensions`, `team_championships`, `payment_items`/`payment_assignments` (target_team_id). Exclut `team_members`. Gate `is_club_member`.
+  - `delete_team_if_empty(_id uuid)` — check admin → check history → `UPDATE teams SET deleted_at = now()` (soft-delete réutilisant le mécanisme existant + purge 7 j).
+  - `archive_team(_id uuid)` — admin-only, `SET archived_at = now()`.
+  - `unarchive_team(_id uuid)` — admin-only, `SET archived_at = NULL`.
+- Garde-fou serveur : trigger `BEFORE INSERT` sur `events` refusant l'insertion si `teams.archived_at IS NOT NULL` (message `team_archived`).
+- Aucune modif de `deleted_at`, `purge_soft_deleted`, ni de la RLS `teams_admin_all`.
 
-- **`is_superadmin()`** → remplacé par un check via la table `super_admins` déjà existante (même pattern que le reste du projet — `has_role` / `super_admins` selon ce qui est utilisé pour `exempt_from_billing`). Vérification sur `auth.uid()`.
-- **Rate-limit** → dans `start_build_clubero_response` et `save_build_clubero_answer`, appel de la fonction `increment_rate_limit` existante (bucket horaire, limite raisonnable type 60/h) via un wrapper qui prend l'IP en paramètre depuis l'appelant. Comme les RPC n'ont pas accès à l'IP directement, on passe `p_ip text` optionnel depuis le client (best-effort, non bloquant si null).
-- **Tables `build_clubero_responses` / `build_clubero_answers`** créées avec RLS activé et **zéro policy** (deny-all). Aucun GRANT SELECT/INSERT sur les tables. Uniquement `GRANT EXECUTE` sur les 3 RPC publics + 1 RPC admin. Les vues restent lisibles uniquement par `service_role` (usage interne de `admin_build_clubero_dashboard`).
+## 2. Filtrage `archived_at IS NULL`
 
-## 2. Route publique `/build-clubero`
+Compléter `.is("deleted_at", null)` partout où les équipes sont listées pour usage courant :
+- `src/routes/_authenticated/teams.tsx` (avec toggle admin `showArchived` → sinon filtré).
+- `src/routes/_authenticated/home.tsx`.
+- `src/routes/_authenticated/events.tsx` (sélecteur d'équipe création).
+- Autres sélecteurs (`grep .from("teams")` → paiements, discipline, chat, sanctions).
+- Exception : `teams/$teamId.tsx` reste accessible aux admins.
 
-Fichier `src/routes/build-clubero.tsx` (route publique, SSR par défaut, `head()` avec titre + description + og:title/description en FR).
+## 3. UI équipe — `teams/$teamId.tsx`
 
-Conversion du prototype en `.tsx` production:
-- Types stricts (`Question`, `Answer`, `ContactPayload`, discriminated union par `type`).
-- Config `QUESTIONS` déplacée dans `src/lib/build-clubero-config.ts`: `question_key` et `option.id` **immuables**, seuls titles/subtitles/labels/hints/scales/placeholders lus via `t('buildClubero.questions.<key>.…')`.
-- Suppression du `<style>` injecté et de l'`@import` Google Fonts → réécriture avec Tailwind + tokens design system Clubero. Garde l'esprit visuel (dégradés bleu/cyan, animations shimmer, cartes glass) mais via classes Tailwind + variables CSS existantes. Respect `prefers-reduced-motion` (déjà géré via classes conditionnelles).
-- Composants extraits: `Logo`, `ProgressBar`, `SingleChoice`, `MultiChoice`, `IconGrid`, `Rating`, `Slider`, `Rank`, `TextArea`, `WelcomeScreen`, `DoneScreen`, `ContactForm`.
-- Accessibilité: aria-labels sur boutons rank monter/descendre, focus visibles, contrastes AA, parcours clavier.
+Bloc admin (à côté du crayon d'édition, ~lignes 657-666) :
 
-## 3. Persistance & autosave
+- `useQuery` sur `team_has_history(teamId)` + count `team_members` (pour `deleteConfirmWithRoster`).
+- 3 boutons mutuellement exclusifs (admin uniquement) :
+  - `team.archived_at` → **Désarchiver** (+ badge « Archivée » dans l'en-tête).
+  - sinon `!hasHistory` → **Supprimer l'équipe** (destructif).
+  - sinon → **Archiver l'équipe**.
+- `AlertDialog` mirror du flux joueur (lignes 1074-1091) :
+  - Supprimer → `delete_team_if_empty` → toast Undo `restore_entity('team', id)` → invalidate + `navigate({ to: "/teams" })`. Catch `team_has_history` → toast `deleteBlockedHasHistory` + proposer archivage.
+  - Archiver → `archive_team` → toast Undo `unarchive_team`.
+  - Désarchiver → `unarchive_team` → toast `unarchived`.
+- Création d'événement quand `team.archived_at != null` : bouton principal désactivé, message `cannotCreateEventArchived` + bouton secondaire **Désarchiver pour ajouter un événement** (`unarchiveToAddEvent`) qui appelle `unarchive_team` puis ouvre directement le formulaire.
 
-Hook `useBuildCluberoSession` (dans `src/lib/build-clubero-session.ts`):
-- Génère `session_id` (uuid v4) au mount, persiste en `localStorage` sous `clubero:build-clubero:session`.
-- Au mount: lit `localStorage` (réponses + index courant), puis appelle `start_build_clubero_response` avec `session_id`, `locale` (i18n courant), `utm` (parsés depuis `window.location.search`), `device` (`window.innerWidth < 768 ? 'mobile' : 'desktop'`).
-- Chaque changement de réponse: `setState` local + persist localStorage immédiat + appel debounced 600ms de `save_build_clubero_answer`.
-- Flush sur `visibilitychange` (hidden) et `pagehide` → annule le debounce et appelle la RPC immédiatement (via `supabase.rpc` — pas de `keepalive` nécessaire, `fetch` classique tient dans le délai de `pagehide` la plupart du temps; acceptable, best-effort documenté).
-- Serveur = source de vérité: dès qu'une RPC répond OK, on ne re-flush pas cette réponse tant qu'elle n'a pas changé.
+## 4. UI liste `teams.tsx`
 
-## 4. Finalisation
+- Toggle admin **Afficher les équipes archivées** (off par défaut).
+- Badge « Archivée » sur chaque ligne archivée.
+- Quand affichées, grouper par `season` (en-tête `seasonGroupLabel`, groupe « — » si null).
+- Non-admins : ne voient jamais le toggle ni les archivées.
 
-Sur clic "Envoyer" à l'écran final:
-- État `loading`, désactive le bouton.
-- Détermine `contact`:
-  - Ni newsletter ni bêta cochés → `contact = null`.
-  - Sinon → validation email (`emailOk`) obligatoire, sinon erreur inline non-bloquante pour le reste des champs. Payload: `{ first_name, email, phone, club, newsletter, beta }`.
-- Appel `complete_build_clubero_response(session_id, contact)`.
-- Sur succès: écran "merci" + purge localStorage (garde `session_id` pour éviter double envoi si retour).
-- Sur erreur: garde l'état, message d'erreur i18n, permet de rejouer.
+## 5. i18n (7 langues : fr, en, es, de, it, nl, pt)
 
-## 5. Section superadmin
+Ajouter dans le namespace `teams` :
+`delete`, `deleteTitle`, `deleteConfirm`, `deleteConfirmWithRoster`, `deleted`, `deleteBlockedHasHistory`, `archive`, `archiveTitle`, `archiveConfirm`, `archived`, `unarchive`, `unarchived`, `unarchiveToAddEvent`, `showArchived`, `badgeArchived`, `seasonGroupLabel`, `cannotCreateEventArchived`.
+Réutiliser `common.cancel`, `common.undo`, `common.delete`. `bun run check:i18n` doit passer.
 
-Route `src/routes/superadmin/build-clubero.tsx` + entrée dans la sidebar `NAV` de `src/routes/superadmin.tsx` (label "Construisons Clubero", icône `MessageCircleHeart` ou similaire).
+## 6. Tests (`bun run test`)
 
-Chargement via TanStack Query:
-```ts
-supabase.rpc('admin_build_clubero_dashboard')
-```
+- Ajouter un test unitaire pour le filtre équipes (helper) si un helper est extrait.
+- Vérifier RLS/RPC via `tests/rls/teams.rls.ts` : admin peut delete/archive, non-admin `Forbidden`, `team_has_history` bloque delete.
 
-Affichage:
-- **Overview**: 5 stats cards (sessions, terminées, leads newsletter, leads bêta, durée moyenne).
-- **Options** & **Ranking**: `BarChart` Recharts par `question_key` (déjà utilisé dans le projet).
-- **Numeric**: cards par `question_key` (moyenne, médiane, min/max, n).
-- **Verbatims**: liste scrollable avec `question_key` + texte + club + date.
-- **Leads**: table avec colonnes séparées ✅ Newsletter / ✅ Bêta, dates de consentement séparées, bouton "Export CSV" via `downloadCsv` de `src/lib/csv.ts`.
+## 7. Non-négociable
 
-## 6. i18n
+- Toutes les mutations passent par RPC (pas de `.update({archived_at})` client).
+- Migration purement additive.
+- Aucune string en dur.
 
-Namespace `buildClubero` créé pour les 7 langues (`fr`, `en`, `de`, `es`, `it`, `nl`, `pt`) dans `src/locales/<lang>/buildClubero.json`. Ajout au `resources` de `src/lib/i18n.ts` et au tableau `ns`.
+## Séquencement d'exécution
 
-Contenu: `hero.*`, `questions.<key>.title/subtitle/placeholder`, `questions.<key>.options.<id>.label/hint`, `questions.<key>.scale.<v>.label`, `nav.next/back/send/skip`, `save.saving/saved`, `contact.*`, `errors.*`, `done.*`.
+1. Créer la migration (schema + RPC + trigger events).
+2. Ajouter les i18n clés (7 langues).
+3. Mettre à jour `teams.tsx` + `teams/$teamId.tsx`.
+4. Compléter les filtres `archived_at IS NULL` (home, events, sélecteurs).
+5. Lancer `bun run test` + `bun run check:i18n`.
 
-FR = source, autres langues traduites (ton coach/humain). Script check-i18n confirmera la parité.
+## Points hors périmètre (notés pour plus tard)
 
-## 7. Tests
-
-Nouveaux tests dans `src/tests/unit/`:
-- `build-clubero-config.test.ts`: `isAnswered()` par type, `emailOk()`, `reorder()`.
-- `build-clubero-session.test.ts`: debounce, flush sur visibilitychange/pagehide (mock `document.dispatchEvent`), reprise après reload (mock localStorage), dérivation contact null vs newsletter vs bêta vs both.
-
-Tests RLS dans `tests/rls/build-clubero.rls.ts`:
-- Anon `SELECT` sur `build_clubero_responses` / `build_clubero_answers` → refusé.
-- Anon `INSERT` direct → refusé.
-- Anon `rpc('start_build_clubero_response')` → OK, retourne un uuid.
-- Anon `rpc('save_build_clubero_answer')` → OK.
-- Anon `rpc('complete_build_clubero_response')` avec contact newsletter+beta → OK, vérif via service_role que `newsletter_consent_at` ET `beta_consent_at` sont timestampés séparément.
-- Non-superadmin authentifié `rpc('admin_build_clubero_dashboard')` → `42501 forbidden`.
-- Superadmin authentifié → OK, retourne l'objet jsonb complet.
-
-Script `bun run check:i18n` pour garantir aucune clé manquante sur les 7 langues.
-
-Lancement: `bun run test`, `bun run test:rls`, `bun run check:i18n`, `bun run check:guards`.
-
-## Fichiers créés/modifiés
-- **Migration**: `supabase/migrations/<ts>_build_clubero.sql`
-- **Route publique**: `src/routes/build-clubero.tsx`
-- **Route superadmin**: `src/routes/superadmin/build-clubero.tsx` + sidebar update dans `src/routes/superadmin.tsx`
-- **Config & hooks**: `src/lib/build-clubero-config.ts`, `src/lib/build-clubero-session.ts`
-- **Composants**: `src/components/build-clubero/*.tsx` (un fichier par composant complexe)
-- **i18n**: 7× `src/locales/<lang>/buildClubero.json` + `src/lib/i18n.ts`
-- **Tests**: 2 fichiers unit + 1 fichier RLS
-
-## Points d'attention
-- La RPC `is_superadmin()` sera implémentée en tant que wrapper vers le vrai check du projet — je vais vérifier `super_admins` table et le pattern exact avant migration.
-- Rate-limit IP: le client ne connaît pas son IP publique fiable → on branche `increment_rate_limit` côté serveur uniquement dans les routes `/api/public/*`. Comme ici on appelle les RPC en direct depuis le client Supabase, le rate-limit reste **best-effort** avec un TODO clair. Alternative si tu préfères : passer par un endpoint TanStack `src/routes/api/public/build-clubero/*.ts` proxifiant les RPC → là on a l'IP via `getClientIp()`. Dis-moi si tu veux cette variante (plus coûteux mais rate-limit dur).
-- Pas de worker, pas d'email — la finalisation ne déclenche **aucun** side-effect au-delà de l'update DB.
+- Table `seasons` normalisée + FK.
+- Détachement automatique des joueurs à l'archivage.

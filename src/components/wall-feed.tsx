@@ -213,6 +213,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .select("id, name")
         .eq("club_id", clubId)
         .is("deleted_at", null)
+        .is("archived_at", null)
         .order("name", { ascending: true });
       if (cancelled) return;
       const all = (teamRows ?? []) as Team[];

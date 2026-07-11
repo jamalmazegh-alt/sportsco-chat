@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useCallback, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -49,6 +49,18 @@ import { UnavailableBadge, type UnavailableReason } from "@/components/unavailab
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamAbsencesTable } from "@/components/team-absences-table";
 import { TeamChampionshipsSection } from "@/components/team-championships-section";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Archive, ArchiveRestore } from "lucide-react";
 
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
@@ -76,6 +88,8 @@ function TeamDetail() {
   const isCoach =
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const isAdmin = roles.includes("admin");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
 
@@ -85,13 +99,107 @@ function TeamDetail() {
       const { data } = await supabase
         .from("teams")
         .select(
-          "id, name, age_group, championship, competitions, sport, season, image_url, club_id",
+          "id, name, age_group, championship, competitions, sport, season, image_url, club_id, archived_at",
         )
         .eq("id", teamId)
         .single();
       return data;
     },
   });
+
+  const isArchived = !!team?.archived_at;
+
+  const { data: teamHasHistory } = useQuery({
+    queryKey: ["team-has-history", teamId],
+    enabled: isAdmin && !!team,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("team_has_history", { _id: teamId });
+      if (error) throw error;
+      return !!data;
+    },
+  });
+
+  const [confirmDeleteTeam, setConfirmDeleteTeam] = useState(false);
+  const [confirmArchiveTeam, setConfirmArchiveTeam] = useState(false);
+  const [teamActionBusy, setTeamActionBusy] = useState(false);
+
+  async function onDeleteTeam() {
+    if (!team) return;
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("delete_team_if_empty", { _id: teamId });
+    setTeamActionBusy(false);
+    setConfirmDeleteTeam(false);
+    if (error) {
+      if ((error.message ?? "").includes("team_has_history")) {
+        toast.error(t("teams.deleteBlockedHasHistory"));
+        qc.invalidateQueries({ queryKey: ["team-has-history", teamId] });
+        return;
+      }
+      toast.error(error.message);
+      return;
+    }
+    toast(t("teams.deleted"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", {
+            _kind: "team",
+            _id: teamId,
+          });
+          if (e2) toast.error(e2.message);
+          else {
+            qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+            qc.invalidateQueries({ queryKey: ["teams"] });
+          }
+        },
+      },
+    });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+    navigate({ to: "/teams" });
+  }
+
+  async function onArchiveTeam() {
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("archive_team", { _id: teamId });
+    setTeamActionBusy(false);
+    setConfirmArchiveTeam(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast(t("teams.archived"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("unarchive_team", { _id: teamId });
+          if (e2) toast.error(e2.message);
+          else {
+            qc.invalidateQueries({ queryKey: ["team", teamId] });
+            qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+          }
+        },
+      },
+    });
+    qc.invalidateQueries({ queryKey: ["team", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+  }
+
+  async function onUnarchiveTeam() {
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("unarchive_team", { _id: teamId });
+    setTeamActionBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("teams.unarchived"));
+    qc.invalidateQueries({ queryKey: ["team", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+  }
+
 
   const { data: players, isLoading } = useQuery({
     queryKey: ["team-players", teamId],
@@ -767,7 +875,14 @@ function TeamDetail() {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+                {isArchived && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    {t("teams.badgeArchived")}
+                  </Badge>
+                )}
+              </div>
               {team && (
                 <p className="text-xs text-muted-foreground mt-1">
                   {[team.age_group, team.championship, team.sport, team.season]
@@ -777,7 +892,7 @@ function TeamDetail() {
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              {roles.includes("admin") && team?.club_id && (
+              {roles.includes("admin") && team?.club_id && !isArchived && (
                 <TeamInviteShareButton clubId={team.club_id} teamName={team.name} />
               )}
               {isCoach && team && (
@@ -790,7 +905,103 @@ function TeamDetail() {
         </div>
       </div>
 
+      {isAdmin && isArchived && (
+        <div className="rounded-2xl border border-amber-400/40 bg-amber-50 dark:bg-amber-950/30 p-3 space-y-2">
+          <p className="text-sm text-amber-900 dark:text-amber-200">
+            {t("teams.cannotCreateEventArchived")}
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              await onUnarchiveTeam();
+              navigate({ to: "/events" });
+            }}
+            disabled={teamActionBusy}
+          >
+            <ArchiveRestore className="h-4 w-4 mr-1" />
+            {t("teams.unarchiveToAddEvent")}
+          </Button>
+        </div>
+      )}
+
+      {isAdmin && team && (
+        <div className="flex flex-wrap gap-2">
+          {isArchived ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onUnarchiveTeam}
+              disabled={teamActionBusy}
+            >
+              <ArchiveRestore className="h-4 w-4 mr-1" />
+              {t("teams.unarchive")}
+            </Button>
+          ) : teamHasHistory ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmArchiveTeam(true)}
+              disabled={teamActionBusy}
+            >
+              <Archive className="h-4 w-4 mr-1" />
+              {t("teams.archive")}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmDeleteTeam(true)}
+              disabled={teamActionBusy}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {t("teams.delete")}
+            </Button>
+          )}
+        </div>
+      )}
+
       <TeamChampionshipsSection teamId={teamId} canManage={isCoach} />
+
+      <AlertDialog open={confirmDeleteTeam} onOpenChange={setConfirmDeleteTeam}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("teams.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(players?.length ?? 0) > 0
+                ? t("teams.deleteConfirmWithRoster", { count: players!.length })
+                : t("teams.deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDeleteTeam}
+              disabled={teamActionBusy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {teamActionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmArchiveTeam} onOpenChange={setConfirmArchiveTeam}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("teams.archiveTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("teams.archiveConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={onArchiveTeam} disabled={teamActionBusy}>
+              {teamActionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.archive")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
 
 

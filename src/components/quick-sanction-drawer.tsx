@@ -91,12 +91,12 @@ export function QuickSanctionDrawer({
       const { data } = await supabase
         .from("team_members")
         .select(
-          "team_id, teams:team_id(id, name, club_id, deleted_at), players:player_id(id, first_name, last_name, deleted_at)",
+          "team_id, teams:team_id(id, name, club_id, deleted_at, archived_at), players:player_id(id, first_name, last_name, deleted_at)",
         )
         .order("team_id");
       const rows: PlayerRow[] = [];
       for (const r of (data ?? []) as any[]) {
-        if (!r.teams || r.teams.club_id !== clubId || r.teams.deleted_at) continue;
+        if (!r.teams || r.teams.club_id !== clubId || r.teams.deleted_at || r.teams.archived_at) continue;
         if (!r.players || r.players.deleted_at) continue;
         rows.push({
           id: r.players.id,

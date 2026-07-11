@@ -4013,6 +4013,7 @@ export type Database = {
       teams: {
         Row: {
           age_group: string | null
+          archived_at: string | null
           championship: string | null
           club_id: string
           communication_mode: string
@@ -4028,6 +4029,7 @@ export type Database = {
         }
         Insert: {
           age_group?: string | null
+          archived_at?: string | null
           championship?: string | null
           club_id: string
           communication_mode?: string
@@ -4043,6 +4045,7 @@ export type Database = {
         }
         Update: {
           age_group?: string | null
+          archived_at?: string | null
           championship?: string | null
           club_id?: string
           communication_mode?: string
@@ -5587,6 +5590,7 @@ export type Database = {
       }
       admin_build_clubero_dashboard: { Args: never; Returns: Json }
       admin_build_clubero_responses: { Args: never; Returns: Json }
+      archive_team: { Args: { _id: string }; Returns: undefined }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
@@ -5697,6 +5701,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      delete_team_if_empty: { Args: { _id: string }; Returns: undefined }
       email_exists: { Args: { _email: string }; Returns: boolean }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
@@ -6036,7 +6041,9 @@ export type Database = {
         }
         Returns: string
       }
+      team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
+      unarchive_team: { Args: { _id: string }; Returns: undefined }
       update_player_review_content: {
         Args: { _content: string; _id: string; _model: string }
         Returns: {
