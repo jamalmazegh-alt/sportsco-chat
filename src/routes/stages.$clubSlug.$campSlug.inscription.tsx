@@ -71,7 +71,7 @@ function RegistrationFormPage() {
   const { clubSlug, campSlug } = Route.useParams();
   const { data } = useSuspenseQuery(publicCampQuery(clubSlug, campSlug));
   const { t } = useTranslation("camps");
-  const navigate = useNavigate();
+  
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<RegistrationSuccess | null>(null);
 
