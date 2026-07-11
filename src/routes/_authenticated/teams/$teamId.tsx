@@ -447,11 +447,31 @@ function TeamDetail() {
 
     if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
 
-    // Déduplication : si l'email est déjà associé à un compte Clubero existant,
-    // on saute l'invitation (et on tag comme "skipped" pour informer l'utilisateur).
+    // Déduplication : sauter les contacts (email/téléphone) qui ont déjà une
+    // invitation en cours pour ce joueur, et ceux dont l'email est déjà lié
+    // à un compte Clubero existant.
+    const { data: pendingRows } = await supabase
+      .from("member_invites")
+      .select("email, phone, player_id, parent_for_player_id, used_at")
+      .eq("club_id", activeClubId)
+      .or(`player_id.eq.${playerId},parent_for_player_id.eq.${playerId}`)
+      .is("used_at", null);
+    const pendingEmails = new Set<string>();
+    const pendingPhones = new Set<string>();
+    (pendingRows ?? []).forEach((r: any) => {
+      if (r.email) pendingEmails.add(String(r.email).toLowerCase().trim());
+      if (r.phone) pendingPhones.add(String(r.phone).trim());
+    });
+
     const filtered: InviteTarget[] = [];
     let skippedExisting = 0;
     for (const target of targets) {
+      const e = (target.email ?? "").toLowerCase().trim();
+      const ph = (target.phone ?? "").trim();
+      if ((e && pendingEmails.has(e)) || (ph && pendingPhones.has(ph))) {
+        skippedExisting += 1;
+        continue;
+      }
       if (target.email) {
         const { data: exists } = await supabase.rpc("email_exists", { _email: target.email });
         if (exists === true) {
