@@ -999,8 +999,3 @@ function Field({
   );
 }
 
-// Local class helper used above to keep inputs consistent.
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface CSSStyleDeclaration {}
-}
