@@ -391,8 +391,14 @@ function CampEditPage() {
           clubId={camp.club_id}
           venueId={form.venue_id}
           facilityId={form.facility_id}
+          externalLocation={form.external_location || null}
           onChange={(next) =>
-            setForm({ ...form, venue_id: next.venueId, facility_id: next.facilityId })
+            setForm({
+              ...form,
+              venue_id: next.venueId,
+              facility_id: next.facilityId,
+              external_location: next.externalLocation ?? "",
+            })
           }
         />
       </section>
