@@ -1306,8 +1306,8 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
-            const canInvite = !p.user_id && (p.email || p.phone || (playersWithParentContact?.has(p.id) ?? false));
-            const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
+            const canInvite = !p.user_id && hasOpenContact(p);
+            const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
             const linked = !!p.user_id;
 
             const checked = selectedIds.has(p.id);
