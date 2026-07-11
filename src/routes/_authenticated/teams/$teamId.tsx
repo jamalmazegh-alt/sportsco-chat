@@ -929,39 +929,24 @@ function TeamDetail() {
                   </Button>
                 )}
                 {invitableIds.length > 0 && (
-                  <>
-                    <Button
-                      size="sm"
-                      className="h-9"
-                      disabled={inviting}
-                      onClick={inviteWholeTeam}
-                      title={t("players.inviteWholeTeamHint", {
-                        defaultValue:
-                          "Envoie une invitation à chaque joueur/parent sans compte. Les personnes déjà inscrites ou déjà invitées sont ignorées.",
-                      })}
-                    >
-                      {inviting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
-                      )}
-                      {t("players.inviteWholeTeam", {
-                        defaultValue: "Inviter toute l'équipe ({{count}})",
-                        count: invitableIds.length,
-                      })}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-9"
-                      onClick={() => setSelectMode(true)}
-                      title={t("players.inviteSelectedHint", {
-                        defaultValue: "Choisir manuellement les personnes à inviter",
-                      })}
-                    >
-                      <CheckSquare className="h-4 w-4" />
-                    </Button>
-                  </>
+                  <Button
+                    size="sm"
+                    className="h-9"
+                    onClick={() => {
+                      setSelectedIds(new Set(invitableIds));
+                      setSelectMode(true);
+                    }}
+                    title={t("players.inviteWholeTeamHint", {
+                      defaultValue:
+                        "Envoie une invitation à chaque joueur/parent sans compte. Les personnes déjà inscrites ou déjà invitées sont ignorées.",
+                    })}
+                  >
+                    <Send className="h-4 w-4" />
+                    {t("players.inviteWholeTeam", {
+                      defaultValue: "Inviter ({{count}})",
+                      count: invitableIds.length,
+                    })}
+                  </Button>
                 )}
                 {isCoach && activeClubId && (
                   <Button
