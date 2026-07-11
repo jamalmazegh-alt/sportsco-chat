@@ -208,6 +208,7 @@ const UpdatePatch = z
     description: z.string().max(4000).nullable().optional(),
     venue_id: z.string().uuid().nullable().optional(),
     facility_id: z.string().uuid().nullable().optional(),
+    external_location: z.string().trim().max(300).nullable().optional(),
     start_date: z.string().min(1).optional(),
     end_date: z.string().min(1).optional(),
     registration_deadline: z.string().nullable().optional(),
