@@ -85,7 +85,7 @@ function TeamDetail() {
       const { data } = await supabase
         .from("teams")
         .select(
-          "id, name, age_group, championship, competitions, sport, season, image_url, club_id",
+          "id, name, age_group, championship, competitions, sport, season, image_url, club_id, archived_at",
         )
         .eq("id", teamId)
         .single();
