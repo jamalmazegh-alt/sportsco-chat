@@ -157,17 +157,6 @@ function TeamsPage() {
                   placeholder="U13"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label>
-                  {t("teams.championship")}{" "}
-                  <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-                </Label>
-                <Input
-                  value={championship}
-                  onChange={(e) => setChampionship(e.target.value)}
-                  placeholder="District D2"
-                />
-              </div>
               <div className="space-y-2">
                 <Label>{t("teams.competitions")}</Label>
                 <div className="grid grid-cols-3 gap-2">
