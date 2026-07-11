@@ -90,6 +90,7 @@ function CampEditPage() {
     description: "",
     venue_id: null as string | null,
     facility_id: null as string | null,
+    external_location: "" as string,
     start_date: "",
     end_date: "",
     registration_deadline: "",
