@@ -73,7 +73,14 @@ export function HomeQuickCards({ clubId, teams }: Props) {
     .map((x) => x.name)
     .join(" · ");
 
+  const camps = campsData ?? [];
+  const campsCount = camps.length;
+  const nextCamp = [...camps]
+    .filter((c) => c.status === "published" || c.status === "draft")
+    .sort((a, b) => (a.start_date ?? "").localeCompare(b.start_date ?? ""))[0];
+
   return (
+    <div className="space-y-2.5">
     <div className="grid grid-cols-2 gap-2.5">
       {/* Teams card */}
       <Link
