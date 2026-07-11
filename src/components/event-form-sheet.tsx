@@ -35,6 +35,9 @@ import {
   type CreateEventInput,
 } from "@/lib/events/events.functions";
 import { ChampionshipPicker } from "@/components/events/championship-picker";
+import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
+import { useAuth } from "@/lib/auth-context";
+
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
