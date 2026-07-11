@@ -885,7 +885,7 @@ function TeamDetail() {
               </div>
               {team && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {[team.age_group, team.championship, team.sport, team.season]
+                  {[team.age_group, team.sport, team.season]
                     .filter(Boolean)
                     .join(" · ")}
                 </p>
