@@ -761,6 +761,7 @@
     "startTime": "Starttijd",
     "endTime": "Eindtijd",
     "locationGoogleHelper": "Begin te typen om een Google Maps-adres te selecteren.",
+    "locationLockedHint": "Adres van de geselecteerde locatie. Wijzig de locatie om het te bewerken.",
     "locationGoogleNeedsKey": "Voeg een Google Maps-browsersleutel toe om suggesties in te schakelen; een Maps-link wordt hoe dan ook automatisch gemaakt.",
     "details": "Details",
     "selectTeam": "Team kiezen",

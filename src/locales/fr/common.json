@@ -761,6 +761,7 @@
     "startTime": "Début",
     "endTime": "Fin",
     "locationGoogleHelper": "Commencez à taper pour choisir une adresse Google Maps.",
+    "locationLockedHint": "Adresse issue du site sélectionné. Modifiez le site pour la changer.",
     "locationGoogleNeedsKey": "Ajoutez une clé navigateur Google Maps pour activer les suggestions ; un lien Maps est quand même créé automatiquement.",
     "details": "Détails",
     "selectTeam": "Choisir une équipe",

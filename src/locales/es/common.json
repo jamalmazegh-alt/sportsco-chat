@@ -761,6 +761,7 @@
     "startTime": "Hora de inicio",
     "endTime": "Hora de finalización",
     "locationGoogleHelper": "Empieza a escribir para seleccionar una dirección de Google Maps.",
+    "locationLockedHint": "Dirección del lugar seleccionado. Cambia el lugar para editarla.",
     "locationGoogleNeedsKey": "Añade una clave de navegador de Google Maps para activar las sugerencias; se creará un enlace de Maps automáticamente de todos modos.",
     "details": "Detalles",
     "selectTeam": "Seleccionar equipo",
