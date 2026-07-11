@@ -107,6 +107,100 @@ function TeamDetail() {
     },
   });
 
+  const isArchived = !!team?.archived_at;
+
+  const { data: teamHasHistory } = useQuery({
+    queryKey: ["team-has-history", teamId],
+    enabled: isAdmin && !!team,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("team_has_history", { _id: teamId });
+      if (error) throw error;
+      return !!data;
+    },
+  });
+
+  const [confirmDeleteTeam, setConfirmDeleteTeam] = useState(false);
+  const [confirmArchiveTeam, setConfirmArchiveTeam] = useState(false);
+  const [teamActionBusy, setTeamActionBusy] = useState(false);
+
+  async function onDeleteTeam() {
+    if (!team) return;
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("delete_team_if_empty", { _id: teamId });
+    setTeamActionBusy(false);
+    setConfirmDeleteTeam(false);
+    if (error) {
+      if ((error.message ?? "").includes("team_has_history")) {
+        toast.error(t("teams.deleteBlockedHasHistory"));
+        qc.invalidateQueries({ queryKey: ["team-has-history", teamId] });
+        return;
+      }
+      toast.error(error.message);
+      return;
+    }
+    toast(t("teams.deleted"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", {
+            _kind: "team",
+            _id: teamId,
+          });
+          if (e2) toast.error(e2.message);
+          else {
+            qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+            qc.invalidateQueries({ queryKey: ["teams"] });
+          }
+        },
+      },
+    });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+    navigate({ to: "/teams" });
+  }
+
+  async function onArchiveTeam() {
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("archive_team", { _id: teamId });
+    setTeamActionBusy(false);
+    setConfirmArchiveTeam(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast(t("teams.archived"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("unarchive_team", { _id: teamId });
+          if (e2) toast.error(e2.message);
+          else {
+            qc.invalidateQueries({ queryKey: ["team", teamId] });
+            qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+          }
+        },
+      },
+    });
+    qc.invalidateQueries({ queryKey: ["team", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+  }
+
+  async function onUnarchiveTeam() {
+    setTeamActionBusy(true);
+    const { error } = await supabase.rpc("unarchive_team", { _id: teamId });
+    setTeamActionBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("teams.unarchived"));
+    qc.invalidateQueries({ queryKey: ["team", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    qc.invalidateQueries({ queryKey: ["teams"] });
+  }
+
+
   const { data: players, isLoading } = useQuery({
     queryKey: ["team-players", teamId],
     queryFn: async () => {
