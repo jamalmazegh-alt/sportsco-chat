@@ -1002,14 +1002,33 @@ export function EventFormSheet({
 
         {!(mode === "create" && type === "training" && isRecurring) && (
           <>
+            <VenuePicker
+              clubId={activeClubId ?? undefined}
+              venueId={venueId}
+              facilityId={facilityId}
+              autoApplyDefaults={mode === "create" && !location}
+              onChange={(v: VenuePickerValue | null) => {
+                if (!v) return;
+                setVenueId(v.venueId);
+                setFacilityId(v.facilityId);
+                setLocation(v.location);
+                setLocationUrl(v.locationUrl ?? "");
+              }}
+            />
             <AddressField
               label={t("events.location")}
               value={location ?? ""}
-              onValueChange={setLocation}
+              onValueChange={(val) => {
+                setLocation(val);
+                // Manual override: detach from the structured venue link.
+                setVenueId(null);
+                setFacilityId(null);
+              }}
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
               helper={t("events.locationGoogleHelper")}
             />
+
             <div className="space-y-1.5">
               <Label>{t("events.details")}</Label>
               <Textarea
