@@ -459,14 +459,14 @@ function VenueEditDialog({
               placeholder="Stade municipal"
             />
           </div>
-          <div className="space-y-1.5">
-            <Label>{t("venues.field.address", { defaultValue: "Adresse" })}</Label>
-            <LocationAutocomplete
-              value={draft.address ?? ""}
-              onChange={(v: string) => setDraft({ ...draft, address: v })}
-              placeholder="12 rue du Stade, 75000 Paris"
-            />
-          </div>
+          <AddressField
+            label={t("venues.field.address", { defaultValue: "Adresse" })}
+            value={draft.address ?? ""}
+            onValueChange={(v: string) => setDraft({ ...draft, address: v })}
+            onPlaceUrl={() => {}}
+            placeholder="12 rue du Stade, 75000 Paris"
+            helper=""
+          />
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1.5">
               <Label>{t("venues.field.city", { defaultValue: "Ville" })}</Label>
