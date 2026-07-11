@@ -51,14 +51,16 @@ import {
   type CampRequiredDocument,
 } from "@/lib/camps-content.functions";
 
+// Socle: valeurs stockées strictement medical / license / authorization /
+// health_form / insurance / other (voir CHECK sur club_camp_required_documents).
+// Les libellés FR/EN restent libres côté i18n.
 const DOC_TYPES = [
   { value: "__none", label: { fr: "Sans catégorie", en: "Uncategorized" } },
-  { value: "id", label: { fr: "Pièce d'identité", en: "ID document" } },
   { value: "medical", label: { fr: "Certificat médical", en: "Medical certificate" } },
-  { value: "health_form", label: { fr: "Fiche sanitaire", en: "Health form" } },
+  { value: "license", label: { fr: "Licence", en: "License" } },
   { value: "authorization", label: { fr: "Autorisation parentale", en: "Parental authorization" } },
+  { value: "health_form", label: { fr: "Fiche sanitaire", en: "Health form" } },
   { value: "insurance", label: { fr: "Attestation d'assurance", en: "Insurance certificate" } },
-  { value: "photo", label: { fr: "Photo d'identité", en: "ID photo" } },
   { value: "other", label: { fr: "Autre", en: "Other" } },
 ];
 

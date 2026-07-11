@@ -22,12 +22,12 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const MANAGER_ROLES: ClubRole[] = ["admin", "dirigeant", "coach"];
 
-/** Document types that must always be treated as sensitive. */
-export const SENSITIVE_DOCUMENT_TYPES = new Set([
-  "medical",
-  "health_form",
-  "certificat_medical",
-]);
+/**
+ * Document types that must always be treated as sensitive.
+ * Must match the socle exactly — do NOT extend without updating the DB
+ * CHECK constraint and the RGPD purge/access rules that read this set.
+ */
+export const SENSITIVE_DOCUMENT_TYPES = new Set(["medical", "health_form"]);
 
 // ---------------------------------------------------------------------------
 // Types
