@@ -112,6 +112,7 @@ import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
+import { Route as AuthenticatedAdminCampsIndexRouteImport } from './routes/_authenticated/admin/camps.index'
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
 import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
@@ -156,6 +157,7 @@ import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './
 import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
 import { Route as AuthenticatedAdminPaymentsItemsRouteImport } from './routes/_authenticated/admin/payments.items'
 import { Route as AuthenticatedAdminPaymentsDashboardRouteImport } from './routes/_authenticated/admin/payments.dashboard'
+import { Route as AuthenticatedAdminCampsCampIdRouteImport } from './routes/_authenticated/admin/camps.$campId'
 import { Route as ApiPublicTournamentIdRegulationsRouteImport } from './routes/api/public/tournament.$id.regulations'
 
 const SuperadminRoute = SuperadminRouteImport.update({
@@ -700,6 +702,12 @@ const AuthenticatedAdminUsersIndexRoute =
     path: '/users/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCampsIndexRoute =
+  AuthenticatedAdminCampsIndexRouteImport.update({
+    id: '/camps/',
+    path: '/camps/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const TournamentSlugRosterTokenRoute =
   TournamentSlugRosterTokenRouteImport.update({
     id: '/tournament/$slug_/roster/$token',
@@ -959,6 +967,12 @@ const AuthenticatedAdminPaymentsDashboardRoute =
     path: '/payments/dashboard',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCampsCampIdRoute =
+  AuthenticatedAdminCampsCampIdRouteImport.update({
+    id: '/camps/$campId',
+    path: '/camps/$campId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicTournamentIdRegulationsRoute =
   ApiPublicTournamentIdRegulationsRouteImport.update({
     id: '/api/public/tournament/$id/regulations',
@@ -1068,6 +1082,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
   '/support-view/$sessionId/': typeof SupportViewSessionIdIndexRoute
+  '/admin/camps/$campId': typeof AuthenticatedAdminCampsCampIdRoute
   '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1112,6 +1127,7 @@ export interface FileRoutesByFullPath {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/admin/camps/': typeof AuthenticatedAdminCampsIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
@@ -1212,6 +1228,7 @@ export interface FileRoutesByTo {
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
   '/support-view/$sessionId': typeof SupportViewSessionIdIndexRoute
+  '/admin/camps/$campId': typeof AuthenticatedAdminCampsCampIdRoute
   '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1256,6 +1273,7 @@ export interface FileRoutesByTo {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/admin/camps': typeof AuthenticatedAdminCampsIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
@@ -1363,6 +1381,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
   '/support-view/$sessionId/': typeof SupportViewSessionIdIndexRoute
+  '/_authenticated/admin/camps/$campId': typeof AuthenticatedAdminCampsCampIdRoute
   '/_authenticated/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/_authenticated/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1407,6 +1426,7 @@ export interface FileRoutesById {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug_/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/_authenticated/admin/camps/': typeof AuthenticatedAdminCampsIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
@@ -1514,6 +1534,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
     | '/support-view/$sessionId/'
+    | '/admin/camps/$campId'
     | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
@@ -1558,6 +1579,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
+    | '/admin/camps/'
     | '/admin/users/'
     | '/api/public/tournament/$id/regulations'
   fileRoutesByTo: FileRoutesByTo
@@ -1658,6 +1680,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
     | '/support-view/$sessionId'
+    | '/admin/camps/$campId'
     | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
@@ -1702,6 +1725,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
+    | '/admin/camps'
     | '/admin/users'
     | '/api/public/tournament/$id/regulations'
   id:
@@ -1808,6 +1832,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
     | '/support-view/$sessionId/'
+    | '/_authenticated/admin/camps/$campId'
     | '/_authenticated/admin/payments/dashboard'
     | '/_authenticated/admin/payments/items'
     | '/_authenticated/admin/settings/branding'
@@ -1852,6 +1877,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/tournament/$slug_/roster/$token'
+    | '/_authenticated/admin/camps/'
     | '/_authenticated/admin/users/'
     | '/api/public/tournament/$id/regulations'
   fileRoutesById: FileRoutesById
@@ -2659,6 +2685,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/camps/': {
+      id: '/_authenticated/admin/camps/'
+      path: '/camps'
+      fullPath: '/admin/camps/'
+      preLoaderRoute: typeof AuthenticatedAdminCampsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/tournament/$slug_/roster/$token': {
       id: '/tournament/$slug_/roster/$token'
       path: '/tournament/$slug/roster/$token'
@@ -2967,6 +3000,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaymentsDashboardRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/camps/$campId': {
+      id: '/_authenticated/admin/camps/$campId'
+      path: '/camps/$campId'
+      fullPath: '/admin/camps/$campId'
+      preLoaderRoute: typeof AuthenticatedAdminCampsCampIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/tournament/$id/regulations': {
       id: '/api/public/tournament/$id/regulations'
       path: '/api/public/tournament/$id/regulations'
@@ -2980,6 +3020,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminCampsCampIdRoute: typeof AuthenticatedAdminCampsCampIdRoute
   AuthenticatedAdminPaymentsDashboardRoute: typeof AuthenticatedAdminPaymentsDashboardRoute
   AuthenticatedAdminPaymentsItemsRoute: typeof AuthenticatedAdminPaymentsItemsRoute
   AuthenticatedAdminSettingsBrandingRoute: typeof AuthenticatedAdminSettingsBrandingRoute
@@ -2992,12 +3033,14 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsSponsorsRoute: typeof AuthenticatedAdminSettingsSponsorsRoute
   AuthenticatedAdminSettingsVenuesRoute: typeof AuthenticatedAdminSettingsVenuesRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
+  AuthenticatedAdminCampsIndexRoute: typeof AuthenticatedAdminCampsIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminCampsCampIdRoute: AuthenticatedAdminCampsCampIdRoute,
   AuthenticatedAdminPaymentsDashboardRoute:
     AuthenticatedAdminPaymentsDashboardRoute,
   AuthenticatedAdminPaymentsItemsRoute: AuthenticatedAdminPaymentsItemsRoute,
@@ -3018,6 +3061,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminSettingsSponsorsRoute,
   AuthenticatedAdminSettingsVenuesRoute: AuthenticatedAdminSettingsVenuesRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
+  AuthenticatedAdminCampsIndexRoute: AuthenticatedAdminCampsIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
 
@@ -3390,13 +3434,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
