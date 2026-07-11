@@ -58,5 +58,9 @@
     "event": "Eventos",
     "feature_request": "Pedido de funcionalidade",
     "other": "Outro"
+  },
+  "actions": {
+    "mark_resolved": "Marcar como resolvido",
+    "resolved_toast": "Ticket marcado como resolvido"
   }
 }
