@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronUp, ChevronDown, Pencil, Check, X } from "lucide-react";
+import { Plus, Trash2, ChevronUp, ChevronDown, Pencil, Check, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import {
   upsertCampAgeGroup,
