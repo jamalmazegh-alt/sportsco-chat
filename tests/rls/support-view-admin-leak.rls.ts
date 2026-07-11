@@ -40,7 +40,7 @@
  * Répéter la même matrice sur `listTeams` (`.eq("club_id", ...)`) et
  * `listPlayers`. Restaurer entre chaque itération.
  */
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_admin";
 import { signInAs } from "./_clients";
