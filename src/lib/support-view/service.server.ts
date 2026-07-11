@@ -307,8 +307,14 @@ export const supportDataService = {
   async listPlayers(session: ValidatedSession): Promise<{ players: PlayerDTO[] }> {
     const perms = await computeTargetPermissions(session);
     const results = new Map<string, PlayerDTO>();
+    const allowedPlayerIds = perms.is_club_admin
+      ? null
+      : new Set<string>();
     const collect = (rows: PlayerRow[]) => {
       assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "players.club_id");
+      if (allowedPlayerIds) {
+        assertRowsBelongToSession(rows, (r) => r.id, allowedPlayerIds, "players.id");
+      }
       for (const r of rows) {
         const { club_id: _c, ...dto } = r;
         results.set(r.id, sanitizePlayer(dto as PlayerDTO));
@@ -335,6 +341,7 @@ export const supportDataService = {
         const pids = Array.from(
           new Set((tms ?? []).map((t) => t.player_id as string).filter(Boolean)),
         );
+        pids.forEach((id) => allowedPlayerIds!.add(id));
         if (pids.length > 0) {
           const { data } = await supabaseAdmin
             .from("players")
@@ -346,6 +353,7 @@ export const supportDataService = {
       }
       const own = [...perms.player_ids, ...perms.child_player_ids];
       if (own.length > 0) {
+        own.forEach((id) => allowedPlayerIds!.add(id));
         const { data } = await supabaseAdmin
           .from("players")
           .select("id, first_name, last_name, birth_date, club_id")
@@ -356,6 +364,7 @@ export const supportDataService = {
     }
     return { players: Array.from(results.values()) };
   },
+
 
   /**
    * Read-only payments view. Scope:
