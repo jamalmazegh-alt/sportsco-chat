@@ -226,9 +226,14 @@ beforeAll(async () => {
 afterAll(async () => {
   const fx = getFixtures();
   for (const sid of [sessionId, sessionIdParent, sessionIdCoach].filter(Boolean)) {
-    await superadminClient
-      .rpc("end_support_view_session" as never, { _session_id: sid } as never)
-      .catch(() => {});
+    try {
+      await superadminClient.rpc(
+        "end_support_view_session" as never,
+        { _session_id: sid } as never,
+      );
+    } catch {
+      // best-effort
+    }
   }
   // Belt-and-braces — global teardown also purges by superadmin_id.
   await admin
