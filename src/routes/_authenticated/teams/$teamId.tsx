@@ -1361,15 +1361,28 @@ function TeamDetail() {
                 )}
                 <li key={p.id}>
                   {selectMode ? (
-                    <button
-                      type="button"
-                      disabled={!canInvite}
-                      onClick={() => canInvite && toggleSelected(p.id)}
-                      className={cn(rowClass, "w-full text-left", !canInvite && "opacity-50")}
-                    >
-                      <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
-                      {inner}
-                    </button>
+                    (() => {
+                      const selectable = canInvite && !hasPendingInvite;
+                      return (
+                        <button
+                          type="button"
+                          disabled={!selectable}
+                          onClick={() => selectable && toggleSelected(p.id)}
+                          className={cn(
+                            rowClass,
+                            "w-full text-left",
+                            !selectable && "opacity-50 grayscale",
+                          )}
+                        >
+                          <Checkbox
+                            checked={checked && selectable}
+                            disabled={!selectable}
+                            className="shrink-0"
+                          />
+                          {inner}
+                        </button>
+                      );
+                    })()
                   ) : (
                     (() => {
                       const rowContent = (
