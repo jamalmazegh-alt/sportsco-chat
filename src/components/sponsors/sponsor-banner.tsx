@@ -9,6 +9,7 @@ import {
   recordSponsorImpression,
 } from "@/lib/sponsors.functions";
 import { shouldRecordClick, shouldRecordImpression } from "@/lib/sponsor-session";
+import { SponsorLogo } from "./SponsorLogo";
 
 const ROTATION_MS = 12_000;
 const IMPRESSION_VISIBLE_MS = 1_000;
