@@ -106,7 +106,11 @@
     "addTitle": "Add an age group",
     "labelPlaceholder": "Label (e.g. U9)",
     "yearMin": "Min year",
-    "yearMax": "Max year"
+    "yearMax": "Max year",
+    "quickAdd": "Quick add",
+    "pickPreset": "Pick U6 – U19",
+    "allAdded": "All added",
+    "addCustom": "+ Custom category"
   },
   "cover": {
     "empty": "No cover image",
