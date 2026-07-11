@@ -288,17 +288,21 @@ export const supportDataService = {
       .from("teams")
       .select("id, name, sport, age_group, club_id")
       .eq("club_id", session.club_id);
+    const coachScope = Array.from(new Set(perms.coach_team_ids));
     if (!perms.is_club_admin) {
-      const scope = Array.from(new Set(perms.coach_team_ids));
-      if (scope.length === 0) return { teams: [] };
-      q = q.in("id", scope);
+      if (coachScope.length === 0) return { teams: [] };
+      q = q.in("id", coachScope);
     }
     const { data, error } = await q.order("name");
     if (error) throw new Response(error.message, { status: 500 });
     const rows = (data ?? []) as unknown as TeamRow[];
     assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "teams.club_id");
+    if (!perms.is_club_admin) {
+      assertRowsBelongToSession(rows, (r) => r.id, new Set(coachScope), "teams.id");
+    }
     return { teams: rows.map(({ club_id: _c, ...rest }) => rest) as TeamDTO[] };
   },
+
 
   async listPlayers(session: ValidatedSession): Promise<{ players: PlayerDTO[] }> {
     const perms = await computeTargetPermissions(session);
