@@ -53,6 +53,7 @@ interface WizardState {
   price: string;
   venueId: string | null;
   facilityId: string | null;
+  externalLocation: string;
   ageGroups: Array<{ label: string; min: number | null; max: number | null }>;
 }
 
