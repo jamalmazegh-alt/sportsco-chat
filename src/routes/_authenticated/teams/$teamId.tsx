@@ -88,6 +88,8 @@ function TeamDetail() {
   const isCoach =
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const isAdmin = roles.includes("admin");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
 
