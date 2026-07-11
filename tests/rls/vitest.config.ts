@@ -14,6 +14,6 @@ export default defineConfig({
     fileParallelism: false,
   },
   resolve: {
-    alias: { "@": resolve(__dirname, "./src") },
+    alias: { "@": resolve(__dirname, "../../src") },
   },
 });
