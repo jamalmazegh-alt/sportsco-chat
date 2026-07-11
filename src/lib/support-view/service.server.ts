@@ -288,23 +288,33 @@ export const supportDataService = {
       .from("teams")
       .select("id, name, sport, age_group, club_id")
       .eq("club_id", session.club_id);
+    const coachScope = Array.from(new Set(perms.coach_team_ids));
     if (!perms.is_club_admin) {
-      const scope = Array.from(new Set(perms.coach_team_ids));
-      if (scope.length === 0) return { teams: [] };
-      q = q.in("id", scope);
+      if (coachScope.length === 0) return { teams: [] };
+      q = q.in("id", coachScope);
     }
     const { data, error } = await q.order("name");
     if (error) throw new Response(error.message, { status: 500 });
     const rows = (data ?? []) as unknown as TeamRow[];
     assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "teams.club_id");
+    if (!perms.is_club_admin) {
+      assertRowsBelongToSession(rows, (r) => r.id, new Set(coachScope), "teams.id");
+    }
     return { teams: rows.map(({ club_id: _c, ...rest }) => rest) as TeamDTO[] };
   },
+
 
   async listPlayers(session: ValidatedSession): Promise<{ players: PlayerDTO[] }> {
     const perms = await computeTargetPermissions(session);
     const results = new Map<string, PlayerDTO>();
+    const allowedPlayerIds = perms.is_club_admin
+      ? null
+      : new Set<string>();
     const collect = (rows: PlayerRow[]) => {
       assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "players.club_id");
+      if (allowedPlayerIds) {
+        assertRowsBelongToSession(rows, (r) => r.id, allowedPlayerIds, "players.id");
+      }
       for (const r of rows) {
         const { club_id: _c, ...dto } = r;
         results.set(r.id, sanitizePlayer(dto as PlayerDTO));
@@ -331,6 +341,7 @@ export const supportDataService = {
         const pids = Array.from(
           new Set((tms ?? []).map((t) => t.player_id as string).filter(Boolean)),
         );
+        pids.forEach((id) => allowedPlayerIds!.add(id));
         if (pids.length > 0) {
           const { data } = await supabaseAdmin
             .from("players")
@@ -342,6 +353,7 @@ export const supportDataService = {
       }
       const own = [...perms.player_ids, ...perms.child_player_ids];
       if (own.length > 0) {
+        own.forEach((id) => allowedPlayerIds!.add(id));
         const { data } = await supabaseAdmin
           .from("players")
           .select("id, first_name, last_name, birth_date, club_id")
@@ -352,6 +364,7 @@ export const supportDataService = {
     }
     return { players: Array.from(results.values()) };
   },
+
 
   /**
    * Read-only payments view. Scope:
@@ -446,6 +459,7 @@ export const supportDataService = {
       .select("id, event_id, player_id, status, responded_at")
       .in("event_id", eventIds);
 
+    let parentPlayerScope: Set<string> | null = null;
     if (!perms.is_club_admin) {
       const playerScope = Array.from(new Set([...perms.player_ids, ...perms.child_player_ids]));
       // Coach without any own/child players still sees team convocations.
@@ -455,6 +469,7 @@ export const supportDataService = {
       if (perms.coach_team_ids.length === 0) {
         if (playerScope.length === 0) return { convocations: [] };
         cq = cq.in("player_id", playerScope);
+        parentPlayerScope = new Set(playerScope);
       }
     }
 
@@ -463,7 +478,16 @@ export const supportDataService = {
     type ConvRow = ConvocationDTO;
     const rows = (data ?? []) as unknown as ConvRow[];
     assertRowsBelongToSession(rows, (r) => r.event_id, eventSet, "convocations.event_id");
+    if (parentPlayerScope) {
+      assertRowsBelongToSession(
+        rows,
+        (r) => r.player_id,
+        parentPlayerScope,
+        "convocations.player_id",
+      );
+    }
     return { convocations: rows };
+
   },
 };
 
