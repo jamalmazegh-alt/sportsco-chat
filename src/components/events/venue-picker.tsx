@@ -95,7 +95,11 @@ export function VenuePicker({
   useEffect(() => {
     if (initializedRef.current) return;
     if (!clubId || list.length === 0) return;
-    if (venueId && !autoApplyDefaults) {
+    // Only auto-apply the club default when the caller explicitly opts in
+    // (typically: create flow with no existing location). In edit / prefilled
+    // cases, never override the current selection — even if venueId is still
+    // null while the parent form is hydrating.
+    if (!autoApplyDefaults) {
       initializedRef.current = true;
       return;
     }
