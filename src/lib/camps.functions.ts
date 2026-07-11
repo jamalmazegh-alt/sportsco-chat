@@ -41,6 +41,7 @@ export interface ClubCamp {
   cover_image_url: string | null;
   venue_id: string | null;
   facility_id: string | null;
+  external_location: string | null;
   start_date: string;
   end_date: string;
   price: number | null;
@@ -104,7 +105,7 @@ export const listClubCamps = createServerFn({ method: "GET" })
     const q = context.supabase
       .from("club_camps")
       .select(
-        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
+        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, external_location, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
       )
       .eq("club_id", data.clubId)
       .order("start_date", { ascending: false });
@@ -124,7 +125,7 @@ export const getClubCamp = createServerFn({ method: "GET" })
     const { data: camp, error } = await context.supabase
       .from("club_camps")
       .select(
-        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
+        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, external_location, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
       )
       .eq("id", data.campId)
       .maybeSingle();
@@ -207,6 +208,7 @@ const UpdatePatch = z
     description: z.string().max(4000).nullable().optional(),
     venue_id: z.string().uuid().nullable().optional(),
     facility_id: z.string().uuid().nullable().optional(),
+    external_location: z.string().trim().max(300).nullable().optional(),
     start_date: z.string().min(1).optional(),
     end_date: z.string().min(1).optional(),
     registration_deadline: z.string().nullable().optional(),

@@ -90,6 +90,7 @@ function CampEditPage() {
     description: "",
     venue_id: null as string | null,
     facility_id: null as string | null,
+    external_location: "" as string,
     start_date: "",
     end_date: "",
     registration_deadline: "",
@@ -109,6 +110,7 @@ function CampEditPage() {
       description: camp.description ?? "",
       venue_id: camp.venue_id,
       facility_id: camp.facility_id,
+      external_location: camp.external_location ?? "",
       start_date: toDateInput(camp.start_date),
       end_date: toDateInput(camp.end_date),
       registration_deadline: toDateInput(camp.registration_deadline),
@@ -143,6 +145,7 @@ function CampEditPage() {
             description: form.description.trim() || null,
             venue_id: form.venue_id,
             facility_id: form.facility_id,
+            external_location: form.external_location.trim() || null,
             start_date: fromDateInput(form.start_date) ?? undefined,
             end_date: fromDateInput(form.end_date) ?? undefined,
             registration_deadline: fromDateInput(form.registration_deadline),
@@ -389,8 +392,14 @@ function CampEditPage() {
           clubId={camp.club_id}
           venueId={form.venue_id}
           facilityId={form.facility_id}
+          externalLocation={form.external_location || null}
           onChange={(next) =>
-            setForm({ ...form, venue_id: next.venueId, facility_id: next.facilityId })
+            setForm({
+              ...form,
+              venue_id: next.venueId,
+              facility_id: next.facilityId,
+              external_location: next.externalLocation ?? "",
+            })
           }
         />
       </section>

@@ -14,19 +14,11 @@ import {
   MapPin,
   Tag,
   Loader2,
-  Plus,
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
 import {
@@ -53,6 +45,7 @@ interface WizardState {
   price: string;
   venueId: string | null;
   facilityId: string | null;
+  externalLocation: string;
   ageGroups: Array<{ label: string; min: number | null; max: number | null }>;
 }
 
@@ -69,6 +62,7 @@ function defaultState(): WizardState {
     price: "",
     venueId: null,
     facilityId: null,
+    externalLocation: "",
     ageGroups: [],
   };
 }
@@ -84,7 +78,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
 
   const [state, setState] = useState<WizardState>(defaultState);
   const [stepIdx, setStepIdx] = useState(0);
-  const [presetChoice, setPresetChoice] = useState("");
+  
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const current = STEP_ORDER[stepIdx];
@@ -104,7 +98,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
   // U6 → U19 presets with birth years derived from current football season.
   const seasonStart =
     new Date().getMonth() >= 7 ? new Date().getFullYear() : new Date().getFullYear() - 1;
-  const existingLabels = useMemo(
+  const selectedLabels = useMemo(
     () => new Set(state.ageGroups.map((g) => g.label.toUpperCase())),
     [state.ageGroups],
   );
@@ -115,21 +109,25 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
         const label = `U${n}`;
         const min = seasonStart - n + 1;
         return { label, min, max: min + 1 };
-      }).filter((p) => !existingLabels.has(p.label)),
-    [existingLabels, seasonStart],
+      }),
+    [seasonStart],
   );
 
-  function addPreset() {
-    const p = presets.find((x) => x.label === presetChoice);
-    if (!p) return;
-    setState((s) => ({
-      ...s,
-      ageGroups: [...s.ageGroups, { label: p.label, min: p.min, max: p.max }],
-    }));
-    setPresetChoice("");
-  }
-  function removeAgeGroup(label: string) {
-    setState((s) => ({ ...s, ageGroups: s.ageGroups.filter((g) => g.label !== label) }));
+  function togglePreset(label: string, min: number, max: number) {
+    setState((s) => {
+      const upper = label.toUpperCase();
+      const exists = s.ageGroups.some((g) => g.label.toUpperCase() === upper);
+      if (exists) {
+        return { ...s, ageGroups: s.ageGroups.filter((g) => g.label.toUpperCase() !== upper) };
+      }
+      const next = [...s.ageGroups, { label, min, max }];
+      next.sort((a, b) => {
+        const na = parseInt(a.label.replace(/^U/i, ""), 10);
+        const nb = parseInt(b.label.replace(/^U/i, ""), 10);
+        return (Number.isNaN(na) ? Infinity : na) - (Number.isNaN(nb) ? Infinity : nb);
+      });
+      return { ...s, ageGroups: next };
+    });
   }
 
   // Validation per step
@@ -166,6 +164,9 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
       }
       if (state.venueId) patchBody.venue_id = state.venueId;
       if (state.facilityId) patchBody.facility_id = state.facilityId;
+      if (!state.venueId && state.externalLocation.trim()) {
+        patchBody.external_location = state.externalLocation.trim();
+      }
       if (Object.keys(patchBody).length > 0) {
         await updateFn({ data: { campId: created.id, patch: patchBody } });
       }
@@ -385,8 +386,14 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
               clubId={clubId}
               venueId={state.venueId}
               facilityId={state.facilityId}
+              externalLocation={state.externalLocation || null}
               onChange={(next) =>
-                setState((s) => ({ ...s, venueId: next.venueId, facilityId: next.facilityId }))
+                setState((s) => ({
+                  ...s,
+                  venueId: next.venueId,
+                  facilityId: next.facilityId,
+                  externalLocation: next.externalLocation ?? "",
+                }))
               }
             />
             <p className="text-[11px] text-muted-foreground">
@@ -399,61 +406,36 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
 
         {current === "ageGroups" && (
           <div className="space-y-3">
-            <div className="flex gap-2">
-              <Select
-                value={presetChoice}
-                onValueChange={setPresetChoice}
-                disabled={presets.length === 0}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue
-                    placeholder={
-                      presets.length === 0
-                        ? t("ageGroups.allAdded", { defaultValue: "Toutes ajoutées" })
-                        : t("ageGroups.pickPreset", { defaultValue: "Choisir U6 – U19" })
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {presets.map((p) => (
-                    <SelectItem key={p.label} value={p.label}>
-                      {p.label}
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        ({p.min}–{p.max})
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button type="button" onClick={addPreset} disabled={!presetChoice}>
-                <Plus className="h-4 w-4 mr-1" />
-                {t("common.add", { defaultValue: "Ajouter" })}
-              </Button>
-            </div>
-
-            {state.ageGroups.length > 0 ? (
-              <ul className="flex flex-wrap gap-2">
-                {state.ageGroups.map((g) => (
-                  <li
-                    key={g.label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs"
+            <p className="text-xs text-muted-foreground">
+              {t("ageGroups.selectAll", {
+                defaultValue: "Sélectionne les catégories concernées",
+              })}
+            </p>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
+              {presets.map((p) => {
+                const active = selectedLabels.has(p.label.toUpperCase());
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => togglePreset(p.label, p.min, p.max)}
+                    aria-pressed={active}
+                    className={cn(
+                      "flex flex-col items-center justify-center rounded-lg border p-2 text-center transition",
+                      active
+                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
+                        : "border-border bg-card hover:bg-muted/50",
+                    )}
                   >
-                    <span className="font-semibold">{g.label}</span>
-                    <span className="text-muted-foreground">
-                      {g.min}–{g.max}
+                    <span className="text-sm font-semibold">{p.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {p.min}–{p.max}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => removeAgeGroup(g.label)}
-                      className="ml-1 rounded-full hover:bg-muted p-0.5"
-                      aria-label={t("common.delete", { defaultValue: "Supprimer" })}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
+                  </button>
+                );
+              })}
+            </div>
+            {state.ageGroups.length === 0 && (
               <p className="text-xs text-muted-foreground">
                 {t("wizard.ageGroupsEmpty", {
                   defaultValue:
@@ -481,8 +463,13 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 👥 {state.capacity} {t("wizard.summary.places", { defaultValue: "places" })}
                 {state.price && ` · ${state.price} €`}
               </div>
-              {state.venueId && (
-                <div>📍 {t("wizard.summary.venueSet", { defaultValue: "Lieu défini" })}</div>
+              {(state.venueId || state.externalLocation.trim()) && (
+                <div>
+                  📍{" "}
+                  {state.venueId
+                    ? t("wizard.summary.venueSet", { defaultValue: "Lieu défini" })
+                    : state.externalLocation}
+                </div>
               )}
               <div className="pt-1">
                 <span className="text-xs text-muted-foreground">
