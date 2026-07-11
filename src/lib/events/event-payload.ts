@@ -68,7 +68,10 @@ export interface EventRowPayload {
   series_id?: string;
   championship_id?: string | null;
   attachments?: EventAttachment[] | null;
+  venue_id?: string | null;
+  facility_id?: string | null;
 }
+
 
 export function toGoogleMapsUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
