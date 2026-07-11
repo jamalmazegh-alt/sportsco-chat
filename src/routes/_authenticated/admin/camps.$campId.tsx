@@ -35,6 +35,9 @@ import { slugifyCampTitle, isValidCampSlug } from "@/lib/camps.slug";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
 import { CampAgeGroupsEditor } from "@/components/camps/camp-age-groups-editor";
 import { CampCoverUpload } from "@/components/camps/camp-cover-upload";
+import { CampProgramEditor } from "@/components/camps/camp-program-editor";
+import { CampDocumentsEditor } from "@/components/camps/camp-documents-editor";
+import { CampRequiredDocumentsEditor } from "@/components/camps/camp-required-documents-editor";
 
 export const Route = createFileRoute("/_authenticated/admin/camps/$campId")({
   component: CampEditPage,
