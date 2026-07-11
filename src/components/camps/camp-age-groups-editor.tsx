@@ -53,6 +53,27 @@ export function CampAgeGroupsEditor({
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<Draft>(emptyDraft);
+  const [showCustom, setShowCustom] = useState(false);
+  const [presetChoice, setPresetChoice] = useState<string>("");
+
+  const existingLabels = useMemo(
+    () => new Set(ageGroups.map((g) => g.label.toUpperCase())),
+    [ageGroups],
+  );
+
+  // Season = August of current year → July of next year (typical FR/EU football season).
+  // For a Uᴺ category: min birth year ≈ seasonStart - N + 1.
+  const now = new Date();
+  const seasonStart = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+
+  const presets = useMemo(() => {
+    return Array.from({ length: 14 }, (_, i) => {
+      const n = i + 6; // U6 → U19
+      const label = `U${n}`;
+      const min = seasonStart - n + 1;
+      return { label, min, max: min + 1 };
+    }).filter((p) => !existingLabels.has(p.label));
+  }, [existingLabels, seasonStart]);
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["club-camp", campId] });
