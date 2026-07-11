@@ -22,9 +22,8 @@ export const getSupportViewContext = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const summary = await supportDataService.getContextSummary(session);
     await logSupportAction(context.supabase, session.id, "read.context");
@@ -36,9 +35,8 @@ export const getSupportViewEvents = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const out = await supportDataService.listEvents(session);
     await logSupportAction(context.supabase, session.id, "read.events");
@@ -50,9 +48,8 @@ export const getSupportViewTeams = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const out = await supportDataService.listTeams(session);
     await logSupportAction(context.supabase, session.id, "read.teams");
@@ -64,9 +61,8 @@ export const getSupportViewPlayers = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const out = await supportDataService.listPlayers(session);
     await logSupportAction(context.supabase, session.id, "read.players");
@@ -78,9 +74,8 @@ export const getSupportViewPayments = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const out = await supportDataService.listPayments(session);
     await logSupportAction(context.supabase, session.id, "read.payments");
@@ -92,12 +87,10 @@ export const getSupportViewConvocations = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
-    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
-      "@/lib/support-view/service.server"
-    );
+    const { loadValidatedSession, supportDataService, logSupportAction } =
+      await import("@/lib/support-view/service.server");
     const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
     const out = await supportDataService.listConvocations(session);
     await logSupportAction(context.supabase, session.id, "read.convocations");
     return out;
   });
-

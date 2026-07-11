@@ -30,7 +30,10 @@ import {
   formatMoney,
 } from "@/lib/superadmin/ui";
 import { BillingExemptionPanel } from "@/components/superadmin/BillingExemptionPanel";
-import { OnboardingProgress, type OnboardingStep } from "@/components/superadmin/OnboardingProgress";
+import {
+  OnboardingProgress,
+  type OnboardingStep,
+} from "@/components/superadmin/OnboardingProgress";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
@@ -452,7 +455,11 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 type ClubDetailData = NonNullable<Awaited<ReturnType<typeof getClubDetailExtended>>>;
 
 function buildClubOnboardingSteps(data: ClubDetailData): OnboardingStep[] {
-  const club = data.club as { logo_url?: string | null; theme_color?: string | null; name?: string | null } | null;
+  const club = data.club as {
+    logo_url?: string | null;
+    theme_color?: string | null;
+    name?: string | null;
+  } | null;
   const counts = data.counts ?? {
     players: 0,
     invites: 0,
@@ -463,8 +470,7 @@ function buildClubOnboardingSteps(data: ClubDetailData): OnboardingStep[] {
   const activeTeams = (data.teams ?? []).filter((t) => !t.deleted_at);
   const sub = data.subscription as { status?: string | null } | null;
   const subActive =
-    !!sub &&
-    ["active", "trialing", "past_due"].includes((sub.status ?? "").toLowerCase());
+    !!sub && ["active", "trialing", "past_due"].includes((sub.status ?? "").toLowerCase());
 
   return [
     {
@@ -523,4 +529,3 @@ function buildClubOnboardingSteps(data: ClubDetailData): OnboardingStep[] {
     },
   ];
 }
-

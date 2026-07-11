@@ -44,7 +44,6 @@ export function TrialBanner() {
     (!sub.exempt_until || new Date(sub.exempt_until).getTime() > Date.now());
   if (exemptActive) return null;
 
-
   const now = Date.now();
   const trialEnd = sub.trial_end ? new Date(sub.trial_end).getTime() : null;
   const periodEnd = sub.current_period_end ? new Date(sub.current_period_end).getTime() : null;

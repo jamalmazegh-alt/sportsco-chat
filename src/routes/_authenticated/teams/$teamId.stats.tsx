@@ -8,10 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
-import {
-  listChallenges,
-  getChallengeRanking,
-} from "@/lib/challenges/challenges.functions";
+import { listChallenges, getChallengeRanking } from "@/lib/challenges/challenges.functions";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import i18n from "@/lib/i18n";
 
@@ -82,13 +79,7 @@ function TeamStatsPage() {
   );
 }
 
-function SectionTitle({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function SectionTitle({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
       {icon}
@@ -150,10 +141,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
       }
       const scorerIds = Array.from(scoreMap.keys());
       const { data: players } = scorerIds.length
-        ? await supabase
-            .from("players")
-            .select("id, first_name, last_name")
-            .in("id", scorerIds)
+        ? await supabase.from("players").select("id, first_name, last_name").in("id", scorerIds)
         : { data: [] as any[] };
       const pMap = new Map((players ?? []).map((p: any) => [p.id, p]));
       const scorers = Array.from(scoreMap.entries())
@@ -193,9 +181,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
         </CardHeader>
         <CardContent className="space-y-1 pt-0">
           {scorers.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              {t("stats.noGoals")}
-            </p>
+            <p className="py-4 text-center text-sm text-muted-foreground">{t("stats.noGoals")}</p>
           ) : (
             scorers.map((s, i) => (
               <Link
@@ -204,9 +190,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
                 params={{ playerId: s.id }}
                 className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors"
               >
-                <span className="w-6 text-center font-bold text-muted-foreground">
-                  #{i + 1}
-                </span>
+                <span className="w-6 text-center font-bold text-muted-foreground">#{i + 1}</span>
                 <span className="flex-1 truncate underline underline-offset-2">
                   {s.player
                     ? `${s.player.first_name ?? ""} ${s.player.last_name ?? ""}`
@@ -222,15 +206,7 @@ function TeamMatchStats({ teamId }: { teamId: string }) {
   );
 }
 
-function StatBlock({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color?: string;
-}) {
+function StatBlock({ label, value, color }: { label: string; value: number; color?: string }) {
   return (
     <div>
       <div className={`text-2xl font-bold tabular-nums ${color ?? ""}`}>{value}</div>
@@ -316,9 +292,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
         {isLoading ? (
           <LoaderRow />
         ) : top.length === 0 ? (
-          <p className="py-3 text-center text-sm text-muted-foreground">
-            {t("stats.noResults")}
-          </p>
+          <p className="py-3 text-center text-sm text-muted-foreground">{t("stats.noResults")}</p>
         ) : (
           top.map((row: any, i: number) => {
             const name = row.player
@@ -326,9 +300,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
               : row.player_id.slice(0, 6);
             const content = (
               <>
-                <span className="w-6 text-center font-bold text-muted-foreground">
-                  #{i + 1}
-                </span>
+                <span className="w-6 text-center font-bold text-muted-foreground">#{i + 1}</span>
                 <span className="flex-1 truncate underline underline-offset-2">{name}</span>
                 <span className="font-mono font-bold tabular-nums">{row.score}</span>
               </>
@@ -343,10 +315,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
                 {content}
               </Link>
             ) : (
-              <div
-                key={i}
-                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm"
-              >
+              <div key={i} className="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm">
                 {content}
               </div>
             );

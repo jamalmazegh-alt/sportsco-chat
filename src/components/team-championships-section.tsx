@@ -384,9 +384,7 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("championships.rename", { defaultValue: "Renommer" })}
-            </DialogTitle>
+            <DialogTitle>{t("championships.rename", { defaultValue: "Renommer" })}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmitEdit} className="space-y-3">
             <div className="space-y-1.5">

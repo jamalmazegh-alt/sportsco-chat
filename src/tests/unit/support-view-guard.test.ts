@@ -22,12 +22,7 @@ describe("assertRowsBelongToSession", () => {
   it("throws 500 Response when a row is out of scope (RLS bypass leak)", () => {
     const rows = [{ team_id: "t1" }, { team_id: "foreign-team" }];
     try {
-      assertRowsBelongToSession(
-        rows,
-        (r) => r.team_id,
-        new Set(["t1"]),
-        "events.team_id",
-      );
+      assertRowsBelongToSession(rows, (r) => r.team_id, new Set(["t1"]), "events.team_id");
       throw new Error("guard did not throw");
     } catch (err) {
       expect(err).toBeInstanceOf(Response);

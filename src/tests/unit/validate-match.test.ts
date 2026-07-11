@@ -84,10 +84,7 @@ function makeSupabase(opts: {
   };
 }
 
-async function expectResponseStatus(
-  promise: Promise<unknown>,
-  status: number,
-): Promise<Response> {
+async function expectResponseStatus(promise: Promise<unknown>, status: number): Promise<Response> {
   try {
     await promise;
     throw new Error(`expected Response ${status}`);

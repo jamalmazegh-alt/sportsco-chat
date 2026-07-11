@@ -298,7 +298,6 @@ export interface BuildTeamPosterInput {
 
 const CLUBERO_LOGO_URL = "https://clubero.app/clubero-logo.png";
 
-
 export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<Uint8Array> {
   const t = STRINGS[input.lang];
 
@@ -311,12 +310,12 @@ export async function buildTeamPosterPdf(input: BuildTeamPosterInput): Promise<U
   const bold = await doc.embedFont(boldBytes(), { subset: true });
 
   // Brand palette — aligned with clubero.app marketing site
-  const bg = rgb(0.043, 0.067, 0.094);        // deep navy #0B1118
-  const bgSoft = rgb(0.075, 0.106, 0.145);    // panel navy #131B25
-  const ink = rgb(0.06, 0.09, 0.16);          // for QR on white
+  const bg = rgb(0.043, 0.067, 0.094); // deep navy #0B1118
+  const bgSoft = rgb(0.075, 0.106, 0.145); // panel navy #131B25
+  const ink = rgb(0.06, 0.09, 0.16); // for QR on white
   const white = rgb(1, 1, 1);
-  const textMuted = rgb(0.62, 0.68, 0.76);    // slate on dark
-  const emerald = rgb(0.157, 0.827, 0.443);   // #28D371 CTA green
+  const textMuted = rgb(0.62, 0.68, 0.76); // slate on dark
+  const emerald = rgb(0.157, 0.827, 0.443); // #28D371 CTA green
   const emeraldDeep = rgb(0.09, 0.6, 0.35);
   const hairline = rgb(0.15, 0.2, 0.27);
 

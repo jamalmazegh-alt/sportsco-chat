@@ -27,7 +27,6 @@ const CreateEventSchema = z.object({
   facilityId: z.string().uuid().nullable().optional(),
 });
 
-
 export type CreateEventInput = z.infer<typeof CreateEventSchema>;
 
 /**
@@ -39,10 +38,12 @@ export type CreateEventInput = z.infer<typeof CreateEventSchema>;
  * The server functions here only translate the trigger's raw SQL exception into
  * a stable, i18n-friendly error code. They MUST NOT re-implement the rule.
  */
-export function translateEventDbError(err: {
-  message?: string | null;
-  code?: string | null;
-} | null): string {
+export function translateEventDbError(
+  err: {
+    message?: string | null;
+    code?: string | null;
+  } | null,
+): string {
   const msg = err?.message ?? "";
   if (msg.includes("championship_required")) return "championship_required";
   if (msg.includes("championship_not_found")) return "championship_not_found";

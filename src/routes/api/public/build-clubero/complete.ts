@@ -23,7 +23,6 @@ const ContactSchema = z
   })
   .nullable();
 
-
 const CompleteSchema = z.object({
   session_id: z.string().min(8).max(80),
   contact: ContactSchema.optional(),

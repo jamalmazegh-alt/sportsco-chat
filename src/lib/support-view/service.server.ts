@@ -33,7 +33,9 @@ export type TargetPermissions = {
  */
 // Widened type: rpc names for the support-view feature may not yet be in
 // the generated types.ts; accept any RPC-shaped client.
-type RpcClient = { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+type RpcClient = {
+  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+};
 
 export async function loadValidatedSession(
   userSupabase: unknown,
@@ -76,11 +78,7 @@ export async function computeTargetPermissions(
       .select("team_id, role, teams!inner(club_id)")
       .eq("user_id", target_user_id)
       .eq("teams.club_id", club_id),
-    supabaseAdmin
-      .from("players")
-      .select("id")
-      .eq("club_id", club_id)
-      .eq("user_id", target_user_id),
+    supabaseAdmin.from("players").select("id").eq("club_id", club_id).eq("user_id", target_user_id),
     supabaseAdmin
       .from("player_parents")
       .select("player_id, players!inner(club_id)")
@@ -88,9 +86,7 @@ export async function computeTargetPermissions(
       .eq("players.club_id", club_id),
   ]);
 
-  const is_club_admin = (cm.data ?? []).some(
-    (r) => r.role === "admin" || r.role === "dirigeant",
-  );
+  const is_club_admin = (cm.data ?? []).some((r) => r.role === "admin" || r.role === "dirigeant");
   const coach_team_ids = (tm.data ?? [])
     .filter((r) => r.role === "coach")
     .map((r) => r.team_id as string);
@@ -183,7 +179,6 @@ export type ConvocationDTO = {
   responded_at: string | null;
 };
 
-
 export type ContextSummary = {
   club: { id: string; name: string | null };
   target: { id: string; full_name: string | null };
@@ -193,7 +188,10 @@ export type ContextSummary = {
   reason: string;
 };
 
-async function teamsInScope(session: ValidatedSession, perms: TargetPermissions): Promise<string[]> {
+async function teamsInScope(
+  session: ValidatedSession,
+  perms: TargetPermissions,
+): Promise<string[]> {
   if (perms.is_club_admin) {
     const { data } = await supabaseAdmin.from("teams").select("id").eq("club_id", session.club_id);
     return (data ?? []).map((t) => t.id);
@@ -303,13 +301,10 @@ export const supportDataService = {
     return { teams: rows.map(({ club_id: _c, ...rest }) => rest) as TeamDTO[] };
   },
 
-
   async listPlayers(session: ValidatedSession): Promise<{ players: PlayerDTO[] }> {
     const perms = await computeTargetPermissions(session);
     const results = new Map<string, PlayerDTO>();
-    const allowedPlayerIds = perms.is_club_admin
-      ? null
-      : new Set<string>();
+    const allowedPlayerIds = perms.is_club_admin ? null : new Set<string>();
     const collect = (rows: PlayerRow[]) => {
       assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "players.club_id");
       if (allowedPlayerIds) {
@@ -364,7 +359,6 @@ export const supportDataService = {
     }
     return { players: Array.from(results.values()) };
   },
-
 
   /**
    * Read-only payments view. Scope:
@@ -487,10 +481,8 @@ export const supportDataService = {
       );
     }
     return { convocations: rows };
-
   },
 };
-
 
 function sanitizePlayer(p: PlayerDTO): PlayerDTO {
   if (p.birth_date) {

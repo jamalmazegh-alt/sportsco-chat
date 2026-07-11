@@ -29,15 +29,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
 import { type EventAttachment } from "@/lib/events/event-payload";
-import {
-  createEvent,
-  updateEvent,
-  type CreateEventInput,
-} from "@/lib/events/events.functions";
+import { createEvent, updateEvent, type CreateEventInput } from "@/lib/events/events.functions";
 import { ChampionshipPicker } from "@/components/events/championship-picker";
 import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
 import { useAuth } from "@/lib/auth-context";
-
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -99,7 +94,6 @@ export type EventFormValues = {
   venue_id?: string | null;
   facility_id?: string | null;
 };
-
 
 type Team = { id: string; name: string };
 type TeamOption = Team & { competitions?: string[] | null };
@@ -456,7 +450,6 @@ export function EventFormSheet({
   const [facilityId, setFacilityId] = useState<string | null>(initial?.facility_id ?? null);
   const { activeClubId } = useAuth();
 
-
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
   const convocInit = splitDateTime(initial?.convocation_time);
@@ -633,7 +626,6 @@ export function EventFormSheet({
       venueId,
       facilityId,
     };
-
 
     function invalidateEventsCaches() {
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -834,7 +826,9 @@ export function EventFormSheet({
             )}
             {competitionType === "cup" && (
               <div className="space-y-1.5">
-                <Label>{t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}</Label>
+                <Label>
+                  {t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}
+                </Label>
                 <Input
                   value={competitionName ?? ""}
                   onChange={(e) => setCompetitionName(e.target.value)}
@@ -1056,9 +1050,7 @@ export function EventFormSheet({
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
               helper={
-                isHomeMatch
-                  ? t("events.locationLockedHint")
-                  : t("events.locationGoogleHelper")
+                isHomeMatch ? t("events.locationLockedHint") : t("events.locationGoogleHelper")
               }
               disabled={isHomeMatch}
             />

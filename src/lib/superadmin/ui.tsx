@@ -68,7 +68,6 @@ export function subTone(input?: SubToneInput): {
   }
 }
 
-
 export function roleTone(role?: string | null): keyof typeof TONES {
   switch (role) {
     case "admin":

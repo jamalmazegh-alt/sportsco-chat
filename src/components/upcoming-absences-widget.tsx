@@ -52,7 +52,13 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       const playerIds = Array.from(
         new Set(
           (tm ?? [])
-            .filter((r: any) => r.teams && r.teams.club_id === clubId && !r.teams.deleted_at && !r.teams.archived_at)
+            .filter(
+              (r: any) =>
+                r.teams &&
+                r.teams.club_id === clubId &&
+                !r.teams.deleted_at &&
+                !r.teams.archived_at,
+            )
             .map((r: any) => r.player_id),
         ),
       );

@@ -1164,7 +1164,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   })}
                 />
               </div>
-
             </div>
 
             <Button
@@ -1359,7 +1358,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
               }
             />
-
 
             <Button
               className="w-full mt-2"

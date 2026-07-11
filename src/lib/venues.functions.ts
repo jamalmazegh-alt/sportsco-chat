@@ -233,9 +233,7 @@ export const setDefaultVenue = createServerFn({ method: "POST" })
 export const reorderVenues = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ clubId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertClubRole({
@@ -406,9 +404,7 @@ export const setDefaultFacility = createServerFn({ method: "POST" })
 export const reorderFacilities = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ venueId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) })
-      .parse(input),
+    z.object({ venueId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const clubId = await resolveVenueClubId(context.supabase, data.venueId);

@@ -204,17 +204,18 @@ function SuperAdminUsers() {
                       )}
                     </td>
                     <td className="px-3 py-2.5 hidden md:table-cell">
-                      {u.clubs[0] ? (() => {
-                        const t = subTone({
-                          status: u.clubs[0].subscription_status,
-                          exempt_from_billing: u.clubs[0].subscription_exempt_from_billing,
-                          exempt_until: u.clubs[0].subscription_exempt_until,
-                        });
-                        return <StatusBadge tone={t.tone}>{t.label}</StatusBadge>;
-                      })() : (
+                      {u.clubs[0] ? (
+                        (() => {
+                          const t = subTone({
+                            status: u.clubs[0].subscription_status,
+                            exempt_from_billing: u.clubs[0].subscription_exempt_from_billing,
+                            exempt_until: u.clubs[0].subscription_exempt_until,
+                          });
+                          return <StatusBadge tone={t.tone}>{t.label}</StatusBadge>;
+                        })()
+                      ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
-
                     </td>
                     <td className="px-3 py-2.5 hidden md:table-cell text-xs text-muted-foreground">
                       {u.last_sign_in_at

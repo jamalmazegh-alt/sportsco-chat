@@ -23,7 +23,14 @@ export const createSupportViewSession = createServerFn({ method: "POST" })
   .inputValidator((input) => CreateSupportViewSessionInput.parse(input))
   .handler(async ({ data, context }): Promise<SupportViewSessionDTO> => {
     await assertSuperAdmin(context.userId);
-    const { data: row, error } = await (context.supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }).rpc("create_support_view_session", {
+    const { data: row, error } = await (
+      context.supabase as unknown as {
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>;
+      }
+    ).rpc("create_support_view_session", {
       _target_user_id: data.target_user_id,
       _club_id: data.club_id,
       _persona: data.persona,
@@ -63,7 +70,14 @@ export const endSupportViewSession = createServerFn({ method: "POST" })
   .inputValidator((input) => EndSupportViewSessionInput.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await assertSuperAdmin(context.userId);
-    const { error } = await (context.supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }).rpc("end_support_view_session", {
+    const { error } = await (
+      context.supabase as unknown as {
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>;
+      }
+    ).rpc("end_support_view_session", {
       _session_id: data.session_id,
     });
     if (error) throw new Response(error.message, { status: 400 });
@@ -75,7 +89,14 @@ export const getSupportViewSession = createServerFn({ method: "POST" })
   .inputValidator((input) => ReadSupportViewInput.parse(input))
   .handler(async ({ data, context }): Promise<SupportViewSessionDTO> => {
     await assertSuperAdmin(context.userId);
-    const { data: row, error } = await (context.supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }).rpc("get_active_support_view_session", {
+    const { data: row, error } = await (
+      context.supabase as unknown as {
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>;
+      }
+    ).rpc("get_active_support_view_session", {
       _session_id: data.session_id,
     });
     if (error || !row) {

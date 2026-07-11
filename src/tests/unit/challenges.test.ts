@@ -61,19 +61,31 @@ describe("Phase 3 score unit — templates", () => {
     "targetShots",
   ] as const;
 
-  it.each(SCORE_TEMPLATES)("%s is registered with score unit + higher_better + staff visibility", (key) => {
-    const t = CHALLENGE_TEMPLATES.find((x) => x.key === key);
-    expect(t, `template ${key} missing`).toBeDefined();
-    expect(t!.unit).toBe("score");
-    expect(t!.direction).toBe("higher_better");
-    expect(t!.ranking_visibility).toBe("staff");
-  });
+  it.each(SCORE_TEMPLATES)(
+    "%s is registered with score unit + higher_better + staff visibility",
+    (key) => {
+      const t = CHALLENGE_TEMPLATES.find((x) => x.key === key);
+      expect(t, `template ${key} missing`).toBeDefined();
+      expect(t!.unit).toBe("score");
+      expect(t!.direction).toBe("higher_better");
+      expect(t!.ranking_visibility).toBe("staff");
+    },
+  );
 
   it("pushPower and receptionControl use record aggregate; the other 8 use cumulative", () => {
     const byKey = Object.fromEntries(CHALLENGE_TEMPLATES.map((t) => [t.key, t]));
     expect(byKey.pushPower.aggregate).toBe("record");
     expect(byKey.receptionControl.aggregate).toBe("record");
-    for (const k of ["shotAccuracy","handballShotAccuracy","passingAccuracy","rugbyPassingAccuracy","serveAccuracy","attackAccuracy","tennisServeAccuracy","targetShots"]) {
+    for (const k of [
+      "shotAccuracy",
+      "handballShotAccuracy",
+      "passingAccuracy",
+      "rugbyPassingAccuracy",
+      "serveAccuracy",
+      "attackAccuracy",
+      "tennisServeAccuracy",
+      "targetShots",
+    ]) {
       expect(byKey[k].aggregate, `${k} should be cumulative`).toBe("cumulative");
     }
   });

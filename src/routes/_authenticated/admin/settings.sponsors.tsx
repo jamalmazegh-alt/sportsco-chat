@@ -637,9 +637,7 @@ function SponsorsSettingsPage() {
                         maxHeight={
                           SPONSOR_LOGO_MAX_HEIGHT * clampSponsorLogoScale(editing.logoScale)
                         }
-                        maxWidth={
-                          SPONSOR_LOGO_MAX_WIDTH * clampSponsorLogoScale(editing.logoScale)
-                        }
+                        maxWidth={SPONSOR_LOGO_MAX_WIDTH * clampSponsorLogoScale(editing.logoScale)}
                       />
                     </SponsorBannerFrame>
                   </div>
@@ -673,9 +671,7 @@ function SponsorsSettingsPage() {
                             type="button"
                             size="sm"
                             variant={active ? "default" : "outline"}
-                            onClick={() =>
-                              setEditing({ ...editing, logoScale: preset.value })
-                            }
+                            onClick={() => setEditing({ ...editing, logoScale: preset.value })}
                           >
                             {t(`sponsor.admin.${preset.key}`, {
                               defaultValue: preset.defaultValue,
@@ -698,8 +694,7 @@ function SponsorsSettingsPage() {
                     />
                     <p className="text-xs text-muted-foreground">
                       {t("sponsor.admin.logoSizeHint", {
-                        defaultValue:
-                          "Ajustez la taille telle qu'elle apparaîtra aux membres.",
+                        defaultValue: "Ajustez la taille telle qu'elle apparaîtra aux membres.",
                       })}
                     </p>
                   </div>

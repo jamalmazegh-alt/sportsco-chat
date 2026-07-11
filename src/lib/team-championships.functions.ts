@@ -14,11 +14,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const uuid = z.string().uuid();
 
-const NameSchema = z
-  .string()
-  .trim()
-  .min(1, "name-required")
-  .max(120, "name-too-long");
+const NameSchema = z.string().trim().min(1, "name-required").max(120, "name-too-long");
 
 const SeasonSchema = z.string().trim().max(60).nullable().optional();
 
@@ -53,9 +49,7 @@ export const listTeamChampionships = createServerFn({ method: "GET" })
 export const createTeamChampionship = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z
-      .object({ teamId: uuid, name: NameSchema, seasonLabel: SeasonSchema })
-      .parse(data),
+    z.object({ teamId: uuid, name: NameSchema, seasonLabel: SeasonSchema }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;

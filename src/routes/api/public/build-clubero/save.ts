@@ -45,7 +45,9 @@ export const Route = createFileRoute("/api/public/build-clubero/save")({
 
         const ip = getClientIp(request);
         const effectiveLimit =
-          ip === "unknown" ? Math.max(10, Math.floor(LIMIT_SAVE_PER_HOUR / 10)) : LIMIT_SAVE_PER_HOUR;
+          ip === "unknown"
+            ? Math.max(10, Math.floor(LIMIT_SAVE_PER_HOUR / 10))
+            : LIMIT_SAVE_PER_HOUR;
         const allowed = await checkRateLimit(
           `build_clubero:save:${ip}`,
           "build_clubero_save",
@@ -55,15 +57,19 @@ export const Route = createFileRoute("/api/public/build-clubero/save")({
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { error } = await supabaseAdmin.rpc("save_build_clubero_answer" as never, {
-            p_session_id: body.session_id,
-            p_question_key: body.question_key,
-            p_question_type: body.question_type,
-            p_value: (body.value ?? null) as never,
-          } as never);
+          const { error } = await supabaseAdmin.rpc(
+            "save_build_clubero_answer" as never,
+            {
+              p_session_id: body.session_id,
+              p_question_key: body.question_key,
+              p_question_type: body.question_type,
+              p_value: (body.value ?? null) as never,
+            } as never,
+          );
           if (error) {
             const msg = error.message ?? "";
-            if (msg.includes("response_completed")) return json({ error: "response_completed" }, 409);
+            if (msg.includes("response_completed"))
+              return json({ error: "response_completed" }, 409);
             if (msg.includes("answers_limit_exceeded"))
               return json({ error: "answers_limit_exceeded" }, 409);
             if (msg.includes("session_not_found")) return json({ error: "session_not_found" }, 404);

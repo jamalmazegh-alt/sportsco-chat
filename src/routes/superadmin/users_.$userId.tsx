@@ -39,7 +39,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, StatusBadge, subTone, roleTone, categorize } from "@/lib/superadmin/ui";
-import { OnboardingProgress, type OnboardingStep } from "@/components/superadmin/OnboardingProgress";
+import {
+  OnboardingProgress,
+  type OnboardingStep,
+} from "@/components/superadmin/OnboardingProgress";
 
 export const Route = createFileRoute("/superadmin/users_/$userId")({
   component: UserDetail,
@@ -327,7 +330,6 @@ function UserDetail() {
                       {subTone(m.subscription).label}
                     </StatusBadge>
                   )}
-
                 </div>
               </li>
             ))}
@@ -359,9 +361,7 @@ function UserDetail() {
                     <div className="text-[11px] text-muted-foreground truncate">
                       {inv.kind === "member" ? "Personal invite" : "Shareable link"}
                       {inv.invited_by ? ` · by ${inv.invited_by}` : ""}
-                      {inv.created_at
-                        ? ` · ${new Date(inv.created_at).toLocaleDateString()}`
-                        : ""}
+                      {inv.created_at ? ` · ${new Date(inv.created_at).toLocaleDateString()}` : ""}
                     </div>
                   </div>
                 </Link>

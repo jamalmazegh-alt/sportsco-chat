@@ -74,8 +74,7 @@ function StatusBadge({
   const trialTime = trialEnd ? new Date(trialEnd).getTime() : null;
   const trialExpired = status === "trialing" && trialTime !== null && trialTime <= Date.now();
   const exemptActive =
-    exemptFromBilling === true &&
-    (!exemptUntil || new Date(exemptUntil).getTime() > Date.now());
+    exemptFromBilling === true && (!exemptUntil || new Date(exemptUntil).getTime() > Date.now());
   const map: Record<string, { label: string; cls: string }> = {
     trialing: { label: t("billing.statusTrialing"), cls: "bg-primary/10 text-primary" },
     active: {
@@ -101,8 +100,8 @@ function StatusBadge({
         cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
       }
     : trialExpired
-    ? { label: t("billing.statusTrialExpired"), cls: "bg-destructive/10 text-destructive" }
-    : (map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" });
+      ? { label: t("billing.statusTrialExpired"), cls: "bg-destructive/10 text-destructive" }
+      : (map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" });
 
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   return (
@@ -403,7 +402,6 @@ function BillingPage() {
                       exemptFromBilling={sub.exempt_from_billing}
                       exemptUntil={(sub as { exempt_until?: string | null }).exempt_until ?? null}
                     />
-
                   ) : (
                     <span className="text-sm text-muted-foreground">
                       {t("billing.noSubscription")}

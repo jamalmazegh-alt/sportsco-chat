@@ -17,13 +17,17 @@ const rand = () => `bc-test-${Math.random().toString(36).slice(2, 10)}`;
 describe("RLS: build_clubero (public feedback — hardened)", () => {
   it("anon cannot SELECT build_clubero_responses", async () => {
     const c = anonClient();
-    const { data, error } = await (c.from("build_clubero_responses" as any).select("id") as any).limit(1);
+    const { data, error } = await (
+      c.from("build_clubero_responses" as any).select("id") as any
+    ).limit(1);
     if (!error) expect(data ?? []).toHaveLength(0);
   });
 
   it("anon cannot SELECT build_clubero_answers", async () => {
     const c = anonClient();
-    const { data, error } = await (c.from("build_clubero_answers" as any).select("id") as any).limit(1);
+    const { data, error } = await (
+      c.from("build_clubero_answers" as any).select("id") as any
+    ).limit(1);
     if (!error) expect(data ?? []).toHaveLength(0);
   });
 
@@ -101,7 +105,10 @@ describe("RLS: build_clubero (public feedback — hardened)", () => {
     expect(r.newsletter_consent_at).toBeTruthy();
     expect(r.beta_consent_at).toBeTruthy();
 
-    await admin.from("build_clubero_responses" as any).delete().eq("session_id", sessionId);
+    await admin
+      .from("build_clubero_responses" as any)
+      .delete()
+      .eq("session_id", sessionId);
   });
 
   it("save is REFUSED after complete (response_completed)", async () => {
@@ -124,7 +131,10 @@ describe("RLS: build_clubero (public feedback — hardened)", () => {
     });
     expect(error).toBeTruthy();
     expect(String(error?.message ?? "")).toMatch(/response_completed/);
-    await admin.from("build_clubero_responses" as any).delete().eq("session_id", sessionId);
+    await admin
+      .from("build_clubero_responses" as any)
+      .delete()
+      .eq("session_id", sessionId);
   });
 
   it("complete is idempotent (2 calls → 1 contact)", async () => {
@@ -167,7 +177,10 @@ describe("RLS: build_clubero (public feedback — hardened)", () => {
     expect(r.beta_opt_in).toBe(false);
     expect(r.completed_at).toBe(firstCompletedAt);
 
-    await admin.from("build_clubero_responses" as any).delete().eq("session_id", sessionId);
+    await admin
+      .from("build_clubero_responses" as any)
+      .delete()
+      .eq("session_id", sessionId);
   });
 
   it("MAX_ANSWERS_PER_RESPONSE=100 : refuse au-delà de 100 clés distinctes", async () => {
@@ -206,7 +219,10 @@ describe("RLS: build_clubero (public feedback — hardened)", () => {
     });
     expect(upsert).toBeNull();
 
-    await admin.from("build_clubero_responses" as any).delete().eq("session_id", sessionId);
+    await admin
+      .from("build_clubero_responses" as any)
+      .delete()
+      .eq("session_id", sessionId);
   }, 30_000);
 
   it("admin_build_clubero_dashboard rejects non-superadmin (anon)", async () => {
