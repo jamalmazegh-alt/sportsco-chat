@@ -414,61 +414,36 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
 
         {current === "ageGroups" && (
           <div className="space-y-3">
-            <div className="flex gap-2">
-              <Select
-                value={presetChoice}
-                onValueChange={setPresetChoice}
-                disabled={presets.length === 0}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue
-                    placeholder={
-                      presets.length === 0
-                        ? t("ageGroups.allAdded", { defaultValue: "Toutes ajoutées" })
-                        : t("ageGroups.pickPreset", { defaultValue: "Choisir U6 – U19" })
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {presets.map((p) => (
-                    <SelectItem key={p.label} value={p.label}>
-                      {p.label}
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        ({p.min}–{p.max})
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button type="button" onClick={addPreset} disabled={!presetChoice}>
-                <Plus className="h-4 w-4 mr-1" />
-                {t("common.add", { defaultValue: "Ajouter" })}
-              </Button>
-            </div>
-
-            {state.ageGroups.length > 0 ? (
-              <ul className="flex flex-wrap gap-2">
-                {state.ageGroups.map((g) => (
-                  <li
-                    key={g.label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs"
+            <p className="text-xs text-muted-foreground">
+              {t("ageGroups.selectAll", {
+                defaultValue: "Sélectionne les catégories concernées",
+              })}
+            </p>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
+              {presets.map((p) => {
+                const active = selectedLabels.has(p.label.toUpperCase());
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => togglePreset(p.label, p.min, p.max)}
+                    aria-pressed={active}
+                    className={cn(
+                      "flex flex-col items-center justify-center rounded-lg border p-2 text-center transition",
+                      active
+                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
+                        : "border-border bg-card hover:bg-muted/50",
+                    )}
                   >
-                    <span className="font-semibold">{g.label}</span>
-                    <span className="text-muted-foreground">
-                      {g.min}–{g.max}
+                    <span className="text-sm font-semibold">{p.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {p.min}–{p.max}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => removeAgeGroup(g.label)}
-                      className="ml-1 rounded-full hover:bg-muted p-0.5"
-                      aria-label={t("common.delete", { defaultValue: "Supprimer" })}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
+                  </button>
+                );
+              })}
+            </div>
+            {state.ageGroups.length === 0 && (
               <p className="text-xs text-muted-foreground">
                 {t("wizard.ageGroupsEmpty", {
                   defaultValue:
