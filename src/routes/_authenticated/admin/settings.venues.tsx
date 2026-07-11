@@ -220,9 +220,6 @@ function VenuesSettingsPage() {
             setVenueEdit({
               name: "",
               address: "",
-              city: null,
-              postal_code: null,
-              country: null,
               notes: null,
               is_default: (venues?.length ?? 0) === 0,
             })
