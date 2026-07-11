@@ -86,6 +86,7 @@ import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/u
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
+import { Route as StagesClubSlugCampSlugRouteImport } from './routes/stages.$clubSlug.$campSlug'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
@@ -552,6 +553,11 @@ const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
   id: '/clubs/$clubId',
   path: '/clubs/$clubId',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const StagesClubSlugCampSlugRoute = StagesClubSlugCampSlugRouteImport.update({
+  id: '/stages/$clubSlug/$campSlug',
+  path: '/stages/$clubSlug/$campSlug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -1068,6 +1074,7 @@ export interface FileRoutesByFullPath {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/stages/$clubSlug/$campSlug': typeof StagesClubSlugCampSlugRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
@@ -1214,6 +1221,7 @@ export interface FileRoutesByTo {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/stages/$clubSlug/$campSlug': typeof StagesClubSlugCampSlugRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
@@ -1367,6 +1375,7 @@ export interface FileRoutesById {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/stages/$clubSlug/$campSlug': typeof StagesClubSlugCampSlugRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
@@ -1520,6 +1529,7 @@ export interface FileRouteTypes {
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
+    | '/stages/$clubSlug/$campSlug'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
@@ -1666,6 +1676,7 @@ export interface FileRouteTypes {
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
+    | '/stages/$clubSlug/$campSlug'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
@@ -1818,6 +1829,7 @@ export interface FileRouteTypes {
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
+    | '/stages/$clubSlug/$campSlug'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
@@ -1938,6 +1950,7 @@ export interface RootRouteChildren {
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  StagesClubSlugCampSlugRoute: typeof StagesClubSlugCampSlugRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
   ApiPublicBuildCluberoCompleteRoute: typeof ApiPublicBuildCluberoCompleteRoute
@@ -2502,6 +2515,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/clubs/$clubId'
       preLoaderRoute: typeof SuperadminClubsClubIdRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/stages/$clubSlug/$campSlug': {
+      id: '/stages/$clubSlug/$campSlug'
+      path: '/stages/$clubSlug/$campSlug'
+      fullPath: '/stages/$clubSlug/$campSlug'
+      preLoaderRoute: typeof StagesClubSlugCampSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -3407,6 +3427,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  StagesClubSlugCampSlugRoute: StagesClubSlugCampSlugRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
   ApiPublicBuildCluberoCompleteRoute: ApiPublicBuildCluberoCompleteRoute,
