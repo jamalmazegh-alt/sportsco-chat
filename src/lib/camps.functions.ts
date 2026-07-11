@@ -124,7 +124,7 @@ export const getClubCamp = createServerFn({ method: "GET" })
     const { data: camp, error } = await context.supabase
       .from("club_camps")
       .select(
-        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
+        "id, club_id, title, slug, description, cover_image_url, venue_id, facility_id, external_location, start_date, end_date, price, currency, capacity, registration_deadline, payment_instructions, document_retention_months, status, created_at, updated_at",
       )
       .eq("id", data.campId)
       .maybeSingle();
