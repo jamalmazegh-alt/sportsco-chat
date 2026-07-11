@@ -459,6 +459,7 @@ export const supportDataService = {
       .select("id, event_id, player_id, status, responded_at")
       .in("event_id", eventIds);
 
+    let parentPlayerScope: Set<string> | null = null;
     if (!perms.is_club_admin) {
       const playerScope = Array.from(new Set([...perms.player_ids, ...perms.child_player_ids]));
       // Coach without any own/child players still sees team convocations.
@@ -468,6 +469,7 @@ export const supportDataService = {
       if (perms.coach_team_ids.length === 0) {
         if (playerScope.length === 0) return { convocations: [] };
         cq = cq.in("player_id", playerScope);
+        parentPlayerScope = new Set(playerScope);
       }
     }
 
@@ -476,7 +478,16 @@ export const supportDataService = {
     type ConvRow = ConvocationDTO;
     const rows = (data ?? []) as unknown as ConvRow[];
     assertRowsBelongToSession(rows, (r) => r.event_id, eventSet, "convocations.event_id");
+    if (parentPlayerScope) {
+      assertRowsBelongToSession(
+        rows,
+        (r) => r.player_id,
+        parentPlayerScope,
+        "convocations.player_id",
+      );
+    }
     return { convocations: rows };
+
   },
 };
 
