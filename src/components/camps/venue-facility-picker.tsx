@@ -6,6 +6,7 @@ import { MapPin, Home } from "lucide-react";
 import { listClubVenues, type ClubVenueWithFacilities } from "@/lib/venues.functions";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import {
   Select,
   SelectContent,
