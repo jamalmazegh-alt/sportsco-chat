@@ -1,0 +1,1 @@
+ALTER TABLE public.club_camps ADD COLUMN IF NOT EXISTS external_location text;

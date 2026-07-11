@@ -801,6 +801,7 @@ export type Database = {
           description: string | null
           document_retention_months: number
           end_date: string
+          external_location: string | null
           facility_id: string | null
           id: string
           payment_instructions: string | null
@@ -823,6 +824,7 @@ export type Database = {
           description?: string | null
           document_retention_months?: number
           end_date: string
+          external_location?: string | null
           facility_id?: string | null
           id?: string
           payment_instructions?: string | null
@@ -845,6 +847,7 @@ export type Database = {
           description?: string | null
           document_retention_months?: number
           end_date?: string
+          external_location?: string | null
           facility_id?: string | null
           id?: string
           payment_instructions?: string | null
