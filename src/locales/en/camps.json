@@ -1,104 +1,104 @@
 {
   "common": {
-    "add": "Ajouter",
-    "back": "Retour",
-    "cancel": "Annuler",
-    "delete": "Supprimer"
+    "add": "Add",
+    "back": "Back",
+    "cancel": "Cancel",
+    "delete": "Delete"
   },
   "meta": {
     "list": {
-      "title": "Stages du club – Clubero",
-      "description": "Créez, publiez et gérez les stages proposés par votre club."
+      "title": "Club camps – Clubero",
+      "description": "Create, publish and manage the camps run by your club."
     },
     "edit": {
-      "title": "Édition d'un stage – Clubero"
+      "title": "Edit camp – Clubero"
     }
   },
   "list": {
-    "title": "Stages du club",
-    "subtitle": "Créez et publiez les stages proposés par votre club.",
-    "new": "Nouveau stage",
-    "newTitle": "Nouveau stage",
-    "create": "Créer le brouillon",
-    "empty": "Aucun stage pour le moment.",
-    "hasVenue": "Lieu défini"
+    "title": "Club camps",
+    "subtitle": "Create and publish the camps run by your club.",
+    "new": "New camp",
+    "newTitle": "New camp",
+    "create": "Create draft",
+    "empty": "No camps yet.",
+    "hasVenue": "Venue set"
   },
   "status": {
-    "draft": "Brouillon",
-    "published": "Publié",
-    "closed": "Fermé",
-    "archived": "Archivé"
+    "draft": "Draft",
+    "published": "Published",
+    "closed": "Closed",
+    "archived": "Archived"
   },
   "form": {
-    "sectionInfo": "Informations",
-    "sectionVenue": "Lieu",
-    "sectionAgeGroups": "Catégories d'âge",
-    "title": "Titre",
-    "titlePlaceholder": "Stage de Pâques U9-U11",
+    "sectionInfo": "Information",
+    "sectionVenue": "Venue",
+    "sectionAgeGroups": "Age groups",
+    "title": "Title",
+    "titlePlaceholder": "Easter camp U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
-    "slugLocked": "Le slug est verrouillé après publication.",
+    "slugHint": "Letters, digits and dashes. Editable while the camp is a draft.",
+    "slugLocked": "Slug is locked after publishing.",
     "description": "Description",
-    "cover": "Image de couverture",
-    "startDate": "Début",
-    "endDate": "Fin",
-    "deadline": "Date limite d'inscription",
-    "price": "Tarif indicatif",
-    "currency": "Devise",
-    "capacity": "Capacité",
-    "paymentInstructions": "Modalités de paiement",
-    "paymentInstructionsPlaceholder": "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
-    "retention": "Rétention des documents (mois)",
-    "venue": "Lieu",
-    "venuePlaceholder": "Choisir un lieu",
-    "venueNone": "— Aucun —",
-    "facility": "Terrain / installation",
-    "facilityPlaceholder": "Optionnel",
-    "facilityNone": "— Aucun —",
-    "save": "Enregistrer",
-    "saved": "Modifications enregistrées"
+    "cover": "Cover image",
+    "startDate": "Start",
+    "endDate": "End",
+    "deadline": "Registration deadline",
+    "price": "Indicative price",
+    "currency": "Currency",
+    "capacity": "Capacity",
+    "paymentInstructions": "Payment instructions",
+    "paymentInstructionsPlaceholder": "E.g. payment on registration by card, cheque or cash on-site.",
+    "retention": "Document retention (months)",
+    "venue": "Venue",
+    "venuePlaceholder": "Choose a venue",
+    "venueNone": "— None —",
+    "facility": "Facility",
+    "facilityPlaceholder": "Optional",
+    "facilityNone": "— None —",
+    "save": "Save",
+    "saved": "Changes saved"
   },
   "ageGroups": {
-    "empty": "Aucune catégorie pour l'instant.",
-    "addTitle": "Ajouter une catégorie",
-    "labelPlaceholder": "Label (ex. U9)",
-    "yearMin": "Année min",
-    "yearMax": "Année max"
+    "empty": "No age groups yet.",
+    "addTitle": "Add an age group",
+    "labelPlaceholder": "Label (e.g. U9)",
+    "yearMin": "Min year",
+    "yearMax": "Max year"
   },
   "cover": {
-    "empty": "Aucune image de couverture",
-    "add": "Ajouter une image",
-    "replace": "Remplacer",
-    "uploaded": "Image mise à jour",
-    "tooLarge": "Image trop volumineuse (max 5 MB)",
-    "unsupported": "Format non supporté (JPG, PNG, WEBP)"
+    "empty": "No cover image",
+    "add": "Add an image",
+    "replace": "Replace",
+    "uploaded": "Image updated",
+    "tooLarge": "Image too large (max 5 MB)",
+    "unsupported": "Unsupported format (JPG, PNG, WEBP)"
   },
   "lifecycle": {
-    "publish": "Publier",
-    "published": "Stage publié",
-    "close": "Fermer les inscriptions",
-    "closed": "Inscriptions fermées",
-    "archive": "Archiver",
-    "archived": "Stage archivé",
-    "publicUrl": "Lien public",
-    "publicUrlSoon": "page publique bientôt disponible"
+    "publish": "Publish",
+    "published": "Camp published",
+    "close": "Close registrations",
+    "closed": "Registrations closed",
+    "archive": "Archive",
+    "archived": "Camp archived",
+    "publicUrl": "Public link",
+    "publicUrlSoon": "public page coming soon"
   },
   "delete": {
-    "title": "Supprimer ce brouillon ?",
-    "desc": "Cette action est définitive."
+    "title": "Delete this draft?",
+    "desc": "This action is permanent."
   },
   "errors": {
-    "slugTaken": "Ce slug est déjà utilisé.",
-    "slugInvalid": "Slug invalide.",
-    "slugLocked": "Le slug ne peut plus changer après publication.",
-    "datesInvalid": "La date de fin doit être postérieure au début.",
-    "notDraft": "Le stage n'est plus en brouillon.",
-    "deleteNotDraft": "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
-    "publishTitleRequired": "Titre requis pour publier.",
-    "publishDatesRequired": "Dates de début et de fin requises.",
-    "publishDatesOrder": "La date de fin doit être après le début.",
-    "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
-    "publishCapacityRequired": "Une capacité positive est requise.",
-    "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+    "slugTaken": "This slug is already in use.",
+    "slugInvalid": "Invalid slug.",
+    "slugLocked": "Slug cannot change after publishing.",
+    "datesInvalid": "End date must be after start date.",
+    "notDraft": "The camp is no longer a draft.",
+    "deleteNotDraft": "Only drafts can be deleted. Archive it instead.",
+    "publishTitleRequired": "Title required to publish.",
+    "publishDatesRequired": "Start and end dates required.",
+    "publishDatesOrder": "End date must be after start date.",
+    "publishDeadlineAfterStart": "Registration deadline must be before start date.",
+    "publishCapacityRequired": "A positive capacity is required.",
+    "publishAgeGroupRequired": "Add at least one age group before publishing."
   }
 }
