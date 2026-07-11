@@ -106,7 +106,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
   // U6 → U19 presets with birth years derived from current football season.
   const seasonStart =
     new Date().getMonth() >= 7 ? new Date().getFullYear() : new Date().getFullYear() - 1;
-  const existingLabels = useMemo(
+  const selectedLabels = useMemo(
     () => new Set(state.ageGroups.map((g) => g.label.toUpperCase())),
     [state.ageGroups],
   );
@@ -117,21 +117,25 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
         const label = `U${n}`;
         const min = seasonStart - n + 1;
         return { label, min, max: min + 1 };
-      }).filter((p) => !existingLabels.has(p.label)),
-    [existingLabels, seasonStart],
+      }),
+    [seasonStart],
   );
 
-  function addPreset() {
-    const p = presets.find((x) => x.label === presetChoice);
-    if (!p) return;
-    setState((s) => ({
-      ...s,
-      ageGroups: [...s.ageGroups, { label: p.label, min: p.min, max: p.max }],
-    }));
-    setPresetChoice("");
-  }
-  function removeAgeGroup(label: string) {
-    setState((s) => ({ ...s, ageGroups: s.ageGroups.filter((g) => g.label !== label) }));
+  function togglePreset(label: string, min: number, max: number) {
+    setState((s) => {
+      const upper = label.toUpperCase();
+      const exists = s.ageGroups.some((g) => g.label.toUpperCase() === upper);
+      if (exists) {
+        return { ...s, ageGroups: s.ageGroups.filter((g) => g.label.toUpperCase() !== upper) };
+      }
+      const next = [...s.ageGroups, { label, min, max }];
+      next.sort((a, b) => {
+        const na = parseInt(a.label.replace(/^U/i, ""), 10);
+        const nb = parseInt(b.label.replace(/^U/i, ""), 10);
+        return (Number.isNaN(na) ? Infinity : na) - (Number.isNaN(nb) ? Infinity : nb);
+      });
+      return { ...s, ageGroups: next };
+    });
   }
 
   // Validation per step
