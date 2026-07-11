@@ -61,6 +61,8 @@
   },
   "actions": {
     "mark_resolved": "Markeer als opgelost",
-    "resolved_toast": "Ticket gemarkeerd als opgelost"
+    "resolved_toast": "Ticket gemarkeerd als opgelost",
+    "reopen": "Ticket heropenen",
+    "reopened_toast": "Ticket heropend"
   }
 }
