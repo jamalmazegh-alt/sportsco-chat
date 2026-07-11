@@ -211,11 +211,12 @@ function VenuesSettingsPage() {
     <div className="pb-24">
       <SettingsSubHeader
         title={t("venues.pageTitle", { defaultValue: "Lieux et terrains" })}
-        subtitle={t("venues.pageSubtitle", {
+        description={t("venues.pageSubtitle", {
           defaultValue:
             "Sites du club et terrains associés, réutilisés à la création d'événements.",
         })}
       />
+
 
       <div className="px-5 py-4 space-y-3">
         <Button
