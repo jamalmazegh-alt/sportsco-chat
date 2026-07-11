@@ -324,6 +324,42 @@ describe("Support-view service: cross-club leak (real query path)", () => {
   });
 });
 
+// ===========================================================================
+// VOLET 2a-bis — CROSS-TARGET INTRA-CLUB leak (parent persona)
+// The cross-club test above cannot catch this: for parent/player personas,
+// the frontier is player_id ∈ own+child, NOT club_id. A guard that only
+// checks club_id would let a same-club-different-family row pass. Seeded
+// row: obligationA_otherFamily / convocationA_otherFamily (clubA, playerA2,
+// no link to parentA). parentA's scope is {playerA} only.
+// ===========================================================================
+describe("Support-view service: cross-target intra-club leak (parent persona)", () => {
+  it("parent session sees only own child's obligations, not another family's", async () => {
+    const fx = getFixtures();
+    const { payments } = await supportDataService.listPayments(validatedParent);
+    // Sanity: must see obligationA (playerA belongs to parentA).
+    expect(payments.length).toBeGreaterThan(0);
+    expect(payments.some((p) => p.id === fx.obligationA)).toBe(true);
+    // Real assertion: playerA2's obligation is in clubA but NOT in scope.
+    for (const p of payments) {
+      expect(p.id).not.toBe(obligationA_otherFamily);
+      expect(p.player_id).toBe(fx.playerA); // ONLY parentA's child
+    }
+  });
+
+  it("parent session sees only own child's convocations, not another player's", async () => {
+    const fx = getFixtures();
+    const { convocations } = await supportDataService.listConvocations(validatedParent);
+    expect(convocations.length).toBeGreaterThan(0);
+    expect(convocations.some((c) => c.id === fx.convocationA)).toBe(true);
+    for (const c of convocations) {
+      expect(c.id).not.toBe(convocationA_otherFamily);
+      expect(c.player_id).toBe(fx.playerA);
+    }
+  });
+});
+
+
+
 
 // ===========================================================================
 // VOLET 2b — Guard armed (monkey-patch complement)
