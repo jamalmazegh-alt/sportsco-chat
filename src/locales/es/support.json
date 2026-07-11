@@ -61,6 +61,8 @@
   },
   "actions": {
     "mark_resolved": "Marcar como resuelto",
-    "resolved_toast": "Ticket marcado como resuelto"
+    "resolved_toast": "Ticket marcado como resuelto",
+    "reopen": "Reabrir ticket",
+    "reopened_toast": "Ticket reabierto"
   }
 }

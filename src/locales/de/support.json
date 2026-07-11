@@ -61,6 +61,8 @@
   },
   "actions": {
     "mark_resolved": "Als gelöst markieren",
-    "resolved_toast": "Ticket als gelöst markiert"
+    "resolved_toast": "Ticket als gelöst markiert",
+    "reopen": "Ticket erneut öffnen",
+    "reopened_toast": "Ticket wieder geöffnet"
   }
 }

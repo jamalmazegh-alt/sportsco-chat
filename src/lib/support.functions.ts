@@ -553,20 +553,24 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       _user_id: context.userId,
     });
 
-    // Owner exception: the ticket owner may mark their own ticket as "resolved"
-    // (single-field update, no priority / assignment changes).
+    // Owner exception: the ticket owner may either mark their own ticket as
+    // "resolved" (when it's still active) or reopen it back to "open" (when
+    // it's currently "resolved" or "closed"). Single-field update only.
     if (!isAdmin) {
-      const isOwnerResolve =
-        data.status === "resolved" &&
+      const isOwnerStatusChange =
+        (data.status === "resolved" || data.status === "open") &&
         data.priority === undefined &&
         data.assigned_to === undefined;
-      if (!isOwnerResolve) throw new Error("forbidden");
+      if (!isOwnerStatusChange) throw new Error("forbidden");
       const { data: owned } = await supabaseAdmin
         .from("support_tickets")
-        .select("user_id")
+        .select("user_id, status")
         .eq("id", data.ticket_id)
         .maybeSingle();
       if (!owned || owned.user_id !== context.userId) throw new Error("forbidden");
+      const closedLike = owned.status === "resolved" || owned.status === "closed";
+      if (data.status === "resolved" && closedLike) throw new Error("forbidden");
+      if (data.status === "open" && !closedLike) throw new Error("forbidden");
     }
 
     const patch: {
