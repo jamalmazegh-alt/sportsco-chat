@@ -387,8 +387,14 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
               clubId={clubId}
               venueId={state.venueId}
               facilityId={state.facilityId}
+              externalLocation={state.externalLocation || null}
               onChange={(next) =>
-                setState((s) => ({ ...s, venueId: next.venueId, facilityId: next.facilityId }))
+                setState((s) => ({
+                  ...s,
+                  venueId: next.venueId,
+                  facilityId: next.facilityId,
+                  externalLocation: next.externalLocation ?? "",
+                }))
               }
             />
             <p className="text-[11px] text-muted-foreground">
