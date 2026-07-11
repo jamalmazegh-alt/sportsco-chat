@@ -107,6 +107,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
         .select("id, name")
         .eq("club_id", clubId)
         .is("deleted_at", null)
+        .is("archived_at", null)
         .order("name");
       return data ?? [];
     },
