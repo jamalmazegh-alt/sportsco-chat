@@ -1333,9 +1333,20 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 : t("eventWizard.q.location", { defaultValue: "Où ?" })
             }
           >
+            <VenuePicker
+              clubId={activeClubId ?? undefined}
+              venueId={state.venueId ?? null}
+              facilityId={state.facilityId ?? null}
+              autoApplyDefaults={!state.location}
+              onChange={applyVenuePick}
+            />
             <LocationAutocomplete
               value={state.location ?? ""}
-              onChange={(v) => patch("location", v)}
+              onChange={(v) => {
+                patch("location", v);
+                patch("venueId", null);
+                patch("facilityId", null);
+              }}
               placeholder={
                 state.type === "match"
                   ? t("eventWizard.matchLocationPlaceholder", {
@@ -1344,6 +1355,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
               }
             />
+
 
             <Button
               className="w-full mt-2"
