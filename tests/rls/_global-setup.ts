@@ -606,6 +606,14 @@ async function teardownAll(fx: Fixtures) {
   await admin.from("players").delete().in("id", [fx.playerA, fx.playerA2, fx.playerB]);
 
   await admin.from("teams").delete().in("id", [fx.teamA, fx.teamB]);
+  // Support-view: MUST run BEFORE clubs.delete (support_view_sessions.club_id → clubs).
+  // support_view_actions cascades via session_id ON DELETE CASCADE, so a single
+  // delete on support_view_sessions is enough. Scoped to this run's superadmin
+  // so we never touch other test runs' rows.
+  await admin
+    .from("support_view_sessions")
+    .delete()
+    .eq("superadmin_id", fx.users.superadmin.userId);
   await admin.from("club_members").delete().in("club_id", [fx.clubA, fx.clubB]);
   await admin.from("clubs").delete().in("id", [fx.clubA, fx.clubB]);
   await admin.from("super_admins").delete().eq("user_id", fx.users.superadmin.userId);
