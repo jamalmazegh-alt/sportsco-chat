@@ -86,7 +86,7 @@ function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
-  const [championship, setChampionship] = useState("");
+  
   const [sport, setSport] = useState("football");
   const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
@@ -105,7 +105,6 @@ function TeamsPage() {
       club_id: activeClubId,
       name,
       age_group: ageGroup || null,
-      championship: championship || null,
       sport: sport || null,
       competitions,
     });
@@ -117,7 +116,7 @@ function TeamsPage() {
     setOpen(false);
     setName("");
     setAgeGroup("");
-    setChampionship("");
+    
     setSport("football");
     setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
@@ -155,17 +154,6 @@ function TeamsPage() {
                   value={ageGroup}
                   onChange={(e) => setAgeGroup(e.target.value)}
                   placeholder="U13"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>
-                  {t("teams.championship")}{" "}
-                  <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-                </Label>
-                <Input
-                  value={championship}
-                  onChange={(e) => setChampionship(e.target.value)}
-                  placeholder="District D2"
                 />
               </div>
               <div className="space-y-2">
