@@ -92,6 +92,7 @@ function EventsPage() {
         .select("id, name, sport, championship, competitions")
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
+        .is("archived_at", null)
         .order("name");
       return data ?? [];
     },
