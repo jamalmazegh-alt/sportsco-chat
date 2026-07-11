@@ -491,6 +491,9 @@ export function EventFormSheet({
     setMeetingPoint(initial?.meeting_point ?? "");
     setIsOfficial(initial?.is_official ?? (initial?.type as EventType) === "match");
     setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
+    setVenueId(initial?.venue_id ?? null);
+    setFacilityId(initial?.facility_id ?? null);
+
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
     const c = splitDateTime(initial?.convocation_time);
