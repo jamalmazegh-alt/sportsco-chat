@@ -72,3 +72,32 @@ export const getSupportViewPlayers = createServerFn({ method: "POST" })
     await logSupportAction(context.supabase, session.id, "read.players");
     return out;
   });
+
+export const getSupportViewPayments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ReadSupportViewInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
+      "@/lib/support-view/service.server"
+    );
+    const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
+    const out = await supportDataService.listPayments(session);
+    await logSupportAction(context.supabase, session.id, "read.payments");
+    return out;
+  });
+
+export const getSupportViewConvocations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ReadSupportViewInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { loadValidatedSession, supportDataService, logSupportAction } = await import(
+      "@/lib/support-view/service.server"
+    );
+    const session = await loadValidatedSession(context.supabase, context.userId, data.session_id);
+    const out = await supportDataService.listConvocations(session);
+    await logSupportAction(context.supabase, session.id, "read.convocations");
+    return out;
+  });
+

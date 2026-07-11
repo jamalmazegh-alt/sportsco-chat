@@ -40,7 +40,7 @@
  * Répéter la même matrice sur `listTeams` (`.eq("club_id", ...)`) et
  * `listPlayers`. Restaurer entre chaque itération.
  */
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_admin";
 import { signInAs } from "./_clients";
@@ -95,6 +95,15 @@ beforeAll(async () => {
     fx.users.superadmin.userId,
     sessionId,
   );
+
+  // Seed a clubB convocation (fixtures don't have one) so the convocations
+  // cross-club leak test has a real foreign row to detect the absence of.
+  await admin
+    .from("convocations")
+    .upsert(
+      { event_id: fx.eventB, player_id: fx.playerB, status: "pending" },
+      { onConflict: "event_id,player_id" },
+    );
 });
 
 afterAll(async () => {
@@ -108,7 +117,10 @@ afterAll(async () => {
     .from("support_view_sessions")
     .delete()
     .eq("superadmin_id", fx.users.superadmin.userId);
+  // Convocation seed above is cleaned up by the fixtures teardown
+  // (`delete from convocations where event_id in [eventA, eventB]`).
 });
+
 
 // ===========================================================================
 // VOLET 1 — RLS visibility of support tables
@@ -204,7 +216,43 @@ describe("Support-view service: cross-club leak (real query path)", () => {
     expect(ctx.target.id).toBe(fx.users.adminA.userId);
     expect(ctx.permissions.club_id).toBe(fx.clubA);
   });
+
+  it("listPayments scoped to clubA returns no clubB obligation and no secret fields", async () => {
+    const fx = getFixtures();
+    const { payments } = await supportDataService.listPayments(validated);
+    expect(payments.length).toBeGreaterThan(0); // sanity: obligationA is in clubA
+    for (const p of payments) {
+      expect(p.id).not.toBe(fx.obligationB);
+      // Belt: expurgated DTO must NEVER carry provider tokens or PII fields.
+      const forbidden = [
+        "stripe_payment_intent_id",
+        "stripe_charge_id",
+        "external_reference",
+        "payer_user_id",
+        "exempted_reason",
+        "attachment_url",
+        "comment",
+        "iban",
+      ] as const;
+      for (const k of forbidden) {
+        expect(Object.prototype.hasOwnProperty.call(p, k)).toBe(false);
+      }
+    }
+  });
+
+  it("listConvocations scoped to clubA returns no clubB convocation and no response_token/comment", async () => {
+    const fx = getFixtures();
+    const { convocations } = await supportDataService.listConvocations(validated);
+    expect(convocations.length).toBeGreaterThan(0); // sanity: convocationA is in clubA
+    for (const c of convocations) {
+      expect(c.event_id).not.toBe(fx.eventB);
+      expect(c.player_id).not.toBe(fx.playerB);
+      expect(Object.prototype.hasOwnProperty.call(c, "response_token")).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(c, "comment")).toBe(false);
+    }
+  });
 });
+
 
 // ===========================================================================
 // VOLET 2b — Guard armed (monkey-patch complement)

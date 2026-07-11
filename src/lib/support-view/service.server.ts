@@ -155,6 +155,34 @@ export type PlayerDTO = {
   last_name: string;
   birth_date: string | null;
 };
+/**
+ * Expurgated payment DTO. Status-only exposure per spec — NEVER include:
+ * stripe_payment_intent_id / stripe_charge_id / external_reference /
+ * payer_user_id / exempted_reason / attachment_url / IBAN / bank data /
+ * comments. Amount + currency + item title + due date are kept so support
+ * can eyeball "why is X pending" without seeing PII or provider tokens.
+ */
+export type PaymentObligationDTO = {
+  id: string;
+  status: string;
+  amount_due_cents: number;
+  currency: string;
+  player_id: string | null;
+  item_title: string | null;
+  due_date: string | null;
+};
+/**
+ * Expurgated convocation DTO. NEVER include response_token (secret, grants
+ * write access) nor comment (free-form PII).
+ */
+export type ConvocationDTO = {
+  id: string;
+  event_id: string;
+  player_id: string;
+  status: string;
+  responded_at: string | null;
+};
+
 
 export type ContextSummary = {
   club: { id: string; name: string | null };
@@ -324,7 +352,121 @@ export const supportDataService = {
     }
     return { players: Array.from(results.values()) };
   },
+
+  /**
+   * Read-only payments view. Scope:
+   *  - is_club_admin → all obligations for session.club_id
+   *  - player/parent  → obligations where player_id ∈ own+child players
+   *  - coach-only     → empty (payments are not in coach scope)
+   * Only status + amount + item title + due date are exposed. No stripe
+   * fields, no external references, no comments, no PII.
+   */
+  async listPayments(session: ValidatedSession): Promise<{ payments: PaymentObligationDTO[] }> {
+    const perms = await computeTargetPermissions(session);
+
+    let q = supabaseAdmin
+      .from("payment_obligations")
+      .select(
+        "id, status, amount_due_cents, currency, player_id, club_id, payment_item_id, payment_items(title, due_date)",
+      )
+      .eq("club_id", session.club_id);
+
+    if (!perms.is_club_admin) {
+      const playerScope = Array.from(new Set([...perms.player_ids, ...perms.child_player_ids]));
+      if (playerScope.length === 0) return { payments: [] };
+      q = q.in("player_id", playerScope);
+    }
+
+    const { data, error } = await q.order("created_at", { ascending: false }).limit(200);
+    if (error) throw new Response(error.message, { status: 500 });
+
+    type Row = {
+      id: string;
+      status: string;
+      amount_due_cents: number;
+      currency: string;
+      player_id: string | null;
+      club_id: string;
+      payment_items: { title: string | null; due_date: string | null } | null;
+    };
+    const rows = (data ?? []) as unknown as Row[];
+    assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "payments.club_id");
+    if (!perms.is_club_admin) {
+      const allowed = new Set([...perms.player_ids, ...perms.child_player_ids]);
+      assertRowsBelongToSession(rows, (r) => r.player_id, allowed, "payments.player_id");
+    }
+    return {
+      payments: rows.map((r) => ({
+        id: r.id,
+        status: r.status,
+        amount_due_cents: r.amount_due_cents,
+        currency: r.currency,
+        player_id: r.player_id,
+        item_title: r.payment_items?.title ?? null,
+        due_date: r.payment_items?.due_date ?? null,
+      })),
+    };
+  },
+
+  /**
+   * Read-only convocations view. Scope-gated the same way as events:
+   *  - is_club_admin → all convocations for events in the club's teams
+   *  - coach         → convocations for events in coach_team_ids
+   *  - player/parent → convocations where player_id ∈ own+child players
+   * response_token and free-form comment are NEVER exposed.
+   */
+  async listConvocations(session: ValidatedSession): Promise<{ convocations: ConvocationDTO[] }> {
+    const perms = await computeTargetPermissions(session);
+    const teamIds = await teamsInScope(session, perms);
+    if (teamIds.length === 0) return { convocations: [] };
+
+    // Fetch events in scope first, then convocations by event_id. This double
+    // filter (event_id ∈ scope-events + guard on team_id) is the belt against
+    // a forgotten WHERE — supabaseAdmin bypasses RLS.
+    const { data: evs, error: evErr } = await supabaseAdmin
+      .from("events")
+      .select("id, team_id")
+      .in("team_id", teamIds)
+      .is("deleted_at", null)
+      .limit(500);
+    if (evErr) throw new Response(evErr.message, { status: 500 });
+    const eventRows = (evs ?? []) as { id: string; team_id: string }[];
+    assertRowsBelongToSession(
+      eventRows,
+      (r) => r.team_id,
+      new Set(teamIds),
+      "convocations.event.team_id",
+    );
+    const eventIds = eventRows.map((e) => e.id);
+    if (eventIds.length === 0) return { convocations: [] };
+    const eventSet = new Set(eventIds);
+
+    let cq = supabaseAdmin
+      .from("convocations")
+      .select("id, event_id, player_id, status, responded_at")
+      .in("event_id", eventIds);
+
+    if (!perms.is_club_admin) {
+      const playerScope = Array.from(new Set([...perms.player_ids, ...perms.child_player_ids]));
+      // Coach without any own/child players still sees team convocations.
+      // Coach with players → union: player_id in scope OR event in coach team.
+      // Simpler + safer: coach case uses team scope alone (already applied
+      // via eventIds); player/parent case restricts by player_id.
+      if (perms.coach_team_ids.length === 0) {
+        if (playerScope.length === 0) return { convocations: [] };
+        cq = cq.in("player_id", playerScope);
+      }
+    }
+
+    const { data, error } = await cq.order("created_at", { ascending: false }).limit(300);
+    if (error) throw new Response(error.message, { status: 500 });
+    type ConvRow = ConvocationDTO;
+    const rows = (data ?? []) as unknown as ConvRow[];
+    assertRowsBelongToSession(rows, (r) => r.event_id, eventSet, "convocations.event_id");
+    return { convocations: rows };
+  },
 };
+
 
 function sanitizePlayer(p: PlayerDTO): PlayerDTO {
   if (p.birth_date) {
