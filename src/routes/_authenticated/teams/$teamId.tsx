@@ -199,6 +199,26 @@ function TeamDetail() {
     },
   });
 
+  // Players who have at least one parent with an email or phone — they can be
+  // invited via their parent even if the player themself has no contact info.
+  const { data: playersWithParentContact } = useQuery({
+    queryKey: ["team-players-with-parent-contact", teamId],
+    enabled: !!players && players.length > 0 && isCoach,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("player_parents")
+        .select("player_id, email, phone")
+        .in("player_id", ids);
+      const set = new Set<string>();
+      (data ?? []).forEach((r: any) => {
+        if ((r.email && r.email.trim()) || (r.phone && r.phone.trim())) set.add(r.player_id);
+      });
+      return set;
+    },
+  });
+
   // Players linked to the current user (as player or parent) — pinned at top
   // when the viewer is not a coach.
   const { data: myPlayerIds } = useQuery({
