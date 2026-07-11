@@ -19,9 +19,8 @@ vi.mock("@/integrations/supabase/client.server", () => ({
 
 const rateLimitMock = vi.fn();
 vi.mock("@/lib/rate-limit.server", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/rate-limit.server")>(
-    "@/lib/rate-limit.server",
-  );
+  const actual =
+    await vi.importActual<typeof import("@/lib/rate-limit.server")>("@/lib/rate-limit.server");
   return {
     ...actual,
     checkRateLimit: (...args: unknown[]) => rateLimitMock(...args),

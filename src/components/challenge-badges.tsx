@@ -19,13 +19,7 @@ const TrophySvg = ({ color = "white", size = 15 }: { color?: string; size?: numb
  * - record → gold family
  * - cumulative → green family (reuses existing brand palette)
  */
-export function AggregateBadge({
-  type,
-  value,
-}: {
-  type: AggregateType;
-  value: number | string;
-}) {
+export function AggregateBadge({ type, value }: { type: AggregateType; value: number | string }) {
   const { t } = useTranslation("challenges");
   const isRecord = type === "record";
 
@@ -40,8 +34,7 @@ export function AggregateBadge({
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow:
-      "inset 0 1px 1px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.12)",
+    boxShadow: "inset 0 1px 1px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.12)",
     background: isRecord
       ? "linear-gradient(150deg,#F8D06A,#E7A11B)"
       : "linear-gradient(150deg,#4FCB84,#16A34A)",
@@ -61,9 +54,7 @@ export function AggregateBadge({
         borderRadius: 999,
       }}
     >
-      <span style={coinStyle}>
-        {isRecord ? <StarSvg /> : <TrophySvg />}
-      </span>
+      <span style={coinStyle}>{isRecord ? <StarSvg /> : <TrophySvg />}</span>
       <span style={{ display: "inline-flex", alignItems: "baseline", gap: 6 }}>
         <span
           style={{
@@ -74,9 +65,7 @@ export function AggregateBadge({
             fontWeight: 700,
           }}
         >
-          {isRecord
-            ? t("player_stats.aggregate_record")
-            : t("player_stats.aggregate_cumulative")}
+          {isRecord ? t("player_stats.aggregate_record") : t("player_stats.aggregate_cumulative")}
         </span>
         <span
           style={{

@@ -72,7 +72,6 @@ function EventChallengesPage() {
           .filter(Boolean)
           .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? "")) ?? [];
       return { event: ev, teamId, clubId, sport, players };
-
     },
   });
 
@@ -86,8 +85,7 @@ function EventChallengesPage() {
   const { data: challengesData, refetch: refetchChallenges } = useQuery({
     queryKey: ["challenges", eventInfo?.clubId, eventInfo?.teamId],
     enabled: !!eventInfo?.clubId,
-    queryFn: () =>
-      list({ data: { clubId: eventInfo!.clubId, teamId: eventInfo!.teamId } }),
+    queryFn: () => list({ data: { clubId: eventInfo!.clubId, teamId: eventInfo!.teamId } }),
   });
 
   const loadCounts = useServerFn(getEventChallengesEntryCounts);
@@ -148,8 +146,6 @@ function EventChallengesPage() {
           }}
         />
       )}
-
-
 
       {view.kind === "entry" && (
         <EntryScreen
@@ -222,7 +218,9 @@ function ChallengesList({
               onClick={onToggleShowAll}
               className="h-8 px-2 text-xs"
             >
-              {showAll ? t("list.active_only", { defaultValue: "Actifs" }) : t("list.show_all", { defaultValue: "Tout voir" })}
+              {showAll
+                ? t("list.active_only", { defaultValue: "Actifs" })
+                : t("list.show_all", { defaultValue: "Tout voir" })}
             </Button>
           )}
           {isStaff && (
@@ -238,13 +236,23 @@ function ChallengesList({
             <p>
               {showAll
                 ? t("list.empty", { defaultValue: "Aucun défi pour l'instant." })
-                : t("list.no_active", { defaultValue: "Aucune activité n'a encore été utilisée pour cette séance." })}
+                : t("list.no_active", {
+                    defaultValue: "Aucune activité n'a encore été utilisée pour cette séance.",
+                  })}
             </p>
             {!showAll && hasHidden && (
-              <p className="mt-1">{t("list.show_all_hint", { defaultValue: "Affiche toutes les activités de l'équipe pour en saisir une." })}</p>
+              <p className="mt-1">
+                {t("list.show_all_hint", {
+                  defaultValue: "Affiche toutes les activités de l'équipe pour en saisir une.",
+                })}
+              </p>
             )}
             {showAll && isStaff && (
-              <p className="mt-1">{t("list.empty_hint", { defaultValue: "Ajoute un défi ou un test à cette séance." })}</p>
+              <p className="mt-1">
+                {t("list.empty_hint", {
+                  defaultValue: "Ajoute un défi ou un test à cette séance.",
+                })}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -252,34 +260,34 @@ function ChallengesList({
       {displayed.map((c) => {
         const hasEntries = (entryCounts[c.id] ?? 0) > 0;
         return (
-        <Card key={c.id}>
-          <CardContent className="flex items-center gap-3 p-4">
-            <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-medium">{c.name}</div>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>{t(`types.${c.kind}`)}</span>
-                <span>·</span>
-                <span>{t(`aggregates.${c.aggregate}`)}</span>
-                <VisibilityBadge visibility={c.ranking_visibility} />
+          <Card key={c.id}>
+            <CardContent className="flex items-center gap-3 p-4">
+              <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-medium">{c.name}</div>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>{t(`types.${c.kind}`)}</span>
+                  <span>·</span>
+                  <span>{t(`aggregates.${c.aggregate}`)}</span>
+                  <VisibilityBadge visibility={c.ranking_visibility} />
+                </div>
               </div>
-            </div>
-            <div className="flex gap-1">
-              <Button size="sm" variant="outline" onClick={() => onRanking(c.id)}>
-                <Trophy className="h-4 w-4" />
-              </Button>
-              {isStaff && (
-                <Button
-                  size="sm"
-                  variant={hasEntries ? "outline" : "default"}
-                  onClick={() => onEntry(c.id)}
-                >
-                  {hasEntries ? t("list.edit") : t("entry.title")}
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" onClick={() => onRanking(c.id)}>
+                  <Trophy className="h-4 w-4" />
                 </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                {isStaff && (
+                  <Button
+                    size="sm"
+                    variant={hasEntries ? "outline" : "default"}
+                    onClick={() => onEntry(c.id)}
+                  >
+                    {hasEntries ? t("list.edit") : t("entry.title")}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         );
       })}
     </div>
@@ -328,13 +336,10 @@ function AddChallenge({
   // Templates whose team-challenge doesn't exist yet: brand-new activities.
   const templates = useMemo(() => {
     const usedKeys = new Set(
-      (existingChallenges ?? [])
-        .map((c) => c?.template_key)
-        .filter((k): k is string => !!k),
+      (existingChallenges ?? []).map((c) => c?.template_key).filter((k): k is string => !!k),
     );
     return getTemplatesForSport(sport).filter((tpl) => !usedKeys.has(tpl.key));
   }, [sport, existingChallenges]);
-
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
@@ -357,7 +362,15 @@ function AddChallenge({
   // then brand-new templates. One consistent card style, no section split.
   type Item =
     | { kind: "existing"; id: string; name: string; icon: string; typeLabel: string; popular: true }
-    | { kind: "template"; key: string; name: string; icon: string; description: string; typeLabel: string; popular: boolean };
+    | {
+        kind: "template";
+        key: string;
+        name: string;
+        icon: string;
+        description: string;
+        typeLabel: string;
+        popular: boolean;
+      };
 
   const items: Item[] = useMemo(() => {
     const existing: Item[] = reusable.map((c) => ({
@@ -388,7 +401,9 @@ function AddChallenge({
         {items.length === 0 && (
           <Card>
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              {t("add.all_added", { defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe." })}
+              {t("add.all_added", {
+                defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe.",
+              })}
             </CardContent>
           </Card>
         )}
@@ -435,8 +450,6 @@ function AddChallenge({
         })}
       </div>
 
-
-
       {selected && (
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("add.custom_name_label")}</label>
@@ -459,7 +472,6 @@ function AddChallenge({
     </div>
   );
 }
-
 
 function EntryScreen({
   challengeId,
@@ -501,7 +513,6 @@ function EntryScreen({
       }),
   });
 
-
   const [values, setValues] = useState<Record<string, number | "">>({});
   const [hydratedPassageId, setHydratedPassageId] = useState<string | null>(null);
 
@@ -537,16 +548,16 @@ function EntryScreen({
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
   });
 
-  if (isLoading || loadingExisting || !challenge || !passage || !existingData) return <FullscreenLoader />;
+  if (isLoading || loadingExisting || !challenge || !passage || !existingData)
+    return <FullscreenLoader />;
   if (passage.id !== hydratedPassageId) return <FullscreenLoader />;
 
   if (players.length === 0) {
-    return (
-      <div className="text-center text-sm text-muted-foreground">{t("entry.no_players")}</div>
-    );
+    return <div className="text-center text-sm text-muted-foreground">{t("entry.no_players")}</div>;
   }
 
-  const isStepper = challenge.unit === "count" || challenge.unit === "stage" || challenge.unit === "score";
+  const isStepper =
+    challenge.unit === "count" || challenge.unit === "stage" || challenge.unit === "score";
   const stepSize =
     challenge.unit === "distance_meters" ? 10 : challenge.unit === "time_seconds" ? 0.1 : 1;
   const decimals = challenge.unit === "time_seconds" ? 2 : 0;
@@ -573,7 +584,8 @@ function EntryScreen({
           const prevBest = bestsData?.bests?.[p.id];
           const isRecordChallenge = challenge.aggregate === "record";
           const higher = challenge.direction === "higher_better";
-          const hasNumericValue = typeof current === "number" && !Number.isNaN(current) && current !== 0;
+          const hasNumericValue =
+            typeof current === "number" && !Number.isNaN(current) && current !== 0;
           const beatsPrev =
             isRecordChallenge &&
             hasNumericValue &&
@@ -642,7 +654,11 @@ function EntryScreen({
           );
         })}
       </div>
-      <Button className="w-full" disabled={save.isPending || done === 0} onClick={() => save.mutate()}>
+      <Button
+        className="w-full"
+        disabled={save.isPending || done === 0}
+        onClick={() => save.mutate()}
+      >
         {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("entry.save")}
       </Button>
     </div>
@@ -691,7 +707,12 @@ function RankingScreen({ challengeId, passageId }: { challengeId: string; passag
           </p>
         </div>
         {data.isStaff && ch.kind === "challenge" && (
-          <Button size="sm" variant="outline" onClick={() => flip.mutate()} disabled={flip.isPending}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => flip.mutate()}
+            disabled={flip.isPending}
+          >
             {ch.ranking_visibility === "category" ? (
               <>
                 <Lock className="h-4 w-4" /> {t("visibility.staff_short")}

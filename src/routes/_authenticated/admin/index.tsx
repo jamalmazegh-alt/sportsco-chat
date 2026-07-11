@@ -19,7 +19,6 @@ import {
   TrendingUp,
   Handshake,
   MapPin,
-
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
@@ -179,7 +178,6 @@ function AdminSettingsPage() {
       tone: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
       clubOnly: true,
     },
-
   ];
   const items = allItems.filter((it) => !it.hidden && !(tournamentOnly && it.clubOnly));
 

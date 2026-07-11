@@ -99,7 +99,10 @@ describe("RLS: team_championships", () => {
     expect((upd as unknown[])?.length ?? 0).toBeGreaterThan(0);
 
     // Cleanup
-    await admin.from("team_championships" as never).delete().eq("id", (created as { id: string }).id);
+    await admin
+      .from("team_championships" as never)
+      .delete()
+      .eq("id", (created as { id: string }).id);
   });
 
   // 2. Coach of another team in the SAME club cannot write on teamA championships.

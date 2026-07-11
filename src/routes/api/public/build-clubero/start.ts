@@ -36,7 +36,9 @@ export const Route = createFileRoute("/api/public/build-clubero/start")({
 
         const ip = getClientIp(request);
         const effectiveLimit =
-          ip === "unknown" ? Math.max(3, Math.floor(LIMIT_START_PER_HOUR / 10)) : LIMIT_START_PER_HOUR;
+          ip === "unknown"
+            ? Math.max(3, Math.floor(LIMIT_START_PER_HOUR / 10))
+            : LIMIT_START_PER_HOUR;
         const allowed = await checkRateLimit(
           `build_clubero:start:${ip}`,
           "build_clubero_start",

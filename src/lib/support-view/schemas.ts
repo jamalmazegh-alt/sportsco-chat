@@ -2,13 +2,7 @@
 // Do NOT import server-only modules here.
 import { z } from "zod";
 
-export const SUPPORT_VIEW_PERSONAS = [
-  "club_admin",
-  "coach",
-  "player",
-  "parent",
-  "member",
-] as const;
+export const SUPPORT_VIEW_PERSONAS = ["club_admin", "coach", "player", "parent", "member"] as const;
 export type SupportViewPersona = (typeof SUPPORT_VIEW_PERSONAS)[number];
 
 export const CreateSupportViewSessionInput = z.object({

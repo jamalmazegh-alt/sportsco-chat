@@ -46,7 +46,6 @@ export interface BuildEventPayloadInput {
   facilityId?: string | null;
 }
 
-
 /** The shape inserted into `events` (without insert-meta: status/created_by/...). */
 export interface EventRowPayload {
   team_id: string;
@@ -71,7 +70,6 @@ export interface EventRowPayload {
   venue_id?: string | null;
   facility_id?: string | null;
 }
-
 
 export function toGoogleMapsUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -134,4 +132,3 @@ export function buildEventPayload(input: BuildEventPayloadInput): EventRowPayloa
 
   return row;
 }
-

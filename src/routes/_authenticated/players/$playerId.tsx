@@ -129,7 +129,8 @@ function PlayerProfile() {
   const isTimeline = pathname === `/players/${playerId}/timeline`;
   const isAvailability = pathname === `/players/${playerId}/availability`;
   const isChallenges = pathname === `/players/${playerId}/challenges`;
-  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability || isChallenges;
+  const isSubRoute =
+    isFeedback || isAchievements || isSeasons || isTimeline || isAvailability || isChallenges;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
@@ -281,16 +282,17 @@ function PlayerProfile() {
         .select("teams:team_id(id, name, sport)")
         .eq("player_id", playerId)
         .eq("role", "player");
-      const teams = (data ?? [])
-        .map((r: any) => r?.teams)
-        .filter(Boolean) as { id: string; name: string; sport: string | null }[];
+      const teams = (data ?? []).map((r: any) => r?.teams).filter(Boolean) as {
+        id: string;
+        name: string;
+        sport: string | null;
+      }[];
       // De-dup by id in case of ambiguous joins.
       const seen = new Set<string>();
       return teams.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true)));
     },
   });
   const playerSport = playerTeams?.[0]?.sport ?? null;
-
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -697,7 +699,6 @@ function PlayerProfile() {
           )}
           {isCoach && (
             <>
-
               <Link
                 to="/players/$playerId/feedback"
                 params={{ playerId }}

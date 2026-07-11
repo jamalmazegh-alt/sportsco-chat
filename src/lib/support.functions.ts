@@ -134,10 +134,6 @@ const PUSH_STRINGS: Record<
   },
 };
 
-
-
-
-
 const CATEGORIES = [
   "bug",
   "payment",
@@ -583,7 +579,6 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
     if (!Object.keys(patch).length) return { ok: true };
 
-
     // Read current status to detect change
     const { data: before } = await supabaseAdmin
       .from("support_tickets")
@@ -618,8 +613,6 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
         url: `/support/${data.ticket_id}`,
         tag: `support-status-${data.ticket_id}-${patch.status}`,
       }).catch((e) => console.error("[support] status push failed", e));
-
-
 
       if (email) {
         await enqueueTransactionalEmailServer({

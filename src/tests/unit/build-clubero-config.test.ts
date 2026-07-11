@@ -122,7 +122,6 @@ describe("build-clubero-config", () => {
     });
   });
 
-
   it("parseUtm extracts utm params", () => {
     expect(parseUtm("")).toBeNull();
     expect(parseUtm("?a=1")).toBeNull();

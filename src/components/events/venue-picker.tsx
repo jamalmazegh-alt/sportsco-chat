@@ -66,13 +66,7 @@ function buildValue(
   };
 }
 
-export function VenuePicker({
-  clubId,
-  venueId,
-  facilityId,
-  onChange,
-  autoApplyDefaults,
-}: Props) {
+export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDefaults }: Props) {
   const { t } = useTranslation();
   const listFn = useServerFn(listClubVenues);
 
@@ -86,10 +80,7 @@ export function VenuePicker({
   const list = venues ?? [];
   const initializedRef = useRef(false);
 
-  const totalFacilities = useMemo(
-    () => list.reduce((n, v) => n + v.facilities.length, 0),
-    [list],
-  );
+  const totalFacilities = useMemo(() => list.reduce((n, v) => n + v.facilities.length, 0), [list]);
   const isSingleSingle = list.length === 1 && list[0].facilities.length === 1;
 
   // Auto-fill on first load: pick defaults (venue.is_default → first; then
@@ -112,7 +103,8 @@ export function VenuePicker({
       return;
     }
     const venue = list.find((v) => v.is_default) ?? list[0];
-    const facility = venue.facilities.find((f) => f.is_default) ?? (isSingleSingle ? venue.facilities[0] : null);
+    const facility =
+      venue.facilities.find((f) => f.is_default) ?? (isSingleSingle ? venue.facilities[0] : null);
     initializedRef.current = true;
     onChange(buildValue(list, venue.id, facility?.id ?? null));
   }, [list, clubId, venueId, facilityId, autoApplyDefaults, isSingleSingle, onChange]);

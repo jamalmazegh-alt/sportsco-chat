@@ -86,7 +86,7 @@ function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
-  
+
   const [sport, setSport] = useState("football");
   const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
@@ -116,7 +116,7 @@ function TeamsPage() {
     setOpen(false);
     setName("");
     setAgeGroup("");
-    
+
     setSport("football");
     setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
@@ -270,7 +270,9 @@ function TeamsPage() {
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
+                                {[tm.age_group, tm.championship, tm.sport]
+                                  .filter(Boolean)
+                                  .join(" · ")}
                                 {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
                               </p>
                             </div>

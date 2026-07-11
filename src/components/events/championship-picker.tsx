@@ -68,8 +68,7 @@ export function ChampionshipPicker({
 
   const activeChampionships = championships.filter((c) => c.is_active);
   const historicalArchived =
-    historical?.id &&
-    championships.find((c) => c.id === historical.id && !c.is_active);
+    historical?.id && championships.find((c) => c.id === historical.id && !c.is_active);
 
   // If the current value refers to a championship that no longer exists for
   // this team (team changed, championship deleted), clear it.
@@ -124,10 +123,7 @@ export function ChampionshipPicker({
   return (
     <div className="space-y-1.5">
       <Label className={labelClassName}>{t("championships.championship")}</Label>
-      <Select
-        value={value ?? ""}
-        onValueChange={(v) => onChange(v || null)}
-      >
+      <Select value={value ?? ""} onValueChange={(v) => onChange(v || null)}>
         <SelectTrigger>
           <SelectValue placeholder={t("championships.select")} />
         </SelectTrigger>
@@ -139,11 +135,7 @@ export function ChampionshipPicker({
             </SelectItem>
           ))}
           {historicalArchived && (
-            <SelectItem
-              key={historicalArchived.id}
-              value={historicalArchived.id}
-              disabled
-            >
+            <SelectItem key={historicalArchived.id} value={historicalArchived.id} disabled>
               {historicalArchived.name}
               {historicalArchived.season_label ? ` · ${historicalArchived.season_label}` : ""}
               {" — "}

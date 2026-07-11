@@ -15,8 +15,7 @@ function publicClient() {
 export default defineTool({
   name: "list_public_tournaments",
   title: "List public tournaments",
-  description:
-    "List upcoming public tournaments visible on Clubero, ordered by start date.",
+  description: "List upcoming public tournaments visible on Clubero, ordered by start date.",
   inputSchema: {
     limit: z
       .number()

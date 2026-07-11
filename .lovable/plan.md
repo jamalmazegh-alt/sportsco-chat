@@ -15,6 +15,7 @@
 ## 2. Filtrage `archived_at IS NULL`
 
 Compléter `.is("deleted_at", null)` partout où les équipes sont listées pour usage courant :
+
 - `src/routes/_authenticated/teams.tsx` (avec toggle admin `showArchived` → sinon filtré).
 - `src/routes/_authenticated/home.tsx`.
 - `src/routes/_authenticated/events.tsx` (sélecteur d'équipe création).

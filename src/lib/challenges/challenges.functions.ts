@@ -21,17 +21,19 @@ type Visibility = Database["public"]["Enums"]["challenge_visibility"];
 type Recurrence = Database["public"]["Enums"]["challenge_recurrence"];
 
 const kindEnum = z.enum(["challenge", "physical_test"]) satisfies z.ZodType<Kind>;
-const unitEnum = z.enum(["count", "time_seconds", "distance_meters", "stage", "score"]) satisfies z.ZodType<Unit>;
+const unitEnum = z.enum([
+  "count",
+  "time_seconds",
+  "distance_meters",
+  "stage",
+  "score",
+]) satisfies z.ZodType<Unit>;
 const dirEnum = z.enum(["higher_better", "lower_better"]) satisfies z.ZodType<Direction>;
 const aggEnum = z.enum(["cumulative", "record"]) satisfies z.ZodType<Aggregate>;
 const visEnum = z.enum(["staff", "category"]) satisfies z.ZodType<Visibility>;
 const recEnum = z.enum(["season", "half_season", "punctual"]) satisfies z.ZodType<Recurrence>;
 
-async function assertClubStaff(
-  supabase: any,
-  userId: string,
-  clubId: string,
-): Promise<void> {
+async function assertClubStaff(supabase: any, userId: string, clubId: string): Promise<void> {
   const { data, error } = await supabase.rpc("is_club_staff", {
     _user_id: userId,
     _club_id: clubId,
@@ -214,9 +216,7 @@ export const archiveChallenge = createServerFn({ method: "POST" })
 
 export const listPassages = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ challengeId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ challengeId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("challenge_passages")
@@ -235,7 +235,10 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
         challengeId: z.string().uuid(),
         eventId: z.string().uuid().nullish(),
         // ISO date (YYYY-MM-DD). Used only when eventId is absent; defaults to today.
-        passageDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        passageDate: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
       })
       .parse(input),
   )
@@ -299,7 +302,6 @@ export const getOrCreatePassageForEvent = createServerFn({ method: "POST" })
     return { passage: row };
   });
 
-
 // ---------- results (upsert + ranking)
 
 const entrySchema = z.object({
@@ -352,9 +354,7 @@ export const upsertResults = createServerFn({ method: "POST" })
  */
 export const getPassageResults = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ passageId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ passageId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("challenge_results")
@@ -371,9 +371,7 @@ export const getPassageResults = createServerFn({ method: "POST" })
  */
 export const getEventChallengesEntryCounts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ eventId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ eventId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: passages, error } = await context.supabase
       .from("challenge_passages")
@@ -385,7 +383,10 @@ export const getEventChallengesEntryCounts = createServerFn({ method: "POST" })
     const { data: results } = await context.supabase
       .from("challenge_results")
       .select("passage_id")
-      .in("passage_id", rows.map((r) => r.id));
+      .in(
+        "passage_id",
+        rows.map((r) => r.id),
+      );
     const byPassage = new Map<string, number>();
     for (const r of (results ?? []) as { passage_id: string }[]) {
       byPassage.set(r.passage_id, (byPassage.get(r.passage_id) ?? 0) + 1);
@@ -462,7 +463,9 @@ export const getChallengePlayerBests = createServerFn({ method: "POST" })
 export const getChallengeRanking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ challengeId: z.string().uuid(), highlightPassageId: z.string().uuid().optional() }).parse(input),
+    z
+      .object({ challengeId: z.string().uuid(), highlightPassageId: z.string().uuid().optional() })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: ch, error: chErr } = await context.supabase
@@ -513,8 +516,12 @@ export const getChallengeRanking = createServerFn({ method: "POST" })
 
     // New-record detection for a highlighted passage.
     const isRecordChallenge = ch.aggregate === "record";
-    let newRecordPlayerIds = new Set<string>();
-    if (isRecordChallenge && data.highlightPassageId && passageIds.includes(data.highlightPassageId)) {
+    const newRecordPlayerIds = new Set<string>();
+    if (
+      isRecordChallenge &&
+      data.highlightPassageId &&
+      passageIds.includes(data.highlightPassageId)
+    ) {
       const historical = new Map<string, number>();
       for (const r of (results ?? []) as any[]) {
         if (r.passage_id === data.highlightPassageId) continue;
@@ -574,7 +581,9 @@ export const getPlayerChallengeStats = createServerFn({ method: "POST" })
     // Determine which challenges the caller is staff on (used for UI hints only).
     const staffClubs = new Set<string>();
     const rowsAny = (results ?? []) as any[];
-    const clubIds = Array.from(new Set(rowsAny.map((r) => r.challenge_passages.challenges.club_id)));
+    const clubIds = Array.from(
+      new Set(rowsAny.map((r) => r.challenge_passages.challenges.club_id)),
+    );
     for (const clubId of clubIds) {
       const { data: ok } = await context.supabase.rpc("is_club_staff", {
         _user_id: context.userId,

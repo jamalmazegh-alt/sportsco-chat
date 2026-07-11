@@ -113,7 +113,6 @@ function Landing() {
       <LandingSponsors />
       <LandingComingSoon />
       <V2Waitlist />
-
     </MarketingLayout>
   );
 }
@@ -389,7 +388,6 @@ export function ChallengesVisual() {
 }
 
 export function ChallengesShowcase() {
-
   const { t } = useTranslation("marketing");
   const rows = [
     { name: "Léa M.", score: 92, delta: "+3", medal: "🥇", isNew: true, w: "100%" },
@@ -515,14 +513,11 @@ function LandingChallenges() {
           <div className="flex justify-center">
             <ChallengesVisual />
           </div>
-
         </div>
       </div>
     </section>
   );
 }
-
-
 
 function LandingSponsors() {
   const { t } = useTranslation("marketing");
@@ -674,7 +669,6 @@ function LandingSponsors() {
     </section>
   );
 }
-
 
 function LandingComingSoon() {
   const { t } = useTranslation("marketing");
@@ -1639,7 +1633,6 @@ const HOME_TILES = [
     accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
   },
 ] as const;
-
 
 function HomeFeatureTiles() {
   const { t } = useTranslation("marketing");

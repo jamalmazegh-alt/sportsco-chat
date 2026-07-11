@@ -27,7 +27,6 @@ const ROLES: Role[] = [
   "superadmin",
 ];
 
-
 async function createUser(role: Role): Promise<UserFixture> {
   const email = `${PREFIX}_${role}@clubero-rls.test`;
   const { data, error } = await admin.auth.admin.createUser({
@@ -452,7 +451,8 @@ async function seedAll(): Promise<Fixtures> {
     })
     .select("id")
     .single();
-  if (cChErr || !challChallenge) throw new Error(`challenges (challenge) insert: ${cChErr?.message}`);
+  if (cChErr || !challChallenge)
+    throw new Error(`challenges (challenge) insert: ${cChErr?.message}`);
   const challengeChallengeA = challChallenge.id;
 
   const { data: challTest, error: cTErr } = await admin
@@ -518,7 +518,8 @@ async function seedAll(): Promise<Fixtures> {
       },
     ])
     .select("id, player_id");
-  if (rChErr || !rowsCh) throw new Error(`challenge_results (challenge) insert: ${rChErr?.message}`);
+  if (rChErr || !rowsCh)
+    throw new Error(`challenge_results (challenge) insert: ${rChErr?.message}`);
   const resultChallengeA_playerA = rowsCh.find((r) => r.player_id === playerA)!.id;
   const resultChallengeA_playerA2 = rowsCh.find((r) => r.player_id === playerA2)!.id;
 
@@ -542,8 +543,6 @@ async function seedAll(): Promise<Fixtures> {
   if (rTErr || !rowsT) throw new Error(`challenge_results (test) insert: ${rTErr?.message}`);
   const resultTestA_playerA = rowsT.find((r) => r.player_id === playerA)!.id;
   const resultTestA_playerA2 = rowsT.find((r) => r.player_id === playerA2)!.id;
-
-
 
   return {
     runId: RUN_ID,
@@ -583,7 +582,6 @@ async function seedAll(): Promise<Fixtures> {
     resultTestA_playerA,
     resultTestA_playerA2,
   };
-
 }
 
 async function teardownAll(fx: Fixtures) {

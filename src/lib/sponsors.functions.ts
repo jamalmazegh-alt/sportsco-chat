@@ -53,7 +53,6 @@ export const getActiveSponsorsForHome = createServerFn({ method: "GET" })
     return sponsors;
   });
 
-
 export const recordSponsorImpression = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ sponsorId: z.string().uuid() }).parse(input))

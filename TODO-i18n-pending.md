@@ -45,13 +45,13 @@ implemented** because their result type has no safe mapping onto the current
 `score`) and aggregate system. Per the task rule "do not fake it", they will
 land in a follow-up alongside the required extensions.
 
-| Template | Sport | Missing capability |
-|---|---|---|
-| `verticalJump` | generic | new unit `height_cm` |
-| `shotSpeed` | football | new unit `speed_kmh` |
-| `handballShotSpeed` | handball | new unit `speed_kmh` |
-| `tackleTechnique` | rugby | new unit `rating_out_of_10` + staff-rated entry UI |
-| `firstServeIn` | tennis | new unit `percentage` |
+| Template            | Sport    | Missing capability                                 |
+| ------------------- | -------- | -------------------------------------------------- |
+| `verticalJump`      | generic  | new unit `height_cm`                               |
+| `shotSpeed`         | football | new unit `speed_kmh`                               |
+| `handballShotSpeed` | handball | new unit `speed_kmh`                               |
+| `tackleTechnique`   | rugby    | new unit `rating_out_of_10` + staff-rated entry UI |
+| `firstServeIn`      | tennis   | new unit `percentage`                              |
 
 Adding these requires: extending the `challenge_unit` Postgres enum, the
 matching Zod enum in `src/lib/challenges/challenges.functions.ts`, the

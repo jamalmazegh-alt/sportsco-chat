@@ -723,7 +723,9 @@ export const listAllUsers = createServerFn({ method: "POST" })
       clubIds.length
         ? supabaseAdmin
             .from("subscriptions")
-            .select("club_id, status, plan, trial_end, current_period_end, exempt_from_billing, exempt_until")
+            .select(
+              "club_id, status, plan, trial_end, current_period_end, exempt_from_billing, exempt_until",
+            )
 
             .in("club_id", clubIds)
         : Promise.resolve({ data: [] as never[] }),
@@ -902,9 +904,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
       new Set((memberInvites ?? []).map((i) => i.club_id).filter((v): v is string => !!v)),
     );
     const inviterIds = Array.from(
-      new Set(
-        (memberInvites ?? []).map((i) => i.created_by).filter((v): v is string => !!v),
-      ),
+      new Set((memberInvites ?? []).map((i) => i.created_by).filter((v): v is string => !!v)),
     );
     const [{ data: inviteClubs }, { data: inviters }] = await Promise.all([
       inviteClubIds.length
@@ -938,7 +938,6 @@ export const getUserDetail = createServerFn({ method: "POST" })
       invited_by: i.created_by ? (inviterMap.get(i.created_by) ?? null) : null,
       invited_by_id: i.created_by,
     }));
-
 
     const eventIds = Array.from(new Set((convos ?? []).map((c) => c.event_id)));
     const { data: events } = eventIds.length
@@ -1147,7 +1146,6 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
       },
     };
   });
-
 
 /** Suspends a club (alias for archive with a reason). */
 export const suspendClub = archiveClub;

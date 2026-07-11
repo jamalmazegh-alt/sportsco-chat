@@ -11,15 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { downloadCsv, toCsv } from "@/lib/csv";
 import { QUESTIONS } from "@/lib/build-clubero-config";
 
@@ -129,7 +121,11 @@ function BuildCluberoDashboard() {
         const base = raw as unknown as Omit<Dashboard, "responses">;
         let parsed: unknown = rawResp;
         if (typeof parsed === "string") {
-          try { parsed = JSON.parse(parsed); } catch { /* ignore */ }
+          try {
+            parsed = JSON.parse(parsed);
+          } catch {
+            /* ignore */
+          }
         }
         const responses = Array.isArray(parsed) ? (parsed as ResponseRow[]) : [];
         if (errResp) {
@@ -153,9 +149,7 @@ function BuildCluberoDashboard() {
     );
   }
   if (err || !data) {
-    return (
-      <div className="p-6 text-sm text-destructive">{err ?? t("admin.loadError")}</div>
-    );
+    return <div className="p-6 text-sm text-destructive">{err ?? t("admin.loadError")}</div>;
   }
 
   return (
@@ -296,7 +290,14 @@ function OptionsCharts({ options }: { options: OptionRow[] }) {
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-                <XAxis dataKey="option" fontSize={11} interval={0} angle={-15} textAnchor="end" height={60} />
+                <XAxis
+                  dataKey="option"
+                  fontSize={11}
+                  interval={0}
+                  angle={-15}
+                  textAnchor="end"
+                  height={60}
+                />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip />
                 <Bar dataKey="n" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
@@ -398,9 +399,7 @@ function VerbatimsList({ items }: { items: VerbatimRow[] }) {
           <div className="text-sm">{v.answer_text}</div>
           <div className="mt-1 flex gap-2 text-xs text-muted-foreground">
             <Flame size={12} />
-            <span>
-              {t(`questions.${v.question_key}.title`, { defaultValue: v.question_key })}
-            </span>
+            <span>{t(`questions.${v.question_key}.title`, { defaultValue: v.question_key })}</span>
             {v.club && <span>· {v.club}</span>}
             <span>· {new Date(v.created_at).toLocaleDateString()}</span>
           </div>
@@ -521,7 +520,8 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
   const toggle = (id: string) => {
     setCollapsedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -531,7 +531,10 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
         const isOpen = !collapsedIds.has(r.id);
         const fullName = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
         const identity =
-          fullName || r.email || r.club || `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
+          fullName ||
+          r.email ||
+          r.club ||
+          `${t("admin.responses.anonymous")} · ${r.session_id.slice(0, 8)}`;
 
         return (
           <div key={r.id} className="rounded-xl border border-border bg-card">
@@ -571,10 +574,7 @@ function ResponsesList({ responses }: { responses: ResponseRow[] }) {
                 ) : (
                   <ul className="space-y-2">
                     {r.answers.map((a) => (
-                      <li
-                        key={a.question_key}
-                        className="rounded-lg bg-muted/40 p-2 text-sm"
-                      >
+                      <li key={a.question_key} className="rounded-lg bg-muted/40 p-2 text-sm">
                         <div className="text-xs font-medium text-muted-foreground">
                           {t(`questions.${a.question_key}.title`, {
                             defaultValue: a.question_key,
@@ -603,12 +603,12 @@ function formatAnswerValue(
   value: unknown,
   t: (k: string, o?: Record<string, unknown>) => string,
 ): string {
-  const optLabel = (id: string) =>
-    t(`questions.${qkey}.options.${id}.label`, { defaultValue: id });
+  const optLabel = (id: string) => t(`questions.${qkey}.options.${id}.label`, { defaultValue: id });
   if (value == null) return "—";
   if (qtype === "rank" || qtype === "multi") {
     if (!Array.isArray(value)) return String(value);
-    if (qtype === "rank") return value.map((id, i) => `${i + 1}. ${optLabel(String(id))}`).join(" · ");
+    if (qtype === "rank")
+      return value.map((id, i) => `${i + 1}. ${optLabel(String(id))}`).join(" · ");
     return value.map((id) => optLabel(String(id))).join(", ");
   }
   if (qtype === "single" || qtype === "icon") return optLabel(String(value));

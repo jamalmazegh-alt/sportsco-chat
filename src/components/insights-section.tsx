@@ -199,8 +199,6 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     }
   };
 
-
-
   const confirmDismiss = async () => {
     const id = pendingDismiss;
     if (!id) return;

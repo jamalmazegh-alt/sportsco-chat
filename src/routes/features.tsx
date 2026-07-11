@@ -26,7 +26,6 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
-
 const SPORTS = [
   "Football",
   "Futsal",
@@ -97,13 +96,8 @@ function ChallengesFeatureSection() {
 }
 
 function SponsorsFeatureSection() {
-
   const { t } = useTranslation("marketing");
-  const bullets = [
-    t("features.sponsors.b1"),
-    t("features.sponsors.b2"),
-    t("features.sponsors.b3"),
-  ];
+  const bullets = [t("features.sponsors.b1"), t("features.sponsors.b2"), t("features.sponsors.b3")];
   return (
     <section className="border-b border-border/60 bg-muted/20">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-2 lg:items-center lg:px-8">
@@ -153,11 +147,7 @@ function SponsorsFeatureSection() {
 
 function FutureFeaturesSection() {
   const { t } = useTranslation("marketing");
-  const items = [
-    t("features.future.i1"),
-    t("features.future.i2"),
-    t("features.future.i3"),
-  ];
+  const items = [t("features.future.i1"), t("features.future.i2"), t("features.future.i3")];
   return (
     <section className="border-b border-border/60">
       <div className="mx-auto max-w-4xl px-5 py-16 lg:px-8 lg:py-20">
@@ -187,7 +177,6 @@ function FutureFeaturesSection() {
 }
 
 function FeaturesPage() {
-
   const { t } = useTranslation("marketing");
   const audiences = t("features.audiences", { returnObjects: true }) as {
     t: string;
@@ -234,7 +223,6 @@ function FeaturesPage() {
       <Anchor id="future">
         <FutureFeaturesSection />
       </Anchor>
-
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">

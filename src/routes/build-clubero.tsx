@@ -95,7 +95,9 @@ function BuildCluberoPage() {
                 key={index}
                 className={cn(
                   "rounded-[26px] border border-white/10 bg-gradient-to-b from-[rgba(6,44,34,0.72)] to-[rgba(4,28,22,0.78)] p-6 shadow-[0_24px_60px_-28px_rgba(0,10,6,0.9)] backdrop-blur",
-                  direction === "fwd" ? "animate-in slide-in-from-right-4 fade-in" : "animate-in slide-in-from-left-4 fade-in",
+                  direction === "fwd"
+                    ? "animate-in slide-in-from-right-4 fade-in"
+                    : "animate-in slide-in-from-left-4 fade-in",
                 )}
               >
                 <QuestionEyebrow index={index} />
@@ -130,10 +132,7 @@ function BuildCluberoPage() {
           />
         )}
         {phase === "done" && (
-          <DoneScreen
-            onComplete={session.complete}
-            resetLocal={session.resetLocal}
-          />
+          <DoneScreen onComplete={session.complete} resetLocal={session.resetLocal} />
         )}
       </div>
     </div>
@@ -370,9 +369,7 @@ function MultiChoice({
   };
   return (
     <div className="flex flex-col gap-2.5">
-      {q.max && (
-        <p className="text-xs text-[#9ec8b8]">{t("hints.multiMax", { max: q.max })}</p>
-      )}
+      {q.max && <p className="text-xs text-[#9ec8b8]">{t("hints.multiMax", { max: q.max })}</p>}
       {q.options.map((o) => {
         const sel = value.includes(o.id);
         return (
@@ -557,9 +554,7 @@ function RankList({
   };
 
   const liveText = order.length
-    ? order
-        .map((id, i) => `${i + 1}. ${t(`questions.${q.key}.options.${id}.label`)}`)
-        .join(", ")
+    ? order.map((id, i) => `${i + 1}. ${t(`questions.${q.key}.options.${id}.label`)}`).join(", ")
     : t("rank.emptyState");
 
   return (
@@ -595,11 +590,7 @@ function RankList({
                 data-rank-item={id}
                 className="flex items-center gap-3 rounded-2xl border-[1.5px] border-white/10 bg-white/[0.06] px-3 py-3 transition-[transform,background-color] duration-200"
               >
-                <GripVertical
-                  size={16}
-                  className="flex-none text-white/30"
-                  aria-hidden="true"
-                />
+                <GripVertical size={16} className="flex-none text-white/30" aria-hidden="true" />
                 <span className="grid h-8 w-8 flex-none place-items-center rounded-lg bg-gradient-to-br from-[#10B981] to-[#6EE7B7] text-[14px] font-extrabold text-[#052e26]">
                   {i + 1}
                 </span>
@@ -671,7 +662,9 @@ function RankList({
                     data-testid={`rank-add-${opt.id}`}
                     className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-white/15 bg-white/[0.04] px-3 py-2 text-[13.5px] text-white transition-colors hover:border-[#34D399]/60 hover:bg-[#10B981]/10"
                   >
-                    <span className="text-base" aria-hidden="true">{opt.emoji}</span>
+                    <span className="text-base" aria-hidden="true">
+                      {opt.emoji}
+                    </span>
                     <span>{label}</span>
                     <span className="text-[#6EE7B7]">＋</span>
                   </button>
@@ -805,7 +798,6 @@ function DoneScreen({
   const lastNameInvalid = identityTouched && values.last_name.trim().length === 0;
   const clubInvalid = identityTouched && values.club.trim().length === 0;
   const canSubmit = !sending && isContactValid(values);
-
 
   const submit = async (withContact: boolean) => {
     setErr(null);
@@ -956,7 +948,10 @@ function DoneScreen({
         </div>
 
         {err && (
-          <p role="alert" className="mt-4 rounded-lg border border-[#ff6b81]/40 bg-[#ff6b81]/10 px-3 py-2 text-sm text-[#ffb8c3]">
+          <p
+            role="alert"
+            className="mt-4 rounded-lg border border-[#ff6b81]/40 bg-[#ff6b81]/10 px-3 py-2 text-sm text-[#ffb8c3]"
+          >
             {err}
           </p>
         )}
@@ -1002,10 +997,4 @@ function Field({
       {error && <p className="mt-1 text-xs text-[#ff8fa1]">{error}</p>}
     </div>
   );
-}
-
-// Local class helper used above to keep inputs consistent.
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface CSSStyleDeclaration {}
 }

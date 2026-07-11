@@ -114,8 +114,12 @@ function SupportViewBanner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining]);
 
-  const mm = Math.floor(remaining / 60000).toString().padStart(2, "0");
-  const ss = Math.floor((remaining % 60000) / 1000).toString().padStart(2, "0");
+  const mm = Math.floor(remaining / 60000)
+    .toString()
+    .padStart(2, "0");
+  const ss = Math.floor((remaining % 60000) / 1000)
+    .toString()
+    .padStart(2, "0");
 
   return (
     <div className="fixed top-0 inset-x-0 z-50 border-b border-amber-500/40 bg-amber-500/95 text-black">
@@ -136,7 +140,11 @@ function SupportViewBanner({
             {mm}:{ss}
           </span>
           <Button size="sm" variant="secondary" onClick={quit} disabled={busy}>
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5 mr-1.5" />}
+            {busy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <LogOut className="h-3.5 w-3.5 mr-1.5" />
+            )}
             End session
           </Button>
         </div>

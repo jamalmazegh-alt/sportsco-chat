@@ -70,7 +70,6 @@ let otherTeamA: string; // second clubA team, coachA is NOT a member
 let otherEventA: string; // event on otherTeamA
 let convocationA_otherTeam: string; // convocation on otherTeamA/otherEventA (out of coach scope)
 
-
 beforeAll(async () => {
   const fx = getFixtures();
 
@@ -96,11 +95,7 @@ beforeAll(async () => {
   );
   if (error || !data) throw new Error(`create_support_view_session admin: ${error?.message}`);
   sessionId = (data as { id: string }).id;
-  validated = await loadValidatedSession(
-    superadminClient,
-    fx.users.superadmin.userId,
-    sessionId,
-  );
+  validated = await loadValidatedSession(superadminClient, fx.users.superadmin.userId, sessionId);
 
   // Session #2 — parent persona: target = parentA, whose only child is playerA.
   // Used to prove the cross-target intra-club guard: a clubA obligation /
@@ -258,9 +253,6 @@ afterAll(async () => {
   }
 });
 
-
-
-
 // ===========================================================================
 // VOLET 1 — RLS visibility of support tables
 // ===========================================================================
@@ -289,12 +281,15 @@ describe("Support-view RLS: table visibility", () => {
   it("adminA cannot call create_support_view_session (non-superadmin forbidden)", async () => {
     const fx = getFixtures();
     const c = await signInAs("adminA");
-    const { error } = await c.rpc("create_support_view_session" as never, {
-      _target_user_id: fx.users.playerA.userId,
-      _club_id: fx.clubA,
-      _persona: "player",
-      _reason: "should be forbidden",
-    } as never);
+    const { error } = await c.rpc(
+      "create_support_view_session" as never,
+      {
+        _target_user_id: fx.users.playerA.userId,
+        _club_id: fx.clubA,
+        _persona: "player",
+        _reason: "should be forbidden",
+      } as never,
+    );
     expect(error).not.toBeNull();
     expect(String(error?.message ?? "")).toMatch(/forbidden|superadmin/i);
   });
@@ -302,12 +297,15 @@ describe("Support-view RLS: table visibility", () => {
   it("adminB cannot call create_support_view_session either", async () => {
     const fx = getFixtures();
     const c = await signInAs("adminB");
-    const { error } = await c.rpc("create_support_view_session" as never, {
-      _target_user_id: fx.users.adminA.userId,
-      _club_id: fx.clubA,
-      _persona: "club_admin",
-      _reason: "should be forbidden",
-    } as never);
+    const { error } = await c.rpc(
+      "create_support_view_session" as never,
+      {
+        _target_user_id: fx.users.adminA.userId,
+        _club_id: fx.clubA,
+        _persona: "club_admin",
+        _reason: "should be forbidden",
+      } as never,
+    );
     expect(error).not.toBeNull();
   });
 });
@@ -439,11 +437,6 @@ describe("Support-view service: cross-target intra-club leak (parent persona)", 
     }
   });
 });
-
-
-
-
-
 
 // ===========================================================================
 // VOLET 2b — Guard armed (monkey-patch complement)

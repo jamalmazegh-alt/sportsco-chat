@@ -176,4 +176,3 @@ describe("buildEventPayload — single source of truth", () => {
     });
   });
 });
-

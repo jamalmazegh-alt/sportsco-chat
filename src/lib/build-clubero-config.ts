@@ -70,12 +70,7 @@ export const QUESTIONS: Question[] = [
   {
     key: "audience",
     type: "single",
-    options: [
-      { id: "kids" },
-      { id: "teens" },
-      { id: "adults" },
-      { id: "mix" },
-    ],
+    options: [{ id: "kids" }, { id: "teens" }, { id: "adults" }, { id: "mix" }],
   },
   {
     key: "sport",
@@ -139,12 +134,7 @@ export const QUESTIONS: Question[] = [
   {
     key: "currenttool",
     type: "single",
-    options: [
-      { id: "whatsapp" },
-      { id: "excel" },
-      { id: "app" },
-      { id: "nothing" },
-    ],
+    options: [{ id: "whatsapp" }, { id: "excel" }, { id: "app" }, { id: "nothing" }],
   },
   {
     key: "onewish",
@@ -213,9 +203,7 @@ export interface ContactFormValues {
 /** Champs d'identification obligatoires pour envoyer le contact. */
 export function hasRequiredIdentity(v: ContactFormValues): boolean {
   return (
-    v.first_name.trim().length > 0 &&
-    v.last_name.trim().length > 0 &&
-    v.club.trim().length > 0
+    v.first_name.trim().length > 0 && v.last_name.trim().length > 0 && v.club.trim().length > 0
   );
 }
 
@@ -242,7 +230,6 @@ export function isContactValid(v: ContactFormValues): boolean {
   if (v.newsletter || v.beta) return emailOk(v.email);
   return true;
 }
-
 
 /** UTM basiques à envoyer au backend (JSONB). */
 export function parseUtm(search: string): Record<string, string> | null {

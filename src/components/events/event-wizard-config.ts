@@ -205,7 +205,6 @@ export function toEventPayloadInput(
   };
 }
 
-
 /**
  * Map wizard state to an event row payload via the shared builder.
  * Returns null if mandatory fields are missing.

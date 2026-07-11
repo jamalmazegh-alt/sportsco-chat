@@ -96,7 +96,8 @@ export function QuickSanctionDrawer({
         .order("team_id");
       const rows: PlayerRow[] = [];
       for (const r of (data ?? []) as any[]) {
-        if (!r.teams || r.teams.club_id !== clubId || r.teams.deleted_at || r.teams.archived_at) continue;
+        if (!r.teams || r.teams.club_id !== clubId || r.teams.deleted_at || r.teams.archived_at)
+          continue;
         if (!r.players || r.players.deleted_at) continue;
         rows.push({
           id: r.players.id,

@@ -19,7 +19,6 @@ export type Role =
   | "playerB"
   | "superadmin";
 
-
 export interface UserFixture {
   email: string;
   password: string;
@@ -66,7 +65,6 @@ export interface Fixtures {
   resultTestA_playerA: string;
   resultTestA_playerA2: string;
 }
-
 
 const FIXTURES_FILE = join(tmpdir(), "clubero-rls-fixtures.json");
 

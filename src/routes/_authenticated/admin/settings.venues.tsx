@@ -52,7 +52,9 @@ export const Route = createFileRoute("/_authenticated/admin/settings/venues")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.adminVenues.title", { defaultValue: "Lieux et terrains – Clubero" }),
+        title: i18nInstance.t("meta.adminVenues.title", {
+          defaultValue: "Lieux et terrains – Clubero",
+        }),
       },
       {
         name: "description",
@@ -171,7 +173,8 @@ function VenuesSettingsPage() {
     }
   }
   async function onDeleteFacility(f: ClubFacility) {
-    if (!confirm(t("venues.confirmDeleteField", { defaultValue: "Supprimer ce terrain ?" }))) return;
+    if (!confirm(t("venues.confirmDeleteField", { defaultValue: "Supprimer ce terrain ?" })))
+      return;
     try {
       await deleteFacilityFn({ data: { facilityId: f.id, venueId: f.venue_id } });
       invalidate();
@@ -211,7 +214,6 @@ function VenuesSettingsPage() {
             "Sites du club et terrains associés, réutilisés à la création d'événements.",
         })}
       />
-
 
       <div className="px-5 py-4 space-y-3">
         <Button
@@ -280,11 +282,7 @@ function VenuesSettingsPage() {
                     }
                     title={t("venues.toggleDefault", { defaultValue: "Site par défaut" })}
                   >
-                    {v.is_default ? (
-                      <StarOff className="h-4 w-4" />
-                    ) : (
-                      <Star className="h-4 w-4" />
-                    )}
+                    {v.is_default ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                   </Button>
                   <Button size="icon" variant="ghost" onClick={() => setVenueEdit(v)}>
                     <Pencil className="h-4 w-4" />
@@ -331,10 +329,7 @@ function VenuesSettingsPage() {
                       <span className="flex-1 min-w-0 truncate">
                         └ {f.name}
                         {f.surface_type && (
-                          <span className="text-xs text-muted-foreground">
-                            {" "}
-                            · {f.surface_type}
-                          </span>
+                          <span className="text-xs text-muted-foreground"> · {f.surface_type}</span>
                         )}
                         {f.is_default && (
                           <span className="ml-2 text-[10px] bg-primary/10 text-primary rounded px-1.5 py-0.5">
@@ -482,7 +477,11 @@ function VenueEditDialog({
             onClick={() => onSave(draft)}
             disabled={saving || !draft.name?.trim() || !draft.address?.trim()}
           >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Enregistrer" })}
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("common.save", { defaultValue: "Enregistrer" })
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -544,7 +543,9 @@ function FacilityEditDialog({
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label>{t("venues.field.isDefaultField", { defaultValue: "Terrain par défaut" })}</Label>
+            <Label>
+              {t("venues.field.isDefaultField", { defaultValue: "Terrain par défaut" })}
+            </Label>
             <Switch
               checked={!!draft.is_default}
               onCheckedChange={(v) => setDraft({ ...draft, is_default: v })}
@@ -556,7 +557,11 @@ function FacilityEditDialog({
             {t("common.cancel", { defaultValue: "Annuler" })}
           </Button>
           <Button onClick={() => onSave(draft)} disabled={saving || !draft.name?.trim()}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Enregistrer" })}
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("common.save", { defaultValue: "Enregistrer" })
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

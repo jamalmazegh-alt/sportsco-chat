@@ -50,10 +50,7 @@ export function OnboardingProgress({
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-primary/10 overflow-hidden">
             <div
-              className={cn(
-                "h-full transition-all",
-                allDone ? "bg-emerald-500" : "bg-primary",
-              )}
+              className={cn("h-full transition-all", allDone ? "bg-emerald-500" : "bg-primary")}
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -66,9 +63,7 @@ export function OnboardingProgress({
             key={step.id}
             className={cn(
               "flex items-start gap-2.5 rounded-lg px-2.5 py-2 border",
-              step.done
-                ? "border-emerald-500/20 bg-emerald-500/5"
-                : "border-border bg-card/50",
+              step.done ? "border-emerald-500/20 bg-emerald-500/5" : "border-border bg-card/50",
             )}
           >
             <span

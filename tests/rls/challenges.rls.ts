@@ -105,10 +105,7 @@ describe("RLS — challenges (defis & tests)", () => {
   describe("case 2: player_A — challenge ranking hidden while visibility='staff'", () => {
     it("cannot read the challenge row", async () => {
       const c = await signInAs("playerA");
-      const { data } = await c
-        .from("challenges")
-        .select("id")
-        .eq("id", fx.challengeChallengeA);
+      const { data } = await c.from("challenges").select("id").eq("id", fx.challengeChallengeA);
       expect((data ?? []).length).toBe(0);
     });
 
@@ -195,10 +192,7 @@ describe("RLS — challenges (defis & tests)", () => {
         .eq("id", fx.challengeTestA);
       try {
         const c = await signInAs("playerA");
-        const { data: ch } = await c
-          .from("challenges")
-          .select("id")
-          .eq("id", fx.challengeTestA);
+        const { data: ch } = await c.from("challenges").select("id").eq("id", fx.challengeTestA);
         expect((ch ?? []).length).toBe(0);
 
         const { data: peer } = await c
@@ -329,10 +323,7 @@ describe("RLS — challenges (defis & tests)", () => {
       const { data: results } = await c
         .from("challenge_results")
         .select("id")
-        .in("id", [
-          fx.resultChallengeA_playerA,
-          fx.resultTestA_playerA,
-        ]);
+        .in("id", [fx.resultChallengeA_playerA, fx.resultTestA_playerA]);
       expect((results ?? []).length).toBe(0);
     });
 

@@ -11,9 +11,7 @@ describe("server-fn-error", () => {
 
   it("getServerFnErrorCode reads code from JSON message, not plain text", () => {
     expect(
-      getServerFnErrorCode(
-        new Error(JSON.stringify({ error: "bracket_progression_failed" })),
-      ),
+      getServerFnErrorCode(new Error(JSON.stringify({ error: "bracket_progression_failed" }))),
     ).toBe("bracket_progression_failed");
     expect(getServerFnErrorCode(new Error("bracket_progression_failed"))).toBeNull();
     expect(getServerFnErrorCode({ error: "bracket_progression_failed" })).toBe(

@@ -14,6 +14,9 @@ export default tseslint.config(
       "src/integrations/supabase/types.ts",
       "**/routeTree.gen.ts",
       "**/*.gen.ts",
+      "src/routes/\\[.mcp\\]/**",
+      "src/routes/\\[.well-known\\]/**",
+      "src/routes/mcp.ts",
     ],
   },
   {
@@ -57,7 +60,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["@/components/*", "!@/components/ui/*", "!@/components/support-view/*"],
+              regex: "^@/components/(?!ui/|support-view/).+",
               message:
                 "support-view components may only import from @/components/ui/* or @/components/support-view/*.",
             },
