@@ -62,8 +62,14 @@ let sessionId: string; // admin persona (adminA target)
 let validated: ValidatedSession;
 let sessionIdParent: string; // parent persona (parentA target)
 let validatedParent: ValidatedSession;
+let sessionIdCoach: string; // coach persona (coachA target, scope = teamA only)
+let validatedCoach: ValidatedSession;
 let obligationA_otherFamily: string; // clubA obligation for playerA2 (NOT parentA's child)
 let convocationA_otherFamily: string; // clubA convocation for playerA2 (NOT parentA's child)
+let otherTeamA: string; // second clubA team, coachA is NOT a member
+let otherEventA: string; // event on otherTeamA
+let convocationA_otherTeam: string; // convocation on otherTeamA/otherEventA (out of coach scope)
+
 
 beforeAll(async () => {
   const fx = getFixtures();
