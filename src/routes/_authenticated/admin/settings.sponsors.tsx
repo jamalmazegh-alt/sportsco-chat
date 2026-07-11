@@ -719,14 +719,16 @@ function SponsorsSettingsPage() {
               {t("common.cancel", { defaultValue: "Annuler" })}
             </Button>
             <Button
-              onClick={() => saveMutation.mutate()}
-              disabled={
-                !editing ||
-                !editing.name.trim() ||
-                (editing.targetUrl.trim().length > 0 &&
-                  !/^https?:\/\//i.test(editing.targetUrl.trim())) ||
-                saveMutation.isPending
-              }
+              onClick={() => {
+                if (editing) {
+                  const url = editing.targetUrl.trim();
+                  if (url.length > 0 && !/^https?:\/\//i.test(url)) {
+                    setEditing({ ...editing, targetUrl: `https://${url}` });
+                  }
+                }
+                saveMutation.mutate();
+              }}
+              disabled={!editing || !editing.name.trim() || saveMutation.isPending}
             >
               {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t("sponsor.admin.save", { defaultValue: "Enregistrer" })}
