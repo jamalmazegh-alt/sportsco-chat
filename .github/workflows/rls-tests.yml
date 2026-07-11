@@ -1,18 +1,13 @@
 name: RLS Security Tests
 
 on:
-  schedule:
-    - cron: "0 3 * * *" # Chaque nuit à 3h UTC
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
         description: "Raison du lancement manuel (optionnel)"
         required: false
         default: "Test RLS à la demande"
+
 
 permissions:
   contents: read
