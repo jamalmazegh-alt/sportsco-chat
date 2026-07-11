@@ -116,7 +116,7 @@ function TeamsPage() {
     setOpen(false);
     setName("");
     setAgeGroup("");
-    setChampionship("");
+    
     setSport("football");
     setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
