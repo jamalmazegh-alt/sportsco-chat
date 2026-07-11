@@ -539,6 +539,42 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
+  // Players who still need an invite: no linked account, at least one contact,
+  // and no pending invite already recorded for them.
+  const invitableIds = useMemo(() => {
+    const pending = pendingInvitePlayerIds ?? new Set<string>();
+    return ((players ?? []) as any[])
+      .filter((p) => !p.user_id && (p.email || p.phone) && !pending.has(p.id))
+      .map((p) => p.id as string);
+  }, [players, pendingInvitePlayerIds]);
+
+  async function inviteWholeTeam() {
+    if (!user || invitableIds.length === 0) return;
+    setInviting(true);
+    let totalSent = 0;
+    let totalFailed = 0;
+    let totalSkipped = 0;
+    for (const id of invitableIds) {
+      const r = await sendInvitesForPlayer(id);
+      totalSent += r.sent;
+      totalFailed += r.failed;
+      totalSkipped += r.skipped;
+    }
+    setInviting(false);
+    if (totalSent === 0 && totalFailed === 0)
+      toast.warning(t("players.inviteNoContact"));
+    else if (totalFailed)
+      toast.warning(
+        t("players.inviteBulkResult", {
+          sent: totalSent,
+          failed: totalFailed,
+          skipped: totalSkipped,
+        }),
+      );
+    else toast.success(t("players.inviteBulkSent", { count: totalSent }));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+  }
+
   async function onAdd(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
