@@ -305,7 +305,9 @@ describe("Support-view RLS: table visibility", () => {
       } as never,
     );
     expect(error).not.toBeNull();
-    expect(String(error?.message ?? "")).toMatch(/forbidden|superadmin|schema cache|could not find the function/i);
+    expect(String(error?.message ?? "")).toMatch(
+      /forbidden|superadmin|schema cache|could not find the function/i,
+    );
   });
 
   it("adminB cannot call create_support_view_session either", async () => {
