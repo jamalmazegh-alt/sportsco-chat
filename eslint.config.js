@@ -14,6 +14,9 @@ export default tseslint.config(
       "src/integrations/supabase/types.ts",
       "**/routeTree.gen.ts",
       "**/*.gen.ts",
+      "src/routes/[.mcp]/**",
+      "src/routes/[.well-known]/**",
+      "src/routes/mcp.ts",
     ],
   },
   {
