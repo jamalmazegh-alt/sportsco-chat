@@ -476,6 +476,8 @@ export function EventFormSheet({
   const navigate = useNavigate();
   const selectedTeam = teams.find((tm) => tm.id === teamId);
   const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
+  const isHomeMatch = type === "match" && isHome === "home";
+  const isAwayMatch = type === "match" && isHome === "away";
 
   // When opening fresh, sync from initial
   useEffect(() => {
@@ -600,6 +602,16 @@ export function EventFormSheet({
       return;
     }
 
+    if (isHomeMatch && !venueId) {
+      setBusy(false);
+      toast.error(
+        t("events.homeVenueRequired", {
+          defaultValue: "Choisissez un site pour ce match à domicile.",
+        }),
+      );
+      return;
+    }
+
     const baseInput: CreateEventInput = {
       teamId,
       type,
@@ -611,7 +623,7 @@ export function EventFormSheet({
       competitionType,
       competitionName: competitionName || null,
       championshipId: competitionType === "championship" ? championshipId : null,
-      isHome: type === "match" ? isHome === "home" : null,
+      isHome: type === "match" ? isHomeMatch : null,
       meetingPoint: meetingPoint || null,
       startsAt: startsIso,
       endsAt: type === "training" ? combineDateTime(startDate, endTime) : null,
@@ -854,6 +866,10 @@ export function EventFormSheet({
                         setFacilityId(null);
                         setLocation("");
                         setLocationUrl("");
+                      } else if (!venueId) {
+                        setMeetingPoint("");
+                        setLocation("");
+                        setLocationUrl("");
                       }
                     }}
                     className={cn(
@@ -868,7 +884,7 @@ export function EventFormSheet({
                 ))}
               </div>
             </div>
-            {isHome === "away" && (
+            {isAwayMatch && (
               <AddressField
                 label={t("events.meetingPoint")}
                 value={meetingPoint ?? ""}
@@ -1013,12 +1029,12 @@ export function EventFormSheet({
 
         {!(mode === "create" && type === "training" && isRecurring) && (
           <>
-            {!(type === "match" && isHome === "away") && (
+            {!isAwayMatch && (
               <VenuePicker
                 clubId={activeClubId ?? undefined}
                 venueId={venueId}
                 facilityId={facilityId}
-                autoApplyDefaults={mode === "create" && !location}
+                autoApplyDefaults={isHomeMatch ? !venueId : mode === "create" && !location}
                 onChange={(v: VenuePickerValue | null) => {
                   if (!v) return;
                   setVenueId(v.venueId);
@@ -1040,11 +1056,11 @@ export function EventFormSheet({
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
               helper={
-                type === "match" && isHome === "home" && venueId
+                isHomeMatch
                   ? t("events.locationLockedHint")
                   : t("events.locationGoogleHelper")
               }
-              disabled={type === "match" && isHome === "home" && !!venueId}
+              disabled={isHomeMatch}
             />
 
             <div className="space-y-1.5">
@@ -1081,7 +1097,7 @@ export function EventFormSheet({
             <Button
               type="submit"
               className="w-full h-11"
-              disabled={busy || !teamId || titleMissing}
+              disabled={busy || !teamId || titleMissing || (isHomeMatch && !venueId)}
             >
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
