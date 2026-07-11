@@ -847,7 +847,15 @@ export function EventFormSheet({
                   <button
                     key={v}
                     type="button"
-                    onClick={() => setIsHome(v)}
+                    onClick={() => {
+                      setIsHome(v);
+                      if (v === "away") {
+                        setVenueId(null);
+                        setFacilityId(null);
+                        setLocation("");
+                        setLocationUrl("");
+                      }
+                    }}
                     className={cn(
                       "rounded-xl py-2.5 text-sm font-medium border transition",
                       isHome === v
@@ -1005,19 +1013,21 @@ export function EventFormSheet({
 
         {!(mode === "create" && type === "training" && isRecurring) && (
           <>
-            <VenuePicker
-              clubId={activeClubId ?? undefined}
-              venueId={venueId}
-              facilityId={facilityId}
-              autoApplyDefaults={mode === "create" && !location}
-              onChange={(v: VenuePickerValue | null) => {
-                if (!v) return;
-                setVenueId(v.venueId);
-                setFacilityId(v.facilityId);
-                setLocation(v.location);
-                setLocationUrl(v.locationUrl ?? "");
-              }}
-            />
+            {!(type === "match" && isHome === "away") && (
+              <VenuePicker
+                clubId={activeClubId ?? undefined}
+                venueId={venueId}
+                facilityId={facilityId}
+                autoApplyDefaults={mode === "create" && !location}
+                onChange={(v: VenuePickerValue | null) => {
+                  if (!v) return;
+                  setVenueId(v.venueId);
+                  setFacilityId(v.facilityId);
+                  setLocation(v.location);
+                  setLocationUrl(v.locationUrl ?? "");
+                }}
+              />
+            )}
             <AddressField
               label={t("events.location")}
               value={location ?? ""}
