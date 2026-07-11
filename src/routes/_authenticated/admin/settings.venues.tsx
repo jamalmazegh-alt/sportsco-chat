@@ -45,6 +45,7 @@ import {
   type ClubVenueWithFacilities,
   type ClubFacility,
 } from "@/lib/venues.functions";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/venues")({
   component: VenuesSettingsPage,
