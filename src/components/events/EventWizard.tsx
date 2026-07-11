@@ -187,8 +187,21 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const navigate = useNavigate();
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
+  const { activeClubId } = useAuth();
 
   const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
+
+  function applyVenuePick(v: VenuePickerValue | null) {
+    if (!v) return;
+    setState((s) => ({
+      ...s,
+      venueId: v.venueId,
+      facilityId: v.facilityId,
+      location: v.location,
+      locationUrl: v.locationUrl,
+    }));
+  }
+
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
