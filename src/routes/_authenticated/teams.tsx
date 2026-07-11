@@ -43,16 +43,22 @@ function TeamsPage() {
   const isAdmin = roles.includes("admin");
   const qc = useQueryClient();
 
+  const [showArchived, setShowArchived] = useState(false);
+
   const { data: teams, isLoading } = useQuery({
-    queryKey: ["teams-with-counts", activeClubId],
+    queryKey: ["teams-with-counts", activeClubId, isAdmin && showArchived],
     enabled: !!activeClubId,
     queryFn: async () => {
-      const { data: ts } = await supabase
+      let q = supabase
         .from("teams")
-        .select("id, name, season, sport, age_group, championship, competitions, image_url")
+        .select(
+          "id, name, season, sport, age_group, championship, competitions, image_url, archived_at",
+        )
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .order("name");
+      if (!isAdmin || !showArchived) q = q.is("archived_at", null);
+      const { data: ts } = await q;
       if (!ts) return [];
       const { data: tm } = await supabase
         .from("team_members")
