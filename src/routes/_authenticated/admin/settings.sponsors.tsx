@@ -616,6 +616,95 @@ function SponsorsSettingsPage() {
                   })}
                 </p>
               </div>
+
+              {editing.logoPreviewUrl && (
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {t("sponsor.admin.previewTitle", {
+                      defaultValue: "Aperçu sur la page d'accueil",
+                    })}
+                  </Label>
+                  <div className="overflow-hidden rounded-lg border border-border bg-background">
+                    <SponsorBannerFrame label={t("sponsor.thanksLabel")}>
+                      <SponsorLogo
+                        src={editing.logoPreviewUrl}
+                        alt={
+                          editing.name ||
+                          t("sponsor.admin.previewAlt", {
+                            defaultValue: "Aperçu du logo du partenaire",
+                          })
+                        }
+                        maxHeight={
+                          SPONSOR_LOGO_MAX_HEIGHT * clampSponsorLogoScale(editing.logoScale)
+                        }
+                        maxWidth={
+                          SPONSOR_LOGO_MAX_WIDTH * clampSponsorLogoScale(editing.logoScale)
+                        }
+                      />
+                    </SponsorBannerFrame>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">
+                        {t("sponsor.admin.logoSize", { defaultValue: "Taille du logo" })}
+                      </Label>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {t("sponsor.admin.logoSizePercent", {
+                          percent: Math.round(editing.logoScale * 100),
+                          defaultValue: "{{percent}} %",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { key: "logoSizeSmall", value: 0.85, defaultValue: "Petit" },
+                        {
+                          key: "logoSizeDefault",
+                          value: SPONSOR_LOGO_DEFAULT_SCALE,
+                          defaultValue: "Standard",
+                        },
+                        { key: "logoSizeLarge", value: 1.2, defaultValue: "Grand" },
+                      ].map((preset) => {
+                        const active = Math.abs(editing.logoScale - preset.value) < 0.001;
+                        return (
+                          <Button
+                            key={preset.key}
+                            type="button"
+                            size="sm"
+                            variant={active ? "default" : "outline"}
+                            onClick={() =>
+                              setEditing({ ...editing, logoScale: preset.value })
+                            }
+                          >
+                            {t(`sponsor.admin.${preset.key}`, {
+                              defaultValue: preset.defaultValue,
+                            })}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <Slider
+                      value={[Math.round(editing.logoScale * 100)]}
+                      min={Math.round(SPONSOR_LOGO_MIN_SCALE * 100)}
+                      max={Math.round(SPONSOR_LOGO_MAX_SCALE * 100)}
+                      step={5}
+                      onValueChange={([v]) =>
+                        setEditing({
+                          ...editing,
+                          logoScale: clampSponsorLogoScale((v ?? 100) / 100),
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t("sponsor.admin.logoSizeHint", {
+                        defaultValue:
+                          "Ajustez la taille telle qu'elle apparaîtra aux membres.",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Switch
                   checked={editing.isActive}
