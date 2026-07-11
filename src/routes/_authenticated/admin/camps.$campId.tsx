@@ -145,6 +145,7 @@ function CampEditPage() {
             description: form.description.trim() || null,
             venue_id: form.venue_id,
             facility_id: form.facility_id,
+            external_location: form.external_location.trim() || null,
             start_date: fromDateInput(form.start_date) ?? undefined,
             end_date: fromDateInput(form.end_date) ?? undefined,
             registration_deadline: fromDateInput(form.registration_deadline),
