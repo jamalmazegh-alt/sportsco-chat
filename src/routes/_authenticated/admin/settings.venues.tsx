@@ -463,7 +463,7 @@ function VenueEditDialog({
             <Label>{t("venues.field.address", { defaultValue: "Adresse" })}</Label>
             <LocationAutocomplete
               value={draft.address ?? ""}
-              onChange={(v) => setDraft({ ...draft, address: v })}
+              onChange={(v: string) => setDraft({ ...draft, address: v })}
               placeholder="12 rue du Stade, 75000 Paris"
             />
           </div>
