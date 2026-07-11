@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
