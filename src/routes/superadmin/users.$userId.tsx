@@ -255,6 +255,12 @@ function UserDetail() {
         </p>
       </section>
 
+      <OnboardingProgress
+        title="User onboarding"
+        className="mb-6"
+        steps={buildUserOnboardingSteps(data)}
+      />
+
       <div className="grid md:grid-cols-2 gap-4 mb-6">
         <InfoCard
           icon={Calendar}
