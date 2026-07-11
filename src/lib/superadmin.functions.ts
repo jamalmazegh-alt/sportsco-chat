@@ -999,7 +999,16 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
     const teamIds = (teams ?? []).map((t) => t.id);
     const userIds = (members ?? []).map((m) => m.user_id);
 
-    const [{ data: profiles }, { data: recentEvents }, { data: recentConvos }] = await Promise.all([
+    const [
+      { data: profiles },
+      { data: recentEvents },
+      { data: recentConvos },
+      playersCountRes,
+      invitesCountRes,
+      publishedEventsCountRes,
+      sponsorsCountRes,
+      paymentSettingsRes,
+    ] = await Promise.all([
       userIds.length
         ? supabaseAdmin
             .from("profiles")
@@ -1021,6 +1030,30 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
             .order("created_at", { ascending: false })
             .limit(150)
         : Promise.resolve({ data: [] as never[] }),
+      supabaseAdmin
+        .from("players")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", data.club_id),
+      supabaseAdmin
+        .from("member_invites")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", data.club_id),
+      teamIds.length
+        ? supabaseAdmin
+            .from("events")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "published")
+            .in("team_id", teamIds)
+        : Promise.resolve({ count: 0 }),
+      supabaseAdmin
+        .from("sponsors")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", data.club_id),
+      supabaseAdmin
+        .from("club_payment_settings")
+        .select("club_id")
+        .eq("club_id", data.club_id)
+        .maybeSingle(),
     ]);
 
     // Filter convos to events of this club via recent events list (cheap heuristic).
@@ -1040,8 +1073,16 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
       recent_events: recentEvents ?? [],
       recent_convocations: clubConvos,
       whatsapp_configured_count: (teams ?? []).filter((t) => !!t.whatsapp_group_url).length,
+      counts: {
+        players: playersCountRes.count ?? 0,
+        invites: invitesCountRes.count ?? 0,
+        published_events: publishedEventsCountRes.count ?? 0,
+        sponsors: sponsorsCountRes.count ?? 0,
+        has_payment_settings: !!paymentSettingsRes.data,
+      },
     };
   });
+
 
 /** Suspends a club (alias for archive with a reason). */
 export const suspendClub = archiveClub;
