@@ -96,7 +96,10 @@ export type EventFormValues = {
   convocation_time: string | null;
   attachments?: Attachment[] | null;
   is_official?: boolean | null;
+  venue_id?: string | null;
+  facility_id?: string | null;
 };
+
 
 type Team = { id: string; name: string };
 type TeamOption = Team & { competitions?: string[] | null };
