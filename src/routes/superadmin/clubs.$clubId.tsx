@@ -30,6 +30,7 @@ import {
   formatMoney,
 } from "@/lib/superadmin/ui";
 import { BillingExemptionPanel } from "@/components/superadmin/BillingExemptionPanel";
+import { OnboardingProgress, type OnboardingStep } from "@/components/superadmin/OnboardingProgress";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
