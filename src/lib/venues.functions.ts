@@ -153,7 +153,17 @@ export const updateVenue = createServerFn({ method: "POST" })
       clubId: data.clubId,
       allowedRoles: ["admin"],
     });
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      name?: string;
+      address?: string;
+      city?: string | null;
+      postal_code?: string | null;
+      country?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+      notes?: string | null;
+      is_default?: boolean;
+    } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.address !== undefined) patch.address = data.address;
     if (data.city !== undefined) patch.city = data.city;
@@ -166,6 +176,7 @@ export const updateVenue = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("club_venues")
       .update(patch)
+
       .eq("id", data.venueId)
       .eq("club_id", data.clubId);
     if (error) throw new Error(error.message);
