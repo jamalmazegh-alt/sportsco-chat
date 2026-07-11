@@ -876,37 +876,27 @@ export const getUserDetail = createServerFn({ method: "POST" })
           .limit(10)
       : { data: [] as never[] };
 
-    // Invite provenance: match by email against member_invites + club_invites.
+    // Invite provenance: match member_invites by email (link-based
+    // club_invites are NOT tied to any specific recipient, so we never
+    // attribute them to a user).
     const authEmail = (authRes?.user?.email ?? "").toLowerCase() || null;
-    const [{ data: memberInvites }, { data: clubInvites }] = await Promise.all([
-      authEmail
-        ? supabaseAdmin
-            .from("member_invites")
-            .select(
-              "id, club_id, team_id, role, email, created_at, created_by, used_at, expires_at, first_name, last_name",
-            )
-            .ilike("email", authEmail)
-            .order("created_at", { ascending: false })
-            .limit(10)
-        : Promise.resolve({ data: [] as never[] }),
-      authEmail
-        ? supabaseAdmin
-            .from("club_invites")
-            .select("id, club_id, role, created_at, created_by, expires_at, uses_count, max_uses")
-            .order("created_at", { ascending: false })
-            .limit(10)
-        : Promise.resolve({ data: [] as never[] }),
-    ]);
+    const { data: memberInvites } = authEmail
+      ? await supabaseAdmin
+          .from("member_invites")
+          .select(
+            "id, club_id, team_id, role, email, created_at, created_by, used_at, expires_at, first_name, last_name",
+          )
+          .ilike("email", authEmail)
+          .order("created_at", { ascending: false })
+          .limit(10)
+      : { data: [] as never[] };
 
     const inviteClubIds = Array.from(
-      new Set([...(memberInvites ?? []).map((i) => i.club_id)].filter((v): v is string => !!v)),
+      new Set((memberInvites ?? []).map((i) => i.club_id).filter((v): v is string => !!v)),
     );
     const inviterIds = Array.from(
       new Set(
-        [
-          ...(memberInvites ?? []).map((i) => i.created_by),
-          ...(clubInvites ?? []).map((i) => i.created_by),
-        ].filter((v): v is string => !!v),
+        (memberInvites ?? []).map((i) => i.created_by).filter((v): v is string => !!v),
       ),
     );
     const [{ data: inviteClubs }, { data: inviters }] = await Promise.all([
@@ -928,34 +918,20 @@ export const getUserDetail = createServerFn({ method: "POST" })
       ]),
     );
 
-    const invites = [
-      ...(memberInvites ?? []).map((i) => ({
-        kind: "member" as const,
-        id: i.id,
-        club_id: i.club_id,
-        club: inviteClubMap.get(i.club_id) ?? null,
-        role: i.role as string,
-        team_id: i.team_id,
-        created_at: i.created_at,
-        expires_at: i.expires_at,
-        used_at: i.used_at,
-        invited_by: i.created_by ? (inviterMap.get(i.created_by) ?? null) : null,
-        invited_by_id: i.created_by,
-      })),
-      ...(clubInvites ?? []).map((i) => ({
-        kind: "club_link" as const,
-        id: i.id,
-        club_id: i.club_id,
-        club: inviteClubMap.get(i.club_id) ?? null,
-        role: i.role as string,
-        team_id: null as string | null,
-        created_at: i.created_at,
-        expires_at: i.expires_at,
-        used_at: null as string | null,
-        invited_by: i.created_by ? (inviterMap.get(i.created_by) ?? null) : null,
-        invited_by_id: i.created_by,
-      })),
-    ];
+    const invites = (memberInvites ?? []).map((i) => ({
+      kind: "member" as const,
+      id: i.id,
+      club_id: i.club_id,
+      club: inviteClubMap.get(i.club_id) ?? null,
+      role: i.role as string,
+      team_id: i.team_id,
+      created_at: i.created_at,
+      expires_at: i.expires_at,
+      used_at: i.used_at,
+      invited_by: i.created_by ? (inviterMap.get(i.created_by) ?? null) : null,
+      invited_by_id: i.created_by,
+    }));
+
 
     const eventIds = Array.from(new Set((convos ?? []).map((c) => c.event_id)));
     const { data: events } = eventIds.length
