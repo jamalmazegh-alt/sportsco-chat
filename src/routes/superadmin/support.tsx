@@ -21,6 +21,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { StatusBadge, trialCountdown } from "@/lib/superadmin/ui";
+import { SupportViewLauncher } from "@/components/support-view/SupportViewLauncher";
 
 export const Route = createFileRoute("/superadmin/support")({
   component: SupportPage,
@@ -330,18 +331,28 @@ function SupportPage() {
               </div>
               <ul className="space-y-1 text-sm">
                 {userSummary.clubs.map((m) => (
-                  <li key={m.club_id} className="flex justify-between">
+                  <li key={m.club_id} className="flex justify-between items-center gap-3">
                     <Link
                       to="/superadmin/clubs/$clubId"
                       params={{ clubId: m.club_id }}
-                      className="hover:underline"
+                      className="hover:underline truncate"
                     >
                       {m.club?.name ?? m.club_id}
                       {m.club?.archived_at && (
                         <span className="ml-2 text-xs text-muted-foreground">(archived)</span>
                       )}
                     </Link>
-                    <span className="text-xs text-muted-foreground uppercase">{m.role}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs text-muted-foreground uppercase">{m.role}</span>
+                      {userSummary.profile && (
+                        <SupportViewLauncher
+                          targetUserId={userSummary.profile.id}
+                          clubId={m.club_id}
+                          clubName={m.club?.name ?? null}
+                          targetName={userSummary.profile.full_name ?? null}
+                        />
+                      )}
+                    </div>
                   </li>
                 ))}
                 {userSummary.clubs.length === 0 && (
