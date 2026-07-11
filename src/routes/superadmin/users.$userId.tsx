@@ -334,6 +334,53 @@ function UserDetail() {
         )}
       </Section>
 
+      {/* Invites received (provenance) */}
+      <Section icon={Mailbox} title={`Invites received (${data.invites.length})`}>
+        {data.invites.length === 0 ? (
+          <Empty>No invites match this user's email.</Empty>
+        ) : (
+          <ul className="divide-y divide-border">
+            {data.invites.map((inv) => (
+              <li
+                key={inv.kind + inv.id}
+                className="px-4 py-2.5 flex items-center justify-between gap-3"
+              >
+                <Link
+                  to="/superadmin/clubs/$clubId"
+                  params={{ clubId: inv.club_id }}
+                  className="flex items-center gap-3 min-w-0 hover:underline"
+                >
+                  <Avatar url={inv.club?.logo_url} name={inv.club?.name ?? "?"} size={28} />
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {inv.club?.name ?? inv.club_id.slice(0, 8)}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {inv.kind === "member" ? "Personal invite" : "Shareable link"}
+                      {inv.invited_by ? ` · by ${inv.invited_by}` : ""}
+                      {inv.created_at
+                        ? ` · ${new Date(inv.created_at).toLocaleDateString()}`
+                        : ""}
+                    </div>
+                  </div>
+                </Link>
+                <div className="flex gap-1.5">
+                  <StatusBadge tone={roleTone(inv.role)}>{inv.role}</StatusBadge>
+                  {inv.kind === "member" &&
+                    (inv.used_at ? (
+                      <StatusBadge tone="success">accepted</StatusBadge>
+                    ) : inv.expires_at && new Date(inv.expires_at).getTime() < Date.now() ? (
+                      <StatusBadge tone="danger">expired</StatusBadge>
+                    ) : (
+                      <StatusBadge tone="warn">pending</StatusBadge>
+                    ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
       {/* Teams */}
       <Section icon={UsersIcon} title={`Teams (${data.teams.length})`}>
         {data.teams.length === 0 ? (
