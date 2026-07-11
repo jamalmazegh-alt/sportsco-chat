@@ -20,10 +20,19 @@ export function HomeQuickCards({ clubId, teams }: Props) {
   const { t } = useTranslation();
   const roles = useMyRoles();
   const canCreateTournament = roles.includes("admin") || roles.includes("tournament_manager");
+  const canManageCamps =
+    roles.includes("admin") || roles.includes("dirigeant") || roles.includes("coach");
   const fn = useServerFn(listMyTournaments);
+  const campsFn = useServerFn(listClubCamps);
   const { data, isLoading } = useQuery({
     queryKey: ["home-tournaments", clubId],
     queryFn: () => fn({ data: { club_id: clubId, limit: 10, exclude_completed: true } }),
+    staleTime: 30_000,
+  });
+  const { data: campsData } = useQuery({
+    queryKey: ["home-camps", clubId],
+    queryFn: () => campsFn({ data: { clubId, includeArchived: false } }),
+    enabled: canManageCamps,
     staleTime: 30_000,
   });
 
