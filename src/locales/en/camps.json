@@ -3,7 +3,8 @@
     "add": "Add",
     "back": "Back",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "save": "Save"
   },
   "chooser": {
     "title": "New camp",
@@ -53,9 +54,7 @@
       "title": "Club camps – Clubero",
       "description": "Create, publish and manage the camps run by your club."
     },
-    "edit": {
-      "title": "Edit camp – Clubero"
-    }
+    "edit": { "title": "Edit camp – Clubero" }
   },
   "list": {
     "title": "Club camps",
@@ -65,6 +64,18 @@
     "create": "Create draft",
     "empty": "No camps yet.",
     "hasVenue": "Venue set"
+  },
+  "filters": {
+    "searchPlaceholder": "Search…",
+    "count": "{{shown}} / {{total}}",
+    "noResults": "No camps match these filters.",
+    "status": { "all": "All statuses" },
+    "sort": {
+      "startDesc": "Start date ↓",
+      "startAsc": "Start date ↑",
+      "titleAsc": "Title A→Z",
+      "createdDesc": "Recently created"
+    }
   },
   "status": {
     "draft": "Draft",
@@ -76,6 +87,12 @@
     "sectionInfo": "Information",
     "sectionVenue": "Venue",
     "sectionAgeGroups": "Age groups",
+    "sectionProgram": "Program",
+    "sectionProgramHint": "Describe the schedule. Drag and drop to reorder.",
+    "sectionDocuments": "Provided documents",
+    "sectionDocumentsHint": "Files shared with families (rules, detailed schedule, map…).",
+    "sectionRequired": "Required documents",
+    "sectionRequiredHint": "What each family must upload at registration.",
     "title": "Title",
     "titlePlaceholder": "Easter camp U9-U11",
     "slug": "Slug (URL)",
@@ -129,6 +146,45 @@
     "archived": "Camp archived",
     "publicUrl": "Public link",
     "publicUrlSoon": "public page coming soon"
+  },
+  "duplicate": {
+    "action": "Duplicate",
+    "done": "Camp duplicated",
+    "hint": "Create a draft copy (without registrations)."
+  },
+  "program": {
+    "add": "Add a step",
+    "addTitle": "Add to program",
+    "editTitle": "Edit step",
+    "empty": "No steps yet.",
+    "startsAt": "Start",
+    "endsAt": "End",
+    "titlePlaceholder": "E.g. Welcome and warm-up",
+    "descPlaceholder": "Description (optional)"
+  },
+  "documents": {
+    "addTitle": "Add a document",
+    "empty": "No documents provided yet.",
+    "maxHint": "PDF, JPG or PNG — max 15 MB.",
+    "titlePlaceholder": "E.g. Rules and regulations",
+    "tooLarge": "File too large (max 15 MB).",
+    "upload": "Upload",
+    "uploaded": "Document added"
+  },
+  "required": {
+    "add": "Add a required document",
+    "addTitle": "Add a required document",
+    "editTitle": "Edit required document",
+    "empty": "No required documents yet.",
+    "mandatory": "Mandatory",
+    "mandatoryTag": "Mandatory",
+    "optionalTag": "Optional",
+    "sensitive": "Sensitive data",
+    "sensitiveForced": "Locked — this category is always treated as sensitive.",
+    "sensitiveHint": "Sensitive data has restricted access and faster purge.",
+    "sensitiveTag": "Sensitive",
+    "titlePlaceholder": "E.g. Medical certificate",
+    "type": "Type"
   },
   "delete": {
     "title": "Delete this draft?",
