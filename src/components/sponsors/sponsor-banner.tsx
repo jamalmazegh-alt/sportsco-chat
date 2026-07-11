@@ -55,7 +55,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isVisibleRef = useRef(false);
   const [imgFailed, setImgFailed] = useState(false);
-  const [logoHeight, setLogoHeight] = useState<number>(SPONSOR_LOGO_MIN_HEIGHT);
 
   const list = useMemo<Sponsor[]>(() => sponsors ?? [], [sponsors]);
 
@@ -69,7 +68,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
 
   useEffect(() => {
     setImgFailed(false);
-    setLogoHeight(SPONSOR_LOGO_MIN_HEIGHT);
   }, [current?.id]);
 
   // Impression tracking — >50% visible ~1s, gated by document visibility.
