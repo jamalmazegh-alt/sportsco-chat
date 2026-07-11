@@ -14,19 +14,11 @@ import {
   MapPin,
   Tag,
   Loader2,
-  Plus,
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
 import {
