@@ -615,7 +615,10 @@ export function EventFormSheet({
       convocationTime: eventConvocationTime,
       isOfficial: type === "tournament" ? isOfficial : false,
       attachments: attachments as unknown as Record<string, unknown>[],
+      venueId,
+      facilityId,
     };
+
 
     function invalidateEventsCaches() {
       queryClient.invalidateQueries({ queryKey: ["events"] });
