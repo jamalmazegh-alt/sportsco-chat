@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Zum Vereinsmitglied befördern",
     "rolesUpdated": "Rollen aktualisiert",
     "hubSponsors": "Sponsoren",
-    "hubSponsorsHint": "Zeige deine Partner ganz oben auf der Startseite"
+    "hubSponsorsHint": "Zeige deine Partner ganz oben auf der Startseite",
+    "hubVenues": "Anlagen & Plätze",
+    "hubVenuesHint": "Vereinsanlagen und Plätze werden bei der Erstellung vorausgefüllt"
   },
   "attachments": {
     "add": "Datei hinzufügen",
@@ -1745,6 +1747,10 @@
       "title": "Turniere — Live-Ergebnisse, öffentliche Tabellen, TV-Modus | Clubero",
       "description": "Organisiere moderne Turniere mit Live-Ergebnissen, öffentlichen Tabellen, mobilem Schiedsrichter-Modus und TV-Modus. Gedacht für Organisatoren, Spieler, Eltern und Fans.",
       "ogDescription": "Moderne, lebendige und öffentliche Turniere. Gemacht für den Platz und die Bildschirme."
+    },
+    "adminVenues": {
+      "title": "Anlagen & Plätze – Clubero",
+      "description": "Konfiguriere Standorte und Plätze deines Vereins."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Groß",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Passen Sie die Größe so an, wie sie den Mitgliedern angezeigt wird."
+    }
+  },
+  "venues": {
+    "pageTitle": "Anlagen & Plätze",
+    "pageSubtitle": "Standorte und Plätze des Vereins, bei Terminen wiederverwendet.",
+    "addSite": "Standort hinzufügen",
+    "editSite": "Standort bearbeiten",
+    "addField": "Platz hinzufügen",
+    "editField": "Platz bearbeiten",
+    "emptyState": "Kein Standort. Füge einen hinzu.",
+    "facilitiesTitle": "Plätze / Anlagen",
+    "noFacilities": "Keine Plätze für diesen Standort.",
+    "defaultBadge": "Standard",
+    "toggleDefault": "Standardstandort",
+    "confirmDeleteSite": "Diesen Standort löschen?",
+    "confirmDeleteField": "Diesen Platz löschen?",
+    "field": {
+      "name": "Name",
+      "address": "Adresse",
+      "city": "Stadt",
+      "postalCode": "PLZ",
+      "notes": "Notizen",
+      "isDefault": "Standardstandort",
+      "isDefaultField": "Standardplatz",
+      "surface": "Belag",
+      "sport": "Sportart (optional)"
+    },
+    "picker": {
+      "siteLabel": "Standort",
+      "sitePlaceholder": "Standort wählen",
+      "facilityLabel": "Platz / Anlage",
+      "facilityPlaceholder": "Platz wählen",
+      "noFacilitiesHint": "Kein Platz konfiguriert."
     }
   }
 }

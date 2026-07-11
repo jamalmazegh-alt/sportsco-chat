@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Promote to club member",
     "rolesUpdated": "Roles updated",
     "hubSponsors": "Sponsors",
-    "hubSponsorsHint": "Show your partners at the top of the home screen"
+    "hubSponsorsHint": "Show your partners at the top of the home screen",
+    "hubVenues": "Venues & fields",
+    "hubVenuesHint": "Club sites and fields prefilled on event creation"
   },
   "attachments": {
     "add": "Add file",
@@ -1745,6 +1747,10 @@
       "title": "Tournaments — Live scores, public standings, TV mode | Clubero",
       "description": "Run modern tournaments with live scores, public standings, mobile referees and TV mode. Built for organizers, players, parents and fans.",
       "ogDescription": "Modern, live and community-driven tournaments. Built for the field and the big screen."
+    },
+    "adminVenues": {
+      "title": "Venues – Clubero",
+      "description": "Configure your club sites and fields."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Large",
       "logoSizePercent": "{{percent}}%",
       "logoSizeHint": "Adjust the size as it will appear to members."
+    }
+  },
+  "venues": {
+    "pageTitle": "Venues & fields",
+    "pageSubtitle": "Club sites and their fields, reused when creating events.",
+    "addSite": "Add site",
+    "editSite": "Edit site",
+    "addField": "Add field",
+    "editField": "Edit field",
+    "emptyState": "No site configured. Add one to prefill your events.",
+    "facilitiesTitle": "Fields / facilities",
+    "noFacilities": "No field for this site.",
+    "defaultBadge": "Default",
+    "toggleDefault": "Default site",
+    "confirmDeleteSite": "Delete this site?",
+    "confirmDeleteField": "Delete this field?",
+    "field": {
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "notes": "Notes",
+      "isDefault": "Default site",
+      "isDefaultField": "Default field",
+      "surface": "Surface",
+      "sport": "Sport (optional)"
+    },
+    "picker": {
+      "siteLabel": "Site",
+      "sitePlaceholder": "Pick a site",
+      "facilityLabel": "Field / facility",
+      "facilityPlaceholder": "Pick a field",
+      "noFacilitiesHint": "No field configured for this site."
     }
   }
 }

@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Promouvoir membre du club",
     "rolesUpdated": "Rôles mis à jour",
     "hubSponsors": "Sponsors",
-    "hubSponsorsHint": "Affichez vos partenaires en haut de la page d'accueil"
+    "hubSponsorsHint": "Affichez vos partenaires en haut de la page d'accueil",
+    "hubVenues": "Lieux et terrains",
+    "hubVenuesHint": "Sites et terrains du club préremplis à la création d'événement"
   },
   "attachments": {
     "add": "Ajouter un fichier",
@@ -1745,6 +1747,10 @@
       "title": "Tournois — Scores live, classements publics, mode TV | Clubero",
       "description": "Organisez des tournois modernes avec scores en direct, classements publics, arbitrage mobile et mode TV. Pensé pour les organisateurs, joueurs, parents et supporters.",
       "ogDescription": "Des tournois modernes, vivants et publics. Pensés pour le terrain et les écrans."
+    },
+    "adminVenues": {
+      "title": "Lieux et terrains – Clubero",
+      "description": "Configurez les sites et terrains de votre club."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Grand",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Ajustez la taille telle qu'elle apparaîtra aux membres."
+    }
+  },
+  "venues": {
+    "pageTitle": "Lieux et terrains",
+    "pageSubtitle": "Sites du club et terrains associés, réutilisés à la création d'événements.",
+    "addSite": "Ajouter un site",
+    "editSite": "Modifier le site",
+    "addField": "Ajouter un terrain",
+    "editField": "Modifier le terrain",
+    "emptyState": "Aucun site configuré. Ajoutez-en un pour préremplir vos événements.",
+    "facilitiesTitle": "Terrains / installations",
+    "noFacilities": "Aucun terrain pour ce site.",
+    "defaultBadge": "Défaut",
+    "toggleDefault": "Site par défaut",
+    "confirmDeleteSite": "Supprimer ce site ?",
+    "confirmDeleteField": "Supprimer ce terrain ?",
+    "field": {
+      "name": "Nom",
+      "address": "Adresse",
+      "city": "Ville",
+      "postalCode": "Code postal",
+      "notes": "Notes",
+      "isDefault": "Site par défaut",
+      "isDefaultField": "Terrain par défaut",
+      "surface": "Surface",
+      "sport": "Sport (optionnel)"
+    },
+    "picker": {
+      "siteLabel": "Site",
+      "sitePlaceholder": "Choisir un site",
+      "facilityLabel": "Terrain / installation",
+      "facilityPlaceholder": "Choisir un terrain",
+      "noFacilitiesHint": "Aucun terrain configuré pour ce site."
     }
   }
 }

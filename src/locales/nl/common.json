@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Promoveer tot Clublid",
     "rolesUpdated": "Rollen bijgewerkt",
     "hubSponsors": "Sponsors",
-    "hubSponsorsHint": "Toon je partners bovenaan het startscherm"
+    "hubSponsorsHint": "Toon je partners bovenaan het startscherm",
+    "hubVenues": "Locaties en velden",
+    "hubVenuesHint": "Clublocaties en velden vooraf ingevuld bij het aanmaken"
   },
   "attachments": {
     "add": "Bestand toevoegen",
@@ -1745,6 +1747,10 @@
       "title": "Toernooien — Live uitslagen, openbare standen, TV-modus | Clubero",
       "description": "Organiseer moderne Toernooien met live uitslagen, openbare standen, mobiele Scheidsrechter-modus en TV-modus. Bedoeld voor organisatoren, Spelers, Ouders en fans.",
       "ogDescription": "Moderne, levendige en openbare Toernooien. Gemaakt voor op het veld en op schermen."
+    },
+    "adminVenues": {
+      "title": "Locaties en velden – Clubero",
+      "description": "Configureer locaties en velden van je club."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Groot",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Pas de grootte aan zoals deze aan leden wordt weergegeven."
+    }
+  },
+  "venues": {
+    "pageTitle": "Locaties en velden",
+    "pageSubtitle": "Clublocaties en bijhorende velden, hergebruikt bij het maken van events.",
+    "addSite": "Locatie toevoegen",
+    "editSite": "Locatie bewerken",
+    "addField": "Veld toevoegen",
+    "editField": "Veld bewerken",
+    "emptyState": "Geen locaties.",
+    "facilitiesTitle": "Velden / accommodaties",
+    "noFacilities": "Geen velden voor deze locatie.",
+    "defaultBadge": "Standaard",
+    "toggleDefault": "Standaardlocatie",
+    "confirmDeleteSite": "Deze locatie verwijderen?",
+    "confirmDeleteField": "Dit veld verwijderen?",
+    "field": {
+      "name": "Naam",
+      "address": "Adres",
+      "city": "Stad",
+      "postalCode": "Postcode",
+      "notes": "Notities",
+      "isDefault": "Standaardlocatie",
+      "isDefaultField": "Standaardveld",
+      "surface": "Ondergrond",
+      "sport": "Sport (optioneel)"
+    },
+    "picker": {
+      "siteLabel": "Locatie",
+      "sitePlaceholder": "Kies een locatie",
+      "facilityLabel": "Veld / accommodatie",
+      "facilityPlaceholder": "Kies een veld",
+      "noFacilitiesHint": "Geen veld geconfigureerd."
     }
   }
 }
