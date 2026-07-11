@@ -40,7 +40,12 @@ export interface BuildEventPayloadInput {
   /** Links a child event to its training_series. */
   seriesId?: string | null;
   attachments?: EventAttachment[] | null;
+  /** Structured link to a preconfigured club venue (site). */
+  venueId?: string | null;
+  /** Structured link to a preconfigured facility (field) within the venue. */
+  facilityId?: string | null;
 }
+
 
 /** The shape inserted into `events` (without insert-meta: status/created_by/...). */
 export interface EventRowPayload {
