@@ -31,10 +31,26 @@ export function StatusBadge({
   );
 }
 
-export function subTone(status?: string | null): {
+export type SubToneInput =
+  | string
+  | null
+  | undefined
+  | {
+      status?: string | null;
+      exempt_from_billing?: boolean | null;
+      exempt_until?: string | null;
+    };
+
+export function subTone(input?: SubToneInput): {
   tone: keyof typeof TONES;
   label: string;
 } {
+  const status = typeof input === "string" || input == null ? input : input.status;
+  const exempt =
+    typeof input === "object" && input != null && input.exempt_from_billing === true
+      ? !input.exempt_until || new Date(input.exempt_until).getTime() > Date.now()
+      : false;
+  if (exempt) return { tone: "success", label: "exempté" };
   if (!status) return { tone: "muted", label: "no sub" };
   switch (status) {
     case "active":
@@ -51,6 +67,7 @@ export function subTone(status?: string | null): {
       return { tone: "muted", label: status };
   }
 }
+
 
 export function roleTone(role?: string | null): keyof typeof TONES {
   switch (role) {
