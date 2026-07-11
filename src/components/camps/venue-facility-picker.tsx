@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -45,10 +46,13 @@ export function VenueFacilityPicker({
   const selectedVenue = list.find((v) => v.id === venueId);
   const facilities = selectedVenue?.facilities ?? [];
 
-  // Mode is inferred from current values, but user can flip explicitly.
-  const mode: "home" | "external" = externalLocation && !venueId ? "external" : "home";
+  // Mode is tracked locally so the user can switch to "external" before typing.
+  const [mode, setModeState] = useState<"home" | "external">(
+    externalLocation !== null && externalLocation !== "" && !venueId ? "external" : "home",
+  );
 
   function setMode(next: "home" | "external") {
+    setModeState(next);
     if (next === "home") {
       onChange({ venueId, facilityId, externalLocation: null });
     } else {
