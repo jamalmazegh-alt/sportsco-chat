@@ -158,41 +158,12 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
             {current.name}
           </span>
         ) : (
-          <img
+          <SponsorLogo
             src={current.logo_url!}
             alt={current.name}
-            style={{
-              height: `${logoHeight}px`,
-              maxWidth: `${SPONSOR_LOGO_MAX_WIDTH}px`,
-            }}
-            className="w-auto object-contain"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              const nw = img.naturalWidth;
-              const nh = img.naturalHeight;
-              if (!nw || !nh) return;
-              // Derive height from natural aspect ratio, clamped, and
-              // capped so the image never exceeds SPONSOR_LOGO_MAX_WIDTH.
-              const ratio = nw / nh; // >1 = landscape, <1 = portrait
-              // Wider logos get more vertical room so text stays readable.
-              const target = Math.round(
-                Math.min(
-                  SPONSOR_LOGO_MAX_HEIGHT,
-                  Math.max(SPONSOR_LOGO_MIN_HEIGHT, 44 + (ratio - 1) * 22),
-                ),
-              );
-              const widthAtTarget = target * ratio;
-              const finalHeight =
-                widthAtTarget > SPONSOR_LOGO_MAX_WIDTH
-                  ? Math.max(
-                      SPONSOR_LOGO_MIN_HEIGHT,
-                      Math.round(SPONSOR_LOGO_MAX_WIDTH / ratio),
-                    )
-                  : target;
-              setLogoHeight(finalHeight);
-            }}
+            maxHeight={SPONSOR_LOGO_MAX_HEIGHT}
+            maxWidth={SPONSOR_LOGO_MAX_WIDTH}
             onError={() => setImgFailed(true)}
-            loading="lazy"
           />
         )}
       </span>
