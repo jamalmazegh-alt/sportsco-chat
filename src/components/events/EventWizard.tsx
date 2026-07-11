@@ -906,7 +906,17 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               subtitle="On se déplace"
               color="blue"
               active={state.isHome === "away"}
-              onClick={() => answer("isHome", "away")}
+              onClick={() => {
+                setState((s) => ({
+                  ...s,
+                  isHome: "away",
+                  venueId: null,
+                  facilityId: null,
+                  location: "",
+                  locationUrl: null,
+                  step: s.step + 1,
+                }));
+              }}
             />
           </StepQuestion>
         )}
