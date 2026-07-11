@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 
 /**
- * SponsorLogo — affiche un logo sponsor en supprimant automatiquement
- * les marges blanches/transparentes, puis en adaptant la taille au ratio
- * du contenu réel (logo bandeau → plus large, logo carré → plus haut).
+ * SponsorLogo — trim automatique des marges blanches/transparentes,
+ * puis dimensionnement par poids visuel : on vise une quantité d'encre
+ * affichée constante (surface × densité), amortie en racine carrée et
+ * bornée. Les logos denses (Nike) sont réduits, les logos épars (texte
+ * fin, cartes de visite) agrandis.
  */
 
-type Trimmed = { url: string; ratio: number };
+type Trimmed = {
+  url: string;
+  ratio: number; // largeur / hauteur
+  density: number; // proportion de pixels "utiles" dans la bbox (0..1)
+};
 
 const cache = new Map<string, Trimmed>();
 
@@ -41,7 +47,11 @@ async function trimLogo(src: string): Promise<Trimmed> {
   try {
     data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
   } catch {
-    const fallback = { url: src, ratio: img.naturalWidth / img.naturalHeight };
+    const fallback = {
+      url: src,
+      ratio: img.naturalWidth / img.naturalHeight,
+      density: 0.25,
+    };
     cache.set(src, fallback);
     return fallback;
   }
@@ -50,9 +60,11 @@ async function trimLogo(src: string): Promise<Trimmed> {
   let bottom = 0;
   let left = canvas.width;
   let right = 0;
+  let ink = 0;
   for (let y = 0; y < canvas.height; y++) {
     for (let x = 0; x < canvas.width; x++) {
       if (!isEmpty(data, (y * canvas.width + x) * 4)) {
+        ink++;
         if (y < top) top = y;
         if (y > bottom) bottom = y;
         if (x < left) left = x;
@@ -62,7 +74,11 @@ async function trimLogo(src: string): Promise<Trimmed> {
   }
 
   if (right <= left || bottom <= top) {
-    const fallback = { url: src, ratio: img.naturalWidth / img.naturalHeight };
+    const fallback = {
+      url: src,
+      ratio: img.naturalWidth / img.naturalHeight,
+      density: 0.25,
+    };
     cache.set(src, fallback);
     return fallback;
   }
@@ -87,7 +103,7 @@ async function trimLogo(src: string): Promise<Trimmed> {
     url = src;
   }
 
-  const result = { url, ratio: w / h };
+  const result = { url, ratio: w / h, density: ink / (w * h) };
   cache.set(src, result);
   return result;
 }
@@ -95,9 +111,9 @@ async function trimLogo(src: string): Promise<Trimmed> {
 interface Props {
   src: string;
   alt?: string;
-  /** Hauteur max du slot en px (défaut 72) */
+  /** Hauteur max du slot en px */
   maxHeight?: number;
-  /** Largeur max du slot en px (défaut 240) */
+  /** Largeur max du slot en px */
   maxWidth?: number;
   className?: string;
   onError?: () => void;
@@ -107,7 +123,7 @@ export function SponsorLogo({
   src,
   alt = "",
   maxHeight = 96,
-  maxWidth = 320,
+  maxWidth = 420,
   className,
   onError,
 }: Props) {
@@ -121,7 +137,7 @@ export function SponsorLogo({
         if (alive) setLogo(t);
       })
       .catch(() => {
-        if (alive) setLogo({ url: src, ratio: 3 });
+        if (alive) setLogo({ url: src, ratio: 3, density: 0.25 });
       });
     return () => {
       alive = false;
@@ -132,17 +148,31 @@ export function SponsorLogo({
     return (
       <div
         className={className}
-        style={{ height: maxHeight, width: Math.min(maxWidth, maxHeight * 3) }}
+        style={{ height: maxHeight * 0.8, width: Math.min(maxWidth, maxHeight * 3) * 0.8 }}
         aria-hidden
       />
     );
   }
 
-  const slotRatio = maxWidth / maxHeight;
-  const style =
-    logo.ratio >= slotRatio
-      ? { width: maxWidth, height: maxWidth / logo.ratio }
-      : { height: maxHeight, width: maxHeight * logo.ratio };
+  // Dimensionnement par poids visuel : on vise une "quantité d'encre affichée"
+  // constante — surface × densité ≈ constante. Amorti en racine, borné [0.65, 1.5].
+  const REF_DENSITY = 0.2;
+  const BASE_AREA = maxHeight * 0.75 * Math.min(maxWidth, maxHeight * 3);
+  const d = Math.min(Math.max(logo.density, 0.02), 0.9);
+  const scale = Math.min(Math.max(Math.sqrt(REF_DENSITY / d), 0.65), 1.5);
+  const area = BASE_AREA * scale * scale;
+
+  let h = Math.sqrt(area / logo.ratio);
+  let w = h * logo.ratio;
+  if (h > maxHeight) {
+    h = maxHeight;
+    w = h * logo.ratio;
+  }
+  if (w > maxWidth) {
+    w = maxWidth;
+    h = w / logo.ratio;
+  }
+  const style = { width: Math.round(w), height: Math.round(h) };
 
   return (
     <img
