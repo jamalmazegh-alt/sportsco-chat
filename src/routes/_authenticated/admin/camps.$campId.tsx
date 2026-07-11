@@ -208,6 +208,16 @@ function CampEditPage() {
     onError: (e: Error) => toast.error(mapErr(e.message, t)),
   });
 
+  const duplicateMut = useMutation({
+    mutationFn: () => duplicateFn({ data: { campId } }),
+    onSuccess: (res) => {
+      toast.success(t("duplicate.done", { defaultValue: "Stage dupliqué" }));
+      qc.invalidateQueries({ queryKey: ["club-camps"] });
+      navigate({ to: "/admin/camps/$campId", params: { campId: res.id } });
+    },
+    onError: (e: Error) => toast.error(mapErr(e.message, t)),
+  });
+
   if (!canManage) return <Navigate to="/profile" replace />;
   if (isLoading || !camp) {
     return (
