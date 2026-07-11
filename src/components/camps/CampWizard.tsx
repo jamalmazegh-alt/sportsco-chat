@@ -168,6 +168,9 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
       }
       if (state.venueId) patchBody.venue_id = state.venueId;
       if (state.facilityId) patchBody.facility_id = state.facilityId;
+      if (!state.venueId && state.externalLocation.trim()) {
+        patchBody.external_location = state.externalLocation.trim();
+      }
       if (Object.keys(patchBody).length > 0) {
         await updateFn({ data: { campId: created.id, patch: patchBody } });
       }
