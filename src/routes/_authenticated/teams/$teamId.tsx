@@ -585,15 +585,34 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
-  // Players who still need an invite: no linked account, at least one contact,
-  // and no pending invite already recorded for them.
+  // Helper: does this player still have at least one contact (self or parent)
+  // that is neither linked to an account nor already pending an invite?
+  const hasOpenContact = useCallback(
+    (p: any): boolean => {
+      const pending = pendingInvitesByPlayer?.get(p.id);
+      const isPending = (email?: string | null, phone?: string | null) => {
+        if (!pending) return false;
+        const e = (email ?? "").toLowerCase().trim();
+        const ph = (phone ?? "").trim();
+        return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
+      };
+      if (!p.user_id && (p.email || p.phone) && !isPending(p.email, p.phone)) return true;
+      const parents = parentsByPlayer?.get(p.id) ?? [];
+      return parents.some(
+        (pr) =>
+          !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
+      );
+    },
+    [pendingInvitesByPlayer, parentsByPlayer],
+  );
+
+  // Players who still need an invite: no linked account, and at least one
+  // contact (self or parent) that isn't already linked or pending.
   const invitableIds = useMemo(() => {
-    const pending = pendingInvitePlayerIds ?? new Set<string>();
-    const withParent = playersWithParentContact ?? new Set<string>();
     return ((players ?? []) as any[])
-      .filter((p) => !p.user_id && (p.email || p.phone || withParent.has(p.id)) && !pending.has(p.id))
+      .filter((p) => !p.user_id && hasOpenContact(p))
       .map((p) => p.id as string);
-  }, [players, pendingInvitePlayerIds, playersWithParentContact]);
+  }, [players, hasOpenContact]);
 
   async function inviteWholeTeam() {
     if (!user || invitableIds.length === 0) return;
