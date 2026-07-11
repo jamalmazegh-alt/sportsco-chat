@@ -1289,7 +1289,7 @@ export type Database = {
           logo_url?: string | null
           looking_for_coach?: boolean | null
           name: string
-          slug: string
+          slug?: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
           stripe_account_status?: string | null
