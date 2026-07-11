@@ -41,6 +41,15 @@ type ExistingPlayer = {
   phone: string | null;
 };
 
+type PlayerPatch = {
+  jersey_number?: number;
+  license_number?: string;
+  preferred_position?: string;
+  birth_date?: string;
+  email?: string;
+  phone?: string;
+};
+
 const HEADERS = [
   "first_name",
   "last_name",
@@ -228,8 +237,8 @@ function findMatchingPlayer(roster: ExistingPlayer[], row: ParsedRow): ExistingP
   return roster.find((p) => sameName(p, row)) ?? null;
 }
 
-function playerPatch(existing: ExistingPlayer, row: ParsedRow) {
-  const patch: Partial<ExistingPlayer> = {};
+function playerPatch(existing: ExistingPlayer, row: ParsedRow): PlayerPatch {
+  const patch: PlayerPatch = {};
   if (existing.jersey_number == null && row.jersey_number != null) patch.jersey_number = row.jersey_number;
   if (!existing.license_number && row.license_number) patch.license_number = row.license_number;
   if (!existing.preferred_position && row.position) patch.preferred_position = row.position;
