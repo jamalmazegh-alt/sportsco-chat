@@ -1005,19 +1005,21 @@ export function EventFormSheet({
 
         {!(mode === "create" && type === "training" && isRecurring) && (
           <>
-            <VenuePicker
-              clubId={activeClubId ?? undefined}
-              venueId={venueId}
-              facilityId={facilityId}
-              autoApplyDefaults={mode === "create" && !location}
-              onChange={(v: VenuePickerValue | null) => {
-                if (!v) return;
-                setVenueId(v.venueId);
-                setFacilityId(v.facilityId);
-                setLocation(v.location);
-                setLocationUrl(v.locationUrl ?? "");
-              }}
-            />
+            {!(type === "match" && isHome === "away") && (
+              <VenuePicker
+                clubId={activeClubId ?? undefined}
+                venueId={venueId}
+                facilityId={facilityId}
+                autoApplyDefaults={mode === "create" && !location}
+                onChange={(v: VenuePickerValue | null) => {
+                  if (!v) return;
+                  setVenueId(v.venueId);
+                  setFacilityId(v.facilityId);
+                  setLocation(v.location);
+                  setLocationUrl(v.locationUrl ?? "");
+                }}
+              />
+            )}
             <AddressField
               label={t("events.location")}
               value={location ?? ""}
