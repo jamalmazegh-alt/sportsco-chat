@@ -449,6 +449,10 @@ export function EventFormSheet({
   const [attachments, setAttachments] = useState<Attachment[]>(
     (initial?.attachments as Attachment[] | undefined) ?? [],
   );
+  const [venueId, setVenueId] = useState<string | null>(initial?.venue_id ?? null);
+  const [facilityId, setFacilityId] = useState<string | null>(initial?.facility_id ?? null);
+  const { activeClubId } = useAuth();
+
 
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
