@@ -5,6 +5,49 @@
     "cancel": "Annuler",
     "delete": "Supprimer"
   },
+  "chooser": {
+    "title": "Nouveau stage",
+    "subtitle": "Comment veux-tu créer ce stage ?",
+    "assistant": "Créer avec l'assistant",
+    "assistantHint": "Guidé, étape par étape",
+    "classic": "Création rapide",
+    "classicHint": "Titre, dates, capacité"
+  },
+  "wizard": {
+    "title": "Assistant de création",
+    "back": "Retour",
+    "next": "Suivant",
+    "create": "Créer le stage",
+    "optional": "optionnel",
+    "deadlineHint": "Facultatif — doit être avant la date de début.",
+    "venueHint": "Tu peux passer cette étape et l'ajouter plus tard.",
+    "ageGroupsEmpty": "Au moins une catégorie est requise pour publier. Tu pourras en ajouter d'autres après.",
+    "footerReady": "Tout est prêt",
+    "footerProgress": "Étape {{current}} sur {{total}}",
+    "eyebrow": {
+      "title": "Étape 1",
+      "dates": "Étape 2",
+      "capacity": "Étape 3",
+      "venue": "Étape 4",
+      "ageGroups": "Étape 5",
+      "summary": "Récap"
+    },
+    "step": {
+      "title": { "title": "Nom du stage", "hint": "Ce que verront les familles" },
+      "dates": { "title": "Quand ?", "hint": "Début, fin et deadline d'inscription" },
+      "capacity": { "title": "Places et tarif", "hint": "Combien de participants, à quel prix" },
+      "venue": { "title": "Où se passe le stage ?", "hint": "Facultatif — modifiable plus tard" },
+      "ageGroups": { "title": "Catégories d'âge", "hint": "Requis pour publier — sélectionne au moins une catégorie" },
+      "summary": { "title": "Prêt à créer", "hint": "Brouillon créé — publication au prochain écran" }
+    },
+    "summary": {
+      "deadline": "deadline",
+      "places": "places",
+      "venueSet": "Lieu défini",
+      "ageGroups": "Catégories",
+      "next": "Le stage sera créé en brouillon. Tu pourras ajouter description, image, programme et documents avant de publier."
+    }
+  },
   "meta": {
     "list": {
       "title": "Stages du club – Clubero",
@@ -63,7 +106,11 @@
     "addTitle": "Ajouter une catégorie",
     "labelPlaceholder": "Label (ex. U9)",
     "yearMin": "Année min",
-    "yearMax": "Année max"
+    "yearMax": "Année max",
+    "quickAdd": "Ajout rapide",
+    "pickPreset": "Choisir U6 – U19",
+    "allAdded": "Toutes ajoutées",
+    "addCustom": "+ Catégorie personnalisée"
   },
   "cover": {
     "empty": "Aucune image de couverture",

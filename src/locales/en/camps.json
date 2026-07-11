@@ -5,6 +5,49 @@
     "cancel": "Cancel",
     "delete": "Delete"
   },
+  "chooser": {
+    "title": "New camp",
+    "subtitle": "How do you want to create this camp?",
+    "assistant": "Create with the assistant",
+    "assistantHint": "Guided, step by step",
+    "classic": "Quick create",
+    "classicHint": "Title, dates, capacity"
+  },
+  "wizard": {
+    "title": "Creation assistant",
+    "back": "Back",
+    "next": "Next",
+    "create": "Create camp",
+    "optional": "optional",
+    "deadlineHint": "Optional — must be before the start date.",
+    "venueHint": "You can skip this step and add it later.",
+    "ageGroupsEmpty": "At least one age group is required to publish. You can add more later.",
+    "footerReady": "All set",
+    "footerProgress": "Step {{current}} of {{total}}",
+    "eyebrow": {
+      "title": "Step 1",
+      "dates": "Step 2",
+      "capacity": "Step 3",
+      "venue": "Step 4",
+      "ageGroups": "Step 5",
+      "summary": "Summary"
+    },
+    "step": {
+      "title": { "title": "Camp name", "hint": "What families will see" },
+      "dates": { "title": "When?", "hint": "Start, end and registration deadline" },
+      "capacity": { "title": "Spots and price", "hint": "How many participants, at what price" },
+      "venue": { "title": "Where does it take place?", "hint": "Optional — editable later" },
+      "ageGroups": { "title": "Age groups", "hint": "Required to publish — pick at least one category" },
+      "summary": { "title": "Ready to create", "hint": "Draft will be created — publish on the next screen" }
+    },
+    "summary": {
+      "deadline": "deadline",
+      "places": "spots",
+      "venueSet": "Venue set",
+      "ageGroups": "Categories",
+      "next": "The camp will be created as a draft. You can add description, cover image, program and documents before publishing."
+    }
+  },
   "meta": {
     "list": {
       "title": "Club camps – Clubero",
@@ -63,7 +106,11 @@
     "addTitle": "Add an age group",
     "labelPlaceholder": "Label (e.g. U9)",
     "yearMin": "Min year",
-    "yearMax": "Max year"
+    "yearMax": "Max year",
+    "quickAdd": "Quick add",
+    "pickPreset": "Pick U6 – U19",
+    "allAdded": "All added",
+    "addCustom": "+ Custom category"
   },
   "cover": {
     "empty": "No cover image",
