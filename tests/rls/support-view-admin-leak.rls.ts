@@ -232,10 +232,15 @@ afterAll(async () => {
     }
   }
   // Belt-and-braces — global teardown also purges by superadmin_id.
-  await admin
-    .from("support_view_sessions")
-    .delete()
-    .eq("superadmin_id", fx.users.superadmin.userId);
+  // Tolerate schema-cache misses on CI bases where the migration hasn't been applied.
+  try {
+    await admin
+      .from("support_view_sessions")
+      .delete()
+      .eq("superadmin_id", fx.users.superadmin.userId);
+  } catch {
+    // ignore — table may not be exposed on this base
+  }
   // Local-seeded rows: explicit cleanup (cascades handle FK children).
   if (convocationA_otherFamily) {
     await admin.from("convocations").delete().eq("id", convocationA_otherFamily);
