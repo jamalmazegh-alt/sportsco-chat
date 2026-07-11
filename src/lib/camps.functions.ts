@@ -41,6 +41,7 @@ export interface ClubCamp {
   cover_image_url: string | null;
   venue_id: string | null;
   facility_id: string | null;
+  external_location: string | null;
   start_date: string;
   end_date: string;
   price: number | null;
