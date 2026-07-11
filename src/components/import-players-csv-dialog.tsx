@@ -29,6 +29,18 @@ type ParsedRow = {
   parent2_phone: string | null;
 };
 
+type ExistingPlayer = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  jersey_number: number | null;
+  license_number: string | null;
+  preferred_position: string | null;
+  birth_date: string | null;
+  email: string | null;
+  phone: string | null;
+};
+
 const HEADERS = [
   "first_name",
   "last_name",
@@ -178,6 +190,59 @@ function isMinor(birth: string | null): boolean {
   return age < 18;
 }
 
+function normalizeKey(value: string | null | undefined): string {
+  return (value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function normalizePhone(value: string | null | undefined): string {
+  return (value ?? "").replace(/[^+\d]/g, "");
+}
+
+function sameName(a: Pick<ExistingPlayer, "first_name" | "last_name">, row: ParsedRow): boolean {
+  return normalizeKey(a.first_name) === normalizeKey(row.first_name) && normalizeKey(a.last_name) === normalizeKey(row.last_name);
+}
+
+function findMatchingPlayer(roster: ExistingPlayer[], row: ParsedRow): ExistingPlayer | null {
+  const license = normalizeKey(row.license_number);
+  if (license) {
+    const byLicense = roster.find((p) => normalizeKey(p.license_number) === license);
+    if (byLicense) return byLicense;
+  }
+
+  const email = normalizeKey(row.email);
+  if (email) {
+    const byEmail = roster.find((p) => normalizeKey(p.email) === email);
+    if (byEmail) return byEmail;
+  }
+
+  const phone = normalizePhone(row.phone);
+  if (phone) {
+    const byPhone = roster.find((p) => normalizePhone(p.phone) === phone);
+    if (byPhone) return byPhone;
+  }
+
+  return roster.find((p) => sameName(p, row)) ?? null;
+}
+
+function playerPatch(existing: ExistingPlayer, row: ParsedRow) {
+  const patch: Partial<ExistingPlayer> = {};
+  if (existing.jersey_number == null && row.jersey_number != null) patch.jersey_number = row.jersey_number;
+  if (!existing.license_number && row.license_number) patch.license_number = row.license_number;
+  if (!existing.preferred_position && row.position) patch.preferred_position = row.position;
+  if (!existing.birth_date && row.birth_date) patch.birth_date = row.birth_date;
+  if (!existing.email && row.email) patch.email = row.email;
+  if (!existing.phone && row.phone) patch.phone = row.phone;
+  return patch;
+}
+
+function parentDedupeKey(parent: { full_name: string | null; email: string | null; phone: string | null }) {
+  return normalizeKey(parent.email) || normalizePhone(parent.phone) || normalizeKey(parent.full_name);
+}
+
 export function ImportPlayersCsvDialog({
   open,
   onOpenChange,
@@ -254,6 +319,24 @@ export function ImportPlayersCsvDialog({
     let failed = 0;
     const errors: string[] = [];
 
+    const { data: currentMembers, error: currentMembersError } = await supabase
+      .from("team_members")
+      .select(
+        "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone)",
+      )
+      .eq("team_id", teamId)
+      .eq("role", "player");
+
+    if (currentMembersError) {
+      setBusy(false);
+      toast.error(currentMembersError.message);
+      return;
+    }
+
+    const roster: ExistingPlayer[] = (currentMembers ?? [])
+      .map((member: any) => member.players)
+      .filter(Boolean);
+
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const minor = isMinor(r.birth_date);
@@ -292,43 +375,111 @@ export function ImportPlayersCsvDialog({
         setProgress({ done: i + 1, total: rows.length });
         continue;
       }
-      const { data: player, error } = await supabase
-        .from("players")
-        .insert({
-          club_id: clubId,
-          first_name: r.first_name,
-          last_name: r.last_name,
-          jersey_number: r.jersey_number,
-          license_number: r.license_number,
-          preferred_position: r.position,
-          phone: r.phone,
-          email: r.email,
-          birth_date: r.birth_date,
-          can_respond: minor ? false : true,
-          child_platform_access: false,
-        })
-        .select("id")
-        .single();
-      if (error || !player) {
-        failed++;
-        errors.push(`${r.first_name} ${r.last_name}: ${error?.message ?? "insert failed"}`);
-        setProgress({ done: i + 1, total: rows.length });
-        continue;
+      let player = findMatchingPlayer(roster, r);
+      let linkedToTeam = !!player;
+
+      if (!player) {
+        const byLicense = r.license_number
+          ? await supabase
+              .from("players")
+              .select("id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone")
+              .eq("club_id", clubId)
+              .eq("license_number", r.license_number)
+              .maybeSingle()
+          : { data: null, error: null };
+        const byEmail = !byLicense.data && r.email
+          ? await supabase
+              .from("players")
+              .select("id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone")
+              .eq("club_id", clubId)
+              .eq("email", r.email)
+              .maybeSingle()
+          : { data: null, error: null };
+        if (byLicense.error || byEmail.error) {
+          failed++;
+          errors.push(`${r.first_name} ${r.last_name}: ${(byLicense.error ?? byEmail.error)?.message}`);
+          setProgress({ done: i + 1, total: rows.length });
+          continue;
+        }
+        player = (byLicense.data ?? byEmail.data) as ExistingPlayer | null;
       }
-      const { error: tmErr } = await supabase
-        .from("team_members")
-        .insert({ team_id: teamId, player_id: player.id, role: "player" });
-      if (tmErr) {
-        failed++;
-        const msg =
-          (tmErr as any).code === "23505"
-            ? t("players.alreadyInTeam", { defaultValue: "Ce joueur est déjà dans cette équipe" })
-            : tmErr.message;
-        errors.push(`${r.first_name} ${r.last_name}: ${msg}`);
-        setProgress({ done: i + 1, total: rows.length });
-        continue;
+
+      if (player) {
+        const patch = playerPatch(player, r);
+        if (Object.keys(patch).length > 0) {
+          const { error: updateError } = await supabase.from("players").update(patch).eq("id", player.id);
+          if (updateError) {
+            failed++;
+            errors.push(`${r.first_name} ${r.last_name}: ${updateError.message}`);
+            setProgress({ done: i + 1, total: rows.length });
+            continue;
+          }
+          player = { ...player, ...patch };
+        }
+      } else {
+        const { data: newPlayer, error } = await supabase
+          .from("players")
+          .insert({
+            club_id: clubId,
+            first_name: r.first_name,
+            last_name: r.last_name,
+            jersey_number: r.jersey_number,
+            license_number: r.license_number,
+            preferred_position: r.position,
+            phone: r.phone,
+            email: r.email,
+            birth_date: r.birth_date,
+            can_respond: minor ? false : true,
+            child_platform_access: false,
+          })
+          .select("id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone")
+          .single();
+        if (error || !newPlayer) {
+          failed++;
+          errors.push(`${r.first_name} ${r.last_name}: ${error?.message ?? "insert failed"}`);
+          setProgress({ done: i + 1, total: rows.length });
+          continue;
+        }
+        player = newPlayer as ExistingPlayer;
       }
+
+      if (!linkedToTeam) {
+        const { data: alreadyMember } = await supabase
+          .from("team_members")
+          .select("id")
+          .eq("team_id", teamId)
+          .eq("player_id", player.id)
+          .eq("role", "player")
+          .maybeSingle();
+        linkedToTeam = !!alreadyMember;
+      }
+
+      if (!linkedToTeam) {
+        const { error: tmErr } = await supabase
+          .from("team_members")
+          .insert({ team_id: teamId, player_id: player.id, role: "player" });
+        if (tmErr) {
+          failed++;
+          const msg =
+            (tmErr as any).code === "23505"
+              ? t("players.alreadyInTeam", { defaultValue: "Ce joueur est déjà dans cette équipe" })
+              : tmErr.message;
+          errors.push(`${r.first_name} ${r.last_name}: ${msg}`);
+          setProgress({ done: i + 1, total: rows.length });
+          continue;
+        }
+      }
+
+      roster.push(player);
+
+      const { data: currentParents } = await supabase
+        .from("player_parents")
+        .select("full_name, email, phone")
+        .eq("player_id", player.id);
+      const parentKeys = new Set((currentParents ?? []).map(parentDedupeKey).filter(Boolean));
       for (const p of parents) {
+        const key = parentDedupeKey(p);
+        if (key && parentKeys.has(key)) continue;
         await supabase.from("player_parents").insert({
           player_id: player.id,
           parent_user_id: null,
@@ -337,6 +488,7 @@ export function ImportPlayersCsvDialog({
           phone: p.phone,
           can_respond: true,
         });
+        if (key) parentKeys.add(key);
       }
       inserted++;
       setProgress({ done: i + 1, total: rows.length });
