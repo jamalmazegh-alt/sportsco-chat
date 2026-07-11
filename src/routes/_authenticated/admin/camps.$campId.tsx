@@ -110,6 +110,7 @@ function CampEditPage() {
       description: camp.description ?? "",
       venue_id: camp.venue_id,
       facility_id: camp.facility_id,
+      external_location: camp.external_location ?? "",
       start_date: toDateInput(camp.start_date),
       end_date: toDateInput(camp.end_date),
       registration_deadline: toDateInput(camp.registration_deadline),
