@@ -2188,7 +2188,15 @@
       "colClicks": "Clics",
       "colCtr": "Tasa de clics (%)",
       "fromDate": "Desde",
-      "toDate": "Hasta"
+      "toDate": "Hasta",
+      "previewTitle": "Vista previa en la página de inicio",
+      "previewAlt": "Vista previa del logotipo del socio",
+      "logoSize": "Tamaño del logotipo",
+      "logoSizeSmall": "Pequeño",
+      "logoSizeDefault": "Estándar",
+      "logoSizeLarge": "Grande",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Ajusta el tamaño tal como aparecerá a los miembros."
     }
   }
 }

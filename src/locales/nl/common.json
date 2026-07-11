@@ -2188,7 +2188,15 @@
       "colClicks": "Klikken",
       "colCtr": "Klikratio (%)",
       "fromDate": "Van",
-      "toDate": "Tot"
+      "toDate": "Tot",
+      "previewTitle": "Voorbeeld op de startpagina",
+      "previewAlt": "Voorbeeld van het partnerlogo",
+      "logoSize": "Logogrootte",
+      "logoSizeSmall": "Klein",
+      "logoSizeDefault": "Standaard",
+      "logoSizeLarge": "Groot",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Pas de grootte aan zoals deze aan leden wordt weergegeven."
     }
   }
 }

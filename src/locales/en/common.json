@@ -2188,7 +2188,15 @@
       "colClicks": "Clicks",
       "colCtr": "Click rate (%)",
       "fromDate": "From",
-      "toDate": "To"
+      "toDate": "To",
+      "previewTitle": "Home page preview",
+      "previewAlt": "Partner logo preview",
+      "logoSize": "Logo size",
+      "logoSizeSmall": "Small",
+      "logoSizeDefault": "Standard",
+      "logoSizeLarge": "Large",
+      "logoSizePercent": "{{percent}}%",
+      "logoSizeHint": "Adjust the size as it will appear to members."
     }
   }
 }
