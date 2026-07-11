@@ -458,22 +458,6 @@ function VenueEditDialog({
             placeholder="12 rue du Stade, 75000 Paris"
             helper=""
           />
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1.5">
-              <Label>{t("venues.field.city", { defaultValue: "Ville" })}</Label>
-              <Input
-                value={draft.city ?? ""}
-                onChange={(e) => setDraft({ ...draft, city: e.target.value || null })}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("venues.field.postalCode", { defaultValue: "Code postal" })}</Label>
-              <Input
-                value={draft.postal_code ?? ""}
-                onChange={(e) => setDraft({ ...draft, postal_code: e.target.value || null })}
-              />
-            </div>
-          </div>
           <div className="space-y-1.5">
             <Label>{t("venues.field.notes", { defaultValue: "Notes" })}</Label>
             <Textarea
