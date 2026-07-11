@@ -723,7 +723,8 @@ export const listAllUsers = createServerFn({ method: "POST" })
       clubIds.length
         ? supabaseAdmin
             .from("subscriptions")
-            .select("club_id, status, plan, trial_end, current_period_end")
+            .select("club_id, status, plan, trial_end, current_period_end, exempt_from_billing, exempt_until")
+
             .in("club_id", clubIds)
         : Promise.resolve({ data: [] as never[] }),
     ]);
