@@ -663,7 +663,19 @@
     "existingAttached_one": "{{count}} player added",
     "existingAttached_other": "{{count}} players added",
     "alreadyInTeam": "This player is already in this team",
-    "teamsLabel": "Teams"
+    "teamsLabel": "Teams",
+    "import": {
+      "title": "Import players (CSV)",
+      "intro": "Import your list from a CSV file. Expected columns: {{cols}}.",
+      "template": "Template",
+      "parentsHint": "Up to 2 parents per player via the file. To add more, open the player profile after import.",
+      "fileLabel": "CSV file",
+      "pasteLabel": "or paste your rows",
+      "submit": "Import",
+      "noneDetected": "No player detected in the file.",
+      "done": "{{inserted}} player(s) imported",
+      "failed": "{{failed}} row(s) with errors"
+    }
   },
   "events": {
     "isOfficial": "Official match",

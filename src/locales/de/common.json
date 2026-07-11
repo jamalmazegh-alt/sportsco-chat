@@ -663,7 +663,19 @@
     "existingAttached_one": "{{count}} Spieler hinzugefügt",
     "existingAttached_other": "{{count}} Spieler hinzugefügt",
     "alreadyInTeam": "Dieser Spieler ist bereits in diesem Team",
-    "teamsLabel": "Teams"
+    "teamsLabel": "Teams",
+    "import": {
+      "title": "Spieler importieren (CSV)",
+      "intro": "Importieren Sie Ihre Liste aus einer CSV-Datei. Erwartete Spalten: {{cols}}.",
+      "template": "Vorlage",
+      "parentsHint": "Bis zu 2 Eltern pro Spieler über die Datei. Für weitere öffnen Sie das Spielerprofil nach dem Import.",
+      "fileLabel": "CSV-Datei",
+      "pasteLabel": "oder Zeilen einfügen",
+      "submit": "Importieren",
+      "noneDetected": "Kein Spieler in der Datei erkannt.",
+      "done": "{{inserted}} Spieler importiert",
+      "failed": "{{failed}} Zeile(n) mit Fehlern"
+    }
   },
   "events": {
     "isOfficial": "Pflichtspiel",
