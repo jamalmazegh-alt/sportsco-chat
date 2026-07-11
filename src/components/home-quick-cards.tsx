@@ -3,8 +3,9 @@ import { useMyRoles } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { Users, Trophy, ChevronRight, Plus, CalendarDays, Check } from "lucide-react";
+import { Users, Trophy, ChevronRight, Plus, CalendarDays, Check, Tent } from "lucide-react";
 import { listMyTournaments } from "@/modules/tournaments/tournaments.functions";
+import { listClubCamps } from "@/lib/camps.functions";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 
