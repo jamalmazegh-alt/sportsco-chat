@@ -27,7 +27,9 @@ export function TrialBanner() {
     queryFn: async () => {
       const { data } = await supabase
         .from("subscriptions")
-        .select("status, trial_end, current_period_end, cancel_at_period_end")
+        .select(
+          "status, trial_end, current_period_end, cancel_at_period_end, exempt_from_billing, exempt_until",
+        )
         .eq("club_id", activeClubId!)
         .maybeSingle();
       return data;
@@ -35,6 +37,13 @@ export function TrialBanner() {
   });
 
   if (!isAdmin || !sub || dismissed) return null;
+
+  // Billing exemption bypasses the trial/expiry banner entirely.
+  const exemptActive =
+    sub.exempt_from_billing === true &&
+    (!sub.exempt_until || new Date(sub.exempt_until).getTime() > Date.now());
+  if (exemptActive) return null;
+
 
   const now = Date.now();
   const trialEnd = sub.trial_end ? new Date(sub.trial_end).getTime() : null;

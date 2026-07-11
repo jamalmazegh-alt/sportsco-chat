@@ -59,10 +59,23 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
   }),
 });
 
-function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | null }) {
+function StatusBadge({
+  status,
+  trialEnd,
+  exemptFromBilling,
+  exemptUntil,
+}: {
+  status: string;
+  trialEnd: string | null;
+  exemptFromBilling?: boolean | null;
+  exemptUntil?: string | null;
+}) {
   const { t, i18n } = useTranslation();
   const trialTime = trialEnd ? new Date(trialEnd).getTime() : null;
   const trialExpired = status === "trialing" && trialTime !== null && trialTime <= Date.now();
+  const exemptActive =
+    exemptFromBilling === true &&
+    (!exemptUntil || new Date(exemptUntil).getTime() > Date.now());
   const map: Record<string, { label: string; cls: string }> = {
     trialing: { label: t("billing.statusTrialing"), cls: "bg-primary/10 text-primary" },
     active: {
@@ -82,9 +95,15 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
     unpaid: { label: t("billing.statusUnpaid"), cls: "bg-destructive/10 text-destructive" },
     paused: { label: t("billing.statusPaused"), cls: "bg-muted text-muted-foreground" },
   };
-  const s = trialExpired
+  const s = exemptActive
+    ? {
+        label: "Exempté",
+        cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      }
+    : trialExpired
     ? { label: t("billing.statusTrialExpired"), cls: "bg-destructive/10 text-destructive" }
     : (map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" });
+
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   return (
     <span
@@ -378,7 +397,13 @@ function BillingPage() {
                 <p className="text-sm text-muted-foreground">{t("billing.status")}</p>
                 <div className="mt-1.5">
                   {sub ? (
-                    <StatusBadge status={sub.status} trialEnd={sub.trial_end} />
+                    <StatusBadge
+                      status={sub.status}
+                      trialEnd={sub.trial_end}
+                      exemptFromBilling={sub.exempt_from_billing}
+                      exemptUntil={(sub as { exempt_until?: string | null }).exempt_until ?? null}
+                    />
+
                   ) : (
                     <span className="text-sm text-muted-foreground">
                       {t("billing.noSubscription")}
