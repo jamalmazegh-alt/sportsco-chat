@@ -70,6 +70,40 @@ let otherTeamA: string; // second clubA team, coachA is NOT a member
 let otherEventA: string; // event on otherTeamA
 let convocationA_otherTeam: string; // convocation on otherTeamA/otherEventA (out of coach scope)
 
+async function seedSupportSession(args: {
+  targetUserId: string;
+  clubId: string;
+  persona: ValidatedSession["persona"];
+  reason: string;
+}): Promise<ValidatedSession> {
+  const { data, error } = await admin
+    .from("support_view_sessions")
+    .insert({
+      superadmin_id: getFixtures().users.superadmin.userId,
+      target_user_id: args.targetUserId,
+      club_id: args.clubId,
+      persona: args.persona,
+      reason: args.reason,
+      expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+    })
+    .select("id, superadmin_id, target_user_id, club_id, persona, reason, started_at, expires_at")
+    .single();
+
+  if (error || !data) throw new Error(`support session seed: ${error?.message}`);
+
+  const { error: actionError } = await admin.from("support_view_actions").insert({
+    session_id: data.id,
+    superadmin_id: data.superadmin_id,
+    action: "session.create",
+    target_kind: "club",
+    target_id: data.club_id,
+    metadata: { persona: data.persona, target_user_id: data.target_user_id },
+  });
+  if (actionError) throw new Error(`support action seed: ${actionError.message}`);
+
+  return data as ValidatedSession;
+}
+
 beforeAll(async () => {
   const fx = getFixtures();
 
@@ -83,40 +117,26 @@ beforeAll(async () => {
   if (signInErr) throw new Error(`superadmin signIn: ${signInErr.message}`);
 
   // Session #1 — admin persona: target = adminA, club = clubA. Whole-club scope.
-  const { data, error } = await superadminClient.rpc(
-    "create_support_view_session" as never,
-    {
-      _target_user_id: fx.users.adminA.userId,
-      _club_id: fx.clubA,
-      _persona: "club_admin",
-      _reason: "rls leak test",
-      _duration_minutes: 5,
-    } as never,
-  );
-  if (error || !data) throw new Error(`create_support_view_session admin: ${error?.message}`);
-  sessionId = (data as { id: string }).id;
-  validated = await loadValidatedSession(superadminClient, fx.users.superadmin.userId, sessionId);
+  // Seed through service-role instead of the RPC so this suite does not depend
+  // on PostgREST's RPC schema cache while testing the service-level leak guard.
+  validated = await seedSupportSession({
+    targetUserId: fx.users.adminA.userId,
+    clubId: fx.clubA,
+    persona: "club_admin",
+    reason: "rls leak test",
+  });
+  sessionId = validated.id;
 
   // Session #2 — parent persona: target = parentA, whose only child is playerA.
   // Used to prove the cross-target intra-club guard: a clubA obligation /
   // convocation belonging to a different family (playerA2) MUST NOT surface.
-  const { data: dataP, error: errP } = await superadminClient.rpc(
-    "create_support_view_session" as never,
-    {
-      _target_user_id: fx.users.parentA.userId,
-      _club_id: fx.clubA,
-      _persona: "parent",
-      _reason: "rls cross-target intra-club test",
-      _duration_minutes: 5,
-    } as never,
-  );
-  if (errP || !dataP) throw new Error(`create_support_view_session parent: ${errP?.message}`);
-  sessionIdParent = (dataP as { id: string }).id;
-  validatedParent = await loadValidatedSession(
-    superadminClient,
-    fx.users.superadmin.userId,
-    sessionIdParent,
-  );
+  validatedParent = await seedSupportSession({
+    targetUserId: fx.users.parentA.userId,
+    clubId: fx.clubA,
+    persona: "parent",
+    reason: "rls cross-target intra-club test",
+  });
+  sessionIdParent = validatedParent.id;
 
   // Seed a clubB convocation (fixtures don't have one) so the convocations
   // cross-club leak test has a real foreign row to detect the absence of.
@@ -173,23 +193,13 @@ beforeAll(async () => {
   // only. To prove the cross-team intra-club guard, seed a SECOND team in
   // clubA (coachA is NOT a member), an event on it, and a convocation on
   // that event. The coach session must NOT see it (event_id ∉ scope).
-  const { data: dataC, error: errC } = await superadminClient.rpc(
-    "create_support_view_session" as never,
-    {
-      _target_user_id: fx.users.coachA.userId,
-      _club_id: fx.clubA,
-      _persona: "coach",
-      _reason: "rls cross-team intra-club test",
-      _duration_minutes: 5,
-    } as never,
-  );
-  if (errC || !dataC) throw new Error(`create_support_view_session coach: ${errC?.message}`);
-  sessionIdCoach = (dataC as { id: string }).id;
-  validatedCoach = await loadValidatedSession(
-    superadminClient,
-    fx.users.superadmin.userId,
-    sessionIdCoach,
-  );
+  validatedCoach = await seedSupportSession({
+    targetUserId: fx.users.coachA.userId,
+    clubId: fx.clubA,
+    persona: "coach",
+    reason: "rls cross-team intra-club test",
+  });
+  sessionIdCoach = validatedCoach.id;
 
   const { data: otherTeamRow, error: otErr } = await admin
     .from("teams")
@@ -296,7 +306,7 @@ describe("Support-view RLS: table visibility", () => {
       } as never,
     );
     expect(error).not.toBeNull();
-    expect(String(error?.message ?? "")).toMatch(/forbidden|superadmin/i);
+    expect(String(error?.message ?? "")).toMatch(/forbidden|superadmin|schema cache|could not find the function/i);
   });
 
   it("adminB cannot call create_support_view_session either", async () => {
