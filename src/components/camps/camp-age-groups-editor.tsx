@@ -383,7 +383,7 @@ export function CampAgeGroupsEditor({
 
 /** Fire the reorder once on mount when the persisted order differs from asc. */
 function ReorderTrigger({ onRun }: { onRun: () => void }) {
-  useMemo(() => {
+  useEffect(() => {
     onRun();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
