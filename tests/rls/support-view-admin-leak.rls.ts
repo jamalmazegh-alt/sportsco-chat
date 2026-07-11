@@ -424,7 +424,23 @@ describe("Support-view service: cross-target intra-club leak (parent persona)", 
       expect(c.player_id).toBe(fx.playerA);
     }
   });
+
+  it("coach session sees only convocations of coached teams, not another clubA team", async () => {
+    const fx = getFixtures();
+    const { convocations } = await supportDataService.listConvocations(validatedCoach);
+    // Sanity: coachA is coach of teamA → convocationA (eventA/playerA) is in scope.
+    expect(convocations.length).toBeGreaterThan(0);
+    expect(convocations.some((c) => c.id === fx.convocationA)).toBe(true);
+    // Real assertion: convocationA_otherTeam belongs to a clubA team coachA
+    // is NOT part of. Same club_id, different team → must NOT surface.
+    for (const c of convocations) {
+      expect(c.id).not.toBe(convocationA_otherTeam);
+      expect(c.event_id).not.toBe(otherEventA);
+    }
+  });
 });
+
+
 
 
 
