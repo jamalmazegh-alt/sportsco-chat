@@ -155,6 +155,34 @@ export type PlayerDTO = {
   last_name: string;
   birth_date: string | null;
 };
+/**
+ * Expurgated payment DTO. Status-only exposure per spec — NEVER include:
+ * stripe_payment_intent_id / stripe_charge_id / external_reference /
+ * payer_user_id / exempted_reason / attachment_url / IBAN / bank data /
+ * comments. Amount + currency + item title + due date are kept so support
+ * can eyeball "why is X pending" without seeing PII or provider tokens.
+ */
+export type PaymentObligationDTO = {
+  id: string;
+  status: string;
+  amount_due_cents: number;
+  currency: string;
+  player_id: string | null;
+  item_title: string | null;
+  due_date: string | null;
+};
+/**
+ * Expurgated convocation DTO. NEVER include response_token (secret, grants
+ * write access) nor comment (free-form PII).
+ */
+export type ConvocationDTO = {
+  id: string;
+  event_id: string;
+  player_id: string;
+  status: string;
+  responded_at: string | null;
+};
+
 
 export type ContextSummary = {
   club: { id: string; name: string | null };
