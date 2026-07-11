@@ -144,6 +144,10 @@
     "title": "Uitdagingen en activiteiten",
     "empty": "Nog geen uitdagingen.",
     "empty_hint": "Voeg een uitdaging of test toe aan deze training.",
+    "no_active": "Er is nog geen activiteit gebruikt voor deze sessie.",
+    "show_all_hint": "Toon alle teamactiviteiten om er een te registreren.",
+    "active_only": "Actief",
+    "show_all": "Alles tonen",
     "add": "Activiteit toevoegen",
     "back": "Terug naar training",
     "edit": "Bewerken"

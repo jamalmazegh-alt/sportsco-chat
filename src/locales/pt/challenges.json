@@ -144,6 +144,10 @@
     "title": "Desafios e atividades",
     "empty": "Ainda não há desafios.",
     "empty_hint": "Adiciona um desafio ou um teste a esta sessão.",
+    "no_active": "Nenhuma atividade foi usada ainda nesta sessão.",
+    "show_all_hint": "Mostra todas as atividades da equipa para registar uma.",
+    "active_only": "Ativas",
+    "show_all": "Ver todas",
     "add": "Adicionar atividade",
     "back": "Voltar ao treino",
     "edit": "Editar"

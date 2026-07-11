@@ -144,6 +144,10 @@
     "title": "Sfide e attività",
     "empty": "Ancora nessuna sfida.",
     "empty_hint": "Aggiungi una sfida o un test a questa seduta.",
+    "no_active": "Nessuna attività è stata ancora utilizzata per questa sessione.",
+    "show_all_hint": "Mostra tutte le attività della squadra per registrarne una.",
+    "active_only": "Attive",
+    "show_all": "Mostra tutte",
     "add": "Aggiungi attività",
     "back": "Torna all'allenamento",
     "edit": "Modifica"

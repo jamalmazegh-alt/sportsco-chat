@@ -144,6 +144,10 @@
     "title": "Retos y actividades",
     "empty": "Todavía no hay retos.",
     "empty_hint": "Añade un reto o una prueba a esta sesión.",
+    "no_active": "Aún no se ha utilizado ninguna actividad para esta sesión.",
+    "show_all_hint": "Muestra todas las actividades del equipo para registrar una.",
+    "active_only": "Activas",
+    "show_all": "Ver todas",
     "add": "Añadir actividad",
     "back": "Volver al entrenamiento",
     "edit": "Editar"
