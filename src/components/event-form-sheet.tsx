@@ -847,7 +847,15 @@ export function EventFormSheet({
                   <button
                     key={v}
                     type="button"
-                    onClick={() => setIsHome(v)}
+                    onClick={() => {
+                      setIsHome(v);
+                      if (v === "away") {
+                        setVenueId(null);
+                        setFacilityId(null);
+                        setLocation("");
+                        setLocationUrl("");
+                      }
+                    }}
                     className={cn(
                       "rounded-xl py-2.5 text-sm font-medium border transition",
                       isHome === v
