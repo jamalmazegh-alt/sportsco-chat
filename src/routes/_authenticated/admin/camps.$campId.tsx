@@ -30,6 +30,7 @@ import {
   closeClubCamp,
   archiveClubCamp,
   deleteClubCamp,
+  duplicateClubCamp,
 } from "@/lib/camps.functions";
 import { slugifyCampTitle, isValidCampSlug } from "@/lib/camps.slug";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
