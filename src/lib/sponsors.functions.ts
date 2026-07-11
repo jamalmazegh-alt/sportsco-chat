@@ -153,6 +153,7 @@ const SponsorUpdateInput = z.object({
   targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
+  logoScale: z.number().min(0.75).max(1.3).optional(),
 });
 
 export const updateSponsor = createServerFn({ method: "POST" })
@@ -182,11 +183,13 @@ export const updateSponsor = createServerFn({ method: "POST" })
       target_url?: string | null;
       logo_url?: string | null;
       is_active?: boolean;
+      logo_scale?: number;
     } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (normalizedUrl !== undefined) patch.target_url = normalizedUrl;
     if (data.logoPath !== undefined) patch.logo_url = data.logoPath;
     if (data.isActive !== undefined) patch.is_active = data.isActive;
+    if (data.logoScale !== undefined) patch.logo_scale = data.logoScale;
     const { error } = await context.supabase
       .from("sponsors")
       .update(patch)
