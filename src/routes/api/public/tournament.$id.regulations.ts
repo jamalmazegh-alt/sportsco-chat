@@ -10,6 +10,7 @@ import {
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sportAllowsDraw } from "@/lib/sports";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
+import { fetchImageBytes } from "@/lib/safe-remote-asset.server";
 
 // ── Constantes mise en page (A4 portrait, marges en pt — 1mm ≈ 2.83465pt) ──
 const PAGE_W = 595.28;
@@ -718,27 +719,7 @@ function formatShortDate(d: Date, lang: Lang): string {
 export async function fetchImage(
   url: string,
 ): Promise<{ bytes: ArrayBuffer; kind: "png" | "jpg" } | null> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const ct = (res.headers.get("content-type") ?? "").toLowerCase();
-    const bytes = await res.arrayBuffer();
-    if (ct.includes("png") || url.toLowerCase().endsWith(".png")) return { bytes, kind: "png" };
-    if (
-      ct.includes("jpeg") ||
-      ct.includes("jpg") ||
-      url.toLowerCase().endsWith(".jpg") ||
-      url.toLowerCase().endsWith(".jpeg")
-    )
-      return { bytes, kind: "jpg" };
-    const head = new Uint8Array(bytes.slice(0, 4));
-    if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47)
-      return { bytes, kind: "png" };
-    if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return { bytes, kind: "jpg" };
-    return null;
-  } catch {
-    return null;
-  }
+  return fetchImageBytes(url);
 }
 
 async function embedImage(
