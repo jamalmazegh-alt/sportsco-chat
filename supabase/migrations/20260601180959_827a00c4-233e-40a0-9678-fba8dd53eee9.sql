@@ -1,5 +1,10 @@
 -- FIX 1b: update clubero-payment-reminders cron job to send x-cron-secret
-SELECT cron.unschedule('clubero-payment-reminders');
+DO $$
+BEGIN
+  PERFORM cron.unschedule('clubero-payment-reminders');
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
 
 SELECT cron.schedule(
   'clubero-payment-reminders',
