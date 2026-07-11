@@ -165,6 +165,12 @@ function ClubDetail() {
         />
       </section>
 
+      <OnboardingProgress
+        title="Club onboarding"
+        className="mb-6"
+        steps={buildClubOnboardingSteps(data)}
+      />
+
       <div className="mb-6">
         <BillingExemptionPanel
           clubId={clubId}
