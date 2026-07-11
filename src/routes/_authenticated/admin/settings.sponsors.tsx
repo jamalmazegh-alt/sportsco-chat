@@ -319,7 +319,14 @@ function SponsorsSettingsPage() {
       <div className="flex justify-end">
         <Button
           onClick={() => {
-            setEditing({ name: "", targetUrl: "", logoPath: null, isActive: true });
+            setEditing({
+              name: "",
+              targetUrl: "",
+              logoPath: null,
+              logoPreviewUrl: null,
+              logoScale: SPONSOR_LOGO_DEFAULT_SCALE,
+              isActive: true,
+            });
             setDialogOpen(true);
           }}
         >
@@ -394,6 +401,8 @@ function SponsorsSettingsPage() {
                     name: s.name,
                     targetUrl: s.target_url ?? "",
                     logoPath: s.logo_url,
+                    logoPreviewUrl: s.logo_signed_url ?? null,
+                    logoScale: clampSponsorLogoScale(s.logo_scale),
                     isActive: s.is_active,
                   });
                   setDialogOpen(true);
