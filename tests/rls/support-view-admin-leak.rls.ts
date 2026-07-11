@@ -75,33 +75,54 @@ async function seedSupportSession(args: {
   persona: ValidatedSession["persona"];
   reason: string;
 }): Promise<ValidatedSession> {
-  const { data, error } = await admin
-    .from("support_view_sessions")
-    .insert({
-      superadmin_id: getFixtures().users.superadmin.userId,
-      target_user_id: args.targetUserId,
-      club_id: args.clubId,
-      persona: args.persona,
-      reason: args.reason,
-      expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-    })
-    .select("id, superadmin_id, target_user_id, club_id, persona, reason, started_at, expires_at")
-    .single();
+  // PostgREST schema cache on hosted Supabase can lag behind recent
+  // migrations. If the table is missing from the cache, retry with a small
+  // backoff — the cache reloads on its own after a few seconds.
+  const maxAttempts = 12;
+  let lastErr: string | undefined;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const { data, error } = await admin
+      .from("support_view_sessions")
+      .insert({
+        superadmin_id: getFixtures().users.superadmin.userId,
+        target_user_id: args.targetUserId,
+        club_id: args.clubId,
+        persona: args.persona,
+        reason: args.reason,
+        expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      })
+      .select(
+        "id, superadmin_id, target_user_id, club_id, persona, reason, started_at, expires_at",
+      )
+      .single();
 
-  if (error || !data) throw new Error(`support session seed: ${error?.message}`);
+    if (!error && data) {
+      const { error: actionError } = await admin.from("support_view_actions").insert({
+        session_id: data.id,
+        superadmin_id: data.superadmin_id,
+        action: "session.create",
+        target_kind: "club",
+        target_id: data.club_id,
+        metadata: { persona: data.persona, target_user_id: data.target_user_id },
+      });
+      if (actionError && /schema cache/i.test(actionError.message)) {
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+      if (actionError) throw new Error(`support action seed: ${actionError.message}`);
+      return data as ValidatedSession;
+    }
 
-  const { error: actionError } = await admin.from("support_view_actions").insert({
-    session_id: data.id,
-    superadmin_id: data.superadmin_id,
-    action: "session.create",
-    target_kind: "club",
-    target_id: data.club_id,
-    metadata: { persona: data.persona, target_user_id: data.target_user_id },
-  });
-  if (actionError) throw new Error(`support action seed: ${actionError.message}`);
-
-  return data as ValidatedSession;
+    lastErr = error?.message;
+    if (error && /schema cache/i.test(error.message)) {
+      await new Promise((r) => setTimeout(r, 2000));
+      continue;
+    }
+    throw new Error(`support session seed: ${error?.message}`);
+  }
+  throw new Error(`support session seed: ${lastErr} (schema cache did not settle)`);
 }
+
 
 beforeAll(async () => {
   const fx = getFixtures();
