@@ -129,6 +129,9 @@ export function buildEventPayload(input: BuildEventPayloadInput): EventRowPayloa
   if (input.attachments !== undefined) {
     row.attachments = input.attachments;
   }
+  if (input.venueId !== undefined) row.venue_id = input.venueId;
+  if (input.facilityId !== undefined) row.facility_id = input.facilityId;
 
   return row;
 }
+
