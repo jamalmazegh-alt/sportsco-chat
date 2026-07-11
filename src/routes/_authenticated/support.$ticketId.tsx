@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSupportTicket, updateSupportTicket } from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, RotateCcw } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { Button } from "@/components/ui/button";
 import { STATUS_BADGE_CLASS, type SupportStatus } from "@/lib/support-constants";
