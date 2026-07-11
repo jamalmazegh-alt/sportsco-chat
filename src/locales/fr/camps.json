@@ -106,7 +106,11 @@
     "addTitle": "Ajouter une catégorie",
     "labelPlaceholder": "Label (ex. U9)",
     "yearMin": "Année min",
-    "yearMax": "Année max"
+    "yearMax": "Année max",
+    "quickAdd": "Ajout rapide",
+    "pickPreset": "Choisir U6 – U19",
+    "allAdded": "Toutes ajoutées",
+    "addCustom": "+ Catégorie personnalisée"
   },
   "cover": {
     "empty": "Aucune image de couverture",
