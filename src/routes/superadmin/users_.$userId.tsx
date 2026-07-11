@@ -323,10 +323,11 @@ function UserDetail() {
                 <div className="flex gap-1.5">
                   <StatusBadge tone={roleTone(m.role)}>{m.role}</StatusBadge>
                   {m.subscription && (
-                    <StatusBadge tone={subTone(m.subscription.status).tone}>
-                      {subTone(m.subscription.status).label}
+                    <StatusBadge tone={subTone(m.subscription).tone}>
+                      {subTone(m.subscription).label}
                     </StatusBadge>
                   )}
+
                 </div>
               </li>
             ))}
