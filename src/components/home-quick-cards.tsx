@@ -3,8 +3,9 @@ import { useMyRoles } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { Users, Trophy, ChevronRight, Plus, CalendarDays, Check } from "lucide-react";
+import { Users, Trophy, ChevronRight, Plus, CalendarDays, Check, Tent } from "lucide-react";
 import { listMyTournaments } from "@/modules/tournaments/tournaments.functions";
+import { listClubCamps } from "@/lib/camps.functions";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +20,19 @@ export function HomeQuickCards({ clubId, teams }: Props) {
   const { t } = useTranslation();
   const roles = useMyRoles();
   const canCreateTournament = roles.includes("admin") || roles.includes("tournament_manager");
+  const canManageCamps =
+    roles.includes("admin") || roles.includes("dirigeant") || roles.includes("coach");
   const fn = useServerFn(listMyTournaments);
+  const campsFn = useServerFn(listClubCamps);
   const { data, isLoading } = useQuery({
     queryKey: ["home-tournaments", clubId],
     queryFn: () => fn({ data: { club_id: clubId, limit: 10, exclude_completed: true } }),
+    staleTime: 30_000,
+  });
+  const { data: campsData } = useQuery({
+    queryKey: ["home-camps", clubId],
+    queryFn: () => campsFn({ data: { clubId, includeArchived: false } }),
+    enabled: canManageCamps,
     staleTime: 30_000,
   });
 
@@ -63,7 +73,14 @@ export function HomeQuickCards({ clubId, teams }: Props) {
     .map((x) => x.name)
     .join(" · ");
 
+  const camps = campsData ?? [];
+  const campsCount = camps.length;
+  const nextCamp = [...camps]
+    .filter((c) => c.status === "published" || c.status === "draft")
+    .sort((a, b) => (a.start_date ?? "").localeCompare(b.start_date ?? ""))[0];
+
   return (
+    <div className="space-y-2.5">
     <div className="grid grid-cols-2 gap-2.5">
       {/* Teams card */}
       <Link
@@ -194,6 +211,43 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           strokeWidth={2.4}
         />
       </Link>
+    </div>
+
+    {canManageCamps && (
+      <Link
+        to="/admin/camps"
+        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[64px] active:scale-[0.99] transition-all hover:border-lime-500 hover:shadow-[0_4px_12px_rgba(132,204,22,0.12)] flex items-center gap-3"
+      >
+        <div
+          aria-hidden
+          className="absolute top-0 inset-x-0 h-[3px]"
+          style={{ background: "linear-gradient(90deg, #4d7c0f 0%, #84cc16 100%)" }}
+        />
+        <div
+          className="h-[36px] w-[36px] rounded-[10px] flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%)" }}
+        >
+          <Tent className="h-5 w-5" strokeWidth={2.4} style={{ color: "#4d7c0f" }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-bold leading-tight">
+            {t("dashboard.campsCard.title", { defaultValue: "Stages" })}
+          </p>
+          {campsCount === 0 ? (
+            <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-0.5 font-medium">
+              <Plus className="h-3 w-3" strokeWidth={2.6} />
+              {t("dashboard.campsCard.createCta", { defaultValue: "Créer un stage" })}
+            </p>
+          ) : (
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+              {campsCount} {campsCount > 1 ? t("dashboard.campsCard.plural", { defaultValue: "stages" }) : t("dashboard.campsCard.singular", { defaultValue: "stage" })}
+              {nextCamp?.start_date ? ` · ${fmt(new Date(nextCamp.start_date), "d MMM")}` : ""}
+            </p>
+          )}
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/70 shrink-0" strokeWidth={2.4} />
+      </Link>
+    )}
     </div>
   );
 }
