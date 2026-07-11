@@ -397,7 +397,13 @@ function BillingPage() {
                 <p className="text-sm text-muted-foreground">{t("billing.status")}</p>
                 <div className="mt-1.5">
                   {sub ? (
-                    <StatusBadge status={sub.status} trialEnd={sub.trial_end} />
+                    <StatusBadge
+                      status={sub.status}
+                      trialEnd={sub.trial_end}
+                      exemptFromBilling={sub.exempt_from_billing}
+                      exemptUntil={(sub as { exempt_until?: string | null }).exempt_until ?? null}
+                    />
+
                   ) : (
                     <span className="text-sm text-muted-foreground">
                       {t("billing.noSubscription")}
