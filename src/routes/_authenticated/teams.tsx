@@ -105,7 +105,6 @@ function TeamsPage() {
       club_id: activeClubId,
       name,
       age_group: ageGroup || null,
-      championship: championship || null,
       sport: sport || null,
       competitions,
     });
