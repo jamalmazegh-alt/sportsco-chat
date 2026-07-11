@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import i18nInstance from "@/lib/i18n";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -44,6 +44,17 @@ import {
   updateSponsor,
 } from "@/lib/sponsors.functions";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import { Slider } from "@/components/ui/slider";
+import { SponsorLogo } from "@/components/sponsors/SponsorLogo";
+import { SponsorBannerFrame } from "@/components/sponsors/SponsorBannerFrame";
+import {
+  SPONSOR_LOGO_DEFAULT_SCALE,
+  SPONSOR_LOGO_MAX_HEIGHT,
+  SPONSOR_LOGO_MAX_SCALE,
+  SPONSOR_LOGO_MAX_WIDTH,
+  SPONSOR_LOGO_MIN_SCALE,
+  clampSponsorLogoScale,
+} from "@/components/sponsors/sponsor-logo.constants";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/sponsors")({
   component: SponsorsSettingsPage,
@@ -120,8 +131,27 @@ function SponsorsSettingsPage() {
     name: string;
     targetUrl: string;
     logoPath: string | null;
+    logoPreviewUrl: string | null;
+    logoScale: number;
     isActive: boolean;
   }>(null);
+  // Keep track of any local object URLs to revoke on cleanup.
+  const localObjectUrlsRef = useRef<Set<string>>(new Set());
+  const revokeLocalUrl = (url: string | null | undefined) => {
+    if (!url) return;
+    if (localObjectUrlsRef.current.has(url)) {
+      URL.revokeObjectURL(url);
+      localObjectUrlsRef.current.delete(url);
+    }
+  };
+  const revokeAllLocalUrls = () => {
+    for (const u of localObjectUrlsRef.current) URL.revokeObjectURL(u);
+    localObjectUrlsRef.current.clear();
+  };
+  useEffect(() => () => revokeAllLocalUrls(), []);
+  useEffect(() => {
+    if (!dialogOpen) revokeAllLocalUrls();
+  }, [dialogOpen]);
 
   const [range, setRange] = useState<Range>("30d");
   const [customFrom, setCustomFrom] = useState("");
