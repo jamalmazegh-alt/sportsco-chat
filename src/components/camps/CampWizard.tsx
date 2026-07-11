@@ -492,8 +492,13 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 👥 {state.capacity} {t("wizard.summary.places", { defaultValue: "places" })}
                 {state.price && ` · ${state.price} €`}
               </div>
-              {state.venueId && (
-                <div>📍 {t("wizard.summary.venueSet", { defaultValue: "Lieu défini" })}</div>
+              {(state.venueId || state.externalLocation.trim()) && (
+                <div>
+                  📍{" "}
+                  {state.venueId
+                    ? t("wizard.summary.venueSet", { defaultValue: "Lieu défini" })
+                    : state.externalLocation}
+                </div>
               )}
               <div className="pt-1">
                 <span className="text-xs text-muted-foreground">
