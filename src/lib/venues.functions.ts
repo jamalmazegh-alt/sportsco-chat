@@ -334,11 +334,17 @@ export const updateFacility = createServerFn({ method: "POST" })
       clubId,
       allowedRoles: ["admin"],
     });
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      name?: string;
+      surface_type?: string | null;
+      sport?: string | null;
+      is_default?: boolean;
+    } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.surfaceType !== undefined) patch.surface_type = data.surfaceType;
     if (data.sport !== undefined) patch.sport = data.sport;
     if (data.isDefault !== undefined) patch.is_default = data.isDefault;
+
     const { error } = await context.supabase
       .from("club_facilities")
       .update(patch)
