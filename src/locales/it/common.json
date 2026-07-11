@@ -663,7 +663,19 @@
     "existingAttached_one": "{{count}} giocatore aggiunto",
     "existingAttached_other": "{{count}} giocatori aggiunti",
     "alreadyInTeam": "Questo giocatore è già in questa squadra",
-    "teamsLabel": "Squadre"
+    "teamsLabel": "Squadre",
+    "import": {
+      "title": "Importa giocatori (CSV)",
+      "intro": "Importa la tua lista da un file CSV. Colonne attese: {{cols}}.",
+      "template": "Modello",
+      "parentsHint": "Fino a 2 genitori per giocatore tramite il file. Per aggiungerne altri, apri la scheda del giocatore dopo l'import.",
+      "fileLabel": "File CSV",
+      "pasteLabel": "o incolla le tue righe",
+      "submit": "Importa",
+      "noneDetected": "Nessun giocatore rilevato nel file.",
+      "done": "{{inserted}} giocatore(i) importato(i)",
+      "failed": "{{failed}} riga(e) con errori"
+    }
   },
   "events": {
     "isOfficial": "Ufficiale",

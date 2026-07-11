@@ -663,7 +663,19 @@
     "existingAttached_one": "{{count}} jugador añadido",
     "existingAttached_other": "{{count}} jugadores añadidos",
     "alreadyInTeam": "Este jugador ya está en este equipo",
-    "teamsLabel": "Equipos"
+    "teamsLabel": "Equipos",
+    "import": {
+      "title": "Importar jugadores (CSV)",
+      "intro": "Importa tu lista desde un archivo CSV. Columnas esperadas: {{cols}}.",
+      "template": "Plantilla",
+      "parentsHint": "Hasta 2 padres por jugador desde el archivo. Para añadir más, abre la ficha del jugador tras la importación.",
+      "fileLabel": "Archivo CSV",
+      "pasteLabel": "o pega tus líneas",
+      "submit": "Importar",
+      "noneDetected": "Ningún jugador detectado en el archivo.",
+      "done": "{{inserted}} jugador(es) importado(s)",
+      "failed": "{{failed}} línea(s) con errores"
+    }
   },
   "events": {
     "isOfficial": "Partido oficial",

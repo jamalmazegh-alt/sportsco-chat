@@ -663,7 +663,19 @@
     "existingAttached_one": "{{count}} speler toegevoegd",
     "existingAttached_other": "{{count}} spelers toegevoegd",
     "alreadyInTeam": "Deze speler zit al in dit team",
-    "teamsLabel": "Teams"
+    "teamsLabel": "Teams",
+    "import": {
+      "title": "Spelers importeren (CSV)",
+      "intro": "Importeer je lijst uit een CSV-bestand. Verwachte kolommen: {{cols}}.",
+      "template": "Sjabloon",
+      "parentsHint": "Maximaal 2 ouders per speler via het bestand. Voor meer opent u het spelerprofiel na de import.",
+      "fileLabel": "CSV-bestand",
+      "pasteLabel": "of plak je regels",
+      "submit": "Importeren",
+      "noneDetected": "Geen speler gedetecteerd in het bestand.",
+      "done": "{{inserted}} speler(s) geïmporteerd",
+      "failed": "{{failed}} regel(s) met fouten"
+    }
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
