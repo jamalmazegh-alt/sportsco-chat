@@ -57,7 +57,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["@/components/*", "!@/components/ui/*", "!@/components/support-view/*"],
+              group: ["@/components/**", "!@/components/ui/**", "!@/components/support-view/**"],
               message:
                 "support-view components may only import from @/components/ui/* or @/components/support-view/*.",
             },
