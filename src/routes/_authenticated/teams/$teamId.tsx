@@ -875,7 +875,14 @@ function TeamDetail() {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+                {isArchived && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    {t("teams.badgeArchived")}
+                  </Badge>
+                )}
+              </div>
               {team && (
                 <p className="text-xs text-muted-foreground mt-1">
                   {[team.age_group, team.championship, team.sport, team.season]
@@ -885,7 +892,7 @@ function TeamDetail() {
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              {roles.includes("admin") && team?.club_id && (
+              {roles.includes("admin") && team?.club_id && !isArchived && (
                 <TeamInviteShareButton clubId={team.club_id} teamName={team.name} />
               )}
               {isCoach && team && (
@@ -898,7 +905,103 @@ function TeamDetail() {
         </div>
       </div>
 
+      {isAdmin && isArchived && (
+        <div className="rounded-2xl border border-amber-400/40 bg-amber-50 dark:bg-amber-950/30 p-3 space-y-2">
+          <p className="text-sm text-amber-900 dark:text-amber-200">
+            {t("teams.cannotCreateEventArchived")}
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              await onUnarchiveTeam();
+              navigate({ to: "/events" });
+            }}
+            disabled={teamActionBusy}
+          >
+            <ArchiveRestore className="h-4 w-4 mr-1" />
+            {t("teams.unarchiveToAddEvent")}
+          </Button>
+        </div>
+      )}
+
+      {isAdmin && team && (
+        <div className="flex flex-wrap gap-2">
+          {isArchived ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onUnarchiveTeam}
+              disabled={teamActionBusy}
+            >
+              <ArchiveRestore className="h-4 w-4 mr-1" />
+              {t("teams.unarchive")}
+            </Button>
+          ) : teamHasHistory ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmArchiveTeam(true)}
+              disabled={teamActionBusy}
+            >
+              <Archive className="h-4 w-4 mr-1" />
+              {t("teams.archive")}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmDeleteTeam(true)}
+              disabled={teamActionBusy}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {t("teams.delete")}
+            </Button>
+          )}
+        </div>
+      )}
+
       <TeamChampionshipsSection teamId={teamId} canManage={isCoach} />
+
+      <AlertDialog open={confirmDeleteTeam} onOpenChange={setConfirmDeleteTeam}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("teams.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(players?.length ?? 0) > 0
+                ? t("teams.deleteConfirmWithRoster", { count: players!.length })
+                : t("teams.deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDeleteTeam}
+              disabled={teamActionBusy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {teamActionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmArchiveTeam} onOpenChange={setConfirmArchiveTeam}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("teams.archiveTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("teams.archiveConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={onArchiveTeam} disabled={teamActionBusy}>
+              {teamActionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.archive")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
 
 
