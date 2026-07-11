@@ -542,3 +542,52 @@ function InfoCard({
     </div>
   );
 }
+
+function buildUserOnboardingSteps(data: Detail): OnboardingStep[] {
+  const p = data.profile;
+  const hasName = !!(p?.full_name || (p?.first_name && p?.last_name));
+  return [
+    {
+      id: "email_confirmed",
+      label: "Email verified",
+      done: !!data.auth.email_confirmed_at,
+      hint: "User must click the confirmation link received by email.",
+    },
+    {
+      id: "first_signin",
+      label: "Signed in at least once",
+      done: !!data.auth.last_sign_in_at,
+      hint: "User has never opened the app.",
+    },
+    {
+      id: "name",
+      label: "Name set",
+      done: hasName,
+      hint: "Profile first/last name missing.",
+    },
+    {
+      id: "avatar",
+      label: "Avatar uploaded",
+      done: !!p?.avatar_url,
+      hint: "Optional but improves recognition.",
+    },
+    {
+      id: "phone",
+      label: "Phone number added",
+      done: !!p?.phone,
+      hint: "Used for SMS/WhatsApp notifications.",
+    },
+    {
+      id: "language",
+      label: "Preferred language chosen",
+      done: !!p?.preferred_language,
+      hint: "Defaults to browser language until set.",
+    },
+    {
+      id: "club_link",
+      label: "Linked to a club",
+      done: data.clubs.length > 0 || data.players.length > 0 || data.parent_of.length > 0,
+      hint: "No club membership, player profile or parent link.",
+    },
+  ];
+}
