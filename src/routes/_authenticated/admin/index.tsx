@@ -18,6 +18,8 @@ import {
   Receipt,
   TrendingUp,
   Handshake,
+  MapPin,
+
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
@@ -167,6 +169,17 @@ function AdminSettingsPage() {
       tone: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
       clubOnly: true,
     },
+    {
+      to: "/admin/settings/venues",
+      icon: MapPin,
+      title: t("admin.hubVenues", { defaultValue: "Lieux et terrains" }),
+      hint: t("admin.hubVenuesHint", {
+        defaultValue: "Sites et terrains du club préremplis à la création d'événement",
+      }),
+      tone: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+      clubOnly: true,
+    },
+
   ];
   const items = allItems.filter((it) => !it.hidden && !(tournamentOnly && it.clubOnly));
 

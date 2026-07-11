@@ -23,7 +23,10 @@ const CreateEventSchema = z.object({
   carpoolEnabled: z.boolean().nullable().optional(),
   seriesId: z.string().uuid().nullable().optional(),
   attachments: z.array(z.record(z.string(), z.unknown())).nullable().optional(),
+  venueId: z.string().uuid().nullable().optional(),
+  facilityId: z.string().uuid().nullable().optional(),
 });
+
 
 export type CreateEventInput = z.infer<typeof CreateEventSchema>;
 

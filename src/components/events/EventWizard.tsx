@@ -48,6 +48,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
+import { useAuth } from "@/lib/auth-context";
+
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
@@ -184,8 +187,21 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const navigate = useNavigate();
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
+  const { activeClubId } = useAuth();
 
   const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
+
+  function applyVenuePick(v: VenuePickerValue | null) {
+    if (!v) return;
+    setState((s) => ({
+      ...s,
+      venueId: v.venueId,
+      facilityId: v.facilityId,
+      location: v.location,
+      locationUrl: v.locationUrl,
+    }));
+  }
+
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
@@ -241,7 +257,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
-      if (state.type !== "match") s.push("location");
+      if (state.type !== "match" || state.isHome === "home") s.push("location");
       s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
@@ -1126,14 +1142,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 <Label className="text-xs">
                   {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
                 </Label>
+                <VenuePicker
+                  clubId={activeClubId ?? undefined}
+                  venueId={state.venueId ?? null}
+                  facilityId={state.facilityId ?? null}
+                  onChange={applyVenuePick}
+                />
                 <LocationAutocomplete
                   value={state.location ?? ""}
-                  onChange={(v) => patch("location", v)}
+                  onChange={(v) => {
+                    patch("location", v);
+                    patch("venueId", null);
+                    patch("facilityId", null);
+                  }}
                   placeholder={t("eventWizard.matchLocationPlaceholder", {
                     defaultValue: "Stade / adresse du match",
                   })}
                 />
               </div>
+
             </div>
 
             <Button
@@ -1306,9 +1333,20 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 : t("eventWizard.q.location", { defaultValue: "Où ?" })
             }
           >
+            <VenuePicker
+              clubId={activeClubId ?? undefined}
+              venueId={state.venueId ?? null}
+              facilityId={state.facilityId ?? null}
+              autoApplyDefaults={!state.location}
+              onChange={applyVenuePick}
+            />
             <LocationAutocomplete
               value={state.location ?? ""}
-              onChange={(v) => patch("location", v)}
+              onChange={(v) => {
+                patch("location", v);
+                patch("venueId", null);
+                patch("facilityId", null);
+              }}
               placeholder={
                 state.type === "match"
                   ? t("eventWizard.matchLocationPlaceholder", {
@@ -1317,6 +1355,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
               }
             />
+
 
             <Button
               className="w-full mt-2"

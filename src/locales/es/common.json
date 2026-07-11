@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Ascender a miembro del Club",
     "rolesUpdated": "Roles actualizados",
     "hubSponsors": "Patrocinadores",
-    "hubSponsorsHint": "Muestra a tus socios en la parte superior del inicio"
+    "hubSponsorsHint": "Muestra a tus socios en la parte superior del inicio",
+    "hubVenues": "Lugares y campos",
+    "hubVenuesHint": "Sedes y campos del club rellenados al crear un evento"
   },
   "attachments": {
     "add": "Añadir archivo",
@@ -1745,6 +1747,10 @@
       "title": "Torneos — Resultados en vivo, tablas públicas, modo TV | Clubero",
       "description": "Organiza Torneos modernos con resultados en vivo, tablas públicas, modo Árbitro móvil y modo TV. Diseñado para organizadores, Jugadores, Padres/Madres y aficionados.",
       "ogDescription": "Torneos modernos, vibrantes y públicos. Hechos para el campo y las pantallas."
+    },
+    "adminVenues": {
+      "title": "Lugares y campos – Clubero",
+      "description": "Configura las sedes y campos del club."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Grande",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Ajusta el tamaño tal como aparecerá a los miembros."
+    }
+  },
+  "venues": {
+    "pageTitle": "Lugares y campos",
+    "pageSubtitle": "Sedes del club y campos asociados, reutilizados al crear eventos.",
+    "addSite": "Añadir sede",
+    "editSite": "Editar sede",
+    "addField": "Añadir campo",
+    "editField": "Editar campo",
+    "emptyState": "Sin sedes configuradas. Añade una para rellenar tus eventos.",
+    "facilitiesTitle": "Campos / instalaciones",
+    "noFacilities": "Sin campos para esta sede.",
+    "defaultBadge": "Predet.",
+    "toggleDefault": "Sede predeterminada",
+    "confirmDeleteSite": "¿Eliminar esta sede?",
+    "confirmDeleteField": "¿Eliminar este campo?",
+    "field": {
+      "name": "Nombre",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "postalCode": "Código postal",
+      "notes": "Notas",
+      "isDefault": "Sede predet.",
+      "isDefaultField": "Campo predet.",
+      "surface": "Superficie",
+      "sport": "Deporte (opcional)"
+    },
+    "picker": {
+      "siteLabel": "Sede",
+      "sitePlaceholder": "Elige una sede",
+      "facilityLabel": "Campo / instalación",
+      "facilityPlaceholder": "Elige un campo",
+      "noFacilitiesHint": "Sin campos configurados."
     }
   }
 }

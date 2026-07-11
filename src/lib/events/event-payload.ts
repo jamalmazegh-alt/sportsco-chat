@@ -40,7 +40,12 @@ export interface BuildEventPayloadInput {
   /** Links a child event to its training_series. */
   seriesId?: string | null;
   attachments?: EventAttachment[] | null;
+  /** Structured link to a preconfigured club venue (site). */
+  venueId?: string | null;
+  /** Structured link to a preconfigured facility (field) within the venue. */
+  facilityId?: string | null;
 }
+
 
 /** The shape inserted into `events` (without insert-meta: status/created_by/...). */
 export interface EventRowPayload {
@@ -63,7 +68,10 @@ export interface EventRowPayload {
   series_id?: string;
   championship_id?: string | null;
   attachments?: EventAttachment[] | null;
+  venue_id?: string | null;
+  facility_id?: string | null;
 }
+
 
 export function toGoogleMapsUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -121,6 +129,9 @@ export function buildEventPayload(input: BuildEventPayloadInput): EventRowPayloa
   if (input.attachments !== undefined) {
     row.attachments = input.attachments;
   }
+  if (input.venueId !== undefined) row.venue_id = input.venueId;
+  if (input.facilityId !== undefined) row.facility_id = input.facilityId;
 
   return row;
 }
+

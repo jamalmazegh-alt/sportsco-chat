@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Promover a membro do clube",
     "rolesUpdated": "Funções atualizadas",
     "hubSponsors": "Patrocinadores",
-    "hubSponsorsHint": "Mostre os seus parceiros no topo do ecrã inicial"
+    "hubSponsorsHint": "Mostre os seus parceiros no topo do ecrã inicial",
+    "hubVenues": "Locais e campos",
+    "hubVenuesHint": "Locais e campos do clube preenchidos ao criar eventos"
   },
   "attachments": {
     "add": "Adicionar ficheiro",
@@ -1745,6 +1747,10 @@
       "title": "Torneios — Resultados ao vivo, tabelas públicas, modo TV | Clubero",
       "description": "Organize Torneios modernos com resultados ao vivo, tabelas públicas, modo de Árbitro móvel e modo TV. Pensado para organizadores, Jogadores, Encarregados de educação e fãs.",
       "ogDescription": "Torneios modernos, vibrantes e públicos. Feitos para o campo e os ecrãs."
+    },
+    "adminVenues": {
+      "title": "Locais e campos – Clubero",
+      "description": "Configure locais e campos do seu clube."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Grande",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Ajuste o tamanho como aparecerá aos membros."
+    }
+  },
+  "venues": {
+    "pageTitle": "Locais e campos",
+    "pageSubtitle": "Locais do clube e campos associados, reutilizados ao criar eventos.",
+    "addSite": "Adicionar local",
+    "editSite": "Editar local",
+    "addField": "Adicionar campo",
+    "editField": "Editar campo",
+    "emptyState": "Nenhum local configurado.",
+    "facilitiesTitle": "Campos / instalações",
+    "noFacilities": "Nenhum campo para este local.",
+    "defaultBadge": "Padrão",
+    "toggleDefault": "Local padrão",
+    "confirmDeleteSite": "Excluir este local?",
+    "confirmDeleteField": "Excluir este campo?",
+    "field": {
+      "name": "Nome",
+      "address": "Endereço",
+      "city": "Cidade",
+      "postalCode": "CEP",
+      "notes": "Notas",
+      "isDefault": "Local padrão",
+      "isDefaultField": "Campo padrão",
+      "surface": "Superfície",
+      "sport": "Esporte (opcional)"
+    },
+    "picker": {
+      "siteLabel": "Local",
+      "sitePlaceholder": "Escolher um local",
+      "facilityLabel": "Campo / instalação",
+      "facilityPlaceholder": "Escolher um campo",
+      "noFacilitiesHint": "Nenhum campo configurado."
     }
   }
 }

@@ -46,7 +46,12 @@ export interface EventWizardState {
   championshipId?: string | null;
   location?: string;
   locationUrl?: string | null;
+  /** Structured venue link (optional). Filled by VenuePicker. */
+  venueId?: string | null;
+  /** Structured facility link (optional). Filled by VenuePicker. */
+  facilityId?: string | null;
   description?: string; // free comment added by the user
+
   convocScope: ConvocScope;
   carpoolEnabled?: boolean;
   recurrence?: RecurrenceState;
@@ -179,7 +184,9 @@ export function toEventPayloadInput(
     type: state.type,
     title,
     description: desc,
-    location: isHomeMatch ? null : (state.location ?? null),
+    // Home match: previously forced to null. Now use whatever the VenuePicker
+    // (or manual entry) set on state — falls back to null when nothing chosen.
+    location: isHomeMatch ? (state.location ?? null) : (state.location ?? null),
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
@@ -193,8 +200,11 @@ export function toEventPayloadInput(
     convocationTime: convocIso,
     isOfficial: state.isOfficial,
     carpoolEnabled: typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : undefined,
+    venueId: state.venueId ?? null,
+    facilityId: state.facilityId ?? null,
   };
 }
+
 
 /**
  * Map wizard state to an event row payload via the shared builder.

@@ -143,6 +143,7 @@ import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedEventsEventIdChallengesRouteImport } from './routes/_authenticated/events/$eventId/challenges'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
+import { Route as AuthenticatedAdminSettingsVenuesRouteImport } from './routes/_authenticated/admin/settings.venues'
 import { Route as AuthenticatedAdminSettingsSponsorsRouteImport } from './routes/_authenticated/admin/settings.sponsors'
 import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
 import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
@@ -879,6 +880,12 @@ const AuthenticatedAdminUsersUserIdRoute =
     path: '/users/$userId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsVenuesRoute =
+  AuthenticatedAdminSettingsVenuesRouteImport.update({
+    id: '/settings/venues',
+    path: '/settings/venues',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSettingsSponsorsRoute =
   AuthenticatedAdminSettingsSponsorsRouteImport.update({
     id: '/settings/sponsors',
@@ -1056,6 +1063,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
+  '/admin/settings/venues': typeof AuthenticatedAdminSettingsVenuesRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -1198,6 +1206,7 @@ export interface FileRoutesByTo {
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
+  '/admin/settings/venues': typeof AuthenticatedAdminSettingsVenuesRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -1346,6 +1355,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/_authenticated/admin/settings/sponsors': typeof AuthenticatedAdminSettingsSponsorsRoute
+  '/_authenticated/admin/settings/venues': typeof AuthenticatedAdminSettingsVenuesRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/challenges': typeof AuthenticatedEventsEventIdChallengesRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -1494,6 +1504,7 @@ export interface FileRouteTypes {
     | '/admin/settings/reminders'
     | '/admin/settings/social'
     | '/admin/settings/sponsors'
+    | '/admin/settings/venues'
     | '/admin/users/$userId'
     | '/events/$eventId/challenges'
     | '/events/$eventId/feedback'
@@ -1636,6 +1647,7 @@ export interface FileRouteTypes {
     | '/admin/settings/reminders'
     | '/admin/settings/social'
     | '/admin/settings/sponsors'
+    | '/admin/settings/venues'
     | '/admin/users/$userId'
     | '/events/$eventId/challenges'
     | '/events/$eventId/feedback'
@@ -1783,6 +1795,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings/reminders'
     | '/_authenticated/admin/settings/social'
     | '/_authenticated/admin/settings/sponsors'
+    | '/_authenticated/admin/settings/venues'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/challenges'
     | '/_authenticated/events/$eventId/feedback'
@@ -2839,6 +2852,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/venues': {
+      id: '/_authenticated/admin/settings/venues'
+      path: '/settings/venues'
+      fullPath: '/admin/settings/venues'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsVenuesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings/sponsors': {
       id: '/_authenticated/admin/settings/sponsors'
       path: '/settings/sponsors'
@@ -2932,6 +2952,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
   AuthenticatedAdminSettingsSocialRoute: typeof AuthenticatedAdminSettingsSocialRoute
   AuthenticatedAdminSettingsSponsorsRoute: typeof AuthenticatedAdminSettingsSponsorsRoute
+  AuthenticatedAdminSettingsVenuesRoute: typeof AuthenticatedAdminSettingsVenuesRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -2957,6 +2978,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSettingsSocialRoute: AuthenticatedAdminSettingsSocialRoute,
   AuthenticatedAdminSettingsSponsorsRoute:
     AuthenticatedAdminSettingsSponsorsRoute,
+  AuthenticatedAdminSettingsVenuesRoute: AuthenticatedAdminSettingsVenuesRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }

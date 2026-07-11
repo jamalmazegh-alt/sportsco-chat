@@ -35,6 +35,9 @@ import {
   type CreateEventInput,
 } from "@/lib/events/events.functions";
 import { ChampionshipPicker } from "@/components/events/championship-picker";
+import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
+import { useAuth } from "@/lib/auth-context";
+
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -93,7 +96,10 @@ export type EventFormValues = {
   convocation_time: string | null;
   attachments?: Attachment[] | null;
   is_official?: boolean | null;
+  venue_id?: string | null;
+  facility_id?: string | null;
 };
+
 
 type Team = { id: string; name: string };
 type TeamOption = Team & { competitions?: string[] | null };
@@ -443,6 +449,10 @@ export function EventFormSheet({
   const [attachments, setAttachments] = useState<Attachment[]>(
     (initial?.attachments as Attachment[] | undefined) ?? [],
   );
+  const [venueId, setVenueId] = useState<string | null>(initial?.venue_id ?? null);
+  const [facilityId, setFacilityId] = useState<string | null>(initial?.facility_id ?? null);
+  const { activeClubId } = useAuth();
+
 
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
@@ -481,6 +491,9 @@ export function EventFormSheet({
     setMeetingPoint(initial?.meeting_point ?? "");
     setIsOfficial(initial?.is_official ?? (initial?.type as EventType) === "match");
     setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
+    setVenueId(initial?.venue_id ?? null);
+    setFacilityId(initial?.facility_id ?? null);
+
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
     const c = splitDateTime(initial?.convocation_time);
@@ -602,7 +615,10 @@ export function EventFormSheet({
       convocationTime: eventConvocationTime,
       isOfficial: type === "tournament" ? isOfficial : false,
       attachments: attachments as unknown as Record<string, unknown>[],
+      venueId,
+      facilityId,
     };
+
 
     function invalidateEventsCaches() {
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -986,14 +1002,33 @@ export function EventFormSheet({
 
         {!(mode === "create" && type === "training" && isRecurring) && (
           <>
+            <VenuePicker
+              clubId={activeClubId ?? undefined}
+              venueId={venueId}
+              facilityId={facilityId}
+              autoApplyDefaults={mode === "create" && !location}
+              onChange={(v: VenuePickerValue | null) => {
+                if (!v) return;
+                setVenueId(v.venueId);
+                setFacilityId(v.facilityId);
+                setLocation(v.location);
+                setLocationUrl(v.locationUrl ?? "");
+              }}
+            />
             <AddressField
               label={t("events.location")}
               value={location ?? ""}
-              onValueChange={setLocation}
+              onValueChange={(val) => {
+                setLocation(val);
+                // Manual override: detach from the structured venue link.
+                setVenueId(null);
+                setFacilityId(null);
+              }}
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
               helper={t("events.locationGoogleHelper")}
             />
+
             <div className="space-y-1.5">
               <Label>{t("events.details")}</Label>
               <Textarea

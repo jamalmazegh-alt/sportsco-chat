@@ -510,6 +510,50 @@ export type Database = {
           },
         ]
       }
+      club_facilities: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_default: boolean
+          name: string
+          sport: string | null
+          surface_type: string | null
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          name: string
+          sport?: string | null
+          surface_type?: string | null
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          name?: string
+          sport?: string | null
+          surface_type?: string | null
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_facilities_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "club_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_invites: {
         Row: {
           club_id: string
@@ -762,6 +806,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "club_social_connections_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_venues: {
+        Row: {
+          address: string
+          city: string | null
+          club_id: string
+          country: string | null
+          created_at: string
+          display_order: number
+          id: string
+          is_default: boolean
+          latitude: number | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          postal_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city?: string | null
+          club_id: string
+          country?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string | null
+          club_id?: string
+          country?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_venues_club_id_fkey"
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "clubs"
@@ -1433,6 +1536,7 @@ export type Database = {
           deleted_at: string | null
           description: string | null
           ends_at: string | null
+          facility_id: string | null
           id: string
           is_home: boolean | null
           is_official: boolean
@@ -1449,6 +1553,7 @@ export type Database = {
           team_id: string
           title: string
           type: Database["public"]["Enums"]["event_type"]
+          venue_id: string | null
         }
         Insert: {
           attachments?: Json
@@ -1467,6 +1572,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           ends_at?: string | null
+          facility_id?: string | null
           id?: string
           is_home?: boolean | null
           is_official?: boolean
@@ -1483,6 +1589,7 @@ export type Database = {
           team_id: string
           title: string
           type?: Database["public"]["Enums"]["event_type"]
+          venue_id?: string | null
         }
         Update: {
           attachments?: Json
@@ -1501,6 +1608,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           ends_at?: string | null
+          facility_id?: string | null
           id?: string
           is_home?: boolean | null
           is_official?: boolean
@@ -1517,6 +1625,7 @@ export type Database = {
           team_id?: string
           title?: string
           type?: Database["public"]["Enums"]["event_type"]
+          venue_id?: string | null
         }
         Relationships: [
           {
@@ -1524,6 +1633,13 @@ export type Database = {
             columns: ["championship_id"]
             isOneToOne: false
             referencedRelation: "team_championships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "club_facilities"
             referencedColumns: ["id"]
           },
           {
@@ -1545,6 +1661,13 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "club_venues"
             referencedColumns: ["id"]
           },
         ]

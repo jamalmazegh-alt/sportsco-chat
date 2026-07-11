@@ -1225,7 +1225,9 @@
     "promoteToClubMember": "Promuovi a membro del Club",
     "rolesUpdated": "Ruoli aggiornati",
     "hubSponsors": "Sponsor",
-    "hubSponsorsHint": "Mostra i tuoi partner in cima alla schermata iniziale"
+    "hubSponsorsHint": "Mostra i tuoi partner in cima alla schermata iniziale",
+    "hubVenues": "Sedi e campi",
+    "hubVenuesHint": "Sedi e campi del club precompilati alla creazione di eventi"
   },
   "attachments": {
     "add": "Aggiungi file",
@@ -1745,6 +1747,10 @@
       "title": "Tornei — Risultati in diretta, classifiche pubbliche, modalità TV | Clubero",
       "description": "Organizza Tornei moderni con risultati in diretta, classifiche pubbliche, modalità arbitro mobile e modalità TV. Pensato per organizzatori, Giocatori, Genitori e tifosi.",
       "ogDescription": "Tornei moderni, vivaci e pubblici. Fatti per il campo e gli schermi."
+    },
+    "adminVenues": {
+      "title": "Sedi e campi – Clubero",
+      "description": "Configura sedi e campi del club."
     }
   },
   "trial": {
@@ -2226,6 +2232,39 @@
       "logoSizeLarge": "Grande",
       "logoSizePercent": "{{percent}} %",
       "logoSizeHint": "Regola la dimensione come apparirà ai membri."
+    }
+  },
+  "venues": {
+    "pageTitle": "Sedi e campi",
+    "pageSubtitle": "Sedi del club e relativi campi, riutilizzati nella creazione degli eventi.",
+    "addSite": "Aggiungi sede",
+    "editSite": "Modifica sede",
+    "addField": "Aggiungi campo",
+    "editField": "Modifica campo",
+    "emptyState": "Nessuna sede configurata.",
+    "facilitiesTitle": "Campi / strutture",
+    "noFacilities": "Nessun campo per questa sede.",
+    "defaultBadge": "Predef.",
+    "toggleDefault": "Sede predefinita",
+    "confirmDeleteSite": "Eliminare questa sede?",
+    "confirmDeleteField": "Eliminare questo campo?",
+    "field": {
+      "name": "Nome",
+      "address": "Indirizzo",
+      "city": "Città",
+      "postalCode": "CAP",
+      "notes": "Note",
+      "isDefault": "Sede predefinita",
+      "isDefaultField": "Campo predefinito",
+      "surface": "Superficie",
+      "sport": "Sport (facoltativo)"
+    },
+    "picker": {
+      "siteLabel": "Sede",
+      "sitePlaceholder": "Scegli una sede",
+      "facilityLabel": "Campo / struttura",
+      "facilityPlaceholder": "Scegli un campo",
+      "noFacilitiesHint": "Nessun campo configurato."
     }
   }
 }
