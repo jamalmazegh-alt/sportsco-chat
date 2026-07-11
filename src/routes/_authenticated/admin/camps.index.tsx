@@ -1,23 +1,15 @@
-import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import i18nInstance from "@/lib/i18n";
-import { toast } from "sonner";
 import { Loader2, Plus, MapPin, CalendarDays, Users } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { listClubCamps, createClubCamp, type ClubCamp } from "@/lib/camps.functions";
+import { CampCreateChooser } from "@/components/camps/CampCreateChooser";
+import { listClubCamps, type ClubCamp } from "@/lib/camps.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/camps/")({
   component: CampsListPage,
