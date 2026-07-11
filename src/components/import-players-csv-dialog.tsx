@@ -410,7 +410,11 @@ export function ImportPlayersCsvDialog({
             onChange={(e) => setText(e.target.value)}
             rows={8}
             className="font-mono text-xs"
-            placeholder={localizedHeaders.join(",")}
+            wrap="soft"
+            placeholder={
+              localizedHeaders.join(",") +
+              "\nLéa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000,Marc,Martin,marc@example.com,+33600000002"
+            }
           />
         </div>
         {progress && (
