@@ -236,9 +236,27 @@ function CampEditPage() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           {t("common.back", { defaultValue: "Retour" })}
         </Button>
-        <Badge variant="outline" className="ml-auto">
-          {t(`status.${camp.status}`, { defaultValue: camp.status })}
-        </Badge>
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => duplicateMut.mutate()}
+            disabled={duplicateMut.isPending}
+            title={t("duplicate.hint", {
+              defaultValue: "Créer une copie en brouillon (sans les inscriptions).",
+            })}
+          >
+            {duplicateMut.isPending ? (
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4 mr-1.5" />
+            )}
+            {t("duplicate.action", { defaultValue: "Dupliquer" })}
+          </Button>
+          <Badge variant="outline">
+            {t(`status.${camp.status}`, { defaultValue: camp.status })}
+          </Badge>
+        </div>
       </div>
 
       {camp.status === "published" && (
