@@ -86,7 +86,7 @@ function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
-  const [championship, setChampionship] = useState("");
+  
   const [sport, setSport] = useState("football");
   const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
