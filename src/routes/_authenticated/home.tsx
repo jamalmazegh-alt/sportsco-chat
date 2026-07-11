@@ -175,12 +175,12 @@ function HomePage() {
       const playerIds = players.map((p) => p.id);
       const { data: tms } = await supabase
         .from("team_members")
-        .select("team_id, player_id, teams:team_id(id, name, image_url, deleted_at)")
+        .select("team_id, player_id, teams:team_id(id, name, image_url, deleted_at, archived_at)")
         .in("player_id", playerIds);
       const seen = new Map<string, { team: any; player: any }>();
       for (const tm of (tms ?? []) as any[]) {
         const team = tm.teams;
-        if (!team || team.deleted_at) continue;
+        if (!team || team.deleted_at || team.archived_at) continue;
         const player = players.find((p) => p.id === tm.player_id);
         if (!player) continue;
         const key = `${team.id}:${player.id}`;
