@@ -92,13 +92,14 @@ export const listClubSponsors = createServerFn({ method: "GET" })
     });
     const { data: rows, error } = await context.supabase
       .from("sponsors")
-      .select("id, name, logo_url, target_url, is_active, created_at, updated_at")
+      .select("id, name, logo_url, target_url, is_active, logo_scale, created_at, updated_at")
       .eq("club_id", data.clubId)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     const withUrls = await Promise.all(
-      (rows ?? []).map(async (s) => ({
+      (rows ?? []).map(async (s: any) => ({
         ...s,
+        logo_scale: Number(s.logo_scale ?? 1),
         logo_signed_url: await signLogoUrl(s.logo_url),
       })),
     );
