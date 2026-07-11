@@ -19,11 +19,26 @@
  *       inject a foreign team_id row and assert assertRowsBelongToSession
  *       fires Response(500).
  *
- * DENTS-CHECK (run manually once to prove the test has teeth):
- *   In src/lib/support-view/service.server.ts, temporarily remove the
- *   `.in("team_id", teamIds)` filter in listEvents (or comment
- *   `assertRowsBelongToSession(...)`) and re-run this file — the volet-2
- *   assertions MUST turn red. Restore, they turn green. Only then trust it.
+ * DENTS-CHECK (matrice à exécuter manuellement une fois pour prouver que
+ * le test a des dents — les deux filets protègent indépendamment) :
+ *
+ *   filtre `.in("team_id", teamIds)` ON  + `assertRowsBelongToSession` ON
+ *     → VERT (baseline).
+ *   filtre OFF + guard OFF
+ *     → ROUGE : eventB fuit dans listEvents, le seed-and-assert-absent le
+ *     détecte. Prouve que le test capte une vraie fuite.
+ *   filtre OFF + guard ON
+ *     → ROUGE (guard-500) : le guard throw Response(500) sur la ligne clubB.
+ *     Prouve que le guard protège seul, sans le WHERE.
+ *   filtre ON + guard OFF
+ *     → VERT : le WHERE fait le boulot. Attendu, ne prouve rien — NE PAS
+ *     attendre du rouge ici.
+ *
+ * Complément volet 2b : commenter le `throw` dans `assertRowsBelongToSession`
+ * → le test « guard fires » tombe rouge. Restaure, il repasse vert.
+ *
+ * Répéter la même matrice sur `listTeams` (`.eq("club_id", ...)`) et
+ * `listPlayers`. Restaurer entre chaque itération.
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
