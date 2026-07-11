@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { MapPin, Home } from "lucide-react";
 import { listClubVenues, type ClubVenueWithFacilities } from "@/lib/venues.functions";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import {
   Select,
   SelectContent,
@@ -173,13 +173,13 @@ export function VenueFacilityPicker({
       ) : (
         <div className="space-y-1.5">
           <Label>{t("form.externalAddress", { defaultValue: "Adresse" })}</Label>
-          <Input
+          <LocationAutocomplete
             value={externalLocation ?? ""}
-            onChange={(e) =>
+            onChange={(v) =>
               onChange({
                 venueId: null,
                 facilityId: null,
-                externalLocation: e.target.value,
+                externalLocation: v,
               })
             }
             placeholder={t("form.externalAddressPlaceholder", {
