@@ -103,15 +103,28 @@ function TeamDetail() {
         )
         .eq("team_id", teamId)
         .eq("role", "player");
-      const seen = new Set<string>();
-      return (tm ?? [])
-        .map((r: any) => r.players)
-        .filter((p: any) => {
-          if (!p || seen.has(p.id)) return false;
-          seen.add(p.id);
-          return true;
-        })
-        .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
+      const seenIds = new Set<string>();
+      const byKey = new Map<string, any>();
+      const norm = (s: string | null | undefined) =>
+        (s ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const score = (p: any) =>
+        (p.jersey_number != null ? 4 : 0) +
+        (p.license_number ? 2 : 0) +
+        (p.photo_url ? 1 : 0) +
+        (p.preferred_position ? 1 : 0);
+      for (const r of tm ?? []) {
+        const p = (r as any).players;
+        if (!p || seenIds.has(p.id)) continue;
+        seenIds.add(p.id);
+        const key = p.license_number
+          ? `lic:${norm(p.license_number)}`
+          : `nm:${norm(p.first_name)}|${norm(p.last_name)}`;
+        const prev = byKey.get(key);
+        if (!prev || score(p) > score(prev)) byKey.set(key, p);
+      }
+      return Array.from(byKey.values()).sort((a: any, b: any) =>
+        (a.last_name ?? "").localeCompare(b.last_name ?? ""),
+      );
     },
   });
 
