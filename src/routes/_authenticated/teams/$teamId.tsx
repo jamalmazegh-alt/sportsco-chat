@@ -49,6 +49,18 @@ import { UnavailableBadge, type UnavailableReason } from "@/components/unavailab
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamAbsencesTable } from "@/components/team-absences-table";
 import { TeamChampionshipsSection } from "@/components/team-championships-section";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Archive, ArchiveRestore } from "lucide-react";
 
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
