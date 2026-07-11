@@ -753,13 +753,19 @@ export const listAllUsers = createServerFn({ method: "POST" })
         const profile = profileMap.get(u.id) ?? null;
         const memberRows = membershipsByUser.get(u.id) ?? [];
         const teamRows = teamsByUser.get(u.id) ?? [];
-        const clubsForUser = memberRows.map((m) => ({
-          club_id: m.club_id,
-          role: m.role,
-          name: clubMap.get(m.club_id)?.name ?? null,
-          logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
-          subscription_status: subByClub.get(m.club_id)?.status ?? null,
-        }));
+        const clubsForUser = memberRows.map((m) => {
+          const s = subByClub.get(m.club_id);
+          return {
+            club_id: m.club_id,
+            role: m.role,
+            name: clubMap.get(m.club_id)?.name ?? null,
+            logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
+            subscription_status: s?.status ?? null,
+            subscription_exempt_from_billing: s?.exempt_from_billing ?? null,
+            subscription_exempt_until: s?.exempt_until ?? null,
+          };
+        });
+
         const teamsForUser = teamRows.map((t) => ({
           team_id: t.team_id,
           role: t.role,
