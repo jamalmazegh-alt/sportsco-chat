@@ -1142,14 +1142,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 <Label className="text-xs">
                   {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
                 </Label>
+                <VenuePicker
+                  clubId={activeClubId ?? undefined}
+                  venueId={state.venueId ?? null}
+                  facilityId={state.facilityId ?? null}
+                  onChange={applyVenuePick}
+                />
                 <LocationAutocomplete
                   value={state.location ?? ""}
-                  onChange={(v) => patch("location", v)}
+                  onChange={(v) => {
+                    patch("location", v);
+                    patch("venueId", null);
+                    patch("facilityId", null);
+                  }}
                   placeholder={t("eventWizard.matchLocationPlaceholder", {
                     defaultValue: "Stade / adresse du match",
                   })}
                 />
               </div>
+
             </div>
 
             <Button
