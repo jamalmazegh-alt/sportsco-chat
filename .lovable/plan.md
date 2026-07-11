@@ -1,75 +1,93 @@
-# Suppression et archivage des équipes
+## Phase 2 — Page publique du stage + inscription famille
 
-## 1. Migration DB (additive)
+Périmètre : rendre les stages `published` visibles publiquement, permettre à une famille (non authentifiée) de préinscrire un enfant avec upload des pièces obligatoires. Aucune modification du back-office Phase 1.
 
-- `ALTER TABLE public.teams ADD COLUMN archived_at timestamptz;`
-- Index partiel `idx_teams_archived_at ... WHERE archived_at IS NOT NULL`.
-- 4 RPC `SECURITY DEFINER` sous `SET search_path = public`, réutilisant `has_club_role(_, _, 'admin')` :
-  - `team_has_history(_id uuid) RETURNS boolean` — `EXISTS` sur : `events` (deleted_at IS NULL), `convocations` (via events de l'équipe), `challenges`, `training_series`, `coach_insights`, `player_feedback`, `player_suspensions`, `team_championships`, `payment_items`/`payment_assignments` (target_team_id). Exclut `team_members`. Gate `is_club_member`.
-  - `delete_team_if_empty(_id uuid)` — check admin → check history → `UPDATE teams SET deleted_at = now()` (soft-delete réutilisant le mécanisme existant + purge 7 j).
-  - `archive_team(_id uuid)` — admin-only, `SET archived_at = now()`.
-  - `unarchive_team(_id uuid)` — admin-only, `SET archived_at = NULL`.
-- Garde-fou serveur : trigger `BEFORE INSERT` sur `events` refusant l'insertion si `teams.archived_at IS NOT NULL` (message `team_archived`).
-- Aucune modif de `deleted_at`, `purge_soft_deleted`, ni de la RLS `teams_admin_all`.
+### 1. Routes publiques (TanStack file-based, SSR)
 
-## 2. Filtrage `archived_at IS NULL`
+- `src/routes/stages.$clubSlug.$campSlug.tsx` — page stage.
+  - `loader` → server fn public `getPublicCampBySlug({ clubSlug, campSlug })` (client publishable + policies anon existantes `published`).
+  - `head()` : title `<Camp.title> — <Club.name>`, meta description = `short_description`, `og:image` = `cover_url` absolu, `twitter:card=summary_large_image`.
+  - `errorComponent` + `notFoundComponent`.
+  - Rend : cover, titre, dates, lieu (venue/facility), description longue, tranches d'âge (badges), programme (jours), documents fournis (liens signés éphémères ou publics), pièces à fournir (liste + `is_sensitive` masqué au public), bouton "S'inscrire".
+- `src/routes/stages.$clubSlug.$campSlug.inscription.tsx` — formulaire famille (page dédiée, meilleure ergonomie qu'un modal, permet deep-link + SEO `noindex`).
+  - Champs : enfant (prénom, nom, date de naissance, sexe), parent référent (prénom, nom, email, téléphone), tranche d'âge choisie (select filtré selon date de naissance), notes libres, honeypot caché, consentement RGPD.
+  - Upload des `required_documents` : un `<input type=file>` par pièce obligatoire, PDF/JPG/PNG ≤ 15 MB.
+  - Soumission → `POST /api/public/submit-camp-registration` (voir §3).
 
-Compléter `.is("deleted_at", null)` partout où les équipes sont listées pour usage courant :
+### 2. Server function publique de lecture
 
-- `src/routes/_authenticated/teams.tsx` (avec toggle admin `showArchived` → sinon filtré).
-- `src/routes/_authenticated/home.tsx`.
-- `src/routes/_authenticated/events.tsx` (sélecteur d'équipe création).
-- Autres sélecteurs (`grep .from("teams")` → paiements, discipline, chat, sanctions).
-- Exception : `teams/$teamId.tsx` reste accessible aux admins.
+`src/lib/public-camps.functions.ts` (client-safe path, pas de `requireSupabaseAuth`) :
 
-## 3. UI équipe — `teams/$teamId.tsx`
+- `getPublicCampBySlug({ clubSlug, campSlug })` : client `SUPABASE_PUBLISHABLE_KEY` (pas admin). SELECT projetés : camp (colonnes publiques), club (name, logo_url, slug), venue/facility, age_groups triés, program_items triés, documents fournis, required_documents (label + type + required, jamais `is_sensitive` côté public).
+- Retourne `notFound()` si aucun résultat (la policy anon filtre déjà `status='published'`).
 
-Bloc admin (à côté du crayon d'édition, ~lignes 657-666) :
+### 3. Route publique d'inscription
 
-- `useQuery` sur `team_has_history(teamId)` + count `team_members` (pour `deleteConfirmWithRoster`).
-- 3 boutons mutuellement exclusifs (admin uniquement) :
-  - `team.archived_at` → **Désarchiver** (+ badge « Archivée » dans l'en-tête).
-  - sinon `!hasHistory` → **Supprimer l'équipe** (destructif).
-  - sinon → **Archiver l'équipe**.
-- `AlertDialog` mirror du flux joueur (lignes 1074-1091) :
-  - Supprimer → `delete_team_if_empty` → toast Undo `restore_entity('team', id)` → invalidate + `navigate({ to: "/teams" })`. Catch `team_has_history` → toast `deleteBlockedHasHistory` + proposer archivage.
-  - Archiver → `archive_team` → toast Undo `unarchive_team`.
-  - Désarchiver → `unarchive_team` → toast `unarchived`.
-- Création d'événement quand `team.archived_at != null` : bouton principal désactivé, message `cannotCreateEventArchived` + bouton secondaire **Désarchiver pour ajouter un événement** (`unarchiveToAddEvent`) qui appelle `unarchive_team` puis ouvre directement le formulaire.
+`src/routes/api/public/submit-camp-registration.ts` (server route, méthode POST) :
 
-## 4. UI liste `teams.tsx`
+1. `getClientIp(request)` + `checkRateLimit(ip, 'camp-registration', 5)` — 5/h/IP.
+2. `multipart/form-data` : parse champs + fichiers.
+3. Validation Zod : payload complet + honeypot vide (sinon 200 fake success).
+4. Résolution `club_id` + `camp_id` par slugs, vérif `status='published'` + `registration_open`, âge de l'enfant compatible avec `age_group_id` choisie.
+5. Vérification que **toutes** les `required_documents.required=true` sont fournies. Type MIME + taille (≤ 15 MB).
+6. `supabaseAdmin` (chargé via `await import`) :
+   - Upload chaque fichier vers `camp-registration-documents/<camp_id>/<registration_id>/<slug(label)>.<ext>`.
+   - INSERT `club_camp_registrations` (statut `pending`, données famille, age_group_id).
+   - INSERT `club_camp_registration_documents` (une ligne par pièce, `storage_path`, `is_sensitive` recopié depuis la définition serveur — jamais du client).
+7. Envoi email confirmation via `enqueueTransactionalEmailServer` avec template dédié `camp-registration-received` (à créer) — sujet FR par défaut, i18n via la locale du club.
+8. Réponse `{ ok: true, registrationId }`.
 
-- Toggle admin **Afficher les équipes archivées** (off par défaut).
-- Badge « Archivée » sur chaque ligne archivée.
-- Quand affichées, grouper par `season` (en-tête `seasonGroupLabel`, groupe « — » si null).
-- Non-admins : ne voient jamais le toggle ni les archivées.
+### 4. Emails transactionnels
 
-## 5. i18n (7 langues : fr, en, es, de, it, nl, pt)
+- Nouveau template serveur `camp-registration-received` (envoi serveur only, pas dans l'allowlist client).
+- Contenu : merci + récap enfant + stage + statut "en attente de validation" + rappel des pièces reçues.
+- Notification interne aux admins/dirigeants du club : template `camp-new-registration` (lien `/admin/stages/<campId>/inscriptions` — la route existe en Phase 3, on lie vers l'édition du stage pour l'instant).
 
-Ajouter dans le namespace `teams` :
-`delete`, `deleteTitle`, `deleteConfirm`, `deleteConfirmWithRoster`, `deleted`, `deleteBlockedHasHistory`, `archive`, `archiveTitle`, `archiveConfirm`, `archived`, `unarchive`, `unarchived`, `unarchiveToAddEvent`, `showArchived`, `badgeArchived`, `seasonGroupLabel`, `cannotCreateEventArchived`.
-Réutiliser `common.cancel`, `common.undo`, `common.delete`. `bun run check:i18n` doit passer.
+### 5. UI publique et composants
 
-## 6. Tests (`bun run test`)
+- `src/components/camps/public/` :
+  - `PublicCampHeader.tsx` (cover + titre + dates + lieu).
+  - `PublicCampContent.tsx` (description, âges, programme, docs fournis).
+  - `PublicRegistrationForm.tsx` (formulaire multi-étapes ou sections, react-hook-form + zodResolver, gestion uploads).
+- Skinning via `ClubThemeProvider` déjà en place (les couleurs du club s'appliquent).
+- État après soumission : écran de confirmation avec numéro de dossier, pas de redirection.
 
-- Ajouter un test unitaire pour le filtre équipes (helper) si un helper est extrait.
-- Vérifier RLS/RPC via `tests/rls/teams.rls.ts` : admin peut delete/archive, non-admin `Forbidden`, `team_has_history` bloque delete.
+### 6. i18n (7 langues)
 
-## 7. Non-négociable
+Étendre `src/locales/*/camps.json` avec un bloc `public` :
+titre section, labels formulaire (enfant, parent, tranche d'âge, pièces), messages d'erreur (rate limit, pièce manquante, âge incompatible), confirmation, RGPD.
 
-- Toutes les mutations passent par RPC (pas de `.update({archived_at})` client).
-- Migration purement additive.
-- Aucune string en dur.
+### 7. Sécurité & garde-fous
 
-## Séquencement d'exécution
+- Route publique `/api/public/*` : jamais authentifiée mais toutes les vérifs faites côté serveur.
+- Aucune donnée sensible (`is_sensitive`) exposée en lecture publique.
+- Honeypot `website` champ caché → 200 sans effet.
+- Rate limit 5/h/IP bucket `camp-registration`.
+- MIME + taille contrôlés serveur avant upload (client n'est qu'indicatif).
+- Aucun INSERT anon direct sur Postgres — tout passe par la route publique service_role.
+- Les URLs signées vers `camp-registration-documents` restent réservées Phase 3 (dossier de traitement admin) : Phase 2 n'expose jamais les fichiers uploadés.
 
-1. Créer la migration (schema + RPC + trigger events).
-2. Ajouter les i18n clés (7 langues).
-3. Mettre à jour `teams.tsx` + `teams/$teamId.tsx`.
-4. Compléter les filtres `archived_at IS NULL` (home, events, sélecteurs).
-5. Lancer `bun run test` + `bun run check:i18n`.
+### 8. Non compris (reste Phase 3)
 
-## Points hors périmètre (notés pour plus tard)
+- Dashboard admin des inscriptions (`/admin/stages/<id>/inscriptions`).
+- Validation/refus, paiement, génération de convocations, purge après stage.
+- Vue signée des pièces sensibles avec restriction `admin|dirigeant`.
 
-- Table `seasons` normalisée + FK.
-- Détachement automatique des joueurs à l'archivage.
+### 9. Détails techniques
+
+- Server route utilise `createFileRoute` avec `server.handlers.POST`.
+- `getPublicCampBySlug` : ne pas utiliser `supabaseAdmin` (bug `Expected 3 parts in JWT` connu). Client publishable + policies anon existantes.
+- Loader du stage : appel de la server fn publique (pas de bearer requis), safe pour SSR / prerender.
+- Route inscription : loader charge le même camp + la liste des `required_documents`.
+- Formatage tailles/MIME : constantes partagées dans `src/lib/camps-content.functions.ts` réexportées.
+- Tests unitaires : ajouter au moins un test sur la validation Zod du payload d'inscription (types MIME, âge, required) — `bun run test`.
+
+### 10. Séquencement
+
+1. Server fn publique de lecture + route stage publique + `head()` SEO.
+2. i18n `public` × 7 langues.
+3. Composants d'affichage + skinning club.
+4. Route inscription publique (page) + form.
+5. Route API publique `/api/public/submit-camp-registration` + rate-limit + honeypot + uploads.
+6. Templates emails `camp-registration-received` + `camp-new-registration`.
+7. `bun run typecheck` + `bun run test` + `bun run check:i18n`.
