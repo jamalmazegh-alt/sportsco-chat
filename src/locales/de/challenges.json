@@ -144,6 +144,10 @@
     "title": "Challenges & Aktivitäten",
     "empty": "Noch keine Challenges.",
     "empty_hint": "Füge diesem Training eine Challenge oder einen Test hinzu.",
+    "no_active": "Für diese Einheit wurde noch keine Aktivität verwendet.",
+    "show_all_hint": "Alle Aktivitäten des Teams anzeigen, um eine zu erfassen.",
+    "active_only": "Aktiv",
+    "show_all": "Alle anzeigen",
     "add": "Aktivität hinzufügen",
     "back": "Zurück zum Training",
     "edit": "Bearbeiten"
