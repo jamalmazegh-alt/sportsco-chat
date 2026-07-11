@@ -104,7 +104,8 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, teams:team_id(club_id, deleted_at)")
+        .select("player_id, teams:team_id(club_id, deleted_at, archived_at)")
+
         .eq("role", "player");
       const playerIds = Array.from(
         new Set(
