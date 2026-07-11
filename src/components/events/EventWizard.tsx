@@ -48,6 +48,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
+import { useAuth } from "@/lib/auth-context";
+
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
