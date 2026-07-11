@@ -415,6 +415,49 @@ function CampEditPage() {
         <CampAgeGroupsEditor campId={campId} ageGroups={camp.age_groups} />
       </section>
 
+      {/* Section: Programme */}
+      <section className="space-y-4 rounded-xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("form.sectionProgram", { defaultValue: "Programme" })}
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          {t("form.sectionProgramHint", {
+            defaultValue:
+              "Détaille le déroulé du stage. Glisse-dépose pour réordonner.",
+          })}
+        </p>
+        <CampProgramEditor campId={campId} />
+      </section>
+
+      {/* Section: Documents fournis */}
+      <section className="space-y-4 rounded-xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("form.sectionDocuments", { defaultValue: "Documents fournis" })}
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          {t("form.sectionDocumentsHint", {
+            defaultValue:
+              "Documents que le club met à disposition (règlement, planning PDF, plan d'accès…). Formats acceptés : PDF, JPG, PNG.",
+          })}
+        </p>
+        <CampDocumentsEditor campId={campId} />
+      </section>
+
+      {/* Section: Pièces à fournir */}
+      <section className="space-y-4 rounded-xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("form.sectionRequired", { defaultValue: "Pièces à fournir" })}
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          {t("form.sectionRequiredHint", {
+            defaultValue:
+              "Liste des documents que les inscrits devront téléverser (certificat médical, autorisation parentale…). Les pièces médicales sont automatiquement marquées « sensible ».",
+          })}
+        </p>
+        <CampRequiredDocumentsEditor campId={campId} />
+      </section>
+
+
       {/* Actions */}
       <div className="sticky bottom-0 z-10 -mx-4 border-t border-border bg-background/95 backdrop-blur px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
