@@ -23,6 +23,10 @@ type ParsedRow = {
   parent_last: string | null;
   parent_email: string | null;
   parent_phone: string | null;
+  parent2_first: string | null;
+  parent2_last: string | null;
+  parent2_email: string | null;
+  parent2_phone: string | null;
 };
 
 const HEADERS = [
@@ -38,6 +42,10 @@ const HEADERS = [
   "parent_last",
   "parent_email",
   "parent_phone",
+  "parent2_first",
+  "parent2_last",
+  "parent2_email",
+  "parent2_phone",
 ] as const;
 
 function splitLine(line: string): string[] {
@@ -107,6 +115,12 @@ function parseCsv(text: string, extraAliases: Record<string, (typeof HEADERS)[nu
       if (norm === "parent_prenom" || norm === "parent_prénom") headerMap!.parent_first = idx;
       if (norm === "parent_nom") headerMap!.parent_last = idx;
       if (norm === "parent_tel" || norm === "parent_telephone") headerMap!.parent_phone = idx;
+      if (norm === "parent2_prenom" || norm === "parent2_prénom" || norm === "prenom_parent_2")
+        headerMap!.parent2_first = idx;
+      if (norm === "parent2_nom" || norm === "nom_parent_2") headerMap!.parent2_last = idx;
+      if (norm === "parent2_email" || norm === "email_parent_2") headerMap!.parent2_email = idx;
+      if (norm === "parent2_tel" || norm === "parent2_telephone" || norm === "telephone_parent_2")
+        headerMap!.parent2_phone = idx;
     });
     startIdx = 1;
   }
@@ -147,6 +161,10 @@ function parseCsv(text: string, extraAliases: Record<string, (typeof HEADERS)[nu
       parent_last: get(parts, "parent_last", 9) || null,
       parent_email: get(parts, "parent_email", 10) || null,
       parent_phone: get(parts, "parent_phone", 11) || null,
+      parent2_first: get(parts, "parent2_first", 12) || null,
+      parent2_last: get(parts, "parent2_last", 13) || null,
+      parent2_email: get(parts, "parent2_email", 14) || null,
+      parent2_phone: get(parts, "parent2_phone", 15) || null,
     });
   }
   return rows;
@@ -179,13 +197,13 @@ export function ImportPlayersCsvDialog({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const HEADER_TRANSLATIONS: Record<string, Record<(typeof HEADERS)[number], string>> = {
-    fr: { first_name: "Prénom", last_name: "Nom", jersey: "Numéro", position: "Poste", license: "Licence", birth_date: "Date de naissance", email: "Email", phone: "Téléphone", parent_first: "Prénom parent", parent_last: "Nom parent", parent_email: "Email parent", parent_phone: "Téléphone parent" },
-    en: { first_name: "First name", last_name: "Last name", jersey: "Number", position: "Position", license: "License", birth_date: "Date of birth", email: "Email", phone: "Phone", parent_first: "Parent first name", parent_last: "Parent last name", parent_email: "Parent email", parent_phone: "Parent phone" },
-    es: { first_name: "Nombre", last_name: "Apellido", jersey: "Número", position: "Posición", license: "Licencia", birth_date: "Fecha de nacimiento", email: "Correo", phone: "Teléfono", parent_first: "Nombre del padre", parent_last: "Apellido del padre", parent_email: "Correo del padre", parent_phone: "Teléfono del padre" },
-    de: { first_name: "Vorname", last_name: "Nachname", jersey: "Nummer", position: "Position", license: "Lizenz", birth_date: "Geburtsdatum", email: "E-Mail", phone: "Telefon", parent_first: "Vorname Elternteil", parent_last: "Nachname Elternteil", parent_email: "E-Mail Elternteil", parent_phone: "Telefon Elternteil" },
-    it: { first_name: "Nome", last_name: "Cognome", jersey: "Numero", position: "Ruolo", license: "Licenza", birth_date: "Data di nascita", email: "Email", phone: "Telefono", parent_first: "Nome genitore", parent_last: "Cognome genitore", parent_email: "Email genitore", parent_phone: "Telefono genitore" },
-    nl: { first_name: "Voornaam", last_name: "Achternaam", jersey: "Nummer", position: "Positie", license: "Licentie", birth_date: "Geboortedatum", email: "E-mail", phone: "Telefoon", parent_first: "Voornaam ouder", parent_last: "Achternaam ouder", parent_email: "E-mail ouder", parent_phone: "Telefoon ouder" },
-    pt: { first_name: "Nome", last_name: "Sobrenome", jersey: "Número", position: "Posição", license: "Licença", birth_date: "Data de nascimento", email: "E-mail", phone: "Telefone", parent_first: "Nome do responsável", parent_last: "Sobrenome do responsável", parent_email: "E-mail do responsável", parent_phone: "Telefone do responsável" },
+    fr: { first_name: "Prénom", last_name: "Nom", jersey: "Numéro", position: "Poste", license: "Licence", birth_date: "Date de naissance", email: "Email", phone: "Téléphone", parent_first: "Prénom parent", parent_last: "Nom parent", parent_email: "Email parent", parent_phone: "Téléphone parent", parent2_first: "Prénom parent 2", parent2_last: "Nom parent 2", parent2_email: "Email parent 2", parent2_phone: "Téléphone parent 2" },
+    en: { first_name: "First name", last_name: "Last name", jersey: "Number", position: "Position", license: "License", birth_date: "Date of birth", email: "Email", phone: "Phone", parent_first: "Parent first name", parent_last: "Parent last name", parent_email: "Parent email", parent_phone: "Parent phone", parent2_first: "Parent 2 first name", parent2_last: "Parent 2 last name", parent2_email: "Parent 2 email", parent2_phone: "Parent 2 phone" },
+    es: { first_name: "Nombre", last_name: "Apellido", jersey: "Número", position: "Posición", license: "Licencia", birth_date: "Fecha de nacimiento", email: "Correo", phone: "Teléfono", parent_first: "Nombre del padre", parent_last: "Apellido del padre", parent_email: "Correo del padre", parent_phone: "Teléfono del padre", parent2_first: "Nombre del padre 2", parent2_last: "Apellido del padre 2", parent2_email: "Correo del padre 2", parent2_phone: "Teléfono del padre 2" },
+    de: { first_name: "Vorname", last_name: "Nachname", jersey: "Nummer", position: "Position", license: "Lizenz", birth_date: "Geburtsdatum", email: "E-Mail", phone: "Telefon", parent_first: "Vorname Elternteil", parent_last: "Nachname Elternteil", parent_email: "E-Mail Elternteil", parent_phone: "Telefon Elternteil", parent2_first: "Vorname Elternteil 2", parent2_last: "Nachname Elternteil 2", parent2_email: "E-Mail Elternteil 2", parent2_phone: "Telefon Elternteil 2" },
+    it: { first_name: "Nome", last_name: "Cognome", jersey: "Numero", position: "Ruolo", license: "Licenza", birth_date: "Data di nascita", email: "Email", phone: "Telefono", parent_first: "Nome genitore", parent_last: "Cognome genitore", parent_email: "Email genitore", parent_phone: "Telefono genitore", parent2_first: "Nome genitore 2", parent2_last: "Cognome genitore 2", parent2_email: "Email genitore 2", parent2_phone: "Telefono genitore 2" },
+    nl: { first_name: "Voornaam", last_name: "Achternaam", jersey: "Nummer", position: "Positie", license: "Licentie", birth_date: "Geboortedatum", email: "E-mail", phone: "Telefoon", parent_first: "Voornaam ouder", parent_last: "Achternaam ouder", parent_email: "E-mail ouder", parent_phone: "Telefoon ouder", parent2_first: "Voornaam ouder 2", parent2_last: "Achternaam ouder 2", parent2_email: "E-mail ouder 2", parent2_phone: "Telefoon ouder 2" },
+    pt: { first_name: "Nome", last_name: "Sobrenome", jersey: "Número", position: "Posição", license: "Licença", birth_date: "Data de nascimento", email: "E-mail", phone: "Telefone", parent_first: "Nome do responsável", parent_last: "Sobrenome do responsável", parent_email: "E-mail do responsável", parent_phone: "Telefone do responsável", parent2_first: "Nome do responsável 2", parent2_last: "Sobrenome do responsável 2", parent2_email: "E-mail do responsável 2", parent2_phone: "Telefone do responsável 2" },
   };
   const lang = (i18n.language || "fr").slice(0, 2).toLowerCase();
   const HEADER_LABELS = HEADER_TRANSLATIONS[lang] ?? HEADER_TRANSLATIONS.fr;
@@ -209,8 +227,8 @@ export function ImportPlayersCsvDialog({
     const csv =
       localizedHeaders.map(csvEscape).join(",") +
       "\r\n" +
-      "Léa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000\r\n" +
-      "Paul,Dupont,10,ATT,,2003-09-01,paul@example.com,+33600000001,,,,";
+      "Léa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000,Marc,Martin,marc@example.com,+33600000002\r\n" +
+      "Paul,Dupont,10,ATT,,2003-09-01,paul@example.com,+33600000001,,,,,,,,";
     downloadCsv("players-template.csv", csv);
   }
 
@@ -239,7 +257,35 @@ export function ImportPlayersCsvDialog({
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const minor = isMinor(r.birth_date);
-      const hasParent = (r.parent_first || r.parent_last) && (r.parent_email || r.parent_phone);
+
+      // Build up to 2 parent candidates, then dedupe (email lowercase, then phone, then name)
+      const parentCandidates = [
+        {
+          full_name: `${r.parent_first ?? ""} ${r.parent_last ?? ""}`.trim() || null,
+          email: r.parent_email,
+          phone: r.parent_phone,
+        },
+        {
+          full_name: `${r.parent2_first ?? ""} ${r.parent2_last ?? ""}`.trim() || null,
+          email: r.parent2_email,
+          phone: r.parent2_phone,
+        },
+      ].filter((p) => p.full_name || p.email || p.phone);
+
+      const seen = new Set<string>();
+      const parents = parentCandidates.filter((p) => {
+        const key = (
+          p.email?.trim().toLowerCase() ||
+          p.phone?.trim() ||
+          p.full_name ||
+          ""
+        ).toString();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      const hasParent = parents.length > 0;
       if (minor && !hasParent) {
         failed++;
         errors.push(`${r.first_name} ${r.last_name}: parent requis (mineur)`);
@@ -282,14 +328,13 @@ export function ImportPlayersCsvDialog({
         setProgress({ done: i + 1, total: rows.length });
         continue;
       }
-      const parentName = `${r.parent_first ?? ""} ${r.parent_last ?? ""}`.trim();
-      if (parentName || r.parent_email || r.parent_phone) {
+      for (const p of parents) {
         await supabase.from("player_parents").insert({
           player_id: player.id,
           parent_user_id: null,
-          full_name: parentName || null,
-          email: r.parent_email,
-          phone: r.parent_phone,
+          full_name: p.full_name,
+          email: p.email,
+          phone: p.phone,
           can_respond: true,
         });
       }
@@ -348,6 +393,12 @@ export function ImportPlayersCsvDialog({
             {t("players.import.template", { defaultValue: "Modèle" })}
           </Button>
         </div>
+        <p className="text-[11px] text-muted-foreground">
+          {t("players.import.parentsHint", {
+            defaultValue:
+              "Jusqu'à 2 parents par joueur via le fichier. Pour en ajouter davantage, ouvrez la fiche du joueur après l'import.",
+          })}
+        </p>
         <div className="space-y-1.5">
           <Label>{t("players.import.fileLabel", { defaultValue: "Fichier CSV" })}</Label>
           <Input type="file" accept=".csv,text/csv,text/plain" onChange={onFile} />
