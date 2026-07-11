@@ -215,55 +215,98 @@ function TeamsPage() {
         />
       ) : (
         <>
-          <ul className="space-y-2">
-            {teams.map((tm) => (
-              <li key={tm.id}>
-                <Link
-                  to="/teams/$teamId"
-                  params={{ teamId: tm.id }}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
-                >
-                  <div className="h-14 w-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
-                    {tm.image_url ? (
-                      <img
-                        src={tm.image_url}
-                        alt={tm.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}
-                      >
-                        {initialsFrom(tm.name)}
-                      </div>
+          {isAdmin && (
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-3 py-2 text-sm">
+              <span className="text-muted-foreground">{t("teams.showArchived")}</span>
+              <Switch checked={showArchived} onCheckedChange={setShowArchived} />
+            </label>
+          )}
+
+          {(() => {
+            const grouped = new Map<string, typeof teams>();
+            const showGroups = isAdmin && showArchived;
+            if (showGroups) {
+              for (const tm of teams) {
+                const key = tm.season || "—";
+                if (!grouped.has(key)) grouped.set(key, [] as typeof teams);
+                grouped.get(key)!.push(tm);
+              }
+            } else {
+              grouped.set("__", teams);
+            }
+            const entries = Array.from(grouped.entries()).sort((a, b) => {
+              if (a[0] === "—") return 1;
+              if (b[0] === "—") return -1;
+              return b[0].localeCompare(a[0]);
+            });
+            return (
+              <div className="space-y-4">
+                {entries.map(([season, list]) => (
+                  <div key={season} className="space-y-2">
+                    {showGroups && (
+                      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-1">
+                        {season === "—" ? "—" : t("teams.seasonGroupLabel", { season })}
+                      </h2>
                     )}
-                  </div>
+                    <ul className="space-y-2">
+                      {list.map((tm) => (
+                        <li key={tm.id}>
+                          <Link
+                            to="/teams/$teamId"
+                            params={{ teamId: tm.id }}
+                            className={`flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform ${tm.archived_at ? "opacity-70" : ""}`}
+                          >
+                            <div className="h-14 w-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
+                              {tm.image_url ? (
+                                <img
+                                  src={tm.image_url}
+                                  alt={tm.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div
+                                  className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}
+                                >
+                                  {initialsFrom(tm.name)}
+                                </div>
+                              )}
+                            </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium truncate">{tm.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
-                      {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
-                    </p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium truncate">{tm.name}</p>
+                                {tm.archived_at && (
+                                  <Badge variant="secondary" className="shrink-0 text-[10px]">
+                                    {t("teams.badgeArchived")}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
+                                {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
+                              </p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                </Link>
-              </li>
-            ))}
+                ))}
 
-            {isAdmin && teams.length < 3 && (
-              <li>
-                <button
-                  type="button"
-                  onClick={() => setOpen(true)}
-                  className="group w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/30 px-4 py-5 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] transition-all"
-                >
-                  <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
-                  {t("teams.create")}
-                </button>
-              </li>
-            )}
-          </ul>
+                {isAdmin && teams.length < 3 && !showArchived && (
+                  <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    className="group w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/30 px-4 py-5 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                  >
+                    <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+                    {t("teams.create")}
+                  </button>
+                )}
+              </div>
+            );
+          })()}
 
           <Link
             to="/stats"
