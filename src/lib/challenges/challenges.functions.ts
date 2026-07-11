@@ -516,7 +516,7 @@ export const getChallengeRanking = createServerFn({ method: "POST" })
 
     // New-record detection for a highlighted passage.
     const isRecordChallenge = ch.aggregate === "record";
-    let newRecordPlayerIds = new Set<string>();
+    const newRecordPlayerIds = new Set<string>();
     if (
       isRecordChallenge &&
       data.highlightPassageId &&
