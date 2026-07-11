@@ -35,6 +35,7 @@ import {
   Users as UsersIcon,
   Calendar,
   History,
+  Mailbox,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, StatusBadge, subTone, roleTone, categorize } from "@/lib/superadmin/ui";
