@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import i18nInstance from "@/lib/i18n";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Save, Rocket, Lock, Archive, XCircle, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Save, Rocket, Lock, Archive, XCircle, Trash2, Copy } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
