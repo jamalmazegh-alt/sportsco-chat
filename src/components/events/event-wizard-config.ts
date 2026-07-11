@@ -46,7 +46,12 @@ export interface EventWizardState {
   championshipId?: string | null;
   location?: string;
   locationUrl?: string | null;
+  /** Structured venue link (optional). Filled by VenuePicker. */
+  venueId?: string | null;
+  /** Structured facility link (optional). Filled by VenuePicker. */
+  facilityId?: string | null;
   description?: string; // free comment added by the user
+
   convocScope: ConvocScope;
   carpoolEnabled?: boolean;
   recurrence?: RecurrenceState;
