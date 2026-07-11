@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import { Avatar, StatusBadge, subTone, roleTone, categorize } from "@/lib/superadmin/ui";
 import { OnboardingProgress, type OnboardingStep } from "@/components/superadmin/OnboardingProgress";
 
-export const Route = createFileRoute("/superadmin/users/$userId")({
+export const Route = createFileRoute("/superadmin/users_/$userId")({
   component: UserDetail,
 });
 
