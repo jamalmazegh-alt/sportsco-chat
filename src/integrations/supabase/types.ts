@@ -6426,6 +6426,10 @@ export type Database = {
         Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_public_camp_by_slug: {
+        Args: { _camp_slug: string; _club_slug: string }
+        Returns: Json
+      }
       get_public_coach_profile: { Args: { _slug: string }; Returns: Json }
       get_public_player_profile: { Args: { _slug: string }; Returns: Json }
       get_registration_by_roster_token: {
