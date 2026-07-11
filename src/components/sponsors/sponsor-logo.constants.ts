@@ -7,7 +7,7 @@ export const SPONSOR_LOGO_MAX_WIDTH = 420;
 // serré : SponsorLogo ayant déjà un ajustement interne jusqu'à 1.5, on évite qu'un logo
 // dense monopolise la bannière.
 export const SPONSOR_LOGO_MIN_SCALE = 0.75;
-export const SPONSOR_LOGO_MAX_SCALE = 1.3;
+export const SPONSOR_LOGO_MAX_SCALE = 1.2;
 export const SPONSOR_LOGO_DEFAULT_SCALE = 1;
 
 /** Borne + normalise défensivement un logo_scale (fallback = défaut). */
