@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -539,6 +539,42 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
+  // Players who still need an invite: no linked account, at least one contact,
+  // and no pending invite already recorded for them.
+  const invitableIds = useMemo(() => {
+    const pending = pendingInvitePlayerIds ?? new Set<string>();
+    return ((players ?? []) as any[])
+      .filter((p) => !p.user_id && (p.email || p.phone) && !pending.has(p.id))
+      .map((p) => p.id as string);
+  }, [players, pendingInvitePlayerIds]);
+
+  async function inviteWholeTeam() {
+    if (!user || invitableIds.length === 0) return;
+    setInviting(true);
+    let totalSent = 0;
+    let totalFailed = 0;
+    let totalSkipped = 0;
+    for (const id of invitableIds) {
+      const r = await sendInvitesForPlayer(id);
+      totalSent += r.sent;
+      totalFailed += r.failed;
+      totalSkipped += r.skipped;
+    }
+    setInviting(false);
+    if (totalSent === 0 && totalFailed === 0)
+      toast.warning(t("players.inviteNoContact"));
+    else if (totalFailed)
+      toast.warning(
+        t("players.inviteBulkResult", {
+          sent: totalSent,
+          failed: totalFailed,
+          skipped: totalSkipped,
+        }),
+      );
+    else toast.success(t("players.inviteBulkSent", { count: totalSent }));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+  }
+
   async function onAdd(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
@@ -892,16 +928,40 @@ function TeamDetail() {
                     <Download className="h-4 w-4" />
                   </Button>
                 )}
-                {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9"
-                    onClick={() => setSelectMode(true)}
-                  >
-                    <CheckSquare className="h-4 w-4" />
-                    {t("players.invite")}
-                  </Button>
+                {invitableIds.length > 0 && (
+                  <>
+                    <Button
+                      size="sm"
+                      className="h-9"
+                      disabled={inviting}
+                      onClick={inviteWholeTeam}
+                      title={t("players.inviteWholeTeamHint", {
+                        defaultValue:
+                          "Envoie une invitation à chaque joueur/parent sans compte. Les personnes déjà inscrites ou déjà invitées sont ignorées.",
+                      })}
+                    >
+                      {inviting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      {t("players.inviteWholeTeam", {
+                        defaultValue: "Inviter toute l'équipe ({{count}})",
+                        count: invitableIds.length,
+                      })}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-9"
+                      onClick={() => setSelectMode(true)}
+                      title={t("players.inviteSelectedHint", {
+                        defaultValue: "Choisir manuellement les personnes à inviter",
+                      })}
+                    >
+                      <CheckSquare className="h-4 w-4" />
+                    </Button>
+                  </>
                 )}
                 {isCoach && activeClubId && (
                   <Button
