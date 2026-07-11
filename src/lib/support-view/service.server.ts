@@ -182,6 +182,34 @@ async function teamsInScope(session: ValidatedSession, perms: TargetPermissions)
   return Array.from(new Set([...perms.coach_team_ids, ...teamsFromPlayers]));
 }
 
+/**
+ * DEFENSE-IN-DEPTH — belt against a forgotten `.eq("club_id", ...)` on the
+ * supabaseAdmin (RLS bypass) client. Every row returned by supportDataService
+ * MUST pass this guard: if any row's scoping key falls outside the session's
+ * known-good invariant, we throw 500 rather than leak. This is the correction
+ * n°1 the reviewer asked for — wired on every method exit, not only DTOs.
+ */
+export function assertRowsBelongToSession<T>(
+  rows: T[],
+  key: (r: T) => string | null | undefined,
+  allowed: Set<string> | string,
+  what: string,
+): T[] {
+  const allowedSet = typeof allowed === "string" ? new Set([allowed]) : allowed;
+  for (const r of rows) {
+    const v = key(r);
+    if (!v || !allowedSet.has(v)) {
+      log.error("support_view_scope_leak", { what, offending: v });
+      throw new Response("Support view scope violation", { status: 500 });
+    }
+  }
+  return rows;
+}
+
+type EventRow = EventDTO & { club_id?: string | null };
+type TeamRow = TeamDTO & { club_id?: string | null };
+type PlayerRow = PlayerDTO & { club_id?: string | null };
+
 export const supportDataService = {
   async getContextSummary(session: ValidatedSession): Promise<ContextSummary> {
     const perms = await computeTargetPermissions(session);
@@ -193,6 +221,12 @@ export const supportDataService = {
         .eq("id", session.target_user_id)
         .maybeSingle(),
     ]);
+    if (club.data && club.data.id !== session.club_id) {
+      throw new Response("Support view scope violation", { status: 500 });
+    }
+    if (target.data && target.data.id !== session.target_user_id) {
+      throw new Response("Support view scope violation", { status: 500 });
+    }
     return {
       club: { id: session.club_id, name: club.data?.name ?? null },
       target: { id: session.target_user_id, full_name: target.data?.full_name ?? null },
@@ -215,14 +249,16 @@ export const supportDataService = {
       .order("starts_at", { ascending: false })
       .limit(100);
     if (error) throw new Response(error.message, { status: 500 });
-    return { events: (data ?? []) as unknown as EventDTO[] };
+    const rows = (data ?? []) as unknown as EventRow[];
+    assertRowsBelongToSession(rows, (r) => r.team_id, new Set(teamIds), "events.team_id");
+    return { events: rows as EventDTO[] };
   },
 
   async listTeams(session: ValidatedSession): Promise<{ teams: TeamDTO[] }> {
     const perms = await computeTargetPermissions(session);
     let q = supabaseAdmin
       .from("teams")
-      .select("id, name, sport, age_group")
+      .select("id, name, sport, age_group, club_id")
       .eq("club_id", session.club_id);
     if (!perms.is_club_admin) {
       const scope = Array.from(new Set(perms.coach_team_ids));
@@ -231,25 +267,33 @@ export const supportDataService = {
     }
     const { data, error } = await q.order("name");
     if (error) throw new Response(error.message, { status: 500 });
-    return { teams: (data ?? []) as unknown as TeamDTO[] };
+    const rows = (data ?? []) as unknown as TeamRow[];
+    assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "teams.club_id");
+    return { teams: rows.map(({ club_id: _c, ...rest }) => rest) as TeamDTO[] };
   },
 
   async listPlayers(session: ValidatedSession): Promise<{ players: PlayerDTO[] }> {
     const perms = await computeTargetPermissions(session);
     const results = new Map<string, PlayerDTO>();
+    const collect = (rows: PlayerRow[]) => {
+      assertRowsBelongToSession(rows, (r) => r.club_id, session.club_id, "players.club_id");
+      for (const r of rows) {
+        const { club_id: _c, ...dto } = r;
+        results.set(r.id, sanitizePlayer(dto as PlayerDTO));
+      }
+    };
 
     if (perms.is_club_admin) {
       const { data, error } = await supabaseAdmin
         .from("players")
-        .select("id, first_name, last_name, birth_date")
+        .select("id, first_name, last_name, birth_date, club_id")
         .eq("club_id", session.club_id)
         .is("deleted_at", null)
         .order("last_name")
         .limit(500);
       if (error) throw new Response(error.message, { status: 500 });
-      for (const r of data ?? []) results.set(r.id, sanitizePlayer(r as PlayerDTO));
+      collect((data ?? []) as unknown as PlayerRow[]);
     } else {
-      // Coach: players from their teams (via team_members)
       if (perms.coach_team_ids.length > 0) {
         const { data: tms } = await supabaseAdmin
           .from("team_members")
@@ -262,20 +306,20 @@ export const supportDataService = {
         if (pids.length > 0) {
           const { data } = await supabaseAdmin
             .from("players")
-            .select("id, first_name, last_name, birth_date")
+            .select("id, first_name, last_name, birth_date, club_id")
             .in("id", pids)
             .is("deleted_at", null);
-          for (const r of data ?? []) results.set(r.id, sanitizePlayer(r as PlayerDTO));
+          collect((data ?? []) as unknown as PlayerRow[]);
         }
       }
       const own = [...perms.player_ids, ...perms.child_player_ids];
       if (own.length > 0) {
         const { data } = await supabaseAdmin
           .from("players")
-          .select("id, first_name, last_name, birth_date")
+          .select("id, first_name, last_name, birth_date, club_id")
           .in("id", own)
           .is("deleted_at", null);
-        for (const r of data ?? []) results.set(r.id, sanitizePlayer(r as PlayerDTO));
+        collect((data ?? []) as unknown as PlayerRow[]);
       }
     }
     return { players: Array.from(results.values()) };
