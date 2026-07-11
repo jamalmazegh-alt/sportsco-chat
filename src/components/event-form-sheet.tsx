@@ -1029,7 +1029,12 @@ export function EventFormSheet({
               }}
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
-              helper={t("events.locationGoogleHelper")}
+              helper={
+                type === "match" && isHome === "home" && venueId
+                  ? t("events.locationLockedHint")
+                  : t("events.locationGoogleHelper")
+              }
+              disabled={type === "match" && isHome === "home" && !!venueId}
             />
 
             <div className="space-y-1.5">
