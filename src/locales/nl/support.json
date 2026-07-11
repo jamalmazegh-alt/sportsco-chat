@@ -58,5 +58,9 @@
     "event": "Evenementen",
     "feature_request": "Functieverzoek",
     "other": "Overig"
+  },
+  "actions": {
+    "mark_resolved": "Markeer als opgelost",
+    "resolved_toast": "Ticket gemarkeerd als opgelost"
   }
 }
