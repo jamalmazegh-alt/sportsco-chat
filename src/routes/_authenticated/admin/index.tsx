@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Handshake,
   MapPin,
+  Tent,
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
@@ -176,6 +177,16 @@ function AdminSettingsPage() {
         defaultValue: "Sites et terrains du club préremplis à la création d'événement",
       }),
       tone: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+      clubOnly: true,
+    },
+    {
+      to: "/admin/camps",
+      icon: Tent,
+      title: t("admin.hubCamps", { defaultValue: "Stages" }),
+      hint: t("admin.hubCampsHint", {
+        defaultValue: "Créez, publiez et gérez les stages proposés par votre club",
+      }),
+      tone: "bg-lime-500/10 text-lime-600 dark:text-lime-400",
       clubOnly: true,
     },
   ];

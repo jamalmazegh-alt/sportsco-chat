@@ -1,0 +1,104 @@
+{
+  "common": {
+    "add": "Ajouter",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  },
+  "meta": {
+    "list": {
+      "title": "Stages du club – Clubero",
+      "description": "Créez, publiez et gérez les stages proposés par votre club."
+    },
+    "edit": {
+      "title": "Édition d'un stage – Clubero"
+    }
+  },
+  "list": {
+    "title": "Stages du club",
+    "subtitle": "Créez et publiez les stages proposés par votre club.",
+    "new": "Nouveau stage",
+    "newTitle": "Nouveau stage",
+    "create": "Créer le brouillon",
+    "empty": "Aucun stage pour le moment.",
+    "hasVenue": "Lieu défini"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "published": "Publié",
+    "closed": "Fermé",
+    "archived": "Archivé"
+  },
+  "form": {
+    "sectionInfo": "Informations",
+    "sectionVenue": "Lieu",
+    "sectionAgeGroups": "Catégories d'âge",
+    "title": "Titre",
+    "titlePlaceholder": "Stage de Pâques U9-U11",
+    "slug": "Slug (URL)",
+    "slugHint": "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
+    "slugLocked": "Le slug est verrouillé après publication.",
+    "description": "Description",
+    "cover": "Image de couverture",
+    "startDate": "Début",
+    "endDate": "Fin",
+    "deadline": "Date limite d'inscription",
+    "price": "Tarif indicatif",
+    "currency": "Devise",
+    "capacity": "Capacité",
+    "paymentInstructions": "Modalités de paiement",
+    "paymentInstructionsPlaceholder": "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
+    "retention": "Rétention des documents (mois)",
+    "venue": "Lieu",
+    "venuePlaceholder": "Choisir un lieu",
+    "venueNone": "— Aucun —",
+    "facility": "Terrain / installation",
+    "facilityPlaceholder": "Optionnel",
+    "facilityNone": "— Aucun —",
+    "save": "Enregistrer",
+    "saved": "Modifications enregistrées"
+  },
+  "ageGroups": {
+    "empty": "Aucune catégorie pour l'instant.",
+    "addTitle": "Ajouter une catégorie",
+    "labelPlaceholder": "Label (ex. U9)",
+    "yearMin": "Année min",
+    "yearMax": "Année max"
+  },
+  "cover": {
+    "empty": "Aucune image de couverture",
+    "add": "Ajouter une image",
+    "replace": "Remplacer",
+    "uploaded": "Image mise à jour",
+    "tooLarge": "Image trop volumineuse (max 5 MB)",
+    "unsupported": "Format non supporté (JPG, PNG, WEBP)"
+  },
+  "lifecycle": {
+    "publish": "Publier",
+    "published": "Stage publié",
+    "close": "Fermer les inscriptions",
+    "closed": "Inscriptions fermées",
+    "archive": "Archiver",
+    "archived": "Stage archivé",
+    "publicUrl": "Lien public",
+    "publicUrlSoon": "page publique bientôt disponible"
+  },
+  "delete": {
+    "title": "Supprimer ce brouillon ?",
+    "desc": "Cette action est définitive."
+  },
+  "errors": {
+    "slugTaken": "Ce slug est déjà utilisé.",
+    "slugInvalid": "Slug invalide.",
+    "slugLocked": "Le slug ne peut plus changer après publication.",
+    "datesInvalid": "La date de fin doit être postérieure au début.",
+    "notDraft": "Le stage n'est plus en brouillon.",
+    "deleteNotDraft": "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
+    "publishTitleRequired": "Titre requis pour publier.",
+    "publishDatesRequired": "Dates de début et de fin requises.",
+    "publishDatesOrder": "La date de fin doit être après le début.",
+    "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
+    "publishCapacityRequired": "Une capacité positive est requise.",
+    "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+  }
+}

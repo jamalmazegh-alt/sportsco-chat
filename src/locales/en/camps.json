@@ -1,0 +1,104 @@
+{
+  "common": {
+    "add": "Add",
+    "back": "Back",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "meta": {
+    "list": {
+      "title": "Club camps – Clubero",
+      "description": "Create, publish and manage the camps run by your club."
+    },
+    "edit": {
+      "title": "Edit camp – Clubero"
+    }
+  },
+  "list": {
+    "title": "Club camps",
+    "subtitle": "Create and publish the camps run by your club.",
+    "new": "New camp",
+    "newTitle": "New camp",
+    "create": "Create draft",
+    "empty": "No camps yet.",
+    "hasVenue": "Venue set"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "closed": "Closed",
+    "archived": "Archived"
+  },
+  "form": {
+    "sectionInfo": "Information",
+    "sectionVenue": "Venue",
+    "sectionAgeGroups": "Age groups",
+    "title": "Title",
+    "titlePlaceholder": "Easter camp U9-U11",
+    "slug": "Slug (URL)",
+    "slugHint": "Letters, digits and dashes. Editable while the camp is a draft.",
+    "slugLocked": "Slug is locked after publishing.",
+    "description": "Description",
+    "cover": "Cover image",
+    "startDate": "Start",
+    "endDate": "End",
+    "deadline": "Registration deadline",
+    "price": "Indicative price",
+    "currency": "Currency",
+    "capacity": "Capacity",
+    "paymentInstructions": "Payment instructions",
+    "paymentInstructionsPlaceholder": "E.g. payment on registration by card, cheque or cash on-site.",
+    "retention": "Document retention (months)",
+    "venue": "Venue",
+    "venuePlaceholder": "Choose a venue",
+    "venueNone": "— None —",
+    "facility": "Facility",
+    "facilityPlaceholder": "Optional",
+    "facilityNone": "— None —",
+    "save": "Save",
+    "saved": "Changes saved"
+  },
+  "ageGroups": {
+    "empty": "No age groups yet.",
+    "addTitle": "Add an age group",
+    "labelPlaceholder": "Label (e.g. U9)",
+    "yearMin": "Min year",
+    "yearMax": "Max year"
+  },
+  "cover": {
+    "empty": "No cover image",
+    "add": "Add an image",
+    "replace": "Replace",
+    "uploaded": "Image updated",
+    "tooLarge": "Image too large (max 5 MB)",
+    "unsupported": "Unsupported format (JPG, PNG, WEBP)"
+  },
+  "lifecycle": {
+    "publish": "Publish",
+    "published": "Camp published",
+    "close": "Close registrations",
+    "closed": "Registrations closed",
+    "archive": "Archive",
+    "archived": "Camp archived",
+    "publicUrl": "Public link",
+    "publicUrlSoon": "public page coming soon"
+  },
+  "delete": {
+    "title": "Delete this draft?",
+    "desc": "This action is permanent."
+  },
+  "errors": {
+    "slugTaken": "This slug is already in use.",
+    "slugInvalid": "Invalid slug.",
+    "slugLocked": "Slug cannot change after publishing.",
+    "datesInvalid": "End date must be after start date.",
+    "notDraft": "The camp is no longer a draft.",
+    "deleteNotDraft": "Only drafts can be deleted. Archive it instead.",
+    "publishTitleRequired": "Title required to publish.",
+    "publishDatesRequired": "Start and end dates required.",
+    "publishDatesOrder": "End date must be after start date.",
+    "publishDeadlineAfterStart": "Registration deadline must be before start date.",
+    "publishCapacityRequired": "A positive capacity is required.",
+    "publishAgeGroupRequired": "Add at least one age group before publishing."
+  }
+}
