@@ -42,15 +42,17 @@ export const getActiveSponsorsForHome = createServerFn({ method: "GET" })
     });
     if (error) throw new Error(error.message);
     const sponsors = await Promise.all(
-      (rows ?? []).map(async (s) => ({
+      (rows ?? []).map(async (s: any) => ({
         id: s.id as string,
         name: s.name as string,
         target_url: (s.target_url as string | null) ?? null,
         logo_url: await signLogoUrl(s.logo_url as string | null),
+        logo_scale: Number(s.logo_scale ?? 1),
       })),
     );
     return sponsors;
   });
+
 
 export const recordSponsorImpression = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
