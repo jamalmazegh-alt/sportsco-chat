@@ -262,40 +262,121 @@ export function CampAgeGroupsEditor({
         ))}
       </ul>
 
-      <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
-        <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("ageGroups.addTitle", { defaultValue: "Ajouter une catégorie" })}
-        </Label>
-        <div className="grid gap-2 sm:grid-cols-[1fr_120px_120px_auto]">
-          <Input
-            value={draft.label}
-            onChange={(e) => setDraft({ ...draft, label: e.target.value })}
-            placeholder={t("ageGroups.labelPlaceholder", { defaultValue: "Label (ex. U9)" })}
-            disabled={disabled}
-          />
-          <Input
-            type="number"
-            value={draft.birth_year_min}
-            onChange={(e) => setDraft({ ...draft, birth_year_min: e.target.value })}
-            placeholder={t("ageGroups.yearMin", { defaultValue: "Année min" })}
-            disabled={disabled}
-          />
-          <Input
-            type="number"
-            value={draft.birth_year_max}
-            onChange={(e) => setDraft({ ...draft, birth_year_max: e.target.value })}
-            placeholder={t("ageGroups.yearMax", { defaultValue: "Année max" })}
-            disabled={disabled}
-          />
-          <Button
-            type="button"
-            onClick={() => addMut.mutate(draft)}
-            disabled={disabled || addMut.isPending || !draft.label.trim()}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            {t("common.add", { defaultValue: "Ajouter" })}
-          </Button>
+      <div className="rounded-lg border border-dashed border-border p-3 space-y-3">
+        <div className="space-y-2">
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" />
+            {t("ageGroups.quickAdd", { defaultValue: "Ajout rapide" })}
+          </Label>
+          <div className="flex gap-2">
+            <Select
+              value={presetChoice}
+              onValueChange={setPresetChoice}
+              disabled={disabled || presets.length === 0}
+            >
+              <SelectTrigger className="flex-1">
+                <SelectValue
+                  placeholder={
+                    presets.length === 0
+                      ? t("ageGroups.allAdded", { defaultValue: "Toutes ajoutées" })
+                      : t("ageGroups.pickPreset", { defaultValue: "Choisir U6 – U19" })
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {presets.map((p) => (
+                  <SelectItem key={p.label} value={p.label}>
+                    {p.label}
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({p.min}
+                      {p.max !== p.min ? `–${p.max}` : ""})
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              onClick={() => {
+                const p = presets.find((x) => x.label === presetChoice);
+                if (!p) return;
+                addMut.mutate({
+                  label: p.label,
+                  birth_year_min: String(p.min),
+                  birth_year_max: String(p.max),
+                });
+                setPresetChoice("");
+              }}
+              disabled={disabled || addMut.isPending || !presetChoice}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              {t("common.add", { defaultValue: "Ajouter" })}
+            </Button>
+          </div>
         </div>
+
+        {!showCustom ? (
+          <button
+            type="button"
+            onClick={() => setShowCustom(true)}
+            disabled={disabled}
+            className="text-xs font-medium text-primary hover:underline disabled:opacity-50"
+          >
+            {t("ageGroups.addCustom", { defaultValue: "+ Catégorie personnalisée" })}
+          </button>
+        ) : (
+          <div className="space-y-2 border-t border-border pt-3">
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+              {t("ageGroups.addTitle", { defaultValue: "Ajouter une catégorie" })}
+            </Label>
+            <div className="grid gap-2 sm:grid-cols-[1fr_100px_100px_auto]">
+              <Input
+                value={draft.label}
+                onChange={(e) => setDraft({ ...draft, label: e.target.value })}
+                placeholder={t("ageGroups.labelPlaceholder", { defaultValue: "Label (ex. Loisirs)" })}
+                disabled={disabled}
+              />
+              <Input
+                type="number"
+                value={draft.birth_year_min}
+                onChange={(e) => setDraft({ ...draft, birth_year_min: e.target.value })}
+                placeholder={t("ageGroups.yearMin", { defaultValue: "Année min" })}
+                disabled={disabled}
+              />
+              <Input
+                type="number"
+                value={draft.birth_year_max}
+                onChange={(e) => setDraft({ ...draft, birth_year_max: e.target.value })}
+                placeholder={t("ageGroups.yearMax", { defaultValue: "Année max" })}
+                disabled={disabled}
+              />
+              <div className="flex gap-1">
+                <Button
+                  type="button"
+                  onClick={() =>
+                    addMut.mutate(draft, {
+                      onSuccess: () => setShowCustom(false),
+                    })
+                  }
+                  disabled={disabled || addMut.isPending || !draft.label.trim()}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setShowCustom(false);
+                    setDraft(emptyDraft);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
