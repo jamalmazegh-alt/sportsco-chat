@@ -3,8 +3,8 @@
  *
  * Behavior:
  *  - 0 venues: renders nothing (caller falls back to free-text address).
- *  - 1 venue + 1 facility: auto-fills silently (no dropdown UI). The user can
- *    still override manually via the free-text address field the caller renders.
+ *  - 1 venue + 1 facility: auto-fills silently (no dropdown UI) when the caller
+ *    opts into defaults.
  *  - Otherwise: hierarchical selectors (venue → facility). Facility is optional
  *    if the venue has none. On mount, the default venue/facility (if any) is
  *    preselected. All writes flow through the caller's onChange, which is
@@ -33,6 +33,8 @@ export interface VenuePickerValue {
   location: string; // resolved address (venue.address + optional " – facility.name")
   locationUrl: string | null; // toGoogleMapsUrl of the resolved address
 }
+
+const NO_FACILITY_VALUE = "__none__";
 
 interface Props {
   clubId: string | undefined;
@@ -91,10 +93,16 @@ export function VenuePicker({
   const isSingleSingle = list.length === 1 && list[0].facilities.length === 1;
 
   // Auto-fill on first load: pick defaults (venue.is_default → first; then
-  // facility.is_default → first). Also handles the "1 site + 1 terrain" case.
+  // facility.is_default if present). Also handles the "1 site + 1 terrain" case.
   useEffect(() => {
     if (initializedRef.current) return;
     if (!clubId || list.length === 0) return;
+    if (venueId) {
+      initializedRef.current = true;
+      const current = buildValue(list, venueId, facilityId);
+      if (current) onChange(current);
+      return;
+    }
     // Only auto-apply the club default when the caller explicitly opts in
     // (typically: create flow with no existing location). In edit / prefilled
     // cases, never override the current selection — even if venueId is still
@@ -104,11 +112,10 @@ export function VenuePicker({
       return;
     }
     const venue = list.find((v) => v.is_default) ?? list[0];
-    const facility =
-      venue.facilities.find((f) => f.is_default) ?? venue.facilities[0] ?? null;
+    const facility = venue.facilities.find((f) => f.is_default) ?? (isSingleSingle ? venue.facilities[0] : null);
     initializedRef.current = true;
     onChange(buildValue(list, venue.id, facility?.id ?? null));
-  }, [list, clubId, venueId, autoApplyDefaults, onChange]);
+  }, [list, clubId, venueId, facilityId, autoApplyDefaults, isSingleSingle, onChange]);
 
   if (!clubId) return null;
   if (list.length === 0) return null;
@@ -140,8 +147,7 @@ export function VenuePicker({
           onValueChange={(v) => {
             const venue = list.find((x) => x.id === v);
             if (!venue) return;
-            const facility =
-              venue.facilities.find((f) => f.is_default) ?? venue.facilities[0] ?? null;
+            const facility = venue.facilities.find((f) => f.is_default) ?? null;
             onChange(buildValue(list, venue.id, facility?.id ?? null));
           }}
         >
@@ -167,8 +173,10 @@ export function VenuePicker({
             {t("venues.picker.facilityLabel", { defaultValue: "Terrain / installation" })}
           </Label>
           <Select
-            value={facilityId ?? ""}
-            onValueChange={(v) => onChange(buildValue(list, selectedVenue.id, v))}
+            value={facilityId ?? NO_FACILITY_VALUE}
+            onValueChange={(v) =>
+              onChange(buildValue(list, selectedVenue.id, v === NO_FACILITY_VALUE ? null : v))
+            }
           >
             <SelectTrigger>
               <SelectValue
@@ -178,6 +186,9 @@ export function VenuePicker({
               />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={NO_FACILITY_VALUE}>
+                {t("venues.picker.noFacilityOption", { defaultValue: "Aucun terrain" })}
+              </SelectItem>
               {selectedVenue.facilities.map((f) => (
                 <SelectItem key={f.id} value={f.id}>
                   {f.name}

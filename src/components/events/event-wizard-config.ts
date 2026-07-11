@@ -238,7 +238,7 @@ export function toEventFormInitial(
     type: state.type || "training",
     title,
     description: descParts.length ? descParts.join("\n") : null,
-    location: state.type === "match" && state.isHome === "home" ? null : (state.location ?? null),
+    location: state.location ?? null,
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
@@ -250,5 +250,7 @@ export function toEventFormInitial(
     ends_at: endsIso,
     convocation_time: state.meetingTime ? toIso(state.startDate, state.meetingTime) : null,
     is_official: state.type === "match" ? true : Boolean(state.isOfficial),
+    venue_id: state.venueId ?? null,
+    facility_id: state.facilityId ?? null,
   };
 }
