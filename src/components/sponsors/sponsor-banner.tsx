@@ -10,23 +10,23 @@ import {
 } from "@/lib/sponsors.functions";
 import { shouldRecordClick, shouldRecordImpression } from "@/lib/sponsor-session";
 import { SponsorLogo } from "./SponsorLogo";
+import { SponsorBannerFrame } from "./SponsorBannerFrame";
+import {
+  SPONSOR_LOGO_MAX_HEIGHT,
+  SPONSOR_LOGO_MAX_WIDTH,
+  clampSponsorLogoScale,
+} from "./sponsor-logo.constants";
 
 const ROTATION_MS = 12_000;
 const IMPRESSION_VISIBLE_MS = 1_000;
 const CLICK_DEBOUNCE_MS = 500;
-/**
- * Slot dimensions — the SponsorLogo component trims empty margins and adapts
- * the render size to the trimmed ratio, filling the slot's width for banner
- * logos and its height for square/tall marks.
- */
-const SPONSOR_LOGO_MAX_HEIGHT = 96;
-const SPONSOR_LOGO_MAX_WIDTH = 420;
 
 type Sponsor = {
   id: string;
   name: string;
   logo_url: string | null;
   target_url: string | null;
+  logo_scale: number;
 };
 
 function isSafeHttpUrl(url: string): boolean {
@@ -56,9 +56,18 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   const isVisibleRef = useRef(false);
   const [imgFailed, setImgFailed] = useState(false);
 
-  const list = useMemo<Sponsor[]>(() => sponsors ?? [], [sponsors]);
+  const list = useMemo<Sponsor[]>(
+    () =>
+      (sponsors ?? []).map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        logo_url: s.logo_url ?? null,
+        target_url: s.target_url ?? null,
+        logo_scale: Number(s.logo_scale ?? 1),
+      })),
+    [sponsors],
+  );
 
-  // Advance to next sponsor on mount (remount of home tab).
   useEffect(() => {
     if (list.length === 0) return;
     setIndex((prev) => (prev + 1) % list.length);
@@ -70,7 +79,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
     setImgFailed(false);
   }, [current?.id]);
 
-  // Impression tracking — >50% visible ~1s, gated by document visibility.
   useEffect(() => {
     if (!current || !containerRef.current) return;
     const el = containerRef.current;
@@ -138,18 +146,21 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
     }
   };
 
-  // Nothing to show → render nothing (no separators, no layout shift).
   if (!current) return null;
 
   const showTextFallback = !current.logo_url || imgFailed;
   const hasLink = !!current.target_url && isSafeHttpUrl(current.target_url);
+  const logoScale = clampSponsorLogoScale(current.logo_scale);
 
-  const inner = (
-    <>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-        {t("sponsor.thanksLabel")}
-      </span>
-      <span className="relative inline-flex max-w-full items-center justify-center overflow-visible transition-transform active:scale-[0.98] dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5">
+  return (
+    <div ref={containerRef}>
+      <SponsorBannerFrame
+        label={t("sponsor.thanksLabel")}
+        action={hasLink}
+        href={hasLink ? current.target_url! : undefined}
+        onClick={handleClick}
+        ariaLabel={t("sponsor.visitExternalAria", { name: current.name })}
+      >
         {showTextFallback ? (
           <span className="line-clamp-2 text-sm font-semibold text-foreground dark:text-neutral-900">
             {current.name}
@@ -158,37 +169,12 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
           <SponsorLogo
             src={current.logo_url!}
             alt={current.name}
-            maxHeight={SPONSOR_LOGO_MAX_HEIGHT}
-            maxWidth={SPONSOR_LOGO_MAX_WIDTH}
+            maxHeight={SPONSOR_LOGO_MAX_HEIGHT * logoScale}
+            maxWidth={SPONSOR_LOGO_MAX_WIDTH * logoScale}
             onError={() => setImgFailed(true)}
           />
         )}
-      </span>
-    </>
-  );
-
-  return (
-    <div
-      ref={containerRef}
-      className="w-full border-y border-border/60 bg-transparent"
-      style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
-    >
-      {hasLink ? (
-        <a
-          href={current.target_url!}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleClick}
-          aria-label={t("sponsor.visitExternalAria", { name: current.name })}
-          className="group flex w-full min-h-12 cursor-pointer flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center transition-opacity hover:opacity-95 active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          {inner}
-        </a>
-      ) : (
-        <div className="group flex w-full min-h-12 flex-col items-center justify-center gap-2 bg-transparent px-4 py-4 text-center">
-          {inner}
-        </div>
-      )}
+      </SponsorBannerFrame>
     </div>
   );
 }

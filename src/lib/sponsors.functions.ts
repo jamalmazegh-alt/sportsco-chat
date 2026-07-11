@@ -42,15 +42,17 @@ export const getActiveSponsorsForHome = createServerFn({ method: "GET" })
     });
     if (error) throw new Error(error.message);
     const sponsors = await Promise.all(
-      (rows ?? []).map(async (s) => ({
+      (rows ?? []).map(async (s: any) => ({
         id: s.id as string,
         name: s.name as string,
         target_url: (s.target_url as string | null) ?? null,
         logo_url: await signLogoUrl(s.logo_url as string | null),
+        logo_scale: Number(s.logo_scale ?? 1),
       })),
     );
     return sponsors;
   });
+
 
 export const recordSponsorImpression = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -90,13 +92,14 @@ export const listClubSponsors = createServerFn({ method: "GET" })
     });
     const { data: rows, error } = await context.supabase
       .from("sponsors")
-      .select("id, name, logo_url, target_url, is_active, created_at, updated_at")
+      .select("id, name, logo_url, target_url, is_active, logo_scale, created_at, updated_at")
       .eq("club_id", data.clubId)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     const withUrls = await Promise.all(
-      (rows ?? []).map(async (s) => ({
+      (rows ?? []).map(async (s: any) => ({
         ...s,
+        logo_scale: Number(s.logo_scale ?? 1),
         logo_signed_url: await signLogoUrl(s.logo_url),
       })),
     );
@@ -109,6 +112,7 @@ const SponsorCreateInput = z.object({
   targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
+  logoScale: z.number().min(0.75).max(1.3).optional(),
 });
 
 export const createSponsor = createServerFn({ method: "POST" })
@@ -134,6 +138,7 @@ export const createSponsor = createServerFn({ method: "POST" })
         target_url: normalizedUrl,
         logo_url: data.logoPath ?? null,
         is_active: data.isActive ?? true,
+        logo_scale: data.logoScale ?? 1,
       })
       .select("id")
       .single();
@@ -148,6 +153,7 @@ const SponsorUpdateInput = z.object({
   targetUrl: z.string().trim().max(2048).optional().nullable(),
   logoPath: z.string().trim().max(500).optional().nullable(),
   isActive: z.boolean().optional(),
+  logoScale: z.number().min(0.75).max(1.3).optional(),
 });
 
 export const updateSponsor = createServerFn({ method: "POST" })
@@ -177,11 +183,13 @@ export const updateSponsor = createServerFn({ method: "POST" })
       target_url?: string | null;
       logo_url?: string | null;
       is_active?: boolean;
+      logo_scale?: number;
     } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (normalizedUrl !== undefined) patch.target_url = normalizedUrl;
     if (data.logoPath !== undefined) patch.logo_url = data.logoPath;
     if (data.isActive !== undefined) patch.is_active = data.isActive;
+    if (data.logoScale !== undefined) patch.logo_scale = data.logoScale;
     const { error } = await context.supabase
       .from("sponsors")
       .update(patch)

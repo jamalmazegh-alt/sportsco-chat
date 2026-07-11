@@ -2188,7 +2188,15 @@
       "colClicks": "Clic",
       "colCtr": "Tasso di clic (%)",
       "fromDate": "Dal",
-      "toDate": "Al"
+      "toDate": "Al",
+      "previewTitle": "Anteprima nella home page",
+      "previewAlt": "Anteprima del logo del partner",
+      "logoSize": "Dimensione del logo",
+      "logoSizeSmall": "Piccolo",
+      "logoSizeDefault": "Standard",
+      "logoSizeLarge": "Grande",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Regola la dimensione come apparirà ai membri."
     }
   }
 }

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import i18nInstance from "@/lib/i18n";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -44,6 +44,17 @@ import {
   updateSponsor,
 } from "@/lib/sponsors.functions";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import { Slider } from "@/components/ui/slider";
+import { SponsorLogo } from "@/components/sponsors/SponsorLogo";
+import { SponsorBannerFrame } from "@/components/sponsors/SponsorBannerFrame";
+import {
+  SPONSOR_LOGO_DEFAULT_SCALE,
+  SPONSOR_LOGO_MAX_HEIGHT,
+  SPONSOR_LOGO_MAX_SCALE,
+  SPONSOR_LOGO_MAX_WIDTH,
+  SPONSOR_LOGO_MIN_SCALE,
+  clampSponsorLogoScale,
+} from "@/components/sponsors/sponsor-logo.constants";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/sponsors")({
   component: SponsorsSettingsPage,
@@ -120,8 +131,27 @@ function SponsorsSettingsPage() {
     name: string;
     targetUrl: string;
     logoPath: string | null;
+    logoPreviewUrl: string | null;
+    logoScale: number;
     isActive: boolean;
   }>(null);
+  // Keep track of any local object URLs to revoke on cleanup.
+  const localObjectUrlsRef = useRef<Set<string>>(new Set());
+  const revokeLocalUrl = (url: string | null | undefined) => {
+    if (!url) return;
+    if (localObjectUrlsRef.current.has(url)) {
+      URL.revokeObjectURL(url);
+      localObjectUrlsRef.current.delete(url);
+    }
+  };
+  const revokeAllLocalUrls = () => {
+    for (const u of localObjectUrlsRef.current) URL.revokeObjectURL(u);
+    localObjectUrlsRef.current.clear();
+  };
+  useEffect(() => () => revokeAllLocalUrls(), []);
+  useEffect(() => {
+    if (!dialogOpen) revokeAllLocalUrls();
+  }, [dialogOpen]);
 
   const [range, setRange] = useState<Range>("30d");
   const [customFrom, setCustomFrom] = useState("");
@@ -156,6 +186,7 @@ function SponsorsSettingsPage() {
             targetUrl: editing.targetUrl,
             logoPath: editing.logoPath,
             isActive: editing.isActive,
+            logoScale: editing.logoScale,
           },
         });
       } else {
@@ -166,6 +197,7 @@ function SponsorsSettingsPage() {
             targetUrl: editing.targetUrl,
             logoPath: editing.logoPath,
             isActive: editing.isActive,
+            logoScale: editing.logoScale,
           },
         });
       }
@@ -205,13 +237,16 @@ function SponsorsSettingsPage() {
       );
       return;
     }
+    // Immediate local preview URL (revoked on cleanup / new file / dialog close).
+    const localPreviewUrl = URL.createObjectURL(file);
+    localObjectUrlsRef.current.add(localPreviewUrl);
     // Ratio hint (non-blocking)
     try {
       const dims = await new Promise<{ w: number; h: number }>((resolve) => {
         const img = new Image();
         img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
         img.onerror = () => resolve({ w: 0, h: 0 });
-        img.src = URL.createObjectURL(file);
+        img.src = localPreviewUrl;
       });
       if (dims.w > 0 && Math.abs(dims.w / dims.h - 4) > 0.6) {
         toast.warning(
@@ -238,9 +273,15 @@ function SponsorsSettingsPage() {
         .from("sponsor-logos")
         .uploadToSignedUrl(path, token, file, { contentType: file.type, upsert: true });
       if (error) throw error;
-      setEditing({ ...editing, logoPath: path });
+      setEditing((current) => {
+        if (!current) return current;
+        // Revoke any previous local preview URL for this editor.
+        if (current.logoPreviewUrl) revokeLocalUrl(current.logoPreviewUrl);
+        return { ...current, logoPath: path, logoPreviewUrl: localPreviewUrl };
+      });
       toast.success(t("sponsor.admin.logoUploaded", { defaultValue: "Logo téléversé" }));
     } catch (e: unknown) {
+      revokeLocalUrl(localPreviewUrl);
       toast.error(
         (e as Error)?.message ??
           t("sponsor.admin.uploadError", { defaultValue: "Échec du téléversement" }),
@@ -289,7 +330,14 @@ function SponsorsSettingsPage() {
       <div className="flex justify-end">
         <Button
           onClick={() => {
-            setEditing({ name: "", targetUrl: "", logoPath: null, isActive: true });
+            setEditing({
+              name: "",
+              targetUrl: "",
+              logoPath: null,
+              logoPreviewUrl: null,
+              logoScale: SPONSOR_LOGO_DEFAULT_SCALE,
+              isActive: true,
+            });
             setDialogOpen(true);
           }}
         >
@@ -364,6 +412,8 @@ function SponsorsSettingsPage() {
                     name: s.name,
                     targetUrl: s.target_url ?? "",
                     logoPath: s.logo_url,
+                    logoPreviewUrl: s.logo_signed_url ?? null,
+                    logoScale: clampSponsorLogoScale(s.logo_scale),
                     isActive: s.is_active,
                   });
                   setDialogOpen(true);
@@ -566,6 +616,95 @@ function SponsorsSettingsPage() {
                   })}
                 </p>
               </div>
+
+              {editing.logoPreviewUrl && (
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {t("sponsor.admin.previewTitle", {
+                      defaultValue: "Aperçu sur la page d'accueil",
+                    })}
+                  </Label>
+                  <div className="overflow-hidden rounded-lg border border-border bg-background">
+                    <SponsorBannerFrame label={t("sponsor.thanksLabel")}>
+                      <SponsorLogo
+                        src={editing.logoPreviewUrl}
+                        alt={
+                          editing.name ||
+                          t("sponsor.admin.previewAlt", {
+                            defaultValue: "Aperçu du logo du partenaire",
+                          })
+                        }
+                        maxHeight={
+                          SPONSOR_LOGO_MAX_HEIGHT * clampSponsorLogoScale(editing.logoScale)
+                        }
+                        maxWidth={
+                          SPONSOR_LOGO_MAX_WIDTH * clampSponsorLogoScale(editing.logoScale)
+                        }
+                      />
+                    </SponsorBannerFrame>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">
+                        {t("sponsor.admin.logoSize", { defaultValue: "Taille du logo" })}
+                      </Label>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {t("sponsor.admin.logoSizePercent", {
+                          percent: Math.round(editing.logoScale * 100),
+                          defaultValue: "{{percent}} %",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { key: "logoSizeSmall", value: 0.85, defaultValue: "Petit" },
+                        {
+                          key: "logoSizeDefault",
+                          value: SPONSOR_LOGO_DEFAULT_SCALE,
+                          defaultValue: "Standard",
+                        },
+                        { key: "logoSizeLarge", value: 1.2, defaultValue: "Grand" },
+                      ].map((preset) => {
+                        const active = Math.abs(editing.logoScale - preset.value) < 0.001;
+                        return (
+                          <Button
+                            key={preset.key}
+                            type="button"
+                            size="sm"
+                            variant={active ? "default" : "outline"}
+                            onClick={() =>
+                              setEditing({ ...editing, logoScale: preset.value })
+                            }
+                          >
+                            {t(`sponsor.admin.${preset.key}`, {
+                              defaultValue: preset.defaultValue,
+                            })}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <Slider
+                      value={[Math.round(editing.logoScale * 100)]}
+                      min={Math.round(SPONSOR_LOGO_MIN_SCALE * 100)}
+                      max={Math.round(SPONSOR_LOGO_MAX_SCALE * 100)}
+                      step={5}
+                      onValueChange={([v]) =>
+                        setEditing({
+                          ...editing,
+                          logoScale: clampSponsorLogoScale((v ?? 100) / 100),
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t("sponsor.admin.logoSizeHint", {
+                        defaultValue:
+                          "Ajustez la taille telle qu'elle apparaîtra aux membres.",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Switch
                   checked={editing.isActive}

@@ -2188,7 +2188,15 @@
       "colClicks": "Cliques",
       "colCtr": "Taxa de cliques (%)",
       "fromDate": "De",
-      "toDate": "Até"
+      "toDate": "Até",
+      "previewTitle": "Pré-visualização na página inicial",
+      "previewAlt": "Pré-visualização do logótipo do parceiro",
+      "logoSize": "Tamanho do logótipo",
+      "logoSizeSmall": "Pequeno",
+      "logoSizeDefault": "Padrão",
+      "logoSizeLarge": "Grande",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Ajuste o tamanho como aparecerá aos membros."
     }
   }
 }

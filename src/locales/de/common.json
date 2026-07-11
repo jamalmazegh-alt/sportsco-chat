@@ -2188,7 +2188,15 @@
       "colClicks": "Klicks",
       "colCtr": "Klickrate (%)",
       "fromDate": "Von",
-      "toDate": "Bis"
+      "toDate": "Bis",
+      "previewTitle": "Vorschau auf der Startseite",
+      "previewAlt": "Vorschau des Partnerlogos",
+      "logoSize": "Logogröße",
+      "logoSizeSmall": "Klein",
+      "logoSizeDefault": "Standard",
+      "logoSizeLarge": "Groß",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Passen Sie die Größe so an, wie sie den Mitgliedern angezeigt wird."
     }
   }
 }

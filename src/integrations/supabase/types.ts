@@ -3547,6 +3547,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          logo_scale: number
           logo_url: string | null
           name: string
           target_url: string | null
@@ -3557,6 +3558,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          logo_scale?: number
           logo_url?: string | null
           name: string
           target_url?: string | null
@@ -3567,6 +3569,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          logo_scale?: number
           logo_url?: string | null
           name?: string
           target_url?: string | null
@@ -5722,6 +5725,7 @@ export type Database = {
         Args: { _club_id: string }
         Returns: {
           id: string
+          logo_scale: number
           logo_url: string
           name: string
           target_url: string

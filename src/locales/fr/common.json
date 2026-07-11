@@ -2188,7 +2188,15 @@
       "colClicks": "Clics",
       "colCtr": "Taux de clic (%)",
       "fromDate": "Du",
-      "toDate": "Au"
+      "toDate": "Au",
+      "previewTitle": "Aperçu sur la page d'accueil",
+      "previewAlt": "Aperçu du logo du partenaire",
+      "logoSize": "Taille du logo",
+      "logoSizeSmall": "Petit",
+      "logoSizeDefault": "Standard",
+      "logoSizeLarge": "Grand",
+      "logoSizePercent": "{{percent}} %",
+      "logoSizeHint": "Ajustez la taille telle qu'elle apparaîtra aux membres."
     }
   }
 }
