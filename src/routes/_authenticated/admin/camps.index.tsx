@@ -2,12 +2,20 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import i18nInstance from "@/lib/i18n";
-import { Loader2, Plus, MapPin, CalendarDays, Users } from "lucide-react";
+import { Loader2, Plus, MapPin, CalendarDays, Users, Search } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CampCreateChooser } from "@/components/camps/CampCreateChooser";
 import { listClubCamps, type ClubCamp } from "@/lib/camps.functions";
 
@@ -29,6 +37,9 @@ export const Route = createFileRoute("/_authenticated/admin/camps/")({
 });
 
 const MANAGER_ROLES = new Set(["admin", "dirigeant", "coach"]);
+
+type StatusFilter = "all" | ClubCamp["status"];
+type SortMode = "startDesc" | "startAsc" | "titleAsc" | "createdDesc";
 
 function statusTone(status: ClubCamp["status"]): string {
   switch (status) {
@@ -58,8 +69,38 @@ function CampsListPage() {
   });
 
   const [creating, setCreating] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortMode, setSortMode] = useState<SortMode>("startDesc");
+  const [search, setSearch] = useState("");
+
+  const displayed = useMemo(() => {
+    const all = camps ?? [];
+    const q = search.trim().toLowerCase();
+    const filtered = all.filter((c) => {
+      if (statusFilter !== "all" && c.status !== statusFilter) return false;
+      if (q && !c.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortMode) {
+        case "startAsc":
+          return a.start_date.localeCompare(b.start_date);
+        case "titleAsc":
+          return a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+        case "createdDesc":
+          return b.created_at.localeCompare(a.created_at);
+        case "startDesc":
+        default:
+          return b.start_date.localeCompare(a.start_date);
+      }
+    });
+    return sorted;
+  }, [camps, statusFilter, sortMode, search]);
 
   if (!canManage) return <Navigate to="/profile" replace />;
+
+  const totalCount = camps?.length ?? 0;
+  const showingCount = displayed.length;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
@@ -80,11 +121,66 @@ function CampsListPage() {
         </Button>
       </div>
 
+      {/* Filters / sort */}
+      {totalCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[180px] max-w-xs">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("filters.searchPlaceholder", { defaultValue: "Rechercher…" })}
+              className="pl-8 h-9"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+            <SelectTrigger className="h-9 w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                {t("filters.status.all", { defaultValue: "Tous les statuts" })}
+              </SelectItem>
+              <SelectItem value="draft">{t("status.draft", { defaultValue: "Brouillon" })}</SelectItem>
+              <SelectItem value="published">{t("status.published", { defaultValue: "Publié" })}</SelectItem>
+              <SelectItem value="closed">{t("status.closed", { defaultValue: "Fermé" })}</SelectItem>
+              <SelectItem value="archived">{t("status.archived", { defaultValue: "Archivé" })}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+            <SelectTrigger className="h-9 w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="startDesc">
+                {t("filters.sort.startDesc", { defaultValue: "Date de début ↓" })}
+              </SelectItem>
+              <SelectItem value="startAsc">
+                {t("filters.sort.startAsc", { defaultValue: "Date de début ↑" })}
+              </SelectItem>
+              <SelectItem value="titleAsc">
+                {t("filters.sort.titleAsc", { defaultValue: "Titre A→Z" })}
+              </SelectItem>
+              <SelectItem value="createdDesc">
+                {t("filters.sort.createdDesc", { defaultValue: "Récemment créés" })}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-xs text-muted-foreground ml-auto">
+            {t("filters.count", {
+              defaultValue: "{{shown}} / {{total}}",
+              shown: showingCount,
+              total: totalCount,
+            })}
+          </div>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
-      ) : (camps ?? []).length === 0 ? (
+      ) : totalCount === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground space-y-4">
           <p>{t("list.empty", { defaultValue: "Aucun stage pour le moment." })}</p>
           <Button onClick={() => setCreating(true)}>
@@ -92,9 +188,13 @@ function CampsListPage() {
             {t("list.new", { defaultValue: "Nouveau stage" })}
           </Button>
         </div>
+      ) : displayed.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+          {t("filters.noResults", { defaultValue: "Aucun stage ne correspond à ces filtres." })}
+        </div>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
-          {(camps ?? []).map((c) => (
+          {displayed.map((c) => (
             <li key={c.id}>
               <Link
                 to="/admin/camps/$campId"
