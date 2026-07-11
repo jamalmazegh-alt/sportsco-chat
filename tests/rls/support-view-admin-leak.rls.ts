@@ -62,8 +62,14 @@ let sessionId: string; // admin persona (adminA target)
 let validated: ValidatedSession;
 let sessionIdParent: string; // parent persona (parentA target)
 let validatedParent: ValidatedSession;
+let sessionIdCoach: string; // coach persona (coachA target, scope = teamA only)
+let validatedCoach: ValidatedSession;
 let obligationA_otherFamily: string; // clubA obligation for playerA2 (NOT parentA's child)
 let convocationA_otherFamily: string; // clubA convocation for playerA2 (NOT parentA's child)
+let otherTeamA: string; // second clubA team, coachA is NOT a member
+let otherEventA: string; // event on otherTeamA
+let convocationA_otherTeam: string; // convocation on otherTeamA/otherEventA (out of coach scope)
+
 
 beforeAll(async () => {
   const fx = getFixtures();
@@ -167,11 +173,64 @@ beforeAll(async () => {
     throw new Error(`convocation playerA2 seed: ${convOtherErr?.message}`);
   }
   convocationA_otherFamily = convOther.id;
+
+  // Session #3 — coach persona: target = coachA. coachA is a coach of teamA
+  // only. To prove the cross-team intra-club guard, seed a SECOND team in
+  // clubA (coachA is NOT a member), an event on it, and a convocation on
+  // that event. The coach session must NOT see it (event_id ∉ scope).
+  const { data: dataC, error: errC } = await superadminClient.rpc(
+    "create_support_view_session" as never,
+    {
+      _target_user_id: fx.users.coachA.userId,
+      _club_id: fx.clubA,
+      _persona: "coach",
+      _reason: "rls cross-team intra-club test",
+      _duration_minutes: 5,
+    } as never,
+  );
+  if (errC || !dataC) throw new Error(`create_support_view_session coach: ${errC?.message}`);
+  sessionIdCoach = (dataC as { id: string }).id;
+  validatedCoach = await loadValidatedSession(
+    superadminClient,
+    fx.users.superadmin.userId,
+    sessionIdCoach,
+  );
+
+  const { data: otherTeamRow, error: otErr } = await admin
+    .from("teams")
+    .insert({ club_id: fx.clubA, name: "rls_supportview_otherTeamA", sport: "football" })
+    .select("id")
+    .single();
+  if (otErr || !otherTeamRow) throw new Error(`otherTeamA seed: ${otErr?.message}`);
+  otherTeamA = otherTeamRow.id;
+
+  const { data: otherEventRow, error: oeErr } = await admin
+    .from("events")
+    .insert({
+      team_id: otherTeamA,
+      title: "rls_supportview_otherEventA",
+      starts_at: new Date(Date.now() + 8 * 24 * 3600 * 1000).toISOString(),
+      type: "training",
+      created_by: fx.users.adminA.userId,
+      status: "published",
+    })
+    .select("id")
+    .single();
+  if (oeErr || !otherEventRow) throw new Error(`otherEventA seed: ${oeErr?.message}`);
+  otherEventA = otherEventRow.id;
+
+  const { data: convOtherTeam, error: cotErr } = await admin
+    .from("convocations")
+    .insert({ event_id: otherEventA, player_id: fx.playerA2, status: "pending" })
+    .select("id")
+    .single();
+  if (cotErr || !convOtherTeam) throw new Error(`otherTeam convocation seed: ${cotErr?.message}`);
+  convocationA_otherTeam = convOtherTeam.id;
 });
 
 afterAll(async () => {
   const fx = getFixtures();
-  for (const sid of [sessionId, sessionIdParent].filter(Boolean)) {
+  for (const sid of [sessionId, sessionIdParent, sessionIdCoach].filter(Boolean)) {
     await superadminClient
       .rpc("end_support_view_session" as never, { _session_id: sid } as never)
       .catch(() => {});
@@ -181,15 +240,24 @@ afterAll(async () => {
     .from("support_view_sessions")
     .delete()
     .eq("superadmin_id", fx.users.superadmin.userId);
-  // Local-seeded rows: clean up explicitly. Fixtures teardown also nukes
-  // convocations by event_id and obligations by cascade — this is belt-only.
-  if (obligationA_otherFamily) {
-    await admin.from("payment_obligations").delete().eq("id", obligationA_otherFamily);
-  }
+  // Local-seeded rows: explicit cleanup (cascades handle FK children).
   if (convocationA_otherFamily) {
     await admin.from("convocations").delete().eq("id", convocationA_otherFamily);
   }
+  if (obligationA_otherFamily) {
+    await admin.from("payment_obligations").delete().eq("id", obligationA_otherFamily);
+  }
+  if (convocationA_otherTeam) {
+    await admin.from("convocations").delete().eq("id", convocationA_otherTeam);
+  }
+  if (otherEventA) {
+    await admin.from("events").delete().eq("id", otherEventA);
+  }
+  if (otherTeamA) {
+    await admin.from("teams").delete().eq("id", otherTeamA);
+  }
 });
+
 
 
 
@@ -356,7 +424,23 @@ describe("Support-view service: cross-target intra-club leak (parent persona)", 
       expect(c.player_id).toBe(fx.playerA);
     }
   });
+
+  it("coach session sees only convocations of coached teams, not another clubA team", async () => {
+    const fx = getFixtures();
+    const { convocations } = await supportDataService.listConvocations(validatedCoach);
+    // Sanity: coachA is coach of teamA → convocationA (eventA/playerA) is in scope.
+    expect(convocations.length).toBeGreaterThan(0);
+    expect(convocations.some((c) => c.id === fx.convocationA)).toBe(true);
+    // Real assertion: convocationA_otherTeam belongs to a clubA team coachA
+    // is NOT part of. Same club_id, different team → must NOT surface.
+    for (const c of convocations) {
+      expect(c.id).not.toBe(convocationA_otherTeam);
+      expect(c.event_id).not.toBe(otherEventA);
+    }
+  });
 });
+
+
 
 
 
