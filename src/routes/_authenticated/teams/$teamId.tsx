@@ -178,44 +178,57 @@ function TeamDetail() {
     },
   });
 
-  // Track which players already have a pending (unaccepted) invite.
-  const { data: pendingInvitePlayerIds } = useQuery({
+  // Pending (unused) invites for the team's players, keyed by playerId, with
+  // the contact points (email/phone) already invited so we can avoid blocking
+  // a player when only *some* of its contacts have been invited/accepted.
+  const { data: pendingInvitesByPlayer } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
       const ids = (players ?? []).map((p: any) => p.id);
-      if (ids.length === 0) return new Set<string>();
+      const map = new Map<string, { emails: Set<string>; phones: Set<string> }>();
+      if (ids.length === 0) return map;
       const { data } = await supabase
         .from("member_invites")
-        .select("player_id, parent_for_player_id, used_at")
+        .select("player_id, parent_for_player_id, email, phone, used_at")
         .eq("club_id", activeClubId!)
         .is("used_at", null);
-      const set = new Set<string>();
       (data ?? []).forEach((r: any) => {
         const pid = r.player_id ?? r.parent_for_player_id;
-        if (pid && ids.includes(pid)) set.add(pid);
+        if (!pid || !ids.includes(pid)) return;
+        if (!map.has(pid)) map.set(pid, { emails: new Set(), phones: new Set() });
+        const entry = map.get(pid)!;
+        if (r.email) entry.emails.add(String(r.email).toLowerCase().trim());
+        if (r.phone) entry.phones.add(String(r.phone).trim());
       });
-      return set;
+      return map;
     },
   });
 
-  // Players who have at least one parent with an email or phone — they can be
-  // invited via their parent even if the player themself has no contact info.
-  const { data: playersWithParentContact } = useQuery({
-    queryKey: ["team-players-with-parent-contact", teamId],
+  // Parents grouped by player — used to know which contacts remain to invite.
+  const { data: parentsByPlayer } = useQuery({
+    queryKey: ["team-parents-by-player", teamId],
     enabled: !!players && players.length > 0 && isCoach,
     queryFn: async () => {
       const ids = (players ?? []).map((p: any) => p.id);
-      if (ids.length === 0) return new Set<string>();
+      const map = new Map<
+        string,
+        Array<{ email: string | null; phone: string | null; parent_user_id: string | null }>
+      >();
+      if (ids.length === 0) return map;
       const { data } = await supabase
         .from("player_parents")
-        .select("player_id, email, phone")
+        .select("player_id, email, phone, parent_user_id")
         .in("player_id", ids);
-      const set = new Set<string>();
       (data ?? []).forEach((r: any) => {
-        if ((r.email && r.email.trim()) || (r.phone && r.phone.trim())) set.add(r.player_id);
+        if (!map.has(r.player_id)) map.set(r.player_id, []);
+        map.get(r.player_id)!.push({
+          email: r.email ?? null,
+          phone: r.phone ?? null,
+          parent_user_id: r.parent_user_id ?? null,
+        });
       });
-      return set;
+      return map;
     },
   });
 
