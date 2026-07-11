@@ -28,11 +28,17 @@ function TicketDetailPage() {
     queryFn: () => getSupportTicket({ data: { ticket_id: ticketId } }),
   });
 
-  const resolve = useMutation({
-    mutationFn: () =>
-      updateSupportTicket({ data: { ticket_id: ticketId, status: "resolved" } }),
-    onSuccess: () => {
-      toast.success(t("actions.resolved_toast", { defaultValue: "Ticket marqué comme résolu" }));
+  const isClosedLike = (s: string) => s === "resolved" || s === "closed";
+
+  const changeStatus = useMutation({
+    mutationFn: (newStatus: "resolved" | "open") =>
+      updateSupportTicket({ data: { ticket_id: ticketId, status: newStatus } }),
+    onSuccess: (_r, newStatus) => {
+      toast.success(
+        newStatus === "resolved"
+          ? t("actions.resolved_toast", { defaultValue: "Ticket marqué comme résolu" })
+          : t("actions.reopened_toast", { defaultValue: "Ticket rouvert" }),
+      );
       refetch();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
@@ -49,7 +55,11 @@ function TicketDetailPage() {
   const { ticket, messages } = data;
   const status = ticket.status as SupportStatus;
   const cls = STATUS_BADGE_CLASS[status] ?? STATUS_BADGE_CLASS.open;
-  const canResolve = status !== "resolved" && status !== "closed";
+  const closedLike = isClosedLike(status);
+  const nextStatus: "resolved" | "open" = closedLike ? "open" : "resolved";
+  const actionLabel = closedLike
+    ? t("actions.reopen", { defaultValue: "Rouvrir le ticket" })
+    : t("actions.mark_resolved", { defaultValue: "Marquer comme résolu" });
 
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen">
@@ -69,26 +79,25 @@ function TicketDetailPage() {
               <span>· {t(`category.${ticket.category}`, { defaultValue: ticket.category })}</span>
             </div>
           </div>
-          {canResolve && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => resolve.mutate()}
-              disabled={resolve.isPending}
-              className="shrink-0"
-            >
-              {resolve.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <CheckCircle2 className="h-3.5 w-3.5" />
-              )}
-              <span className="ml-1.5">
-                {t("actions.mark_resolved", { defaultValue: "Marquer comme résolu" })}
-              </span>
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => changeStatus.mutate(nextStatus)}
+            disabled={changeStatus.isPending}
+            className="shrink-0"
+          >
+            {changeStatus.isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : closedLike ? (
+              <RotateCcw className="h-3.5 w-3.5" />
+            ) : (
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            )}
+            <span className="ml-1.5">{actionLabel}</span>
+          </Button>
         </div>
       </header>
+
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <TicketThread
           ticketId={ticket.id}
