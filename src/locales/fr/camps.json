@@ -3,7 +3,8 @@
     "add": "Ajouter",
     "back": "Retour",
     "cancel": "Annuler",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "save": "Enregistrer"
   },
   "chooser": {
     "title": "Nouveau stage",
@@ -53,9 +54,7 @@
       "title": "Stages du club – Clubero",
       "description": "Créez, publiez et gérez les stages proposés par votre club."
     },
-    "edit": {
-      "title": "Édition d'un stage – Clubero"
-    }
+    "edit": { "title": "Édition d'un stage – Clubero" }
   },
   "list": {
     "title": "Stages du club",
@@ -65,6 +64,18 @@
     "create": "Créer le brouillon",
     "empty": "Aucun stage pour le moment.",
     "hasVenue": "Lieu défini"
+  },
+  "filters": {
+    "searchPlaceholder": "Rechercher…",
+    "count": "{{shown}} / {{total}}",
+    "noResults": "Aucun stage ne correspond à ces filtres.",
+    "status": { "all": "Tous les statuts" },
+    "sort": {
+      "startDesc": "Date de début ↓",
+      "startAsc": "Date de début ↑",
+      "titleAsc": "Titre A→Z",
+      "createdDesc": "Récemment créés"
+    }
   },
   "status": {
     "draft": "Brouillon",
@@ -76,6 +87,12 @@
     "sectionInfo": "Informations",
     "sectionVenue": "Lieu",
     "sectionAgeGroups": "Catégories d'âge",
+    "sectionProgram": "Programme",
+    "sectionProgramHint": "Détaille le déroulé du stage. Glisse-dépose pour réordonner.",
+    "sectionDocuments": "Documents fournis",
+    "sectionDocumentsHint": "Documents mis à disposition des familles (règlement, programme détaillé, plan…).",
+    "sectionRequired": "Pièces à fournir",
+    "sectionRequiredHint": "Ce que chaque famille devra téléverser à l'inscription.",
     "title": "Titre",
     "titlePlaceholder": "Stage de Pâques U9-U11",
     "slug": "Slug (URL)",
@@ -129,6 +146,45 @@
     "archived": "Stage archivé",
     "publicUrl": "Lien public",
     "publicUrlSoon": "page publique bientôt disponible"
+  },
+  "duplicate": {
+    "action": "Dupliquer",
+    "done": "Stage dupliqué",
+    "hint": "Créer une copie en brouillon (sans les inscriptions)."
+  },
+  "program": {
+    "add": "Ajouter une étape",
+    "addTitle": "Ajouter au programme",
+    "editTitle": "Modifier l'étape",
+    "empty": "Aucune étape pour l'instant.",
+    "startsAt": "Début",
+    "endsAt": "Fin",
+    "titlePlaceholder": "Ex. Accueil et échauffement",
+    "descPlaceholder": "Description (facultatif)"
+  },
+  "documents": {
+    "addTitle": "Ajouter un document",
+    "empty": "Aucun document fourni pour l'instant.",
+    "maxHint": "PDF, JPG ou PNG — max 15 Mo.",
+    "titlePlaceholder": "Ex. Règlement intérieur",
+    "tooLarge": "Fichier trop volumineux (max 15 Mo).",
+    "upload": "Téléverser",
+    "uploaded": "Document ajouté"
+  },
+  "required": {
+    "add": "Ajouter une pièce",
+    "addTitle": "Ajouter une pièce à fournir",
+    "editTitle": "Modifier la pièce",
+    "empty": "Aucune pièce demandée pour l'instant.",
+    "mandatory": "Obligatoire",
+    "mandatoryTag": "Obligatoire",
+    "optionalTag": "Facultatif",
+    "sensitive": "Donnée sensible",
+    "sensitiveForced": "Verrouillé — cette catégorie est toujours traitée comme sensible.",
+    "sensitiveHint": "Les données sensibles bénéficient d'un accès restreint et d'une purge accélérée.",
+    "sensitiveTag": "Sensible",
+    "titlePlaceholder": "Ex. Certificat médical",
+    "type": "Type"
   },
   "delete": {
     "title": "Supprimer ce brouillon ?",

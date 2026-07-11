@@ -1,104 +1,207 @@
 {
   "common": {
-    "add": "Ajouter",
-    "back": "Retour",
-    "cancel": "Annuler",
-    "delete": "Supprimer"
+    "add": "Toevoegen",
+    "back": "Terug",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "save": "Opslaan"
+  },
+  "chooser": {
+    "title": "Nieuwe stage",
+    "subtitle": "Hoe wil je deze stage maken?",
+    "assistant": "Maken met de assistent",
+    "assistantHint": "Stap voor stap begeleid",
+    "classic": "Snel aanmaken",
+    "classicHint": "Titel, datums, capaciteit"
+  },
+  "wizard": {
+    "title": "Aanmaakassistent",
+    "back": "Terug",
+    "next": "Volgende",
+    "create": "Stage aanmaken",
+    "optional": "optioneel",
+    "deadlineHint": "Optioneel — moet vóór de startdatum liggen.",
+    "venueHint": "Je kunt deze stap overslaan en later toevoegen.",
+    "ageGroupsEmpty": "Minstens één leeftijdscategorie is vereist om te publiceren. Je kunt er later meer toevoegen.",
+    "footerReady": "Alles klaar",
+    "footerProgress": "Stap {{current}} van {{total}}",
+    "eyebrow": {
+      "title": "Stap 1",
+      "dates": "Stap 2",
+      "capacity": "Stap 3",
+      "venue": "Stap 4",
+      "ageGroups": "Stap 5",
+      "summary": "Overzicht"
+    },
+    "step": {
+      "title": { "title": "Naam van de stage", "hint": "Wat gezinnen zullen zien" },
+      "dates": { "title": "Wanneer?", "hint": "Start, einde en inschrijfdeadline" },
+      "capacity": { "title": "Plaatsen en prijs", "hint": "Hoeveel deelnemers, tegen welke prijs" },
+      "venue": { "title": "Waar vindt het plaats?", "hint": "Optioneel — later te bewerken" },
+      "ageGroups": { "title": "Leeftijdscategorieën", "hint": "Vereist om te publiceren — kies er ten minste één" },
+      "summary": { "title": "Klaar om aan te maken", "hint": "Concept wordt aangemaakt — publiceren op het volgende scherm" }
+    },
+    "summary": {
+      "deadline": "deadline",
+      "places": "plaatsen",
+      "venueSet": "Locatie ingesteld",
+      "ageGroups": "Categorieën",
+      "next": "De stage wordt als concept aangemaakt. Je kunt beschrijving, cover, programma en documenten toevoegen voor je publiceert."
+    }
   },
   "meta": {
     "list": {
-      "title": "Stages du club – Clubero",
-      "description": "Créez, publiez et gérez les stages proposés par votre club."
+      "title": "Clubstages – Clubero",
+      "description": "Maak, publiceer en beheer de stages van je club."
     },
-    "edit": {
-      "title": "Édition d'un stage – Clubero"
-    }
+    "edit": { "title": "Stage bewerken – Clubero" }
   },
   "list": {
-    "title": "Stages du club",
-    "subtitle": "Créez et publiez les stages proposés par votre club.",
-    "new": "Nouveau stage",
-    "newTitle": "Nouveau stage",
-    "create": "Créer le brouillon",
-    "empty": "Aucun stage pour le moment.",
-    "hasVenue": "Lieu défini"
+    "title": "Clubstages",
+    "subtitle": "Maak en publiceer de stages van je club.",
+    "new": "Nieuwe stage",
+    "newTitle": "Nieuwe stage",
+    "create": "Concept aanmaken",
+    "empty": "Nog geen stages.",
+    "hasVenue": "Locatie ingesteld"
+  },
+  "filters": {
+    "searchPlaceholder": "Zoeken…",
+    "count": "{{shown}} / {{total}}",
+    "noResults": "Geen stages die aan deze filters voldoen.",
+    "status": { "all": "Alle statussen" },
+    "sort": {
+      "startDesc": "Startdatum ↓",
+      "startAsc": "Startdatum ↑",
+      "titleAsc": "Titel A→Z",
+      "createdDesc": "Recent aangemaakt"
+    }
   },
   "status": {
-    "draft": "Brouillon",
-    "published": "Publié",
-    "closed": "Fermé",
-    "archived": "Archivé"
+    "draft": "Concept",
+    "published": "Gepubliceerd",
+    "closed": "Gesloten",
+    "archived": "Gearchiveerd"
   },
   "form": {
-    "sectionInfo": "Informations",
-    "sectionVenue": "Lieu",
-    "sectionAgeGroups": "Catégories d'âge",
-    "title": "Titre",
-    "titlePlaceholder": "Stage de Pâques U9-U11",
+    "sectionInfo": "Informatie",
+    "sectionVenue": "Locatie",
+    "sectionAgeGroups": "Leeftijdscategorieën",
+    "sectionProgram": "Programma",
+    "sectionProgramHint": "Beschrijf het verloop. Sleep om te herschikken.",
+    "sectionDocuments": "Aangeleverde documenten",
+    "sectionDocumentsHint": "Bestanden gedeeld met gezinnen (reglement, gedetailleerd programma, plan…).",
+    "sectionRequired": "Vereiste documenten",
+    "sectionRequiredHint": "Wat elk gezin moet uploaden bij inschrijving.",
+    "title": "Titel",
+    "titlePlaceholder": "Paasstage U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
-    "slugLocked": "Le slug est verrouillé après publication.",
-    "description": "Description",
-    "cover": "Image de couverture",
-    "startDate": "Début",
-    "endDate": "Fin",
-    "deadline": "Date limite d'inscription",
-    "price": "Tarif indicatif",
-    "currency": "Devise",
-    "capacity": "Capacité",
-    "paymentInstructions": "Modalités de paiement",
-    "paymentInstructionsPlaceholder": "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
-    "retention": "Rétention des documents (mois)",
-    "venue": "Lieu",
-    "venuePlaceholder": "Choisir un lieu",
-    "venueNone": "— Aucun —",
-    "facility": "Terrain / installation",
-    "facilityPlaceholder": "Optionnel",
-    "facilityNone": "— Aucun —",
-    "save": "Enregistrer",
-    "saved": "Modifications enregistrées"
+    "slugHint": "Letters, cijfers en streepjes. Bewerkbaar zolang de stage een concept is.",
+    "slugLocked": "Slug wordt vergrendeld na publicatie.",
+    "description": "Beschrijving",
+    "cover": "Coverafbeelding",
+    "startDate": "Start",
+    "endDate": "Einde",
+    "deadline": "Inschrijfdeadline",
+    "price": "Indicatieve prijs",
+    "currency": "Valuta",
+    "capacity": "Capaciteit",
+    "paymentInstructions": "Betalingsinstructies",
+    "paymentInstructionsPlaceholder": "Bijv. betaling bij inschrijving met kaart, cheque of cash ter plaatse.",
+    "retention": "Documentbewaring (maanden)",
+    "venue": "Locatie",
+    "venuePlaceholder": "Kies een locatie",
+    "venueNone": "— Geen —",
+    "facility": "Faciliteit",
+    "facilityPlaceholder": "Optioneel",
+    "facilityNone": "— Geen —",
+    "save": "Opslaan",
+    "saved": "Wijzigingen opgeslagen"
   },
   "ageGroups": {
-    "empty": "Aucune catégorie pour l'instant.",
-    "addTitle": "Ajouter une catégorie",
-    "labelPlaceholder": "Label (ex. U9)",
-    "yearMin": "Année min",
-    "yearMax": "Année max"
+    "empty": "Nog geen categorieën.",
+    "addTitle": "Categorie toevoegen",
+    "labelPlaceholder": "Label (bijv. U9)",
+    "yearMin": "Min. jaar",
+    "yearMax": "Max. jaar",
+    "quickAdd": "Snel toevoegen",
+    "pickPreset": "Kies U6 – U19",
+    "allAdded": "Alle toegevoegd",
+    "addCustom": "+ Eigen categorie"
   },
   "cover": {
-    "empty": "Aucune image de couverture",
-    "add": "Ajouter une image",
-    "replace": "Remplacer",
-    "uploaded": "Image mise à jour",
-    "tooLarge": "Image trop volumineuse (max 5 MB)",
-    "unsupported": "Format non supporté (JPG, PNG, WEBP)"
+    "empty": "Geen coverafbeelding",
+    "add": "Afbeelding toevoegen",
+    "replace": "Vervangen",
+    "uploaded": "Afbeelding bijgewerkt",
+    "tooLarge": "Afbeelding te groot (max. 5 MB)",
+    "unsupported": "Formaat niet ondersteund (JPG, PNG, WEBP)"
   },
   "lifecycle": {
-    "publish": "Publier",
-    "published": "Stage publié",
-    "close": "Fermer les inscriptions",
-    "closed": "Inscriptions fermées",
-    "archive": "Archiver",
-    "archived": "Stage archivé",
-    "publicUrl": "Lien public",
-    "publicUrlSoon": "page publique bientôt disponible"
+    "publish": "Publiceren",
+    "published": "Stage gepubliceerd",
+    "close": "Inschrijvingen sluiten",
+    "closed": "Inschrijvingen gesloten",
+    "archive": "Archiveren",
+    "archived": "Stage gearchiveerd",
+    "publicUrl": "Publieke link",
+    "publicUrlSoon": "publieke pagina binnenkort beschikbaar"
+  },
+  "duplicate": {
+    "action": "Dupliceren",
+    "done": "Stage gedupliceerd",
+    "hint": "Maak een conceptkopie (zonder inschrijvingen)."
+  },
+  "program": {
+    "add": "Stap toevoegen",
+    "addTitle": "Aan programma toevoegen",
+    "editTitle": "Stap bewerken",
+    "empty": "Nog geen stappen.",
+    "startsAt": "Start",
+    "endsAt": "Einde",
+    "titlePlaceholder": "Bijv. Onthaal en opwarming",
+    "descPlaceholder": "Beschrijving (optioneel)"
+  },
+  "documents": {
+    "addTitle": "Document toevoegen",
+    "empty": "Nog geen documenten aangeleverd.",
+    "maxHint": "PDF, JPG of PNG — max. 15 MB.",
+    "titlePlaceholder": "Bijv. Huishoudelijk reglement",
+    "tooLarge": "Bestand te groot (max. 15 MB).",
+    "upload": "Uploaden",
+    "uploaded": "Document toegevoegd"
+  },
+  "required": {
+    "add": "Vereist document toevoegen",
+    "addTitle": "Vereist document toevoegen",
+    "editTitle": "Vereist document bewerken",
+    "empty": "Nog geen vereiste documenten.",
+    "mandatory": "Verplicht",
+    "mandatoryTag": "Verplicht",
+    "optionalTag": "Optioneel",
+    "sensitive": "Gevoelige gegevens",
+    "sensitiveForced": "Vergrendeld — deze categorie wordt altijd als gevoelig beschouwd.",
+    "sensitiveHint": "Gevoelige gegevens hebben beperkte toegang en snellere verwijdering.",
+    "sensitiveTag": "Gevoelig",
+    "titlePlaceholder": "Bijv. Medisch attest",
+    "type": "Type"
   },
   "delete": {
-    "title": "Supprimer ce brouillon ?",
-    "desc": "Cette action est définitive."
+    "title": "Dit concept verwijderen?",
+    "desc": "Deze actie is definitief."
   },
   "errors": {
-    "slugTaken": "Ce slug est déjà utilisé.",
-    "slugInvalid": "Slug invalide.",
-    "slugLocked": "Le slug ne peut plus changer après publication.",
-    "datesInvalid": "La date de fin doit être postérieure au début.",
-    "notDraft": "Le stage n'est plus en brouillon.",
-    "deleteNotDraft": "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
-    "publishTitleRequired": "Titre requis pour publier.",
-    "publishDatesRequired": "Dates de début et de fin requises.",
-    "publishDatesOrder": "La date de fin doit être après le début.",
-    "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
-    "publishCapacityRequired": "Une capacité positive est requise.",
-    "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+    "slugTaken": "Deze slug is al in gebruik.",
+    "slugInvalid": "Ongeldige slug.",
+    "slugLocked": "Slug kan niet meer wijzigen na publicatie.",
+    "datesInvalid": "Einddatum moet na de startdatum liggen.",
+    "notDraft": "De stage is geen concept meer.",
+    "deleteNotDraft": "Alleen concepten kunnen verwijderd worden. Archiveer het anders.",
+    "publishTitleRequired": "Titel vereist om te publiceren.",
+    "publishDatesRequired": "Start- en einddatum vereist.",
+    "publishDatesOrder": "Einddatum moet na de startdatum liggen.",
+    "publishDeadlineAfterStart": "Inschrijfdeadline moet vóór de startdatum liggen.",
+    "publishCapacityRequired": "Een positieve capaciteit is vereist.",
+    "publishAgeGroupRequired": "Voeg minstens één leeftijdscategorie toe voor je publiceert."
   }
 }

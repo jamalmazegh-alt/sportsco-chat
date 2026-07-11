@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import i18nInstance from "@/lib/i18n";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Save, Rocket, Lock, Archive, XCircle, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Save, Rocket, Lock, Archive, XCircle, Trash2, Copy } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import {
   closeClubCamp,
   archiveClubCamp,
   deleteClubCamp,
+  duplicateClubCamp,
 } from "@/lib/camps.functions";
 import { slugifyCampTitle, isValidCampSlug } from "@/lib/camps.slug";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
@@ -79,6 +80,7 @@ function CampEditPage() {
   const closeFn = useServerFn(closeClubCamp);
   const archiveFn = useServerFn(archiveClubCamp);
   const deleteFn = useServerFn(deleteClubCamp);
+  const duplicateFn = useServerFn(duplicateClubCamp);
 
   const { data: camp, isLoading } = useQuery({
     queryKey: ["club-camp", campId],
@@ -206,6 +208,16 @@ function CampEditPage() {
     onError: (e: Error) => toast.error(mapErr(e.message, t)),
   });
 
+  const duplicateMut = useMutation({
+    mutationFn: () => duplicateFn({ data: { campId } }),
+    onSuccess: (res) => {
+      toast.success(t("duplicate.done", { defaultValue: "Stage dupliqué" }));
+      qc.invalidateQueries({ queryKey: ["club-camps"] });
+      navigate({ to: "/admin/camps/$campId", params: { campId: res.id } });
+    },
+    onError: (e: Error) => toast.error(mapErr(e.message, t)),
+  });
+
   if (!canManage) return <Navigate to="/profile" replace />;
   if (isLoading || !camp) {
     return (
@@ -224,9 +236,27 @@ function CampEditPage() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           {t("common.back", { defaultValue: "Retour" })}
         </Button>
-        <Badge variant="outline" className="ml-auto">
-          {t(`status.${camp.status}`, { defaultValue: camp.status })}
-        </Badge>
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => duplicateMut.mutate()}
+            disabled={duplicateMut.isPending}
+            title={t("duplicate.hint", {
+              defaultValue: "Créer une copie en brouillon (sans les inscriptions).",
+            })}
+          >
+            {duplicateMut.isPending ? (
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4 mr-1.5" />
+            )}
+            {t("duplicate.action", { defaultValue: "Dupliquer" })}
+          </Button>
+          <Badge variant="outline">
+            {t(`status.${camp.status}`, { defaultValue: camp.status })}
+          </Badge>
+        </div>
       </div>
 
       {camp.status === "published" && (
