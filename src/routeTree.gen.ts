@@ -37,6 +37,7 @@ import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments
 import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
 import { Route as TournamentInviteTokenRouteImport } from './routes/tournament-invite.$token'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as SupportViewSessionIdRouteImport } from './routes/support-view.$sessionId'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
@@ -71,6 +72,7 @@ import { Route as AuthenticatedAssistantRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as SupportViewSessionIdIndexRouteImport } from './routes/support-view.$sessionId.index'
 import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
@@ -295,6 +297,11 @@ const TSlugRoute = TSlugRouteImport.update({
   path: '/t/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SupportViewSessionIdRoute = SupportViewSessionIdRouteImport.update({
+  id: '/support-view/$sessionId',
+  path: '/support-view/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuperadminUsersRoute = SuperadminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -467,6 +474,12 @@ const Char91DotmcpChar93ListToolsRoute =
     id: '/.mcp/list-tools',
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const SupportViewSessionIdIndexRoute =
+  SupportViewSessionIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => SupportViewSessionIdRoute,
   } as any)
 const SuperadminSupportTicketsIndexRoute =
   SuperadminSupportTicketsIndexRouteImport.update({
@@ -1008,6 +1021,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
+  '/support-view/$sessionId': typeof SupportViewSessionIdRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRoute
@@ -1053,6 +1067,7 @@ export interface FileRoutesByFullPath {
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/support-view/$sessionId/': typeof SupportViewSessionIdIndexRoute
   '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1196,6 +1211,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
+  '/support-view/$sessionId': typeof SupportViewSessionIdIndexRoute
   '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1300,6 +1316,7 @@ export interface FileRoutesById {
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
+  '/support-view/$sessionId': typeof SupportViewSessionIdRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRoute
@@ -1345,6 +1362,7 @@ export interface FileRoutesById {
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/support-view/$sessionId/': typeof SupportViewSessionIdIndexRoute
   '/_authenticated/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/_authenticated/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
@@ -1449,6 +1467,7 @@ export interface FileRouteTypes {
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
+    | '/support-view/$sessionId'
     | '/t/$slug'
     | '/tournament-invite/$token'
     | '/tournament/$slug'
@@ -1494,6 +1513,7 @@ export interface FileRouteTypes {
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/support-view/$sessionId/'
     | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
@@ -1637,6 +1657,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
+    | '/support-view/$sessionId'
     | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
@@ -1740,6 +1761,7 @@ export interface FileRouteTypes {
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
+    | '/support-view/$sessionId'
     | '/t/$slug'
     | '/tournament-invite/$token'
     | '/tournament/$slug'
@@ -1785,6 +1807,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/support-view/$sessionId/'
     | '/_authenticated/admin/payments/dashboard'
     | '/_authenticated/admin/payments/items'
     | '/_authenticated/admin/settings/branding'
@@ -1870,6 +1893,7 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   RTokenRoute: typeof RTokenRoute
   RegisterPlayerRoute: typeof RegisterPlayerRoute
+  SupportViewSessionIdRoute: typeof SupportViewSessionIdRouteWithChildren
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
   TournamentSlugRoute: typeof TournamentSlugRoute
@@ -2110,6 +2134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support-view/$sessionId': {
+      id: '/support-view/$sessionId'
+      path: '/support-view/$sessionId'
+      fullPath: '/support-view/$sessionId'
+      preLoaderRoute: typeof SupportViewSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superadmin/users': {
       id: '/superadmin/users'
       path: '/users'
@@ -2347,6 +2378,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.mcp/list-tools'
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/support-view/$sessionId/': {
+      id: '/support-view/$sessionId/'
+      path: '/'
+      fullPath: '/support-view/$sessionId/'
+      preLoaderRoute: typeof SupportViewSessionIdIndexRouteImport
+      parentRoute: typeof SupportViewSessionIdRoute
     }
     '/superadmin/support-tickets/': {
       id: '/superadmin/support-tickets/'
@@ -3229,6 +3267,17 @@ const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
   SuperadminRouteChildren,
 )
 
+interface SupportViewSessionIdRouteChildren {
+  SupportViewSessionIdIndexRoute: typeof SupportViewSessionIdIndexRoute
+}
+
+const SupportViewSessionIdRouteChildren: SupportViewSessionIdRouteChildren = {
+  SupportViewSessionIdIndexRoute: SupportViewSessionIdIndexRoute,
+}
+
+const SupportViewSessionIdRouteWithChildren =
+  SupportViewSessionIdRoute._addFileChildren(SupportViewSessionIdRouteChildren)
+
 interface TSlugRouteChildren {
   TSlugRegisterRoute: typeof TSlugRegisterRoute
   TSlugTvRoute: typeof TSlugTvRoute
@@ -3295,6 +3344,7 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   RTokenRoute: RTokenRoute,
   RegisterPlayerRoute: RegisterPlayerRoute,
+  SupportViewSessionIdRoute: SupportViewSessionIdRouteWithChildren,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
   TournamentSlugRoute: TournamentSlugRoute,
@@ -3340,13 +3390,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

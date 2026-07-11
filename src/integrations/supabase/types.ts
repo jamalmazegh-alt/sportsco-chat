@@ -4019,6 +4019,94 @@ export type Database = {
           },
         ]
       }
+      support_view_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json
+          session_id: string
+          superadmin_id: string
+          target_id: string | null
+          target_kind: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          session_id: string
+          superadmin_id: string
+          target_id?: string | null
+          target_kind?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          session_id?: string
+          superadmin_id?: string
+          target_id?: string | null
+          target_kind?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_view_actions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "support_view_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_view_sessions: {
+        Row: {
+          club_id: string
+          created_at: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          persona: Database["public"]["Enums"]["support_view_persona"]
+          reason: string
+          started_at: string
+          superadmin_id: string
+          target_user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at: string
+          id?: string
+          persona: Database["public"]["Enums"]["support_view_persona"]
+          reason: string
+          started_at?: string
+          superadmin_id: string
+          target_user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          persona?: Database["public"]["Enums"]["support_view_persona"]
+          reason?: string
+          started_at?: string
+          superadmin_id?: string
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_view_sessions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -5819,6 +5907,33 @@ export type Database = {
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
       }
+      create_support_view_session: {
+        Args: {
+          _club_id: string
+          _duration_minutes?: number
+          _persona: Database["public"]["Enums"]["support_view_persona"]
+          _reason: string
+          _target_user_id: string
+        }
+        Returns: {
+          club_id: string
+          created_at: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          persona: Database["public"]["Enums"]["support_view_persona"]
+          reason: string
+          started_at: string
+          superadmin_id: string
+          target_user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "support_view_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       current_user_has_tournament_collab: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -5827,6 +5942,10 @@ export type Database = {
       delete_team_if_empty: { Args: { _id: string }; Returns: undefined }
       email_exists: { Args: { _email: string }; Returns: boolean }
       email_queue_dispatch: { Args: never; Returns: undefined }
+      end_support_view_session: {
+        Args: { _session_id: string }
+        Returns: undefined
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -5858,6 +5977,27 @@ export type Database = {
           name: string
           target_url: string
         }[]
+      }
+      get_active_support_view_session: {
+        Args: { _session_id: string }
+        Returns: {
+          club_id: string
+          created_at: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          persona: Database["public"]["Enums"]["support_view_persona"]
+          reason: string
+          started_at: string
+          superadmin_id: string
+          target_user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "support_view_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_club_stripe_status: {
         Args: { _club_id: string }
@@ -6021,6 +6161,16 @@ export type Database = {
           _user_agent?: string
         }
         Returns: string
+      }
+      log_support_view_action: {
+        Args: {
+          _action: string
+          _metadata?: Json
+          _session_id: string
+          _target_id?: string
+          _target_kind?: string
+        }
+        Returns: undefined
       }
       mark_expired_availabilities_completed: { Args: never; Returns: number }
       mark_support_ticket_read: {
@@ -6296,6 +6446,12 @@ export type Database = {
         | "waiting_user"
         | "resolved"
         | "closed"
+      support_view_persona:
+        | "club_admin"
+        | "coach"
+        | "player"
+        | "parent"
+        | "member"
       tournament_collaborator_role: "co_organizer" | "referee"
       tournament_event_kind:
         | "goal"
@@ -6578,6 +6734,13 @@ export const Constants = {
         "waiting_user",
         "resolved",
         "closed",
+      ],
+      support_view_persona: [
+        "club_admin",
+        "coach",
+        "player",
+        "parent",
+        "member",
       ],
       tournament_collaborator_role: ["co_organizer", "referee"],
       tournament_event_kind: [
