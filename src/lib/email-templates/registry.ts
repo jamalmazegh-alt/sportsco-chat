@@ -81,4 +81,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "tournament-completed": tournamentCompletedTemplate,
   "waitlist-confirmation": waitlistConfirmationTemplate,
   "waitlist-admin-notification": waitlistAdminNotificationTemplate,
+  "camp-registration-received": campRegistrationReceivedTemplate,
+  "camp-new-registration": campNewRegistrationTemplate,
 };
