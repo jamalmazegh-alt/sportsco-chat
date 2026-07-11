@@ -1001,6 +1001,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
         event: eventMap.get(c.event_id) ?? null,
       })),
       recent_admin_actions: recentLogs ?? [],
+      invites,
     };
   });
 
