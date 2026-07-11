@@ -1,104 +1,207 @@
 {
   "common": {
-    "add": "Ajouter",
-    "back": "Retour",
-    "cancel": "Annuler",
-    "delete": "Supprimer"
+    "add": "Añadir",
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "save": "Guardar"
+  },
+  "chooser": {
+    "title": "Nuevo campus",
+    "subtitle": "¿Cómo quieres crear este campus?",
+    "assistant": "Crear con el asistente",
+    "assistantHint": "Guiado, paso a paso",
+    "classic": "Creación rápida",
+    "classicHint": "Título, fechas, aforo"
+  },
+  "wizard": {
+    "title": "Asistente de creación",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "create": "Crear campus",
+    "optional": "opcional",
+    "deadlineHint": "Opcional — debe ser anterior a la fecha de inicio.",
+    "venueHint": "Puedes omitir este paso y añadirlo después.",
+    "ageGroupsEmpty": "Se requiere al menos una categoría para publicar. Puedes añadir más después.",
+    "footerReady": "Todo listo",
+    "footerProgress": "Paso {{current}} de {{total}}",
+    "eyebrow": {
+      "title": "Paso 1",
+      "dates": "Paso 2",
+      "capacity": "Paso 3",
+      "venue": "Paso 4",
+      "ageGroups": "Paso 5",
+      "summary": "Resumen"
+    },
+    "step": {
+      "title": { "title": "Nombre del campus", "hint": "Lo que verán las familias" },
+      "dates": { "title": "¿Cuándo?", "hint": "Inicio, fin y fecha límite de inscripción" },
+      "capacity": { "title": "Plazas y precio", "hint": "Cuántos participantes y a qué precio" },
+      "venue": { "title": "¿Dónde se celebra?", "hint": "Opcional — editable más tarde" },
+      "ageGroups": { "title": "Categorías de edad", "hint": "Obligatorio para publicar — elige al menos una" },
+      "summary": { "title": "Listo para crear", "hint": "Se creará el borrador — publica en la siguiente pantalla" }
+    },
+    "summary": {
+      "deadline": "fecha límite",
+      "places": "plazas",
+      "venueSet": "Lugar definido",
+      "ageGroups": "Categorías",
+      "next": "El campus se creará como borrador. Podrás añadir descripción, imagen, programa y documentos antes de publicar."
+    }
   },
   "meta": {
     "list": {
-      "title": "Stages du club – Clubero",
-      "description": "Créez, publiez et gérez les stages proposés par votre club."
+      "title": "Campus del club – Clubero",
+      "description": "Crea, publica y gestiona los campus organizados por tu club."
     },
-    "edit": {
-      "title": "Édition d'un stage – Clubero"
-    }
+    "edit": { "title": "Editar campus – Clubero" }
   },
   "list": {
-    "title": "Stages du club",
-    "subtitle": "Créez et publiez les stages proposés par votre club.",
-    "new": "Nouveau stage",
-    "newTitle": "Nouveau stage",
-    "create": "Créer le brouillon",
-    "empty": "Aucun stage pour le moment.",
-    "hasVenue": "Lieu défini"
+    "title": "Campus del club",
+    "subtitle": "Crea y publica los campus organizados por tu club.",
+    "new": "Nuevo campus",
+    "newTitle": "Nuevo campus",
+    "create": "Crear borrador",
+    "empty": "Aún no hay campus.",
+    "hasVenue": "Lugar definido"
+  },
+  "filters": {
+    "searchPlaceholder": "Buscar…",
+    "count": "{{shown}} / {{total}}",
+    "noResults": "Ningún campus coincide con estos filtros.",
+    "status": { "all": "Todos los estados" },
+    "sort": {
+      "startDesc": "Fecha de inicio ↓",
+      "startAsc": "Fecha de inicio ↑",
+      "titleAsc": "Título A→Z",
+      "createdDesc": "Creados recientemente"
+    }
   },
   "status": {
-    "draft": "Brouillon",
-    "published": "Publié",
-    "closed": "Fermé",
-    "archived": "Archivé"
+    "draft": "Borrador",
+    "published": "Publicado",
+    "closed": "Cerrado",
+    "archived": "Archivado"
   },
   "form": {
-    "sectionInfo": "Informations",
-    "sectionVenue": "Lieu",
-    "sectionAgeGroups": "Catégories d'âge",
-    "title": "Titre",
-    "titlePlaceholder": "Stage de Pâques U9-U11",
+    "sectionInfo": "Información",
+    "sectionVenue": "Lugar",
+    "sectionAgeGroups": "Categorías de edad",
+    "sectionProgram": "Programa",
+    "sectionProgramHint": "Describe el desarrollo. Arrastra y suelta para reordenar.",
+    "sectionDocuments": "Documentos entregados",
+    "sectionDocumentsHint": "Archivos compartidos con las familias (reglamento, programa detallado, plano…).",
+    "sectionRequired": "Documentos requeridos",
+    "sectionRequiredHint": "Lo que cada familia debe subir en la inscripción.",
+    "title": "Título",
+    "titlePlaceholder": "Campus de Pascua U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
-    "slugLocked": "Le slug est verrouillé après publication.",
-    "description": "Description",
-    "cover": "Image de couverture",
-    "startDate": "Début",
+    "slugHint": "Letras, dígitos y guiones. Editable mientras el campus sea un borrador.",
+    "slugLocked": "El slug se bloquea tras publicar.",
+    "description": "Descripción",
+    "cover": "Imagen de portada",
+    "startDate": "Inicio",
     "endDate": "Fin",
-    "deadline": "Date limite d'inscription",
-    "price": "Tarif indicatif",
-    "currency": "Devise",
-    "capacity": "Capacité",
-    "paymentInstructions": "Modalités de paiement",
-    "paymentInstructionsPlaceholder": "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
-    "retention": "Rétention des documents (mois)",
-    "venue": "Lieu",
-    "venuePlaceholder": "Choisir un lieu",
-    "venueNone": "— Aucun —",
-    "facility": "Terrain / installation",
-    "facilityPlaceholder": "Optionnel",
-    "facilityNone": "— Aucun —",
-    "save": "Enregistrer",
-    "saved": "Modifications enregistrées"
+    "deadline": "Fecha límite de inscripción",
+    "price": "Precio indicativo",
+    "currency": "Divisa",
+    "capacity": "Aforo",
+    "paymentInstructions": "Instrucciones de pago",
+    "paymentInstructionsPlaceholder": "Ej. pago en la inscripción con tarjeta, cheque o efectivo in situ.",
+    "retention": "Retención de documentos (meses)",
+    "venue": "Lugar",
+    "venuePlaceholder": "Elegir un lugar",
+    "venueNone": "— Ninguno —",
+    "facility": "Instalación",
+    "facilityPlaceholder": "Opcional",
+    "facilityNone": "— Ninguna —",
+    "save": "Guardar",
+    "saved": "Cambios guardados"
   },
   "ageGroups": {
-    "empty": "Aucune catégorie pour l'instant.",
-    "addTitle": "Ajouter une catégorie",
-    "labelPlaceholder": "Label (ex. U9)",
-    "yearMin": "Année min",
-    "yearMax": "Année max"
+    "empty": "Aún no hay categorías.",
+    "addTitle": "Añadir una categoría",
+    "labelPlaceholder": "Etiqueta (ej. U9)",
+    "yearMin": "Año mín.",
+    "yearMax": "Año máx.",
+    "quickAdd": "Añadido rápido",
+    "pickPreset": "Elegir U6 – U19",
+    "allAdded": "Todas añadidas",
+    "addCustom": "+ Categoría personalizada"
   },
   "cover": {
-    "empty": "Aucune image de couverture",
-    "add": "Ajouter une image",
-    "replace": "Remplacer",
-    "uploaded": "Image mise à jour",
-    "tooLarge": "Image trop volumineuse (max 5 MB)",
-    "unsupported": "Format non supporté (JPG, PNG, WEBP)"
+    "empty": "Sin imagen de portada",
+    "add": "Añadir imagen",
+    "replace": "Reemplazar",
+    "uploaded": "Imagen actualizada",
+    "tooLarge": "Imagen demasiado grande (máx. 5 MB)",
+    "unsupported": "Formato no compatible (JPG, PNG, WEBP)"
   },
   "lifecycle": {
-    "publish": "Publier",
-    "published": "Stage publié",
-    "close": "Fermer les inscriptions",
-    "closed": "Inscriptions fermées",
-    "archive": "Archiver",
-    "archived": "Stage archivé",
-    "publicUrl": "Lien public",
-    "publicUrlSoon": "page publique bientôt disponible"
+    "publish": "Publicar",
+    "published": "Campus publicado",
+    "close": "Cerrar inscripciones",
+    "closed": "Inscripciones cerradas",
+    "archive": "Archivar",
+    "archived": "Campus archivado",
+    "publicUrl": "Enlace público",
+    "publicUrlSoon": "página pública próximamente"
+  },
+  "duplicate": {
+    "action": "Duplicar",
+    "done": "Campus duplicado",
+    "hint": "Crear una copia en borrador (sin las inscripciones)."
+  },
+  "program": {
+    "add": "Añadir una etapa",
+    "addTitle": "Añadir al programa",
+    "editTitle": "Editar etapa",
+    "empty": "Aún no hay etapas.",
+    "startsAt": "Inicio",
+    "endsAt": "Fin",
+    "titlePlaceholder": "Ej. Recepción y calentamiento",
+    "descPlaceholder": "Descripción (opcional)"
+  },
+  "documents": {
+    "addTitle": "Añadir un documento",
+    "empty": "Aún no hay documentos entregados.",
+    "maxHint": "PDF, JPG o PNG — máx. 15 MB.",
+    "titlePlaceholder": "Ej. Reglamento interno",
+    "tooLarge": "Archivo demasiado grande (máx. 15 MB).",
+    "upload": "Subir",
+    "uploaded": "Documento añadido"
+  },
+  "required": {
+    "add": "Añadir documento requerido",
+    "addTitle": "Añadir documento requerido",
+    "editTitle": "Editar documento requerido",
+    "empty": "Aún no hay documentos requeridos.",
+    "mandatory": "Obligatorio",
+    "mandatoryTag": "Obligatorio",
+    "optionalTag": "Opcional",
+    "sensitive": "Dato sensible",
+    "sensitiveForced": "Bloqueado — esta categoría siempre se trata como sensible.",
+    "sensitiveHint": "Los datos sensibles tienen acceso restringido y purga acelerada.",
+    "sensitiveTag": "Sensible",
+    "titlePlaceholder": "Ej. Certificado médico",
+    "type": "Tipo"
   },
   "delete": {
-    "title": "Supprimer ce brouillon ?",
-    "desc": "Cette action est définitive."
+    "title": "¿Eliminar este borrador?",
+    "desc": "Esta acción es definitiva."
   },
   "errors": {
-    "slugTaken": "Ce slug est déjà utilisé.",
-    "slugInvalid": "Slug invalide.",
-    "slugLocked": "Le slug ne peut plus changer après publication.",
-    "datesInvalid": "La date de fin doit être postérieure au début.",
-    "notDraft": "Le stage n'est plus en brouillon.",
-    "deleteNotDraft": "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
-    "publishTitleRequired": "Titre requis pour publier.",
-    "publishDatesRequired": "Dates de début et de fin requises.",
-    "publishDatesOrder": "La date de fin doit être après le début.",
-    "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
-    "publishCapacityRequired": "Une capacité positive est requise.",
-    "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+    "slugTaken": "Este slug ya está en uso.",
+    "slugInvalid": "Slug no válido.",
+    "slugLocked": "El slug no puede cambiar tras publicar.",
+    "datesInvalid": "La fecha de fin debe ser posterior al inicio.",
+    "notDraft": "El campus ya no es un borrador.",
+    "deleteNotDraft": "Solo se pueden eliminar borradores. Archívalo en su lugar.",
+    "publishTitleRequired": "Título obligatorio para publicar.",
+    "publishDatesRequired": "Fechas de inicio y fin obligatorias.",
+    "publishDatesOrder": "La fecha de fin debe ser posterior al inicio.",
+    "publishDeadlineAfterStart": "La fecha límite de inscripción debe ser anterior al inicio.",
+    "publishCapacityRequired": "Se requiere un aforo positivo.",
+    "publishAgeGroupRequired": "Añade al menos una categoría antes de publicar."
   }
 }

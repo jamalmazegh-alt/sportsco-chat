@@ -1,104 +1,207 @@
 {
   "common": {
-    "add": "Ajouter",
-    "back": "Retour",
-    "cancel": "Annuler",
-    "delete": "Supprimer"
+    "add": "Adicionar",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "save": "Guardar"
+  },
+  "chooser": {
+    "title": "Novo camp",
+    "subtitle": "Como queres criar este camp?",
+    "assistant": "Criar com o assistente",
+    "assistantHint": "Guiado, passo a passo",
+    "classic": "Criação rápida",
+    "classicHint": "Título, datas, capacidade"
+  },
+  "wizard": {
+    "title": "Assistente de criação",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "create": "Criar camp",
+    "optional": "opcional",
+    "deadlineHint": "Opcional — deve ser anterior à data de início.",
+    "venueHint": "Podes saltar este passo e adicionar depois.",
+    "ageGroupsEmpty": "É necessária pelo menos uma categoria para publicar. Podes adicionar mais depois.",
+    "footerReady": "Tudo pronto",
+    "footerProgress": "Passo {{current}} de {{total}}",
+    "eyebrow": {
+      "title": "Passo 1",
+      "dates": "Passo 2",
+      "capacity": "Passo 3",
+      "venue": "Passo 4",
+      "ageGroups": "Passo 5",
+      "summary": "Resumo"
+    },
+    "step": {
+      "title": { "title": "Nome do camp", "hint": "O que as famílias verão" },
+      "dates": { "title": "Quando?", "hint": "Início, fim e prazo de inscrição" },
+      "capacity": { "title": "Vagas e preço", "hint": "Quantos participantes, a que preço" },
+      "venue": { "title": "Onde se realiza?", "hint": "Opcional — editável mais tarde" },
+      "ageGroups": { "title": "Categorias de idade", "hint": "Necessário para publicar — escolhe pelo menos uma" },
+      "summary": { "title": "Pronto para criar", "hint": "Será criado o rascunho — publicar no próximo ecrã" }
+    },
+    "summary": {
+      "deadline": "prazo",
+      "places": "vagas",
+      "venueSet": "Local definido",
+      "ageGroups": "Categorias",
+      "next": "O camp será criado como rascunho. Podes adicionar descrição, imagem, programa e documentos antes de publicar."
+    }
   },
   "meta": {
     "list": {
-      "title": "Stages du club – Clubero",
-      "description": "Créez, publiez et gérez les stages proposés par votre club."
+      "title": "Camps do clube – Clubero",
+      "description": "Cria, publica e gere os camps organizados pelo teu clube."
     },
-    "edit": {
-      "title": "Édition d'un stage – Clubero"
-    }
+    "edit": { "title": "Editar camp – Clubero" }
   },
   "list": {
-    "title": "Stages du club",
-    "subtitle": "Créez et publiez les stages proposés par votre club.",
-    "new": "Nouveau stage",
-    "newTitle": "Nouveau stage",
-    "create": "Créer le brouillon",
-    "empty": "Aucun stage pour le moment.",
-    "hasVenue": "Lieu défini"
+    "title": "Camps do clube",
+    "subtitle": "Cria e publica os camps organizados pelo teu clube.",
+    "new": "Novo camp",
+    "newTitle": "Novo camp",
+    "create": "Criar rascunho",
+    "empty": "Ainda não há camps.",
+    "hasVenue": "Local definido"
+  },
+  "filters": {
+    "searchPlaceholder": "Pesquisar…",
+    "count": "{{shown}} / {{total}}",
+    "noResults": "Nenhum camp corresponde a estes filtros.",
+    "status": { "all": "Todos os estados" },
+    "sort": {
+      "startDesc": "Data de início ↓",
+      "startAsc": "Data de início ↑",
+      "titleAsc": "Título A→Z",
+      "createdDesc": "Recentemente criados"
+    }
   },
   "status": {
-    "draft": "Brouillon",
-    "published": "Publié",
-    "closed": "Fermé",
-    "archived": "Archivé"
+    "draft": "Rascunho",
+    "published": "Publicado",
+    "closed": "Fechado",
+    "archived": "Arquivado"
   },
   "form": {
-    "sectionInfo": "Informations",
-    "sectionVenue": "Lieu",
-    "sectionAgeGroups": "Catégories d'âge",
-    "title": "Titre",
-    "titlePlaceholder": "Stage de Pâques U9-U11",
+    "sectionInfo": "Informações",
+    "sectionVenue": "Local",
+    "sectionAgeGroups": "Categorias de idade",
+    "sectionProgram": "Programa",
+    "sectionProgramHint": "Descreve o desenrolar. Arrasta para reordenar.",
+    "sectionDocuments": "Documentos fornecidos",
+    "sectionDocumentsHint": "Ficheiros partilhados com as famílias (regulamento, programa detalhado, planta…).",
+    "sectionRequired": "Documentos obrigatórios",
+    "sectionRequiredHint": "O que cada família deve carregar na inscrição.",
+    "title": "Título",
+    "titlePlaceholder": "Camp de Páscoa U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
-    "slugLocked": "Le slug est verrouillé après publication.",
-    "description": "Description",
-    "cover": "Image de couverture",
-    "startDate": "Début",
-    "endDate": "Fin",
-    "deadline": "Date limite d'inscription",
-    "price": "Tarif indicatif",
-    "currency": "Devise",
-    "capacity": "Capacité",
-    "paymentInstructions": "Modalités de paiement",
-    "paymentInstructionsPlaceholder": "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
-    "retention": "Rétention des documents (mois)",
-    "venue": "Lieu",
-    "venuePlaceholder": "Choisir un lieu",
-    "venueNone": "— Aucun —",
-    "facility": "Terrain / installation",
-    "facilityPlaceholder": "Optionnel",
-    "facilityNone": "— Aucun —",
-    "save": "Enregistrer",
-    "saved": "Modifications enregistrées"
+    "slugHint": "Letras, dígitos e hífenes. Editável enquanto o camp for rascunho.",
+    "slugLocked": "O slug fica bloqueado após publicação.",
+    "description": "Descrição",
+    "cover": "Imagem de capa",
+    "startDate": "Início",
+    "endDate": "Fim",
+    "deadline": "Prazo de inscrição",
+    "price": "Preço indicativo",
+    "currency": "Moeda",
+    "capacity": "Capacidade",
+    "paymentInstructions": "Instruções de pagamento",
+    "paymentInstructionsPlaceholder": "Ex. pagamento na inscrição por cartão, cheque ou numerário no local.",
+    "retention": "Retenção de documentos (meses)",
+    "venue": "Local",
+    "venuePlaceholder": "Escolher um local",
+    "venueNone": "— Nenhum —",
+    "facility": "Instalação",
+    "facilityPlaceholder": "Opcional",
+    "facilityNone": "— Nenhuma —",
+    "save": "Guardar",
+    "saved": "Alterações guardadas"
   },
   "ageGroups": {
-    "empty": "Aucune catégorie pour l'instant.",
-    "addTitle": "Ajouter une catégorie",
-    "labelPlaceholder": "Label (ex. U9)",
-    "yearMin": "Année min",
-    "yearMax": "Année max"
+    "empty": "Ainda não há categorias.",
+    "addTitle": "Adicionar uma categoria",
+    "labelPlaceholder": "Etiqueta (ex. U9)",
+    "yearMin": "Ano mín.",
+    "yearMax": "Ano máx.",
+    "quickAdd": "Adição rápida",
+    "pickPreset": "Escolher U6 – U19",
+    "allAdded": "Todas adicionadas",
+    "addCustom": "+ Categoria personalizada"
   },
   "cover": {
-    "empty": "Aucune image de couverture",
-    "add": "Ajouter une image",
-    "replace": "Remplacer",
-    "uploaded": "Image mise à jour",
-    "tooLarge": "Image trop volumineuse (max 5 MB)",
-    "unsupported": "Format non supporté (JPG, PNG, WEBP)"
+    "empty": "Sem imagem de capa",
+    "add": "Adicionar imagem",
+    "replace": "Substituir",
+    "uploaded": "Imagem atualizada",
+    "tooLarge": "Imagem demasiado grande (máx. 5 MB)",
+    "unsupported": "Formato não suportado (JPG, PNG, WEBP)"
   },
   "lifecycle": {
-    "publish": "Publier",
-    "published": "Stage publié",
-    "close": "Fermer les inscriptions",
-    "closed": "Inscriptions fermées",
-    "archive": "Archiver",
-    "archived": "Stage archivé",
-    "publicUrl": "Lien public",
-    "publicUrlSoon": "page publique bientôt disponible"
+    "publish": "Publicar",
+    "published": "Camp publicado",
+    "close": "Fechar inscrições",
+    "closed": "Inscrições fechadas",
+    "archive": "Arquivar",
+    "archived": "Camp arquivado",
+    "publicUrl": "Link público",
+    "publicUrlSoon": "página pública em breve"
+  },
+  "duplicate": {
+    "action": "Duplicar",
+    "done": "Camp duplicado",
+    "hint": "Criar uma cópia em rascunho (sem as inscrições)."
+  },
+  "program": {
+    "add": "Adicionar uma etapa",
+    "addTitle": "Adicionar ao programa",
+    "editTitle": "Editar etapa",
+    "empty": "Ainda não há etapas.",
+    "startsAt": "Início",
+    "endsAt": "Fim",
+    "titlePlaceholder": "Ex. Receção e aquecimento",
+    "descPlaceholder": "Descrição (opcional)"
+  },
+  "documents": {
+    "addTitle": "Adicionar um documento",
+    "empty": "Ainda não há documentos fornecidos.",
+    "maxHint": "PDF, JPG ou PNG — máx. 15 MB.",
+    "titlePlaceholder": "Ex. Regulamento interno",
+    "tooLarge": "Ficheiro demasiado grande (máx. 15 MB).",
+    "upload": "Carregar",
+    "uploaded": "Documento adicionado"
+  },
+  "required": {
+    "add": "Adicionar documento obrigatório",
+    "addTitle": "Adicionar documento obrigatório",
+    "editTitle": "Editar documento obrigatório",
+    "empty": "Ainda não há documentos obrigatórios.",
+    "mandatory": "Obrigatório",
+    "mandatoryTag": "Obrigatório",
+    "optionalTag": "Opcional",
+    "sensitive": "Dado sensível",
+    "sensitiveForced": "Bloqueado — esta categoria é sempre tratada como sensível.",
+    "sensitiveHint": "Os dados sensíveis têm acesso restrito e purga acelerada.",
+    "sensitiveTag": "Sensível",
+    "titlePlaceholder": "Ex. Atestado médico",
+    "type": "Tipo"
   },
   "delete": {
-    "title": "Supprimer ce brouillon ?",
-    "desc": "Cette action est définitive."
+    "title": "Eliminar este rascunho?",
+    "desc": "Esta ação é definitiva."
   },
   "errors": {
-    "slugTaken": "Ce slug est déjà utilisé.",
-    "slugInvalid": "Slug invalide.",
-    "slugLocked": "Le slug ne peut plus changer après publication.",
-    "datesInvalid": "La date de fin doit être postérieure au début.",
-    "notDraft": "Le stage n'est plus en brouillon.",
-    "deleteNotDraft": "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
-    "publishTitleRequired": "Titre requis pour publier.",
-    "publishDatesRequired": "Dates de début et de fin requises.",
-    "publishDatesOrder": "La date de fin doit être après le début.",
-    "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
-    "publishCapacityRequired": "Une capacité positive est requise.",
-    "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+    "slugTaken": "Este slug já está em uso.",
+    "slugInvalid": "Slug inválido.",
+    "slugLocked": "O slug não pode mudar após a publicação.",
+    "datesInvalid": "A data de fim deve ser posterior à de início.",
+    "notDraft": "O camp já não é um rascunho.",
+    "deleteNotDraft": "Só rascunhos podem ser eliminados. Arquiva-o em vez disso.",
+    "publishTitleRequired": "Título necessário para publicar.",
+    "publishDatesRequired": "Datas de início e fim necessárias.",
+    "publishDatesOrder": "A data de fim deve ser posterior ao início.",
+    "publishDeadlineAfterStart": "O prazo de inscrição deve ser anterior à data de início.",
+    "publishCapacityRequired": "É necessária uma capacidade positiva.",
+    "publishAgeGroupRequired": "Adiciona pelo menos uma categoria antes de publicar."
   }
 }
