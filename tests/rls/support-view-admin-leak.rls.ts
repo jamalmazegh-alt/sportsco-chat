@@ -58,8 +58,12 @@ import {
 // calls so ordering is deterministic).
 // ---------------------------------------------------------------------------
 let superadminClient: SupabaseClient;
-let sessionId: string;
+let sessionId: string; // admin persona (adminA target)
 let validated: ValidatedSession;
+let sessionIdParent: string; // parent persona (parentA target)
+let validatedParent: ValidatedSession;
+let obligationA_otherFamily: string; // clubA obligation for playerA2 (NOT parentA's child)
+let convocationA_otherFamily: string; // clubA convocation for playerA2 (NOT parentA's child)
 
 beforeAll(async () => {
   const fx = getFixtures();
@@ -73,10 +77,8 @@ beforeAll(async () => {
   });
   if (signInErr) throw new Error(`superadmin signIn: ${signInErr.message}`);
 
-  // Create a real session: target = adminA, club = clubA, persona = club_admin.
-  // adminA has role='admin' in club_members(clubA) via fixtures → persona check passes.
+  // Session #1 — admin persona: target = adminA, club = clubA. Whole-club scope.
   const { data, error } = await superadminClient.rpc(
-    // rpc name not in generated types yet — cast to any for the call site.
     "create_support_view_session" as never,
     {
       _target_user_id: fx.users.adminA.userId,
@@ -86,14 +88,33 @@ beforeAll(async () => {
       _duration_minutes: 5,
     } as never,
   );
-  if (error || !data) throw new Error(`create_support_view_session: ${error?.message}`);
+  if (error || !data) throw new Error(`create_support_view_session admin: ${error?.message}`);
   sessionId = (data as { id: string }).id;
-
-  // Real loadValidatedSession → real computeTargetPermissions inside listX.
   validated = await loadValidatedSession(
     superadminClient,
     fx.users.superadmin.userId,
     sessionId,
+  );
+
+  // Session #2 — parent persona: target = parentA, whose only child is playerA.
+  // Used to prove the cross-target intra-club guard: a clubA obligation /
+  // convocation belonging to a different family (playerA2) MUST NOT surface.
+  const { data: dataP, error: errP } = await superadminClient.rpc(
+    "create_support_view_session" as never,
+    {
+      _target_user_id: fx.users.parentA.userId,
+      _club_id: fx.clubA,
+      _persona: "parent",
+      _reason: "rls cross-target intra-club test",
+      _duration_minutes: 5,
+    } as never,
+  );
+  if (errP || !dataP) throw new Error(`create_support_view_session parent: ${errP?.message}`);
+  sessionIdParent = (dataP as { id: string }).id;
+  validatedParent = await loadValidatedSession(
+    superadminClient,
+    fx.users.superadmin.userId,
+    sessionIdParent,
   );
 
   // Seed a clubB convocation (fixtures don't have one) so the convocations
@@ -104,22 +125,72 @@ beforeAll(async () => {
       { event_id: fx.eventB, player_id: fx.playerB, status: "pending" },
       { onConflict: "event_id,player_id" },
     );
+
+  // Seed a clubA obligation for playerA2 (another family, no parent_user link
+  // to parentA). Reuses paymentItemA (same clubA item). Without this row, the
+  // parent-persona cross-target test would pass trivially (empty = green).
+  const { data: poOther, error: poOtherErr } = await admin
+    .from("payment_obligations")
+    .upsert(
+      {
+        payment_item_id: (
+          await admin
+            .from("payment_obligations")
+            .select("payment_item_id")
+            .eq("id", fx.obligationA)
+            .single()
+        ).data!.payment_item_id,
+        club_id: fx.clubA,
+        player_id: fx.playerA2,
+        amount_due_cents: 5000,
+      },
+      { onConflict: "payment_item_id,player_id,payer_user_id" },
+    )
+    .select("id")
+    .single();
+  if (poOtherErr || !poOther) {
+    throw new Error(`obligation playerA2 seed: ${poOtherErr?.message}`);
+  }
+  obligationA_otherFamily = poOther.id;
+
+  // Seed a clubA convocation on eventA for playerA2 (another player). parentA's
+  // scope is {playerA} only → this row must NOT surface for the parent session.
+  const { data: convOther, error: convOtherErr } = await admin
+    .from("convocations")
+    .upsert(
+      { event_id: fx.eventA, player_id: fx.playerA2, status: "pending" },
+      { onConflict: "event_id,player_id" },
+    )
+    .select("id")
+    .single();
+  if (convOtherErr || !convOther) {
+    throw new Error(`convocation playerA2 seed: ${convOtherErr?.message}`);
+  }
+  convocationA_otherFamily = convOther.id;
 });
 
 afterAll(async () => {
-  if (!sessionId) return;
   const fx = getFixtures();
-  await superadminClient
-    .rpc("end_support_view_session" as never, { _session_id: sessionId } as never)
-    .catch(() => {});
+  for (const sid of [sessionId, sessionIdParent].filter(Boolean)) {
+    await superadminClient
+      .rpc("end_support_view_session" as never, { _session_id: sid } as never)
+      .catch(() => {});
+  }
   // Belt-and-braces — global teardown also purges by superadmin_id.
   await admin
     .from("support_view_sessions")
     .delete()
     .eq("superadmin_id", fx.users.superadmin.userId);
-  // Convocation seed above is cleaned up by the fixtures teardown
-  // (`delete from convocations where event_id in [eventA, eventB]`).
+  // Local-seeded rows: clean up explicitly. Fixtures teardown also nukes
+  // convocations by event_id and obligations by cascade — this is belt-only.
+  if (obligationA_otherFamily) {
+    await admin.from("payment_obligations").delete().eq("id", obligationA_otherFamily);
+  }
+  if (convocationA_otherFamily) {
+    await admin.from("convocations").delete().eq("id", convocationA_otherFamily);
+  }
 });
+
 
 
 // ===========================================================================
@@ -252,6 +323,42 @@ describe("Support-view service: cross-club leak (real query path)", () => {
     }
   });
 });
+
+// ===========================================================================
+// VOLET 2a-bis — CROSS-TARGET INTRA-CLUB leak (parent persona)
+// The cross-club test above cannot catch this: for parent/player personas,
+// the frontier is player_id ∈ own+child, NOT club_id. A guard that only
+// checks club_id would let a same-club-different-family row pass. Seeded
+// row: obligationA_otherFamily / convocationA_otherFamily (clubA, playerA2,
+// no link to parentA). parentA's scope is {playerA} only.
+// ===========================================================================
+describe("Support-view service: cross-target intra-club leak (parent persona)", () => {
+  it("parent session sees only own child's obligations, not another family's", async () => {
+    const fx = getFixtures();
+    const { payments } = await supportDataService.listPayments(validatedParent);
+    // Sanity: must see obligationA (playerA belongs to parentA).
+    expect(payments.length).toBeGreaterThan(0);
+    expect(payments.some((p) => p.id === fx.obligationA)).toBe(true);
+    // Real assertion: playerA2's obligation is in clubA but NOT in scope.
+    for (const p of payments) {
+      expect(p.id).not.toBe(obligationA_otherFamily);
+      expect(p.player_id).toBe(fx.playerA); // ONLY parentA's child
+    }
+  });
+
+  it("parent session sees only own child's convocations, not another player's", async () => {
+    const fx = getFixtures();
+    const { convocations } = await supportDataService.listConvocations(validatedParent);
+    expect(convocations.length).toBeGreaterThan(0);
+    expect(convocations.some((c) => c.id === fx.convocationA)).toBe(true);
+    for (const c of convocations) {
+      expect(c.id).not.toBe(convocationA_otherFamily);
+      expect(c.player_id).toBe(fx.playerA);
+    }
+  });
+});
+
+
 
 
 // ===========================================================================
