@@ -46,7 +46,6 @@ import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_admin";
 import { signInAs } from "./_clients";
 import { getFixtures, PASSWORD } from "./_setup";
 import {
-  loadValidatedSession,
   supportDataService,
   assertRowsBelongToSession,
   type ValidatedSession,
