@@ -30,6 +30,7 @@ import {
   formatMoney,
 } from "@/lib/superadmin/ui";
 import { BillingExemptionPanel } from "@/components/superadmin/BillingExemptionPanel";
+import { OnboardingProgress, type OnboardingStep } from "@/components/superadmin/OnboardingProgress";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
@@ -163,6 +164,12 @@ function ClubDetail() {
           value={`${whatsapp_configured_count}/${teams.length}`}
         />
       </section>
+
+      <OnboardingProgress
+        title="Club onboarding"
+        className="mb-6"
+        steps={buildClubOnboardingSteps(data)}
+      />
 
       <div className="mb-6">
         <BillingExemptionPanel
@@ -441,3 +448,79 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     </div>
   );
 }
+
+type ClubDetailData = NonNullable<Awaited<ReturnType<typeof getClubDetailExtended>>>;
+
+function buildClubOnboardingSteps(data: ClubDetailData): OnboardingStep[] {
+  const club = data.club as { logo_url?: string | null; theme_color?: string | null; name?: string | null } | null;
+  const counts = data.counts ?? {
+    players: 0,
+    invites: 0,
+    published_events: 0,
+    sponsors: 0,
+    has_payment_settings: false,
+  };
+  const activeTeams = (data.teams ?? []).filter((t) => !t.deleted_at);
+  const sub = data.subscription as { status?: string | null } | null;
+  const subActive =
+    !!sub &&
+    ["active", "trialing", "past_due"].includes((sub.status ?? "").toLowerCase());
+
+  return [
+    {
+      id: "logo",
+      label: "Club logo uploaded",
+      done: !!club?.logo_url,
+      hint: "Displayed across app, invites and emails.",
+    },
+    {
+      id: "branding",
+      label: "Brand color chosen",
+      done: !!club?.theme_color,
+      hint: "Custom theme not set — using default palette.",
+    },
+    {
+      id: "team",
+      label: "At least one team created",
+      done: activeTeams.length > 0,
+      hint: "No active team yet.",
+    },
+    {
+      id: "players",
+      label: "Players added",
+      done: counts.players > 0,
+      hint: "Roster is empty.",
+    },
+    {
+      id: "invites",
+      label: "Members invited",
+      done: counts.invites > 0,
+      hint: "No parent/coach invite has been sent.",
+    },
+    {
+      id: "event",
+      label: "First event published",
+      done: counts.published_events > 0,
+      hint: "No published event yet — try a training or match.",
+    },
+    {
+      id: "sponsor",
+      label: "Sponsor added",
+      done: counts.sponsors > 0,
+      hint: "Optional — visible on the club wall.",
+    },
+    {
+      id: "payments",
+      label: "Payment settings configured",
+      done: counts.has_payment_settings,
+      hint: "Required to collect fees / receipts.",
+    },
+    {
+      id: "subscription",
+      label: "Active subscription / trial",
+      done: subActive,
+      hint: "No active plan detected.",
+    },
+  ];
+}
+
