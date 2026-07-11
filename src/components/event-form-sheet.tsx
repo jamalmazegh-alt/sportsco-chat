@@ -289,6 +289,7 @@ export function AddressField({
   onPlaceUrl,
   placeholder,
   helper,
+  disabled,
 }: {
   label: string;
   value: string;
@@ -296,6 +297,7 @@ export function AddressField({
   onPlaceUrl: (url: string | null) => void;
   placeholder: string;
   helper: string;
+  disabled?: boolean;
 }) {
   const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>(
     [],
@@ -321,7 +323,7 @@ export function AddressField({
 
   // Debounced predictions
   useEffect(() => {
-    if (!service || value.trim().length < 3) {
+    if (disabled || !service || value.trim().length < 3) {
       setSuggestions([]);
       return;
     }
@@ -339,7 +341,7 @@ export function AddressField({
       );
     }, 250);
     return () => window.clearTimeout(handle);
-  }, [service, value]);
+  }, [service, value, disabled]);
 
   // Close on outside click
   useEffect(() => {
@@ -365,7 +367,7 @@ export function AddressField({
 
   return (
     <div className="space-y-1.5" ref={containerRef}>
-      <Label>{label}</Label>
+      <Label className={cn(disabled && "text-muted-foreground")}>{label}</Label>
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
@@ -377,10 +379,11 @@ export function AddressField({
           }}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder={placeholder}
-          className="pl-9"
+          className="pl-9 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-muted"
           autoComplete="off"
+          disabled={disabled}
         />
-        {open && suggestions.length > 0 && (
+        {open && !disabled && suggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
             {suggestions.map((suggestion) => (
               <button
@@ -1026,7 +1029,12 @@ export function EventFormSheet({
               }}
               onPlaceUrl={(url) => setLocationUrl(url ?? "")}
               placeholder={t("events.locationHint")}
-              helper={t("events.locationGoogleHelper")}
+              helper={
+                type === "match" && isHome === "home" && venueId
+                  ? t("events.locationLockedHint")
+                  : t("events.locationGoogleHelper")
+              }
+              disabled={type === "match" && isHome === "home" && !!venueId}
             />
 
             <div className="space-y-1.5">

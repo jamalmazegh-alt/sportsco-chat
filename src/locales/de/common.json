@@ -761,6 +761,7 @@
     "startTime": "Beginn",
     "endTime": "Ende",
     "locationGoogleHelper": "Beginne zu tippen, um eine Google-Maps-Adresse auszuwählen.",
+    "locationLockedHint": "Adresse des ausgewählten Ortes. Ändere den Ort, um sie zu bearbeiten.",
     "locationGoogleNeedsKey": "Füge einen Google-Maps-Browser-Schlüssel hinzu, um Vorschläge zu aktivieren; ein Maps-Link wird trotzdem automatisch erstellt.",
     "details": "Details",
     "selectTeam": "Mannschaft wählen",
