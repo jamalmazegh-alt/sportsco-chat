@@ -186,6 +186,7 @@ function SponsorsSettingsPage() {
             targetUrl: editing.targetUrl,
             logoPath: editing.logoPath,
             isActive: editing.isActive,
+            logoScale: editing.logoScale,
           },
         });
       } else {
@@ -196,6 +197,7 @@ function SponsorsSettingsPage() {
             targetUrl: editing.targetUrl,
             logoPath: editing.logoPath,
             isActive: editing.isActive,
+            logoScale: editing.logoScale,
           },
         });
       }
@@ -235,13 +237,16 @@ function SponsorsSettingsPage() {
       );
       return;
     }
+    // Immediate local preview URL (revoked on cleanup / new file / dialog close).
+    const localPreviewUrl = URL.createObjectURL(file);
+    localObjectUrlsRef.current.add(localPreviewUrl);
     // Ratio hint (non-blocking)
     try {
       const dims = await new Promise<{ w: number; h: number }>((resolve) => {
         const img = new Image();
         img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
         img.onerror = () => resolve({ w: 0, h: 0 });
-        img.src = URL.createObjectURL(file);
+        img.src = localPreviewUrl;
       });
       if (dims.w > 0 && Math.abs(dims.w / dims.h - 4) > 0.6) {
         toast.warning(
@@ -268,9 +273,15 @@ function SponsorsSettingsPage() {
         .from("sponsor-logos")
         .uploadToSignedUrl(path, token, file, { contentType: file.type, upsert: true });
       if (error) throw error;
-      setEditing({ ...editing, logoPath: path });
+      setEditing((current) => {
+        if (!current) return current;
+        // Revoke any previous local preview URL for this editor.
+        if (current.logoPreviewUrl) revokeLocalUrl(current.logoPreviewUrl);
+        return { ...current, logoPath: path, logoPreviewUrl: localPreviewUrl };
+      });
       toast.success(t("sponsor.admin.logoUploaded", { defaultValue: "Logo téléversé" }));
     } catch (e: unknown) {
+      revokeLocalUrl(localPreviewUrl);
       toast.error(
         (e as Error)?.message ??
           t("sponsor.admin.uploadError", { defaultValue: "Échec du téléversement" }),
