@@ -573,3 +573,180 @@ export const setCampCoverFromUpload = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { coverUrl: pub.publicUrl };
   });
+
+// ---------------------------------------------------------------------------
+// Duplicate
+// ---------------------------------------------------------------------------
+
+/**
+ * Duplique un stage : infos, âges, programme, documents fournis, pièces
+ * à fournir. Repart en `draft`, nouveau slug (`<slug>-copy`, `-copy-2`…),
+ * pas d'inscriptions. Les fichiers du bucket (cover + documents) sont
+ * COPIÉS (pas référencés) sinon la suppression du stage source purgerait
+ * les fichiers du duplicata via le trigger de purge storage.
+ */
+export const duplicateClubCamp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ campId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ id: string; slug: string }> => {
+    // 1. Load source + authorize
+    const { data: src, error: srcErr } = await supabaseAdmin
+      .from("club_camps")
+      .select("*")
+      .eq("id", data.campId)
+      .maybeSingle();
+    if (srcErr) throw new Error(srcErr.message);
+    if (!src) throw new Error("NOT_FOUND");
+    await assertClubRole({
+      supabase: context.supabase,
+      userId: context.userId,
+      clubId: src.club_id,
+      allowedRoles: MANAGER_ROLES,
+    });
+
+    // 2. Unique slug
+    const base = `${src.slug}-copy`;
+    let slug = base;
+    for (let n = 2; n < 100; n++) {
+      try {
+        await ensureSlugAvailable(src.club_id, slug);
+        break;
+      } catch (e) {
+        if ((e as Error).message !== "SLUG_TAKEN") throw e;
+        slug = `${base}-${n}`;
+      }
+    }
+
+    // 3. Insert duplicate camp row (draft, no cover for now, no external id)
+    const { data: created, error: insErr } = await supabaseAdmin
+      .from("club_camps")
+      .insert({
+        club_id: src.club_id,
+        title: src.title,
+        slug,
+        description: src.description,
+        cover_image_url: null,
+        venue_id: src.venue_id,
+        facility_id: src.facility_id,
+        external_location: src.external_location,
+        start_date: src.start_date,
+        end_date: src.end_date,
+        registration_deadline: src.registration_deadline,
+        price: src.price,
+        currency: src.currency,
+        capacity: src.capacity,
+        payment_instructions: src.payment_instructions,
+        document_retention_months: src.document_retention_months,
+        status: "draft",
+        created_by: context.userId,
+      })
+      .select("id, slug")
+      .single();
+    if (insErr) throw new Error(insErr.message);
+    const newId = created.id;
+
+    // 4. Copy cover file (bucket "camp-covers") if any
+    if (src.cover_image_url) {
+      const marker = "/camp-covers/";
+      const idx = src.cover_image_url.indexOf(marker);
+      if (idx >= 0) {
+        const oldPath = src.cover_image_url.slice(idx + marker.length);
+        const oldName = oldPath.split("/").slice(1).join("/") || "cover";
+        const newPath = `${newId}/${Date.now()}-${globalThis.crypto.randomUUID()}-${oldName}`;
+        const { error: copyErr } = await supabaseAdmin.storage
+          .from("camp-covers")
+          .copy(oldPath, newPath);
+        if (!copyErr) {
+          const { data: pub } = supabaseAdmin.storage
+            .from("camp-covers")
+            .getPublicUrl(newPath);
+          await supabaseAdmin
+            .from("club_camps")
+            .update({ cover_image_url: pub.publicUrl })
+            .eq("id", newId);
+        }
+        // Best effort — a missing cover file must not fail the whole dup.
+      }
+    }
+
+    // 5. Age groups
+    const { data: ags } = await supabaseAdmin
+      .from("club_camp_age_groups")
+      .select("label, birth_year_min, birth_year_max, sort_order")
+      .eq("camp_id", src.id)
+      .order("sort_order", { ascending: true });
+    if (ags && ags.length > 0) {
+      const rows = ags.map((a) => ({ ...a, camp_id: newId }));
+      const { error } = await supabaseAdmin.from("club_camp_age_groups").insert(rows);
+      if (error) throw new Error(error.message);
+    }
+
+    // 6. Program items
+    const { data: prog } = await supabaseAdmin
+      .from("club_camp_program_items")
+      .select("title, description, starts_at, ends_at, sort_order")
+      .eq("camp_id", src.id)
+      .order("sort_order", { ascending: true });
+    if (prog && prog.length > 0) {
+      const rows = prog.map((p) => ({ ...p, camp_id: newId }));
+      const { error } = await supabaseAdmin.from("club_camp_program_items").insert(rows);
+      if (error) throw new Error(error.message);
+    }
+
+    // 7. Required documents definitions
+    const { data: reqs } = await supabaseAdmin
+      .from("club_camp_required_documents")
+      .select("title, required, document_type, is_sensitive, sort_order")
+      .eq("camp_id", src.id)
+      .order("sort_order", { ascending: true });
+    if (reqs && reqs.length > 0) {
+      const rows = reqs.map((r) => ({ ...r, camp_id: newId }));
+      const { error } = await supabaseAdmin
+        .from("club_camp_required_documents")
+        .insert(rows);
+      if (error) throw new Error(error.message);
+    }
+
+    // 8. Provided documents — copy each file inside "attachments" bucket
+    const { data: docs } = await supabaseAdmin
+      .from("club_camp_documents")
+      .select("title, file_url, document_type, sort_order")
+      .eq("camp_id", src.id)
+      .order("sort_order", { ascending: true });
+    if (docs && docs.length > 0) {
+      const marker = "/attachments/";
+      for (const d of docs) {
+        let newFileUrl: string = d.file_url;
+        const idx = d.file_url.indexOf(marker);
+        if (idx >= 0) {
+          const oldPath = d.file_url.slice(idx + marker.length);
+          const ext = oldPath.split(".").pop() ?? "bin";
+          const newPath = `camps/${newId}/documents/${Date.now()}-${globalThis.crypto.randomUUID()}.${ext}`;
+          const { error: copyErr } = await supabaseAdmin.storage
+            .from("attachments")
+            .copy(oldPath, newPath);
+          if (!copyErr) {
+            const { data: pub } = supabaseAdmin.storage
+              .from("attachments")
+              .getPublicUrl(newPath);
+            newFileUrl = pub.publicUrl;
+          }
+          // If copy failed, we fall back to referencing the source URL —
+          // rare, and manageable: user can re-upload from the duplicate.
+        }
+        const { error } = await supabaseAdmin.from("club_camp_documents").insert({
+          camp_id: newId,
+          title: d.title,
+          file_url: newFileUrl,
+          document_type: d.document_type,
+          sort_order: d.sort_order,
+        });
+        if (error) throw new Error(error.message);
+      }
+    }
+
+    // Registrations are intentionally NOT copied.
+    return { id: newId, slug: created.slug };
+  });
