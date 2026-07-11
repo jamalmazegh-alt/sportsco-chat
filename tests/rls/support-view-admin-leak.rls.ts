@@ -95,6 +95,15 @@ beforeAll(async () => {
     fx.users.superadmin.userId,
     sessionId,
   );
+
+  // Seed a clubB convocation (fixtures don't have one) so the convocations
+  // cross-club leak test has a real foreign row to detect the absence of.
+  await admin
+    .from("convocations")
+    .upsert(
+      { event_id: fx.eventB, player_id: fx.playerB, status: "pending" },
+      { onConflict: "event_id,player_id" },
+    );
 });
 
 afterAll(async () => {
@@ -108,7 +117,10 @@ afterAll(async () => {
     .from("support_view_sessions")
     .delete()
     .eq("superadmin_id", fx.users.superadmin.userId);
+  // Convocation seed above is cleaned up by the fixtures teardown
+  // (`delete from convocations where event_id in [eventA, eventB]`).
 });
+
 
 // ===========================================================================
 // VOLET 1 — RLS visibility of support tables
