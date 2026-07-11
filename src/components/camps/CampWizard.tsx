@@ -78,7 +78,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
 
   const [state, setState] = useState<WizardState>(defaultState);
   const [stepIdx, setStepIdx] = useState(0);
-  const [presetChoice, setPresetChoice] = useState("");
+  
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const current = STEP_ORDER[stepIdx];
