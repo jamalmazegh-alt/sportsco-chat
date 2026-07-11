@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useMemo, useState, type FormEvent } from "react";
+import { Fragment, useCallback, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,44 +178,57 @@ function TeamDetail() {
     },
   });
 
-  // Track which players already have a pending (unaccepted) invite.
-  const { data: pendingInvitePlayerIds } = useQuery({
+  // Pending (unused) invites for the team's players, keyed by playerId, with
+  // the contact points (email/phone) already invited so we can avoid blocking
+  // a player when only *some* of its contacts have been invited/accepted.
+  const { data: pendingInvitesByPlayer } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
       const ids = (players ?? []).map((p: any) => p.id);
-      if (ids.length === 0) return new Set<string>();
+      const map = new Map<string, { emails: Set<string>; phones: Set<string> }>();
+      if (ids.length === 0) return map;
       const { data } = await supabase
         .from("member_invites")
-        .select("player_id, parent_for_player_id, used_at")
+        .select("player_id, parent_for_player_id, email, phone, used_at")
         .eq("club_id", activeClubId!)
         .is("used_at", null);
-      const set = new Set<string>();
       (data ?? []).forEach((r: any) => {
         const pid = r.player_id ?? r.parent_for_player_id;
-        if (pid && ids.includes(pid)) set.add(pid);
+        if (!pid || !ids.includes(pid)) return;
+        if (!map.has(pid)) map.set(pid, { emails: new Set(), phones: new Set() });
+        const entry = map.get(pid)!;
+        if (r.email) entry.emails.add(String(r.email).toLowerCase().trim());
+        if (r.phone) entry.phones.add(String(r.phone).trim());
       });
-      return set;
+      return map;
     },
   });
 
-  // Players who have at least one parent with an email or phone — they can be
-  // invited via their parent even if the player themself has no contact info.
-  const { data: playersWithParentContact } = useQuery({
-    queryKey: ["team-players-with-parent-contact", teamId],
+  // Parents grouped by player — used to know which contacts remain to invite.
+  const { data: parentsByPlayer } = useQuery({
+    queryKey: ["team-parents-by-player", teamId],
     enabled: !!players && players.length > 0 && isCoach,
     queryFn: async () => {
       const ids = (players ?? []).map((p: any) => p.id);
-      if (ids.length === 0) return new Set<string>();
+      const map = new Map<
+        string,
+        Array<{ email: string | null; phone: string | null; parent_user_id: string | null }>
+      >();
+      if (ids.length === 0) return map;
       const { data } = await supabase
         .from("player_parents")
-        .select("player_id, email, phone")
+        .select("player_id, email, phone, parent_user_id")
         .in("player_id", ids);
-      const set = new Set<string>();
       (data ?? []).forEach((r: any) => {
-        if ((r.email && r.email.trim()) || (r.phone && r.phone.trim())) set.add(r.player_id);
+        if (!map.has(r.player_id)) map.set(r.player_id, []);
+        map.get(r.player_id)!.push({
+          email: r.email ?? null,
+          phone: r.phone ?? null,
+          parent_user_id: r.parent_user_id ?? null,
+        });
       });
-      return set;
+      return map;
     },
   });
 
@@ -434,11 +447,31 @@ function TeamDetail() {
 
     if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
 
-    // Déduplication : si l'email est déjà associé à un compte Clubero existant,
-    // on saute l'invitation (et on tag comme "skipped" pour informer l'utilisateur).
+    // Déduplication : sauter les contacts (email/téléphone) qui ont déjà une
+    // invitation en cours pour ce joueur, et ceux dont l'email est déjà lié
+    // à un compte Clubero existant.
+    const { data: pendingRows } = await supabase
+      .from("member_invites")
+      .select("email, phone, player_id, parent_for_player_id, used_at")
+      .eq("club_id", activeClubId)
+      .or(`player_id.eq.${playerId},parent_for_player_id.eq.${playerId}`)
+      .is("used_at", null);
+    const pendingEmails = new Set<string>();
+    const pendingPhones = new Set<string>();
+    (pendingRows ?? []).forEach((r: any) => {
+      if (r.email) pendingEmails.add(String(r.email).toLowerCase().trim());
+      if (r.phone) pendingPhones.add(String(r.phone).trim());
+    });
+
     const filtered: InviteTarget[] = [];
     let skippedExisting = 0;
     for (const target of targets) {
+      const e = (target.email ?? "").toLowerCase().trim();
+      const ph = (target.phone ?? "").trim();
+      if ((e && pendingEmails.has(e)) || (ph && pendingPhones.has(ph))) {
+        skippedExisting += 1;
+        continue;
+      }
       if (target.email) {
         const { data: exists } = await supabase.rpc("email_exists", { _email: target.email });
         if (exists === true) {
@@ -572,15 +605,34 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
-  // Players who still need an invite: no linked account, at least one contact,
-  // and no pending invite already recorded for them.
+  // Helper: does this player still have at least one contact (self or parent)
+  // that is neither linked to an account nor already pending an invite?
+  const hasOpenContact = useCallback(
+    (p: any): boolean => {
+      const pending = pendingInvitesByPlayer?.get(p.id);
+      const isPending = (email?: string | null, phone?: string | null) => {
+        if (!pending) return false;
+        const e = (email ?? "").toLowerCase().trim();
+        const ph = (phone ?? "").trim();
+        return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
+      };
+      if (!p.user_id && (p.email || p.phone) && !isPending(p.email, p.phone)) return true;
+      const parents = parentsByPlayer?.get(p.id) ?? [];
+      return parents.some(
+        (pr) =>
+          !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
+      );
+    },
+    [pendingInvitesByPlayer, parentsByPlayer],
+  );
+
+  // Players who still need an invite: no linked account, and at least one
+  // contact (self or parent) that isn't already linked or pending.
   const invitableIds = useMemo(() => {
-    const pending = pendingInvitePlayerIds ?? new Set<string>();
-    const withParent = playersWithParentContact ?? new Set<string>();
     return ((players ?? []) as any[])
-      .filter((p) => !p.user_id && (p.email || p.phone || withParent.has(p.id)) && !pending.has(p.id))
+      .filter((p) => !p.user_id && hasOpenContact(p))
       .map((p) => p.id as string);
-  }, [players, pendingInvitePlayerIds, playersWithParentContact]);
+  }, [players, hasOpenContact]);
 
   async function inviteWholeTeam() {
     if (!user || invitableIds.length === 0) return;
@@ -1274,8 +1326,8 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
-            const canInvite = !p.user_id && (p.email || p.phone || (playersWithParentContact?.has(p.id) ?? false));
-            const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
+            const canInvite = !p.user_id && hasOpenContact(p);
+            const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
             const linked = !!p.user_id;
 
             const checked = selectedIds.has(p.id);
