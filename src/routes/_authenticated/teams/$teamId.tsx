@@ -444,6 +444,7 @@ function TeamDetail() {
       .update({
         name: editName,
         age_group: editAge || null,
+        championship: null,
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
