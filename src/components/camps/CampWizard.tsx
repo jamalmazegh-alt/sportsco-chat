@@ -70,6 +70,7 @@ function defaultState(): WizardState {
     price: "",
     venueId: null,
     facilityId: null,
+    externalLocation: "",
     ageGroups: [],
   };
 }
