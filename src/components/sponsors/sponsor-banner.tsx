@@ -9,18 +9,18 @@ import {
   recordSponsorImpression,
 } from "@/lib/sponsors.functions";
 import { shouldRecordClick, shouldRecordImpression } from "@/lib/sponsor-session";
+import { SponsorLogo } from "./SponsorLogo";
 
 const ROTATION_MS = 12_000;
 const IMPRESSION_VISIBLE_MS = 1_000;
 const CLICK_DEBOUNCE_MS = 500;
 /**
- * Dynamic sizing bounds — the actual rendered height is derived from the
- * logo's aspect ratio so wide banner-style logos (e.g. 16:9 with fine text)
- * stay legible while square/tall marks stay compact.
+ * Slot dimensions — the SponsorLogo component trims empty margins and adapts
+ * the render size to the trimmed ratio, filling the slot's width for banner
+ * logos and its height for square/tall marks.
  */
-const SPONSOR_LOGO_MIN_HEIGHT = 40;
 const SPONSOR_LOGO_MAX_HEIGHT = 96;
-const SPONSOR_LOGO_MAX_WIDTH = 320;
+const SPONSOR_LOGO_MAX_WIDTH = 420;
 
 type Sponsor = {
   id: string;
@@ -55,7 +55,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isVisibleRef = useRef(false);
   const [imgFailed, setImgFailed] = useState(false);
-  const [logoHeight, setLogoHeight] = useState<number>(SPONSOR_LOGO_MIN_HEIGHT);
 
   const list = useMemo<Sponsor[]>(() => sponsors ?? [], [sponsors]);
 
@@ -69,7 +68,6 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
 
   useEffect(() => {
     setImgFailed(false);
-    setLogoHeight(SPONSOR_LOGO_MIN_HEIGHT);
   }, [current?.id]);
 
   // Impression tracking — >50% visible ~1s, gated by document visibility.
@@ -157,41 +155,12 @@ export function SponsorBanner({ clubId }: { clubId: string }) {
             {current.name}
           </span>
         ) : (
-          <img
+          <SponsorLogo
             src={current.logo_url!}
             alt={current.name}
-            style={{
-              height: `${logoHeight}px`,
-              maxWidth: `${SPONSOR_LOGO_MAX_WIDTH}px`,
-            }}
-            className="w-auto object-contain"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              const nw = img.naturalWidth;
-              const nh = img.naturalHeight;
-              if (!nw || !nh) return;
-              // Derive height from natural aspect ratio, clamped, and
-              // capped so the image never exceeds SPONSOR_LOGO_MAX_WIDTH.
-              const ratio = nw / nh; // >1 = landscape, <1 = portrait
-              // Wider logos get more vertical room so text stays readable.
-              const target = Math.round(
-                Math.min(
-                  SPONSOR_LOGO_MAX_HEIGHT,
-                  Math.max(SPONSOR_LOGO_MIN_HEIGHT, 44 + (ratio - 1) * 22),
-                ),
-              );
-              const widthAtTarget = target * ratio;
-              const finalHeight =
-                widthAtTarget > SPONSOR_LOGO_MAX_WIDTH
-                  ? Math.max(
-                      SPONSOR_LOGO_MIN_HEIGHT,
-                      Math.round(SPONSOR_LOGO_MAX_WIDTH / ratio),
-                    )
-                  : target;
-              setLogoHeight(finalHeight);
-            }}
+            maxHeight={SPONSOR_LOGO_MAX_HEIGHT}
+            maxWidth={SPONSOR_LOGO_MAX_WIDTH}
             onError={() => setImgFailed(true)}
-            loading="lazy"
           />
         )}
       </span>
