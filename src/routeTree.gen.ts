@@ -80,7 +80,7 @@ import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug_
 import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug_.register'
 import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
-import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
+import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users_.$userId'
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
@@ -516,9 +516,9 @@ const TSlugRegisterRoute = TSlugRegisterRouteImport.update({
   getParentRoute: () => TSlugRoute,
 } as any)
 const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => SuperadminUsersRoute,
+  id: '/users_/$userId',
+  path: '/users/$userId',
+  getParentRoute: () => SuperadminRoute,
 } as any)
 const SuperadminSupportTicketsTicketIdRoute =
   SuperadminSupportTicketsTicketIdRouteImport.update({
@@ -1000,7 +1000,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
-  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/superadmin/users': typeof SuperadminUsersRoute
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRoute
@@ -1142,7 +1142,7 @@ export interface FileRoutesByTo {
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
-  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/superadmin/users': typeof SuperadminUsersRoute
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRoute
@@ -1290,7 +1290,7 @@ export interface FileRoutesById {
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
-  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/superadmin/users': typeof SuperadminUsersRoute
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRoute
@@ -1326,7 +1326,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
-  '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/superadmin/users_/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
   '/tournament/$slug_/register': typeof TournamentSlugRegisterRouteWithChildren
@@ -1763,7 +1763,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
-    | '/superadmin/users/$userId'
+    | '/superadmin/users_/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
     | '/tournament/$slug_/register'
@@ -2398,12 +2398,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugRegisterRouteImport
       parentRoute: typeof TSlugRoute
     }
-    '/superadmin/users/$userId': {
-      id: '/superadmin/users/$userId'
-      path: '/$userId'
+    '/superadmin/users_/$userId': {
+      id: '/superadmin/users_/$userId'
+      path: '/users/$userId'
       fullPath: '/superadmin/users/$userId'
       preLoaderRoute: typeof SuperadminUsersUserIdRouteImport
-      parentRoute: typeof SuperadminUsersRoute
+      parentRoute: typeof SuperadminRoute
     }
     '/superadmin/support-tickets/$ticketId': {
       id: '/superadmin/support-tickets/$ticketId'
@@ -3171,29 +3171,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface SuperadminUsersRouteChildren {
-  SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
-}
-
-const SuperadminUsersRouteChildren: SuperadminUsersRouteChildren = {
-  SuperadminUsersUserIdRoute: SuperadminUsersUserIdRoute,
-}
-
-const SuperadminUsersRouteWithChildren = SuperadminUsersRoute._addFileChildren(
-  SuperadminUsersRouteChildren,
-)
-
 interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
   SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
-  SuperadminUsersRoute: typeof SuperadminUsersRouteWithChildren
+  SuperadminUsersRoute: typeof SuperadminUsersRoute
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
   SuperadminOnboardingImportRoute: typeof SuperadminOnboardingImportRoute
   SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
+  SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
   SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
   SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
 }
@@ -3204,11 +3193,12 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminLogsRoute: SuperadminLogsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
-  SuperadminUsersRoute: SuperadminUsersRouteWithChildren,
+  SuperadminUsersRoute: SuperadminUsersRoute,
   SuperadminIndexRoute: SuperadminIndexRoute,
   SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
   SuperadminOnboardingImportRoute: SuperadminOnboardingImportRoute,
   SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
+  SuperadminUsersUserIdRoute: SuperadminUsersUserIdRoute,
   SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
   SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
 }
