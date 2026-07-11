@@ -18,6 +18,8 @@ import {
   Receipt,
   TrendingUp,
   Handshake,
+  MapPin,
+
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
