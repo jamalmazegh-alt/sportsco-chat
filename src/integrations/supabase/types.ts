@@ -510,6 +510,377 @@ export type Database = {
           },
         ]
       }
+      club_camp_age_groups: {
+        Row: {
+          birth_year_max: number | null
+          birth_year_min: number | null
+          camp_id: string
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          birth_year_max?: number | null
+          birth_year_min?: number | null
+          camp_id: string
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          birth_year_max?: number | null
+          birth_year_min?: number | null
+          camp_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_age_groups_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camp_documents: {
+        Row: {
+          camp_id: string
+          created_at: string
+          document_type: string | null
+          file_url: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          camp_id: string
+          created_at?: string
+          document_type?: string | null
+          file_url: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          camp_id?: string
+          created_at?: string
+          document_type?: string | null
+          file_url?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_documents_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camp_program_items: {
+        Row: {
+          camp_id: string
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          sort_order: number
+          starts_at: string | null
+          title: string
+        }
+        Insert: {
+          camp_id: string
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          sort_order?: number
+          starts_at?: string | null
+          title: string
+        }
+        Update: {
+          camp_id?: string
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          sort_order?: number
+          starts_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_program_items_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camp_registration_documents: {
+        Row: {
+          file_path: string
+          id: string
+          registration_id: string
+          rejection_reason: string | null
+          required_document_id: string
+          review_status: string
+          uploaded_at: string
+        }
+        Insert: {
+          file_path: string
+          id?: string
+          registration_id: string
+          rejection_reason?: string | null
+          required_document_id: string
+          review_status?: string
+          uploaded_at?: string
+        }
+        Update: {
+          file_path?: string
+          id?: string
+          registration_id?: string
+          rejection_reason?: string | null
+          required_document_id?: string
+          review_status?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_registration_documents_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "club_camp_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_camp_registration_documents_required_document_id_fkey"
+            columns: ["required_document_id"]
+            isOneToOne: false
+            referencedRelation: "club_camp_required_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camp_registrations: {
+        Row: {
+          access_token: string
+          amount_paid: number
+          birth_date: string
+          camp_id: string
+          club_name: string | null
+          created_at: string
+          gender: string | null
+          guardian_email: string
+          guardian_first_name: string
+          guardian_last_name: string
+          guardian_phone: string | null
+          id: string
+          notes: string | null
+          participant_first_name: string
+          participant_last_name: string
+          payment_status: string
+          registration_status: string
+          rejection_reason: string | null
+          reserved_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string
+          amount_paid?: number
+          birth_date: string
+          camp_id: string
+          club_name?: string | null
+          created_at?: string
+          gender?: string | null
+          guardian_email: string
+          guardian_first_name: string
+          guardian_last_name: string
+          guardian_phone?: string | null
+          id?: string
+          notes?: string | null
+          participant_first_name: string
+          participant_last_name: string
+          payment_status?: string
+          registration_status?: string
+          rejection_reason?: string | null
+          reserved_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          amount_paid?: number
+          birth_date?: string
+          camp_id?: string
+          club_name?: string | null
+          created_at?: string
+          gender?: string | null
+          guardian_email?: string
+          guardian_first_name?: string
+          guardian_last_name?: string
+          guardian_phone?: string | null
+          id?: string
+          notes?: string | null
+          participant_first_name?: string
+          participant_last_name?: string
+          payment_status?: string
+          registration_status?: string
+          rejection_reason?: string | null
+          reserved_until?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_registrations_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camp_required_documents: {
+        Row: {
+          camp_id: string
+          created_at: string
+          document_type: string | null
+          id: string
+          is_sensitive: boolean
+          required: boolean
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          camp_id: string
+          created_at?: string
+          document_type?: string | null
+          id?: string
+          is_sensitive?: boolean
+          required?: boolean
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          camp_id?: string
+          created_at?: string
+          document_type?: string | null
+          id?: string
+          is_sensitive?: boolean
+          required?: boolean
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_required_documents_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_camps: {
+        Row: {
+          capacity: number
+          club_id: string
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          document_retention_months: number
+          end_date: string
+          facility_id: string | null
+          id: string
+          payment_instructions: string | null
+          price: number | null
+          registration_deadline: string | null
+          slug: string
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          capacity: number
+          club_id: string
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          document_retention_months?: number
+          end_date: string
+          facility_id?: string | null
+          id?: string
+          payment_instructions?: string | null
+          price?: number | null
+          registration_deadline?: string | null
+          slug: string
+          start_date: string
+          status?: string
+          title: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          capacity?: number
+          club_id?: string
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          document_retention_months?: number
+          end_date?: string
+          facility_id?: string | null
+          id?: string
+          payment_instructions?: string | null
+          price?: number | null
+          registration_deadline?: string | null
+          slug?: string
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camps_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_camps_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "club_facilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_camps_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "club_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_facilities: {
         Row: {
           created_at: string
@@ -891,6 +1262,7 @@ export type Database = {
           logo_url: string | null
           looking_for_coach: boolean | null
           name: string
+          slug: string
           stripe_account_created_at: string | null
           stripe_account_id: string | null
           stripe_account_status: string | null
@@ -917,6 +1289,7 @@ export type Database = {
           logo_url?: string | null
           looking_for_coach?: boolean | null
           name: string
+          slug: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
           stripe_account_status?: string | null
@@ -943,6 +1316,7 @@ export type Database = {
           logo_url?: string | null
           looking_for_coach?: boolean | null
           name?: string
+          slug?: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
           stripe_account_status?: string | null
@@ -5815,6 +6189,10 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_manage_club_camp: {
+        Args: { _camp_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_manage_tournament: {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
@@ -5859,6 +6237,7 @@ export type Database = {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
+      club_camp_is_published: { Args: { _camp_id: string }; Returns: boolean }
       club_has_active_subscription: {
         Args: { _club_id: string }
         Returns: boolean
@@ -6113,6 +6492,7 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      is_reserved_club_slug: { Args: { _slug: string }; Returns: boolean }
       is_team_coach: {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
@@ -6301,6 +6681,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      slugify: { Args: { _input: string }; Returns: string }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }
         Returns: undefined
