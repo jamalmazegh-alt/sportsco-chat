@@ -34,12 +34,30 @@
       "summary": "Récap"
     },
     "step": {
-      "title": { "title": "Nom du stage", "hint": "Ce que verront les familles" },
-      "dates": { "title": "Quand ?", "hint": "Début, fin et deadline d'inscription" },
-      "capacity": { "title": "Places et tarif", "hint": "Combien de participants, à quel prix" },
-      "venue": { "title": "Où se passe le stage ?", "hint": "Facultatif — modifiable plus tard" },
-      "ageGroups": { "title": "Catégories d'âge", "hint": "Requis pour publier — sélectionne au moins une catégorie" },
-      "summary": { "title": "Prêt à créer", "hint": "Brouillon créé — publication au prochain écran" }
+      "title": {
+        "title": "Nom du stage",
+        "hint": "Ce que verront les familles"
+      },
+      "dates": {
+        "title": "Quand ?",
+        "hint": "Début, fin et deadline d'inscription"
+      },
+      "capacity": {
+        "title": "Places et tarif",
+        "hint": "Combien de participants, à quel prix"
+      },
+      "venue": {
+        "title": "Où se passe le stage ?",
+        "hint": "Facultatif — modifiable plus tard"
+      },
+      "ageGroups": {
+        "title": "Catégories d'âge",
+        "hint": "Requis pour publier — sélectionne au moins une catégorie"
+      },
+      "summary": {
+        "title": "Prêt à créer",
+        "hint": "Brouillon créé — publication au prochain écran"
+      }
     },
     "summary": {
       "deadline": "deadline",
@@ -54,7 +72,9 @@
       "title": "Stages du club – Clubero",
       "description": "Créez, publiez et gérez les stages proposés par votre club."
     },
-    "edit": { "title": "Édition d'un stage – Clubero" }
+    "edit": {
+      "title": "Édition d'un stage – Clubero"
+    }
   },
   "list": {
     "title": "Stages du club",
@@ -69,7 +89,9 @@
     "searchPlaceholder": "Rechercher…",
     "count": "{{shown}} / {{total}}",
     "noResults": "Aucun stage ne correspond à ces filtres.",
-    "status": { "all": "Tous les statuts" },
+    "status": {
+      "all": "Tous les statuts"
+    },
     "sort": {
       "startDesc": "Date de début ↓",
       "startAsc": "Date de début ↑",
@@ -203,5 +225,59 @@
     "publishDeadlineAfterStart": "La deadline d'inscription doit être avant la date de début.",
     "publishCapacityRequired": "Une capacité positive est requise.",
     "publishAgeGroupRequired": "Ajoutez au moins une catégorie d'âge avant de publier."
+  },
+  "public": {
+    "free": "Gratuit",
+    "capacity": "{{count}} places",
+    "ageGroups": "Catégories d'âge",
+    "program": "Programme",
+    "providedDocs": "Documents fournis",
+    "requiredDocs": "Pièces à fournir",
+    "requiredTag": "obligatoire",
+    "deadlinePassed": "Les inscriptions sont fermées.",
+    "registerCta": "S'inscrire à ce stage",
+    "deadlineHint": "Date limite d'inscription : {{date}}",
+    "backToCamp": "Retour au stage",
+    "formTitle": "Inscription — {{title}}",
+    "docsHint": "PDF, JPG ou PNG — 15 Mo max par fichier.",
+    "consent": "J'autorise le club à utiliser les données transmises pour gérer cette inscription au stage (RGPD).",
+    "submit": "Envoyer l'inscription",
+    "confirmTitle": "Inscription envoyée !",
+    "confirmBody": "Nous avons bien reçu votre dossier. Le club vous contactera pour la suite.",
+    "confirmRef": "Référence : {{id}}",
+    "section": {
+      "child": "Enfant participant",
+      "category": "Catégorie d'âge",
+      "guardian": "Parent référent",
+      "docs": "Pièces à fournir",
+      "notes": "Informations complémentaires"
+    },
+    "field": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "birthDate": "Date de naissance",
+      "gender": "Sexe",
+      "clubName": "Club d'origine (facultatif)",
+      "ageGroup": "Catégorie",
+      "email": "Email",
+      "phone": "Téléphone",
+      "notes": "Notes (facultatif)"
+    },
+    "gender": {
+      "female": "Fille",
+      "male": "Garçon",
+      "other": "Autre"
+    },
+    "errors": {
+      "missingDoc": "Pièce manquante : {{title}}",
+      "tooLarge": "Fichier trop volumineux : {{title}}",
+      "badMime": "Format non supporté ({{title}}). PDF, JPG ou PNG uniquement.",
+      "consent": "Vous devez accepter les conditions.",
+      "rateLimited": "Trop de tentatives, réessayez plus tard.",
+      "closed": "Les inscriptions sont fermées.",
+      "ageMismatch": "L'âge de l'enfant ne correspond pas à la catégorie choisie.",
+      "generic": "Une erreur est survenue. Réessayez.",
+      "network": "Erreur réseau. Vérifiez votre connexion."
+    }
   }
 }

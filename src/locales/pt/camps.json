@@ -34,12 +34,30 @@
       "summary": "Resumo"
     },
     "step": {
-      "title": { "title": "Nome do camp", "hint": "O que as famílias verão" },
-      "dates": { "title": "Quando?", "hint": "Início, fim e prazo de inscrição" },
-      "capacity": { "title": "Vagas e preço", "hint": "Quantos participantes, a que preço" },
-      "venue": { "title": "Onde se realiza?", "hint": "Opcional — editável mais tarde" },
-      "ageGroups": { "title": "Categorias de idade", "hint": "Necessário para publicar — escolhe pelo menos uma" },
-      "summary": { "title": "Pronto para criar", "hint": "Será criado o rascunho — publicar no próximo ecrã" }
+      "title": {
+        "title": "Nome do camp",
+        "hint": "O que as famílias verão"
+      },
+      "dates": {
+        "title": "Quando?",
+        "hint": "Início, fim e prazo de inscrição"
+      },
+      "capacity": {
+        "title": "Vagas e preço",
+        "hint": "Quantos participantes, a que preço"
+      },
+      "venue": {
+        "title": "Onde se realiza?",
+        "hint": "Opcional — editável mais tarde"
+      },
+      "ageGroups": {
+        "title": "Categorias de idade",
+        "hint": "Necessário para publicar — escolhe pelo menos uma"
+      },
+      "summary": {
+        "title": "Pronto para criar",
+        "hint": "Será criado o rascunho — publicar no próximo ecrã"
+      }
     },
     "summary": {
       "deadline": "prazo",
@@ -54,7 +72,9 @@
       "title": "Camps do clube – Clubero",
       "description": "Cria, publica e gere os camps organizados pelo teu clube."
     },
-    "edit": { "title": "Editar camp – Clubero" }
+    "edit": {
+      "title": "Editar camp – Clubero"
+    }
   },
   "list": {
     "title": "Camps do clube",
@@ -69,7 +89,9 @@
     "searchPlaceholder": "Pesquisar…",
     "count": "{{shown}} / {{total}}",
     "noResults": "Nenhum camp corresponde a estes filtros.",
-    "status": { "all": "Todos os estados" },
+    "status": {
+      "all": "Todos os estados"
+    },
     "sort": {
       "startDesc": "Data de início ↓",
       "startAsc": "Data de início ↑",
@@ -203,5 +225,59 @@
     "publishDeadlineAfterStart": "O prazo de inscrição deve ser anterior à data de início.",
     "publishCapacityRequired": "É necessária uma capacidade positiva.",
     "publishAgeGroupRequired": "Adiciona pelo menos uma categoria antes de publicar."
+  },
+  "public": {
+    "free": "Free",
+    "capacity": "{{count}} spots",
+    "ageGroups": "Age groups",
+    "program": "Programme",
+    "providedDocs": "Provided documents",
+    "requiredDocs": "Required documents",
+    "requiredTag": "required",
+    "deadlinePassed": "Registration is closed.",
+    "registerCta": "Register for this camp",
+    "deadlineHint": "Registration deadline: {{date}}",
+    "backToCamp": "Back to camp",
+    "formTitle": "Registration — {{title}}",
+    "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
+    "consent": "I allow the club to use the submitted data to manage this camp registration (GDPR).",
+    "submit": "Submit registration",
+    "confirmTitle": "Registration sent!",
+    "confirmBody": "We received your file. The club will contact you shortly.",
+    "confirmRef": "Reference: {{id}}",
+    "section": {
+      "child": "Participating child",
+      "category": "Age group",
+      "guardian": "Parent / guardian",
+      "docs": "Required documents",
+      "notes": "Additional information"
+    },
+    "field": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "birthDate": "Date of birth",
+      "gender": "Gender",
+      "clubName": "Home club (optional)",
+      "ageGroup": "Category",
+      "email": "Email",
+      "phone": "Phone",
+      "notes": "Notes (optional)"
+    },
+    "gender": {
+      "female": "Girl",
+      "male": "Boy",
+      "other": "Other"
+    },
+    "errors": {
+      "missingDoc": "Missing document: {{title}}",
+      "tooLarge": "File too large: {{title}}",
+      "badMime": "Unsupported format ({{title}}). PDF, JPG or PNG only.",
+      "consent": "You must accept the terms.",
+      "rateLimited": "Too many attempts, please try again later.",
+      "closed": "Registration is closed.",
+      "ageMismatch": "The child's age does not match the chosen category.",
+      "generic": "An error occurred. Please try again.",
+      "network": "Network error. Check your connection."
+    }
   }
 }

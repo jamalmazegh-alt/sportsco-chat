@@ -34,12 +34,30 @@
       "summary": "Riepilogo"
     },
     "step": {
-      "title": { "title": "Nome del camp", "hint": "Ciò che vedranno le famiglie" },
-      "dates": { "title": "Quando?", "hint": "Inizio, fine e scadenza iscrizioni" },
-      "capacity": { "title": "Posti e prezzo", "hint": "Quanti partecipanti e a quale prezzo" },
-      "venue": { "title": "Dove si svolge?", "hint": "Facoltativo — modificabile più tardi" },
-      "ageGroups": { "title": "Categorie d'età", "hint": "Necessario per pubblicare — scegli almeno una categoria" },
-      "summary": { "title": "Pronto per la creazione", "hint": "Verrà creata la bozza — pubblicazione nella schermata successiva" }
+      "title": {
+        "title": "Nome del camp",
+        "hint": "Ciò che vedranno le famiglie"
+      },
+      "dates": {
+        "title": "Quando?",
+        "hint": "Inizio, fine e scadenza iscrizioni"
+      },
+      "capacity": {
+        "title": "Posti e prezzo",
+        "hint": "Quanti partecipanti e a quale prezzo"
+      },
+      "venue": {
+        "title": "Dove si svolge?",
+        "hint": "Facoltativo — modificabile più tardi"
+      },
+      "ageGroups": {
+        "title": "Categorie d'età",
+        "hint": "Necessario per pubblicare — scegli almeno una categoria"
+      },
+      "summary": {
+        "title": "Pronto per la creazione",
+        "hint": "Verrà creata la bozza — pubblicazione nella schermata successiva"
+      }
     },
     "summary": {
       "deadline": "scadenza",
@@ -54,7 +72,9 @@
       "title": "Camp del club – Clubero",
       "description": "Crea, pubblica e gestisci i camp organizzati dal tuo club."
     },
-    "edit": { "title": "Modifica camp – Clubero" }
+    "edit": {
+      "title": "Modifica camp – Clubero"
+    }
   },
   "list": {
     "title": "Camp del club",
@@ -69,7 +89,9 @@
     "searchPlaceholder": "Cerca…",
     "count": "{{shown}} / {{total}}",
     "noResults": "Nessun camp corrisponde a questi filtri.",
-    "status": { "all": "Tutti gli stati" },
+    "status": {
+      "all": "Tutti gli stati"
+    },
     "sort": {
       "startDesc": "Data di inizio ↓",
       "startAsc": "Data di inizio ↑",
@@ -203,5 +225,59 @@
     "publishDeadlineAfterStart": "La scadenza iscrizioni deve precedere la data di inizio.",
     "publishCapacityRequired": "È richiesta una capienza positiva.",
     "publishAgeGroupRequired": "Aggiungi almeno una categoria d'età prima di pubblicare."
+  },
+  "public": {
+    "free": "Free",
+    "capacity": "{{count}} spots",
+    "ageGroups": "Age groups",
+    "program": "Programme",
+    "providedDocs": "Provided documents",
+    "requiredDocs": "Required documents",
+    "requiredTag": "required",
+    "deadlinePassed": "Registration is closed.",
+    "registerCta": "Register for this camp",
+    "deadlineHint": "Registration deadline: {{date}}",
+    "backToCamp": "Back to camp",
+    "formTitle": "Registration — {{title}}",
+    "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
+    "consent": "I allow the club to use the submitted data to manage this camp registration (GDPR).",
+    "submit": "Submit registration",
+    "confirmTitle": "Registration sent!",
+    "confirmBody": "We received your file. The club will contact you shortly.",
+    "confirmRef": "Reference: {{id}}",
+    "section": {
+      "child": "Participating child",
+      "category": "Age group",
+      "guardian": "Parent / guardian",
+      "docs": "Required documents",
+      "notes": "Additional information"
+    },
+    "field": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "birthDate": "Date of birth",
+      "gender": "Gender",
+      "clubName": "Home club (optional)",
+      "ageGroup": "Category",
+      "email": "Email",
+      "phone": "Phone",
+      "notes": "Notes (optional)"
+    },
+    "gender": {
+      "female": "Girl",
+      "male": "Boy",
+      "other": "Other"
+    },
+    "errors": {
+      "missingDoc": "Missing document: {{title}}",
+      "tooLarge": "File too large: {{title}}",
+      "badMime": "Unsupported format ({{title}}). PDF, JPG or PNG only.",
+      "consent": "You must accept the terms.",
+      "rateLimited": "Too many attempts, please try again later.",
+      "closed": "Registration is closed.",
+      "ageMismatch": "The child's age does not match the chosen category.",
+      "generic": "An error occurred. Please try again.",
+      "network": "Network error. Check your connection."
+    }
   }
 }
