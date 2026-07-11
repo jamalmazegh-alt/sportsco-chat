@@ -576,10 +576,11 @@ function TeamDetail() {
   // and no pending invite already recorded for them.
   const invitableIds = useMemo(() => {
     const pending = pendingInvitePlayerIds ?? new Set<string>();
+    const withParent = playersWithParentContact ?? new Set<string>();
     return ((players ?? []) as any[])
-      .filter((p) => !p.user_id && (p.email || p.phone) && !pending.has(p.id))
+      .filter((p) => !p.user_id && (p.email || p.phone || withParent.has(p.id)) && !pending.has(p.id))
       .map((p) => p.id as string);
-  }, [players, pendingInvitePlayerIds]);
+  }, [players, pendingInvitePlayerIds, playersWithParentContact]);
 
   async function inviteWholeTeam() {
     if (!user || invitableIds.length === 0) return;
