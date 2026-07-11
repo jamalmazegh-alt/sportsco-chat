@@ -552,7 +552,22 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
       _user_id: context.userId,
     });
-    if (!isAdmin) throw new Error("forbidden");
+
+    // Owner exception: the ticket owner may mark their own ticket as "resolved"
+    // (single-field update, no priority / assignment changes).
+    if (!isAdmin) {
+      const isOwnerResolve =
+        data.status === "resolved" &&
+        data.priority === undefined &&
+        data.assigned_to === undefined;
+      if (!isOwnerResolve) throw new Error("forbidden");
+      const { data: owned } = await supabaseAdmin
+        .from("support_tickets")
+        .select("user_id")
+        .eq("id", data.ticket_id)
+        .maybeSingle();
+      if (!owned || owned.user_id !== context.userId) throw new Error("forbidden");
+    }
 
     const patch: {
       status?: (typeof STATUSES)[number];
@@ -563,6 +578,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (data.priority !== undefined) patch.priority = data.priority;
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
     if (!Object.keys(patch).length) return { ok: true };
+
 
     // Read current status to detect change
     const { data: before } = await supabaseAdmin
