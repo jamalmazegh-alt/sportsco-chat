@@ -174,13 +174,13 @@ export function VenueFacilityPicker({
       ) : (
         <div className="space-y-1.5">
           <Label>{t("form.externalAddress", { defaultValue: "Adresse" })}</Label>
-          <Input
+          <LocationAutocomplete
             value={externalLocation ?? ""}
-            onChange={(e) =>
+            onChange={(v) =>
               onChange({
                 venueId: null,
                 facilityId: null,
-                externalLocation: e.target.value,
+                externalLocation: v,
               })
             }
             placeholder={t("form.externalAddressPlaceholder", {
