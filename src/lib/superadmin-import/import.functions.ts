@@ -920,9 +920,14 @@ export const runImport = createServerFn({ method: "POST" })
               player_id: playerId,
               role: "player" as never,
             });
-            if (tmErr && (tmErr as { code?: string }).code !== "23505") {
-              throw new Error(tmErr.message);
+            if (tmErr) {
+              if ((tmErr as { code?: string }).code !== "23505") {
+                throw new Error(tmErr.message);
+              }
+            } else {
+              playersLinked++;
             }
+
 
             const player = { id: playerId };
 
