@@ -257,8 +257,9 @@ Clés Clubero valides : ${fieldList}
 En-têtes source du fichier :
 ${JSON.stringify(headers)}
 
-Échantillon des 3 premières lignes (pour aider la désambiguïsation) :
-${JSON.stringify(rawRows.slice(0, 3))}
+Échantillon des premières lignes (utilise-le pour vérifier la cohérence en-tête ↔ valeurs) :
+${JSON.stringify(rawRows.slice(0, 8))}
+
 
 Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
         abortSignal: AbortSignal.timeout(30_000),
