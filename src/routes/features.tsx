@@ -1,7 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CheckCircle2, ArrowRight, Megaphone, Clock, Trophy } from "lucide-react";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Megaphone,
+  Clock,
+  Trophy,
+  CalendarCheck2,
+  Users,
+  Sun,
+  MessageCircle,
+  Settings2,
+  CreditCard,
+  Sparkles,
+  Rocket,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
