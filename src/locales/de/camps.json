@@ -240,7 +240,7 @@
     "backToCamp": "Back to camp",
     "formTitle": "Registration — {{title}}",
     "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
-    "consent": "Ich erlaube dem Verein, die übermittelten Daten (Identität des Kindes, Kontakt des Elternteils, Anhänge) zur Verwaltung dieser Camp-Anmeldung gemäß DSGVO zu nutzen. Die Daten werden bis zu 12 Monate nach Ende des Camps aufbewahrt und dann automatisch gelöscht.",
+    "consent": "Ich erlaube dem Verein, die übermittelten Daten (Identität des Kindes, Kontakt des Elternteils, Anhänge) zur Verwaltung dieser Camp-Anmeldung gemäß DSGVO zu nutzen. Die Daten werden bis zu {{months}} Monate nach Ende des Camps aufbewahrt und dann automatisch gelöscht.",
     "submit": "Submit registration",
     "confirmTitle": "Registration sent!",
     "confirmBody": "We received your file. The club will contact you shortly.",

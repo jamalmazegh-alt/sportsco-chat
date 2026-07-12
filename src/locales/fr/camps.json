@@ -240,7 +240,7 @@
     "backToCamp": "Retour au stage",
     "formTitle": "Inscription — {{title}}",
     "docsHint": "PDF, JPG ou PNG — 15 Mo max par fichier.",
-    "consent": "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à 12 mois après la fin du stage, puis supprimées automatiquement.",
+    "consent": "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à {{months}} mois après la fin du stage, puis supprimées automatiquement.",
     "submit": "Envoyer l'inscription",
     "confirmTitle": "Inscription envoyée !",
     "confirmBody": "Nous avons bien reçu votre dossier. Le club vous contactera pour la suite.",
