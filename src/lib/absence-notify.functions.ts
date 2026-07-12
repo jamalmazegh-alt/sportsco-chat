@@ -188,20 +188,16 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
 
     const { data: profs } = await supabaseAdmin
       .from("profiles")
-      .select("id, first_name, notifications_email, preferred_language")
+      .select("id, first_name, notifications_email, notifications_push, preferred_language")
       .in("id", coachIds);
 
     const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
     let sent = 0;
-    for (const p of profs ?? []) {
-      if ((p as any).notifications_email === false) continue;
-      const { data: u } = await supabaseAdmin.auth.admin.getUserById((p as any).id);
-      const email = u?.user?.email;
-      if (!email) continue;
 
-      const locale = resolveLocale((p as any).preferred_language, clubDefaultLang);
+    const localeFor = (p: any) => resolveLocale(p?.preferred_language, clubDefaultLang);
+    const fmtFor = (locale: string) => {
       const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
-      const fmt = (d: string) => {
+      return (d: string) => {
         try {
           return new Date(`${d}T00:00:00`).toLocaleDateString(bcp, {
             weekday: "long",
@@ -212,15 +208,19 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
           return d;
         }
       };
+    };
+
+    // Push fan-out — independent of email preference / auth email presence.
+    for (const p of profs ?? []) {
+      if ((p as any).notifications_push === false) continue;
+      const locale = localeFor(p);
+      const fmt = fmtFor(locale);
       const reasonLabel =
         REASON_LABELS[locale]?.[avail.reason as string] ??
         REASON_LABELS.fr[avail.reason as string] ??
         (avail.reason as string);
-
       const startStr = fmt(avail.start_date as string);
       const endStr = fmt(avail.end_date as string);
-
-      // Push (best-effort, non-blocking)
       try {
         const strings = PUSH_STRINGS[locale] ?? PUSH_STRINGS.fr;
         sendPushToUser((p as any).id, {
@@ -232,6 +232,25 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
       } catch {
         // best-effort
       }
+    }
+
+    // Email fan-out
+    for (const p of profs ?? []) {
+      if ((p as any).notifications_email === false) continue;
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById((p as any).id);
+      const email = u?.user?.email;
+      if (!email) continue;
+
+      const locale = localeFor(p);
+      const fmt = fmtFor(locale);
+      const reasonLabel =
+        REASON_LABELS[locale]?.[avail.reason as string] ??
+        REASON_LABELS.fr[avail.reason as string] ??
+        (avail.reason as string);
+
+      const startStr = fmt(avail.start_date as string);
+      const endStr = fmt(avail.end_date as string);
+
 
       try {
         await fetch(`${baseUrl}/lovable/email/transactional/send`, {
