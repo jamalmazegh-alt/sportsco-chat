@@ -406,9 +406,11 @@ function ImportPage() {
     setLoading(true);
     try {
       const teamOverrides: Record<string, string> = {};
+      const teamsToCreate: string[] = [];
       if (type === "players" && preview) {
         for (const [key, val] of Object.entries(teamChoices)) {
-          if (val) teamOverrides[key] = val;
+          if (val === "__create__") teamsToCreate.push(key);
+          else if (val) teamOverrides[key] = val;
         }
       }
       const fieldOverridesPayload: Record<string, string[]> = {};
@@ -428,6 +430,7 @@ function ImportPage() {
           teamOverrides: Object.keys(teamOverrides).length > 0 ? teamOverrides : undefined,
           fieldOverrides:
             Object.keys(fieldOverridesPayload).length > 0 ? fieldOverridesPayload : undefined,
+          teamsToCreate: teamsToCreate.length > 0 ? teamsToCreate : undefined,
         },
       });
       setResult(res);
