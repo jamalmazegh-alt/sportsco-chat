@@ -1,8 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getSupportTicket, updateSupportTicket } from "@/lib/support.functions";
+import {
+  getSupportTicket,
+  updateSupportTicket,
+  getSupportTicketAudit,
+} from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
-import { ArrowLeft, Loader2, User } from "lucide-react";
+import { ArrowLeft, Loader2, User, History } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,12 +24,28 @@ export const Route = createFileRoute("/superadmin/support-tickets/$ticketId")({
 const STATUSES = ["open", "in_progress", "waiting_user", "resolved", "closed"];
 const PRIORITIES = ["low", "normal", "high", "urgent"];
 
+const ACTION_LABELS: Record<string, string> = {
+  created: "Ticket créé",
+  status_changed: "Statut",
+  priority_changed: "Priorité",
+  assigned: "Assignation",
+  reply: "Réponse",
+  internal_note: "Note interne",
+};
+
 function AdminTicketDetail() {
   const { ticketId } = Route.useParams();
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-support-ticket", ticketId],
     queryFn: () => getSupportTicket({ data: { ticket_id: ticketId } }),
   });
+
+  const { data: audit, refetch: refetchAudit } = useQuery({
+    queryKey: ["admin-support-ticket-audit", ticketId],
+    queryFn: () => getSupportTicketAudit({ data: { ticket_id: ticketId } }),
+  });
+
+
 
   const update = useMutation({
     mutationFn: (patch: { status?: string; priority?: string }) =>
@@ -39,7 +59,9 @@ function AdminTicketDetail() {
     onSuccess: () => {
       toast.success("Mis à jour");
       refetch();
+      refetchAudit();
     },
+
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
   });
 
@@ -75,10 +97,14 @@ function AdminTicketDetail() {
             ticketId={ticket.id}
             messages={messages}
             isStaffView
-            onReplied={() => refetch()}
+            onReplied={() => {
+              refetch();
+              refetchAudit();
+            }}
           />
         </div>
       </div>
+
 
       {/* Sidebar */}
       <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 overflow-y-auto p-5 space-y-5">
@@ -149,10 +175,49 @@ function AdminTicketDetail() {
             <Row k="Créé" v={new Date(ticket.created_at).toLocaleString()} />
           </dl>
         </section>
+
+        <section className="space-y-2">
+
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1">
+            <History className="h-3 w-3" /> Historique
+          </Label>
+          <ol className="rounded-md border bg-card p-3 text-xs space-y-2 max-h-80 overflow-y-auto">
+            {!audit || audit.length === 0 ? (
+              <li className="text-muted-foreground italic">Aucune action enregistrée.</li>
+            ) : (
+              audit.map((row) => {
+                const label = ACTION_LABELS[row.action] ?? row.action;
+                const who = row.actor_name ?? (row.actor_role === "staff" ? "Support" : "—");
+                const when = new Date(row.created_at).toLocaleString();
+                let detail: string | null = null;
+                if (row.action === "status_changed" || row.action === "priority_changed") {
+                  detail = `${row.from_value ?? "—"} → ${row.to_value ?? "—"}`;
+                } else if (row.action === "assigned") {
+                  detail = row.to_value ? "assigné" : "désassigné";
+                } else if (row.action === "reply" || row.action === "internal_note") {
+                  detail = row.to_value ? `« ${row.to_value.slice(0, 80)}${row.to_value.length > 80 ? "…" : ""} »` : null;
+                }
+                return (
+                  <li key={row.id} className="flex flex-col gap-0.5 pb-2 border-b last:border-b-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{label}</span>
+                      <span className="text-muted-foreground">{when}</span>
+                    </div>
+                    <div className="text-muted-foreground">
+                      <span className="font-medium text-foreground">{who}</span>
+                      {detail ? ` · ${detail}` : null}
+                    </div>
+                  </li>
+                );
+              })
+            )}
+          </ol>
+        </section>
       </aside>
     </div>
   );
 }
+
 
 function Row({ k, v }: { k: string; v: string }) {
   return (

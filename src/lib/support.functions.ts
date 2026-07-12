@@ -147,7 +147,33 @@ const PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 const STATUSES = ["open", "in_progress", "waiting_user", "resolved", "closed"] as const;
 
 const APP_BASE_URL = "https://www.clubero.app";
+const SUPPORT_FROM_NAME = "Support Clubero";
 const shortId = (id: string) => id.slice(0, 6).toUpperCase();
+
+async function logSupportAudit(entry: {
+  ticket_id: string;
+  actor_user_id: string | null;
+  actor_role: "user" | "staff" | "system";
+  action: "status_changed" | "priority_changed" | "assigned" | "reply" | "internal_note" | "created";
+  from_value?: string | null;
+  to_value?: string | null;
+  meta?: Record<string, unknown> | null;
+}) {
+  try {
+    await supabaseAdmin.from("support_ticket_audit").insert({
+      ticket_id: entry.ticket_id,
+      actor_user_id: entry.actor_user_id,
+      actor_role: entry.actor_role,
+      action: entry.action,
+      from_value: entry.from_value ?? null,
+      to_value: entry.to_value ?? null,
+      meta: (entry.meta ?? null) as any,
+    });
+  } catch (e) {
+    console.error("[support] audit log failed", e);
+  }
+}
+
 
 // ---------- Helpers ----------
 
@@ -246,6 +272,16 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       attachment_paths: data.attachment_paths ?? [],
     });
 
+    // Audit: ticket created
+    await logSupportAudit({
+      ticket_id: ticket.id,
+      actor_user_id: userId,
+      actor_role: "user",
+      action: "created",
+      to_value: ticket.subject,
+    });
+
+
     // Notify superadmins in-app
     await notifySuperAdmins({
       title: `Nouveau ticket #${shortId(ticket.id)}`,
@@ -279,6 +315,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       await enqueueTransactionalEmailServer({
         templateName: "support-ticket-created",
         recipientEmail: email,
+        fromName: SUPPORT_FROM_NAME,
         templateData: {
           name: profile?.first_name ?? profile?.full_name ?? null,
           subject: ticket.subject,
@@ -289,6 +326,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
         },
         idempotencyKey: `support-created-user-${ticket.id}`,
       }).catch((e) => console.error("[support] user confirmation email failed", e));
+
     }
 
     return { id: ticket.id };
@@ -398,6 +436,16 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     const messageId = inserted.id;
 
+    // Audit
+    await logSupportAudit({
+      ticket_id: data.ticket_id,
+      actor_user_id: userId,
+      actor_role: senderRole as "user" | "staff",
+      action: data.internal_note ? "internal_note" : "reply",
+      to_value: data.body.slice(0, 200),
+      meta: { message_id: messageId },
+    });
+
     if (!data.internal_note && senderRole === "staff") {
       // Notify ticket owner
       await supabaseAdmin.from("notifications").insert({
@@ -422,6 +470,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-reply",
           recipientEmail: email,
+          fromName: SUPPORT_FROM_NAME,
           templateData: {
             name: profile?.first_name ?? profile?.full_name ?? null,
             subject: ticket.subject,
@@ -435,6 +484,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
         }).catch((e) => console.error("[support] reply email failed", e));
       }
     }
+
 
     if (!data.internal_note && senderRole === "user") {
       // Internal notification to hello@clubero.app on user reply
@@ -579,10 +629,10 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
     if (!Object.keys(patch).length) return { ok: true };
 
-    // Read current status to detect change
+    // Read current row to detect change
     const { data: before } = await supabaseAdmin
       .from("support_tickets")
-      .select("status, user_id, subject")
+      .select("status, priority, assigned_to, user_id, subject")
       .eq("id", data.ticket_id)
       .maybeSingle();
 
@@ -592,8 +642,50 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       .eq("id", data.ticket_id);
     if (error) throw new Error(error.message);
 
-    // Notify ticket owner on status change
-    if (before && patch.status !== undefined && patch.status !== before.status && before.user_id) {
+    const actorRole: "user" | "staff" = isAdmin ? "staff" : "user";
+
+    // Audit — one row per changed field
+    if (before) {
+      if (patch.status !== undefined && patch.status !== before.status) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "status_changed",
+          from_value: before.status,
+          to_value: patch.status,
+        });
+      }
+      if (patch.priority !== undefined && patch.priority !== before.priority) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "priority_changed",
+          from_value: before.priority,
+          to_value: patch.priority,
+        });
+      }
+      if (patch.assigned_to !== undefined && patch.assigned_to !== before.assigned_to) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "assigned",
+          from_value: before.assigned_to ?? null,
+          to_value: patch.assigned_to ?? null,
+        });
+      }
+    }
+
+    // Notify ticket owner on status change (staff-initiated)
+    if (
+      before &&
+      patch.status !== undefined &&
+      patch.status !== before.status &&
+      before.user_id &&
+      actorRole === "staff"
+    ) {
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
       const locale = pickLocale(profile?.preferred_language);
@@ -618,6 +710,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-status",
           recipientEmail: email,
+          fromName: SUPPORT_FROM_NAME,
           templateData: {
             name: profile?.first_name ?? profile?.full_name ?? null,
             subject: before.subject,
@@ -631,8 +724,96 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
+    // Notify superadmins when the owner themself resolves / closes / reopens
+    if (
+      before &&
+      patch.status !== undefined &&
+      patch.status !== before.status &&
+      actorRole === "user"
+    ) {
+      const profile = await getUserProfile(context.userId);
+      const authorEmail = await getUserEmail(context.userId);
+      const authorName = profile?.full_name ?? profile?.first_name ?? "Utilisateur";
+      const isReopen = patch.status === "open";
+      const verb = isReopen ? "rouvert" : "clôturé";
+
+      await notifySuperAdmins({
+        title: `Ticket #${shortId(data.ticket_id)} ${verb} par l'utilisateur`,
+        body: `${authorName} — ${before.subject}`,
+        link: `/superadmin/support-tickets/${data.ticket_id}`,
+      });
+
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-internal",
+        recipientEmail: "hello@clubero.app",
+        templateData: {
+          kind: isReopen ? "user_reopened" : "user_resolved",
+          ticketShortId: shortId(data.ticket_id),
+          subject: before.subject,
+          authorName,
+          authorEmail,
+          bodyPreview: `Statut passé de "${before.status}" à "${patch.status}" par l'utilisateur.`,
+          ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${data.ticket_id}`,
+        },
+        idempotencyKey: `support-internal-userstatus-${data.ticket_id}-${patch.status}`,
+      }).catch((e) => console.error("[support] internal user-status email failed", e));
+    }
+
     return { ok: true };
   });
+
+// ---------- Audit trail (superadmin) ----------
+
+export const getSupportTicketAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => TicketIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    // Owner OR superadmin (RLS enforces this too, but check explicitly)
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
+    const { data: ticket } = await supabaseAdmin
+      .from("support_tickets")
+      .select("user_id")
+      .eq("id", data.ticket_id)
+      .maybeSingle();
+    if (!ticket) throw new Error("not_found");
+    if (!isAdmin && ticket.user_id !== context.userId) throw new Error("forbidden");
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("support_ticket_audit")
+      .select("id, actor_user_id, actor_role, action, from_value, to_value, meta, created_at")
+      .eq("ticket_id", data.ticket_id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    // Resolve actor names
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r) => r.actor_user_id).filter(Boolean)),
+    ) as string[];
+    const actorNames = new Map<string, string | null>();
+    if (actorIds.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name")
+        .in("id", actorIds);
+      for (const p of profiles ?? []) {
+        actorNames.set(p.id, p.full_name ?? p.first_name ?? null);
+      }
+    }
+
+    return (rows ?? []).map((r) => ({
+      ...r,
+      actor_name:
+        r.actor_role === "staff"
+          ? SUPPORT_FROM_NAME
+          : r.actor_user_id
+            ? (actorNames.get(r.actor_user_id) ?? null)
+            : null,
+    }));
+  });
+
 
 // ---------- Stats for admin dashboard ----------
 

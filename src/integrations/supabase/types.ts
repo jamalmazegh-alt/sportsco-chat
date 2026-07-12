@@ -4372,6 +4372,50 @@ export type Database = {
           },
         ]
       }
+      support_ticket_audit: {
+        Row: {
+          action: string
+          actor_role: string
+          actor_user_id: string | null
+          created_at: string
+          from_value: string | null
+          id: string
+          meta: Json | null
+          ticket_id: string
+          to_value: string | null
+        }
+        Insert: {
+          action: string
+          actor_role: string
+          actor_user_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          meta?: Json | null
+          ticket_id: string
+          to_value?: string | null
+        }
+        Update: {
+          action?: string
+          actor_role?: string
+          actor_user_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          meta?: Json | null
+          ticket_id?: string
+          to_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_audit_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           assigned_to: string | null
