@@ -768,7 +768,8 @@ function ImportPage() {
                             setTeamChoices((prev) => ({ ...prev, [tr.key]: e.target.value }))
                           }
                         >
-                          <option value="">➕ Créer une nouvelle équipe</option>
+                          <option value="">— choisir —</option>
+                          <option value="__create__">➕ Créer cette équipe</option>
                           {tr.existingTeams.map((et) => (
                             <option key={et.id} value={et.id}>
                               {et.name} ({et.sport ?? "?"} · {et.age_group ?? "?"})
