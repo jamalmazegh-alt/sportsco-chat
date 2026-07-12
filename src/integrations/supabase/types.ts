@@ -6381,6 +6381,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_camp_registration_by_token: {
+        Args: { _token: string }
+        Returns: Json
+      }
       get_club_stripe_status: {
         Args: { _club_id: string }
         Returns: {
@@ -6599,6 +6603,14 @@ export type Database = {
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
+      resolve_camp_registration_document: {
+        Args: { _document_id: string; _token: string }
+        Returns: string
+      }
+      resolve_camp_registration_for_upload: {
+        Args: { _required_document_id: string; _token: string }
+        Returns: Json
+      }
       respond_via_token: {
         Args: {
           _comment?: string
