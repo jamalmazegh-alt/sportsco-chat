@@ -446,11 +446,34 @@ export function ImportPlayersCsvDialog({
     let failed = 0;
     const errors: string[] = [];
 
+    // Fetch full club roster (active + soft-deleted) to build the identity index.
+    // Matching is business-unique: normalize(first) + normalize(last) + birth_date, scoped to club.
+    const { data: clubPlayers, error: clubPlayersError } = await supabase
+      .from("players")
+      .select(
+        "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at",
+      )
+      .eq("club_id", clubId);
+
+    if (clubPlayersError) {
+      setBusy(false);
+      toast.error(clubPlayersError.message);
+      return;
+    }
+
+    const playersByIdentity = new Map<string, ExistingPlayer>();
+    for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
+      const key = identityKey(p.first_name, p.last_name, p.birth_date);
+      if (!key) continue;
+      // Prefer active over soft-deleted if collision (shouldn't happen thanks to unique index).
+      const prev = playersByIdentity.get(key);
+      if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(key, p);
+    }
+
+    // Existing team links for quick "already in team" check.
     const { data: currentMembers, error: currentMembersError } = await supabase
       .from("team_members")
-      .select(
-        "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at)",
-      )
+      .select("player_id")
       .eq("team_id", teamId)
       .eq("role", "player");
 
@@ -459,13 +482,23 @@ export function ImportPlayersCsvDialog({
       toast.error(currentMembersError.message);
       return;
     }
-
-    const roster: ExistingPlayer[] = (currentMembers ?? [])
-      .map((member: any) => member.players)
-      .filter((p: any) => p && !p.deleted_at);
+    const teamPlayerIds = new Set<string>(
+      (currentMembers ?? []).map((m: any) => m.player_id).filter(Boolean),
+    );
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
+
+      // DOB obligatoire pour l'import : sans DOB, pas de clé d'identité fiable.
+      if (!r.birth_date) {
+        failed++;
+        errors.push(
+          `${r.first_name} ${r.last_name}: ${t("players.import.dobRequired", { defaultValue: "date de naissance requise" })}`,
+        );
+        setProgress({ done: i + 1, total: rows.length });
+        continue;
+      }
+
       const minor = isMinor(r.birth_date);
 
       // Build up to 2 parent candidates, then dedupe (email lowercase, then phone, then name)
@@ -502,40 +535,24 @@ export function ImportPlayersCsvDialog({
         setProgress({ done: i + 1, total: rows.length });
         continue;
       }
-      let player = findMatchingPlayer(roster, r);
-      let linkedToTeam = !!player;
 
-      if (!player) {
-        const byLicense = r.license_number
-          ? await supabase
-              .from("players")
-              .select(
-                "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone",
-              )
-              .eq("club_id", clubId)
-              .eq("license_number", r.license_number)
-              .maybeSingle()
-          : { data: null, error: null };
-        const byEmail =
-          !byLicense.data && r.email
-            ? await supabase
-                .from("players")
-                .select(
-                  "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone",
-                )
-                .eq("club_id", clubId)
-                .eq("email", r.email)
-                .maybeSingle()
-            : { data: null, error: null };
-        if (byLicense.error || byEmail.error) {
+      const idKey = identityKey(r.first_name, r.last_name, r.birth_date)!;
+      let player: ExistingPlayer | null = playersByIdentity.get(idKey) ?? null;
+
+      // Match soft-deleted → réactivation via restore_entity (RPC déjà existante).
+      if (player && player.deleted_at) {
+        const { error: restoreErr } = await supabase.rpc("restore_entity", {
+          _kind: "player",
+          _id: player.id,
+        });
+        if (restoreErr) {
           failed++;
-          errors.push(
-            `${r.first_name} ${r.last_name}: ${(byLicense.error ?? byEmail.error)?.message}`,
-          );
+          errors.push(`${r.first_name} ${r.last_name}: ${restoreErr.message}`);
           setProgress({ done: i + 1, total: rows.length });
           continue;
         }
-        player = (byLicense.data ?? byEmail.data) as ExistingPlayer | null;
+        player = { ...player, deleted_at: null };
+        playersByIdentity.set(idKey, player);
       }
 
       if (player) {
@@ -552,6 +569,7 @@ export function ImportPlayersCsvDialog({
             continue;
           }
           player = { ...player, ...patch };
+          playersByIdentity.set(idKey, player);
         }
       } else {
         const { data: newPlayer, error } = await supabase
@@ -570,7 +588,7 @@ export function ImportPlayersCsvDialog({
             child_platform_access: false,
           })
           .select(
-            "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone",
+            "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at",
           )
           .single();
         if (error || !newPlayer) {
@@ -580,36 +598,23 @@ export function ImportPlayersCsvDialog({
           continue;
         }
         player = newPlayer as ExistingPlayer;
+        playersByIdentity.set(idKey, player);
       }
 
-      if (!linkedToTeam) {
-        const { data: alreadyMember } = await supabase
-          .from("team_members")
-          .select("id")
-          .eq("team_id", teamId)
-          .eq("player_id", player.id)
-          .eq("role", "player")
-          .maybeSingle();
-        linkedToTeam = !!alreadyMember;
-      }
-
-      if (!linkedToTeam) {
+      if (!teamPlayerIds.has(player.id)) {
         const { error: tmErr } = await supabase
           .from("team_members")
           .insert({ team_id: teamId, player_id: player.id, role: "player" });
-        if (tmErr) {
+        if (tmErr && (tmErr as any).code !== "23505") {
           failed++;
-          const msg =
-            (tmErr as any).code === "23505"
-              ? t("players.alreadyInTeam", { defaultValue: "Ce joueur est déjà dans cette équipe" })
-              : tmErr.message;
-          errors.push(`${r.first_name} ${r.last_name}: ${msg}`);
+          errors.push(`${r.first_name} ${r.last_name}: ${tmErr.message}`);
           setProgress({ done: i + 1, total: rows.length });
           continue;
         }
+        teamPlayerIds.add(player.id);
       }
 
-      roster.push(player);
+
 
       const { data: currentParents } = await supabase
         .from("player_parents")
