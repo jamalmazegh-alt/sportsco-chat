@@ -85,6 +85,13 @@ function DossierBadge({ status, t }: { status: DossierStatus; t: (k: string, o?:
       label: t("registrations.dossier.paymentMissing", { defaultValue: "Paiement manquant" }),
       emoji: "🟠",
     },
+    documents_pending: {
+      className: "bg-blue-500/10 text-blue-700 border-blue-500/30",
+      label: t("registrations.dossier.documentsPending", {
+        defaultValue: "En attente de vérification",
+      }),
+      emoji: "🔵",
+    },
     documents_missing: {
       className: "bg-red-500/10 text-red-700 border-red-500/30",
       label: t("registrations.dossier.documentsMissing", { defaultValue: "Documents manquants" }),
