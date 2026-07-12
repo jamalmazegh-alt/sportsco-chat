@@ -495,6 +495,8 @@ export const runImport = createServerFn({ method: "POST" })
         teamOverrides: z.record(z.string(), z.string().uuid()).optional(),
         /** row index (0-based, as string) → list of columns authorized to overwrite. */
         fieldOverrides: z.record(z.string(), z.array(z.string())).optional(),
+        /** teamKeys the caller explicitly authorizes to CREATE when unresolved. */
+        teamsToCreate: z.array(z.string()).optional(),
       })
       .parse(input),
   )
