@@ -605,6 +605,8 @@ function CampEditPage() {
           </div>
         </div>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
