@@ -444,7 +444,6 @@ function ImportPage() {
     }
   };
 
-
   const reset = (keepClub: boolean) => {
     setStep(2);
     setType(null);
@@ -720,11 +719,7 @@ function ImportPage() {
               disabled={loading || analysis.summary.to_fix > 0 || analysis.summary.valid === 0}
               className="w-full"
             >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
               Prévisualiser l'import
             </Button>
           )}
@@ -737,11 +732,15 @@ function ImportPage() {
                   <div className="text-muted-foreground">nouveaux</div>
                 </div>
                 <div className="rounded-lg border p-2">
-                  <div className="text-xl font-semibold text-blue-600">{preview.summary.update}</div>
+                  <div className="text-xl font-semibold text-blue-600">
+                    {preview.summary.update}
+                  </div>
                   <div className="text-muted-foreground">à mettre à jour</div>
                 </div>
                 <div className="rounded-lg border p-2">
-                  <div className="text-xl font-semibold text-amber-600">{preview.summary.restore}</div>
+                  <div className="text-xl font-semibold text-amber-600">
+                    {preview.summary.restore}
+                  </div>
                   <div className="text-muted-foreground">à réactiver</div>
                 </div>
               </div>
@@ -751,10 +750,7 @@ function ImportPage() {
                   <div className="text-sm font-medium">Résolution des équipes</div>
                   <div className="rounded-md border divide-y">
                     {preview.teamResolutions.map((tr) => (
-                      <div
-                        key={tr.key}
-                        className="flex items-center gap-2 p-2 text-xs flex-wrap"
-                      >
+                      <div key={tr.key} className="flex items-center gap-2 p-2 text-xs flex-wrap">
                         <div className="flex-1 min-w-[180px]">
                           <div className="font-medium">{tr.name}</div>
                           <div className="text-muted-foreground">
@@ -817,8 +813,7 @@ function ImportPage() {
                           <table className="w-full text-xs">
                             <tbody>
                               {row.diffs.map((d) => {
-                                const checked =
-                                  fieldOverrides[row.index]?.has(d.field) ?? false;
+                                const checked = fieldOverrides[row.index]?.has(d.field) ?? false;
                                 return (
                                   <tr key={d.field} className="border-t">
                                     <td className="py-1 font-medium w-28">

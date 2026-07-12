@@ -27,7 +27,10 @@ import {
 describe("resolveTeamForRow", () => {
   const teamsByNorm = new Map<string, string>([
     // "U13 Filles" / football / u13 → id-1
-    [`${_normalizeName("U13 Filles")}|${_normalizeName("football")}|${_normalizeName("U13")}`, "id-1"],
+    [
+      `${_normalizeName("U13 Filles")}|${_normalizeName("football")}|${_normalizeName("U13")}`,
+      "id-1",
+    ],
   ]);
 
   it("returns override when caller pinned a specific team_id", () => {
@@ -38,7 +41,11 @@ describe("resolveTeamForRow", () => {
       teamOverrides: { "Anything|football|U13": "id-override" },
       teamsByNorm,
     });
-    expect(res).toEqual({ kind: "override", teamKey: "Anything|football|U13", teamId: "id-override" });
+    expect(res).toEqual({
+      kind: "override",
+      teamKey: "Anything|football|U13",
+      teamId: "id-override",
+    });
   });
 
   it("matches an existing team when casse/accents differ (normalized)", () => {
@@ -87,13 +94,25 @@ describe("resolveTeamForRow", () => {
 
 // =========================================================================
 describe("computePlayerPatch", () => {
-  const baseSpecs = (overrides: Partial<Record<FieldSpec["col"], Partial<FieldSpec>>> = {}): FieldSpec[] => {
+  const baseSpecs = (
+    overrides: Partial<Record<FieldSpec["col"], Partial<FieldSpec>>> = {},
+  ): FieldSpec[] => {
     const defaults: Record<FieldSpec["col"], FieldSpec> = {
       first_name: { col: "first_name", incoming: null, current: "Alice", allowBlankFill: false },
       last_name: { col: "last_name", incoming: null, current: "Doe", allowBlankFill: false },
       jersey_number: { col: "jersey_number", incoming: null, current: null, allowBlankFill: true },
-      license_number: { col: "license_number", incoming: null, current: null, allowBlankFill: true },
-      preferred_position: { col: "preferred_position", incoming: null, current: null, allowBlankFill: true },
+      license_number: {
+        col: "license_number",
+        incoming: null,
+        current: null,
+        allowBlankFill: true,
+      },
+      preferred_position: {
+        col: "preferred_position",
+        incoming: null,
+        current: null,
+        allowBlankFill: true,
+      },
       email: { col: "email", incoming: null, current: null, allowBlankFill: true },
       phone: { col: "phone", incoming: null, current: null, allowBlankFill: true },
     };

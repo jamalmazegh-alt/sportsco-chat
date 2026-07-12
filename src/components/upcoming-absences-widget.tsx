@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle, CalendarDays } from "lucide-react";
+import {
+  Palmtree,
+  Plus,
+  CheckCircle2,
+  ChevronRight,
+  AlertTriangle,
+  CalendarDays,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
 
@@ -15,7 +22,6 @@ interface Props {
   teamId?: string;
   className?: string;
 }
-
 
 type Row = {
   id: string;
@@ -90,7 +96,6 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
     },
     staleTime: 30_000,
   });
-
 
   const total = rows.length;
   const top = rows.slice(0, 4);
@@ -233,7 +238,6 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
               })}
             </ul>
           )}
-
 
           {teamId && (
             <Link

@@ -81,173 +81,176 @@ export function HomeQuickCards({ clubId, teams }: Props) {
 
   return (
     <div className="space-y-2.5">
-    <div className="grid grid-cols-2 gap-2.5">
-      {/* Teams card */}
-      <Link
-        to="/teams"
-        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
-      >
-        <div
-          aria-hidden
-          className="absolute top-0 inset-x-0 h-[3px]"
-          style={{ background: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)" }}
-        />
-        <div className="relative">
+      <div className="grid grid-cols-2 gap-2.5">
+        {/* Teams card */}
+        <Link
+          to="/teams"
+          className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
+        >
           <div
-            className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
-            style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
-          >
-            <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
-          </div>
-          <p
-            className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
-          >
-            {teamsCount}
-          </p>
-          <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
-            {t("nav.teams")}
-          </p>
-          {teamsSummary && (
-            <p className="text-[10px] text-muted-foreground/70 mt-1 truncate font-medium">
-              {teamsSummary}
+            aria-hidden
+            className="absolute top-0 inset-x-0 h-[3px]"
+            style={{ background: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)" }}
+          />
+          <div className="relative">
+            <div
+              className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
+              style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
+            >
+              <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
+            </div>
+            <p
+              className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+              style={{ backgroundImage: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+            >
+              {teamsCount}
             </p>
-          )}
-        </div>
-        <ChevronRight
-          className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
-          strokeWidth={2.4}
-        />
-      </Link>
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
+              {t("nav.teams")}
+            </p>
+            {teamsSummary && (
+              <p className="text-[10px] text-muted-foreground/70 mt-1 truncate font-medium">
+                {teamsSummary}
+              </p>
+            )}
+          </div>
+          <ChevronRight
+            className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
+            strokeWidth={2.4}
+          />
+        </Link>
 
-      {/* Tournaments card */}
-      <Link
-        to="/tournaments"
-        className={cn(
-          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all",
-          state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
-          state === "planned" &&
-            "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
-          state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
-          state === "done" && "border-border opacity-90",
-        )}
-      >
-        <div
-          aria-hidden
-          className="absolute top-0 inset-x-0 h-[3px]"
-          style={{
-            background:
-              state === "live"
-                ? "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)"
-                : state === "planned"
-                  ? "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)"
-                  : "linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%)",
-          }}
-        />
-        <div className="relative">
+        {/* Tournaments card */}
+        <Link
+          to="/tournaments"
+          className={cn(
+            "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all",
+            state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
+            state === "planned" &&
+              "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
+            state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
+            state === "done" && "border-border opacity-90",
+          )}
+        >
           <div
-            className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
+            aria-hidden
+            className="absolute top-0 inset-x-0 h-[3px]"
             style={{
               background:
                 state === "live"
-                  ? "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)"
+                  ? "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)"
                   : state === "planned"
-                    ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
-                    : "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+                    ? "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)"
+                    : "linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%)",
             }}
-          >
-            <Trophy
-              className="h-4 w-4"
-              strokeWidth={2.4}
+          />
+          <div className="relative">
+            <div
+              className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
               style={{
-                color: state === "live" ? "#0f4a26" : state === "planned" ? "#92400e" : "#64748b",
+                background:
+                  state === "live"
+                    ? "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)"
+                    : state === "planned"
+                      ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
+                      : "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
               }}
-            />
-          </div>
-
-          {state === "empty" ? (
-            <>
-              <p className="text-[24px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">
-                0
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
-                {t("nav.tournaments")}
-              </p>
-              {canCreateTournament && (
-                <p className="text-[10px] font-bold text-foreground mt-1.5 inline-flex items-center gap-0.5">
-                  <Plus className="h-3 w-3" strokeWidth={2.6} />
-                  {t("dashboard.tournamentsCard.createCta", {
-                    defaultValue: "Créer un tournoi",
-                  })}
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <p
-                className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+            >
+              <Trophy
+                className="h-4 w-4"
+                strokeWidth={2.4}
                 style={{
-                  backgroundImage:
-                    state === "live"
-                      ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
-                      : state === "planned"
-                        ? "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)"
-                        : "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
+                  color: state === "live" ? "#0f4a26" : state === "planned" ? "#92400e" : "#64748b",
                 }}
-              >
-                {isLoading ? "…" : count}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
-                {count > 1
-                  ? t("nav.tournaments")
-                  : t("nav.tournament", { defaultValue: "Tournoi" })}
-              </p>
-              <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
-            </>
-          )}
-        </div>
-        <ChevronRight
-          className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
-          strokeWidth={2.4}
-        />
-      </Link>
-    </div>
+              />
+            </div>
 
-    {canManageCamps && (
-      <Link
-        to="/admin/camps"
-        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[64px] active:scale-[0.99] transition-all hover:border-lime-500 hover:shadow-[0_4px_12px_rgba(132,204,22,0.12)] flex items-center gap-3"
-      >
-        <div
-          aria-hidden
-          className="absolute top-0 inset-x-0 h-[3px]"
-          style={{ background: "linear-gradient(90deg, #4d7c0f 0%, #84cc16 100%)" }}
-        />
-        <div
-          className="h-[36px] w-[36px] rounded-[10px] flex items-center justify-center shrink-0"
-          style={{ background: "linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%)" }}
+            {state === "empty" ? (
+              <>
+                <p className="text-[24px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">
+                  0
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
+                  {t("nav.tournaments")}
+                </p>
+                {canCreateTournament && (
+                  <p className="text-[10px] font-bold text-foreground mt-1.5 inline-flex items-center gap-0.5">
+                    <Plus className="h-3 w-3" strokeWidth={2.6} />
+                    {t("dashboard.tournamentsCard.createCta", {
+                      defaultValue: "Créer un tournoi",
+                    })}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <p
+                  className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage:
+                      state === "live"
+                        ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
+                        : state === "planned"
+                          ? "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)"
+                          : "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
+                  }}
+                >
+                  {isLoading ? "…" : count}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
+                  {count > 1
+                    ? t("nav.tournaments")
+                    : t("nav.tournament", { defaultValue: "Tournoi" })}
+                </p>
+                <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
+              </>
+            )}
+          </div>
+          <ChevronRight
+            className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5"
+            strokeWidth={2.4}
+          />
+        </Link>
+      </div>
+
+      {canManageCamps && (
+        <Link
+          to="/admin/camps"
+          className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[64px] active:scale-[0.99] transition-all hover:border-lime-500 hover:shadow-[0_4px_12px_rgba(132,204,22,0.12)] flex items-center gap-3"
         >
-          <Tent className="h-5 w-5" strokeWidth={2.4} style={{ color: "#4d7c0f" }} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-bold leading-tight">
-            {t("dashboard.campsCard.title", { defaultValue: "Stages" })}
-          </p>
-          {campsCount === 0 ? (
-            <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-0.5 font-medium">
-              <Plus className="h-3 w-3" strokeWidth={2.6} />
-              {t("dashboard.campsCard.createCta", { defaultValue: "Créer un stage" })}
+          <div
+            aria-hidden
+            className="absolute top-0 inset-x-0 h-[3px]"
+            style={{ background: "linear-gradient(90deg, #4d7c0f 0%, #84cc16 100%)" }}
+          />
+          <div
+            className="h-[36px] w-[36px] rounded-[10px] flex items-center justify-center shrink-0"
+            style={{ background: "linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%)" }}
+          >
+            <Tent className="h-5 w-5" strokeWidth={2.4} style={{ color: "#4d7c0f" }} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-bold leading-tight">
+              {t("dashboard.campsCard.title", { defaultValue: "Stages" })}
             </p>
-          ) : (
-            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-              {campsCount} {campsCount > 1 ? t("dashboard.campsCard.plural", { defaultValue: "stages" }) : t("dashboard.campsCard.singular", { defaultValue: "stage" })}
-              {nextCamp?.start_date ? ` · ${fmt(new Date(nextCamp.start_date), "d MMM")}` : ""}
-            </p>
-          )}
-        </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground/70 shrink-0" strokeWidth={2.4} />
-      </Link>
-    )}
+            {campsCount === 0 ? (
+              <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-0.5 font-medium">
+                <Plus className="h-3 w-3" strokeWidth={2.6} />
+                {t("dashboard.campsCard.createCta", { defaultValue: "Créer un stage" })}
+              </p>
+            ) : (
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                {campsCount}{" "}
+                {campsCount > 1
+                  ? t("dashboard.campsCard.plural", { defaultValue: "stages" })
+                  : t("dashboard.campsCard.singular", { defaultValue: "stage" })}
+                {nextCamp?.start_date ? ` · ${fmt(new Date(nextCamp.start_date), "d MMM")}` : ""}
+              </p>
+            )}
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/70 shrink-0" strokeWidth={2.4} />
+        </Link>
+      )}
     </div>
   );
 }

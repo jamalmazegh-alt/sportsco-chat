@@ -8,7 +8,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Loader2, Search, Clock, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Download } from "lucide-react";
+import {
+  Loader2,
+  Search,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  Download,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -129,7 +138,8 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
       if (payFilter !== "all" && r.payment_status !== payFilter) return false;
       if (dossierFilter !== "all" && r.dossier_status !== dossierFilter) return false;
       if (s) {
-        const hay = `${r.participant_first_name} ${r.participant_last_name} ${r.guardian_email}`.toLowerCase();
+        const hay =
+          `${r.participant_first_name} ${r.participant_last_name} ${r.guardian_email}`.toLowerCase();
         if (!hay.includes(s)) return false;
       }
       return true;
@@ -393,7 +403,9 @@ function RegistrationRow({
         </div>
       </td>
       <td className="px-3 py-3">
-        <div>{row.guardian_first_name} {row.guardian_last_name}</div>
+        <div>
+          {row.guardian_first_name} {row.guardian_last_name}
+        </div>
         <div className="text-xs text-muted-foreground">{row.guardian_email}</div>
         {row.guardian_phone && (
           <div className="text-xs text-muted-foreground">{row.guardian_phone}</div>
@@ -447,7 +459,8 @@ function RegistrationRow({
             : t("registrations.noRequiredDocs", { defaultValue: "Aucune pièce requise" })}
           {row.documents_rejected > 0 && (
             <span className="ml-1 text-red-700">
-              · {row.documents_rejected} {t("registrations.rejected", { defaultValue: "refusée(s)" })}
+              · {row.documents_rejected}{" "}
+              {t("registrations.rejected", { defaultValue: "refusée(s)" })}
             </span>
           )}
         </div>
@@ -492,8 +505,11 @@ function RegistrationStatusBadge({
     cancelled: "bg-muted text-muted-foreground border-border",
   };
   const icon =
-    status === "approved" ? <CheckCircle2 className="h-3 w-3 mr-1" /> :
-    status === "rejected" ? <XCircle className="h-3 w-3 mr-1" /> : null;
+    status === "approved" ? (
+      <CheckCircle2 className="h-3 w-3 mr-1" />
+    ) : status === "rejected" ? (
+      <XCircle className="h-3 w-3 mr-1" />
+    ) : null;
   return (
     <Badge variant="outline" className={map[status]}>
       {icon}
@@ -502,13 +518,7 @@ function RegistrationStatusBadge({
   );
 }
 
-function PaymentBadge({
-  status,
-  t,
-}: {
-  status: PaymentStatus;
-  t: (k: string, o?: any) => string;
-}) {
+function PaymentBadge({ status, t }: { status: PaymentStatus; t: (k: string, o?: any) => string }) {
   const map: Record<PaymentStatus, string> = {
     not_required: "bg-slate-500/10 text-slate-700 border-slate-500/30",
     pending: "bg-amber-500/10 text-amber-800 border-amber-500/30",

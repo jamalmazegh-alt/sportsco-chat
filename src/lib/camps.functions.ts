@@ -118,9 +118,7 @@ export const listClubCamps = createServerFn({ method: "GET" })
 
 export const getClubCamp = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<ClubCampWithAgeGroups> => {
     const { data: camp, error } = await context.supabase
       .from("club_camps")
@@ -259,10 +257,7 @@ export const updateClubCamp = createServerFn({ method: "POST" })
       throw new Error("DATES_INVALID");
     }
 
-    const { error } = await supabaseAdmin
-      .from("club_camps")
-      .update(patch)
-      .eq("id", data.campId);
+    const { error } = await supabaseAdmin.from("club_camps").update(patch).eq("id", data.campId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -293,16 +288,12 @@ async function transitionStatus(
 
 export const publishClubCamp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     // Validate publish preconditions using admin client to read full row.
     const { data: camp, error } = await supabaseAdmin
       .from("club_camps")
-      .select(
-        "id, club_id, title, start_date, end_date, capacity, registration_deadline, status",
-      )
+      .select("id, club_id, title, start_date, end_date, capacity, registration_deadline, status")
       .eq("id", data.campId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -346,9 +337,7 @@ export const publishClubCamp = createServerFn({ method: "POST" })
 
 export const closeClubCamp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await transitionStatus(data.campId, context.userId, context.supabase, "closed");
     return { ok: true as const };
@@ -356,9 +345,7 @@ export const closeClubCamp = createServerFn({ method: "POST" })
 
 export const archiveClubCamp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await transitionStatus(data.campId, context.userId, context.supabase, "archived");
     return { ok: true as const };
@@ -366,9 +353,7 @@ export const archiveClubCamp = createServerFn({ method: "POST" })
 
 export const deleteClubCamp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const camp = await loadCampForClubCheck(data.campId);
     if (camp.status !== "draft") throw new Error("DELETE_NOT_DRAFT");
@@ -448,9 +433,7 @@ export const upsertCampAgeGroup = createServerFn({ method: "POST" })
 
 export const deleteCampAgeGroup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { data: row, error: readErr } = await supabaseAdmin
       .from("club_camp_age_groups")
@@ -460,8 +443,7 @@ export const deleteCampAgeGroup = createServerFn({ method: "POST" })
     if (readErr) throw new Error(readErr.message);
     if (!row) throw new Error("NOT_FOUND");
     const clubId =
-      (row as unknown as { club_camps: { club_id: string } | null }).club_camps?.club_id ??
-      null;
+      (row as unknown as { club_camps: { club_id: string } | null }).club_camps?.club_id ?? null;
     if (!clubId) throw new Error("NOT_FOUND");
     await assertClubRole({
       supabase: context.supabase,
@@ -469,10 +451,7 @@ export const deleteCampAgeGroup = createServerFn({ method: "POST" })
       clubId,
       allowedRoles: MANAGER_ROLES,
     });
-    const { error } = await supabaseAdmin
-      .from("club_camp_age_groups")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await supabaseAdmin.from("club_camp_age_groups").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -507,11 +486,7 @@ export const reorderCampAgeGroups = createServerFn({ method: "POST" })
 // Cover upload
 // ---------------------------------------------------------------------------
 
-const ALLOWED_COVER_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+const ALLOWED_COVER_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 
 const CoverUploadInput = z.object({
@@ -587,9 +562,7 @@ export const setCampCoverFromUpload = createServerFn({ method: "POST" })
  */
 export const duplicateClubCamp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ id: string; slug: string }> => {
     // 1. Load source + authorize
     const { data: src, error: srcErr } = await supabaseAdmin
@@ -659,9 +632,7 @@ export const duplicateClubCamp = createServerFn({ method: "POST" })
           .from("camp-covers")
           .copy(oldPath, newPath);
         if (!copyErr) {
-          const { data: pub } = supabaseAdmin.storage
-            .from("camp-covers")
-            .getPublicUrl(newPath);
+          const { data: pub } = supabaseAdmin.storage.from("camp-covers").getPublicUrl(newPath);
           await supabaseAdmin
             .from("club_camps")
             .update({ cover_image_url: pub.publicUrl })
@@ -703,9 +674,7 @@ export const duplicateClubCamp = createServerFn({ method: "POST" })
       .order("sort_order", { ascending: true });
     if (reqs && reqs.length > 0) {
       const rows = reqs.map((r) => ({ ...r, camp_id: newId }));
-      const { error } = await supabaseAdmin
-        .from("club_camp_required_documents")
-        .insert(rows);
+      const { error } = await supabaseAdmin.from("club_camp_required_documents").insert(rows);
       if (error) throw new Error(error.message);
     }
 
@@ -728,9 +697,7 @@ export const duplicateClubCamp = createServerFn({ method: "POST" })
             .from("attachments")
             .copy(oldPath, newPath);
           if (!copyErr) {
-            const { data: pub } = supabaseAdmin.storage
-              .from("attachments")
-              .getPublicUrl(newPath);
+            const { data: pub } = supabaseAdmin.storage.from("attachments").getPublicUrl(newPath);
             newFileUrl = pub.publicUrl;
           }
           // If copy failed, we fall back to referencing the source URL —

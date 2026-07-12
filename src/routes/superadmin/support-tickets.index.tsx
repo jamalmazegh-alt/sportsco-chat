@@ -62,7 +62,6 @@ function AdminTicketsPage() {
     );
   })();
 
-
   return (
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-6">
@@ -141,7 +140,6 @@ function AdminTicketsPage() {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : !data || data.length === 0 ? (
-
         <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
           Aucun ticket.
         </div>
@@ -183,7 +181,6 @@ function AdminTicketsPage() {
                     )}
                     {t.user_full_name && <span>· {t.user_full_name}</span>}
                     <span>· {new Date(t.last_activity_at).toLocaleString()}</span>
-
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />

@@ -24,7 +24,9 @@ export const Route = createFileRoute("/_authenticated/admin/camps/")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("camps:meta.list.title", { defaultValue: "Stages du club – Clubero" }),
+        title: i18nInstance.t("camps:meta.list.title", {
+          defaultValue: "Stages du club – Clubero",
+        }),
       },
       {
         name: "description",
@@ -62,7 +64,11 @@ function CampsListPage() {
   const canManage = roles.some((r) => MANAGER_ROLES.has(r));
   const listFn = useServerFn(listClubCamps);
 
-  const { data: camps, isLoading, refetch } = useQuery({
+  const {
+    data: camps,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["club-camps", activeClubId],
     queryFn: () => listFn({ data: { clubId: activeClubId!, includeArchived: true } }),
     enabled: !!activeClubId,
@@ -141,10 +147,18 @@ function CampsListPage() {
               <SelectItem value="all">
                 {t("filters.status.all", { defaultValue: "Tous les statuts" })}
               </SelectItem>
-              <SelectItem value="draft">{t("status.draft", { defaultValue: "Brouillon" })}</SelectItem>
-              <SelectItem value="published">{t("status.published", { defaultValue: "Publié" })}</SelectItem>
-              <SelectItem value="closed">{t("status.closed", { defaultValue: "Fermé" })}</SelectItem>
-              <SelectItem value="archived">{t("status.archived", { defaultValue: "Archivé" })}</SelectItem>
+              <SelectItem value="draft">
+                {t("status.draft", { defaultValue: "Brouillon" })}
+              </SelectItem>
+              <SelectItem value="published">
+                {t("status.published", { defaultValue: "Publié" })}
+              </SelectItem>
+              <SelectItem value="closed">
+                {t("status.closed", { defaultValue: "Fermé" })}
+              </SelectItem>
+              <SelectItem value="archived">
+                {t("status.archived", { defaultValue: "Archivé" })}
+              </SelectItem>
             </SelectContent>
           </Select>
           <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>

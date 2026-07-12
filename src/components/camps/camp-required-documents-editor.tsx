@@ -19,16 +19,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  GripVertical,
-  Plus,
-  Trash2,
-  Pencil,
-  Check,
-  X,
-  Lock,
-  Loader2,
-} from "lucide-react";
+import { GripVertical, Plus, Trash2, Pencil, Check, X, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +59,7 @@ function typeLabel(v: string | null, lang: string): string {
   const key = (v ?? "__none").toLowerCase();
   const found = DOC_TYPES.find((d) => d.value === key);
   const l = lang.startsWith("en") ? "en" : "fr";
-  return found ? found.label[l as "fr" | "en"] : v ?? "";
+  return found ? found.label[l as "fr" | "en"] : (v ?? "");
 }
 
 type Draft = {
@@ -128,8 +119,7 @@ export function CampRequiredDocumentsEditor({
             id: payload.id,
             title: payload.title.trim(),
             required: payload.required,
-            document_type:
-              payload.document_type === "__none" ? null : payload.document_type,
+            document_type: payload.document_type === "__none" ? null : payload.document_type,
             is_sensitive: payload.is_sensitive,
           },
         },
@@ -149,8 +139,7 @@ export function CampRequiredDocumentsEditor({
   });
 
   const reorderMut = useMutation({
-    mutationFn: (orderedIds: string[]) =>
-      reorderFn({ data: { campId, orderedIds } }),
+    mutationFn: (orderedIds: string[]) => reorderFn({ data: { campId, orderedIds } }),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -230,9 +219,7 @@ export function CampRequiredDocumentsEditor({
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label className="text-xs">
-                {t("required.type", { defaultValue: "Type" })}
-              </Label>
+              <Label className="text-xs">{t("required.type", { defaultValue: "Type" })}</Label>
               <Select
                 value={draft.document_type}
                 onValueChange={(v) => setDraft({ ...draft, document_type: v })}
@@ -282,9 +269,7 @@ export function CampRequiredDocumentsEditor({
             </div>
             <Switch
               checked={effectiveSensitive}
-              onCheckedChange={(v) =>
-                !typeIsSensitive && setDraft({ ...draft, is_sensitive: v })
-              }
+              onCheckedChange={(v) => !typeIsSensitive && setDraft({ ...draft, is_sensitive: v })}
               disabled={disabled || typeIsSensitive}
             />
           </div>
@@ -300,9 +285,7 @@ export function CampRequiredDocumentsEditor({
               ) : (
                 <Check className="h-4 w-4" />
               )}
-              <span className="ml-1.5">
-                {t("common.save", { defaultValue: "Enregistrer" })}
-              </span>
+              <span className="ml-1.5">{t("common.save", { defaultValue: "Enregistrer" })}</span>
             </Button>
             <Button
               type="button"

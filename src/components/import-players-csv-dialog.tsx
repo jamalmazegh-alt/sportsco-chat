@@ -3,14 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import {
-  Loader2,
-  Upload,
-  Download,
-  Sparkles,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
+import { Loader2, Upload, Download, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -21,11 +14,7 @@ import {
   runImport,
   type PlayerImportPreview,
 } from "@/lib/superadmin-import/import.functions";
-import {
-  type AnalysisResult,
-  getFields,
-} from "@/lib/superadmin-import/schemas";
-
+import { type AnalysisResult, getFields } from "@/lib/superadmin-import/schemas";
 
 /**
  * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
@@ -72,16 +61,12 @@ function cleanSheetRows(rows: Array<Record<string, unknown>>) {
       }
       return out;
     })
-    .filter((row) =>
-      Object.values(row).some((v) => v != null && String(v).trim() !== ""),
-    );
+    .filter((row) => Object.values(row).some((v) => v != null && String(v).trim() !== ""));
 }
 
 function downloadTemplate() {
   const headers = FIELD_KEYS.map(
-    (k) =>
-      k +
-      (k === "prenom_joueur" || k === "nom_joueur" || k === "date_naissance" ? "*" : ""),
+    (k) => k + (k === "prenom_joueur" || k === "nom_joueur" || k === "date_naissance" ? "*" : ""),
   );
   const example = [
     "Léa",
@@ -122,7 +107,7 @@ export function ImportPlayersCsvDialog({
 }) {
   const { t } = useTranslation();
   const aiAnalyze = useServerFn(analyzeFileWithAI);
-  
+
   const doPreview = useServerFn(previewPlayersImport);
   const doImport = useServerFn(runImport);
 
@@ -136,8 +121,7 @@ export function ImportPlayersCsvDialog({
   const [overrides, setOverrides] = useState<Record<number, Set<string>>>({});
   const [loading, setLoading] = useState(false);
   const [busyLabel, setBusyLabel] = useState<string>("");
-  const [result, setResult] =
-    useState<Awaited<ReturnType<typeof runImport>> | null>(null);
+  const [result, setResult] = useState<Awaited<ReturnType<typeof runImport>> | null>(null);
 
   const fields = useMemo(() => getFields("players"), []);
 
@@ -172,9 +156,7 @@ export function ImportPlayersCsvDialog({
     let valid = 0;
     let to_fix = 0;
     for (const r of newRows) {
-      const ok =
-        required.every((k) => r[k]?.value) &&
-        Object.values(r).every((c) => !c.error);
+      const ok = required.every((k) => r[k]?.value) && Object.values(r).every((c) => !c.error);
       if (ok) valid++;
       else to_fix++;
     }
@@ -209,9 +191,7 @@ export function ImportPlayersCsvDialog({
       setPreview(null);
       setOverrides({});
       setLoading(true);
-      setBusyLabel(
-        t("players.import.reading", { defaultValue: "Lecture du fichier..." }),
-      );
+      setBusyLabel(t("players.import.reading", { defaultValue: "Lecture du fichier..." }));
       try {
         const buf = await f.arrayBuffer();
         const wb = XLSX.read(buf, { type: "array", cellDates: true });
@@ -233,15 +213,12 @@ export function ImportPlayersCsvDialog({
         setHeaders(hdrs);
         setRawRows(rows);
 
-        setBusyLabel(
-          t("players.import.ai", { defaultValue: "Analyse IA en cours..." }),
-        );
+        setBusyLabel(t("players.import.ai", { defaultValue: "Analyse IA en cours..." }));
         const res = await aiAnalyze({
           data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
         });
         setAnalysis(res);
         setIaUsed(true);
-
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
       } finally {
@@ -259,9 +236,7 @@ export function ImportPlayersCsvDialog({
       // 1. Preview to detect conflicts on existing players.
       let previewRes = preview;
       if (!previewRes) {
-        setBusyLabel(
-          t("players.import.previewing", { defaultValue: "Vérification..." }),
-        );
+        setBusyLabel(t("players.import.previewing", { defaultValue: "Vérification..." }));
         previewRes = await doPreview({
           data: { clubId, teamId, rows: cleanRows },
         });
@@ -277,9 +252,7 @@ export function ImportPlayersCsvDialog({
       }
 
       // 2. Direct import (no conflicts, or user confirmed from diffs step).
-      setBusyLabel(
-        t("players.import.importing", { defaultValue: "Import en cours..." }),
-      );
+      setBusyLabel(t("players.import.importing", { defaultValue: "Import en cours..." }));
       const fieldOverrides: Record<string, string[]> = {};
       for (const [idx, set] of Object.entries(overrides)) {
         if (set.size > 0) fieldOverrides[idx] = Array.from(set);
@@ -293,8 +266,7 @@ export function ImportPlayersCsvDialog({
           sendInvitations: false,
           fileName,
           iaUsed,
-          fieldOverrides:
-            Object.keys(fieldOverrides).length > 0 ? fieldOverrides : undefined,
+          fieldOverrides: Object.keys(fieldOverrides).length > 0 ? fieldOverrides : undefined,
         },
       });
       setResult(res);
@@ -317,7 +289,6 @@ export function ImportPlayersCsvDialog({
       return next;
     });
   };
-
 
   const handleClose = (v: boolean) => {
     if (!v) reset();
@@ -343,12 +314,7 @@ export function ImportPlayersCsvDialog({
               })}
             </p>
             <div className="flex items-center justify-between gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={downloadTemplate}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate}>
                 <Download className="h-4 w-4 mr-1" />
                 {t("players.import.template", {
                   defaultValue: "Télécharger le modèle",
@@ -372,7 +338,6 @@ export function ImportPlayersCsvDialog({
                 onChange={onFile}
                 disabled={loading}
               />
-
             </label>
             {loading && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -438,10 +403,7 @@ export function ImportPlayersCsvDialog({
                   <tr>
                     <th className="px-2 py-1.5 text-left">#</th>
                     {fields.map((f) => (
-                      <th
-                        key={f.key}
-                        className="px-2 py-1.5 text-left whitespace-nowrap"
-                      >
+                      <th key={f.key} className="px-2 py-1.5 text-left whitespace-nowrap">
                         {f.label}
                         {f.required && <span className="text-destructive">*</span>}
                       </th>
@@ -461,11 +423,7 @@ export function ImportPlayersCsvDialog({
                             ? "bg-amber-500/10"
                             : "";
                         return (
-                          <td
-                            key={f.key}
-                            className={`px-1 py-0.5 ${bg}`}
-                            title={c?.error || ""}
-                          >
+                          <td key={f.key} className={`px-1 py-0.5 ${bg}`} title={c?.error || ""}>
                             <input
                               value={c?.value || ""}
                               onChange={(e) => editCell(i, f.key, e.target.value)}
@@ -498,7 +456,6 @@ export function ImportPlayersCsvDialog({
                   })
                 )}
               </Button>
-
             </div>
           </div>
         )}
@@ -508,17 +465,13 @@ export function ImportPlayersCsvDialog({
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
               <div className="rounded-lg border p-2">
-                <div className="text-xl font-semibold text-green-600">
-                  {preview.summary.new}
-                </div>
+                <div className="text-xl font-semibold text-green-600">{preview.summary.new}</div>
                 <div className="text-muted-foreground">
                   {t("players.import.actionNew", { defaultValue: "nouveaux" })}
                 </div>
               </div>
               <div className="rounded-lg border p-2">
-                <div className="text-xl font-semibold text-blue-600">
-                  {preview.summary.update}
-                </div>
+                <div className="text-xl font-semibold text-blue-600">{preview.summary.update}</div>
                 <div className="text-muted-foreground">
                   {t("players.import.actionUpdate", { defaultValue: "mises à jour" })}
                 </div>
@@ -550,17 +503,12 @@ export function ImportPlayersCsvDialog({
                 </div>
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                   {rowsWithDiffs.map((row) => (
-                    <div
-                      key={row.index}
-                      className="rounded-md border p-3 space-y-2 bg-card"
-                    >
+                    <div key={row.index} className="rounded-md border p-3 space-y-2 bg-card">
                       <div className="flex items-center justify-between text-xs">
                         <div className="font-medium">
                           {row.firstName} {row.lastName}
                           {row.birthDate && (
-                            <span className="text-muted-foreground ml-1">
-                              · {row.birthDate}
-                            </span>
+                            <span className="text-muted-foreground ml-1">· {row.birthDate}</span>
                           )}
                         </div>
                         <span
@@ -715,8 +663,7 @@ export function ImportPlayersCsvDialog({
               <ul className="text-xs text-muted-foreground max-h-32 overflow-y-auto space-y-0.5">
                 {result.errors.slice(0, 10).map((e, i) => (
                   <li key={i}>
-                    {t("players.import.row", { defaultValue: "Ligne" })} {e.row} :{" "}
-                    {e.error}
+                    {t("players.import.row", { defaultValue: "Ligne" })} {e.row} : {e.error}
                   </li>
                 ))}
               </ul>

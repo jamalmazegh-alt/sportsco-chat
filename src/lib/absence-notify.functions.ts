@@ -251,7 +251,6 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
       const startStr = fmt(avail.start_date as string);
       const endStr = fmt(avail.end_date as string);
 
-
       try {
         await fetch(`${baseUrl}/lovable/email/transactional/send`, {
           method: "POST",

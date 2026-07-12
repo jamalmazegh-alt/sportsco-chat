@@ -145,9 +145,7 @@ function HomePage() {
           convocation: { id: c.id, status: c.status },
           player: players.find((p) => p.id === c.player_id) ?? null,
         }))
-        .sort(
-          (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-        )
+        .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
         .slice(0, 3);
     },
   });
@@ -201,9 +199,6 @@ function HomePage() {
   const isCoach =
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
-
-
-
 
   const paymentSummary = useMemo(() => {
     const obligations = paymentData?.obligations ?? [];
@@ -706,7 +701,6 @@ function HomePage() {
                   })}
                 </ul>
               )}
-
             </section>
           );
         })()}

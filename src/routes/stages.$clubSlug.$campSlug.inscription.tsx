@@ -71,7 +71,7 @@ function RegistrationFormPage() {
   const { clubSlug, campSlug } = Route.useParams();
   const { data } = useSuspenseQuery(publicCampQuery(clubSlug, campSlug));
   const { t } = useTranslation("camps");
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<RegistrationSuccess | null>(null);
 
@@ -101,11 +101,7 @@ function RegistrationFormPage() {
               id: success.registrationId.slice(0, 8).toUpperCase(),
             })}
           </p>
-          <Button
-            asChild
-            variant="outline"
-            className="mt-6"
-          >
+          <Button asChild variant="outline" className="mt-6">
             <Link to="/stages/$clubSlug/$campSlug" params={{ clubSlug, campSlug }}>
               {t("public.backToCamp", "Retour au stage")}
             </Link>
@@ -125,18 +121,26 @@ function RegistrationFormPage() {
     for (const doc of required_documents.filter((d) => d.required)) {
       const file = formData.get(`doc_${doc.id}`);
       if (!(file instanceof File) || file.size === 0) {
-        toast.error(t("public.errors.missingDoc", "Pièce manquante : {{title}}", { title: doc.title }));
+        toast.error(
+          t("public.errors.missingDoc", "Pièce manquante : {{title}}", { title: doc.title }),
+        );
         return;
       }
       if (file.size > CAMP_UPLOAD_MAX_BYTES) {
-        toast.error(t("public.errors.tooLarge", "Fichier trop volumineux : {{title}}", { title: doc.title }));
+        toast.error(
+          t("public.errors.tooLarge", "Fichier trop volumineux : {{title}}", { title: doc.title }),
+        );
         return;
       }
       if (!(CAMP_UPLOAD_ALLOWED_MIME as readonly string[]).includes(file.type)) {
         toast.error(
-          t("public.errors.badMime", "Format non supporté ({{title}}). PDF, JPG ou PNG uniquement.", {
-            title: doc.title,
-          }),
+          t(
+            "public.errors.badMime",
+            "Format non supporté ({{title}}). PDF, JPG ou PNG uniquement.",
+            {
+              title: doc.title,
+            },
+          ),
         );
         return;
       }
@@ -162,7 +166,12 @@ function RegistrationFormPage() {
         } else if (code === "registration_closed") {
           toast.error(t("public.errors.closed", "Les inscriptions sont fermées."));
         } else if (code === "age_mismatch") {
-          toast.error(t("public.errors.ageMismatch", "L'âge de l'enfant ne correspond pas à la catégorie choisie."));
+          toast.error(
+            t(
+              "public.errors.ageMismatch",
+              "L'âge de l'enfant ne correspond pas à la catégorie choisie.",
+            ),
+          );
         } else if (code === "duplicate") {
           toast.error(
             t(
@@ -174,7 +183,6 @@ function RegistrationFormPage() {
           toast.error(t("public.errors.generic", "Une erreur est survenue. Réessayez."));
         }
         return;
-
       }
       setSuccess({ registrationId: json.registrationId });
     } catch (err) {
@@ -207,11 +215,7 @@ function RegistrationFormPage() {
           </div>
         )}
 
-        <form
-          onSubmit={onSubmit}
-          className="mt-8 space-y-8"
-          encType="multipart/form-data"
-        >
+        <form onSubmit={onSubmit} className="mt-8 space-y-8" encType="multipart/form-data">
           <input type="hidden" name="club_slug" value={clubSlug} />
           <input type="hidden" name="camp_slug" value={campSlug} />
           {/* Honeypot */}
@@ -343,7 +347,6 @@ function RegistrationFormPage() {
                 )}
               </Label>
             </div>
-
 
             <div className="flex justify-end">
               <Button type="submit" size="lg" disabled={submitting || deadlinePassed}>

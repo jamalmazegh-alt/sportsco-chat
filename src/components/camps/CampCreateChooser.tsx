@@ -71,19 +71,13 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={
-          mode === "wizard"
-            ? "max-w-md p-0 overflow-hidden gap-0"
-            : "max-w-md"
-        }
+        className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}
         hideClose={mode === "wizard"}
       >
         {mode === "chooser" && (
           <>
             <DialogHeader>
-              <DialogTitle>
-                {t("chooser.title", { defaultValue: "Nouveau stage" })}
-              </DialogTitle>
+              <DialogTitle>{t("chooser.title", { defaultValue: "Nouveau stage" })}</DialogTitle>
               <DialogDescription>
                 {t("chooser.subtitle", {
                   defaultValue: "Comment veux-tu créer ce stage ?",

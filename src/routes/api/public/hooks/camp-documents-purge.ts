@@ -53,13 +53,7 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
           return new Response("Forbidden", { status: 403 });
         }
 
-
-
-
-
-        const { supabaseAdmin } = await import(
-          "@/integrations/supabase/client.server"
-        );
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         // 1. Sélection des stages arrivés à échéance de rétention via RPC
         //    utilisant l'arithmétique exacte de dates Postgres
@@ -69,16 +63,16 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
         );
 
         if (campsErr) {
-          return Response.json(
-            { ok: false, error: campsErr.message },
-            { status: 500 },
-          );
+          return Response.json({ ok: false, error: campsErr.message }, { status: 500 });
         }
-
 
         const results: CampPurgeResult[] = [];
 
-        for (const camp of (dueCamps ?? []) as Array<{ id: string; end_date: string; document_retention_months: number }>) {
+        for (const camp of (dueCamps ?? []) as Array<{
+          id: string;
+          end_date: string;
+          document_retention_months: number;
+        }>) {
           try {
             // 2. Récupère les registrations du stage.
             const { data: regs, error: regErr } = await supabaseAdmin
@@ -99,9 +93,7 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
               .in("registration_id", regIds);
             if (docsErr) throw new Error(docsErr.message);
 
-            const paths = (docs ?? [])
-              .map((d: any) => d.file_path as string)
-              .filter(Boolean);
+            const paths = (docs ?? []).map((d: any) => d.file_path as string).filter(Boolean);
 
             let filesDeleted = 0;
             // 4. Supprime par lots de 1000 (limite du client Storage).
@@ -128,14 +120,12 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
               rowsDeleted = count ?? 0;
             }
 
-            await supabaseAdmin
-              .from("club_camp_document_purge_log" as any)
-              .insert({
-                camp_id: camp.id,
-                files_deleted: filesDeleted,
-                rows_deleted: rowsDeleted,
-                details: { registrations: regIds.length },
-              });
+            await supabaseAdmin.from("club_camp_document_purge_log" as any).insert({
+              camp_id: camp.id,
+              files_deleted: filesDeleted,
+              rows_deleted: rowsDeleted,
+              details: { registrations: regIds.length },
+            });
 
             results.push({
               camp_id: camp.id,
@@ -144,14 +134,12 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
             });
           } catch (e: any) {
             const msg = e?.message ?? String(e);
-            await supabaseAdmin
-              .from("club_camp_document_purge_log" as any)
-              .insert({
-                camp_id: camp.id,
-                files_deleted: 0,
-                rows_deleted: 0,
-                error: msg,
-              });
+            await supabaseAdmin.from("club_camp_document_purge_log" as any).insert({
+              camp_id: camp.id,
+              files_deleted: 0,
+              rows_deleted: 0,
+              error: msg,
+            });
             results.push({
               camp_id: camp.id,
               files_deleted: 0,
@@ -166,7 +154,6 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
           due: (dueCamps ?? []).length,
           results,
         });
-
       },
     },
   },

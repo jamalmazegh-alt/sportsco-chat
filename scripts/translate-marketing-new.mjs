@@ -29,18 +29,24 @@ const fr = JSON.parse(fs.readFileSync("src/locales/fr/marketing.json", "utf8"));
 const PH_RE = /\{\{[^}]+\}\}|\{[a-zA-Z0-9_]+\}|%\{[^}]+\}|<\d+>|<\/?\d+>/g;
 const collectStrings = (o, out = []) => {
   if (typeof o === "string") return (out.push(o), out);
-  if (Array.isArray(o)) return o.forEach((v) => collectStrings(v, out)), out;
+  if (Array.isArray(o)) return (o.forEach((v) => collectStrings(v, out)), out);
   if (o && typeof o === "object") for (const v of Object.values(o)) collectStrings(v, out);
   return out;
 };
 const ph = (s) => (s.match(PH_RE) || []).sort().join("|");
 const structOk = (a, b) => {
   if (typeof a === "string") return typeof b === "string";
-  if (Array.isArray(a)) return Array.isArray(b) && a.length === b.length && a.every((x, i) => structOk(x, b[i]));
+  if (Array.isArray(a))
+    return Array.isArray(b) && a.length === b.length && a.every((x, i) => structOk(x, b[i]));
   if (a && typeof a === "object") {
     if (!b || typeof b !== "object" || Array.isArray(b)) return false;
-    const ka = Object.keys(a).sort(), kb = Object.keys(b).sort();
-    return ka.length === kb.length && ka.every((k, i) => k === kb[i]) && ka.every((k) => structOk(a[k], b[k]));
+    const ka = Object.keys(a).sort(),
+      kb = Object.keys(b).sort();
+    return (
+      ka.length === kb.length &&
+      ka.every((k, i) => k === kb[i]) &&
+      ka.every((k) => structOk(a[k], b[k]))
+    );
   }
   return true;
 };
@@ -51,9 +57,18 @@ async function callAI(messages, retries = 4) {
       const r = await fetch(URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_KEY}` },
-        body: JSON.stringify({ model: MODEL, messages, response_format: { type: "json_object" }, temperature: 0.2, max_tokens: 16000 }),
+        body: JSON.stringify({
+          model: MODEL,
+          messages,
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+          max_tokens: 16000,
+        }),
       });
-      if (r.status === 429 || r.status >= 500) { await new Promise((x) => setTimeout(x, 3000 * (i + 1))); continue; }
+      if (r.status === 429 || r.status >= 500) {
+        await new Promise((x) => setTimeout(x, 3000 * (i + 1)));
+        continue;
+      }
       if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
       const j = await r.json();
       const c = j.choices?.[0]?.message?.content;
@@ -77,11 +92,16 @@ Rules:
 - For "Bientôt" translate as: DE "Bald", EN "Coming soon", ES "Próximamente", IT "Prossimamente", NL "Binnenkort", PT "Em breve".
 - Output ONLY valid JSON, top-level shape {"data": <translated value>}, no commentary, no markdown.`;
   const user = `Section: ${label}\nTranslate the values of this JSON to ${LANG_NAMES[lang]}:\n\n${JSON.stringify({ data: payload })}`;
-  const raw = await callAI([{ role: "system", content: sys }, { role: "user", content: user }]);
+  const raw = await callAI([
+    { role: "system", content: sys },
+    { role: "user", content: user },
+  ]);
   const out = JSON.parse(raw).data;
   if (!structOk(payload, out)) throw new Error(`structure-mismatch on ${label}`);
-  const s = collectStrings(payload), d = collectStrings(out);
-  for (let i = 0; i < s.length; i++) if (ph(s[i]) !== ph(d[i])) throw new Error(`placeholder-mismatch on ${label}`);
+  const s = collectStrings(payload),
+    d = collectStrings(out);
+  for (let i = 0; i < s.length; i++)
+    if (ph(s[i]) !== ph(d[i])) throw new Error(`placeholder-mismatch on ${label}`);
   return out;
 }
 
@@ -98,18 +118,23 @@ for (const lang of TARGETS) {
   // 2. home.paymentsSoon
   console.log(" -- home.paymentsSoon");
   dst.home = dst.home || {};
-  dst.home.paymentsSoon = (await translate(lang, "home.paymentsSoon", { s: fr.home.paymentsSoon })).s;
+  dst.home.paymentsSoon = (
+    await translate(lang, "home.paymentsSoon", { s: fr.home.paymentsSoon })
+  ).s;
 
   // 3. pricing.paymentsSoonLine
   console.log(" -- pricing.paymentsSoonLine");
   dst.pricing = dst.pricing || {};
-  dst.pricing.paymentsSoonLine = (await translate(lang, "pricing.paymentsSoonLine", { s: fr.pricing.paymentsSoonLine })).s;
+  dst.pricing.paymentsSoonLine = (
+    await translate(lang, "pricing.paymentsSoonLine", { s: fr.pricing.paymentsSoonLine })
+  ).s;
 
   // 4. faq.items last 5
   console.log(" -- faq.items[11..15]");
   const newItems = NEW_FAQ_INDICES.map((i) => fr.faq.items[i]);
   const translated = await translate(lang, "faq.items", newItems);
-  for (let k = 0; k < NEW_FAQ_INDICES.length; k++) dst.faq.items[NEW_FAQ_INDICES[k]] = translated[k];
+  for (let k = 0; k < NEW_FAQ_INDICES.length; k++)
+    dst.faq.items[NEW_FAQ_INDICES[k]] = translated[k];
 
   fs.writeFileSync(dstPath, JSON.stringify(dst, null, 2) + "\n");
   console.log(` ✓ wrote ${dstPath}`);

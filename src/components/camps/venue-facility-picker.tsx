@@ -138,9 +138,7 @@ export function VenueFacilityPicker({
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label>
-              {t("form.facility", { defaultValue: "Terrain / installation" })}
-            </Label>
+            <Label>{t("form.facility", { defaultValue: "Terrain / installation" })}</Label>
             <Select
               value={facilityId ?? "__none"}
               onValueChange={(v) =>

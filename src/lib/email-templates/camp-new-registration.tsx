@@ -56,7 +56,8 @@ const CampNewRegistration = ({
 
 export const template = {
   component: CampNewRegistration,
-  subject: (data) => `Nouvelle inscription — ${data.participantName ?? ""} (${data.campTitle ?? ""})`,
+  subject: (data) =>
+    `Nouvelle inscription — ${data.participantName ?? ""} (${data.campTitle ?? ""})`,
   displayName: "Camp new registration",
   previewData: {
     campTitle: "Stage de printemps U11",

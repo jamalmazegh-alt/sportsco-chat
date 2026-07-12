@@ -209,7 +209,6 @@ VÉRIFICATION SÉMANTIQUE DES DONNÉES (important) :
 - Si plusieurs en-têtes source pointeraient vers la même clé Clubero à cause d'un décalage évident (colonnes shiftées), résous le décalage en cascade en te basant sur le type de données de chaque colonne (date, email, téléphone numérique, nom court, mot du vocabulaire genre/poste, etc.), pas sur les libellés.
 - Si une colonne n'a aucun sens exploitable (valeurs vides ou incohérentes) → "ignore".`;
 
-
 export const analyzeFileWithAI = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -297,7 +296,6 @@ Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
         // non reconnues seront visibles dans l'écran d'édition manuelle.
       }
     }
-
 
     // In coach mode we already injected equipe/sport/categorie by their
     // canonical keys — pass them through as-is so parseTemplate finds them.
@@ -587,7 +585,6 @@ export function computePlayerPatch(
   return patch;
 }
 
-
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -613,9 +610,12 @@ export const runImport = createServerFn({ method: "POST" })
     await assertImportAccess(context.supabase, context.userId, data.clubId);
 
     // If a teamId is provided, verify it belongs to the club (defense in depth).
-    let fixedTeam:
-      | { id: string; name: string; sport: string | null; age_group: string | null }
-      | null = null;
+    let fixedTeam: {
+      id: string;
+      name: string;
+      sport: string | null;
+      age_group: string | null;
+    } | null = null;
     if (data.teamId) {
       const { data: t } = await supabaseAdmin
         .from("teams")
@@ -674,7 +674,6 @@ export const runImport = createServerFn({ method: "POST" })
         let playersLinked = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
-
 
         // Preload club teams for normalized dedupe (case/accents-insensitive).
         const { data: clubTeamsList } = await supabaseAdmin
@@ -928,9 +927,7 @@ export const runImport = createServerFn({ method: "POST" })
               playersLinked++;
             }
 
-
             const player = { id: playerId };
-
 
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
@@ -960,8 +957,7 @@ export const runImport = createServerFn({ method: "POST" })
               .from("player_parents")
               .select("full_name, email, phone")
               .eq("player_id", player.id);
-            const normPhone = (v: string | null | undefined) =>
-              (v ?? "").replace(/[^0-9+]/g, "");
+            const normPhone = (v: string | null | undefined) => (v ?? "").replace(/[^0-9+]/g, "");
             const parentKey = (opts: {
               email: string | null;
               phone: string | null;
@@ -1062,7 +1058,6 @@ export const runImport = createServerFn({ method: "POST" })
         summary.players_linked = playersLinked;
         summary.parents_created = parentsCreated;
         summary.invitations_sent = invitationsSent;
-
       } else if (data.type === "coaches") {
         const teamCache = new Map<string, string>();
         const toCreate = new Set(data.teamsToCreate ?? []);
@@ -1327,7 +1322,12 @@ export type PlayerImportPreview = {
     sport: string;
     category: string;
     suggestedTeamId: string | null;
-    existingTeams: Array<{ id: string; name: string; sport: string | null; age_group: string | null }>;
+    existingTeams: Array<{
+      id: string;
+      name: string;
+      sport: string | null;
+      age_group: string | null;
+    }>;
   }>;
   rowPreviews: Array<{
     index: number;
@@ -1337,7 +1337,12 @@ export type PlayerImportPreview = {
     action: "new" | "update" | "restore";
     existingId: string | null;
     teamKey: string | null;
-    diffs: Array<{ field: string; current: string | null; incoming: string | null; overwritable: boolean }>;
+    diffs: Array<{
+      field: string;
+      current: string | null;
+      incoming: string | null;
+      overwritable: boolean;
+    }>;
   }>;
   summary: { new: number; update: number; restore: number };
 };
@@ -1442,7 +1447,7 @@ export const previewPlayersImport = createServerFn({ method: "POST" })
       const firstName = titleCase(row.prenom_joueur ?? "");
       const lastName = titleCase(row.nom_joueur ?? "");
       const idKey = key(firstName, lastName, row.date_naissance ?? null);
-      const existing = idKey ? byIdentity.get(idKey) ?? null : null;
+      const existing = idKey ? (byIdentity.get(idKey) ?? null) : null;
       let action: "new" | "update" | "restore" = "new";
       const diffs: PlayerImportPreview["rowPreviews"][number]["diffs"] = [];
       if (existing) {

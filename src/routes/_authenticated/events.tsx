@@ -28,7 +28,10 @@ import {
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { ConvocationBand } from "@/components/convocation-band";
-import { ConvocationResponseBadge, type ConvocationResponse } from "@/components/convocation-response-badge";
+import {
+  ConvocationResponseBadge,
+  type ConvocationResponse,
+} from "@/components/convocation-response-badge";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
 
@@ -227,7 +230,6 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
-
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
@@ -387,8 +389,6 @@ function EventsPage() {
                 </span>
               )}
 
-
-
               {e.type === "match" && e.competition_type && (
                 <span
                   className={cn(
@@ -484,12 +484,9 @@ function EventsPage() {
             if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
             if (!myC) return null;
-            return (
-              <ConvocationBand title={`Convoqué · ${myC.playerName}`} />
-            );
+            return <ConvocationBand title={`Convoqué · ${myC.playerName}`} />;
           })()}
         </Link>
-
       </li>
     );
   }

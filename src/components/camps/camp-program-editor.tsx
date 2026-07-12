@@ -134,8 +134,7 @@ export function CampProgramEditor({
   });
 
   const reorderMut = useMutation({
-    mutationFn: (orderedIds: string[]) =>
-      reorderFn({ data: { campId, orderedIds } }),
+    mutationFn: (orderedIds: string[]) => reorderFn({ data: { campId, orderedIds } }),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -216,9 +215,7 @@ export function CampProgramEditor({
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label className="text-xs">
-                {t("program.startsAt", { defaultValue: "Début" })}
-              </Label>
+              <Label className="text-xs">{t("program.startsAt", { defaultValue: "Début" })}</Label>
               <Input
                 type="datetime-local"
                 value={draft.starts_at}
@@ -227,9 +224,7 @@ export function CampProgramEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">
-                {t("program.endsAt", { defaultValue: "Fin" })}
-              </Label>
+              <Label className="text-xs">{t("program.endsAt", { defaultValue: "Fin" })}</Label>
               <Input
                 type="datetime-local"
                 value={draft.ends_at}
@@ -258,9 +253,7 @@ export function CampProgramEditor({
               ) : (
                 <Check className="h-4 w-4" />
               )}
-              <span className="ml-1.5">
-                {t("common.save", { defaultValue: "Enregistrer" })}
-              </span>
+              <span className="ml-1.5">{t("common.save", { defaultValue: "Enregistrer" })}</span>
             </Button>
             <Button
               type="button"

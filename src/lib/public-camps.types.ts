@@ -89,10 +89,6 @@ export interface PublicCampBundle {
   required_documents: PublicCampRequiredDocument[];
 }
 
-export const CAMP_UPLOAD_ALLOWED_MIME = [
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-] as const;
+export const CAMP_UPLOAD_ALLOWED_MIME = ["application/pdf", "image/jpeg", "image/png"] as const;
 
 export const CAMP_UPLOAD_MAX_BYTES = 15 * 1024 * 1024; // 15 MB
