@@ -10,8 +10,8 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
-  Eye,
 } from "lucide-react";
+
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
