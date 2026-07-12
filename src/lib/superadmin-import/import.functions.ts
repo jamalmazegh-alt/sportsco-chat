@@ -557,12 +557,26 @@ export const runImport = createServerFn({ method: "POST" })
       if (data.type === "players") {
         const teamCache = new Map<string, string>();
         const parentCache = new Map<string, string>();
+        const toCreate = new Set(data.teamsToCreate ?? []);
         let teamsCreated = 0;
         let playersCreated = 0;
         let playersUpdated = 0;
         let playersRestored = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
+        // Preload club teams for normalized dedupe (case/accents-insensitive).
+        const { data: clubTeamsList } = await supabaseAdmin
+          .from("teams")
+          .select("id, name, sport, age_group")
+          .eq("club_id", data.clubId)
+          .is("deleted_at", null);
+        const teamsByNorm = new Map<string, string>();
+        const normTeamKey = (name: string, sport: string | null, cat: string | null) =>
+          `${normalizeName(name)}|${normalizeName(sport)}|${normalizeName(cat)}`;
+        for (const t of clubTeamsList ?? []) {
+          teamsByNorm.set(normTeamKey(t.name, t.sport, t.age_group), t.id);
+        }
 
         // Load full club roster (active + soft-deleted) once — identity index.
         type ExistingPlayer = {
