@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
+import { ConvocationBand } from "@/components/convocation-band";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
 
