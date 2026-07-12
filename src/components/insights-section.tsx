@@ -178,22 +178,43 @@ export function InsightsSection({ clubId }: { clubId: string }) {
       old?.filter((i) => i.id !== ins.id),
     );
 
-    // Persist the dismissal BEFORE navigating — otherwise the component
-    // unmounts, the in-flight RPC is aborted, and the insight reappears
-    // on next visit because `dismissed_by` was never written.
+    // Persist the dismissal so the card doesn't reappear (dedup_key includes
+    // isoDay so a new insight can only be generated tomorrow — effective 24h cooldown).
     try {
       await dismissInsight({ data: { insightId: ins.id } });
     } catch {
       qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
     }
 
-    if (ins.action_type === "send_reminder" && ap.event_id) {
-      navigate({
-        to: "/events/$eventId",
-        params: { eventId: ap.event_id },
-        search: { action: "remind" },
-      });
-    } else if (ins.action_type === "view_event" && ap.event_id) {
+    // For "send_reminder" we perform the action IN-PLACE (no navigation)
+    // so the user gets immediate feedback and the card actually does its job.
+    if (ins.action_type === "send_reminder" && ap.event_id && user) {
+      try {
+        const { data: ev } = await supabase
+          .from("events")
+          .select("title")
+          .eq("id", ap.event_id)
+          .maybeSingle();
+        const eventTitle = ev?.title ?? "";
+        const sent = await remindAllForEvent(
+          ap.event_id,
+          user.id,
+          t("attendance.respondPrompt"),
+          eventTitle,
+        );
+        if (sent > 0) {
+          toast.success(t("attendance.remindAllSent", { count: sent }));
+        } else {
+          toast.info(t("attendance.alreadyRemindedRecently"));
+        }
+      } catch (e) {
+        console.error("[insights] remind-all failed", e);
+        toast.error(t("errors.generic"));
+      }
+      return;
+    }
+
+    if (ins.action_type === "view_event" && ap.event_id) {
       navigate({ to: "/events/$eventId", params: { eventId: ap.event_id } });
     } else if (ins.action_type === "view_player" && ap.player_id) {
       navigate({ to: "/players/$playerId", params: { playerId: ap.player_id } });
