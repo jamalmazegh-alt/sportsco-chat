@@ -864,7 +864,7 @@ function TeamDetail() {
     toast.success(t("teams.addPlayer"));
   }
 
-  if (isStatsRoute) return <Outlet />;
+  if (isSubRoute) return <Outlet />;
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
