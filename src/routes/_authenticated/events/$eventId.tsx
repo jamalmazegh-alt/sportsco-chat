@@ -3716,7 +3716,7 @@ function EventDetail() {
                     <>
                       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                          {t("attendance.convokedPlayers", { defaultValue: "Joueurs convoqués" })}
+                          {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
                         </p>
                       </div>
                       <ul className="px-2 pb-2">
