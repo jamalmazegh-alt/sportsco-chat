@@ -130,7 +130,7 @@ export const facebook = {
   getAuthUrl(state: string, redirectUri: string): string {
     const appId = process.env.FACEBOOK_APP_ID;
     if (!appId) throw new Error("FACEBOOK_APP_ID missing");
-    const scope = ["pages_show_list", "pages_read_engagement", "pages_read_user_content"].join(",");
+    const scope = ["pages_show_list", "pages_read_engagement"].join(",");
     const url = new URL("https://www.facebook.com/v19.0/dialog/oauth");
     url.searchParams.set("client_id", appId);
     url.searchParams.set("redirect_uri", redirectUri);
