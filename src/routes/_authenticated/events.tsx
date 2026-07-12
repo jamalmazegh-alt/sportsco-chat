@@ -182,6 +182,50 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
+  // For players/parents: convocations on visible events, keyed by event_id.
+  const { data: myConvocsByEvent } = useQuery({
+    queryKey: ["my-convocs-by-event", user?.id, activeClubId, (events ?? []).length],
+    enabled: !!user && !isCoach && !!events && events.length > 0,
+    queryFn: async () => {
+      const [{ data: own }, { data: children }] = await Promise.all([
+        supabase.from("players").select("id, first_name").eq("user_id", user!.id),
+        supabase
+          .from("player_parents")
+          .select("player_id, players:player_id(id, first_name)")
+          .eq("parent_user_id", user!.id),
+      ]);
+      const players: Array<{ id: string; first_name: string }> = [
+        ...(own ?? []).map((p: any) => ({ id: p.id, first_name: p.first_name })),
+        ...(children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ id: p.id, first_name: p.first_name })),
+      ];
+      const playerIds = Array.from(new Set(players.map((p) => p.id)));
+      if (playerIds.length === 0) return new Map<string, any>();
+      const eventIds = (events ?? []).map((e) => e.id);
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id, status, player_id")
+        .in("event_id", eventIds)
+        .in("player_id", playerIds);
+      const byPlayer = new Map(players.map((p) => [p.id, p]));
+      const map = new Map<string, { status: string; playerName: string }>();
+      for (const c of (data ?? []) as any[]) {
+        const p = byPlayer.get(c.player_id);
+        if (!p) continue;
+        // Keep first (any convoc); if multiple children, priorité au pending
+        const existing = map.get(c.event_id);
+        if (!existing || (c.status === "pending" && existing.status !== "pending")) {
+          map.set(c.event_id, { status: c.status, playerName: p.first_name });
+        }
+      }
+      return map;
+    },
+    staleTime: 30_000,
+  });
+
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
