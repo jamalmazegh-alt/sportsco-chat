@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
+
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { cn } from "@/lib/utils";
