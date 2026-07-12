@@ -444,7 +444,10 @@ export function ImportPlayersCsvDialog({
             )}
 
             {/* Editable data table — same UX as superadmin onboarding */}
-            <div className="overflow-auto border rounded-lg max-h-[50vh]">
+            <div
+              className="overflow-auto overscroll-contain border rounded-lg max-h-[50vh] max-w-full"
+              style={{ overscrollBehavior: "contain" }}
+            >
               <table className="w-full text-xs">
                 <thead className="bg-muted sticky top-0 z-10">
                   <tr>
