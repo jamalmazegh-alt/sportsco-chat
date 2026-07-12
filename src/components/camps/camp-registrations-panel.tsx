@@ -56,7 +56,12 @@ const PAYMENT_STATUSES: PaymentStatus[] = [
   "partial",
   "refunded",
 ];
-const DOSSIER_STATUSES: DossierStatus[] = ["complete", "payment_missing", "documents_missing"];
+const DOSSIER_STATUSES: DossierStatus[] = [
+  "complete",
+  "payment_missing",
+  "documents_pending",
+  "documents_missing",
+];
 
 function ageFromBirthDate(iso: string): number | null {
   const d = new Date(iso);
@@ -79,6 +84,13 @@ function DossierBadge({ status, t }: { status: DossierStatus; t: (k: string, o?:
       className: "bg-amber-500/10 text-amber-800 border-amber-500/30",
       label: t("registrations.dossier.paymentMissing", { defaultValue: "Paiement manquant" }),
       emoji: "🟠",
+    },
+    documents_pending: {
+      className: "bg-blue-500/10 text-blue-700 border-blue-500/30",
+      label: t("registrations.dossier.documentsPending", {
+        defaultValue: "En attente de vérification",
+      }),
+      emoji: "🔵",
     },
     documents_missing: {
       className: "bg-red-500/10 text-red-700 border-red-500/30",
@@ -317,11 +329,10 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
 }
 
 function statusKey(s: DossierStatus) {
-  return s === "documents_missing"
-    ? "documentsMissing"
-    : s === "payment_missing"
-      ? "paymentMissing"
-      : "complete";
+  if (s === "documents_missing") return "documentsMissing";
+  if (s === "documents_pending") return "documentsPending";
+  if (s === "payment_missing") return "paymentMissing";
+  return "complete";
 }
 
 function StatCard({

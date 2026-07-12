@@ -30,7 +30,11 @@ export type PaymentStatus =
   | "partial"
   | "refunded";
 
-export type DossierStatus = "complete" | "payment_missing" | "documents_missing";
+export type DossierStatus =
+  | "complete"
+  | "payment_missing"
+  | "documents_pending"
+  | "documents_missing";
 
 export interface CampRegistrationRow {
   id: string;
@@ -87,10 +91,12 @@ function computeDossierStatus(
   required: number,
   approved: number,
   rejected: number,
+  pending: number,
   campHasPrice: boolean,
 ): DossierStatus {
-  const documentsOk = required === 0 || (approved >= required && rejected === 0);
-  if (!documentsOk) return "documents_missing";
+  const missing = Math.max(0, required - approved - rejected - pending);
+  if (missing > 0 || rejected > 0) return "documents_missing";
+  if (pending > 0) return "documents_pending";
   const paymentOk = paymentStatus === "paid" || paymentStatus === "not_required" || !campHasPrice;
   if (paymentOk) return "complete";
   return "payment_missing";
@@ -153,11 +159,13 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       // Une pièce required est "approuvée" si au moins une soumission approuvée existe.
       const approvedByReq = new Set<string>();
       const rejectedByReq = new Set<string>();
+      const pendingByReq = new Set<string>();
       const seen = new Set<string>();
       for (const d of docs) {
         seen.add(d.required_document_id);
         if (d.review_status === "approved") approvedByReq.add(d.required_document_id);
         else if (d.review_status === "rejected") rejectedByReq.add(d.required_document_id);
+        else if (d.review_status === "pending") pendingByReq.add(d.required_document_id);
       }
       const approvedCount = approvedByReq.size;
       // Rejeté "actif" = rejeté et pas ré-uploadé (approved n'est pas venu remplacer)
@@ -165,7 +173,12 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       rejectedByReq.forEach((id) => {
         if (!approvedByReq.has(id)) rejectedCount++;
       });
-      const missing = Math.max(0, required - approvedCount - rejectedCount);
+      // Pending "actif" = en attente et pas déjà approuvé/rejeté effectivement
+      let pendingCount = 0;
+      pendingByReq.forEach((id) => {
+        if (!approvedByReq.has(id) && !rejectedByReq.has(id)) pendingCount++;
+      });
+      const missing = Math.max(0, required - approvedCount - rejectedCount - pendingCount);
       const reservedUntilTs = r.reserved_until ? new Date(r.reserved_until).getTime() : null;
       const reservationExpired =
         r.registration_status === "under_review" &&
@@ -197,6 +210,7 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
           required,
           approvedCount,
           rejectedCount,
+          pendingCount,
           campHasPrice,
         ),
         required_total: required,
