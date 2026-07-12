@@ -284,6 +284,8 @@ export const parseTemplateFn = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
+        clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         headers: z.array(z.string()).min(1).max(50),
         rawRows: z.array(z.record(z.string(), z.unknown())).min(1).max(500),
@@ -291,8 +293,15 @@ export const parseTemplateFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
-    return parseTemplate(data.type, data.headers, data.rawRows);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+    let headers = data.headers;
+    let rawRows = data.rawRows;
+    if (data.teamId) {
+      const ctx = await injectTeamContext(data.teamId, data.clubId, headers, rawRows);
+      headers = ctx.headers;
+      rawRows = ctx.rawRows;
+    }
+    return parseTemplate(data.type, headers, rawRows);
   });
 
 // ============================================================
