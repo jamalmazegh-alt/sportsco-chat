@@ -97,10 +97,14 @@ function AdminTicketDetail() {
             ticketId={ticket.id}
             messages={messages}
             isStaffView
-            onReplied={() => refetch()}
+            onReplied={() => {
+              refetch();
+              refetchAudit();
+            }}
           />
         </div>
       </div>
+
 
       {/* Sidebar */}
       <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 overflow-y-auto p-5 space-y-5">
