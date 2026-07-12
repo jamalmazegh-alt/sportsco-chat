@@ -63,12 +63,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CampRegistrationDetailSheet({
-  campId,
-  registrationId,
-  open,
-  onOpenChange,
-}: Props) {
+export function CampRegistrationDetailSheet({ campId, registrationId, open, onOpenChange }: Props) {
   const { t } = useTranslation("camps");
   const qc = useQueryClient();
 
@@ -229,17 +224,11 @@ export function CampRegistrationDetailSheet({
                 detail={detail}
                 t={t}
                 onOpen={openDoc}
-                onApprove={(doc) =>
-                  reviewDocMut.mutate({ documentId: doc.id, status: "approved" })
-                }
-                onReset={(doc) =>
-                  reviewDocMut.mutate({ documentId: doc.id, status: "pending" })
-                }
+                onApprove={(doc) => reviewDocMut.mutate({ documentId: doc.id, status: "approved" })}
+                onReset={(doc) => reviewDocMut.mutate({ documentId: doc.id, status: "pending" })}
                 onAskReject={(doc) => setDocReject({ doc, reason: "" })}
                 pendingId={
-                  reviewDocMut.isPending
-                    ? (reviewDocMut.variables?.documentId ?? null)
-                    : null
+                  reviewDocMut.isPending ? (reviewDocMut.variables?.documentId ?? null) : null
                 }
               />
 
@@ -248,7 +237,7 @@ export function CampRegistrationDetailSheet({
               <StatusActions
                 detail={detail}
                 t={t}
-                pending={statusMut.isPending ? statusMut.variables?.status ?? null : null}
+                pending={statusMut.isPending ? (statusMut.variables?.status ?? null) : null}
                 onSet={(status) => statusMut.mutate({ status })}
                 onAskReject={() => {
                   setRejectReason("");
@@ -265,7 +254,9 @@ export function CampRegistrationDetailSheet({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("registrations.detail.rejectTitle", { defaultValue: "Refuser cette inscription ?" })}
+              {t("registrations.detail.rejectTitle", {
+                defaultValue: "Refuser cette inscription ?",
+              })}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {t("registrations.detail.rejectHelp", {
@@ -286,9 +277,7 @@ export function CampRegistrationDetailSheet({
             <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
             <AlertDialogAction
               disabled={statusMut.isPending || rejectReason.trim().length === 0}
-              onClick={() =>
-                statusMut.mutate({ status: "rejected", reason: rejectReason.trim() })
-              }
+              onClick={() => statusMut.mutate({ status: "rejected", reason: rejectReason.trim() })}
             >
               {statusMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
               {t("registrations.detail.confirmReject", { defaultValue: "Refuser" })}
@@ -318,7 +307,9 @@ export function CampRegistrationDetailSheet({
               onClick={() => statusMut.mutate({ status: "waitlist" })}
             >
               {statusMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {t("registrations.detail.placeOnWaitlist", { defaultValue: "Placer en liste d'attente" })}
+              {t("registrations.detail.placeOnWaitlist", {
+                defaultValue: "Placer en liste d'attente",
+              })}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -555,16 +546,16 @@ function DocumentsSection({
       ) : (
         <ul className="space-y-2">
           {detail.documents.map((d) => (
-            <li
-              key={d.id}
-              className="rounded-lg border border-border bg-card p-3 space-y-2"
-            >
+            <li key={d.id} className="rounded-lg border border-border bg-card p-3 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 font-medium text-sm">
                     {d.title}
                     {d.is_sensitive && (
-                      <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-800 border-amber-500/30">
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] bg-amber-500/10 text-amber-800 border-amber-500/30"
+                      >
                         <Lock className="h-3 w-3 mr-1" />
                         {t("registrations.detail.sensitive", { defaultValue: "Sensible" })}
                       </Badge>

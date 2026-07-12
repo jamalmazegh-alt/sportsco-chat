@@ -21,7 +21,12 @@ const FieldsSchema = z.object({
     .optional()
     .or(z.literal("").transform(() => undefined)),
   club_name: z.string().trim().max(200).optional().nullable(),
-  age_group_id: z.string().uuid().optional().nullable().or(z.literal("").transform(() => null)),
+  age_group_id: z
+    .string()
+    .uuid()
+    .optional()
+    .nullable()
+    .or(z.literal("").transform(() => null)),
   guardian_first_name: z.string().trim().min(1).max(120),
   guardian_last_name: z.string().trim().min(1).max(120),
   guardian_email: z.string().trim().email().max(255),

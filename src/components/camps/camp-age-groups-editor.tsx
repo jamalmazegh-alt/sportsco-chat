@@ -373,9 +373,7 @@ export function CampAgeGroupsEditor({
 
       {/* One-shot reorder to enforce ascending persisted order */}
       {needsReorder && !disabled && !reorderMut.isPending && (
-        <ReorderTrigger
-          onRun={() => reorderMut.mutate(sortedGroups.map((g) => g.id))}
-        />
+        <ReorderTrigger onRun={() => reorderMut.mutate(sortedGroups.map((g) => g.id))} />
       )}
     </div>
   );

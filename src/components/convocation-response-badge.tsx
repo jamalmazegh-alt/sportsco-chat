@@ -26,10 +26,7 @@ export function ConvocationResponseBadge({ response, className }: ResponseBadgeP
   const { Icon } = cfg;
   return (
     <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-[20px] font-medium",
-        className,
-      )}
+      className={cn("inline-flex items-center gap-1 rounded-[20px] font-medium", className)}
       style={{
         backgroundColor: cfg.bg,
         color: cfg.fg,

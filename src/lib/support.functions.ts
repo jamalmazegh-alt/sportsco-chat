@@ -154,7 +154,13 @@ async function logSupportAudit(entry: {
   ticket_id: string;
   actor_user_id: string | null;
   actor_role: "user" | "staff" | "system";
-  action: "status_changed" | "priority_changed" | "assigned" | "reply" | "internal_note" | "created";
+  action:
+    | "status_changed"
+    | "priority_changed"
+    | "assigned"
+    | "reply"
+    | "internal_note"
+    | "created";
   from_value?: string | null;
   to_value?: string | null;
   meta?: Record<string, unknown> | null;
@@ -173,7 +179,6 @@ async function logSupportAudit(entry: {
     console.error("[support] audit log failed", e);
   }
 }
-
 
 // ---------- Helpers ----------
 
@@ -281,7 +286,6 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       to_value: ticket.subject,
     });
 
-
     // Notify superadmins in-app
     await notifySuperAdmins({
       title: `Nouveau ticket #${shortId(ticket.id)}`,
@@ -326,7 +330,6 @@ export const createSupportTicket = createServerFn({ method: "POST" })
         },
         idempotencyKey: `support-created-user-${ticket.id}`,
       }).catch((e) => console.error("[support] user confirmation email failed", e));
-
     }
 
     return { id: ticket.id };
@@ -485,7 +488,6 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
-
     if (!data.internal_note && senderRole === "user") {
       // Internal notification to hello@clubero.app on user reply
       const profile = await getUserProfile(userId);
@@ -544,7 +546,6 @@ const ListInput = z
   })
   .partial();
 
-
 export const listAllSupportTickets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ListInput.parse(input ?? {}))
@@ -600,7 +601,6 @@ export const listAllSupportTickets = createServerFn({ method: "POST" })
       club_name: t.club_id ? (clubMap.get(t.club_id)?.name ?? null) : null,
     }));
   });
-
 
 const UpdateInput = z.object({
   ticket_id: z.string().uuid(),
@@ -831,7 +831,6 @@ export const getSupportTicketAudit = createServerFn({ method: "POST" })
             : null,
     }));
   });
-
 
 // ---------- Stats for admin dashboard ----------
 

@@ -91,8 +91,7 @@ function computeDossierStatus(
 ): DossierStatus {
   const documentsOk = required === 0 || (approved >= required && rejected === 0);
   if (!documentsOk) return "documents_missing";
-  const paymentOk =
-    paymentStatus === "paid" || paymentStatus === "not_required" || !campHasPrice;
+  const paymentOk = paymentStatus === "paid" || paymentStatus === "not_required" || !campHasPrice;
   if (paymentOk) return "complete";
   return "payment_missing";
 }
@@ -225,10 +224,9 @@ export const getCampRegistrationStats = createServerFn({ method: "GET" })
       clubId,
       allowedRoles: MANAGER_ROLES,
     });
-    const { data: stats, error } = await supabaseAdmin.rpc(
-      "get_camp_registration_stats" as any,
-      { _camp_id: data.campId },
-    );
+    const { data: stats, error } = await supabaseAdmin.rpc("get_camp_registration_stats" as any, {
+      _camp_id: data.campId,
+    });
     if (error) throw new Error(error.message);
     return (stats ?? {
       capacity: 0,
@@ -344,7 +342,7 @@ async function getViewerClubRole(
     .eq("user_id", userId)
     .maybeSingle();
   const roles = new Set<string>([
-    ...(((data?.roles as string[] | null) ?? [])),
+    ...((data?.roles as string[] | null) ?? []),
     ...(data?.role ? [data.role as string] : []),
   ]);
   if (roles.has("admin")) return "admin";
@@ -355,7 +353,9 @@ async function getViewerClubRole(
 async function loadRegistrationAndClub(registrationId: string) {
   const { data, error } = await supabaseAdmin
     .from("club_camp_registrations")
-    .select("*, club_camps!inner(club_id, capacity, price, currency, title, start_date, end_date, document_retention_months)")
+    .select(
+      "*, club_camps!inner(club_id, capacity, price, currency, title, start_date, end_date, document_retention_months)",
+    )
     .eq("id", registrationId)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -435,8 +435,13 @@ export const getCampRegistrationDetail = createServerFn({ method: "GET" })
       updated_at: reg.updated_at,
       documents,
       stats: (stats ?? {
-        capacity: 0, approved: 0, reserved: 0, pending: 0, waitlist: 0,
-        expired_reservations: 0, remaining: 0,
+        capacity: 0,
+        approved: 0,
+        reserved: 0,
+        pending: 0,
+        waitlist: 0,
+        expired_reservations: 0,
+        remaining: 0,
       }) as CampRegistrationStats,
       viewer_role: viewerRole,
     };
@@ -455,84 +460,89 @@ const SetStatusInput = z.object({
 export const setCampRegistrationStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SetStatusInput.parse(input))
-  .handler(async ({ data, context }): Promise<{
-    registration_status: RegistrationStatus;
-    reserved_until: string | null;
-    rejection_reason: string | null;
-  }> => {
-    const reg = await loadRegistrationAndClub(data.registrationId);
-    const clubId = reg.club_camps.club_id as string;
-    await assertClubRole({
-      supabase: context.supabase,
-      userId: context.userId,
-      clubId,
-      allowedRoles: MANAGER_ROLES,
-    });
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      registration_status: RegistrationStatus;
+      reserved_until: string | null;
+      rejection_reason: string | null;
+    }> => {
+      const reg = await loadRegistrationAndClub(data.registrationId);
+      const clubId = reg.club_camps.club_id as string;
+      await assertClubRole({
+        supabase: context.supabase,
+        userId: context.userId,
+        clubId,
+        allowedRoles: MANAGER_ROLES,
+      });
 
-    const current = reg.registration_status as RegistrationStatus;
-    const next = data.status;
+      const current = reg.registration_status as RegistrationStatus;
+      const next = data.status;
 
-    if (current === next) {
-      return {
-        registration_status: current,
-        reserved_until: reg.reserved_until,
-        rejection_reason: reg.rejection_reason,
-      };
-    }
-
-    // Rejection requires a reason
-    if (next === "rejected" && !(data.reason && data.reason.trim().length > 0)) {
-      throw new Error("REASON_REQUIRED");
-    }
-
-    // Capacity guard when moving to `approved`
-    if (next === "approved") {
-      const { data: stats, error: sErr } = await supabaseAdmin.rpc(
-        "get_camp_registration_stats" as any,
-        { _camp_id: reg.camp_id },
-      );
-      if (sErr) throw new Error(sErr.message);
-      const s = (stats ?? { remaining: 0 }) as CampRegistrationStats;
-      const alreadyApproved = current === "approved";
-      if (!alreadyApproved && s.remaining <= 0) {
-        // Signal the UI; it will propose waitlist.
-        const err = new Error("CAPACITY_FULL");
-        (err as any).code = "CAPACITY_FULL";
-        throw err;
+      if (current === next) {
+        return {
+          registration_status: current,
+          reserved_until: reg.reserved_until,
+          rejection_reason: reg.rejection_reason,
+        };
       }
-    }
 
-    const patch: any = {
-      registration_status: next,
-      updated_at: new Date().toISOString(),
-    };
+      // Rejection requires a reason
+      if (next === "rejected" && !(data.reason && data.reason.trim().length > 0)) {
+        throw new Error("REASON_REQUIRED");
+      }
 
-    if (next === "under_review") {
-      patch.reserved_until = new Date(Date.now() + 72 * 3600 * 1000).toISOString();
-    } else if (next === "approved" || next === "waitlist" || next === "cancelled") {
-      patch.reserved_until = null;
-    }
+      // Capacity guard when moving to `approved`
+      if (next === "approved") {
+        const { data: stats, error: sErr } = await supabaseAdmin.rpc(
+          "get_camp_registration_stats" as any,
+          { _camp_id: reg.camp_id },
+        );
+        if (sErr) throw new Error(sErr.message);
+        const s = (stats ?? { remaining: 0 }) as CampRegistrationStats;
+        const alreadyApproved = current === "approved";
+        if (!alreadyApproved && s.remaining <= 0) {
+          // Signal the UI; it will propose waitlist.
+          const err = new Error("CAPACITY_FULL");
+          (err as any).code = "CAPACITY_FULL";
+          throw err;
+        }
+      }
 
-    if (next === "rejected") {
-      patch.rejection_reason = data.reason!.trim();
-    } else if (current === "rejected") {
-      // Clear stale reason when leaving rejected state
-      patch.rejection_reason = null;
-    }
+      const patch: any = {
+        registration_status: next,
+        updated_at: new Date().toISOString(),
+      };
 
-    const { data: updated, error } = await supabaseAdmin
-      .from("club_camp_registrations")
-      .update(patch)
-      .eq("id", data.registrationId)
-      .select("registration_status, reserved_until, rejection_reason")
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    return {
-      registration_status: (updated?.registration_status ?? next) as RegistrationStatus,
-      reserved_until: (updated?.reserved_until as string | null) ?? null,
-      rejection_reason: (updated?.rejection_reason as string | null) ?? null,
-    };
-  });
+      if (next === "under_review") {
+        patch.reserved_until = new Date(Date.now() + 72 * 3600 * 1000).toISOString();
+      } else if (next === "approved" || next === "waitlist" || next === "cancelled") {
+        patch.reserved_until = null;
+      }
+
+      if (next === "rejected") {
+        patch.rejection_reason = data.reason!.trim();
+      } else if (current === "rejected") {
+        // Clear stale reason when leaving rejected state
+        patch.rejection_reason = null;
+      }
+
+      const { data: updated, error } = await supabaseAdmin
+        .from("club_camp_registrations")
+        .update(patch)
+        .eq("id", data.registrationId)
+        .select("registration_status, reserved_until, rejection_reason")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return {
+        registration_status: (updated?.registration_status ?? next) as RegistrationStatus,
+        reserved_until: (updated?.reserved_until as string | null) ?? null,
+        rejection_reason: (updated?.rejection_reason as string | null) ?? null,
+      };
+    },
+  );
 
 // ---------------------------------------------------------------------------
 // reviewCampRegistrationDocument — approve / reject a single uploaded file
@@ -547,48 +557,55 @@ const ReviewDocInput = z.object({
 export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ReviewDocInput.parse(input))
-  .handler(async ({ data, context }): Promise<{
-    id: string;
-    review_status: DocReviewStatus;
-    rejection_reason: string | null;
-  }> => {
-    const { data: doc, error: dErr } = await supabaseAdmin
-      .from("club_camp_registration_documents")
-      .select("id, registration_id, club_camp_registrations!inner(camp_id, club_camps!inner(club_id))")
-      .eq("id", data.documentId)
-      .maybeSingle();
-    if (dErr) throw new Error(dErr.message);
-    if (!doc) throw new Error("NOT_FOUND");
-    const clubId = (doc as any).club_camp_registrations.club_camps.club_id as string;
-    await assertClubRole({
-      supabase: context.supabase,
-      userId: context.userId,
-      clubId,
-      allowedRoles: MANAGER_ROLES,
-    });
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      id: string;
+      review_status: DocReviewStatus;
+      rejection_reason: string | null;
+    }> => {
+      const { data: doc, error: dErr } = await supabaseAdmin
+        .from("club_camp_registration_documents")
+        .select(
+          "id, registration_id, club_camp_registrations!inner(camp_id, club_camps!inner(club_id))",
+        )
+        .eq("id", data.documentId)
+        .maybeSingle();
+      if (dErr) throw new Error(dErr.message);
+      if (!doc) throw new Error("NOT_FOUND");
+      const clubId = (doc as any).club_camp_registrations.club_camps.club_id as string;
+      await assertClubRole({
+        supabase: context.supabase,
+        userId: context.userId,
+        clubId,
+        allowedRoles: MANAGER_ROLES,
+      });
 
-    if (data.status === "rejected" && !(data.reason && data.reason.trim().length > 0)) {
-      throw new Error("REASON_REQUIRED");
-    }
+      if (data.status === "rejected" && !(data.reason && data.reason.trim().length > 0)) {
+        throw new Error("REASON_REQUIRED");
+      }
 
-    const patch: any = {
-      review_status: data.status,
-      rejection_reason: data.status === "rejected" ? data.reason!.trim() : null,
-    };
+      const patch: any = {
+        review_status: data.status,
+        rejection_reason: data.status === "rejected" ? data.reason!.trim() : null,
+      };
 
-    const { data: updated, error } = await supabaseAdmin
-      .from("club_camp_registration_documents")
-      .update(patch)
-      .eq("id", data.documentId)
-      .select("id, review_status, rejection_reason")
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    return {
-      id: updated!.id as string,
-      review_status: updated!.review_status as DocReviewStatus,
-      rejection_reason: (updated!.rejection_reason as string | null) ?? null,
-    };
-  });
+      const { data: updated, error } = await supabaseAdmin
+        .from("club_camp_registration_documents")
+        .update(patch)
+        .eq("id", data.documentId)
+        .select("id, review_status, rejection_reason")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return {
+        id: updated!.id as string,
+        review_status: updated!.review_status as DocReviewStatus,
+        rejection_reason: (updated!.rejection_reason as string | null) ?? null,
+      };
+    },
+  );
 
 // ---------------------------------------------------------------------------
 // getRegistrationDocumentSignedUrl — admin/dirigeant only for sensitive files

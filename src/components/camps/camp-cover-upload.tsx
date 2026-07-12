@@ -114,11 +114,7 @@ export function CampCoverUpload({
         onClick={() => inputRef.current?.click()}
         disabled={disabled || busy}
       >
-        {busy ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <ImagePlus className="h-4 w-4" />
-        )}
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
         <span className="ml-1.5">
           {coverUrl
             ? t("cover.replace", { defaultValue: "Remplacer" })

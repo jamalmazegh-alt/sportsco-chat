@@ -21,11 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { VenueFacilityPicker } from "@/components/camps/venue-facility-picker";
-import {
-  createClubCamp,
-  updateClubCamp,
-  upsertCampAgeGroup,
-} from "@/lib/camps.functions";
+import { createClubCamp, updateClubCamp, upsertCampAgeGroup } from "@/lib/camps.functions";
 import { cn } from "@/lib/utils";
 
 type Step = "title" | "dates" | "capacity" | "venue" | "ageGroups" | "summary";
@@ -78,7 +74,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
 
   const [state, setState] = useState<WizardState>(defaultState);
   const [stepIdx, setStepIdx] = useState(0);
-  
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const current = STEP_ORDER[stepIdx];
@@ -188,7 +184,10 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const eyebrows: Record<Step, { eyebrow: string; title: string; hint: string; icon: React.ElementType }> = {
+  const eyebrows: Record<
+    Step,
+    { eyebrow: string; title: string; hint: string; icon: React.ElementType }
+  > = {
     title: {
       eyebrow: t("wizard.eyebrow.title", { defaultValue: "Étape 1" }),
       title: t("wizard.step.title.title", { defaultValue: "Nom du stage" }),
@@ -204,7 +203,9 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
     capacity: {
       eyebrow: t("wizard.eyebrow.capacity", { defaultValue: "Étape 3" }),
       title: t("wizard.step.capacity.title", { defaultValue: "Places et tarif" }),
-      hint: t("wizard.step.capacity.hint", { defaultValue: "Combien de participants, à quel prix" }),
+      hint: t("wizard.step.capacity.hint", {
+        defaultValue: "Combien de participants, à quel prix",
+      }),
       icon: Users,
     },
     venue: {
@@ -224,7 +225,9 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
     summary: {
       eyebrow: t("wizard.eyebrow.summary", { defaultValue: "Récap" }),
       title: t("wizard.step.summary.title", { defaultValue: "Prêt à créer" }),
-      hint: t("wizard.step.summary.hint", { defaultValue: "Brouillon créé — publication au prochain écran" }),
+      hint: t("wizard.step.summary.hint", {
+        defaultValue: "Brouillon créé — publication au prochain écran",
+      }),
       icon: Check,
     },
   };
@@ -278,7 +281,12 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
             </div>
           </div>
           <p className="mt-1.5 text-[11.5px] leading-snug opacity-75 line-clamp-1">{head.hint}</p>
-          <WizardProgress step={stepIdx} total={totalSteps} variant="onPrimary" className="mt-2.5" />
+          <WizardProgress
+            step={stepIdx}
+            total={totalSteps}
+            variant="onPrimary"
+            className="mt-2.5"
+          />
         </div>
       </div>
 

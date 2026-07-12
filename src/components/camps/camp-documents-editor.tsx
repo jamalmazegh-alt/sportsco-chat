@@ -106,9 +106,7 @@ export function CampDocumentsEditor({
 
   async function handleUpload(file: File) {
     if (file.size > MAX_BYTES) {
-      toast.error(
-        t("documents.tooLarge", { defaultValue: "Fichier trop volumineux (max 15 MB)" }),
-      );
+      toast.error(t("documents.tooLarge", { defaultValue: "Fichier trop volumineux (max 15 MB)" }));
       return;
     }
     setUploading(true);
@@ -129,9 +127,7 @@ export function CampDocumentsEditor({
       await addFn({ data: { campId, path, title, documentType: null } });
       setPendingTitle("");
       invalidate();
-      toast.success(
-        t("documents.uploaded", { defaultValue: "Document ajouté" }),
-      );
+      toast.success(t("documents.uploaded", { defaultValue: "Document ajouté" }));
     } catch (e) {
       toast.error((e as Error).message);
     } finally {

@@ -58,9 +58,9 @@ const CampRegistrationReceived = ({
       {isFull ? (
         <Section style={warn}>
           <Text style={warnText}>
-            ⚠️ Le stage est actuellement <strong>complet</strong>. Votre demande est enregistrée
-            en liste d'attente : le club vous recontactera dès qu'une place se libère ou pour
-            confirmer votre placement.
+            ⚠️ Le stage est actuellement <strong>complet</strong>. Votre demande est enregistrée en
+            liste d'attente : le club vous recontactera dès qu'une place se libère ou pour confirmer
+            votre placement.
           </Text>
         </Section>
       ) : (

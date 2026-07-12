@@ -77,10 +77,7 @@ async function loadCampForClubCheck(campId: string) {
   return data;
 }
 
-async function authorizeCampManager(
-  campId: string,
-  ctx: { supabase: any; userId: string },
-) {
+async function authorizeCampManager(campId: string, ctx: { supabase: any; userId: string }) {
   const camp = await loadCampForClubCheck(campId);
   await assertClubRole({
     supabase: ctx.supabase,
@@ -122,9 +119,7 @@ const ProgramItemPayload = z
 
 export const listCampProgramItems = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<CampProgramItem[]> => {
     const { data: rows, error } = await context.supabase
       .from("club_camp_program_items")
@@ -138,9 +133,7 @@ export const listCampProgramItems = createServerFn({ method: "GET" })
 export const upsertCampProgramItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ campId: z.string().uuid(), item: ProgramItemPayload })
-      .parse(input),
+    z.object({ campId: z.string().uuid(), item: ProgramItemPayload }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     await authorizeCampManager(data.campId, context);
@@ -194,9 +187,7 @@ export const deleteCampProgramItem = createServerFn({ method: "POST" })
 export const reorderCampProgramItems = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) })
-      .parse(input),
+    z.object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await authorizeCampManager(data.campId, context);
@@ -215,11 +206,7 @@ export const reorderCampProgramItems = createServerFn({ method: "POST" })
 // Documents fournis (admin-uploaded)
 // ---------------------------------------------------------------------------
 
-const ALLOWED_DOC_MIME = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-]);
+const ALLOWED_DOC_MIME = new Set(["application/pdf", "image/jpeg", "image/png"]);
 const MAX_DOC_BYTES = 15 * 1024 * 1024;
 const DOC_BUCKET = "attachments";
 
@@ -235,9 +222,7 @@ function docExtension(name: string, ct: string): string {
 
 export const listCampDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<CampDocument[]> => {
     const { data: rows, error } = await context.supabase
       .from("club_camp_documents")
@@ -327,7 +312,10 @@ export const deleteCampDocument = createServerFn({ method: "POST" })
     const idx = url.indexOf(marker);
     if (idx >= 0) {
       const path = url.slice(idx + marker.length);
-      await supabaseAdmin.storage.from(DOC_BUCKET).remove([path]).catch(() => {});
+      await supabaseAdmin.storage
+        .from(DOC_BUCKET)
+        .remove([path])
+        .catch(() => {});
     }
     const { error } = await supabaseAdmin
       .from("club_camp_documents")
@@ -341,9 +329,7 @@ export const deleteCampDocument = createServerFn({ method: "POST" })
 export const reorderCampDocuments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) })
-      .parse(input),
+    z.object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await authorizeCampManager(data.campId, context);
@@ -374,9 +360,7 @@ const RequiredDocPayload = z
 
 export const listCampRequiredDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ campId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ campId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<CampRequiredDocument[]> => {
     const { data: rows, error } = await context.supabase
       .from("club_camp_required_documents")
@@ -390,16 +374,13 @@ export const listCampRequiredDocuments = createServerFn({ method: "GET" })
 export const upsertCampRequiredDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ campId: z.string().uuid(), doc: RequiredDocPayload })
-      .parse(input),
+    z.object({ campId: z.string().uuid(), doc: RequiredDocPayload }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     await authorizeCampManager(data.campId, context);
     const type = (data.doc.document_type ?? "").toLowerCase() || null;
     // Auto-force is_sensitive for medical / health-form documents.
-    const isSensitive =
-      type && SENSITIVE_DOCUMENT_TYPES.has(type) ? true : !!data.doc.is_sensitive;
+    const isSensitive = type && SENSITIVE_DOCUMENT_TYPES.has(type) ? true : !!data.doc.is_sensitive;
 
     if (data.doc.id) {
       const { error } = await supabaseAdmin
@@ -451,9 +432,7 @@ export const deleteCampRequiredDocument = createServerFn({ method: "POST" })
 export const reorderCampRequiredDocuments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) })
-      .parse(input),
+    z.object({ campId: z.string().uuid(), orderedIds: z.array(z.string().uuid()) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await authorizeCampManager(data.campId, context);

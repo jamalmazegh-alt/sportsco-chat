@@ -45,8 +45,6 @@ function AdminTicketDetail() {
     queryFn: () => getSupportTicketAudit({ data: { ticket_id: ticketId } }),
   });
 
-
-
   const update = useMutation({
     mutationFn: (patch: { status?: string; priority?: string }) =>
       updateSupportTicket({
@@ -104,7 +102,6 @@ function AdminTicketDetail() {
           />
         </div>
       </div>
-
 
       {/* Sidebar */}
       <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 overflow-y-auto p-5 space-y-5">
@@ -177,7 +174,6 @@ function AdminTicketDetail() {
         </section>
 
         <section className="space-y-2">
-
           <Label className="text-xs uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1">
             <History className="h-3 w-3" /> Historique
           </Label>
@@ -195,7 +191,9 @@ function AdminTicketDetail() {
                 } else if (row.action === "assigned") {
                   detail = row.to_value ? "assigné" : "désassigné";
                 } else if (row.action === "reply" || row.action === "internal_note") {
-                  detail = row.to_value ? `« ${row.to_value.slice(0, 80)}${row.to_value.length > 80 ? "…" : ""} »` : null;
+                  detail = row.to_value
+                    ? `« ${row.to_value.slice(0, 80)}${row.to_value.length > 80 ? "…" : ""} »`
+                    : null;
                 }
                 return (
                   <li key={row.id} className="flex flex-col gap-0.5 pb-2 border-b last:border-b-0">
@@ -217,7 +215,6 @@ function AdminTicketDetail() {
     </div>
   );
 }
-
 
 function Row({ k, v }: { k: string; v: string }) {
   return (

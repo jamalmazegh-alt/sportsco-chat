@@ -1,1 +1,3 @@
+# Auto-format staged/pushed code before it hits CI, then run unit tests.
+bun run format
 bun run test

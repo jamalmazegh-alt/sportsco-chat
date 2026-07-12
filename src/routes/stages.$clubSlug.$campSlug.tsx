@@ -35,10 +35,9 @@ export const Route = createFileRoute("/stages/$clubSlug/$campSlug")({
     const url = `${SITE_URL}/stages/${params.clubSlug}/${params.campSlug}`;
     const camp = loaderData?.camp;
     const club = loaderData?.club;
-    const title = camp && club
-      ? `${camp.title} — ${club.name}`
-      : "Stage — Clubero";
-    const rawDesc = camp?.description?.trim() || "Découvrez ce stage sportif et inscrivez votre enfant en ligne.";
+    const title = camp && club ? `${camp.title} — ${club.name}` : "Stage — Clubero";
+    const rawDesc =
+      camp?.description?.trim() || "Découvrez ce stage sportif et inscrivez votre enfant en ligne.";
     const description = rawDesc.length > 160 ? rawDesc.slice(0, 157) + "…" : rawDesc;
     const ogImage = camp?.cover_image_url || DEFAULT_OG_IMAGE;
     return {
@@ -126,11 +125,7 @@ function PublicCampPage() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
       {camp.cover_image_url && (
         <div className="relative h-64 md:h-96 w-full overflow-hidden">
-          <img
-            src={camp.cover_image_url}
-            alt={camp.title}
-            className="h-full w-full object-cover"
-          />
+          <img src={camp.cover_image_url} alt={camp.title} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent" />
         </div>
       )}
@@ -154,9 +149,7 @@ function PublicCampPage() {
           <InfoRow icon={<CalendarDays className="h-4 w-4" />}>
             {formatDateRange(camp.start_date, camp.end_date, i18n.language)}
           </InfoRow>
-          {location && (
-            <InfoRow icon={<MapPin className="h-4 w-4" />}>{location}</InfoRow>
-          )}
+          {location && <InfoRow icon={<MapPin className="h-4 w-4" />}>{location}</InfoRow>}
           <InfoRow icon={<Users className="h-4 w-4" />}>
             {t("public.capacity", "{{count}} places", { count: camp.capacity })}
           </InfoRow>
@@ -173,9 +166,7 @@ function PublicCampPage() {
 
         {age_groups.length > 0 && (
           <section className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="text-lg font-semibold">
-              {t("public.ageGroups", "Catégories d'âge")}
-            </h2>
+            <h2 className="text-lg font-semibold">{t("public.ageGroups", "Catégories d'âge")}</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {age_groups.map((g) => (
                 <span
@@ -319,7 +310,6 @@ function PublicCampPage() {
             </p>
           )}
         </div>
-
       </div>
     </div>
   );

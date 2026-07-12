@@ -28,7 +28,6 @@ export async function enqueueTransactionalEmailServer(params: {
   idempotencyKey?: string;
   fromName?: string;
 }) {
-
   const template = TEMPLATES[params.templateName];
   if (!template) throw new Error(`Template '${params.templateName}' not found`);
 

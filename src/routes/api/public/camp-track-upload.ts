@@ -138,14 +138,12 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
             return Response.json({ error: "db_failed" }, { status: 500 });
           }
         } else {
-          const { error: insErr } = await supabase
-            .from("club_camp_registration_documents")
-            .insert({
-              registration_id: registrationId,
-              required_document_id: parsed.data.required_document_id,
-              file_path: objectPath,
-              review_status: "pending",
-            });
+          const { error: insErr } = await supabase.from("club_camp_registration_documents").insert({
+            registration_id: registrationId,
+            required_document_id: parsed.data.required_document_id,
+            file_path: objectPath,
+            review_status: "pending",
+          });
           if (insErr) {
             console.error("Doc row insert failed", insErr);
             return Response.json({ error: "db_failed" }, { status: 500 });

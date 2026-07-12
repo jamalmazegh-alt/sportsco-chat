@@ -1120,9 +1120,7 @@ function TeamDetail() {
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </Link>
 
-      {isCoach && team?.club_id && (
-        <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />
-      )}
+      {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />}
 
       <TeamCoaches
         teamId={teamId}

@@ -33,6 +33,7 @@ Fichiers touchés :
 - Head metadata mise à jour si les titres/descriptions changent.
 
 Contraintes respectées :
+
 - Aucun texte en dur dans les composants — tout via `useTranslation` sur les clés existantes ou nouvelles dans `marketing.json`.
 - Pas de nouveau design system, on garde les composants existants.
 

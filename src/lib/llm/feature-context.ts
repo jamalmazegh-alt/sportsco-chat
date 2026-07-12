@@ -213,8 +213,7 @@ const GATED_LINE_PATTERNS: Record<keyof FeatureFlags, RegExp> = {
     /^- (Cotisations, obligations.*|Encaissement direct.*|Membership fees.*|Direct club payouts.*)$/gm,
   fundraising_v2: /^- (Collectes et cagnottes.*|Fundraising campaigns.*)$/gm,
   social_network_v2: /^- (Follows inter-clubs.*|Cross-club follows.*)$/gm,
-  public_player_profiles:
-    /^- (Profils publics.*|Public player\/coach profiles.*)$/gm,
+  public_player_profiles: /^- (Profils publics.*|Public player\/coach profiles.*)$/gm,
 };
 
 const RULES_VISITOR_FR = `### Règles transverses (visiteur)

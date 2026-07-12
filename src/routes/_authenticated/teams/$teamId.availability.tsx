@@ -82,7 +82,10 @@ function TeamAvailabilityCalendar() {
   const daysInMonth = monthEnd.getDate();
   const days = useMemo(
     () =>
-      Array.from({ length: daysInMonth }, (_, i) => new Date(cursor.getFullYear(), cursor.getMonth(), i + 1)),
+      Array.from(
+        { length: daysInMonth },
+        (_, i) => new Date(cursor.getFullYear(), cursor.getMonth(), i + 1),
+      ),
     [cursor, daysInMonth],
   );
   const monthStartStr = ymd(monthStart);
@@ -91,7 +94,11 @@ function TeamAvailabilityCalendar() {
   const { data: team } = useQuery({
     queryKey: ["team-basic", teamId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("teams").select("id, name").eq("id", teamId).single();
+      const { data, error } = await supabase
+        .from("teams")
+        .select("id, name")
+        .eq("id", teamId)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -173,7 +180,9 @@ function TeamAvailabilityCalendar() {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="min-w-[140px] text-center text-sm font-medium capitalize">{monthLabel}</div>
+          <div className="min-w-[140px] text-center text-sm font-medium capitalize">
+            {monthLabel}
+          </div>
           <Button
             variant="outline"
             size="icon"
@@ -265,7 +274,9 @@ function TeamAvailabilityCalendar() {
         <CardContent className="p-0 overflow-x-auto">
           {players.length === 0 ? (
             <div className="p-6 text-sm text-center text-muted-foreground">
-              {t("availability.calendar.noPlayers", { defaultValue: "Aucun joueur dans cette équipe." })}
+              {t("availability.calendar.noPlayers", {
+                defaultValue: "Aucun joueur dans cette équipe.",
+              })}
             </div>
           ) : (
             <div className="min-w-max">
@@ -305,7 +316,10 @@ function TeamAvailabilityCalendar() {
                   <div
                     key={p.id}
                     className="grid border-b hover:bg-muted/20 relative"
-                    style={{ gridTemplateColumns: `180px repeat(${daysInMonth}, 28px)`, minHeight: 40 }}
+                    style={{
+                      gridTemplateColumns: `180px repeat(${daysInMonth}, 28px)`,
+                      minHeight: 40,
+                    }}
                   >
                     <Link
                       to="/players/$playerId/availability"
@@ -335,10 +349,19 @@ function TeamAvailabilityCalendar() {
                     {list.map((r) => {
                       const s = new Date(r.start_date);
                       const e = new Date(r.end_date);
-                      const startDay = Math.max(1, s.getMonth() === cursor.getMonth() && s.getFullYear() === cursor.getFullYear() ? s.getDate() : 1);
+                      const startDay = Math.max(
+                        1,
+                        s.getMonth() === cursor.getMonth() &&
+                          s.getFullYear() === cursor.getFullYear()
+                          ? s.getDate()
+                          : 1,
+                      );
                       const endDay = Math.min(
                         daysInMonth,
-                        e.getMonth() === cursor.getMonth() && e.getFullYear() === cursor.getFullYear() ? e.getDate() : daysInMonth,
+                        e.getMonth() === cursor.getMonth() &&
+                          e.getFullYear() === cursor.getFullYear()
+                          ? e.getDate()
+                          : daysInMonth,
                       );
                       const left = 180 + (startDay - 1) * 28 + 2;
                       const width = (endDay - startDay + 1) * 28 - 4;
@@ -371,11 +394,19 @@ function TeamAvailabilityCalendar() {
         <span className="text-muted-foreground mr-2">
           {t("availability.calendar.legend", { defaultValue: "Légende" })} :
         </span>
-        {(["vacation", "injury", "school", "family", "work", "suspension", "other"] as UnavailableReason[]).map(
-          (r) => (
-            <UnavailableBadge key={r} reason={r} />
-          ),
-        )}
+        {(
+          [
+            "vacation",
+            "injury",
+            "school",
+            "family",
+            "work",
+            "suspension",
+            "other",
+          ] as UnavailableReason[]
+        ).map((r) => (
+          <UnavailableBadge key={r} reason={r} />
+        ))}
       </div>
 
       {isLoading && (
