@@ -377,9 +377,11 @@ function ImportPage() {
       });
       setPreview(res);
       // Default team choices to the suggested match.
+      // Default: use the normalized match when found, otherwise force the user
+      // to explicitly opt in to creation via the "__create__" sentinel.
       const defaults: Record<string, string> = {};
       for (const tr of res.teamResolutions) {
-        defaults[tr.key] = tr.suggestedTeamId ?? "";
+        defaults[tr.key] = tr.suggestedTeamId ?? "__create__";
       }
       setTeamChoices(defaults);
       setFieldOverrides({});
@@ -406,9 +408,11 @@ function ImportPage() {
     setLoading(true);
     try {
       const teamOverrides: Record<string, string> = {};
+      const teamsToCreate: string[] = [];
       if (type === "players" && preview) {
         for (const [key, val] of Object.entries(teamChoices)) {
-          if (val) teamOverrides[key] = val;
+          if (val === "__create__") teamsToCreate.push(key);
+          else if (val) teamOverrides[key] = val;
         }
       }
       const fieldOverridesPayload: Record<string, string[]> = {};
@@ -428,6 +432,7 @@ function ImportPage() {
           teamOverrides: Object.keys(teamOverrides).length > 0 ? teamOverrides : undefined,
           fieldOverrides:
             Object.keys(fieldOverridesPayload).length > 0 ? fieldOverridesPayload : undefined,
+          teamsToCreate: teamsToCreate.length > 0 ? teamsToCreate : undefined,
         },
       });
       setResult(res);
@@ -763,7 +768,8 @@ function ImportPage() {
                             setTeamChoices((prev) => ({ ...prev, [tr.key]: e.target.value }))
                           }
                         >
-                          <option value="">➕ Créer une nouvelle équipe</option>
+                          <option value="">— choisir —</option>
+                          <option value="__create__">➕ Créer cette équipe</option>
                           {tr.existingTeams.map((et) => (
                             <option key={et.id} value={et.id}>
                               {et.name} ({et.sport ?? "?"} · {et.age_group ?? "?"})

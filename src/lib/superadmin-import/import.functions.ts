@@ -479,6 +479,82 @@ const PLAYER_OVERWRITABLE_FIELDS = [
   "phone",
 ] as const;
 
+// ---------------------------------------------------------------------------
+// Pure helpers (exported for unit tests) — no DB access, no side effects.
+// ---------------------------------------------------------------------------
+
+/** Same normalization as `public.normalize_name` (unaccent + lower + alnum). */
+export const _normalizeName = normalizeName;
+
+export type ResolveTeamInput = {
+  equipe: string | null | undefined;
+  sport: string | null | undefined;
+  categorie: string | null | undefined;
+  teamOverrides?: Record<string, string>;
+  teamsToCreate?: Set<string>;
+  teamsByNorm: Map<string, string>;
+};
+
+export type ResolveTeamResult =
+  | { kind: "override"; teamKey: string; teamId: string }
+  | { kind: "matched"; teamKey: string; teamId: string }
+  | { kind: "create"; teamKey: string }
+  | { kind: "error"; message: string };
+
+/**
+ * Resolve a team for one player row using the same rules as `runImport`:
+ * override > normalized match > explicit "create" > error.
+ * NEVER creates implicitly.
+ */
+export function resolveTeamForRow(input: ResolveTeamInput): ResolveTeamResult {
+  const { equipe, sport, categorie } = input;
+  if (!equipe || !sport || !categorie) {
+    return { kind: "error", message: "équipe/sport/catégorie manquants" };
+  }
+  const teamKey = `${equipe}|${sport}|${categorie}`;
+  const override = input.teamOverrides?.[teamKey];
+  if (override) return { kind: "override", teamKey, teamId: override };
+  const normKey = `${normalizeName(equipe)}|${normalizeName(sport)}|${normalizeName(categorie)}`;
+  const matched = input.teamsByNorm.get(normKey);
+  if (matched) return { kind: "matched", teamKey, teamId: matched };
+  if (input.teamsToCreate?.has(teamKey)) return { kind: "create", teamKey };
+  return {
+    kind: "error",
+    message: `Équipe non résolue: ${equipe} / ${sport} / ${categorie} — choisir une équipe existante ou cocher "créer".`,
+  };
+}
+
+export type FieldSpec = {
+  col: (typeof PLAYER_OVERWRITABLE_FIELDS)[number];
+  incoming: string | number | null;
+  current: string | number | null;
+  allowBlankFill: boolean;
+};
+
+/**
+ * Compute the patch to apply to an existing player row.
+ * Rules: blank-fill (only when `allowBlankFill` and current is empty),
+ * overwrite ONLY if the field is explicitly in `allowed` AND value differs.
+ * first_name/last_name are identity and cannot be blank-filled.
+ */
+export function computePlayerPatch(
+  specs: FieldSpec[],
+  allowed: Set<string>,
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  for (const s of specs) {
+    if (s.incoming == null || s.incoming === "") continue;
+    const currentEmpty = s.current == null || s.current === "";
+    if (currentEmpty && s.allowBlankFill) {
+      patch[s.col] = s.incoming;
+    } else if (allowed.has(s.col) && s.incoming !== s.current) {
+      patch[s.col] = s.incoming;
+    }
+  }
+  return patch;
+}
+
+
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -495,6 +571,8 @@ export const runImport = createServerFn({ method: "POST" })
         teamOverrides: z.record(z.string(), z.string().uuid()).optional(),
         /** row index (0-based, as string) → list of columns authorized to overwrite. */
         fieldOverrides: z.record(z.string(), z.array(z.string())).optional(),
+        /** teamKeys the caller explicitly authorizes to CREATE when unresolved. */
+        teamsToCreate: z.array(z.string()).optional(),
       })
       .parse(input),
   )
@@ -555,12 +633,26 @@ export const runImport = createServerFn({ method: "POST" })
       if (data.type === "players") {
         const teamCache = new Map<string, string>();
         const parentCache = new Map<string, string>();
+        const toCreate = new Set(data.teamsToCreate ?? []);
         let teamsCreated = 0;
         let playersCreated = 0;
         let playersUpdated = 0;
         let playersRestored = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
+        // Preload club teams for normalized dedupe (case/accents-insensitive).
+        const { data: clubTeamsList } = await supabaseAdmin
+          .from("teams")
+          .select("id, name, sport, age_group")
+          .eq("club_id", data.clubId)
+          .is("deleted_at", null);
+        const teamsByNorm = new Map<string, string>();
+        const normTeamKey = (name: string, sport: string | null, cat: string | null) =>
+          `${normalizeName(name)}|${normalizeName(sport)}|${normalizeName(cat)}`;
+        for (const t of clubTeamsList ?? []) {
+          teamsByNorm.set(normTeamKey(t.name, t.sport, t.age_group), t.id);
+        }
 
         // Load full club roster (active + soft-deleted) once — identity index.
         type ExistingPlayer = {
@@ -610,11 +702,20 @@ export const runImport = createServerFn({ method: "POST" })
               throw new Error("date de naissance requise");
             }
 
-            // Resolve team: fixed team (coach mode), caller override, or per-row lookup.
+            // Resolve team. Explicit contract:
+            //  1) fixed team (coach dialog, teamId prop)
+            //  2) caller override (UI dropdown chose an existing team)
+            //  3) normalized match against club roster (dedupe casse/accents)
+            //  4) explicit "create" opt-in via teamsToCreate — otherwise ERROR.
+            // Implicit creation is forbidden here — a silent create was the
+            // exact bug we're closing.
             let teamId: string;
             if (fixedTeam) {
               teamId = fixedTeam.id;
             } else {
+              if (!r.equipe || !r.sport || !r.categorie) {
+                throw new Error("équipe/sport/catégorie manquants");
+              }
               const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
               const override = data.teamOverrides?.[teamKey];
               const cached = teamCache.get(teamKey);
@@ -624,17 +725,34 @@ export const runImport = createServerFn({ method: "POST" })
               } else if (cached) {
                 teamId = cached;
               } else {
-                const t = await findOrCreateTeam(
-                  data.clubId,
-                  r.equipe!,
-                  r.sport!,
-                  r.categorie!,
-                  r.genre,
-                  r.saison,
-                );
-                teamId = t.id;
-                teamCache.set(teamKey, teamId);
-                if (t.created) teamsCreated++;
+                const normKey = normTeamKey(r.equipe, r.sport, r.categorie);
+                const matched = teamsByNorm.get(normKey);
+                if (matched) {
+                  teamId = matched;
+                  teamCache.set(teamKey, teamId);
+                } else if (toCreate.has(teamKey)) {
+                  const { data: inserted, error: cErr } = await supabaseAdmin
+                    .from("teams")
+                    .insert({
+                      club_id: data.clubId,
+                      name: r.equipe,
+                      sport: r.sport,
+                      age_group: r.categorie,
+                      season: r.saison,
+                      championship: r.genre,
+                    })
+                    .select("id")
+                    .single();
+                  if (cErr) throw new Error(`Création équipe ${r.equipe}: ${cErr.message}`);
+                  teamId = inserted.id;
+                  teamsByNorm.set(normKey, teamId);
+                  teamCache.set(teamKey, teamId);
+                  teamsCreated++;
+                } else {
+                  throw new Error(
+                    `Équipe non résolue: ${r.equipe} / ${r.sport} / ${r.categorie} — choisir une équipe existante ou cocher "créer".`,
+                  );
+                }
               }
             }
 
@@ -1174,15 +1292,21 @@ export const previewPlayersImport = createServerFn({ method: "POST" })
       if (!fixedTeam && row.equipe && row.sport && row.categorie) {
         teamKey = `${row.equipe}|${row.sport}|${row.categorie}`;
         if (!teamTuples.has(teamKey)) {
-          const exact = teamList.find(
-            (t) => t.name === row.equipe && t.sport === row.sport && t.age_group === row.categorie,
+          // Normalized (unaccent + lowercase + strip non-alnum) match — dedupes
+          // casse/accents differences so "U13 F" and "u13-f" resolve to the
+          // same team instead of proposing "create" again.
+          const targetNorm = `${normalizeName(row.equipe)}|${normalizeName(row.sport)}|${normalizeName(row.categorie)}`;
+          const matched = teamList.find(
+            (t) =>
+              `${normalizeName(t.name)}|${normalizeName(t.sport)}|${normalizeName(t.age_group)}` ===
+              targetNorm,
           );
           teamTuples.set(teamKey, {
             key: teamKey,
             name: row.equipe,
             sport: row.sport,
             category: row.categorie,
-            suggestedTeamId: exact?.id ?? null,
+            suggestedTeamId: matched?.id ?? null,
             existingTeams: teamList,
           });
         }
