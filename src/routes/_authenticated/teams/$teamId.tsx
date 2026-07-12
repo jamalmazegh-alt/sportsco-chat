@@ -208,7 +208,7 @@ function TeamDetail() {
       const { data: tm } = await supabase
         .from("team_members")
         .select(
-          "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone)",
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone, deleted_at)",
         )
         .eq("team_id", teamId)
         .eq("role", "player");
@@ -227,7 +227,7 @@ function TeamDetail() {
         (p.preferred_position ? 1 : 0);
       for (const r of tm ?? []) {
         const p = (r as any).players;
-        if (!p || seenIds.has(p.id)) continue;
+        if (!p || p.deleted_at || seenIds.has(p.id)) continue;
         seenIds.add(p.id);
         const key = p.license_number
           ? `lic:${norm(p.license_number)}`

@@ -461,7 +461,7 @@ export function ImportPlayersCsvDialog({
     const { data: currentMembers, error: currentMembersError } = await supabase
       .from("team_members")
       .select(
-        "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone)",
+        "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at)",
       )
       .eq("team_id", teamId)
       .eq("role", "player");
@@ -474,7 +474,7 @@ export function ImportPlayersCsvDialog({
 
     const roster: ExistingPlayer[] = (currentMembers ?? [])
       .map((member: any) => member.players)
-      .filter(Boolean);
+      .filter((p: any) => p && !p.deleted_at);
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
