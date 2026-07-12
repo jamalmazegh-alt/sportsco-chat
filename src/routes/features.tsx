@@ -280,6 +280,20 @@ const ACCENT_CLASSES: Record<
   },
 };
 
+// Modules with a dedicated deep-dive section further down the page.
+// `excludedIndices` removes items already covered in that section to avoid
+// duplication. Everything else stays in the bento grid.
+const MODULE_DEEP_DIVE: Record<string, { anchor: string; excludedIndices: number[] }> = {
+  effectif: { anchor: "#player", excludedIndices: [2] },
+  tournois: { anchor: "#tournaments", excludedIndices: [0, 2, 3, 6] },
+  communication: { anchor: "#wall", excludedIndices: [0, 3, 4] },
+  ia: { anchor: "#coach-ai", excludedIndices: [0] },
+};
+
+function moduleHref(keyName: string) {
+  return MODULE_DEEP_DIVE[keyName]?.anchor ?? `#module-${keyName}`;
+}
+
 function ModuleNavPill({
   keyName,
   label,
@@ -292,7 +306,7 @@ function ModuleNavPill({
   const Icon = vis.icon;
   return (
     <a
-      href={`#module-${keyName}`}
+      href={moduleHref(keyName)}
       className={`group inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:shadow-sm ${cls.ring}`}
     >
       <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${cls.chip}`}>
@@ -315,12 +329,17 @@ function ModuleBlock({
     items: { title: string; body: string; badge?: string }[];
   };
 }) {
+  const { t } = useTranslation("marketing");
   const vis = MODULE_VISUALS[keyName];
   const cls = ACCENT_CLASSES[vis.accent];
   const Icon = vis.icon;
-  const featured = !!vis.featured;
+  const deepDive = MODULE_DEEP_DIVE[keyName];
+  const excluded = new Set(deepDive?.excludedIndices ?? []);
+  const items = mod.items.filter((_, i) => !excluded.has(i));
+  // Only keep the hero layout for featured modules that DON'T have a deep-dive
+  // (otherwise the "En savoir plus" CTA in the header is the real hero).
+  const featured = !!vis.featured && !deepDive;
 
-  // Bento layout: first item spans 2 cols on large screens for featured modules
   return (
     <div id={`module-${keyName}`} className="scroll-mt-20">
       {/* Header band */}
@@ -353,15 +372,26 @@ function ModuleBlock({
             </div>
             <p className="mt-1 text-muted-foreground">{mod.subtitle}</p>
           </div>
-          <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:inline">
-            {mod.items.length} fonctionnalités
-          </span>
+          {deepDive ? (
+            <a
+              href={deepDive.anchor}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/60 px-3.5 py-1.5 text-xs font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:shadow-sm ${cls.ring}`}
+            >
+              {t("features.learnMore", { defaultValue: "En savoir plus" })}
+              <ArrowRight className={`h-3.5 w-3.5 ${cls.icon}`} />
+            </a>
+          ) : (
+            <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:inline">
+              {items.length} {t("features.modulesCount", { defaultValue: "fonctionnalités" })}
+            </span>
+          )}
         </div>
       </div>
 
       {/* Items — bento grid */}
+      {items.length > 0 && (
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {mod.items.map((item, idx) => {
+        {items.map((item, idx) => {
           const isHero = featured && idx === 0;
           return (
             <div
@@ -402,7 +432,7 @@ function ModuleBlock({
               {isHero && (
                 <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-foreground/70">
                   <CheckCircle2 className={`h-3.5 w-3.5 ${cls.icon}`} />
-                  Inclus dès la V1
+                  {t("features.includedV1", { defaultValue: "Inclus dès la V1" })}
                 </div>
               )}
             </div>
