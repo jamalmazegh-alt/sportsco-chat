@@ -1068,3 +1068,181 @@ export const runImport = createServerFn({ method: "POST" })
 
     return { status, imported, total: data.rows.length, errors, summary };
   });
+
+// ============================================================
+// 6) Preview import players — team resolutions + per-row diffs
+// ============================================================
+
+export type PlayerImportPreview = {
+  fixedTeam: { id: string; name: string; sport: string | null; age_group: string | null } | null;
+  teamResolutions: Array<{
+    key: string;
+    name: string;
+    sport: string;
+    category: string;
+    suggestedTeamId: string | null;
+    existingTeams: Array<{ id: string; name: string; sport: string | null; age_group: string | null }>;
+  }>;
+  rowPreviews: Array<{
+    index: number;
+    firstName: string;
+    lastName: string;
+    birthDate: string | null;
+    action: "new" | "update" | "restore";
+    existingId: string | null;
+    teamKey: string | null;
+    diffs: Array<{ field: string; current: string | null; incoming: string | null; overwritable: boolean }>;
+  }>;
+  summary: { new: number; update: number; restore: number };
+};
+
+export const previewPlayersImport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
+        rows: importRowsSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<PlayerImportPreview> => {
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+
+    let fixedTeam: PlayerImportPreview["fixedTeam"] = null;
+    if (data.teamId) {
+      const { data: t } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id, name, sport, age_group")
+        .eq("id", data.teamId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (!t || t.club_id !== data.clubId) throw new Response("Forbidden", { status: 403 });
+      fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
+    }
+
+    type ExistingPlayer = {
+      id: string;
+      first_name: string | null;
+      last_name: string | null;
+      birth_date: string | null;
+      jersey_number: number | null;
+      license_number: string | null;
+      preferred_position: string | null;
+      email: string | null;
+      phone: string | null;
+      deleted_at: string | null;
+    };
+
+    const { data: roster, error: rosterErr } = await supabaseAdmin
+      .from("players")
+      .select(
+        "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+      )
+      .eq("club_id", data.clubId);
+    if (rosterErr) throw new Error(rosterErr.message);
+
+    const byIdentity = new Map<string, ExistingPlayer>();
+    const key = (f: string | null, l: string | null, b: string | null) => {
+      if (!b) return null;
+      const nf = normalizeName(f);
+      const nl = normalizeName(l);
+      if (!nf || !nl) return null;
+      return `${nf}|${nl}|${b}`;
+    };
+    for (const p of (roster ?? []) as ExistingPlayer[]) {
+      const k = key(p.first_name, p.last_name, p.birth_date);
+      if (!k) continue;
+      const prev = byIdentity.get(k);
+      if (!prev || (prev.deleted_at && !p.deleted_at)) byIdentity.set(k, p);
+    }
+
+    const { data: clubTeams } = await supabaseAdmin
+      .from("teams")
+      .select("id, name, sport, age_group")
+      .eq("club_id", data.clubId)
+      .is("deleted_at", null);
+    const teamList = clubTeams ?? [];
+
+    const teamTuples = new Map<string, PlayerImportPreview["teamResolutions"][number]>();
+    const summary = { new: 0, update: 0, restore: 0 };
+
+    const rowPreviews: PlayerImportPreview["rowPreviews"] = data.rows.map((r, i) => {
+      const row = r as RowMap;
+      let teamKey: string | null = null;
+      if (!fixedTeam && row.equipe && row.sport && row.categorie) {
+        teamKey = `${row.equipe}|${row.sport}|${row.categorie}`;
+        if (!teamTuples.has(teamKey)) {
+          const exact = teamList.find(
+            (t) => t.name === row.equipe && t.sport === row.sport && t.age_group === row.categorie,
+          );
+          teamTuples.set(teamKey, {
+            key: teamKey,
+            name: row.equipe,
+            sport: row.sport,
+            category: row.categorie,
+            suggestedTeamId: exact?.id ?? null,
+            existingTeams: teamList,
+          });
+        }
+      }
+      const firstName = titleCase(row.prenom_joueur ?? "");
+      const lastName = titleCase(row.nom_joueur ?? "");
+      const idKey = key(firstName, lastName, row.date_naissance ?? null);
+      const existing = idKey ? byIdentity.get(idKey) ?? null : null;
+      let action: "new" | "update" | "restore" = "new";
+      const diffs: PlayerImportPreview["rowPreviews"][number]["diffs"] = [];
+      if (existing) {
+        action = existing.deleted_at ? "restore" : "update";
+        const incomingMap: Record<string, string | null> = {
+          first_name: firstName || null,
+          last_name: lastName || null,
+          jersey_number: row.numero_maillot || null,
+          license_number: row.numero_licence || null,
+          preferred_position: row.poste || null,
+          email: row.email_contact ? row.email_contact.toLowerCase() : null,
+          phone: row.telephone_joueur || null,
+        };
+        const currentMap: Record<string, string | null> = {
+          first_name: existing.first_name,
+          last_name: existing.last_name,
+          jersey_number: existing.jersey_number != null ? String(existing.jersey_number) : null,
+          license_number: existing.license_number,
+          preferred_position: existing.preferred_position,
+          email: existing.email,
+          phone: existing.phone,
+        };
+        for (const f of PLAYER_OVERWRITABLE_FIELDS) {
+          const inc = incomingMap[f];
+          const cur = currentMap[f];
+          if (inc && inc !== cur) {
+            diffs.push({
+              field: f,
+              current: cur,
+              incoming: inc,
+              overwritable: cur != null && cur !== "",
+            });
+          }
+        }
+      }
+      summary[action]++;
+      return {
+        index: i,
+        firstName: row.prenom_joueur ?? "",
+        lastName: row.nom_joueur ?? "",
+        birthDate: row.date_naissance ?? null,
+        action,
+        existingId: existing?.id ?? null,
+        teamKey,
+        diffs,
+      };
+    });
+
+    return {
+      fixedTeam,
+      teamResolutions: Array.from(teamTuples.values()),
+      rowPreviews,
+      summary,
+    };
+  });
