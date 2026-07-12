@@ -439,6 +439,7 @@ function ModuleBlock({
           );
         })}
       </div>
+      )}
     </div>
   );
 }
