@@ -167,7 +167,7 @@ async function logSupportAudit(entry: {
       action: entry.action,
       from_value: entry.from_value ?? null,
       to_value: entry.to_value ?? null,
-      meta: entry.meta ?? null,
+      meta: (entry.meta ?? null) as any,
     });
   } catch (e) {
     console.error("[support] audit log failed", e);
