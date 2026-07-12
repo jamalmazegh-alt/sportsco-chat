@@ -267,11 +267,19 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
                 t={t}
                 onExtend={() => extendMut.mutate(r.id)}
                 extending={extendMut.isPending && extendMut.variables === r.id}
+                onOpen={() => setOpenId(r.id)}
               />
             ))}
           </tbody>
         </table>
       </div>
+
+      <CampRegistrationDetailSheet
+        campId={campId}
+        registrationId={openId}
+        open={openId !== null}
+        onOpenChange={(o) => !o && setOpenId(null)}
+      />
     </div>
   );
 }
