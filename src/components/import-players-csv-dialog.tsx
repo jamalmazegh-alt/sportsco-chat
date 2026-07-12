@@ -435,13 +435,63 @@ export function ImportPlayersCsvDialog({
               <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
                 <div className="font-medium flex items-center gap-1">
                   <AlertCircle className="h-3.5 w-3.5" />
-                  {t("players.import.toFixHint", {
+                  {t("players.import.toFixHintEditable", {
                     defaultValue:
-                      "Certaines lignes ont des erreurs et seront ignorées. Corrigez le fichier puis relancez l'import si besoin.",
+                      "Certaines lignes ont des erreurs (cases rouges) ou champs manquants (cases orange). Corrigez-les directement dans le tableau ci-dessous avant d'importer.",
                   })}
                 </div>
               </div>
             )}
+
+            {/* Editable data table — same UX as superadmin onboarding */}
+            <div className="overflow-auto border rounded-lg max-h-[50vh]">
+              <table className="w-full text-xs">
+                <thead className="bg-muted sticky top-0 z-10">
+                  <tr>
+                    <th className="px-2 py-1.5 text-left">#</th>
+                    {fields.map((f) => (
+                      <th
+                        key={f.key}
+                        className="px-2 py-1.5 text-left whitespace-nowrap"
+                      >
+                        {f.label}
+                        {f.required && <span className="text-destructive">*</span>}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {analysis.rows.map((row, i) => (
+                    <tr key={i} className="border-t">
+                      <td className="px-2 py-1 text-muted-foreground">{i + 1}</td>
+                      {fields.map((f) => {
+                        const c = row[f.key];
+                        const missing = f.required && !c?.value;
+                        const bg = c?.error
+                          ? "bg-destructive/10"
+                          : missing
+                            ? "bg-amber-500/10"
+                            : "";
+                        return (
+                          <td
+                            key={f.key}
+                            className={`px-1 py-0.5 ${bg}`}
+                            title={c?.error || ""}
+                          >
+                            <input
+                              value={c?.value || ""}
+                              onChange={(e) => editCell(i, f.key, e.target.value)}
+                              placeholder={missing ? "Requis" : ""}
+                              className="w-full bg-transparent outline-none px-1 py-0.5 min-w-[100px]"
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={reset} disabled={loading}>
                 {t("common.back", { defaultValue: "Retour" })}
