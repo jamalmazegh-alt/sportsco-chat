@@ -317,27 +317,29 @@ function DocRow({
               Télécharger
             </Button>
           )}
-          <label className="inline-flex">
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-              className="hidden"
-              onChange={onFile}
-              disabled={replacing}
-            />
-            <span
-              className={`inline-flex cursor-pointer items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground ${
-                replacing ? "opacity-60" : "hover:bg-primary/90"
-              }`}
-            >
-              {replacing ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Upload className="h-3.5 w-3.5" />
-              )}
-              {isMissing ? "Envoyer" : isRejected ? "Remplacer" : "Remplacer"}
-            </span>
-          </label>
+          {status !== "approved" && (
+            <label className="inline-flex">
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                className="hidden"
+                onChange={onFile}
+                disabled={replacing}
+              />
+              <span
+                className={`inline-flex cursor-pointer items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground ${
+                  replacing ? "opacity-60" : "hover:bg-primary/90"
+                }`}
+              >
+                {replacing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Upload className="h-3.5 w-3.5" />
+                )}
+                {isMissing ? "Envoyer" : "Remplacer"}
+              </span>
+            </label>
+          )}
         </div>
       </div>
       {/* Hidden field kept to satisfy Input import in file-heavy shells; not used */}
