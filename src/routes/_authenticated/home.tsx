@@ -147,7 +147,8 @@ function HomePage() {
         }))
         .sort(
           (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-        );
+        )
+        .slice(0, 3);
     },
   });
 
