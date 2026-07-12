@@ -39,6 +39,8 @@ import { CampCoverUpload } from "@/components/camps/camp-cover-upload";
 import { CampProgramEditor } from "@/components/camps/camp-program-editor";
 import { CampDocumentsEditor } from "@/components/camps/camp-documents-editor";
 import { CampRequiredDocumentsEditor } from "@/components/camps/camp-required-documents-editor";
+import { CampRegistrationsPanel } from "@/components/camps/camp-registrations-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/camps/$campId")({
   component: CampEditPage,
