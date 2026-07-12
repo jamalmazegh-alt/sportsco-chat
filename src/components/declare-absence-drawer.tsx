@@ -423,7 +423,7 @@ export function DeclareAbsenceDrawer({
         <div className="mt-4 space-y-4">
           {!initialPlayerId && candidates.length > 1 && (
             <div className="space-y-1.5">
-              <Label>{t("availability.forChild", { defaultValue: "Pour quel enfant ?" })}</Label>
+              <Label>{teamId ? t("availability.forPlayer", { defaultValue: "Pour quel joueur ?" }) : t("availability.forChild", { defaultValue: "Pour quel enfant ?" })}</Label>
               <Select value={playerId} onValueChange={setPlayerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="—" />
