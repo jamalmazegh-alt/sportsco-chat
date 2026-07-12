@@ -449,6 +449,9 @@ function ImportPage() {
     setResult(null);
     setIaUsed(false);
     setSendInvitations(false);
+    setPreview(null);
+    setTeamChoices({});
+    setFieldOverrides({});
     if (!keepClub) {
       setClub(null);
       setStats(null);
