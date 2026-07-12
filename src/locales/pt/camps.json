@@ -286,6 +286,33 @@
     "registerWaitlistCta": "Entrar na lista de espera"
   },
   "registrations": {
+    "status": {
+      "pending": "Pendente",
+      "under_review": "Em análise",
+      "approved": "Aprovada",
+      "waitlist": "Lista de espera",
+      "rejected": "Recusada",
+      "cancelled": "Cancelada"
+    },
+    "payment": {
+      "not_required": "Não obrigatório",
+      "pending": "Pendente",
+      "declared": "Declarado",
+      "paid": "Pago",
+      "partial": "Parcial",
+      "refunded": "Reembolsado"
+    },
+    "dossier": {
+      "complete": "Completo",
+      "paymentMissing": "Pagamento em falta",
+      "documentsPending": "A aguardar verificação",
+      "documentsMissing": "Documentos em falta"
+    },
+    "filters": {
+      "allReg": "Todas as inscrições",
+      "allPay": "Todos os pagamentos",
+      "allDossier": "Todos os dossiês"
+    },
     "detail": {
       "title": "Registration record",
       "subtitle": "Check the details, review the documents and change the status.",
