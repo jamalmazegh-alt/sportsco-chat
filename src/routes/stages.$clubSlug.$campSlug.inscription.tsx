@@ -163,10 +163,18 @@ function RegistrationFormPage() {
           toast.error(t("public.errors.closed", "Les inscriptions sont fermées."));
         } else if (code === "age_mismatch") {
           toast.error(t("public.errors.ageMismatch", "L'âge de l'enfant ne correspond pas à la catégorie choisie."));
+        } else if (code === "duplicate") {
+          toast.error(
+            t(
+              "public.errors.duplicate",
+              "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier.",
+            ),
+          );
         } else {
           toast.error(t("public.errors.generic", "Une erreur est survenue. Réessayez."));
         }
         return;
+
       }
       setSuccess({ registrationId: json.registrationId });
     } catch (err) {
