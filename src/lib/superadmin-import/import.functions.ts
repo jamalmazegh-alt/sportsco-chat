@@ -242,39 +242,62 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
       .map((f) => `${f.key} (${f.required ? "obligatoire" : "optionnel"})`)
       .join(", ");
 
+    // Pré-mapping trivial : normalise l'en-tête et matche exactement une clé Clubero.
+    // Ça couvre le modèle officiel (colonnes suffixées par `*`, accents, casse, espaces)
+    // sans appel IA, et évite qu'une hallucination fasse rater le mapping du template.
+    const normHeader = (s: string) =>
+      s
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\*+$/g, "")
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9_]/g, "");
+    const keyByNorm = new Map<string, string>();
+    for (const k of validKeys) keyByNorm.set(normHeader(k), k);
+
+    const mapping: Record<string, string> = {};
+    const unmapped: string[] = [];
+    for (const h of headers) {
+      const hit = keyByNorm.get(normHeader(h));
+      if (hit) mapping[h] = hit;
+      else unmapped.push(h);
+    }
+
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
-    const mapping: Record<string, string> = {};
-    try {
-      const { object } = await generateObject({
-        model,
-        schema: aiMappingSchema,
-        system: SYSTEM_PROMPT,
-        prompt: `Type d'import : ${data.type}
+    if (unmapped.length > 0) {
+      try {
+        const { object } = await generateObject({
+          model,
+          schema: aiMappingSchema,
+          system: SYSTEM_PROMPT,
+          prompt: `Type d'import : ${data.type}
 Clés Clubero valides : ${fieldList}
 
-En-têtes source du fichier :
-${JSON.stringify(headers)}
+En-têtes source à mapper :
+${JSON.stringify(unmapped)}
 
 Échantillon des premières lignes (utilise-le pour vérifier la cohérence en-tête ↔ valeurs) :
 ${JSON.stringify(rawRows.slice(0, 8))}
 
 
 Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
-        abortSignal: AbortSignal.timeout(30_000),
-      });
-      for (const m of object.mapping) {
-        if (m.field && m.field !== "ignore" && validKeys.has(m.field)) {
-          mapping[m.source] = m.field;
+          abortSignal: AbortSignal.timeout(30_000),
+        });
+        for (const m of object.mapping) {
+          if (m.field && m.field !== "ignore" && validKeys.has(m.field)) {
+            mapping[m.source] = m.field;
+          }
         }
+      } catch (e) {
+        log.error("AI analysis chunk failed", { error: String(e) });
+        // Non bloquant : on continue avec le pré-mapping trivial. Les colonnes
+        // non reconnues seront visibles dans l'écran d'édition manuelle.
       }
-    } catch (e) {
-      log.error("AI analysis chunk failed", { error: String(e) });
-      throw new Error(
-        "L'analyse IA n'a pas réussi à mapper les colonnes. Vérifie que le fichier contient des en-têtes lisibles ou utilise le modèle Clubero.",
-      );
     }
+
 
     // In coach mode we already injected equipe/sport/categorie by their
     // canonical keys — pass them through as-is so parseTemplate finds them.

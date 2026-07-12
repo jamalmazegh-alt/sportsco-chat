@@ -364,11 +364,12 @@ export function ImportPlayersCsvDialog({
               <div className="text-xs text-muted-foreground mt-1">.xlsx, .xls, .csv</div>
               <input
                 type="file"
-                accept=".xlsx,.xls,.csv,text/csv"
+                accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/comma-separated-values,text/plain,*/*"
                 className="hidden"
                 onChange={onFile}
                 disabled={loading}
               />
+
             </label>
             {loading && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
