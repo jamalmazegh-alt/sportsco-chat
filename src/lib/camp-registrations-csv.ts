@@ -78,9 +78,11 @@ export function buildRegistrationsCsv(
         `registrations.dossier.${
           r.dossier_status === "documents_missing"
             ? "documentsMissing"
-            : r.dossier_status === "payment_missing"
-              ? "paymentMissing"
-              : "complete"
+            : r.dossier_status === "documents_pending"
+              ? "documentsPending"
+              : r.dossier_status === "payment_missing"
+                ? "paymentMissing"
+                : "complete"
         }`,
         { defaultValue: r.dossier_status },
       ),
