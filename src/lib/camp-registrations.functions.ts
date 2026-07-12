@@ -91,10 +91,12 @@ function computeDossierStatus(
   required: number,
   approved: number,
   rejected: number,
+  pending: number,
   campHasPrice: boolean,
 ): DossierStatus {
-  const documentsOk = required === 0 || (approved >= required && rejected === 0);
-  if (!documentsOk) return "documents_missing";
+  const missing = Math.max(0, required - approved - rejected - pending);
+  if (missing > 0 || rejected > 0) return "documents_missing";
+  if (pending > 0) return "documents_pending";
   const paymentOk = paymentStatus === "paid" || paymentStatus === "not_required" || !campHasPrice;
   if (paymentOk) return "complete";
   return "payment_missing";
