@@ -234,26 +234,15 @@ export function ImportPlayersCsvDialog({
         setHeaders(hdrs);
         setRawRows(rows);
 
-        const isTemplate = templateMatchRatio(hdrs, "players") >= 0.8;
-        if (isTemplate) {
-          setBusyLabel(
-            t("players.import.parsing", { defaultValue: "Analyse du modèle..." }),
-          );
-          const res = await tplParse({
-            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
-          });
-          setAnalysis(res);
-          setIaUsed(false);
-        } else {
-          setBusyLabel(
-            t("players.import.ai", { defaultValue: "Analyse IA en cours..." }),
-          );
-          const res = await aiAnalyze({
-            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
-          });
-          setAnalysis(res);
-          setIaUsed(true);
-        }
+        setBusyLabel(
+          t("players.import.ai", { defaultValue: "Analyse IA en cours..." }),
+        );
+        const res = await aiAnalyze({
+          data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
+        });
+        setAnalysis(res);
+        setIaUsed(true);
+
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
       } finally {
