@@ -1,10 +1,10 @@
 import { createFileRoute, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Loader2, Camera, Users, AtSign, RefreshCw, Unplug, ExternalLink } from "lucide-react";
+import { Loader2, RefreshCw, Unplug, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
 import {
@@ -16,13 +16,14 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { dateLocale } from "@/lib/date-locale";
 import i18nInstance from "@/lib/i18n";
+import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Network = "instagram" | "facebook" | "twitter";
 
-const META: Record<Network, { label: string; Icon: typeof Camera; tint: string }> = {
-  instagram: { label: "Instagram", Icon: Camera, tint: "text-pink-500" },
-  facebook: { label: "Facebook", Icon: Users, tint: "text-blue-600" },
-  twitter: { label: "X / Twitter", Icon: AtSign, tint: "text-foreground" },
+const META: Record<Network, { label: string; Icon: ComponentType<{ className?: string }>; tint: string }> = {
+  instagram: { label: "Instagram", Icon: InstagramIcon, tint: "text-pink-500" },
+  facebook: { label: "Facebook", Icon: FacebookIcon, tint: "text-blue-600" },
+  twitter: { label: "X / Twitter", Icon: XIcon, tint: "text-foreground" },
 };
 
 export const Route = createFileRoute("/_authenticated/admin/settings/social")({
