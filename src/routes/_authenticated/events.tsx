@@ -384,35 +384,8 @@ function EventsPage() {
                   {t("events.status.cancelled")}
                 </span>
               )}
-              {(() => {
-                const myC = myConvocsByEvent?.get(e.id);
-                if (!myC) return null;
-                const styles: Record<string, string> = {
-                  pending:
-                    "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
-                  present:
-                    "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300",
-                  absent: "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
-                  uncertain:
-                    "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300",
-                };
-                const label =
-                  myC.status === "pending"
-                    ? t("dashboard.actionRequired", { defaultValue: "Action requise" })
-                    : t("events.convokedBadge", { defaultValue: "Convoqué" });
-                return (
-                  <span
-                    className={cn(
-                      "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
-                      styles[myC.status] ?? styles.pending,
-                    )}
-                    title={myC.playerName}
-                  >
-                    <BellRing className="h-3 w-3" />
-                    {label}
-                  </span>
-                );
-              })()}
+
+
 
               {e.type === "match" && e.competition_type && (
                 <span
