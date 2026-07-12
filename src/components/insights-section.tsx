@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { dismissInsight } from "@/lib/insights.functions";
 import { refreshCoachInsights } from "@/lib/llm/coach-insights.functions";
+import { remindAllForEvent } from "@/lib/urgency/remind";
 import { toast } from "sonner";
 import {
   AlertDialog,
