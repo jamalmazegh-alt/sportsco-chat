@@ -6385,6 +6385,7 @@ export type Database = {
         Args: { _token: string }
         Returns: Json
       }
+      get_camp_registration_stats: { Args: { _camp_id: string }; Returns: Json }
       get_club_stripe_status: {
         Args: { _club_id: string }
         Returns: {
