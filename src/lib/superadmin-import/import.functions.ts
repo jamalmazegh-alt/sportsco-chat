@@ -199,7 +199,16 @@ Règles :
 - field doit être l'une des clés Clubero attendues, ou exactement "ignore" si aucune ne correspond.
 - N'invente pas de clé : utilise uniquement celles fournies dans la liste.
 - Sois tolérant aux abréviations, anglais, accents, casse, espaces.
-- Exemples : "first name" → prenom, "DOB" → date_naissance, "team" → equipe, "category" → categorie, "phone" → telephone.`;
+- Exemples de correspondance sémantique d'en-tête : "first name" → prenom, "DOB" → date_naissance, "team" → equipe, "category" → categorie, "phone" → telephone.
+
+VÉRIFICATION SÉMANTIQUE DES DONNÉES (important) :
+- Regarde aussi l'échantillon de valeurs sous chaque en-tête. Si les valeurs ne correspondent PAS à ce que suggère l'en-tête, fais confiance aux données et remappe.
+  Ex. en-tête "prenom_joueur" mais valeurs "30/00/2012", "15/08/2013" → field = "date_naissance" (les données sont clairement des dates).
+  Ex. en-tête "saison" mais valeurs "0641726100", "0768262000" → field = "telephone_joueur".
+  Ex. en-tête "genre" mais valeurs "Attaquant", "Gardien" → field = "poste".
+- Si plusieurs en-têtes source pointeraient vers la même clé Clubero à cause d'un décalage évident (colonnes shiftées), résous le décalage en cascade en te basant sur le type de données de chaque colonne (date, email, téléphone numérique, nom court, mot du vocabulaire genre/poste, etc.), pas sur les libellés.
+- Si une colonne n'a aucun sens exploitable (valeurs vides ou incohérentes) → "ignore".`;
+
 
 export const analyzeFileWithAI = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
