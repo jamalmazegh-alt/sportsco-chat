@@ -978,27 +978,68 @@ export const runImport = createServerFn({ method: "POST" })
         summary.invitations_sent = invitationsSent;
       } else if (data.type === "coaches") {
         const teamCache = new Map<string, string>();
+        const toCreate = new Set(data.teamsToCreate ?? []);
         let teamsCreated = 0;
         let coachesAdded = 0;
         let invitationsSent = 0;
 
+        // Preload club teams for normalized dedupe (case/accents-insensitive) —
+        // same contract as the players branch: override > normalized match >
+        // explicit "create" opt-in > error. No implicit creation.
+        const { data: clubTeamsList } = await supabaseAdmin
+          .from("teams")
+          .select("id, name, sport, age_group")
+          .eq("club_id", data.clubId)
+          .is("deleted_at", null);
+        const teamsByNorm = new Map<string, string>();
+        const normTeamKey = (name: string, sport: string | null, cat: string | null) =>
+          `${normalizeName(name)}|${normalizeName(sport)}|${normalizeName(cat)}`;
+        for (const t of clubTeamsList ?? []) {
+          teamsByNorm.set(normTeamKey(t.name, t.sport, t.age_group), t.id);
+        }
+
         for (let i = 0; i < data.rows.length; i++) {
           const r = data.rows[i] as RowMap;
           try {
-            const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
-            let teamId = teamCache.get(teamKey);
-            if (!teamId) {
-              const t = await findOrCreateTeam(
-                data.clubId,
-                r.equipe!,
-                r.sport!,
-                r.categorie!,
-                r.genre,
-                r.saison,
-              );
-              teamId = t.id;
+            const resolution = resolveTeamForRow({
+              equipe: r.equipe,
+              sport: r.sport,
+              categorie: r.categorie,
+              teamOverrides: data.teamOverrides,
+              teamsToCreate: toCreate,
+              teamsByNorm,
+            });
+            let teamId: string;
+            const teamKey =
+              resolution.kind === "error"
+                ? `${r.equipe}|${r.sport}|${r.categorie}`
+                : resolution.teamKey;
+            const cached = teamCache.get(teamKey);
+            if (cached) {
+              teamId = cached;
+            } else if (resolution.kind === "override" || resolution.kind === "matched") {
+              teamId = resolution.teamId;
               teamCache.set(teamKey, teamId);
-              if (t.created) teamsCreated++;
+            } else if (resolution.kind === "create") {
+              const { data: inserted, error: cErr } = await supabaseAdmin
+                .from("teams")
+                .insert({
+                  club_id: data.clubId,
+                  name: r.equipe!,
+                  sport: r.sport!,
+                  age_group: r.categorie!,
+                  season: r.saison,
+                  championship: r.genre,
+                })
+                .select("id")
+                .single();
+              if (cErr) throw new Error(`Création équipe ${r.equipe}: ${cErr.message}`);
+              teamId = inserted.id;
+              teamsByNorm.set(normTeamKey(r.equipe!, r.sport!, r.categorie!), teamId);
+              teamCache.set(teamKey, teamId);
+              teamsCreated++;
+            } else {
+              throw new Error(resolution.message);
             }
 
             const email = r.email!.toLowerCase();
