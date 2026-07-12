@@ -147,7 +147,33 @@ const PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 const STATUSES = ["open", "in_progress", "waiting_user", "resolved", "closed"] as const;
 
 const APP_BASE_URL = "https://www.clubero.app";
+const SUPPORT_FROM_NAME = "Support Clubero";
 const shortId = (id: string) => id.slice(0, 6).toUpperCase();
+
+async function logSupportAudit(entry: {
+  ticket_id: string;
+  actor_user_id: string | null;
+  actor_role: "user" | "staff" | "system";
+  action: "status_changed" | "priority_changed" | "assigned" | "reply" | "internal_note" | "created";
+  from_value?: string | null;
+  to_value?: string | null;
+  meta?: Record<string, unknown> | null;
+}) {
+  try {
+    await supabaseAdmin.from("support_ticket_audit").insert({
+      ticket_id: entry.ticket_id,
+      actor_user_id: entry.actor_user_id,
+      actor_role: entry.actor_role,
+      action: entry.action,
+      from_value: entry.from_value ?? null,
+      to_value: entry.to_value ?? null,
+      meta: entry.meta ?? null,
+    });
+  } catch (e) {
+    console.error("[support] audit log failed", e);
+  }
+}
+
 
 // ---------- Helpers ----------
 
