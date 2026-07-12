@@ -207,6 +207,7 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     z
       .object({
         clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         headers: z.array(z.string()).min(1).max(50),
         rawRows: z.array(z.record(z.string(), z.unknown())).min(1).max(500),
@@ -214,9 +215,17 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY non configurée");
+
+    let headers = data.headers;
+    let rawRows = data.rawRows;
+    if (data.teamId) {
+      const ctx = await injectTeamContext(data.teamId, data.clubId, headers, rawRows);
+      headers = ctx.headers;
+      rawRows = ctx.rawRows;
+    }
 
     const fields = getFields(data.type);
     const validKeys = new Set(fields.map((f) => f.key));
@@ -227,7 +236,6 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
-    // 1) Demande IA : seulement le mapping (petit, fiable)
     const mapping: Record<string, string> = {};
     try {
       const { object } = await generateObject({
@@ -238,10 +246,10 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
 Clés Clubero valides : ${fieldList}
 
 En-têtes source du fichier :
-${JSON.stringify(data.headers)}
+${JSON.stringify(headers)}
 
 Échantillon des 3 premières lignes (pour aider la désambiguïsation) :
-${JSON.stringify(data.rawRows.slice(0, 3))}
+${JSON.stringify(rawRows.slice(0, 3))}
 
 Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
         abortSignal: AbortSignal.timeout(30_000),
@@ -258,10 +266,16 @@ Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
       );
     }
 
-    // 2) Renomme les en-têtes du dataset selon le mapping IA, puis applique parseTemplate
-    //    (toute la normalisation/validation locale s'applique).
-    const renamedHeaders = data.headers.map((h) => mapping[h] ?? h);
-    const renamedRows = data.rawRows.map((row) => {
+    // In coach mode we already injected equipe/sport/categorie by their
+    // canonical keys — pass them through as-is so parseTemplate finds them.
+    if (data.teamId) {
+      for (const k of ["equipe", "sport", "categorie"]) {
+        if (headers.includes(k) && !mapping[k]) mapping[k] = k;
+      }
+    }
+
+    const renamedHeaders = headers.map((h) => mapping[h] ?? h);
+    const renamedRows = rawRows.map((row) => {
       const out: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(row)) {
         const target = mapping[k];
@@ -271,7 +285,6 @@ Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
     });
 
     const parsed = parseTemplate(data.type, renamedHeaders, renamedRows);
-    // Conserve le mapping IA dans le résultat final pour traçabilité
     parsed.mapping = mapping;
     return parsed as AnalysisResult;
   });
