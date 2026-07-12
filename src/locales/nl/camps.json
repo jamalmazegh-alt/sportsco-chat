@@ -240,7 +240,7 @@
     "backToCamp": "Back to camp",
     "formTitle": "Registration — {{title}}",
     "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
-    "consent": "I allow the club to use the submitted data to manage this camp registration (GDPR).",
+    "consent": "Ik machtig de club om de verzonden gegevens (identiteit van het kind, contact van de ouder, bijlagen) te gebruiken voor het beheer van deze stage-inschrijving, in overeenstemming met de AVG. De gegevens worden tot 12 maanden na het einde van de stage bewaard en daarna automatisch verwijderd.",
     "submit": "Submit registration",
     "confirmTitle": "Registration sent!",
     "confirmBody": "We received your file. The club will contact you shortly.",
@@ -277,7 +277,11 @@
       "closed": "Registration is closed.",
       "ageMismatch": "The child's age does not match the chosen category.",
       "generic": "An error occurred. Please try again.",
-      "network": "Network error. Check your connection."
-    }
+      "network": "Network error. Check your connection.",
+      "duplicate": "Dit kind is al ingeschreven voor deze stage. Raadpleeg de ontvangen e-mail om het dossier te volgen."
+    },
+    "full": "Vol — inschrijving mogelijk op wachtlijst",
+    "lastSpots": "Laatste plaatsen (nog {{count}})",
+    "registerWaitlistCta": "Op de wachtlijst"
   }
 }
