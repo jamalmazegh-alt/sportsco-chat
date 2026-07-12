@@ -138,24 +138,27 @@ function PlayerProfile() {
   async function onDeletePlayer() {
     if (!player) return;
     setDeleting(true);
-    const { error } = await supabase.rpc("soft_delete_entity", { _kind: "player", _id: player.id });
+    const { data: mode, error } = await supabase.rpc("delete_player_smart", { _id: player.id });
     setDeleting(false);
     if (error) {
       toast.error(error.message);
       return;
     }
+    const wasSoft = mode === "soft";
     toast(t("players.deleted"), {
-      action: {
-        label: t("common.undo", { defaultValue: "Undo" }),
-        onClick: async () => {
-          const { error: e2 } = await supabase.rpc("restore_entity", {
-            _kind: "player",
-            _id: player.id,
-          });
-          if (e2) toast.error(e2.message);
-          else qc.invalidateQueries({ queryKey: ["team-players"] });
-        },
-      },
+      action: wasSoft
+        ? {
+            label: t("common.undo", { defaultValue: "Undo" }),
+            onClick: async () => {
+              const { error: e2 } = await supabase.rpc("restore_entity", {
+                _kind: "player",
+                _id: player.id,
+              });
+              if (e2) toast.error(e2.message);
+              else qc.invalidateQueries({ queryKey: ["team-players"] });
+            },
+          }
+        : undefined,
     });
     qc.invalidateQueries({ queryKey: ["team-players"] });
     navigate({ to: "/teams" });
