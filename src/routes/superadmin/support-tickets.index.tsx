@@ -110,13 +110,26 @@ function AdminTicketsPage() {
           </SelectContent>
         </Select>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="sm:col-start-4">
+          <SelectTrigger>
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
             {CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>
                 {c === "all" ? "Toutes catégories" : c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={clubId} onValueChange={setClubId}>
+          <SelectTrigger className="sm:col-span-2">
+            <SelectValue placeholder="Club" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous clubs</SelectItem>
+            {clubOptions.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -128,6 +141,7 @@ function AdminTicketsPage() {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : !data || data.length === 0 ? (
+
         <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
           Aucun ticket.
         </div>
