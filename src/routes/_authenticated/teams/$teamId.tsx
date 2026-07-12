@@ -92,6 +92,8 @@ function TeamDetail() {
   const isAdmin = roles.includes("admin");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
+  const isAvailabilityRoute = pathname.endsWith("/availability");
+  const isSubRoute = isStatsRoute || isAvailabilityRoute;
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
