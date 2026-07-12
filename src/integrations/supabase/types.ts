@@ -6359,6 +6359,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      delete_player_smart: { Args: { _id: string }; Returns: string }
       delete_team_if_empty: { Args: { _id: string }; Returns: undefined }
       email_exists: { Args: { _email: string }; Returns: boolean }
       email_queue_dispatch: { Args: never; Returns: undefined }

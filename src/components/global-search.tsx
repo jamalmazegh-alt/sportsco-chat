@@ -44,7 +44,8 @@ export function GlobalSearch() {
         supabase
           .from("players")
           .select("id, first_name, last_name, jersey_number")
-          .eq("club_id", activeClubId!),
+          .eq("club_id", activeClubId!)
+          .is("deleted_at", null),
         (async () => {
           const { data: ts } = await supabase
             .from("teams")

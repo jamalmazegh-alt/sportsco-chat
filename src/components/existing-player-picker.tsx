@@ -49,6 +49,7 @@ export function ExistingPlayerPicker({
         .from("players")
         .select("id, first_name, last_name, jersey_number, photo_url")
         .eq("club_id", clubId)
+        .is("deleted_at", null)
         .order("last_name", { ascending: true });
       const candidates = (allPlayers ?? []).filter((p: any) => !excluded.has(p.id));
       if (candidates.length === 0) return [];
