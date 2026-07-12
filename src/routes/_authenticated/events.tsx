@@ -465,38 +465,18 @@ function EventsPage() {
               })()}
           </div>
           {(() => {
+            if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
             if (!myC) return null;
-            const label =
-              myC.status === "pending"
-                ? t("dashboard.actionRequired", { defaultValue: "Action requise" })
-                : t("events.convokedBadge", { defaultValue: "Convoqué" });
-            const isPending = myC.status === "pending";
+            const s = myC.status;
+            const bandStatus: "pending" | "present" | "absent" | null =
+              s === "pending" || s === "present" || s === "absent" ? s : null;
+            if (!bandStatus) return null;
             return (
-              <div
-                className="relative shrink-0 flex flex-col items-center justify-center"
-                title={`${label} · ${myC.playerName}`}
-              >
-                <div
-                  className={cn(
-                    "relative flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-yellow-100/60 bg-gradient-to-br from-yellow-300 via-amber-300 to-amber-500 px-2.5 py-2 shadow-lg shadow-amber-500/25",
-                    isPending && "ring-2 ring-amber-200/60",
-                  )}
-                >
-                  {isPending && (
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="absolute inline-flex h-full w-full rounded-full bg-amber-100 opacity-90 animate-ping" />
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
-                    </span>
-                  )}
-                  <div className="flex items-center justify-center h-7 w-7 rounded-full bg-white/20 backdrop-blur-sm">
-                    <BellRing className="h-3.5 w-3.5 text-white drop-shadow-sm" />
-                  </div>
-                  <span className="text-[9px] font-black uppercase tracking-wider leading-tight text-center text-white drop-shadow-sm max-w-[52px]">
-                    {label}
-                  </span>
-                </div>
-              </div>
+              <ConvocationBand
+                status={bandStatus}
+                title={`${bandStatus} · ${myC.playerName}`}
+              />
             );
           })()}
         </Link>
