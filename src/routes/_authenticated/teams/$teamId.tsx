@@ -92,6 +92,8 @@ function TeamDetail() {
   const isAdmin = roles.includes("admin");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
+  const isAvailabilityRoute = pathname.endsWith("/availability");
+  const isSubRoute = isStatsRoute || isAvailabilityRoute;
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
@@ -862,7 +864,7 @@ function TeamDetail() {
     toast.success(t("teams.addPlayer"));
   }
 
-  if (isStatsRoute) return <Outlet />;
+  if (isSubRoute) return <Outlet />;
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
