@@ -272,6 +272,16 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       attachment_paths: data.attachment_paths ?? [],
     });
 
+    // Audit: ticket created
+    await logSupportAudit({
+      ticket_id: ticket.id,
+      actor_user_id: userId,
+      actor_role: "user",
+      action: "created",
+      to_value: ticket.subject,
+    });
+
+
     // Notify superadmins in-app
     await notifySuperAdmins({
       title: `Nouveau ticket #${shortId(ticket.id)}`,
