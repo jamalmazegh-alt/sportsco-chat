@@ -39,7 +39,6 @@ export const Route = createFileRoute("/_authenticated/teams/$teamId/availability
   component: TeamAvailabilityCalendar,
   errorComponent: ErrorBoundary,
 
-
   notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
 });
 
