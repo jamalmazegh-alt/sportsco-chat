@@ -28,6 +28,7 @@ import {
   type PaymentStatus,
   type DossierStatus,
 } from "@/lib/camp-registrations.functions";
+import { CampRegistrationDetailSheet } from "@/components/camps/camp-registration-detail-sheet";
 
 const REGISTRATION_STATUSES: RegistrationStatus[] = [
   "pending",
