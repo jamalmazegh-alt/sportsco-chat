@@ -93,7 +93,7 @@ function XIcon({ className }: { className?: string }) {
 
 const SOURCE_META: Record<
   Exclude<PostSource, "clubero">,
-  { label: string; cls: string; icon: React.ComponentType<{ className?: string }> }
+  { label: string; cls: string; icon: ComponentType<{ className?: string }> }
 > = {
   instagram: {
     label: "Instagram",
