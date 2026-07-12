@@ -337,6 +337,8 @@ export interface RegistrationDetail {
   /** aggregated stats to help the UI decide capacity */
   stats: CampRegistrationStats;
   viewer_role: "admin" | "dirigeant" | "coach";
+  camp_price: number;
+  camp_currency: string;
 }
 
 async function getViewerClubRole(
@@ -460,6 +462,8 @@ export const getCampRegistrationDetail = createServerFn({ method: "GET" })
         remaining: 0,
       }) as CampRegistrationStats,
       viewer_role: viewerRole,
+      camp_price: Number(reg.club_camps?.price ?? 0),
+      camp_currency: (reg.club_camps?.currency as string) ?? "EUR",
     };
   });
 
@@ -556,6 +560,57 @@ export const setCampRegistrationStatus = createServerFn({ method: "POST" })
         registration_status: (updated?.registration_status ?? next) as RegistrationStatus,
         reserved_until: (updated?.reserved_until as string | null) ?? null,
         rejection_reason: (updated?.rejection_reason as string | null) ?? null,
+      };
+    },
+  );
+
+// ---------------------------------------------------------------------------
+// setCampRegistrationPayment — mark as paid / pending / refunded (manuel)
+// ---------------------------------------------------------------------------
+
+const SetPaymentInput = z.object({
+  registrationId: z.string().uuid(),
+  status: z.enum(["not_required", "pending", "declared", "paid", "partial", "refunded"]),
+  amount: z.number().min(0).optional(),
+});
+
+export const setCampRegistrationPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SetPaymentInput.parse(input))
+  .handler(
+    async ({ data, context }): Promise<{ payment_status: PaymentStatus; amount_paid: number }> => {
+      const reg = await loadRegistrationAndClub(data.registrationId);
+      const clubId = reg.club_camps.club_id as string;
+      await assertClubRole({
+        supabase: context.supabase,
+        userId: context.userId,
+        clubId,
+        allowedRoles: MANAGER_ROLES,
+      });
+
+      const campPrice = Number(reg.club_camps?.price ?? 0);
+      const patch: any = {
+        payment_status: data.status,
+        updated_at: new Date().toISOString(),
+      };
+      if (data.amount !== undefined) {
+        patch.amount_paid = data.amount;
+      } else if (data.status === "paid") {
+        patch.amount_paid = campPrice;
+      } else if (data.status === "pending" || data.status === "not_required") {
+        patch.amount_paid = 0;
+      }
+
+      const { data: updated, error } = await supabaseAdmin
+        .from("club_camp_registrations")
+        .update(patch)
+        .eq("id", data.registrationId)
+        .select("payment_status, amount_paid")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return {
+        payment_status: (updated?.payment_status ?? data.status) as PaymentStatus,
+        amount_paid: Number(updated?.amount_paid ?? 0),
       };
     },
   );

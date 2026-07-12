@@ -49,11 +49,13 @@ import {
 import {
   getCampRegistrationDetail,
   setCampRegistrationStatus,
+  setCampRegistrationPayment,
   reviewCampRegistrationDocument,
   getRegistrationDocumentSignedUrl,
   type RegistrationDetail,
   type RegistrationDocumentDetail,
   type RegistrationStatus,
+  type PaymentStatus,
 } from "@/lib/camp-registrations.functions";
 
 interface Props {
@@ -69,6 +71,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 
   const detailFn = useServerFn(getCampRegistrationDetail);
   const setStatusFn = useServerFn(setCampRegistrationStatus);
+  const setPaymentFn = useServerFn(setCampRegistrationPayment);
   const reviewDocFn = useServerFn(reviewCampRegistrationDocument);
   const signedUrlFn = useServerFn(getRegistrationDocumentSignedUrl);
 
@@ -164,6 +167,18 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
     },
   });
 
+  const paymentMut = useMutation({
+    mutationFn: (input: { status: PaymentStatus; amount?: number }) =>
+      setPaymentFn({ data: { registrationId: registrationId!, ...input } }),
+    onSuccess: () => {
+      toast.success(
+        t("registrations.detail.paymentUpdated", { defaultValue: "Paiement mis à jour" }),
+      );
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   async function openDoc(doc: RegistrationDocumentDetail) {
     if (!doc.viewer_can_view) return;
     try {
@@ -233,6 +248,16 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
               />
 
               <Separator />
+
+              <PaymentSection
+                detail={detail}
+                t={t}
+                pending={paymentMut.isPending}
+                onSet={(status, amount) => paymentMut.mutate({ status, amount })}
+              />
+
+              <Separator />
+
 
               <StatusActions
                 detail={detail}
@@ -760,3 +785,110 @@ function DocStatusBadge({
     </Badge>
   );
 }
+
+function PaymentSection({
+  detail,
+  t,
+  pending,
+  onSet,
+}: {
+  detail: RegistrationDetail;
+  t: any;
+  pending: boolean;
+  onSet: (status: PaymentStatus, amount?: number) => void;
+}) {
+  const price = detail.camp_price ?? 0;
+  const currency = detail.camp_currency ?? "EUR";
+  const status = detail.payment_status;
+  const isPaid = status === "paid";
+  const notRequired = status === "not_required" || price <= 0;
+
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">
+          {t("registrations.detail.paymentSection", { defaultValue: "Paiement" })}
+        </h3>
+        <PaymentPill status={status} t={t} />
+      </div>
+      <div className="text-sm text-muted-foreground">
+        {notRequired ? (
+          t("registrations.detail.paymentNotRequired", {
+            defaultValue: "Aucun paiement requis pour ce stage.",
+          })
+        ) : (
+          <>
+            {t("registrations.detail.paymentPrice", {
+              defaultValue: "Prix du stage : {{price}} {{currency}}",
+              price: price.toFixed(2),
+              currency,
+            })}
+            {detail.amount_paid > 0 && (
+              <span className="ml-2">
+                ·{" "}
+                {t("registrations.detail.paymentReceived", {
+                  defaultValue: "Reçu : {{amount}} {{currency}}",
+                  amount: detail.amount_paid.toFixed(2),
+                  currency,
+                })}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+      {!notRequired && (
+        <div className="flex flex-wrap gap-2">
+          {!isPaid && (
+            <Button
+              size="sm"
+              disabled={pending}
+              onClick={() => onSet("paid", price)}
+            >
+              {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+              {t("registrations.detail.markPaid", { defaultValue: "Marquer comme payé" })}
+            </Button>
+          )}
+          {isPaid && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={pending}
+              onClick={() => onSet("pending", 0)}
+            >
+              {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
+              {t("registrations.detail.markUnpaid", { defaultValue: "Marquer non payé" })}
+            </Button>
+          )}
+          {isPaid && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={pending}
+              onClick={() => onSet("refunded")}
+            >
+              {t("registrations.detail.markRefunded", { defaultValue: "Marquer remboursé" })}
+            </Button>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function PaymentPill({ status, t }: { status: PaymentStatus; t: any }) {
+  const map: Record<PaymentStatus, string> = {
+    not_required: "bg-slate-500/10 text-slate-700 border-slate-500/30",
+    pending: "bg-amber-500/10 text-amber-800 border-amber-500/30",
+    declared: "bg-blue-500/10 text-blue-700 border-blue-500/30",
+    paid: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+    partial: "bg-amber-500/10 text-amber-800 border-amber-500/30",
+    refunded: "bg-purple-500/10 text-purple-700 border-purple-500/30",
+  };
+  return (
+    <Badge variant="outline" className={map[status]}>
+      {t(`registrations.payment.${status}`, { defaultValue: status })}
+    </Badge>
+  );
+}
+
