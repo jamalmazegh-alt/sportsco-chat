@@ -28,6 +28,7 @@ import {
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { ConvocationBand } from "@/components/convocation-band";
+import { ConvocationResponseBadge, type ConvocationResponse } from "@/components/convocation-response-badge";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
 
