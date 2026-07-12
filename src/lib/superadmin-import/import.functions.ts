@@ -626,11 +626,20 @@ export const runImport = createServerFn({ method: "POST" })
               throw new Error("date de naissance requise");
             }
 
-            // Resolve team: fixed team (coach mode), caller override, or per-row lookup.
+            // Resolve team. Explicit contract:
+            //  1) fixed team (coach dialog, teamId prop)
+            //  2) caller override (UI dropdown chose an existing team)
+            //  3) normalized match against club roster (dedupe casse/accents)
+            //  4) explicit "create" opt-in via teamsToCreate — otherwise ERROR.
+            // Implicit creation is forbidden here — a silent create was the
+            // exact bug we're closing.
             let teamId: string;
             if (fixedTeam) {
               teamId = fixedTeam.id;
             } else {
+              if (!r.equipe || !r.sport || !r.categorie) {
+                throw new Error("équipe/sport/catégorie manquants");
+              }
               const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
               const override = data.teamOverrides?.[teamKey];
               const cached = teamCache.get(teamKey);
@@ -640,17 +649,34 @@ export const runImport = createServerFn({ method: "POST" })
               } else if (cached) {
                 teamId = cached;
               } else {
-                const t = await findOrCreateTeam(
-                  data.clubId,
-                  r.equipe!,
-                  r.sport!,
-                  r.categorie!,
-                  r.genre,
-                  r.saison,
-                );
-                teamId = t.id;
-                teamCache.set(teamKey, teamId);
-                if (t.created) teamsCreated++;
+                const normKey = normTeamKey(r.equipe, r.sport, r.categorie);
+                const matched = teamsByNorm.get(normKey);
+                if (matched) {
+                  teamId = matched;
+                  teamCache.set(teamKey, teamId);
+                } else if (toCreate.has(teamKey)) {
+                  const { data: inserted, error: cErr } = await supabaseAdmin
+                    .from("teams")
+                    .insert({
+                      club_id: data.clubId,
+                      name: r.equipe,
+                      sport: r.sport,
+                      age_group: r.categorie,
+                      season: r.saison,
+                      championship: r.genre,
+                    })
+                    .select("id")
+                    .single();
+                  if (cErr) throw new Error(`Création équipe ${r.equipe}: ${cErr.message}`);
+                  teamId = inserted.id;
+                  teamsByNorm.set(normKey, teamId);
+                  teamCache.set(teamKey, teamId);
+                  teamsCreated++;
+                } else {
+                  throw new Error(
+                    `Équipe non résolue: ${r.equipe} / ${r.sport} / ${r.categorie} — choisir une équipe existante ou cocher "créer".`,
+                  );
+                }
               }
             }
 
