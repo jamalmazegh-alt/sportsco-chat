@@ -516,6 +516,22 @@ export const runImport = createServerFn({ method: "POST" })
       fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
     }
 
+    // Validate teamOverrides — each mapped team_id must belong to clubId.
+    if (data.teamOverrides && Object.keys(data.teamOverrides).length > 0) {
+      const ids = Array.from(new Set(Object.values(data.teamOverrides)));
+      const { data: teamsCheck, error: tcErr } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id")
+        .in("id", ids);
+      if (tcErr) throw new Error(tcErr.message);
+      const okIds = new Set(
+        (teamsCheck ?? []).filter((t) => t.club_id === data.clubId).map((t) => t.id),
+      );
+      for (const id of ids) {
+        if (!okIds.has(id)) throw new Response("Forbidden", { status: 403 });
+      }
+    }
+
     // Hard limits
     const maxRows = data.type === "planning" ? PLANNING_MAX_ROWS : ENTITY_MAX_ROWS;
     if (data.rows.length > maxRows) {
