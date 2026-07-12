@@ -707,18 +707,181 @@ function ImportPage() {
               Envoyer les invitations par email après import
             </label>
           )}
-          <Button
-            onClick={confirmImport}
-            disabled={loading || analysis.summary.to_fix > 0}
-            className="w-full"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
-            Confirmer et importer
-          </Button>
+          {/* Players: two-phase preview → confirm. Other types: single confirm. */}
+          {type === "players" && !preview && (
+            <Button
+              onClick={runPreview}
+              disabled={loading || analysis.summary.to_fix > 0 || analysis.summary.valid === 0}
+              className="w-full"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+              Prévisualiser l'import
+            </Button>
+          )}
+
+          {type === "players" && preview && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-green-600">{preview.summary.new}</div>
+                  <div className="text-muted-foreground">nouveaux</div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-blue-600">{preview.summary.update}</div>
+                  <div className="text-muted-foreground">à mettre à jour</div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-amber-600">{preview.summary.restore}</div>
+                  <div className="text-muted-foreground">à réactiver</div>
+                </div>
+              </div>
+
+              {preview.teamResolutions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Résolution des équipes</div>
+                  <div className="rounded-md border divide-y">
+                    {preview.teamResolutions.map((tr) => (
+                      <div
+                        key={tr.key}
+                        className="flex items-center gap-2 p-2 text-xs flex-wrap"
+                      >
+                        <div className="flex-1 min-w-[180px]">
+                          <div className="font-medium">{tr.name}</div>
+                          <div className="text-muted-foreground">
+                            {tr.sport} · {tr.category}
+                          </div>
+                        </div>
+                        <select
+                          className="border rounded px-2 py-1 bg-background text-xs"
+                          value={teamChoices[tr.key] ?? ""}
+                          onChange={(e) =>
+                            setTeamChoices((prev) => ({ ...prev, [tr.key]: e.target.value }))
+                          }
+                        >
+                          <option value="">➕ Créer une nouvelle équipe</option>
+                          {tr.existingTeams.map((et) => (
+                            <option key={et.id} value={et.id}>
+                              {et.name} ({et.sport ?? "?"} · {et.age_group ?? "?"})
+                              {et.id === tr.suggestedTeamId ? " ✓ suggéré" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {preview.rowPreviews.some((r) => r.diffs.length > 0) && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Différences détectées</div>
+                  <div className="rounded-md border border-blue-200 bg-blue-50 p-2 text-xs text-blue-900">
+                    Cochez uniquement les champs à écraser. Par défaut, aucun écrasement — seuls les
+                    champs vides sont complétés.
+                  </div>
+                  <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                    {preview.rowPreviews
+                      .filter((r) => r.diffs.length > 0)
+                      .map((row) => (
+                        <div key={row.index} className="rounded-md border p-2 space-y-1 bg-card">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="font-medium">
+                              {row.firstName} {row.lastName}
+                              {row.birthDate && (
+                                <span className="text-muted-foreground ml-1">
+                                  · {row.birthDate}
+                                </span>
+                              )}
+                            </div>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] uppercase ${
+                                row.action === "restore"
+                                  ? "bg-amber-100 text-amber-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {row.action}
+                            </span>
+                          </div>
+                          <table className="w-full text-xs">
+                            <tbody>
+                              {row.diffs.map((d) => {
+                                const checked =
+                                  fieldOverrides[row.index]?.has(d.field) ?? false;
+                                return (
+                                  <tr key={d.field} className="border-t">
+                                    <td className="py-1 font-medium w-28">
+                                      {FIELD_LABEL_FR[d.field] ?? d.field}
+                                    </td>
+                                    <td className="py-1 text-muted-foreground">
+                                      {d.current ?? <span className="italic">(vide)</span>}
+                                    </td>
+                                    <td className="py-1">→ {d.incoming ?? "—"}</td>
+                                    <td className="py-1 text-right w-20">
+                                      {d.overwritable ? (
+                                        <Checkbox
+                                          checked={checked}
+                                          onCheckedChange={(v) =>
+                                            toggleOverride(row.index, d.field, !!v)
+                                          }
+                                        />
+                                      ) : (
+                                        <span className="text-[10px] text-green-700">auto</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPreview(null);
+                    setFieldOverrides({});
+                    setTeamChoices({});
+                  }}
+                  disabled={loading}
+                >
+                  Retour
+                </Button>
+                <Button onClick={confirmImport} disabled={loading} className="flex-1">
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
+                  Confirmer et importer
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {type !== "players" && (
+            <Button
+              onClick={confirmImport}
+              disabled={loading || analysis.summary.to_fix > 0}
+              className="w-full"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              Confirmer et importer
+            </Button>
+          )}
         </div>
       )}
 
