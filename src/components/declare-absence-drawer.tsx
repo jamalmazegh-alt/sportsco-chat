@@ -53,8 +53,10 @@ const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  /** Pre-selected player; if omitted, derived from current user (player or parent). */
+  /** Pre-selected player; if omitted, derived from current user (player or parent) or from teamId. */
   playerId?: string;
+  /** When provided, the candidate list = all players of this team (coach/admin flow). */
+  teamId?: string;
   onCreated?: () => void;
 }
 
@@ -64,6 +66,7 @@ export function DeclareAbsenceDrawer({
   open,
   onOpenChange,
   playerId: initialPlayerId,
+  teamId,
   onCreated,
 }: Props) {
   const { t } = useTranslation();
