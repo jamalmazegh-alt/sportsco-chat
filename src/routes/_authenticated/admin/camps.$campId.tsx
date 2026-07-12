@@ -677,9 +677,7 @@ function PublicCampLinkCard({
   };
   return (
     <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm space-y-2">
-      <div className="font-medium">
-        {t("lifecycle.publicUrl", { defaultValue: "Lien public" })}
-      </div>
+      <div className="font-medium">{t("lifecycle.publicUrl", { defaultValue: "Lien public" })}</div>
       <div className="flex items-center gap-2">
         <Input value={url} readOnly className="text-xs h-8" />
         <Button
