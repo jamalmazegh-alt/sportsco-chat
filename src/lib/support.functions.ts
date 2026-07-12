@@ -315,6 +315,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       await enqueueTransactionalEmailServer({
         templateName: "support-ticket-created",
         recipientEmail: email,
+        fromName: SUPPORT_FROM_NAME,
         templateData: {
           name: profile?.first_name ?? profile?.full_name ?? null,
           subject: ticket.subject,
@@ -325,6 +326,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
         },
         idempotencyKey: `support-created-user-${ticket.id}`,
       }).catch((e) => console.error("[support] user confirmation email failed", e));
+
     }
 
     return { id: ticket.id };
