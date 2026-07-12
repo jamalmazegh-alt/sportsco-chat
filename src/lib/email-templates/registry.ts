@@ -49,6 +49,7 @@ import { template as waitlistConfirmationTemplate } from "./waitlist-confirmatio
 import { template as waitlistAdminNotificationTemplate } from "./waitlist-admin-notification";
 import { template as campRegistrationReceivedTemplate } from "./camp-registration-received";
 import { template as campNewRegistrationTemplate } from "./camp-new-registration";
+import { template as campDocumentRejectedTemplate } from "./camp-document-rejected";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
@@ -83,4 +84,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "waitlist-admin-notification": waitlistAdminNotificationTemplate,
   "camp-registration-received": campRegistrationReceivedTemplate,
   "camp-new-registration": campNewRegistrationTemplate,
+  "camp-document-rejected": campDocumentRejectedTemplate,
 };
