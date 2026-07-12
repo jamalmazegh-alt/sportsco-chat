@@ -202,46 +202,33 @@ function isMinor(birth: string | null): boolean {
   return age < 18;
 }
 
+// Must mirror public.normalize_name(text) in SQL:
+// unaccent -> lower -> strip everything non alphanumeric.
 function normalizeKey(value: string | null | undefined): string {
   return (value ?? "")
-    .trim()
-    .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 }
 
 function normalizePhone(value: string | null | undefined): string {
   return (value ?? "").replace(/[^+\d]/g, "");
 }
 
-function sameName(a: Pick<ExistingPlayer, "first_name" | "last_name">, row: ParsedRow): boolean {
-  return (
-    normalizeKey(a.first_name) === normalizeKey(row.first_name) &&
-    normalizeKey(a.last_name) === normalizeKey(row.last_name)
-  );
+// Business identity key: first + last (normalized) + birth_date (ISO).
+function identityKey(
+  first: string | null | undefined,
+  last: string | null | undefined,
+  birth: string | null | undefined,
+): string | null {
+  if (!birth) return null;
+  const f = normalizeKey(first);
+  const l = normalizeKey(last);
+  if (!f || !l) return null;
+  return `${f}|${l}|${birth}`;
 }
 
-function findMatchingPlayer(roster: ExistingPlayer[], row: ParsedRow): ExistingPlayer | null {
-  const license = normalizeKey(row.license_number);
-  if (license) {
-    const byLicense = roster.find((p) => normalizeKey(p.license_number) === license);
-    if (byLicense) return byLicense;
-  }
-
-  const email = normalizeKey(row.email);
-  if (email) {
-    const byEmail = roster.find((p) => normalizeKey(p.email) === email);
-    if (byEmail) return byEmail;
-  }
-
-  const phone = normalizePhone(row.phone);
-  if (phone) {
-    const byPhone = roster.find((p) => normalizePhone(p.phone) === phone);
-    if (byPhone) return byPhone;
-  }
-
-  return roster.find((p) => sameName(p, row)) ?? null;
-}
 
 function playerPatch(existing: ExistingPlayer, row: ParsedRow): PlayerPatch {
   const patch: PlayerPatch = {};
