@@ -15,6 +15,7 @@ import {
   XCircle,
   Trash2,
   Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
