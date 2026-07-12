@@ -147,8 +147,42 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
           });
           if (insErr) {
             console.error("Doc row insert failed", insErr);
-            return Response.json({ error: "db_failed" }, { status: 500 });
+        }
+
+        // Notify camp organizer that a document was (re)submitted and is pending review
+        try {
+          const wasRejected = existing?.review_status === "rejected";
+          const { data: reg } = await supabase
+            .from("club_camp_registrations")
+            .select(
+              "participant_first_name, participant_last_name, camp_id, club_camps:camp_id(title, created_by, club:clubs(name))",
+            )
+            .eq("id", registrationId)
+            .maybeSingle();
+          const camp = (reg as any)?.club_camps;
+          const createdBy = camp?.created_by;
+          if (createdBy) {
+            const { data: organizer } = await supabase.auth.admin.getUserById(createdBy);
+            const organizerEmail = organizer?.user?.email;
+            if (organizerEmail) {
+              const origin = new URL(request.url).origin;
+              await enqueueTransactionalEmailServer({
+                templateName: "camp-document-resubmitted",
+                recipientEmail: organizerEmail,
+                templateData: {
+                  campTitle: camp?.title ?? "",
+                  clubName: camp?.club?.name,
+                  participantName: `${(reg as any)?.participant_first_name ?? ""} ${(reg as any)?.participant_last_name ?? ""}`.trim(),
+                  documentTitle: title,
+                  wasRejected,
+                  manageUrl: `${origin}/admin/stages/${campId}`,
+                },
+                idempotencyKey: `camp-doc-resub:${registrationId}:${parsed.data.required_document_id}:${Date.now()}`.slice(0, 80),
+              });
+            }
           }
+        } catch (e) {
+          console.error("Organizer resubmit notify failed", e);
         }
 
         return Response.json({ ok: true });
