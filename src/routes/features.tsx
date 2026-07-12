@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { CheckCircle2, ArrowRight, Megaphone, Clock, Trophy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import {
@@ -176,6 +177,74 @@ function FutureFeaturesSection() {
   );
 }
 
+
+function ModulesGridSection() {
+  const { t } = useTranslation("marketing");
+  const moduleKeys = [
+    "coordination",
+    "effectif",
+    "tournois",
+    "stages",
+    "communication",
+    "admin",
+    "paiements",
+    "ia",
+    "soon",
+  ] as const;
+
+  return (
+    <section className="border-b border-border/60 bg-muted/10">
+      <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div className="space-y-16">
+          {moduleKeys.map((key) => {
+            const mod = t(`features.modules.${key}`, { returnObjects: true }) as {
+              title: string;
+              subtitle: string;
+              badge?: string;
+              items: { title: string; body: string; badge?: string }[];
+            };
+            return (
+              <div key={key} id={`module-${key}`} className="scroll-mt-20">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                    {mod.title}
+                  </h2>
+                  {mod.badge && (
+                    <Badge variant="secondary" className="uppercase tracking-wide">
+                      {mod.badge}
+                    </Badge>
+                  )}
+                </div>
+                <p className="mt-2 max-w-2xl text-muted-foreground">{mod.subtitle}</p>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {mod.items.map((item) => (
+                    <div
+                      key={item.title}
+                      className="rounded-2xl border border-border bg-card p-5"
+                    >
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display text-base font-bold">{item.title}</h3>
+                        {item.badge && (
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {item.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeaturesPage() {
   const { t } = useTranslation("marketing");
   const audiences = t("features.audiences", { returnObjects: true }) as {
@@ -199,6 +268,9 @@ function FeaturesPage() {
         </div>
       </section>
 
+      <Anchor id="modules">
+        <ModulesGridSection />
+      </Anchor>
       <Anchor id="tournaments">
         <TournamentsSection />
       </Anchor>

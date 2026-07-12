@@ -1,0 +1,275 @@
+/**
+ * Single source of truth for Clubero feature knowledge, injected into every
+ * AI system prompt (marketing chat, member chat, tournament assistant,
+ * build-clubero wizard). Keeps gated V2 features ("bientôt disponible")
+ * from ever being promised as active by an assistant.
+ *
+ * Canonical feature list: `docs/beta-v1/feature-inventory.md` (sections 1 & 5).
+ *
+ * Pure module — no Supabase / server imports — safe to import anywhere.
+ */
+
+export type FeatureAudience = "member" | "visitor" | "tournament" | "wizard";
+
+export interface FeatureFlags {
+  payments_v2?: boolean;
+  fundraising_v2?: boolean;
+  social_network_v2?: boolean;
+  public_player_profiles?: boolean;
+}
+
+export interface BuildFeatureContextOptions {
+  lang?: "fr" | "en";
+  audience: FeatureAudience;
+  flags?: FeatureFlags;
+}
+
+export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source unique)
+
+### Coordination & événements
+- Calendrier d'événements (match, entraînement, tournoi, réunion) : planifie la vie de l'équipe.
+- Convocations avec réponse présent/absent/incertain + motif : fin des allers-retours WhatsApp.
+- Partage de convocation sur WhatsApp (mode hybride) : coexiste avec le groupe WhatsApp habituel.
+- Relances de convocation automatiques : réduit les non-réponses.
+- Déclaration d'absence par un parent → notif automatique du coach : évite l'oubli d'un joueur.
+- Disponibilités des joueurs par équipe : facilite la préparation des compositions.
+- Chat temps réel par événement + inbox globale : communication centralisée.
+- Feuille de match / compositions : prépare le jour J.
+- Feedback / suivi joueur par le coach : historique de progression.
+- Discipline club (cartons, suspensions) : suivi sportif et réglementaire.
+- Défis et tests physiques : gamification et suivi de la condition physique.
+- Statistiques (présence, résultats) : pilotage de la saison.
+- Covoiturage par événement : logistique simplifiée pour les parents.
+
+### Effectif & joueurs
+- Fiche joueur (avatar, historique, feedback, sanctions) : carnet de vie sportif.
+- Parents et tuteurs légaux liés au joueur : autorité parentale, notifications famille.
+- Achievements et timeline joueur : journal sportif.
+- Import CSV de joueurs (club et superadmin) : onboarding en masse.
+- Profils publics joueur/coach et listing /players : vitrine publique du joueur/coach.
+- Follows inter-clubs (réseau sportif ouvert) : réseau sportif interclubs ouvert.
+
+### Tournois
+- Formats multiples : poules + finales, élimination directe, double élimination, système
+  Suisse, flights (plusieurs niveaux/trophées) — couvre toutes les compétitions amateurs.
+- Inscriptions publiques en ligne + import roster CSV : self-service pour l'organisateur.
+- Centre de contrôle Jour J (scores live, bracket, mode TV) : pilotage terrain en temps réel.
+- Règlement PDF + page publique partageable : communication du tournoi.
+- Co-organisateurs et arbitres invités : délégation de la gestion.
+- Organisation libre sans club (club "personnel") : un particulier peut créer un tournoi.
+- Paiement d'inscription tournoi et packs payants : disponible (fonctionnalité V2 débloquée).
+- Assistant IA tournoi (recommandation de format + questions/réponses) : aide à la config.
+
+### Stages (camps)
+- Création et gestion de stages club : organisation simplifiée.
+- Inscriptions publiques + upload de justificatifs : self-service pour les familles.
+- Suivi de dossier par famille via token (sans compte requis) : accès simple et sécurisé.
+- Export CSV des inscriptions : facilite comptabilité et listings.
+- Documents requis + purge automatique : conformité RGPD des justificatifs.
+
+### Paiements
+- Cotisations, obligations, reçus, relances de paiement : gestion des cotisations de saison.
+- Encaissement direct du club (Stripe Connect) : encaissement des paiements directement au club.
+- Collectes et cagnottes (fundraising) : financement de projets d'équipe.
+- Exemptions de facturation pour cas particuliers : disponible côté administration.
+- Facturation de l'abonnement club (SaaS Clubero → club) : disponible.
+- Paiement d'inscription tournoi : disponible (voir section Tournois, débloqué en V2).
+
+### Communication
+- Mur du club (posts épinglés, @mentions, lu/non-lu, pièces jointes) : fil d'infos du club.
+- Ingestion des réseaux sociaux du club (Facebook) : reprend automatiquement les publications.
+- Notifications push web (PWA) par type d'événement : notifications natives sans app store.
+- Emails transactionnels (allowlist + rate limit) : convocations, invitations, tournois.
+- Partage WhatsApp des convocations : coexiste avec les habitudes existantes des familles.
+- Sponsors du club (logos + statistiques d'affichage) : valorisation des partenaires.
+
+### Administration & branding
+- Branding par club (couleur de thème, appliqué aux pages publiques) : identité visuelle.
+- Réglages granulaires : notifications, convocations, venues, sponsors, réseaux, rappels.
+- Gestion des utilisateurs et des rôles (rôles séparés par table dédiée) : sécurité fine.
+- Support intégré (tickets club, échange coach ↔ Clubero) : assistance suivie.
+- RGPD complet : export JSON, anonymisation, suppression de compte sur demande.
+- Multi-équipes et multi-catégories : gestion de plusieurs groupes en parallèle.
+- Gestion des lieux (venues) du club : terrains et salles centralisés.
+
+### Public (non authentifié)
+- Pages publiques de tournoi et mode TV (grand écran) : partage facile avec le public.
+- Pages publiques de stage, inscription et suivi de dossier par token : accès sans compte.
+- Profils publics joueur/coach : vitrine publique consultable sans compte.
+- Recovery link joueur et inscription joueur autonome : onboarding simplifié.
+- Invitation à un tournoi par lien dédié : intégration rapide des équipes invitées.
+
+### IA
+- Assistant chat membre in-app, connecté aux données du club selon les rôles : disponible.
+- Assistant chat marketing pour les visiteurs du site : disponible (c'est potentiellement moi).
+- Assistant tournoi (recommandation de format + questions/réponses) : disponible.
+- Assistant règles de tournoi (extraction depuis un document) : disponible.
+- Wizard IA « Construisons Clubero » (feedback conversationnel produit) : disponible.
+- Assistant de création de tournoi guidé (wizard IA) : disponible.
+
+### Superadmin & RGPD
+- Dashboard superadmin (clubs, utilisateurs, facturation, logs, support, imports) : interne.
+- Import de données club en masse : outil réservé au superadmin.
+- Flags de fonctionnalités V2 (source unique de vérité) : pilotage des mises en production.
+- Serveur MCP (Model Context Protocol) pour les tournois publics : expérimental, limité.
+- Vue Support à distance pour l'assistance : outil interne superadmin.
+`;
+
+export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source of truth)
+
+### Coordination & events
+- Event calendar (match, training, tournament, meeting): plans the whole team's life.
+- Attendance requests with present/absent/uncertain + reason: ends WhatsApp back-and-forth.
+- Share attendance requests on WhatsApp (hybrid mode): coexists with the usual group.
+- Automatic reminders for pending responses: reduces no-replies.
+- Parent-declared absence → automatic coach notification: prevents a missed player.
+- Player availabilities per team: makes lineup preparation easier.
+- Real-time chat per event + global inbox: centralised communication.
+- Match sheet / lineups: prepares match day.
+- Coach feedback / player follow-up: progression history.
+- Club discipline (cards, suspensions): sporting and regulatory tracking.
+- Physical challenges and tests: gamification and fitness tracking.
+- Statistics (attendance, results): season steering.
+- Event carpooling: simplified logistics for parents.
+
+### Roster & players
+- Player profile (avatar, history, feedback, sanctions): a sporting life record.
+- Linked parents and legal guardians: parental authority, family notifications.
+- Player achievements and timeline: sporting journal.
+- CSV player import (club and superadmin): bulk onboarding.
+- Public player/coach profiles and /players listing: public showcase for players/coaches.
+- Cross-club follows (open sports network): open cross-club sporting network.
+
+### Tournaments
+- Multiple formats: pools + finals, single elimination, double elimination, Swiss system,
+  flights (multiple divisions/trophies) — covers every amateur competition.
+- Public online registration + CSV roster import: self-service for organisers.
+- Match-day control centre (live scores, bracket, TV mode): real-time on-field control.
+- PDF rulebook + shareable public page: tournament communication.
+- Co-organisers and guest referees: delegated management.
+- Club-free organisation ("personal" club): anyone can create a tournament.
+- Tournament registration payments and paid packs: available (V2 feature unlocked).
+- Tournament AI assistant (format recommendation + Q&A): configuration help.
+
+### Camps
+- Camp creation and management: simplified club-run camps.
+- Public registration + supporting document upload: self-service for families.
+- Family follow-up via token (no account needed): simple, secure access.
+- CSV export of registrations: eases accounting and listings.
+- Required documents + automatic purge: GDPR compliance for documents.
+
+### Payments
+- Membership fees, dues, receipts, reminders: season membership fee management.
+- Direct club payouts (Stripe Connect): direct payouts to the club's bank account.
+- Fundraising campaigns and collections: funding for team projects.
+- Billing exemptions for special cases: available in administration.
+- Club subscription billing (Clubero → club): available.
+- Tournament registration payments: available (see Tournaments, unlocked in V2).
+
+### Communication
+- Club wall (pinned posts, @mentions, read receipts, attachments): club news feed.
+- Social media ingestion (Facebook): automatically pulls in club posts.
+- Web push notifications (PWA) per type: native notifications, no app store.
+- Transactional emails (allowlist + rate limit): attendance requests, invites, tournaments.
+- WhatsApp sharing of attendance requests: coexists with existing family habits.
+- Club sponsors (logos + display stats): partner visibility.
+
+### Administration & branding
+- Per-club branding (theme colour, applied to public pages): visual identity.
+- Granular settings: notifications, attendance, venues, sponsors, networks, reminders.
+- User and role management (roles in a dedicated table): fine-grained security.
+- Built-in support (club tickets, coach ↔ Clubero thread): tracked assistance.
+- Full GDPR: JSON export, anonymisation, account deletion on request.
+- Multi-team and multi-category management: several groups handled in parallel.
+- Club venue management: fields and rooms centralised.
+
+### Public (unauthenticated)
+- Public tournament pages and TV mode (big screen): easy sharing with the public.
+- Public camp pages, registration and token-based follow-up: no account needed.
+- Public player/coach profiles: public showcase accessible without an account.
+- Player recovery link and self-service player registration: simplified onboarding.
+- Tournament invite links: fast onboarding for invited teams.
+
+### AI
+- In-app member chat assistant, connected to club data per role: available.
+- Marketing chat assistant for site visitors: available (possibly me).
+- Tournament assistant (format recommendation + Q&A): available.
+- Tournament rules assistant (document extraction): available.
+- "Build Clubero" AI wizard (conversational product feedback): available.
+- Guided tournament creation wizard (AI): available.
+
+### Superadmin & compliance
+- Superadmin dashboard (clubs, users, billing, logs, support, imports): internal.
+- Bulk club data import: superadmin-only tool.
+- V2 feature flags (single source of truth): controls staged rollouts.
+- MCP server (Model Context Protocol) for public tournaments: experimental, limited.
+- Remote support view: internal superadmin tool.
+`;
+
+// One regex per gated flag, matching every bullet line describing that
+// feature in both the FR and EN base texts (multiline, global).
+const GATED_LINE_PATTERNS: Record<keyof FeatureFlags, RegExp> = {
+  payments_v2:
+    /^- (Cotisations, obligations.*|Encaissement direct.*|Membership fees.*|Direct club payouts.*)$/gm,
+  fundraising_v2: /^- (Collectes et cagnottes.*|Fundraising campaigns.*)$/gm,
+  social_network_v2: /^- (Follows inter-clubs.*|Cross-club follows.*)$/gm,
+  public_player_profiles:
+    /^- (Profils publics.*|Public player\/coach profiles.*)$/gm,
+};
+
+const RULES_VISITOR_FR = `### Règles transverses (visiteur)
+- N'invente jamais de tarif au-delà de ce qui figure sur le site vitrine (/pricing).
+- Oriente toujours vers /demo pour démarrer l'onboarding.
+- Le canal de retour produit est le wizard "Construisons Clubero" (donnez votre avis).
+- Ne présente jamais une fonctionnalité "bientôt disponible" comme active aujourd'hui.`;
+
+const RULES_MEMBER_FR = `### Règles transverses (membre)
+- Confirme toujours explicitement avant une action d'écriture (brouillon, relance, etc.).
+- Respecte les limites de débit (rate limit) : si atteinte, invite à réessayer plus tard.
+- Ne présente jamais une fonctionnalité "bientôt disponible" comme active aujourd'hui.`;
+
+const RULES_VISITOR_EN = `### Cross-cutting rules (visitor)
+- Never invent pricing beyond what the marketing site states (/pricing).
+- Always route users to /demo to start onboarding.
+- The feedback channel is the "Build Clubero" wizard (share your feedback).
+- Never present a "coming soon" feature as active today.`;
+
+const RULES_MEMBER_EN = `### Cross-cutting rules (member)
+- Always confirm explicitly before any write action (draft, reminder, etc.).
+- Respect rate limits: if hit, tell the user to try again later.
+- Never present a "coming soon" feature as active today.`;
+
+function applyGating(context: string, flags: Required<FeatureFlags>, lang: "fr" | "en"): string {
+  let out = context;
+  (Object.keys(flags) as Array<keyof FeatureFlags>).forEach((flag) => {
+    if (flags[flag]) return; // ON: leave the full section content as-is.
+    const pattern = GATED_LINE_PATTERNS[flag];
+    const soon = lang === "en" ? "Coming soon." : "Bientôt disponible.";
+    out = out.replace(pattern, (line) => {
+      const label = line.replace(/^- /, "").split(/[:：]/)[0];
+      return `- ${label}: ${soon}`;
+    });
+  });
+  return out;
+}
+
+export function buildFeatureContext(opts: BuildFeatureContextOptions): string {
+  const lang = opts.lang ?? "fr";
+  const flags: Required<FeatureFlags> = {
+    payments_v2: opts.flags?.payments_v2 ?? false,
+    fundraising_v2: opts.flags?.fundraising_v2 ?? false,
+    social_network_v2: opts.flags?.social_network_v2 ?? false,
+    public_player_profiles: opts.flags?.public_player_profiles ?? false,
+  };
+
+  const base = lang === "en" ? FEATURE_CONTEXT_EN : FEATURE_CONTEXT_FR;
+  let context = applyGating(base, flags, lang);
+
+  if (opts.audience === "visitor") {
+    context += `\n${lang === "en" ? RULES_VISITOR_EN : RULES_VISITOR_FR}\n`;
+  } else if (opts.audience === "member") {
+    context += `\n${lang === "en" ? RULES_MEMBER_EN : RULES_MEMBER_FR}\n`;
+  }
+
+  return context;
+}

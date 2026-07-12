@@ -395,7 +395,8 @@
       }
     },
     "tile_sponsors_t": "Sponsor e partner",
-    "tile_sponsors_b": "Banner sponsor rotante nell'app per ripagare il tuo abbonamento."
+    "tile_sponsors_b": "Banner sponsor rotante nell'app per ripagare il tuo abbonamento.",
+    "paymentsSoon": "Pagamenti del club (Stripe Connect, quote associative, raccolte fondi) — prossimamente disponibile."
   },
   "whatsapp": {
     "chip": "Comunicazione flessibile",
@@ -587,7 +588,8 @@
       "Onboarding dedicato",
       "Esportazione dati personalizzata",
       "SLA e formazione"
-    ]
+    ],
+    "paymentsSoonLine": "Pagamenti del club — prossimamente disponibile (Stripe Connect, HelloAsso, quote associative)."
   },
   "features": {
     "metaTitle": "Funzionalità — Clubero",
@@ -779,6 +781,280 @@
       "b3": "Live leaderboard with podium and 'New record' badge",
       "b4": "Custom challenges built by the coach in 30 seconds",
       "cta": "Explore challenges"
+    },
+    "modules": {
+      "coordination": {
+        "title": "Coordinamento ed eventi",
+        "subtitle": "Tutta la logistica della squadra, centralizzata.",
+        "items": [
+          {
+            "title": "Convocazioni",
+            "body": "Presente / assente / incerto con motivo, solleciti automatici."
+          },
+          {
+            "title": "Assenze genitore",
+            "body": "I genitori dichiarano un'assenza, l'allenatore viene subito notificato."
+          },
+          {
+            "title": "Disponibilità per squadra",
+            "body": "Ogni giocatore indica le sue disponibilità per facilitare le formazioni."
+          },
+          {
+            "title": "Chat per evento",
+            "body": "Discussione dedicata a ogni partita o allenamento, oltre alla casella di posta globale."
+          },
+          {
+            "title": "Foglio partita",
+            "body": "Formazione, sostituti e ruoli pronti prima del fischio d'inizio."
+          },
+          {
+            "title": "Disciplina club",
+            "body": "Cartellini, sospensioni e avvisi automatici durante le convocazioni."
+          },
+          {
+            "title": "Sfide e test fisici",
+            "body": "Monitoraggio della condizione fisica e classifica ludica dei giocatori."
+          },
+          {
+            "title": "Statistiche",
+            "body": "Presenze, risultati e tendenze per tutta la stagione."
+          },
+          {
+            "title": "Car pooling",
+            "body": "Organizza i viaggi per le partite direttamente dall'evento."
+          }
+        ]
+      },
+      "effectif": {
+        "title": "Effettivo e giocatori",
+        "subtitle": "Ogni giocatore ha il suo dossier completo.",
+        "items": [
+          {
+            "title": "Scheda giocatore",
+            "body": "Avatar, storico, feedback allenatore e sanzioni su un'unica scheda."
+          },
+          {
+            "title": "Importa CSV",
+            "body": "Importa tutto il tuo organico del club o i giocatori in pochi minuti."
+          },
+          {
+            "title": "Obiettivi e cronologia",
+            "body": "Un vero diario sportivo che segue il giocatore nel tempo."
+          },
+          {
+            "title": "Gestione genitori / tutori",
+            "body": "Più genitori o tutori possono essere collegati a un giocatore minorenne."
+          }
+        ]
+      },
+      "tournois": {
+        "title": "Tornei",
+        "subtitle": "Una vera app di gestione tornei, inclusa.",
+        "items": [
+          {
+            "title": "Tutti i formati",
+            "body": "Gironi + finali, eliminazione diretta, doppia eliminazione, Svizzera, flights — per tutte le competizioni amatoriali."
+          },
+          {
+            "title": "Iscrizioni pubbliche",
+            "body": "Le tue squadre si iscrivono online, con roster a supporto, senza account richiesto."
+          },
+          {
+            "title": "Centro di controllo Giorno J",
+            "body": "Punteggi in diretta, bracket aggiornato, gestione del campo in tempo reale."
+          },
+          {
+            "title": "Modalità TV",
+            "body": "Una pagina pubblica a schermo intero per visualizzare i punteggi in diretta su grande schermo."
+          },
+          {
+            "title": "Regolamento PDF",
+            "body": "Genera e condividi il regolamento del tuo torneo con un clic."
+          },
+          {
+            "title": "Tornei a pagamento",
+            "body": "Vendi le iscrizioni online, con pagamento sicuro integrato."
+          },
+          {
+            "title": "Assistente IA torneo",
+            "body": "Raccomandazione del formato e risposte alle tue domande durante la creazione."
+          }
+        ]
+      },
+      "stages": {
+        "title": "Campi estivi",
+        "subtitle": "Organizza i tuoi campi estivi da A a Z.",
+        "items": [
+          {
+            "title": "Creazione di campi estivi",
+            "body": "Organizza i tuoi campi estivi o specializzati in pochi minuti."
+          },
+          {
+            "title": "Iscrizioni pubbliche",
+            "body": "Le famiglie si iscrivono online e caricano i loro giustificativi, senza account."
+          },
+          {
+            "title": "Monitoraggio tramite token famiglia",
+            "body": "Ogni famiglia segue il proprio dossier tramite un link personale, senza password."
+          },
+          {
+            "title": "Esporta CSV",
+            "body": "Esporta l'elenco delle iscrizioni per la contabilità o il conteggio."
+          },
+          {
+            "title": "Pulizia GDPR automatica",
+            "body": "I giustificativi vengono eliminati automaticamente dopo il periodo legale."
+          }
+        ]
+      },
+      "communication": {
+        "title": "Comunicazione",
+        "subtitle": "Tutta la vita del club, nello stesso posto.",
+        "items": [
+          {
+            "title": "Bacheca del club",
+            "body": "Annunci, @menzioni e conferme di lettura — il flusso di vita del club."
+          },
+          {
+            "title": "Notifiche push",
+            "body": "Avvisi nativi su mobile e desktop grazie alla PWA, senza app store."
+          },
+          {
+            "title": "Email transazionali",
+            "body": "Convocazioni, inviti e conferme inviate automaticamente."
+          },
+          {
+            "title": "WhatsApp ibrido",
+            "body": "Condividi la convocazione formattata su WhatsApp con un clic, mantenendo il monitoraggio in Clubero."
+          },
+          {
+            "title": "Sponsor",
+            "body": "Metti in evidenza i tuoi partner sulla bacheca e nell'app, con statistiche di visibilità."
+          },
+          {
+            "title": "Bacheca collegata a Facebook",
+            "body": "Le pubblicazioni Facebook del club appaiono automaticamente nella bacheca Clubero."
+          }
+        ]
+      },
+      "admin": {
+        "title": "Amministrazione e branding",
+        "subtitle": "Un club che ti assomiglia, semplice da amministrare.",
+        "items": [
+          {
+            "title": "Branding del club",
+            "body": "Personalizza il colore del tuo club, applicato alle pagine pubbliche."
+          },
+          {
+            "title": "Impostazioni complete",
+            "body": "Notifiche, convocazioni, campi, sponsor, promemoria — tutto è configurabile."
+          },
+          {
+            "title": "Gestione dei ruoli",
+            "body": "Assegna i diritti per ruolo: allenatore, manager, dirigente, genitore."
+          },
+          {
+            "title": "Supporto e ticket",
+            "body": "Un filo di discussione diretto con il team Clubero in caso di necessità."
+          },
+          {
+            "title": "GDPR completo",
+            "body": "Esportazione dei dati, anonimizzazione ed eliminazione dell'account con un clic."
+          },
+          {
+            "title": "Multi-squadre e categorie",
+            "body": "Gestisci più squadre e categorie di età in un unico club."
+          },
+          {
+            "title": "Campi e sedi",
+            "body": "Centralizza i luoghi di partita e allenamento del club."
+          }
+        ]
+      },
+      "paiements": {
+        "title": "Pagamenti",
+        "subtitle": "Incassa direttamente in Clubero — in arrivo.",
+        "badge": "Prossimamente",
+        "items": [
+          {
+            "title": "Stripe Connect",
+            "body": "Incasso diretto sul conto del club, senza intermediari.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "HelloAsso",
+            "body": "Collega il tuo account HelloAsso esistente a Clubero.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "Quote associative",
+            "body": "Monitoraggio delle quote, ricevute automatiche e solleciti.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "Rimborsi",
+            "body": "Gestisci i rimborsi direttamente da Clubero.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "Raccolte fondi e collette",
+            "body": "Finanzia un progetto di squadra o un viaggio in comune.",
+            "badge": "Prossimamente"
+          }
+        ]
+      },
+      "ia": {
+        "title": "Intelligenza artificiale",
+        "subtitle": "L'IA al servizio del club, non un gadget.",
+        "items": [
+          {
+            "title": "Assistente membro",
+            "body": "Poni le tue domande sul tuo club direttamente nell'app, in italiano."
+          },
+          {
+            "title": "Assistente visitatore",
+            "body": "Una chat IA risponde alle domande dei visitatori del sito."
+          },
+          {
+            "title": "Assistente torneo",
+            "body": "Raccomandazione del formato e risposte alle tue domande."
+          },
+          {
+            "title": "Wizard IA — crea un torneo",
+            "body": "Un assistente conversazionale costruisce il torneo con te, passo dopo passo."
+          },
+          {
+            "title": "Wizard IA — regolamento",
+            "body": "Genera e affina il regolamento del tuo torneo con l'IA."
+          },
+          {
+            "title": "build-clubero",
+            "body": "Dai il tuo parere e modella le prossime funzionalità di Clubero con il nostro assistente di prodotto."
+          }
+        ]
+      },
+      "soon": {
+        "title": "Prossimamente in V2",
+        "subtitle": "Queste funzionalità arriveranno dopo il lancio.",
+        "badge": "V2",
+        "items": [
+          {
+            "title": "Rete aperta inter-club",
+            "body": "Collega il tuo club all'ecosistema Clubero.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "Profili pubblici giocatori e allenatori",
+            "body": "Una vetrina pubblica condivisibile per ogni giocatore e allenatore.",
+            "badge": "Prossimamente"
+          },
+          {
+            "title": "Follow",
+            "body": "Segui i tuoi club, giocatori e allenatori preferiti.",
+            "badge": "Prossimamente"
+          }
+        ]
+      }
     }
   },
   "faq": {
@@ -833,6 +1109,26 @@
       {
         "q": "E per organizzare un torneo?",
         "a": "L'assistente torneo consiglia il formato corretto (gironi + finali, eliminazione, Svizzero, misto) a partire da poche risposte: numero di squadre, durata disponibile, campi, più trofei o no, gratis o a pagamento. Calcola il numero di partite, l'orario di fine stimato e il numero di campi da prevedere. Decidi tu se modificare prima di lanciare."
+      },
+      {
+        "q": "Posso riscuotere le quote associative tramite Clubero?",
+        "a": "Non ancora. I pagamenti del club (Stripe Connect, HelloAsso, quote associative, raccolte fondi) sono in fase di finalizzazione e arriveranno prossimamente. Nel frattempo, puoi monitorare gli obblighi di pagamento e gestire le tue riscossioni al di fuori dell'applicazione."
+      },
+      {
+        "q": "Posso organizzare un torneo a pagamento?",
+        "a": "Sì. Le iscrizioni a pagamento per i tornei sono disponibili da subito, con pagamento sicuro integrato, sia che il tuo club sia abbonato o che tu stia organizzando un torneo occasionale."
+      },
+      {
+        "q": "Quali formati di torneo sono supportati?",
+        "a": "Gironi + finali, eliminazione diretta, doppia eliminazione, sistema svizzero e flights (suddivisione per livello). Questo copre quasi tutte le competizioni amatoriali."
+      },
+      {
+        "q": "Come funziona il GDPR in Clubero?",
+        "a": "Ogni membro può richiedere l'esportazione dei propri dati o la cancellazione del proprio account. I documenti sensibili (ad esempio, certificati di stage) vengono automaticamente eliminati dopo il periodo legale e i dati sono ospitati in Europa."
+      },
+      {
+        "q": "Posso personalizzare i colori del mio club?",
+        "a": "Sì. Ogni club può definire il proprio colore distintivo, applicato automaticamente sulle sue pagine pubbliche (tornei, stage, bacheca del club)."
       }
     ]
   },

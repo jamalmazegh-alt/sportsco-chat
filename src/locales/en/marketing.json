@@ -395,7 +395,8 @@
       }
     },
     "tile_sponsors_t": "Sponsors & partners",
-    "tile_sponsors_b": "Rotating sponsor banner in the app to pay back your subscription."
+    "tile_sponsors_b": "Rotating sponsor banner in the app to pay back your subscription.",
+    "paymentsSoon": "Club payments (Stripe Connect, memberships, kitties) — coming soon."
   },
   "whatsapp": {
     "chip": "Flexible communication",
@@ -587,7 +588,8 @@
       "Dedicated onboarding",
       "Custom data exports",
       "SLA and training"
-    ]
+    ],
+    "paymentsSoonLine": "Club payments — coming soon (Stripe Connect, HelloAsso, membership fees)."
   },
   "features": {
     "metaTitle": "Features — Clubero",
@@ -779,6 +781,280 @@
       "b3": "Live leaderboard with podium and 'New record' badge",
       "b4": "Custom challenges built by the coach in 30 seconds",
       "cta": "Explore challenges"
+    },
+    "modules": {
+      "coordination": {
+        "title": "Coordination & Events",
+        "subtitle": "All team logistics, centralised.",
+        "items": [
+          {
+            "title": "Call-ups",
+            "body": "Present/absent/uncertain with reason, automatic reminders."
+          },
+          {
+            "title": "Parent Absences",
+            "body": "Parents report an absence, the coach is notified immediately."
+          },
+          {
+            "title": "Team Availability",
+            "body": "Each player indicates their availability to help with team selections."
+          },
+          {
+            "title": "Event Chat",
+            "body": "Discussion dedicated to each match or training session, in addition to the global inbox."
+          },
+          {
+            "title": "Match Sheet",
+            "body": "Line-up, substitutes, and positions ready before kick-off."
+          },
+          {
+            "title": "Club Discipline",
+            "body": "Cards, suspensions, and automatic alerts during call-ups."
+          },
+          {
+            "title": "Challenges & Physical Tests",
+            "body": "Fitness tracking and fun player rankings."
+          },
+          {
+            "title": "Statistics",
+            "body": "Attendances, results, and trends throughout the season."
+          },
+          {
+            "title": "Car Sharing",
+            "body": "Organise travel to matches directly from the event."
+          }
+        ]
+      },
+      "effectif": {
+        "title": "Squad & Players",
+        "subtitle": "Every player has a complete profile.",
+        "items": [
+          {
+            "title": "Player Profile",
+            "body": "Avatar, history, coach feedback, and sanctions all in one profile."
+          },
+          {
+            "title": "CSV Import",
+            "body": "Import your entire club squad or players in minutes."
+          },
+          {
+            "title": "Achievements & Timeline",
+            "body": "A true sports journal that tracks the player over time."
+          },
+          {
+            "title": "Parent/Guardian Management",
+            "body": "Multiple parents or guardians can be linked to a minor player."
+          }
+        ]
+      },
+      "tournois": {
+        "title": "Tournaments",
+        "subtitle": "A real tournament management app, included.",
+        "items": [
+          {
+            "title": "All Formats",
+            "body": "Pools + finals, single elimination, double elimination, Swiss, flights — for all amateur competitions."
+          },
+          {
+            "title": "Public Registrations",
+            "body": "Your teams register online, with rosters, no account required."
+          },
+          {
+            "title": "Match Day Control Centre",
+            "body": "Live scores, updated bracket, real-time pitch management."
+          },
+          {
+            "title": "TV Mode",
+            "body": "A full-screen public page to display live scores on a big screen."
+          },
+          {
+            "title": "PDF Rules",
+            "body": "Generate and share your tournament rules in one click."
+          },
+          {
+            "title": "Paid Tournaments",
+            "body": "Sell registrations online, with integrated secure payment."
+          },
+          {
+            "title": "AI Tournament Assistant",
+            "body": "Format recommendations and answers to your questions during creation."
+          }
+        ]
+      },
+      "stages": {
+        "title": "Camps",
+        "subtitle": "Organise your holiday camps from A to Z.",
+        "items": [
+          {
+            "title": "Camp Creation",
+            "body": "Organise your holiday or specialised camps in minutes."
+          },
+          {
+            "title": "Public Registrations",
+            "body": "Families register online and submit their supporting documents, no account needed."
+          },
+          {
+            "title": "Tracking by Family Token",
+            "body": "Each family tracks their application using a personal link, without a password."
+          },
+          {
+            "title": "CSV Export",
+            "body": "Export the list of registrations for accounting or attendance."
+          },
+          {
+            "title": "Automatic GDPR Purge",
+            "body": "Supporting documents are automatically deleted after the legal period."
+          }
+        ]
+      },
+      "communication": {
+        "title": "Communication",
+        "subtitle": "All club life, in one place.",
+        "items": [
+          {
+            "title": "Club Wall",
+            "body": "Announcements, @mentions, and read receipts — the club's live feed."
+          },
+          {
+            "title": "Push Notifications",
+            "body": "Native alerts on mobile and desktop thanks to PWA, without an app store."
+          },
+          {
+            "title": "Transactional Emails",
+            "body": "Call-ups, invitations, and confirmations sent automatically."
+          },
+          {
+            "title": "Hybrid WhatsApp",
+            "body": "Share the formatted call-up on WhatsApp in one click, while keeping track in Clubero."
+          },
+          {
+            "title": "Sponsors",
+            "body": "Showcase your partners on the wall and in the app, with visibility statistics."
+          },
+          {
+            "title": "Facebook Connected Wall",
+            "body": "The club's Facebook posts automatically appear on the Clubero wall."
+          }
+        ]
+      },
+      "admin": {
+        "title": "Administration & Branding",
+        "subtitle": "A club that reflects you, simple to administer.",
+        "items": [
+          {
+            "title": "Club Branding",
+            "body": "Customise your club's colour, applied to public pages."
+          },
+          {
+            "title": "Complete Settings",
+            "body": "Notifications, call-ups, pitches, sponsors, reminders — everything is configurable."
+          },
+          {
+            "title": "Role Management",
+            "body": "Assign rights by role: coach, manager, director, parent."
+          },
+          {
+            "title": "Support & Tickets",
+            "body": "A direct discussion thread with the Clubero team when needed."
+          },
+          {
+            "title": "Full GDPR Compliance",
+            "body": "Data export, anonymisation, and account deletion in one click."
+          },
+          {
+            "title": "Multi-team & Categories",
+            "body": "Manage multiple teams and age categories within a single club."
+          },
+          {
+            "title": "Pitches & Venues",
+            "body": "Centralise the club's match and training locations."
+          }
+        ]
+      },
+      "paiements": {
+        "title": "Payments",
+        "subtitle": "Collect payments directly in Clubero — coming soon.",
+        "badge": "Coming soon",
+        "items": [
+          {
+            "title": "Stripe Connect",
+            "body": "Direct collection to the club's account, without intermediaries.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "HelloAsso",
+            "body": "Connect your existing HelloAsso account to Clubero.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "Memberships",
+            "body": "Membership tracking, automatic receipts, and reminders.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "Refunds",
+            "body": "Manage refunds directly from Clubero.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "Fundraisers & Collections",
+            "body": "Fund a team project or a joint trip.",
+            "badge": "Coming soon"
+          }
+        ]
+      },
+      "ia": {
+        "title": "Artificial Intelligence",
+        "subtitle": "AI at the service of the club, not a gimmick.",
+        "items": [
+          {
+            "title": "Member Assistant",
+            "body": "Ask your club questions directly in the app, in English."
+          },
+          {
+            "title": "Visitor Assistant",
+            "body": "An AI chat answers questions from website visitors."
+          },
+          {
+            "title": "Tournament Assistant",
+            "body": "Format recommendations and answers to your questions."
+          },
+          {
+            "title": "AI Wizard — Create a Tournament",
+            "body": "A conversational assistant builds the tournament with you, step by step."
+          },
+          {
+            "title": "AI Wizard — Rules",
+            "body": "Generate and refine your tournament rules with AI."
+          },
+          {
+            "title": "build-clubero",
+            "body": "Give your feedback and shape Clubero's next features with our product assistant."
+          }
+        ]
+      },
+      "soon": {
+        "title": "Coming Soon in V2",
+        "subtitle": "These features will arrive after launch.",
+        "badge": "V2",
+        "items": [
+          {
+            "title": "Open Inter-club Network",
+            "body": "Connect your club to the Clubero ecosystem.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "Public Player & Coach Profiles",
+            "body": "A shareable public showcase for each player and coach.",
+            "badge": "Coming soon"
+          },
+          {
+            "title": "Follows",
+            "body": "Follow your favourite clubs, players, and coaches.",
+            "badge": "Coming soon"
+          }
+        ]
+      }
     }
   },
   "faq": {
@@ -833,6 +1109,26 @@
       {
         "q": "And what about organising a tournament?",
         "a": "The tournament assistant recommends the right format (pools + finals, knockout, Swiss, mixed) from a handful of answers: number of teams, available duration, courts, multiple trophies or not, paid or free. It computes the number of matches, the estimated end time and the number of courts you should plan. You stay in control to adjust before launching."
+      },
+      {
+        "q": "Can I collect membership fees in Clubero?",
+        "a": "Not yet. Club payments (Stripe Connect, HelloAsso, membership fees, prize pools) are being finalised and will be available soon. In the meantime, you can track payment obligations and manage your collections outside the app."
+      },
+      {
+        "q": "Can I organise a paid tournament?",
+        "a": "Yes. Paid tournament registrations are available today, with integrated secure payment, whether your club is subscribed or you are organising a one-off tournament."
+      },
+      {
+        "q": "What tournament formats are supported?",
+        "a": "Pools + finals, single elimination, double elimination, Swiss system and flights (level-based distribution). Enough to cover almost all amateur competitions."
+      },
+      {
+        "q": "How does GDPR work at Clubero?",
+        "a": "Each member can request to export their data or delete their account. Sensitive documents (e.g., internship certificates) are automatically purged after the legal period, and data is hosted in Europe."
+      },
+      {
+        "q": "Can I customise my club's colours?",
+        "a": "Yes. Each club can define its own brand colour, which is automatically applied to its public pages (tournaments, training camps, club wall)."
       }
     ]
   },
@@ -1257,7 +1553,11 @@
         "b": "Final phase after a regular season."
       }
     ],
-    "formatsExtras": ["Automatic scheduling", "Field assignment", "Qualification management"],
+    "formatsExtras": [
+      "Automatic scheduling",
+      "Field assignment",
+      "Qualification management"
+    ],
     "mobileTitle": "Mobile first, on the field.",
     "mobileSubtitle": "Designed to be used one-handed, between matches.",
     "mobilePoints": [

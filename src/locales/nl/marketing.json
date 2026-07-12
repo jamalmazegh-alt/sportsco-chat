@@ -395,7 +395,8 @@
       }
     },
     "tile_sponsors_t": "Sponsors en partners",
-    "tile_sponsors_b": "Roterende sponsorbanner in de app om je abonnement terug te verdienen."
+    "tile_sponsors_b": "Roterende sponsorbanner in de app om je abonnement terug te verdienen.",
+    "paymentsSoon": "Clubbetalingen (Stripe Connect, contributies, groepspotten) — binnenkort beschikbaar."
   },
   "whatsapp": {
     "chip": "Flexibele communicatie",
@@ -587,7 +588,8 @@
       "Toegewijde onboarding",
       "Aangepaste gegevensexport",
       "SLA en training"
-    ]
+    ],
+    "paymentsSoonLine": "Clubbetalingen — binnenkort beschikbaar (Stripe Connect, HelloAsso, lidmaatschapsgelden)."
   },
   "features": {
     "metaTitle": "Functies — Clubero",
@@ -779,6 +781,280 @@
       "b3": "Live leaderboard with podium and 'New record' badge",
       "b4": "Custom challenges built by the coach in 30 seconds",
       "cta": "Explore challenges"
+    },
+    "modules": {
+      "coordination": {
+        "title": "Coördinatie & evenementen",
+        "subtitle": "Alle teamlogistiek, gecentraliseerd.",
+        "items": [
+          {
+            "title": "Oproepen",
+            "body": "Aanwezig / afwezig / onzeker met reden, automatische herinneringen."
+          },
+          {
+            "title": "Afwezigheid ouder",
+            "body": "Ouders melden een afwezigheid, de coach wordt direct op de hoogte gebracht."
+          },
+          {
+            "title": "Beschikbaarheid per team",
+            "body": "Elke speler geeft zijn beschikbaarheid aan om de teamindeling te vergemakkelijken."
+          },
+          {
+            "title": "Chat per evenement",
+            "body": "Specifieke discussie voor elke wedstrijd of training, naast de algemene inbox."
+          },
+          {
+            "title": "Wedstrijdformulier",
+            "body": "Opstelling, wissels en posities klaar voor de aftrap."
+          },
+          {
+            "title": "Clubdiscipline",
+            "body": "Kaarten, schorsingen en automatische waarschuwingen bij oproepen."
+          },
+          {
+            "title": "Uitdagingen & fysieke tests",
+            "body": "Opvolging van de fysieke conditie en een leuke rangschikking van spelers."
+          },
+          {
+            "title": "Statistieken",
+            "body": "Aanwezigheid, resultaten en trends gedurende het hele seizoen."
+          },
+          {
+            "title": "Carpooldienst",
+            "body": "Organiseer ritten naar wedstrijden direct vanuit het evenement."
+          }
+        ]
+      },
+      "effectif": {
+        "title": "Selectie & spelers",
+        "subtitle": "Elke speler heeft zijn complete dossier.",
+        "items": [
+          {
+            "title": "Spelersfiche",
+            "body": "Avatar, geschiedenis, feedback van de coach en sancties op één fiche."
+          },
+          {
+            "title": "CSV-import",
+            "body": "Importeer al uw clubleden of spelers in enkele minuten."
+          },
+          {
+            "title": "Prestaties & tijdlijn",
+            "body": "Een echt sportdagboek dat de speler in de tijd volgt."
+          },
+          {
+            "title": "Beheer ouders / voogden",
+            "body": "Meerdere ouders of voogden kunnen aan een minderjarige speler worden gekoppeld."
+          }
+        ]
+      },
+      "tournois": {
+        "title": "Toernooien",
+        "subtitle": "Een echte toernooibeheer-app, inbegrepen.",
+        "items": [
+          {
+            "title": "Alle formaten",
+            "body": "Poules + finales, directe eliminatie, dubbele eliminatie, Zwitsers systeem, flights — voor alle amateurcompetities."
+          },
+          {
+            "title": "Openbare inschrijvingen",
+            "body": "Uw teams schrijven zich online in, met roster, zonder account."
+          },
+          {
+            "title": "Controlecentrum Wedstrijddag",
+            "body": "Live scores, actuele bracket, real-time veldbeheer."
+          },
+          {
+            "title": "TV-modus",
+            "body": "Een openbare fullscreen pagina om live scores op een groot scherm weer te geven."
+          },
+          {
+            "title": "PDF-reglement",
+            "body": "Genereer en deel het reglement van uw toernooi met één klik."
+          },
+          {
+            "title": "Betaalde toernooien",
+            "body": "Verkoop online inschrijvingen, met geïntegreerde beveiligde betaling."
+          },
+          {
+            "title": "AI-assistent toernooi",
+            "body": "Formaataanbeveling en antwoorden op uw vragen tijdens het aanmaken."
+          }
+        ]
+      },
+      "stages": {
+        "title": "Stages",
+        "subtitle": "Organiseer uw vakantiestages van A tot Z.",
+        "items": [
+          {
+            "title": "Aanmaken van stages",
+            "body": "Organiseer uw vakantie- of gespecialiseerde stages in enkele minuten."
+          },
+          {
+            "title": "Openbare inschrijvingen",
+            "body": "Families schrijven zich online in en uploaden hun bewijsstukken, zonder account."
+          },
+          {
+            "title": "Opvolging via familietoken",
+            "body": "Elke familie volgt haar dossier via een persoonlijke link, zonder wachtwoord."
+          },
+          {
+            "title": "CSV-export",
+            "body": "Exporteer de lijst met inschrijvingen voor de boekhouding of aanwezigheidsregistratie."
+          },
+          {
+            "title": "Automatische GDPR-opschoning",
+            "body": "Bewijsstukken worden automatisch verwijderd na de wettelijke periode."
+          }
+        ]
+      },
+      "communication": {
+        "title": "Communicatie",
+        "subtitle": "Het hele clubleven, op één plek.",
+        "items": [
+          {
+            "title": "Clubmuur",
+            "body": "Aankondigingen, @vermeldingen en leesbevestigingen — de levenslijn van de club."
+          },
+          {
+            "title": "Pushmeldingen",
+            "body": "Native waarschuwingen op mobiel en desktop dankzij de PWA, zonder app store."
+          },
+          {
+            "title": "Transactionele e-mails",
+            "body": "Oproepen, uitnodigingen en bevestigingen worden automatisch verzonden."
+          },
+          {
+            "title": "Hybride WhatsApp",
+            "body": "Deel de geformatteerde oproep met één klik op WhatsApp, terwijl de opvolging in Clubero behouden blijft."
+          },
+          {
+            "title": "Sponsors",
+            "body": "Promoot uw partners op de muur en in de app, met zichtbaarheidsstatistieken."
+          },
+          {
+            "title": "Muur gekoppeld aan Facebook",
+            "body": "De Facebook-berichten van de club verschijnen automatisch op de Clubero-muur."
+          }
+        ]
+      },
+      "admin": {
+        "title": "Administratie & branding",
+        "subtitle": "Een club die bij u past, eenvoudig te beheren.",
+        "items": [
+          {
+            "title": "Clubbranding",
+            "body": "Personaliseer de kleur van uw club, toegepast op openbare pagina's."
+          },
+          {
+            "title": "Volledige instellingen",
+            "body": "Meldingen, oproepen, velden, sponsors, herinneringen — alles is configureerbaar."
+          },
+          {
+            "title": "Rollenbeheer",
+            "body": "Wijs rechten toe per rol: coach, manager, bestuurder, ouder."
+          },
+          {
+            "title": "Support & tickets",
+            "body": "Een directe discussielijn met het Clubero-team indien nodig."
+          },
+          {
+            "title": "Volledige GDPR",
+            "body": "Gegevensexport, anonimisering en accountverwijdering met één klik."
+          },
+          {
+            "title": "Meerdere teams & categorieën",
+            "body": "Beheer meerdere teams en leeftijdscategorieën in één club."
+          },
+          {
+            "title": "Velden & locaties",
+            "body": "Centraliseer de wedstrijd- en trainingslocaties van de club."
+          }
+        ]
+      },
+      "paiements": {
+        "title": "Betalingen",
+        "subtitle": "Incasseren direct in Clubero — binnenkort beschikbaar.",
+        "badge": "Binnenkort",
+        "items": [
+          {
+            "title": "Stripe Connect",
+            "body": "Directe incasso op de rekening van de club, zonder tussenpersoon.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "HelloAsso",
+            "body": "Koppel uw bestaande HelloAsso-account aan Clubero.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "Contributies",
+            "body": "Opvolging van contributies, automatische kwitanties en herinneringen.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "Terugbetalingen",
+            "body": "Beheer terugbetalingen direct vanuit Clubero.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "Crowdfunding & collectes",
+            "body": "Financier een teamproject of een gezamenlijke reis.",
+            "badge": "Binnenkort"
+          }
+        ]
+      },
+      "ia": {
+        "title": "Kunstmatige intelligentie",
+        "subtitle": "AI ten dienste van de club, geen gadget.",
+        "items": [
+          {
+            "title": "Ledenassistent",
+            "body": "Stel uw vragen over uw club direct in de app, in het Nederlands."
+          },
+          {
+            "title": "Bezoekersassistent",
+            "body": "Een AI-chat beantwoordt vragen van websitebezoekers."
+          },
+          {
+            "title": "Toernooiassistent",
+            "body": "Formaataanbeveling en antwoorden op uw vragen."
+          },
+          {
+            "title": "AI-wizard — maak een toernooi",
+            "body": "Een conversationele assistent bouwt het toernooi stap voor stap met u op."
+          },
+          {
+            "title": "AI-wizard — reglement",
+            "body": "Genereer en verfijn het reglement van uw toernooi met AI."
+          },
+          {
+            "title": "build-clubero",
+            "body": "Geef uw mening en vorm de volgende Clubero-functies met onze productassistent."
+          }
+        ]
+      },
+      "soon": {
+        "title": "Binnenkort in V2",
+        "subtitle": "Deze functies komen na de lancering.",
+        "badge": "V2",
+        "items": [
+          {
+            "title": "Open interclubnetwerk",
+            "body": "Verbind uw club met het Clubero-ecosysteem.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "Openbare profielen spelers & coaches",
+            "body": "Een openbaar deelbaar profiel voor elke speler en coach.",
+            "badge": "Binnenkort"
+          },
+          {
+            "title": "Volgen",
+            "body": "Volg uw favoriete clubs, spelers en coaches.",
+            "badge": "Binnenkort"
+          }
+        ]
+      }
     }
   },
   "faq": {
@@ -833,6 +1109,26 @@
       {
         "q": "En voor een toernooi?",
         "a": "De toernooi-assistent raadt het juiste formaat aan (poules + finales, knockout, Zwitsers, gemengd) op basis van enkele antwoorden: aantal teams, beschikbare duur, velden, meerdere prijzen of niet, gratis of betaald. Hij berekent het aantal wedstrijden, het geschatte eindtijdstip en het benodigde aantal velden. Je kunt nog aanpassen voordat je start."
+      },
+      {
+        "q": "Kan ik contributie innen via Clubero?",
+        "a": "Nog niet. Clubbetalingen (Stripe Connect, HelloAsso, contributies, groepspotten) worden momenteel afgerond en zijn binnenkort beschikbaar. In de tussentijd kunt u betalingsverplichtingen bijhouden en uw incasso's buiten de app beheren."
+      },
+      {
+        "q": "Kan ik een betaald toernooi organiseren?",
+        "a": "Ja. Betaalde inschrijvingen voor toernooien zijn nu beschikbaar, met geïntegreerde beveiligde betaling, of uw club nu een abonnement heeft of u een eenmalig toernooi organiseert."
+      },
+      {
+        "q": "Welke toernooiformaten worden ondersteund?",
+        "a": "Poules + finales, knock-out, dubbele eliminatie, Zwitsers systeem en flights (indeling op niveau). Dit dekt bijna alle amateurcompetities."
+      },
+      {
+        "q": "Hoe werkt de GDPR bij Clubero?",
+        "a": "Elk lid kan vragen om export van zijn gegevens of verwijdering van zijn account. Gevoelige documenten (bijvoorbeeld stagebewijzen) worden automatisch verwijderd na de wettelijke periode, en de gegevens worden gehost in Europa."
+      },
+      {
+        "q": "Kan ik de kleuren van mijn club personaliseren?",
+        "a": "Ja. Elke club kan zijn eigen merkkleur definiëren, die automatisch wordt toegepast op zijn openbare pagina's (toernooien, stages, clubmuur)."
       }
     ]
   },
@@ -1257,7 +1553,11 @@
         "b": "Finalerondes na een regulier seizoen."
       }
     ],
-    "formatsExtras": ["Automatische planning", "Veldtoewijzing", "Beheer van kwalificaties"],
+    "formatsExtras": [
+      "Automatische planning",
+      "Veldtoewijzing",
+      "Beheer van kwalificaties"
+    ],
     "mobileTitle": "Mobile first, direct op het veld.",
     "mobileSubtitle": "Gemaakt om met één hand te bedienen, tussen twee wedstrijden door.",
     "mobilePoints": [

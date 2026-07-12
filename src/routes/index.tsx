@@ -1612,13 +1612,6 @@ const HOME_TILES = [
     accent: "from-[color:var(--brand-blue)] to-[color:var(--victory)]",
   },
   {
-    key: "network",
-    icon: Share2,
-    to: "/features",
-    hash: "network",
-    accent: "from-[color:var(--energy)] to-[color:var(--brand-blue)]",
-  },
-  {
     key: "ai",
     icon: BrainCircuit,
     to: "/features",
@@ -1652,6 +1645,10 @@ function HomeFeatureTiles() {
             {t("home.allTitle")}
           </h2>
           <p className="mt-4 text-muted-foreground">{t("home.allSub")}</p>
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            {t("home.paymentsSoon")}
+          </p>
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

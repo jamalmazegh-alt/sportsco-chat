@@ -395,7 +395,8 @@
       }
     },
     "tile_sponsors_t": "Sponsoren & Partner",
-    "tile_sponsors_b": "Rotierendes Sponsoren-Banner in der App zur Refinanzierung Ihres Abos."
+    "tile_sponsors_b": "Rotierendes Sponsoren-Banner in der App zur Refinanzierung Ihres Abos.",
+    "paymentsSoon": "Vereinszahlungen (Stripe Connect, Mitgliedsbeiträge, Spendenaktionen) – bald verfügbar."
   },
   "whatsapp": {
     "chip": "Flexible Kommunikation",
@@ -587,7 +588,8 @@
       "Dediziertes Onboarding",
       "Benutzerdefinierte Datenexporte",
       "SLA und Schulung"
-    ]
+    ],
+    "paymentsSoonLine": "Vereinszahlungen – bald verfügbar (Stripe Connect, HelloAsso, Mitgliedsbeiträge)."
   },
   "features": {
     "metaTitle": "Funktionen — Clubero",
@@ -779,6 +781,280 @@
       "b3": "Live leaderboard with podium and 'New record' badge",
       "b4": "Custom challenges built by the coach in 30 seconds",
       "cta": "Explore challenges"
+    },
+    "modules": {
+      "coordination": {
+        "title": "Koordination & Events",
+        "subtitle": "Die gesamte Teamlogistik, zentralisiert.",
+        "items": [
+          {
+            "title": "Einladungen",
+            "body": "Anwesend / abwesend / unsicher mit Grund, automatische Erinnerungen."
+          },
+          {
+            "title": "Abwesenheiten der Eltern",
+            "body": "Eltern melden eine Abwesenheit, der Trainer wird sofort benachrichtigt."
+          },
+          {
+            "title": "Verfügbarkeiten pro Team",
+            "body": "Jeder Spieler gibt seine Verfügbarkeit an, um die Aufstellung zu erleichtern."
+          },
+          {
+            "title": "Chat pro Event",
+            "body": "Dedizierter Chat für jedes Spiel oder Training, zusätzlich zum globalen Posteingang."
+          },
+          {
+            "title": "Spielberichtsbogen",
+            "body": "Aufstellung, Ersatzspieler und Positionen sind vor dem Anpfiff bereit."
+          },
+          {
+            "title": "Vereinsdisziplin",
+            "body": "Karten, Sperren und automatische Warnungen bei Einladungen."
+          },
+          {
+            "title": "Herausforderungen & Fitnesstests",
+            "body": "Überwachung der körperlichen Verfassung und spielerische Rangliste der Spieler."
+          },
+          {
+            "title": "Statistiken",
+            "body": "Anwesenheiten, Ergebnisse und Trends über die gesamte Saison."
+          },
+          {
+            "title": "Fahrgemeinschaften",
+            "body": "Organisieren Sie Fahrten zu Spielen direkt vom Event aus."
+          }
+        ]
+      },
+      "effectif": {
+        "title": "Kader & Spieler",
+        "subtitle": "Jeder Spieler hat seine vollständige Akte.",
+        "items": [
+          {
+            "title": "Spielerprofil",
+            "body": "Avatar, Historie, Trainer-Feedback und Sanktionen auf einem einzigen Blatt."
+          },
+          {
+            "title": "CSV-Import",
+            "body": "Importieren Sie Ihren gesamten Vereins- oder Spielerkader in wenigen Minuten."
+          },
+          {
+            "title": "Erfolge & Zeitachse",
+            "body": "Ein echtes Sporttagebuch, das den Spieler über die Zeit begleitet."
+          },
+          {
+            "title": "Verwaltung von Eltern / Erziehungsberechtigten",
+            "body": "Mehrere Eltern oder Erziehungsberechtigte können einem minderjährigen Spieler zugeordnet werden."
+          }
+        ]
+      },
+      "tournois": {
+        "title": "Turniere",
+        "subtitle": "Eine echte Turnierverwaltungs-App, inklusive.",
+        "items": [
+          {
+            "title": "Alle Formate",
+            "body": "Gruppen + Finals, K.o.-System, Double Elimination, Schweizer System, Flights – für alle Amateurwettbewerbe."
+          },
+          {
+            "title": "Öffentliche Anmeldungen",
+            "body": "Ihre Teams melden sich online an, mit Kader, ohne Konto."
+          },
+          {
+            "title": "Kontrollzentrum am Spieltag",
+            "body": "Live-Ergebnisse, aktueller Turnierbaum, Echtzeit-Feldsteuerung."
+          },
+          {
+            "title": "TV-Modus",
+            "body": "Eine öffentliche Vollbildseite zur Anzeige von Live-Ergebnissen auf einem Großbildschirm."
+          },
+          {
+            "title": "PDF-Reglement",
+            "body": "Generieren und teilen Sie das Reglement Ihres Turniers mit einem Klick."
+          },
+          {
+            "title": "Kostenpflichtige Turniere",
+            "body": "Verkaufen Sie Online-Anmeldungen mit integrierter sicherer Zahlung."
+          },
+          {
+            "title": "KI-Turnierassistent",
+            "body": "Formatempfehlung und Antworten auf Ihre Fragen während der Erstellung."
+          }
+        ]
+      },
+      "stages": {
+        "title": "Camps",
+        "subtitle": "Organisieren Sie Ihre Ferien-Camps von A bis Z.",
+        "items": [
+          {
+            "title": "Erstellung von Camps",
+            "body": "Organisieren Sie Ihre Ferien- oder Spezialcamps in wenigen Minuten."
+          },
+          {
+            "title": "Öffentliche Anmeldungen",
+            "body": "Familien melden sich online an und reichen ihre Unterlagen ein, ohne Konto."
+          },
+          {
+            "title": "Verfolgung per Familien-Token",
+            "body": "Jede Familie verfolgt ihre Akte über einen persönlichen Link, ohne Passwort."
+          },
+          {
+            "title": "CSV-Export",
+            "body": "Exportieren Sie die Anmeldeliste für die Buchhaltung oder die Anwesenheitsliste."
+          },
+          {
+            "title": "Automatische DSGVO-Bereinigung",
+            "body": "Die Nachweise werden nach der gesetzlichen Frist automatisch gelöscht."
+          }
+        ]
+      },
+      "communication": {
+        "title": "Kommunikation",
+        "subtitle": "Das gesamte Vereinsleben an einem Ort.",
+        "items": [
+          {
+            "title": "Vereins-Pinnwand",
+            "body": "Ankündigungen, @Erwähnungen und Lesebestätigungen – der Lebensfaden des Vereins."
+          },
+          {
+            "title": "Push-Benachrichtigungen",
+            "body": "Native Benachrichtigungen auf Mobilgeräten und Desktops dank PWA, ohne App Store."
+          },
+          {
+            "title": "Transaktions-E-Mails",
+            "body": "Einladungen, Bestätigungen und Erinnerungen werden automatisch versendet."
+          },
+          {
+            "title": "Hybrides WhatsApp",
+            "body": "Teilen Sie die formatierte Einladung mit einem Klick auf WhatsApp, während Sie die Nachverfolgung in Clubero behalten."
+          },
+          {
+            "title": "Sponsoren",
+            "body": "Präsentieren Sie Ihre Partner an der Pinnwand und in der App, mit Sichtbarkeitsstatistiken."
+          },
+          {
+            "title": "Pinnwand mit Facebook verbunden",
+            "body": "Die Facebook-Beiträge des Vereins erscheinen automatisch an der Clubero-Pinnwand."
+          }
+        ]
+      },
+      "admin": {
+        "title": "Administration & Branding",
+        "subtitle": "Ein Verein, der zu Ihnen passt, einfach zu verwalten.",
+        "items": [
+          {
+            "title": "Vereins-Branding",
+            "body": "Passen Sie die Farbe Ihres Vereins an, die auf den öffentlichen Seiten angewendet wird."
+          },
+          {
+            "title": "Umfassende Einstellungen",
+            "body": "Benachrichtigungen, Einladungen, Felder, Sponsoren, Erinnerungen – alles ist konfigurierbar."
+          },
+          {
+            "title": "Rollenverwaltung",
+            "body": "Weisen Sie Berechtigungen nach Rolle zu: Trainer, Manager, Funktionär, Elternteil."
+          },
+          {
+            "title": "Support & Tickets",
+            "body": "Ein direkter Chat mit dem Clubero-Team bei Bedarf."
+          },
+          {
+            "title": "Vollständige DSGVO",
+            "body": "Datenexport, Anonymisierung und Kontolöschung mit einem Klick."
+          },
+          {
+            "title": "Multi-Teams & Kategorien",
+            "body": "Verwalten Sie mehrere Teams und Alterskategorien in einem einzigen Verein."
+          },
+          {
+            "title": "Felder & Veranstaltungsorte",
+            "body": "Zentralisieren Sie die Spiel- und Trainingsorte des Vereins."
+          }
+        ]
+      },
+      "paiements": {
+        "title": "Zahlungen",
+        "subtitle": "Direkt in Clubero kassieren – demnächst verfügbar.",
+        "badge": "Bald",
+        "items": [
+          {
+            "title": "Stripe Connect",
+            "body": "Direkte Einzahlung auf das Vereinskonto, ohne Zwischenhändler.",
+            "badge": "Bald"
+          },
+          {
+            "title": "HelloAsso",
+            "body": "Verbinden Sie Ihr bestehendes HelloAsso-Konto mit Clubero.",
+            "badge": "Bald"
+          },
+          {
+            "title": "Mitgliedsbeiträge",
+            "body": "Verfolgung der Mitgliedsbeiträge, automatische Quittungen und Mahnungen.",
+            "badge": "Bald"
+          },
+          {
+            "title": "Rückerstattungen",
+            "body": "Verwalten Sie Rückerstattungen direkt in Clubero.",
+            "badge": "Bald"
+          },
+          {
+            "title": "Spendenaktionen & Sammlungen",
+            "body": "Finanzieren Sie ein Teamprojekt oder eine gemeinsame Reise.",
+            "badge": "Bald"
+          }
+        ]
+      },
+      "ia": {
+        "title": "Künstliche Intelligenz",
+        "subtitle": "KI im Dienste des Vereins, kein Gadget.",
+        "items": [
+          {
+            "title": "Mitgliederassistent",
+            "body": "Stellen Sie Ihre Fragen zu Ihrem Verein direkt in der App, auf Deutsch."
+          },
+          {
+            "title": "Besucherassistent",
+            "body": "Ein KI-Chat beantwortet Fragen von Website-Besuchern."
+          },
+          {
+            "title": "Turnierassistent",
+            "body": "Formatempfehlung und Antworten auf Ihre Fragen."
+          },
+          {
+            "title": "KI-Assistent – Turnier erstellen",
+            "body": "Ein Konversationsassistent erstellt das Turnier Schritt für Schritt mit Ihnen."
+          },
+          {
+            "title": "KI-Assistent – Reglement",
+            "body": "Generieren und verfeinern Sie das Reglement Ihres Turniers mit KI."
+          },
+          {
+            "title": "build-clubero",
+            "body": "Geben Sie Ihr Feedback und gestalten Sie die nächsten Clubero-Funktionen mit unserem Produktassistenten."
+          }
+        ]
+      },
+      "soon": {
+        "title": "Bald in V2",
+        "subtitle": "Diese Funktionen kommen nach dem Start.",
+        "badge": "V2",
+        "items": [
+          {
+            "title": "Offenes Inter-Club-Netzwerk",
+            "body": "Verbinden Sie Ihren Verein mit dem Clubero-Ökosystem.",
+            "badge": "Bald"
+          },
+          {
+            "title": "Öffentliche Profile für Spieler & Trainer",
+            "body": "Ein öffentlich teilbares Schaufenster für jeden Spieler und Trainer.",
+            "badge": "Bald"
+          },
+          {
+            "title": "Folgen",
+            "body": "Folgen Sie Ihren Lieblingsvereinen, Spielern und Trainern.",
+            "badge": "Bald"
+          }
+        ]
+      }
     }
   },
   "faq": {
@@ -833,6 +1109,26 @@
       {
         "q": "Und wie ist es mit der Turnierorganisation?",
         "a": "Der Turnier-Assistent empfiehlt das passende Format (Gruppen + Finals, K.-o., Schweizer, gemischt) auf Basis weniger Antworten: Anzahl Teams, verfügbare Dauer, Plätze, mehrere Trophäen oder nicht, kostenlos oder kostenpflichtig. Er berechnet die Anzahl Spiele, die voraussichtliche Endzeit und die nötige Anzahl Plätze. Du kannst vor dem Start jederzeit anpassen."
+      },
+      {
+        "q": "Kann ich Mitgliedsbeiträge in Clubero einziehen?",
+        "a": "Noch nicht. Die Zahlungsfunktionen für Vereine (Stripe Connect, HelloAsso, Mitgliedsbeiträge, Spendenaktionen) werden gerade fertiggestellt und sind bald verfügbar. In der Zwischenzeit können Sie Zahlungsverpflichtungen verfolgen und Ihre Einnahmen außerhalb der App verwalten."
+      },
+      {
+        "q": "Kann ich ein kostenpflichtiges Turnier organisieren?",
+        "a": "Ja. Kostenpflichtige Turnierregistrierungen sind ab sofort verfügbar, mit integrierter sicherer Zahlung, egal ob Ihr Verein abonniert ist oder Sie ein einmaliges Turnier organisieren."
+      },
+      {
+        "q": "Welche Turnierformate werden unterstützt?",
+        "a": "Gruppen + Finals, K.o.-System, Double Elimination, Schweizer System und Flights (Einteilung nach Spielstärke). Damit sind fast alle Amateurwettbewerbe abgedeckt."
+      },
+      {
+        "q": "Wie funktioniert die DSGVO bei Clubero?",
+        "a": "Jedes Mitglied kann den Export seiner Daten oder die Löschung seines Kontos beantragen. Sensible Dokumente (z.B. Praktikumsnachweise) werden nach der gesetzlichen Frist automatisch gelöscht, und die Daten werden in Europa gehostet."
+      },
+      {
+        "q": "Kann ich die Farben meines Vereins anpassen?",
+        "a": "Ja. Jeder Verein kann seine eigene Markenfarbe definieren, die automatisch auf seinen öffentlichen Seiten (Turniere, Trainingslager, Vereins-Pinnwand) angewendet wird."
       }
     ]
   },
