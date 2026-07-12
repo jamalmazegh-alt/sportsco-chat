@@ -455,9 +455,6 @@ function ModulesGridSection() {
     </section>
   );
 }
-    </section>
-  );
-}
 
 function FeaturesPage() {
   const { t } = useTranslation("marketing");
