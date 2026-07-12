@@ -176,8 +176,14 @@ function AdminTicketsPage() {
                     </span>
                     <span>· {t.category}</span>
                     <span>· #{t.id.slice(0, 6).toUpperCase()}</span>
+                    {t.club_name && (
+                      <span className="inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/10 text-blue-700 dark:text-blue-300">
+                        {t.club_name}
+                      </span>
+                    )}
                     {t.user_full_name && <span>· {t.user_full_name}</span>}
                     <span>· {new Date(t.last_activity_at).toLocaleString()}</span>
+
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
