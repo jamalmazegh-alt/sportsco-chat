@@ -180,6 +180,8 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
         participant_first_name: r.participant_first_name,
         participant_last_name: r.participant_last_name,
         birth_date: r.birth_date,
+        gender: r.gender ?? null,
+        club_name: r.club_name ?? null,
         guardian_first_name: r.guardian_first_name,
         guardian_last_name: r.guardian_last_name,
         guardian_email: r.guardian_email,
