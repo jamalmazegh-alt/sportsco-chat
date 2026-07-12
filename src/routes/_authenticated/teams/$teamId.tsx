@@ -46,7 +46,7 @@ import { ExistingPlayerPicker } from "@/components/existing-player-picker";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
-import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+
 import { TeamAbsencesTable } from "@/components/team-absences-table";
 import { TeamChampionshipsSection } from "@/components/team-championships-section";
 import { Badge } from "@/components/ui/badge";
@@ -1118,7 +1118,7 @@ function TeamDetail() {
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </Link>
 
-      {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
+      {/* UpcomingAbsencesWidget est club-wide → il vit sur le dashboard club, pas sur la page équipe */}
 
       {isCoach && (players ?? []).length > 0 && (
         <>
