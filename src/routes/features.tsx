@@ -1,7 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CheckCircle2, ArrowRight, Megaphone, Clock, Trophy } from "lucide-react";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Megaphone,
+  Clock,
+  Trophy,
+  CalendarCheck2,
+  Users,
+  Sun,
+  MessageCircle,
+  Settings2,
+  CreditCard,
+  Sparkles,
+  Rocket,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -178,6 +193,226 @@ function FutureFeaturesSection() {
 }
 
 
+type ModuleVisual = {
+  icon: LucideIcon;
+  accent: string; // tailwind color class base, e.g. "sky", "amber"
+  featured?: boolean;
+};
+
+const MODULE_VISUALS: Record<string, ModuleVisual> = {
+  coordination: { icon: CalendarCheck2, accent: "sky" },
+  effectif: { icon: Users, accent: "emerald" },
+  tournois: { icon: Trophy, accent: "amber", featured: true },
+  stages: { icon: Sun, accent: "orange" },
+  communication: { icon: MessageCircle, accent: "violet" },
+  admin: { icon: Settings2, accent: "slate" },
+  paiements: { icon: CreditCard, accent: "rose" },
+  ia: { icon: Sparkles, accent: "fuchsia", featured: true },
+  soon: { icon: Rocket, accent: "indigo" },
+};
+
+const ACCENT_CLASSES: Record<
+  string,
+  { chip: string; ring: string; glow: string; icon: string; dot: string }
+> = {
+  sky: {
+    chip: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    ring: "hover:border-sky-500/40",
+    glow: "from-sky-500/20 via-sky-500/5 to-transparent",
+    icon: "text-sky-600 dark:text-sky-400",
+    dot: "bg-sky-500",
+  },
+  emerald: {
+    chip: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    ring: "hover:border-emerald-500/40",
+    glow: "from-emerald-500/20 via-emerald-500/5 to-transparent",
+    icon: "text-emerald-600 dark:text-emerald-400",
+    dot: "bg-emerald-500",
+  },
+  amber: {
+    chip: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    ring: "hover:border-amber-500/40",
+    glow: "from-amber-500/25 via-amber-500/5 to-transparent",
+    icon: "text-amber-600 dark:text-amber-400",
+    dot: "bg-amber-500",
+  },
+  orange: {
+    chip: "bg-orange-500/10 text-orange-700 dark:text-orange-300",
+    ring: "hover:border-orange-500/40",
+    glow: "from-orange-500/20 via-orange-500/5 to-transparent",
+    icon: "text-orange-600 dark:text-orange-400",
+    dot: "bg-orange-500",
+  },
+  violet: {
+    chip: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
+    ring: "hover:border-violet-500/40",
+    glow: "from-violet-500/20 via-violet-500/5 to-transparent",
+    icon: "text-violet-600 dark:text-violet-400",
+    dot: "bg-violet-500",
+  },
+  slate: {
+    chip: "bg-slate-500/10 text-slate-700 dark:text-slate-300",
+    ring: "hover:border-slate-500/40",
+    glow: "from-slate-500/15 via-slate-500/5 to-transparent",
+    icon: "text-slate-600 dark:text-slate-300",
+    dot: "bg-slate-500",
+  },
+  rose: {
+    chip: "bg-rose-500/10 text-rose-700 dark:text-rose-300",
+    ring: "hover:border-rose-500/40",
+    glow: "from-rose-500/20 via-rose-500/5 to-transparent",
+    icon: "text-rose-600 dark:text-rose-400",
+    dot: "bg-rose-500",
+  },
+  fuchsia: {
+    chip: "bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-300",
+    ring: "hover:border-fuchsia-500/40",
+    glow: "from-fuchsia-500/25 via-fuchsia-500/5 to-transparent",
+    icon: "text-fuchsia-600 dark:text-fuchsia-400",
+    dot: "bg-fuchsia-500",
+  },
+  indigo: {
+    chip: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300",
+    ring: "hover:border-indigo-500/40",
+    glow: "from-indigo-500/20 via-indigo-500/5 to-transparent",
+    icon: "text-indigo-600 dark:text-indigo-400",
+    dot: "bg-indigo-500",
+  },
+};
+
+function ModuleNavPill({
+  keyName,
+  label,
+}: {
+  keyName: string;
+  label: string;
+}) {
+  const vis = MODULE_VISUALS[keyName];
+  const cls = ACCENT_CLASSES[vis.accent];
+  const Icon = vis.icon;
+  return (
+    <a
+      href={`#module-${keyName}`}
+      className={`group inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:shadow-sm ${cls.ring}`}
+    >
+      <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${cls.chip}`}>
+        <Icon className={`h-3 w-3 ${cls.icon}`} />
+      </span>
+      {label}
+    </a>
+  );
+}
+
+function ModuleBlock({
+  keyName,
+  mod,
+}: {
+  keyName: string;
+  mod: {
+    title: string;
+    subtitle: string;
+    badge?: string;
+    items: { title: string; body: string; badge?: string }[];
+  };
+}) {
+  const vis = MODULE_VISUALS[keyName];
+  const cls = ACCENT_CLASSES[vis.accent];
+  const Icon = vis.icon;
+  const featured = !!vis.featured;
+
+  // Bento layout: first item spans 2 cols on large screens for featured modules
+  return (
+    <div id={`module-${keyName}`} className="scroll-mt-20">
+      {/* Header band */}
+      <div
+        className={`relative overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8`}
+      >
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${cls.glow} opacity-70`}
+          aria-hidden
+        />
+        <div className="relative flex flex-wrap items-center gap-4">
+          <div
+            className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${cls.chip}`}
+          >
+            <Icon className={`h-6 w-6 ${cls.icon}`} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                {mod.title}
+              </h2>
+              {mod.badge && (
+                <Badge
+                  variant="secondary"
+                  className={`uppercase tracking-wide ${cls.chip} border-transparent`}
+                >
+                  {mod.badge}
+                </Badge>
+              )}
+            </div>
+            <p className="mt-1 text-muted-foreground">{mod.subtitle}</p>
+          </div>
+          <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:inline">
+            {mod.items.length} fonctionnalités
+          </span>
+        </div>
+      </div>
+
+      {/* Items — bento grid */}
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {mod.items.map((item, idx) => {
+          const isHero = featured && idx === 0;
+          return (
+            <div
+              key={item.title}
+              className={`group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md ${cls.ring} ${
+                isHero ? "sm:col-span-2 lg:row-span-2" : ""
+              }`}
+            >
+              <span
+                className={`absolute left-0 top-0 h-full w-[3px] ${cls.dot} opacity-0 transition group-hover:opacity-100`}
+                aria-hidden
+              />
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className={`h-1.5 w-1.5 rounded-full ${cls.dot}`} />
+                  <h3
+                    className={`font-display font-bold ${isHero ? "text-xl" : "text-base"}`}
+                  >
+                    {item.title}
+                  </h3>
+                </div>
+                {item.badge && (
+                  <Badge
+                    variant="secondary"
+                    className={`shrink-0 text-[10px] uppercase tracking-wide ${cls.chip} border-transparent`}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+              </div>
+              <p
+                className={`mt-2 leading-relaxed text-muted-foreground ${
+                  isHero ? "text-base" : "text-sm"
+                }`}
+              >
+                {item.body}
+              </p>
+              {isHero && (
+                <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-foreground/70">
+                  <CheckCircle2 className={`h-3.5 w-3.5 ${cls.icon}`} />
+                  Inclus dès la V1
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ModulesGridSection() {
   const { t } = useTranslation("marketing");
   const moduleKeys = [
@@ -193,9 +428,19 @@ function ModulesGridSection() {
   ] as const;
 
   return (
-    <section className="border-b border-border/60 bg-muted/10">
+    <section className="border-b border-border/60 bg-gradient-to-b from-muted/30 via-background to-muted/10">
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="space-y-16">
+        {/* Quick nav */}
+        <div className="mb-14 flex flex-wrap justify-center gap-2">
+          {moduleKeys.map((key) => {
+            const mod = t(`features.modules.${key}`, { returnObjects: true }) as {
+              title: string;
+            };
+            return <ModuleNavPill key={key} keyName={key} label={mod.title} />;
+          })}
+        </div>
+
+        <div className="space-y-20">
           {moduleKeys.map((key) => {
             const mod = t(`features.modules.${key}`, { returnObjects: true }) as {
               title: string;
@@ -203,41 +448,7 @@ function ModulesGridSection() {
               badge?: string;
               items: { title: string; body: string; badge?: string }[];
             };
-            return (
-              <div key={key} id={`module-${key}`} className="scroll-mt-20">
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                    {mod.title}
-                  </h2>
-                  {mod.badge && (
-                    <Badge variant="secondary" className="uppercase tracking-wide">
-                      {mod.badge}
-                    </Badge>
-                  )}
-                </div>
-                <p className="mt-2 max-w-2xl text-muted-foreground">{mod.subtitle}</p>
-                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {mod.items.map((item) => (
-                    <div
-                      key={item.title}
-                      className="rounded-2xl border border-border bg-card p-5"
-                    >
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-display text-base font-bold">{item.title}</h3>
-                        {item.badge && (
-                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {item.body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
+            return <ModuleBlock key={key} keyName={key} mod={mod} />;
           })}
         </div>
       </div>
