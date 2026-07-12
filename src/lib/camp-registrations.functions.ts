@@ -30,7 +30,11 @@ export type PaymentStatus =
   | "partial"
   | "refunded";
 
-export type DossierStatus = "complete" | "payment_missing" | "documents_missing";
+export type DossierStatus =
+  | "complete"
+  | "payment_missing"
+  | "documents_pending"
+  | "documents_missing";
 
 export interface CampRegistrationRow {
   id: string;
