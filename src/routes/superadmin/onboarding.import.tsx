@@ -377,9 +377,11 @@ function ImportPage() {
       });
       setPreview(res);
       // Default team choices to the suggested match.
+      // Default: use the normalized match when found, otherwise force the user
+      // to explicitly opt in to creation via the "__create__" sentinel.
       const defaults: Record<string, string> = {};
       for (const tr of res.teamResolutions) {
-        defaults[tr.key] = tr.suggestedTeamId ?? "";
+        defaults[tr.key] = tr.suggestedTeamId ?? "__create__";
       }
       setTeamChoices(defaults);
       setFieldOverrides({});
