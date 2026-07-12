@@ -1,8 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getSupportTicket, updateSupportTicket } from "@/lib/support.functions";
+import {
+  getSupportTicket,
+  updateSupportTicket,
+  getSupportTicketAudit,
+} from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
-import { ArrowLeft, Loader2, User } from "lucide-react";
+import { ArrowLeft, Loader2, User, History } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,12 +24,28 @@ export const Route = createFileRoute("/superadmin/support-tickets/$ticketId")({
 const STATUSES = ["open", "in_progress", "waiting_user", "resolved", "closed"];
 const PRIORITIES = ["low", "normal", "high", "urgent"];
 
+const ACTION_LABELS: Record<string, string> = {
+  created: "Ticket créé",
+  status_changed: "Statut",
+  priority_changed: "Priorité",
+  assigned: "Assignation",
+  reply: "Réponse",
+  internal_note: "Note interne",
+};
+
 function AdminTicketDetail() {
   const { ticketId } = Route.useParams();
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-support-ticket", ticketId],
     queryFn: () => getSupportTicket({ data: { ticket_id: ticketId } }),
   });
+
+  const { data: audit, refetch: refetchAudit } = useQuery({
+    queryKey: ["admin-support-ticket-audit", ticketId],
+    queryFn: () => getSupportTicketAudit({ data: { ticket_id: ticketId } }),
+  });
+
+
 
   const update = useMutation({
     mutationFn: (patch: { status?: string; priority?: string }) =>
