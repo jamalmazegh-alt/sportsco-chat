@@ -98,7 +98,7 @@ export async function enqueueTransactionalEmailServer(params: {
     payload: {
       message_id: messageId,
       to: recipient,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: `${params.fromName || SITE_NAME} <noreply@${FROM_DOMAIN}>`,
       sender_domain: SENDER_DOMAIN,
       subject,
       html,
