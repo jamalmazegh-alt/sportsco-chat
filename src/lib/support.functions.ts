@@ -538,10 +538,12 @@ const ListInput = z
     status: z.enum(STATUSES).optional(),
     priority: z.enum(PRIORITIES).optional(),
     category: z.enum(CATEGORIES).optional(),
+    club_id: z.string().uuid().optional(),
     search: z.string().trim().max(120).optional(),
     limit: z.number().int().min(1).max(200).default(50),
   })
   .partial();
+
 
 export const listAllSupportTickets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
