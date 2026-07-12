@@ -230,6 +230,27 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
           <RefreshCw className="h-4 w-4 mr-1" />
           {t("common.refresh", { defaultValue: "Actualiser" })}
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            downloadRegistrationsCsv(filtered, { t, campSlug: campId });
+            toast.success(
+              t("registrations.csv.done", {
+                defaultValue: "Export CSV téléchargé ({{count}} lignes).",
+                count: filtered.length,
+              }),
+            );
+          }}
+          title={t("registrations.csv.hint", {
+            defaultValue:
+              "Exporte les inscriptions visibles selon les filtres. Ne contient aucun document.",
+          })}
+        >
+          <Download className="h-4 w-4 mr-1" />
+          {t("registrations.csv.cta", { defaultValue: "Exporter CSV" })}
+        </Button>
       </div>
 
       {/* Tableau */}
