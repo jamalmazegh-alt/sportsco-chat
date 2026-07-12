@@ -229,7 +229,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
             guardian_phone: fields.guardian_phone || null,
             notes: fields.notes || null,
             registration_status: "pending",
-            payment_status: "unpaid",
+            payment_status: "pending",
           })
           .select("id, access_token")
           .single();
