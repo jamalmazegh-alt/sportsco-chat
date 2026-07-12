@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const CAMP_UPLOAD_MAX_BYTES = 15 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -118,7 +119,10 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
         // Upsert doc row: replace existing (any status) → set pending, clear rejection.
         const { data: existing } = await supabase
           .from("club_camp_registration_documents")
-          .select("id")
+          .select("id, review_status")
+          .eq("registration_id", registrationId)
+          .eq("required_document_id", parsed.data.required_document_id)
+          .maybeSingle();
           .eq("registration_id", registrationId)
           .eq("required_document_id", parsed.data.required_document_id)
           .maybeSingle();
