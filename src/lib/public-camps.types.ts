@@ -6,8 +6,6 @@ export interface PublicCampClub {
   slug: string;
   logo_url: string | null;
   theme_color: string | null;
-  city: string | null;
-  country: string | null;
 }
 
 export interface PublicCampVenue {
