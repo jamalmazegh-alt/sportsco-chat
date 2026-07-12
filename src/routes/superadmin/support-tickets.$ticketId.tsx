@@ -175,11 +175,9 @@ function AdminTicketDetail() {
             <Row k="Créé" v={new Date(ticket.created_at).toLocaleString()} />
           </dl>
         </section>
-      </aside>
-    </div>
-  );
 
         <section className="space-y-2">
+
           <Label className="text-xs uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1">
             <History className="h-3 w-3" /> Historique
           </Label>
