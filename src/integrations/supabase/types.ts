@@ -6626,6 +6626,7 @@ export type Database = {
         Returns: number
       }
       next_receipt_number: { Args: { _club_id: string }; Returns: number }
+      normalize_name: { Args: { t: string }; Returns: string }
       player_belongs_to_user: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
