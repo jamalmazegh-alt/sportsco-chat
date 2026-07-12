@@ -240,7 +240,7 @@
     "backToCamp": "Back to camp",
     "formTitle": "Registration — {{title}}",
     "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
-    "consent": "Autorizzo il club a utilizzare i dati trasmessi (identità del bambino, contatto del genitore, allegati) per gestire questa iscrizione allo stage, conformemente al GDPR. I dati vengono conservati fino a 12 mesi dopo la fine dello stage, poi eliminati automaticamente.",
+    "consent": "Autorizzo il club a utilizzare i dati trasmessi (identità del bambino, contatto del genitore, allegati) per gestire questa iscrizione allo stage, conformemente al GDPR. I dati vengono conservati fino a {{months}} mesi dopo la fine dello stage, poi eliminati automaticamente.",
     "submit": "Submit registration",
     "confirmTitle": "Registration sent!",
     "confirmBody": "We received your file. The club will contact you shortly.",

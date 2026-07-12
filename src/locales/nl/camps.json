@@ -240,7 +240,7 @@
     "backToCamp": "Back to camp",
     "formTitle": "Registration — {{title}}",
     "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
-    "consent": "Ik machtig de club om de verzonden gegevens (identiteit van het kind, contact van de ouder, bijlagen) te gebruiken voor het beheer van deze stage-inschrijving, in overeenstemming met de AVG. De gegevens worden tot 12 maanden na het einde van de stage bewaard en daarna automatisch verwijderd.",
+    "consent": "Ik machtig de club om de verzonden gegevens (identiteit van het kind, contact van de ouder, bijlagen) te gebruiken voor het beheer van deze stage-inschrijving, in overeenstemming met de AVG. De gegevens worden tot {{months}} maanden na het einde van de stage bewaard en daarna automatisch verwijderd.",
     "submit": "Submit registration",
     "confirmTitle": "Registration sent!",
     "confirmBody": "We received your file. The club will contact you shortly.",

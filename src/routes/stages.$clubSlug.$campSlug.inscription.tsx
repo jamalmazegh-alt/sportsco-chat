@@ -338,7 +338,8 @@ function RegistrationFormPage() {
               <Label htmlFor="consent" className="text-sm leading-snug">
                 {t(
                   "public.consent",
-                  "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à 12 mois après la fin du stage, puis supprimées automatiquement.",
+                  "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à {{months}} mois après la fin du stage, puis supprimées automatiquement.",
+                  { months: camp.document_retention_months ?? 6 },
                 )}
               </Label>
             </div>

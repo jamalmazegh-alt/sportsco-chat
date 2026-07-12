@@ -74,6 +74,10 @@ export interface PublicCampDetails {
   external_location: string | null;
   payment_instructions: string | null;
   status: string;
+  document_retention_months: number;
+  taken_count?: number;
+  remaining?: number;
+  is_full?: boolean;
 }
 
 export interface PublicCampBundle {
