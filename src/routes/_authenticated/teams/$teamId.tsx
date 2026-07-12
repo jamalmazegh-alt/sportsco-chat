@@ -47,7 +47,7 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 
-import { TeamAbsencesTable } from "@/components/team-absences-table";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamChampionshipsSection } from "@/components/team-championships-section";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -1120,25 +1120,8 @@ function TeamDetail() {
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </Link>
 
-      {/* UpcomingAbsencesWidget est club-wide → il vit sur le dashboard club, pas sur la page équipe */}
-
-      {isCoach && (players ?? []).length > 0 && (
-        <>
-          <TeamAbsencesTable teamId={teamId} players={players as any} />
-          <Link
-            to="/teams/$teamId/availability"
-            params={{ teamId }}
-            className="flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">
-                {t("availability.calendar.open", { defaultValue: "Voir le calendrier des absences" })}
-              </span>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-        </>
+      {isCoach && team?.club_id && (
+        <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />
       )}
 
       <TeamCoaches

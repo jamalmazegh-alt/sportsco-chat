@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
+import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,10 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   clubId: string;
+  teamId?: string;
   className?: string;
 }
+
 
 type Row = {
   id: string;
@@ -31,24 +33,29 @@ function formatRange(start: string, end: string) {
   return s === e ? s : `${s} → ${e}`;
 }
 
-export function UpcomingAbsencesWidget({ clubId, className }: Props) {
+export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const roles = useMyRoles();
-  const canDeclare = roles.includes("player") || roles.includes("parent");
+  const canDeclare =
+    roles.includes("player") ||
+    roles.includes("parent") ||
+    (!!teamId && (roles.includes("coach") || roles.includes("admin")));
 
   const today = new Date().toISOString().slice(0, 10);
   const in14days = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
 
   const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["upcoming-absences", clubId, today],
+    queryKey: ["upcoming-absences", clubId, teamId ?? null, today],
     enabled: !!clubId,
     queryFn: async (): Promise<Row[]> => {
-      // Players of the club (via team_members → teams)
-      const { data: tm } = await supabase
+      // Players of the club (via team_members → teams), optionally filtered to a single team
+      let tmQuery = supabase
         .from("team_members")
-        .select("player_id, teams:team_id(club_id, deleted_at, archived_at)")
+        .select("player_id, teams:team_id(id, club_id, deleted_at, archived_at)")
         .eq("role", "player");
+      if (teamId) tmQuery = tmQuery.eq("team_id", teamId);
+      const { data: tm } = await tmQuery;
       const playerIds = Array.from(
         new Set(
           (tm ?? [])
@@ -83,6 +90,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
     },
     staleTime: 30_000,
   });
+
 
   const total = rows.length;
   const top = rows.slice(0, 4);
@@ -182,7 +190,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       </div>
 
       {/* Body */}
-      {(reducedSquad || total > 0 || canDeclare) && (
+      {(reducedSquad || total > 0 || canDeclare || teamId) && (
         <div className="p-3 space-y-2.5">
           {reducedSquad && (
             <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
@@ -232,6 +240,24 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
               <Plus className="h-4 w-4" strokeWidth={2.4} />
               {t("availability.declare", { defaultValue: "Déclarer une absence" })}
             </Button>
+          )}
+
+          {teamId && (
+            <Link
+              to="/teams/$teamId/availability"
+              params={{ teamId }}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-[10px] border-[1.5px] border-border bg-card hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <span className="text-[13px] font-bold">
+                  {t("availability.calendar.open", {
+                    defaultValue: "Voir le calendrier des absences",
+                  })}
+                </span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           )}
         </div>
       )}
