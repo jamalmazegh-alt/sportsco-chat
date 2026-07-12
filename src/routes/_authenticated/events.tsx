@@ -182,6 +182,50 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
+  // For players/parents: convocations on visible events, keyed by event_id.
+  const { data: myConvocsByEvent } = useQuery({
+    queryKey: ["my-convocs-by-event", user?.id, activeClubId, (events ?? []).length],
+    enabled: !!user && !isCoach && !!events && events.length > 0,
+    queryFn: async () => {
+      const [{ data: own }, { data: children }] = await Promise.all([
+        supabase.from("players").select("id, first_name").eq("user_id", user!.id),
+        supabase
+          .from("player_parents")
+          .select("player_id, players:player_id(id, first_name)")
+          .eq("parent_user_id", user!.id),
+      ]);
+      const players: Array<{ id: string; first_name: string }> = [
+        ...(own ?? []).map((p: any) => ({ id: p.id, first_name: p.first_name })),
+        ...(children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ id: p.id, first_name: p.first_name })),
+      ];
+      const playerIds = Array.from(new Set(players.map((p) => p.id)));
+      if (playerIds.length === 0) return new Map<string, any>();
+      const eventIds = (events ?? []).map((e) => e.id);
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id, status, player_id")
+        .in("event_id", eventIds)
+        .in("player_id", playerIds);
+      const byPlayer = new Map(players.map((p) => [p.id, p]));
+      const map = new Map<string, { status: string; playerName: string }>();
+      for (const c of (data ?? []) as any[]) {
+        const p = byPlayer.get(c.player_id);
+        if (!p) continue;
+        // Keep first (any convoc); if multiple children, priorité au pending
+        const existing = map.get(c.event_id);
+        if (!existing || (c.status === "pending" && existing.status !== "pending")) {
+          map.set(c.event_id, { status: c.status, playerName: p.first_name });
+        }
+      }
+      return map;
+    },
+    staleTime: 30_000,
+  });
+
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
@@ -340,6 +384,36 @@ function EventsPage() {
                   {t("events.status.cancelled")}
                 </span>
               )}
+              {(() => {
+                const myC = myConvocsByEvent?.get(e.id);
+                if (!myC) return null;
+                const styles: Record<string, string> = {
+                  pending:
+                    "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
+                  present:
+                    "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300",
+                  absent: "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
+                  uncertain:
+                    "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300",
+                };
+                const label =
+                  myC.status === "pending"
+                    ? t("dashboard.actionRequired", { defaultValue: "Action requise" })
+                    : t("events.convokedBadge", { defaultValue: "Convoqué" });
+                return (
+                  <span
+                    className={cn(
+                      "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
+                      styles[myC.status] ?? styles.pending,
+                    )}
+                    title={myC.playerName}
+                  >
+                    <BellRing className="h-3 w-3" />
+                    {label}
+                  </span>
+                );
+              })()}
+
               {e.type === "match" && e.competition_type && (
                 <span
                   className={cn(

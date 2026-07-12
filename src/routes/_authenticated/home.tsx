@@ -201,14 +201,8 @@ function HomePage() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
 
-  const playerHomeEvents = useMemo(() => {
-    const byId = new Map<string, any>();
-    for (const e of (upcoming ?? []) as any[]) byId.set(e.id, e);
-    for (const e of (myConvocs ?? []) as any[]) byId.set(e.id, e);
-    return Array.from(byId.values())
-      .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
-      .slice(0, 3);
-  }, [upcoming, myConvocs]);
+
+
 
   const paymentSummary = useMemo(() => {
     const obligations = paymentData?.obligations ?? [];
@@ -608,7 +602,7 @@ function HomePage() {
                   <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
                 </Link>
               </div>
-              {playerHomeEvents.length === 0 ? (
+              {!myConvocs || myConvocs.length === 0 ? (
                 <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
                   <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
                   <p className="text-sm text-muted-foreground font-medium">
@@ -617,12 +611,12 @@ function HomePage() {
                 </div>
               ) : (
                 <ul className="space-y-2">
-                  {playerHomeEvents.map((e: any, idx: number) => {
+                  {(myConvocs as any[]).map((e: any, idx: number) => {
                     const isCancelled = e.status === "cancelled";
                     const actionRequired = !isCancelled && e.convocation?.status === "pending";
                     const isFirst = idx === 0 && !actionRequired && !isCancelled;
                     return (
-                      <li key={e.id}>
+                      <li key={`${e.id}-${e.player?.id ?? ""}`}>
                         <Link
                           to="/events/$eventId"
                           params={{ eventId: e.id }}
@@ -711,6 +705,7 @@ function HomePage() {
                   })}
                 </ul>
               )}
+
             </section>
           );
         })()}
