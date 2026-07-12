@@ -11,6 +11,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertClubRole, type ClubRole } from "@/lib/authz.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getRequest } from "@tanstack/react-start/server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const MANAGER_ROLES: ClubRole[] = ["admin", "dirigeant", "coach"];
 
@@ -583,13 +585,23 @@ export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
       const { data: doc, error: dErr } = await supabaseAdmin
         .from("club_camp_registration_documents")
         .select(
-          "id, registration_id, club_camp_registrations!inner(camp_id, club_camps!inner(club_id))",
+          `id, registration_id, required_document_id,
+           club_camp_required_documents!inner ( title ),
+           club_camp_registrations!inner (
+             access_token, guardian_email, guardian_first_name,
+             participant_first_name, participant_last_name,
+             camp_id,
+             club_camps!inner ( club_id, title, slug, clubs!inner ( name, slug ) )
+           )`,
         )
         .eq("id", data.documentId)
         .maybeSingle();
       if (dErr) throw new Error(dErr.message);
       if (!doc) throw new Error("NOT_FOUND");
-      const clubId = (doc as any).club_camp_registrations.club_camps.club_id as string;
+      const reg = (doc as any).club_camp_registrations;
+      const camp = reg.club_camps;
+      const club = camp.clubs;
+      const clubId = camp.club_id as string;
       await assertClubRole({
         supabase: context.supabase,
         userId: context.userId,
@@ -613,6 +625,42 @@ export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
         .select("id, review_status, rejection_reason")
         .maybeSingle();
       if (error) throw new Error(error.message);
+
+      // Notify guardian on rejection (idempotent per doc+reason)
+      if (data.status === "rejected" && reg.guardian_email) {
+        try {
+          let origin = "https://clubero.app";
+          try {
+            const req = getRequest();
+            const h = req.headers.get("origin") || req.headers.get("referer");
+            if (h) origin = new URL(h).origin;
+          } catch {
+            // fallback ok
+          }
+          const trackingUrl = `${origin}/stages/${club.slug}/${camp.slug}/suivi/${reg.access_token}`;
+          const reasonHash = data
+            .reason!.trim()
+            .slice(0, 40)
+            .replace(/[^a-z0-9]/gi, "-");
+          await enqueueTransactionalEmailServer({
+            templateName: "camp-document-rejected",
+            recipientEmail: reg.guardian_email,
+            templateData: {
+              guardianFirstName: reg.guardian_first_name,
+              participantName: `${reg.participant_first_name} ${reg.participant_last_name}`,
+              campTitle: camp.title,
+              clubName: club.name,
+              documentLabel: (doc as any).club_camp_required_documents.title,
+              rejectionReason: data.reason!.trim(),
+              trackingUrl,
+            },
+            idempotencyKey: `camp-doc-rejected:${data.documentId}:${reasonHash}`,
+          });
+        } catch (e) {
+          console.error("[camp-document-rejected] email failed", e);
+        }
+      }
+
       return {
         id: updated!.id as string,
         review_status: updated!.review_status as DocReviewStatus,
