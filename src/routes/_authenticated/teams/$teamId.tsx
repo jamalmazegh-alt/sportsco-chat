@@ -47,7 +47,7 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 
-import { TeamAbsencesTable } from "@/components/team-absences-table";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { TeamChampionshipsSection } from "@/components/team-championships-section";
 import { Badge } from "@/components/ui/badge";
 import {
