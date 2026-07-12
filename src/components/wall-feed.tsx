@@ -24,6 +24,7 @@ import { MentionInput, RenderWithMentions, parseMentions } from "@/components/me
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
+import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
