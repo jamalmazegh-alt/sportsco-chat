@@ -136,6 +136,7 @@ import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
+import { Route as ApiPublicHooksCampDocumentsPurgeRouteImport } from './routes/api/public/hooks/camp-documents-purge'
 import { Route as ApiPublicBuildCluberoStartRouteImport } from './routes/api/public/build-clubero/start'
 import { Route as ApiPublicBuildCluberoSaveRouteImport } from './routes/api/public/build-clubero/save'
 import { Route as ApiPublicBuildCluberoCompleteRouteImport } from './routes/api/public/build-clubero/complete'
@@ -846,6 +847,12 @@ const ApiPublicHooksCoachInsightsRoute =
     path: '/api/public/hooks/coach-insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCampDocumentsPurgeRoute =
+  ApiPublicHooksCampDocumentsPurgeRouteImport.update({
+    id: '/api/public/hooks/camp-documents-purge',
+    path: '/api/public/hooks/camp-documents-purge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicBuildCluberoStartRoute =
   ApiPublicBuildCluberoStartRouteImport.update({
     id: '/api/public/build-clubero/start',
@@ -1154,6 +1161,7 @@ export interface FileRoutesByFullPath {
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
+  '/api/public/hooks/camp-documents-purge': typeof ApiPublicHooksCampDocumentsPurgeRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1306,6 +1314,7 @@ export interface FileRoutesByTo {
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
+  '/api/public/hooks/camp-documents-purge': typeof ApiPublicHooksCampDocumentsPurgeRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1465,6 +1474,7 @@ export interface FileRoutesById {
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
   '/api/public/build-clubero/start': typeof ApiPublicBuildCluberoStartRoute
+  '/api/public/hooks/camp-documents-purge': typeof ApiPublicHooksCampDocumentsPurgeRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1624,6 +1634,7 @@ export interface FileRouteTypes {
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
+    | '/api/public/hooks/camp-documents-purge'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1776,6 +1787,7 @@ export interface FileRouteTypes {
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
+    | '/api/public/hooks/camp-documents-purge'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1934,6 +1946,7 @@ export interface FileRouteTypes {
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
     | '/api/public/build-clubero/start'
+    | '/api/public/hooks/camp-documents-purge'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -2024,6 +2037,7 @@ export interface RootRouteChildren {
   ApiPublicBuildCluberoCompleteRoute: typeof ApiPublicBuildCluberoCompleteRoute
   ApiPublicBuildCluberoSaveRoute: typeof ApiPublicBuildCluberoSaveRoute
   ApiPublicBuildCluberoStartRoute: typeof ApiPublicBuildCluberoStartRoute
+  ApiPublicHooksCampDocumentsPurgeRoute: typeof ApiPublicHooksCampDocumentsPurgeRoute
   ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
@@ -2934,6 +2948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCoachInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/camp-documents-purge': {
+      id: '/api/public/hooks/camp-documents-purge'
+      path: '/api/public/hooks/camp-documents-purge'
+      fullPath: '/api/public/hooks/camp-documents-purge'
+      preLoaderRoute: typeof ApiPublicHooksCampDocumentsPurgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/build-clubero/start': {
       id: '/api/public/build-clubero/start'
       path: '/api/public/build-clubero/start'
@@ -3557,6 +3578,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBuildCluberoCompleteRoute: ApiPublicBuildCluberoCompleteRoute,
   ApiPublicBuildCluberoSaveRoute: ApiPublicBuildCluberoSaveRoute,
   ApiPublicBuildCluberoStartRoute: ApiPublicBuildCluberoStartRoute,
+  ApiPublicHooksCampDocumentsPurgeRoute: ApiPublicHooksCampDocumentsPurgeRoute,
   ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
