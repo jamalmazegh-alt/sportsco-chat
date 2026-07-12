@@ -658,7 +658,7 @@ export function ImportPlayersCsvDialog({
                 {t("common.back", { defaultValue: "Retour" })}
               </Button>
               <Button
-                onClick={confirmImport}
+                onClick={() => runImportFlow({ fromDiffs: true })}
                 disabled={loading || (analysis?.summary.valid ?? 0) === 0}
                 className="flex-1"
               >
