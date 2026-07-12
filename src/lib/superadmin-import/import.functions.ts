@@ -464,6 +464,21 @@ async function createInviteAndEmail(params: {
   }
 }
 
+/**
+ * Fields that can be updated on an existing player when the caller explicitly
+ * authorizes each one via `fieldOverrides` (per-row). Blank-fill still applies
+ * unconditionally for the same columns except first_name/last_name (identity).
+ */
+const PLAYER_OVERWRITABLE_FIELDS = [
+  "first_name",
+  "last_name",
+  "jersey_number",
+  "license_number",
+  "preferred_position",
+  "email",
+  "phone",
+] as const;
+
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -476,6 +491,10 @@ export const runImport = createServerFn({ method: "POST" })
         sendInvitations: z.boolean().default(false),
         fileName: z.string().max(255).optional(),
         iaUsed: z.boolean().default(false),
+        /** teamKey (`equipe|sport|categorie`) → team_id resolved by the caller. */
+        teamOverrides: z.record(z.string(), z.string().uuid()).optional(),
+        /** row index (0-based, as string) → list of columns authorized to overwrite. */
+        fieldOverrides: z.record(z.string(), z.array(z.string())).optional(),
       })
       .parse(input),
   )
