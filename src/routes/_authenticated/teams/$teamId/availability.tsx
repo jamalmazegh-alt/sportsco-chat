@@ -192,8 +192,69 @@ function TeamAvailabilityCalendar() {
           >
             {t("common.today", { defaultValue: "Aujourd'hui" })}
           </Button>
+          <Button
+            size="sm"
+            className="ml-2"
+            disabled={players.length === 0}
+            onClick={() => {
+              setAbsencePlayerId("");
+              setPickerOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
         </div>
       </div>
+
+      {/* Player picker → drawer */}
+      {pickerOpen && (
+        <Card className="border-primary/40">
+          <CardContent className="p-3 flex items-end gap-2">
+            <div className="flex-1 space-y-1.5">
+              <label className="text-xs font-medium">
+                {t("availability.calendar.pickPlayer", { defaultValue: "Joueur concerné" })}
+              </label>
+              <Select value={absencePlayerId} onValueChange={setAbsencePlayerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  {players.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.first_name} {p.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              size="sm"
+              disabled={!absencePlayerId}
+              onClick={() => {
+                setPickerOpen(false);
+                setAbsenceOpen(true);
+              }}
+            >
+              {t("common.continue", { defaultValue: "Continuer" })}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setPickerOpen(false)}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {absencePlayerId && (
+        <DeclareAbsenceDrawer
+          open={absenceOpen}
+          onOpenChange={setAbsenceOpen}
+          playerId={absencePlayerId}
+          onCreated={() => {
+            qc.invalidateQueries({ queryKey: ["team-availability-month", teamId] });
+          }}
+        />
+      )}
 
       <Card>
         <CardHeader className="pb-2">
