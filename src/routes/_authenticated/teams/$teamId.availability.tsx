@@ -19,23 +19,8 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/availability")({
   component: TeamAvailabilityCalendar,
-  errorComponent: ({ error, reset }) => {
-    const router = useRouter();
-    return (
-      <div className="p-6 space-y-3">
-        <p className="text-sm text-destructive">{String(error?.message ?? error)}</p>
-        <Button
-          onClick={() => {
-            reset();
-            router.invalidate();
-          }}
-          size="sm"
-        >
-          Réessayer
-        </Button>
-      </div>
-    );
-  },
+  errorComponent: ErrorBoundary,
+
   notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
 });
 
