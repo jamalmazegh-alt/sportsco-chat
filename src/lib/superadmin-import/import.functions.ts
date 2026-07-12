@@ -1216,15 +1216,21 @@ export const previewPlayersImport = createServerFn({ method: "POST" })
       if (!fixedTeam && row.equipe && row.sport && row.categorie) {
         teamKey = `${row.equipe}|${row.sport}|${row.categorie}`;
         if (!teamTuples.has(teamKey)) {
-          const exact = teamList.find(
-            (t) => t.name === row.equipe && t.sport === row.sport && t.age_group === row.categorie,
+          // Normalized (unaccent + lowercase + strip non-alnum) match — dedupes
+          // casse/accents differences so "U13 F" and "u13-f" resolve to the
+          // same team instead of proposing "create" again.
+          const targetNorm = `${normalizeName(row.equipe)}|${normalizeName(row.sport)}|${normalizeName(row.categorie)}`;
+          const matched = teamList.find(
+            (t) =>
+              `${normalizeName(t.name)}|${normalizeName(t.sport)}|${normalizeName(t.age_group)}` ===
+              targetNorm,
           );
           teamTuples.set(teamKey, {
             key: teamKey,
             name: row.equipe,
             sport: row.sport,
             category: row.categorie,
-            suggestedTeamId: exact?.id ?? null,
+            suggestedTeamId: matched?.id ?? null,
             existingTeams: teamList,
           });
         }
