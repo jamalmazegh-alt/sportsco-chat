@@ -60,7 +60,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Archive, ArchiveRestore } from "lucide-react";
+import { Archive, ArchiveRestore, CalendarDays } from "lucide-react";
 
 import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
