@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   analyzeFileWithAI,
-  parseTemplateFn,
   previewPlayersImport,
   runImport,
   type PlayerImportPreview,
@@ -25,8 +24,8 @@ import {
 import {
   type AnalysisResult,
   getFields,
-  templateMatchRatio,
 } from "@/lib/superadmin-import/schemas";
+
 
 /**
  * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
