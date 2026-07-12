@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
+
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { cn } from "@/lib/utils";
@@ -177,13 +177,14 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
+              aria-label={t("availability.declare", { defaultValue: "Déclarer une absence" })}
+              title={t("availability.declare", { defaultValue: "Déclarer une absence" })}
               className={cn(
-                "shrink-0 text-[11px] font-bold inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full transition-all",
+                "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full transition-all",
                 declareBtnClass,
               )}
             >
-              {t("availability.declare", { defaultValue: "Déclarer" })}
-              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
+              <Plus className="h-5 w-5" strokeWidth={2.8} />
             </button>
           )}
         </div>
@@ -230,17 +231,6 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             </ul>
           )}
 
-          {canDeclare && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full border-[1.5px] border-border hover:border-[#2d9d5f] hover:bg-[#f0f9f3] hover:text-foreground font-bold rounded-[10px]"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <Plus className="h-4 w-4" strokeWidth={2.4} />
-              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-            </Button>
-          )}
 
           {teamId && (
             <Link
@@ -262,7 +252,9 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
         </div>
       )}
 
-      {canDeclare && <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />}
+      {canDeclare && (
+        <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} teamId={teamId} />
+      )}
     </section>
   );
 }

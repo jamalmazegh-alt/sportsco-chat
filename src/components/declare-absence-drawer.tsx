@@ -53,8 +53,10 @@ const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  /** Pre-selected player; if omitted, derived from current user (player or parent). */
+  /** Pre-selected player; if omitted, derived from current user (player or parent) or from teamId. */
   playerId?: string;
+  /** When provided, the candidate list = all players of this team (coach/admin flow). */
+  teamId?: string;
   onCreated?: () => void;
 }
 
@@ -64,6 +66,7 @@ export function DeclareAbsenceDrawer({
   open,
   onOpenChange,
   playerId: initialPlayerId,
+  teamId,
   onCreated,
 }: Props) {
   const { t } = useTranslation();
@@ -91,11 +94,28 @@ export function DeclareAbsenceDrawer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialPlayerId]);
 
-  // Candidates: players linked to the current user (as player or parent).
+  // Candidates:
+  // - if teamId provided → all players of the team (coach flow)
+  // - else → players linked to the current user (own or via parent link)
   const { data: candidates = [] } = useQuery({
-    queryKey: ["absence-candidates", user?.id, initialPlayerId],
-    enabled: open && !!user?.id && !initialPlayerId,
+    queryKey: ["absence-candidates", user?.id, initialPlayerId, teamId ?? null],
+    enabled: open && !initialPlayerId && (!!teamId || !!user?.id),
     queryFn: async (): Promise<Candidate[]> => {
+      if (teamId) {
+        const { data } = await supabase
+          .from("team_members")
+          .select("players:player_id(id, first_name, last_name)")
+          .eq("team_id", teamId)
+          .eq("role", "player");
+        const map = new Map<string, Candidate>();
+        for (const r of (data ?? []) as any[]) {
+          const p = r.players;
+          if (p) map.set(p.id, p);
+        }
+        return Array.from(map.values()).sort((a, b) =>
+          (a.first_name + a.last_name).localeCompare(b.first_name + b.last_name),
+        );
+      }
       const [own, asParent] = await Promise.all([
         supabase.from("players").select("id, first_name, last_name").eq("user_id", user!.id),
         supabase
@@ -114,6 +134,7 @@ export function DeclareAbsenceDrawer({
       );
     },
   });
+
 
   // Auto-select if only one candidate
   useEffect(() => {
@@ -402,7 +423,7 @@ export function DeclareAbsenceDrawer({
         <div className="mt-4 space-y-4">
           {!initialPlayerId && candidates.length > 1 && (
             <div className="space-y-1.5">
-              <Label>{t("availability.forChild", { defaultValue: "Pour quel enfant ?" })}</Label>
+              <Label>{teamId ? t("availability.forPlayer", { defaultValue: "Pour quel joueur ?" }) : t("availability.forChild", { defaultValue: "Pour quel enfant ?" })}</Label>
               <Select value={playerId} onValueChange={setPlayerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="—" />
