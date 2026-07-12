@@ -190,7 +190,7 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
       </div>
 
       {/* Body */}
-      {(reducedSquad || total > 0 || canDeclare) && (
+      {(reducedSquad || total > 0 || canDeclare || teamId) && (
         <div className="p-3 space-y-2.5">
           {reducedSquad && (
             <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
