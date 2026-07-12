@@ -294,22 +294,8 @@ function CampEditPage() {
         </TabsContent>
 
         <TabsContent value="edit" className="space-y-6">
-          {camp.status === "published" && (
-            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
-              <div className="font-medium">
-                {t("lifecycle.publicUrl", { defaultValue: "Lien public" })}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                /stages/&lt;club-slug&gt;/{camp.slug}{" "}
-                <span className="italic">
-                  (
-                  {t("lifecycle.publicUrlSoon", {
-                    defaultValue: "page publique bientôt disponible",
-                  })}
-                  )
-                </span>
-              </div>
-            </div>
+          {camp.status !== "draft" && camp.club_slug && (
+            <PublicCampLinkCard clubSlug={camp.club_slug} campSlug={camp.slug} t={t} />
           )}
 
           {/* Section: Informations */}
