@@ -1052,13 +1052,17 @@ export const runImport = createServerFn({ method: "POST" })
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
         }
-        imported = playersCreated + playersUpdated + playersRestored;
+        // A row "counts" as imported if it created/updated/restored a player
+        // OR simply linked an already-existing player to a new team.
+        imported = playersCreated + playersUpdated + playersRestored + playersLinked;
         summary.teams_created = teamsCreated;
         summary.players_created = playersCreated;
         summary.players_updated = playersUpdated;
         summary.players_restored = playersRestored;
+        summary.players_linked = playersLinked;
         summary.parents_created = parentsCreated;
         summary.invitations_sent = invitationsSent;
+
       } else if (data.type === "coaches") {
         const teamCache = new Map<string, string>();
         const toCreate = new Set(data.teamsToCreate ?? []);
