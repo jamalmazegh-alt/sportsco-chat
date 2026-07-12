@@ -764,10 +764,13 @@ export const runImport = createServerFn({ method: "POST" })
             let playerId: string;
 
             if (existing && existing.deleted_at) {
-              const { error: restoreErr } = await supabaseAdmin.rpc(
-                "restore_entity" as never,
-                { _kind: "player", _id: existing.id } as never,
-              );
+              // Restore directement via service role — assertImportAccess a déjà
+              // validé le droit d'écriture sur ce club. On n'utilise pas le RPC
+              // restore_entity qui exige auth.uid() (NULL avec supabaseAdmin).
+              const { error: restoreErr } = await supabaseAdmin
+                .from("players")
+                .update({ deleted_at: null } as never)
+                .eq("id", existing.id);
               if (restoreErr) throw new Error(restoreErr.message);
               existing = { ...existing, deleted_at: null };
               playersRestored++;
