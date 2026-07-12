@@ -485,19 +485,20 @@ export function ImportPlayersCsvDialog({
                 {t("common.back", { defaultValue: "Retour" })}
               </Button>
               <Button
-                onClick={runPreview}
+                onClick={() => runImportFlow()}
                 disabled={loading || analysis.summary.valid === 0}
                 className="flex-1"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>
-                    <Eye className="h-4 w-4 mr-1" />
-                    {t("players.import.preview", { defaultValue: "Prévisualiser" })}
-                  </>
+                  t("players.import.confirm", {
+                    defaultValue: `Importer ${analysis.summary.valid} joueur(s)`,
+                    count: analysis.summary.valid,
+                  })
                 )}
               </Button>
+
             </div>
           </div>
         )}
