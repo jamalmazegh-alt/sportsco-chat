@@ -129,15 +129,24 @@ export const getClubCamp = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!camp) throw new Error("NOT_FOUND");
-    const { data: ageGroups, error: agErr } = await context.supabase
-      .from("club_camp_age_groups")
-      .select("id, camp_id, label, birth_year_min, birth_year_max, sort_order")
-      .eq("camp_id", data.campId)
-      .order("sort_order", { ascending: true });
+    const [{ data: ageGroups, error: agErr }, { data: club, error: clubErr }] = await Promise.all([
+      context.supabase
+        .from("club_camp_age_groups")
+        .select("id, camp_id, label, birth_year_min, birth_year_max, sort_order")
+        .eq("camp_id", data.campId)
+        .order("sort_order", { ascending: true }),
+      context.supabase
+        .from("clubs")
+        .select("slug")
+        .eq("id", (camp as ClubCamp).club_id)
+        .maybeSingle(),
+    ]);
     if (agErr) throw new Error(agErr.message);
+    if (clubErr) throw new Error(clubErr.message);
     return {
       ...(camp as ClubCamp),
       age_groups: (ageGroups ?? []) as CampAgeGroup[],
+      club_slug: (club as { slug: string } | null)?.slug ?? null,
     };
   });
 
