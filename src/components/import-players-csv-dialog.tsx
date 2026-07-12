@@ -151,6 +151,43 @@ export function ImportPlayersCsvDialog({
     });
   }, [analysis, fields]);
 
+  const editCell = (rowIdx: number, key: string, val: string) => {
+    if (!analysis) return;
+    const newRows = [...analysis.rows];
+    const prev = newRows[rowIdx][key] ?? {
+      value: null,
+      error: null,
+      auto_corrected: false,
+      original: null,
+    };
+    const cell = {
+      ...prev,
+      value: val || null,
+      original: prev.value,
+      auto_corrected: false,
+    };
+    const fdef = fields.find((x) => x.key === key);
+    cell.error = fdef?.validate ? fdef.validate(cell.value) : null;
+    newRows[rowIdx] = { ...newRows[rowIdx], [key]: cell };
+    const required = fields.filter((f) => f.required).map((f) => f.key);
+    let valid = 0;
+    let to_fix = 0;
+    for (const r of newRows) {
+      const ok =
+        required.every((k) => r[k]?.value) &&
+        Object.values(r).every((c) => !c.error);
+      if (ok) valid++;
+      else to_fix++;
+    }
+    setAnalysis({
+      ...analysis,
+      rows: newRows,
+      summary: { total: newRows.length, valid, to_fix },
+    });
+    setPreview(null);
+    setOverrides({});
+  };
+
   const reset = () => {
     setFileName("");
     setHeaders([]);
