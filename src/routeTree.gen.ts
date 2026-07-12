@@ -99,6 +99,8 @@ import { Route as ApiPublicSubmitCampRegistrationRouteImport } from './routes/ap
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
+import { Route as ApiPublicCampTrackUploadRouteImport } from './routes/api/public/camp-track-upload'
+import { Route as ApiPublicCampTrackSignedUrlRouteImport } from './routes/api/public/camp-track-signed-url'
 import { Route as AuthenticatedTournamentsPricingRouteImport } from './routes/_authenticated/tournaments.pricing'
 import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './routes/_authenticated/tournaments.new-from-pass'
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
@@ -161,6 +163,7 @@ import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes
 import { Route as AuthenticatedAdminPaymentsItemsRouteImport } from './routes/_authenticated/admin/payments.items'
 import { Route as AuthenticatedAdminPaymentsDashboardRouteImport } from './routes/_authenticated/admin/payments.dashboard'
 import { Route as AuthenticatedAdminCampsCampIdRouteImport } from './routes/_authenticated/admin/camps.$campId'
+import { Route as StagesClubSlugCampSlugSuiviTokenRouteImport } from './routes/stages.$clubSlug.$campSlug.suivi.$token'
 import { Route as ApiPublicTournamentIdRegulationsRouteImport } from './routes/api/public/tournament.$id.regulations'
 
 const SuperadminRoute = SuperadminRouteImport.update({
@@ -626,6 +629,18 @@ const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
   path: '/api/public/inquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCampTrackUploadRoute =
+  ApiPublicCampTrackUploadRouteImport.update({
+    id: '/api/public/camp-track-upload',
+    path: '/api/public/camp-track-upload',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCampTrackSignedUrlRoute =
+  ApiPublicCampTrackSignedUrlRouteImport.update({
+    id: '/api/public/camp-track-signed-url',
+    path: '/api/public/camp-track-signed-url',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedTournamentsPricingRoute =
   AuthenticatedTournamentsPricingRouteImport.update({
     id: '/pricing',
@@ -993,6 +1008,12 @@ const AuthenticatedAdminCampsCampIdRoute =
     path: '/camps/$campId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const StagesClubSlugCampSlugSuiviTokenRoute =
+  StagesClubSlugCampSlugSuiviTokenRouteImport.update({
+    id: '/suivi/$token',
+    path: '/suivi/$token',
+    getParentRoute: () => StagesClubSlugCampSlugRoute,
+  } as any)
 const ApiPublicTournamentIdRegulationsRoute =
   ApiPublicTournamentIdRegulationsRouteImport.update({
     id: '/api/public/tournament/$id/regulations',
@@ -1077,6 +1098,8 @@ export interface FileRoutesByFullPath {
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
+  '/api/public/camp-track-signed-url': typeof ApiPublicCampTrackSignedUrlRoute
+  '/api/public/camp-track-upload': typeof ApiPublicCampTrackUploadRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1153,6 +1176,7 @@ export interface FileRoutesByFullPath {
   '/admin/camps/': typeof AuthenticatedAdminCampsIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
+  '/stages/$clubSlug/$campSlug/suivi/$token': typeof StagesClubSlugCampSlugSuiviTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1226,6 +1250,8 @@ export interface FileRoutesByTo {
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
+  '/api/public/camp-track-signed-url': typeof ApiPublicCampTrackSignedUrlRoute
+  '/api/public/camp-track-upload': typeof ApiPublicCampTrackUploadRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1302,6 +1328,7 @@ export interface FileRoutesByTo {
   '/admin/camps': typeof AuthenticatedAdminCampsIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
+  '/stages/$clubSlug/$campSlug/suivi/$token': typeof StagesClubSlugCampSlugSuiviTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1382,6 +1409,8 @@ export interface FileRoutesById {
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/_authenticated/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
+  '/api/public/camp-track-signed-url': typeof ApiPublicCampTrackSignedUrlRoute
+  '/api/public/camp-track-upload': typeof ApiPublicCampTrackUploadRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1458,6 +1487,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/camps/': typeof AuthenticatedAdminCampsIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
+  '/stages/$clubSlug/$campSlug/suivi/$token': typeof StagesClubSlugCampSlugSuiviTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1538,6 +1568,8 @@ export interface FileRouteTypes {
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
     | '/tournaments/pricing'
+    | '/api/public/camp-track-signed-url'
+    | '/api/public/camp-track-upload'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1614,6 +1646,7 @@ export interface FileRouteTypes {
     | '/admin/camps/'
     | '/admin/users/'
     | '/api/public/tournament/$id/regulations'
+    | '/stages/$clubSlug/$campSlug/suivi/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1687,6 +1720,8 @@ export interface FileRouteTypes {
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
     | '/tournaments/pricing'
+    | '/api/public/camp-track-signed-url'
+    | '/api/public/camp-track-upload'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1763,6 +1798,7 @@ export interface FileRouteTypes {
     | '/admin/camps'
     | '/admin/users'
     | '/api/public/tournament/$id/regulations'
+    | '/stages/$clubSlug/$campSlug/suivi/$token'
   id:
     | '__root__'
     | '/'
@@ -1842,6 +1878,8 @@ export interface FileRouteTypes {
     | '/_authenticated/tournaments/$tournamentId'
     | '/_authenticated/tournaments/new-from-pass'
     | '/_authenticated/tournaments/pricing'
+    | '/api/public/camp-track-signed-url'
+    | '/api/public/camp-track-upload'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1918,6 +1956,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/camps/'
     | '/_authenticated/admin/users/'
     | '/api/public/tournament/$id/regulations'
+    | '/stages/$clubSlug/$campSlug/suivi/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1965,6 +2004,8 @@ export interface RootRouteChildren {
   TournamentsStartRoute: typeof TournamentsStartRoute
   WebhooksStripeRoute: typeof WebhooksStripeRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicCampTrackSignedUrlRoute: typeof ApiPublicCampTrackSignedUrlRoute
+  ApiPublicCampTrackUploadRoute: typeof ApiPublicCampTrackUploadRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -2634,6 +2675,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInquiryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/camp-track-upload': {
+      id: '/api/public/camp-track-upload'
+      path: '/api/public/camp-track-upload'
+      fullPath: '/api/public/camp-track-upload'
+      preLoaderRoute: typeof ApiPublicCampTrackUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/camp-track-signed-url': {
+      id: '/api/public/camp-track-signed-url'
+      path: '/api/public/camp-track-signed-url'
+      fullPath: '/api/public/camp-track-signed-url'
+      preLoaderRoute: typeof ApiPublicCampTrackSignedUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tournaments/pricing': {
       id: '/_authenticated/tournaments/pricing'
       path: '/pricing'
@@ -3068,6 +3123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCampsCampIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/stages/$clubSlug/$campSlug/suivi/$token': {
+      id: '/stages/$clubSlug/$campSlug/suivi/$token'
+      path: '/suivi/$token'
+      fullPath: '/stages/$clubSlug/$campSlug/suivi/$token'
+      preLoaderRoute: typeof StagesClubSlugCampSlugSuiviTokenRouteImport
+      parentRoute: typeof StagesClubSlugCampSlugRoute
+    }
     '/api/public/tournament/$id/regulations': {
       id: '/api/public/tournament/$id/regulations'
       path: '/api/public/tournament/$id/regulations'
@@ -3399,12 +3461,15 @@ const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
 
 interface StagesClubSlugCampSlugRouteChildren {
   StagesClubSlugCampSlugInscriptionRoute: typeof StagesClubSlugCampSlugInscriptionRoute
+  StagesClubSlugCampSlugSuiviTokenRoute: typeof StagesClubSlugCampSlugSuiviTokenRoute
 }
 
 const StagesClubSlugCampSlugRouteChildren: StagesClubSlugCampSlugRouteChildren =
   {
     StagesClubSlugCampSlugInscriptionRoute:
       StagesClubSlugCampSlugInscriptionRoute,
+    StagesClubSlugCampSlugSuiviTokenRoute:
+      StagesClubSlugCampSlugSuiviTokenRoute,
   }
 
 const StagesClubSlugCampSlugRouteWithChildren =
@@ -3472,6 +3537,8 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsStartRoute: TournamentsStartRoute,
   WebhooksStripeRoute: WebhooksStripeRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicCampTrackSignedUrlRoute: ApiPublicCampTrackSignedUrlRoute,
+  ApiPublicCampTrackUploadRoute: ApiPublicCampTrackUploadRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,

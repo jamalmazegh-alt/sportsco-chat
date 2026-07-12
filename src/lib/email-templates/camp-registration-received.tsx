@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Heading, Img, Section, Text } from "@react-email/components";
+import { Button, Heading, Img, Section, Text } from "@react-email/components";
 import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
@@ -11,6 +11,8 @@ interface Props {
   campStartDate?: string;
   campEndDate?: string;
   referenceId?: string;
+  trackingUrl?: string;
+  isFull?: boolean;
 }
 
 const CampRegistrationReceived = ({
@@ -21,6 +23,8 @@ const CampRegistrationReceived = ({
   campStartDate,
   campEndDate,
   referenceId,
+  trackingUrl,
+  isFull,
 }: Props) => {
   const dates =
     campStartDate && campEndDate
@@ -51,10 +55,37 @@ const CampRegistrationReceived = ({
         {dates && <Text style={cardLine}>Dates : {dates}</Text>}
         {referenceId && <Text style={cardLine}>Référence : {referenceId}</Text>}
       </Section>
-      <Text style={text}>
-        Votre dossier est en attente de validation par le club. Vous recevrez un email dès qu'il
-        aura été traité.
-      </Text>
+      {isFull ? (
+        <Section style={warn}>
+          <Text style={warnText}>
+            ⚠️ Le stage est actuellement <strong>complet</strong>. Votre demande est enregistrée
+            en liste d'attente : le club vous recontactera dès qu'une place se libère ou pour
+            confirmer votre placement.
+          </Text>
+        </Section>
+      ) : (
+        <Text style={text}>
+          Votre dossier est en attente de validation par le club. Vous recevrez un email dès qu'il
+          aura été traité.
+        </Text>
+      )}
+      {trackingUrl && (
+        <>
+          <Text style={text}>
+            Vous pouvez suivre l'avancement de votre dossier, télécharger vos pièces et remplacer
+            une pièce refusée depuis votre lien personnel :
+          </Text>
+          <Button style={button} href={trackingUrl}>
+            Suivre mon inscription
+          </Button>
+          <Text style={small}>
+            Ou ouvrez ce lien :<br />
+            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{trackingUrl}</span>
+            <br />
+            <em>Ce lien est personnel — ne le partagez pas.</em>
+          </Text>
+        </>
+      )}
       <Text style={small}>
         Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.
       </Text>
@@ -74,6 +105,8 @@ export const template = {
     campStartDate: new Date().toISOString(),
     campEndDate: new Date(Date.now() + 5 * 86400000).toISOString(),
     referenceId: "AB12CD34",
+    trackingUrl: "https://clubero.app/stages/fc-villeneuve/stage-printemps/suivi/token",
+    isFull: false,
   },
 } satisfies TemplateEntry;
 
@@ -95,4 +128,20 @@ const card = {
   margin: "0 0 20px",
 };
 const cardLine = { fontSize: "13px", color: "#475569", margin: "2px 0" };
+const warn = {
+  backgroundColor: "#fef3c7",
+  borderRadius: "12px",
+  padding: "14px 16px",
+  margin: "0 0 20px",
+};
+const warnText = { fontSize: "14px", color: "#92400e", margin: 0, lineHeight: "1.5" };
+const button = {
+  backgroundColor: "#0f172a",
+  color: "#ffffff",
+  fontSize: "14px",
+  borderRadius: "10px",
+  padding: "12px 20px",
+  textDecoration: "none",
+  display: "inline-block",
+};
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };

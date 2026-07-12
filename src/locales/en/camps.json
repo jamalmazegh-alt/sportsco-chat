@@ -240,7 +240,7 @@
     "backToCamp": "Back to camp",
     "formTitle": "Registration — {{title}}",
     "docsHint": "PDF, JPG or PNG — 15 MB max per file.",
-    "consent": "I allow the club to use the submitted data to manage this camp registration (GDPR).",
+    "consent": "I authorize the club to use the submitted data (child identity, parent contact, attachments) to manage this camp registration in accordance with GDPR. Data is kept up to 12 months after the end of the camp, then deleted automatically.",
     "submit": "Submit registration",
     "confirmTitle": "Registration sent!",
     "confirmBody": "We received your file. The club will contact you shortly.",
@@ -277,7 +277,11 @@
       "closed": "Registration is closed.",
       "ageMismatch": "The child's age does not match the chosen category.",
       "generic": "An error occurred. Please try again.",
-      "network": "Network error. Check your connection."
-    }
+      "network": "Network error. Check your connection.",
+      "duplicate": "This child is already registered for this camp. Check the email you received to follow the file."
+    },
+    "full": "Full — waiting list registration available",
+    "lastSpots": "Last spots ({{count}} left)",
+    "registerWaitlistCta": "Join the waiting list"
   }
 }

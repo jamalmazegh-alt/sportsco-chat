@@ -240,7 +240,7 @@
     "backToCamp": "Retour au stage",
     "formTitle": "Inscription — {{title}}",
     "docsHint": "PDF, JPG ou PNG — 15 Mo max par fichier.",
-    "consent": "J'autorise le club à utiliser les données transmises pour gérer cette inscription au stage (RGPD).",
+    "consent": "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à 12 mois après la fin du stage, puis supprimées automatiquement.",
     "submit": "Envoyer l'inscription",
     "confirmTitle": "Inscription envoyée !",
     "confirmBody": "Nous avons bien reçu votre dossier. Le club vous contactera pour la suite.",
@@ -277,7 +277,11 @@
       "closed": "Les inscriptions sont fermées.",
       "ageMismatch": "L'âge de l'enfant ne correspond pas à la catégorie choisie.",
       "generic": "Une erreur est survenue. Réessayez.",
-      "network": "Erreur réseau. Vérifiez votre connexion."
-    }
+      "network": "Erreur réseau. Vérifiez votre connexion.",
+      "duplicate": "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier."
+    },
+    "full": "Complet — inscription possible en liste d'attente",
+    "lastSpots": "Dernières places ({{count}} restantes)",
+    "registerWaitlistCta": "Rejoindre la liste d'attente"
   }
 }

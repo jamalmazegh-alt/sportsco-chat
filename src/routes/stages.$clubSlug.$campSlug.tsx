@@ -261,20 +261,43 @@ function PublicCampPage() {
         )}
 
         <div className="mt-10 flex flex-col items-center gap-3">
-          {deadlinePassed ? (
-            <div className="rounded-lg bg-muted px-4 py-3 text-sm text-muted-foreground">
-              {t("public.deadlinePassed", "Les inscriptions sont fermées.")}
-            </div>
-          ) : (
-            <Button asChild size="lg">
-              <Link
-                to="/stages/$clubSlug/$campSlug/inscription"
-                params={{ clubSlug, campSlug }}
-              >
-                {t("public.registerCta", "S'inscrire à ce stage")}
-              </Link>
-            </Button>
-          )}
+          {(() => {
+            const remaining = (camp as any).remaining as number | undefined;
+            const isFull = (camp as any).is_full as boolean | undefined;
+            if (deadlinePassed) {
+              return (
+                <div className="rounded-lg bg-muted px-4 py-3 text-sm text-muted-foreground">
+                  {t("public.deadlinePassed", "Les inscriptions sont fermées.")}
+                </div>
+              );
+            }
+            return (
+              <>
+                {isFull && (
+                  <div className="rounded-lg bg-amber-100 px-4 py-2 text-sm font-medium text-amber-800">
+                    {t("public.full", "Complet — inscription possible en liste d'attente")}
+                  </div>
+                )}
+                {!isFull && typeof remaining === "number" && remaining > 0 && remaining <= 5 && (
+                  <div className="rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                    {t("public.lastSpots", "Dernières places ({{count}} restantes)", {
+                      count: remaining,
+                    })}
+                  </div>
+                )}
+                <Button asChild size="lg">
+                  <Link
+                    to="/stages/$clubSlug/$campSlug/inscription"
+                    params={{ clubSlug, campSlug }}
+                  >
+                    {isFull
+                      ? t("public.registerWaitlistCta", "Rejoindre la liste d'attente")
+                      : t("public.registerCta", "S'inscrire à ce stage")}
+                  </Link>
+                </Button>
+              </>
+            );
+          })()}
           {camp.registration_deadline && !deadlinePassed && (
             <p className="text-xs text-muted-foreground">
               {t("public.deadlineHint", "Date limite d'inscription : {{date}}", {
@@ -287,6 +310,7 @@ function PublicCampPage() {
             </p>
           )}
         </div>
+
       </div>
     </div>
   );

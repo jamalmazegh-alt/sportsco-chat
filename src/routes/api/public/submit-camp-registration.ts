@@ -21,7 +21,7 @@ const FieldsSchema = z.object({
     .optional()
     .or(z.literal("").transform(() => undefined)),
   club_name: z.string().trim().max(200).optional().nullable(),
-  age_group_id: z.string().uuid().optional().nullable(),
+  age_group_id: z.string().uuid().optional().nullable().or(z.literal("").transform(() => null)),
   guardian_first_name: z.string().trim().min(1).max(120),
   guardian_last_name: z.string().trim().min(1).max(120),
   guardian_email: z.string().trim().email().max(255),
@@ -46,13 +46,15 @@ function extFor(mime: string): string {
 }
 
 function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60) || "doc";
+  return (
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "doc"
+  );
 }
 
 export const Route = createFileRoute("/api/public/submit-camp-registration")({
@@ -77,7 +79,6 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           return Response.json({ error: "invalid_body" }, { status: 400 });
         }
 
-        // Extract text fields
         const raw: Record<string, string> = {};
         for (const [k, v] of form.entries()) {
           if (typeof v === "string") raw[k] = v;
@@ -85,7 +86,10 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
 
         // Honeypot — pretend success
         if (raw.website && raw.website.length > 0) {
-          return Response.json({ ok: true, registrationId: "00000000-0000-0000-0000-000000000000" });
+          return Response.json({
+            ok: true,
+            registrationId: "00000000-0000-0000-0000-000000000000",
+          });
         }
 
         let fields: z.infer<typeof FieldsSchema>;
@@ -130,32 +134,44 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           return Response.json({ error: "registration_closed" }, { status: 400 });
         }
 
-        // Capacity check (approved + pending)
-        const { count: currentCount } = await supabase
+        // Capacity check — informational only. Full stage does NOT refuse.
+        const { count: takenCount } = await supabase
           .from("club_camp_registrations")
           .select("id", { count: "exact", head: true })
           .eq("camp_id", camp.id)
           .in("registration_status", ["pending", "approved"]);
-        if ((currentCount ?? 0) >= camp.capacity) {
-          return Response.json({ error: "full" }, { status: 400 });
-        }
+        const isFull = (takenCount ?? 0) >= camp.capacity;
 
-        // Age group validation
+        // Age group validation (server-side)
+        const { data: ageGroups } = await supabase
+          .from("club_camp_age_groups")
+          .select("id, birth_year_min, birth_year_max")
+          .eq("camp_id", camp.id);
+        const birthYear = Number(fields.birth_date.slice(0, 4));
+        const groupsWithBounds = (ageGroups ?? []).filter(
+          (g) => g.birth_year_min != null || g.birth_year_max != null,
+        );
+
         if (fields.age_group_id) {
-          const { data: group } = await supabase
-            .from("club_camp_age_groups")
-            .select("id, camp_id, birth_year_min, birth_year_max")
-            .eq("id", fields.age_group_id)
-            .eq("camp_id", camp.id)
-            .maybeSingle();
-          if (!group) {
+          const chosen = (ageGroups ?? []).find((g) => g.id === fields.age_group_id);
+          if (!chosen) {
             return Response.json({ error: "age_group_invalid" }, { status: 400 });
           }
-          const year = Number(fields.birth_date.slice(0, 4));
-          if (
-            (group.birth_year_min && year < group.birth_year_min) ||
-            (group.birth_year_max && year > group.birth_year_max)
-          ) {
+          const min = chosen.birth_year_min;
+          const max = chosen.birth_year_max;
+          if ((min != null && birthYear < min) || (max != null && birthYear > max)) {
+            return Response.json({ error: "age_mismatch" }, { status: 400 });
+          }
+        } else if (groupsWithBounds.length > 0) {
+          // Aucune catégorie choisie mais des bornes existent : la date doit rentrer dans au moins une
+          const fits = groupsWithBounds.some((g) => {
+            const min = g.birth_year_min;
+            const max = g.birth_year_max;
+            const okMin = min == null || birthYear >= min;
+            const okMax = max == null || birthYear <= max;
+            return okMin && okMax;
+          });
+          if (!fits) {
             return Response.json({ error: "age_mismatch" }, { status: 400 });
           }
         }
@@ -166,7 +182,6 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           .select("id, title, required, is_sensitive")
           .eq("camp_id", camp.id);
 
-        // Collect uploaded files by doc id
         const filesByDoc = new Map<string, File>();
         for (const [k, v] of form.entries()) {
           if (k.startsWith("doc_") && v instanceof File && v.size > 0) {
@@ -174,7 +189,6 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           }
         }
 
-        // Verify required + validate size/mime
         for (const doc of requiredDocs ?? []) {
           const file = filesByDoc.get(doc.id);
           if (doc.required && !file) {
@@ -185,22 +199,16 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           }
           if (file) {
             if (file.size > CAMP_UPLOAD_MAX_BYTES) {
-              return Response.json(
-                { error: "file_too_large", doc: doc.title },
-                { status: 400 },
-              );
+              return Response.json({ error: "file_too_large", doc: doc.title }, { status: 400 });
             }
             const mime = file.type || extToMime(file.name) || "";
             if (!ALLOWED_MIME.has(mime)) {
-              return Response.json(
-                { error: "invalid_mime", doc: doc.title },
-                { status: 400 },
-              );
+              return Response.json({ error: "invalid_mime", doc: doc.title }, { status: 400 });
             }
           }
         }
 
-        // Insert registration first (to get an id for storage path)
+        // Insert registration — anti-doublon via unique partial index (case-insensitive)
         const { data: reg, error: regErr } = await supabase
           .from("club_camp_registrations")
           .insert({
@@ -220,7 +228,11 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           })
           .select("id, access_token")
           .single();
+
         if (regErr || !reg) {
+          if (regErr?.code === "23505") {
+            return Response.json({ error: "duplicate" }, { status: 409 });
+          }
           console.error("Camp registration insert failed", regErr);
           return Response.json({ error: "insert_failed" }, { status: 500 });
         }
@@ -260,7 +272,6 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
         }
 
         if (uploadErrors.length > 0) {
-          // Registration is kept but flag error to user
           return Response.json(
             { error: "upload_failed", failed: uploadErrors, registrationId: reg.id },
             { status: 500 },
@@ -269,8 +280,9 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
 
         const origin = new URL(request.url).origin;
         const manageUrl = `${origin}/admin/stages/${camp.id}`;
+        const trackingUrl = `${origin}/stages/${fields.club_slug}/${fields.camp_slug}/suivi/${(reg as any).access_token}`;
 
-        // Family confirmation email
+        // Family confirmation email (with tracking link + full-notice)
         try {
           await enqueueTransactionalEmailServer({
             templateName: "camp-registration-received",
@@ -283,6 +295,8 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
               campStartDate: camp.start_date,
               campEndDate: camp.end_date,
               referenceId: reg.id.slice(0, 8).toUpperCase(),
+              trackingUrl,
+              isFull,
             },
             idempotencyKey: `camp-reg-received:${reg.id}`,
           });
@@ -290,7 +304,6 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
           console.error("Family email failed", e);
         }
 
-        // Notify camp creator (organizer)
         try {
           const createdBy = camp.created_by;
           if (createdBy) {
@@ -320,6 +333,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
         return Response.json({
           ok: true,
           registrationId: reg.id,
+          isFull,
         });
       },
     },

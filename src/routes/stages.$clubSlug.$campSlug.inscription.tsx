@@ -163,10 +163,18 @@ function RegistrationFormPage() {
           toast.error(t("public.errors.closed", "Les inscriptions sont fermées."));
         } else if (code === "age_mismatch") {
           toast.error(t("public.errors.ageMismatch", "L'âge de l'enfant ne correspond pas à la catégorie choisie."));
+        } else if (code === "duplicate") {
+          toast.error(
+            t(
+              "public.errors.duplicate",
+              "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier.",
+            ),
+          );
         } else {
           toast.error(t("public.errors.generic", "Une erreur est survenue. Réessayez."));
         }
         return;
+
       }
       setSuccess({ registrationId: json.registrationId });
     } catch (err) {
@@ -330,10 +338,11 @@ function RegistrationFormPage() {
               <Label htmlFor="consent" className="text-sm leading-snug">
                 {t(
                   "public.consent",
-                  "J'autorise le club à utiliser les données transmises pour gérer cette inscription au stage (RGPD).",
+                  "J'autorise le club à utiliser les données transmises (identité de l'enfant, coordonnées du parent, pièces jointes) pour gérer cette inscription au stage, conformément au RGPD. Ces données sont conservées jusqu'à 12 mois après la fin du stage, puis supprimées automatiquement.",
                 )}
               </Label>
             </div>
+
 
             <div className="flex justify-end">
               <Button type="submit" size="lg" disabled={submitting || deadlinePassed}>
