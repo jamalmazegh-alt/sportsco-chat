@@ -148,10 +148,10 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
 
         return Response.json({
           ok: true,
-          scanned: (camps ?? []).length,
-          due: dueCamps.length,
+          due: (dueCamps ?? []).length,
           results,
         });
+
       },
     },
   },
