@@ -522,51 +522,163 @@ export const runImport = createServerFn({ method: "POST" })
         const parentCache = new Map<string, string>();
         let teamsCreated = 0;
         let playersCreated = 0;
+        let playersUpdated = 0;
+        let playersRestored = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
+        // Load full club roster (active + soft-deleted) once — identity index.
+        type ExistingPlayer = {
+          id: string;
+          first_name: string | null;
+          last_name: string | null;
+          birth_date: string | null;
+          jersey_number: number | null;
+          license_number: string | null;
+          preferred_position: string | null;
+          email: string | null;
+          phone: string | null;
+          deleted_at: string | null;
+        };
+        const { data: clubPlayers, error: rosterErr } = await supabaseAdmin
+          .from("players")
+          .select(
+            "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+          )
+          .eq("club_id", data.clubId);
+        if (rosterErr) throw new Error(rosterErr.message);
+
+        const playersByIdentity = new Map<string, ExistingPlayer>();
+        const identityKey = (
+          first: string | null | undefined,
+          last: string | null | undefined,
+          birth: string | null | undefined,
+        ): string | null => {
+          if (!birth) return null;
+          const f = normalizeName(first);
+          const l = normalizeName(last);
+          if (!f || !l) return null;
+          return `${f}|${l}|${birth}`;
+        };
+        for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
+          const k = identityKey(p.first_name, p.last_name, p.birth_date);
+          if (!k) continue;
+          const prev = playersByIdentity.get(k);
+          if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+        }
 
         for (let i = 0; i < data.rows.length; i++) {
           const r = data.rows[i] as RowMap;
           try {
-            const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
-            let teamId = teamCache.get(teamKey);
-            if (!teamId) {
-              const t = await findOrCreateTeam(
-                data.clubId,
-                r.equipe!,
-                r.sport!,
-                r.categorie!,
-                r.genre,
-                r.saison,
-              );
-              teamId = t.id;
-              teamCache.set(teamKey, teamId);
-              if (t.created) teamsCreated++;
+            // DOB mandatory — identity key requires it.
+            if (!r.date_naissance) {
+              throw new Error("date de naissance requise");
             }
 
-            const { data: player, error: pErr } = await supabaseAdmin
-              .from("players")
-              .insert({
-                club_id: data.clubId,
-                first_name: titleCase(r.prenom_joueur!),
-                last_name: titleCase(r.nom_joueur!),
-                birth_date: r.date_naissance,
-                jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
-                license_number: r.numero_licence || null,
-                preferred_position: r.poste || null,
-                phone: r.telephone_joueur || null,
-                email: r.email_contact?.toLowerCase() || null,
-              })
-              .select("id")
-              .single();
-            if (pErr) throw new Error(pErr.message);
-            playersCreated++;
+            // Resolve team: fixed team (coach mode) or per-row.
+            let teamId: string;
+            if (fixedTeam) {
+              teamId = fixedTeam.id;
+            } else {
+              const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
+              const cached = teamCache.get(teamKey);
+              if (cached) {
+                teamId = cached;
+              } else {
+                const t = await findOrCreateTeam(
+                  data.clubId,
+                  r.equipe!,
+                  r.sport!,
+                  r.categorie!,
+                  r.genre,
+                  r.saison,
+                );
+                teamId = t.id;
+                teamCache.set(teamKey, teamId);
+                if (t.created) teamsCreated++;
+              }
+            }
 
-            await supabaseAdmin.from("team_members").insert({
+            const firstName = titleCase(r.prenom_joueur!);
+            const lastName = titleCase(r.nom_joueur!);
+            const idKey = identityKey(firstName, lastName, r.date_naissance)!;
+
+            let existing = playersByIdentity.get(idKey) ?? null;
+            let playerId: string;
+
+            if (existing && existing.deleted_at) {
+              const { error: restoreErr } = await supabaseAdmin.rpc(
+                "restore_entity" as never,
+                { _kind: "player", _id: existing.id } as never,
+              );
+              if (restoreErr) throw new Error(restoreErr.message);
+              existing = { ...existing, deleted_at: null };
+              playersRestored++;
+            }
+
+            if (existing) {
+              // Non-destructive patch: only fill blanks.
+              const patch: Record<string, unknown> = {};
+              if (existing.jersey_number == null && r.numero_maillot)
+                patch.jersey_number = parseInt(r.numero_maillot, 10);
+              if (!existing.license_number && r.numero_licence)
+                patch.license_number = r.numero_licence;
+              if (!existing.preferred_position && r.poste) patch.preferred_position = r.poste;
+              if (!existing.email && r.email_contact)
+                patch.email = r.email_contact.toLowerCase();
+              if (!existing.phone && r.telephone_joueur) patch.phone = r.telephone_joueur;
+              if (Object.keys(patch).length > 0) {
+                const { error: upErr } = await supabaseAdmin
+                  .from("players")
+                  .update(patch)
+                  .eq("id", existing.id);
+                if (upErr) throw new Error(upErr.message);
+                playersUpdated++;
+                existing = { ...existing, ...(patch as Partial<ExistingPlayer>) };
+                playersByIdentity.set(idKey, existing);
+              }
+              playerId = existing.id;
+            } else {
+              const { data: inserted, error: pErr } = await supabaseAdmin
+                .from("players")
+                .insert({
+                  club_id: data.clubId,
+                  first_name: firstName,
+                  last_name: lastName,
+                  birth_date: r.date_naissance,
+                  jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  license_number: r.numero_licence || null,
+                  preferred_position: r.poste || null,
+                  phone: r.telephone_joueur || null,
+                  email: r.email_contact?.toLowerCase() || null,
+                })
+                .select(
+                  "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+                )
+                .single();
+              if (pErr) {
+                if ((pErr as { code?: string }).code === "23505") {
+                  throw new Error("Identité déjà existante dans ce club");
+                }
+                throw new Error(pErr.message);
+              }
+              playersCreated++;
+              playersByIdentity.set(idKey, inserted as ExistingPlayer);
+              playerId = inserted.id;
+            }
+
+            // Link team_members if missing (ignore duplicate errors).
+            const { error: tmErr } = await supabaseAdmin.from("team_members").insert({
               team_id: teamId,
-              player_id: player.id,
+              player_id: playerId,
               role: "player" as never,
             });
+            if (tmErr && (tmErr as { code?: string }).code !== "23505") {
+              throw new Error(tmErr.message);
+            }
+
+            const player = { id: playerId };
+
 
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
