@@ -1121,7 +1121,22 @@ function TeamDetail() {
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} />}
 
       {isCoach && (players ?? []).length > 0 && (
-        <TeamAbsencesTable teamId={teamId} players={players as any} />
+        <>
+          <TeamAbsencesTable teamId={teamId} players={players as any} />
+          <Link
+            to="/teams/$teamId/availability"
+            params={{ teamId }}
+            className="flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">
+                {t("availability.calendar.open", { defaultValue: "Voir le calendrier des absences" })}
+              </span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </>
       )}
 
       <TeamCoaches
