@@ -329,11 +329,10 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
 }
 
 function statusKey(s: DossierStatus) {
-  return s === "documents_missing"
-    ? "documentsMissing"
-    : s === "payment_missing"
-      ? "paymentMissing"
-      : "complete";
+  if (s === "documents_missing") return "documentsMissing";
+  if (s === "documents_pending") return "documentsPending";
+  if (s === "payment_missing") return "paymentMissing";
+  return "complete";
 }
 
 function StatCard({
