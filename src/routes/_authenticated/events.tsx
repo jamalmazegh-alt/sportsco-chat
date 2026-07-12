@@ -422,6 +422,16 @@ function EventsPage() {
                   {e.competition_name}
                 </span>
               )}
+              {(() => {
+                if (e.type !== "match") return null;
+                const myC = myConvocsByEvent?.get(e.id);
+                if (!myC) return null;
+                const s = myC.status;
+                const resp: ConvocationResponse | null =
+                  s === "pending" || s === "present" || s === "absent" ? s : null;
+                if (!resp) return null;
+                return <ConvocationResponseBadge response={resp} />;
+              })()}
             </div>
             <p
               className={cn(
