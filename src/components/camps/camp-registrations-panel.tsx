@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Loader2, Search, Clock, AlertTriangle, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Loader2, Search, Clock, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
