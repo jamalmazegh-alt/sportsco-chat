@@ -123,9 +123,6 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
           .eq("registration_id", registrationId)
           .eq("required_document_id", parsed.data.required_document_id)
           .maybeSingle();
-          .eq("registration_id", registrationId)
-          .eq("required_document_id", parsed.data.required_document_id)
-          .maybeSingle();
 
         if (existing?.id) {
           const { error: updErr } = await supabase
