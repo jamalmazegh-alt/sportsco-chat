@@ -147,6 +147,8 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
           });
           if (insErr) {
             console.error("Doc row insert failed", insErr);
+            return Response.json({ error: "db_failed" }, { status: 500 });
+          }
         }
 
         // Notify camp organizer that a document was (re)submitted and is pending review
