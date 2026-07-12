@@ -75,12 +75,17 @@ function SupportListPage() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
                       <span
                         className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${cls}`}
                       >
                         {t(`status.${status}`, { defaultValue: status })}
                       </span>
+                      {ticket.category && (
+                        <span className="inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-muted text-foreground/80">
+                          {t(`category.${ticket.category}`, { defaultValue: ticket.category })}
+                        </span>
+                      )}
                       <span>· #{ticket.id.slice(0, 6).toUpperCase()}</span>
                       <span>· {new Date(ticket.last_activity_at).toLocaleDateString()}</span>
                     </div>
