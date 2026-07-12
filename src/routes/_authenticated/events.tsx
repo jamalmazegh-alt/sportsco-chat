@@ -28,6 +28,7 @@ import {
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { ConvocationBand } from "@/components/convocation-band";
+import { ConvocationResponseBadge, type ConvocationResponse } from "@/components/convocation-response-badge";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
 
@@ -421,6 +422,16 @@ function EventsPage() {
                   {e.competition_name}
                 </span>
               )}
+              {(() => {
+                if (e.type !== "match") return null;
+                const myC = myConvocsByEvent?.get(e.id);
+                if (!myC) return null;
+                const s = myC.status;
+                const resp: ConvocationResponse | null =
+                  s === "pending" || s === "present" || s === "absent" ? s : null;
+                if (!resp) return null;
+                return <ConvocationResponseBadge response={resp} />;
+              })()}
             </div>
             <p
               className={cn(
@@ -469,15 +480,8 @@ function EventsPage() {
             if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
             if (!myC) return null;
-            const s = myC.status;
-            const bandStatus: "pending" | "present" | "absent" | null =
-              s === "pending" || s === "present" || s === "absent" ? s : null;
-            if (!bandStatus) return null;
             return (
-              <ConvocationBand
-                status={bandStatus}
-                title={`${bandStatus} · ${myC.playerName}`}
-              />
+              <ConvocationBand title={`Convoqué · ${myC.playerName}`} />
             );
           })()}
         </Link>
