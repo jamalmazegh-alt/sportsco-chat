@@ -392,7 +392,7 @@ function EventsPage() {
               {e.type === "match" && e.competition_type && (
                 <span
                   className={cn(
-                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
+                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 max-w-full",
                     e.competition_type === "friendly" &&
                       "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
                     e.competition_type === "championship" &&
@@ -401,7 +401,15 @@ function EventsPage() {
                       "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
                   )}
                 >
-                  {t(`events.competitionTypes.${e.competition_type}`)}
+                  <span>{t(`events.competitionTypes.${e.competition_type}`)}</span>
+                  {e.competition_name && (
+                    <>
+                      <span className="opacity-50">·</span>
+                      <span className="font-semibold normal-case tracking-normal truncate">
+                        {e.competition_name}
+                      </span>
+                    </>
+                  )}
                 </span>
               )}
               {e.type === "match" && e.is_home !== null && e.is_home !== undefined && (
@@ -417,11 +425,7 @@ function EventsPage() {
                   {e.is_home ? t("events.home") : t("events.away")}
                 </span>
               )}
-              {e.type === "match" && e.competition_name && (
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground truncate">
-                  {e.competition_name}
-                </span>
-              )}
+
               {(() => {
                 if (e.type !== "match") return null;
                 const myC = myConvocsByEvent?.get(e.id);
