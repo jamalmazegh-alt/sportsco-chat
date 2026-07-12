@@ -252,7 +252,9 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
         </div>
       )}
 
-      {canDeclare && <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />}
+      {canDeclare && (
+        <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} teamId={teamId} />
+      )}
     </section>
   );
 }
