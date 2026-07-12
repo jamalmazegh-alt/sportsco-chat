@@ -4,7 +4,8 @@
     "back": "Retour",
     "cancel": "Annuler",
     "delete": "Supprimer",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "copied": "Copié"
   },
   "chooser": {
     "title": "Nouveau stage",
@@ -283,5 +284,63 @@
     "full": "Complet — inscription possible en liste d'attente",
     "lastSpots": "Dernières places ({{count}} restantes)",
     "registerWaitlistCta": "Rejoindre la liste d'attente"
+  },
+  "registrations": {
+    "detail": {
+      "title": "Fiche d'inscription",
+      "subtitle": "Vérifiez les informations, examinez les pièces et changez le statut.",
+      "createdAt": "Reçue le {{date}}",
+      "reservedUntil": "Place réservée jusqu'au {{date}}",
+      "currentReason": "Motif du refus",
+      "trackingLink": "Lien famille",
+      "capacityLine": "Capacité : {{approved}}/{{capacity}} confirmées · {{remaining}} places restantes",
+      "participant": "Participant",
+      "guardian": "Responsable légal",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "birthDate": "Naissance",
+      "gender": "Genre",
+      "clubName": "Club d'origine",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "notes": "Notes de la famille",
+      "documents": "Pièces déposées",
+      "noDocs": "Aucune pièce déposée.",
+      "sensitive": "Sensible",
+      "coachSensitiveNote": "Les pièces sensibles sont réservées aux dirigeants.",
+      "notAllowed": "Pièce sensible — accès réservé aux dirigeants.",
+      "openDoc": "Ouvrir",
+      "approve": "Valider",
+      "reject": "Refuser",
+      "reset": "Réinitialiser",
+      "reasonLabel": "Motif",
+      "docStatus": {
+        "pending": "À examiner",
+        "approved": "Validée",
+        "rejected": "Refusée"
+      },
+      "docApproved": "Pièce validée",
+      "docRejected": "Pièce refusée",
+      "docReset": "Décision réinitialisée",
+      "docRejectTitle": "Refuser cette pièce ?",
+      "docRejectHelp": "La famille recevra le motif et pourra déposer une nouvelle version depuis sa page de suivi.",
+      "docRejectPlaceholder": "Ex. Document illisible, merci de renvoyer un scan net.",
+      "confirmDocReject": "Refuser la pièce",
+      "decision": "Décision",
+      "capacityWarn": "Le stage est complet. Une validation basculera l'inscription en liste d'attente.",
+      "markUnderReview": "Réserver 72 h (en examen)",
+      "waitlist": "Liste d'attente",
+      "cancel": "Annuler l'inscription",
+      "statusChanged": "Statut mis à jour",
+      "reasonRequired": "Un motif est obligatoire pour refuser.",
+      "rejectTitle": "Refuser cette inscription ?",
+      "rejectHelp": "Le motif sera envoyé à la famille dans l'e-mail de refus. Soyez clair et bienveillant.",
+      "rejectPlaceholder": "Ex. Le stage est complet pour cette tranche d'âge.",
+      "confirmReject": "Refuser",
+      "capacityFullTitle": "Stage complet",
+      "capacityFullHelp": "La capacité du stage est atteinte. Voulez-vous placer cette famille sur la liste d'attente ?",
+      "placeOnWaitlist": "Placer en liste d'attente",
+      "emailsHint": "Les e-mails automatiques aux familles seront ajoutés à l'étape suivante (Phase 3, étape 3)."
+    }
   }
 }

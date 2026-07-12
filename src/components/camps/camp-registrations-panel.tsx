@@ -28,6 +28,7 @@ import {
   type PaymentStatus,
   type DossierStatus,
 } from "@/lib/camp-registrations.functions";
+import { CampRegistrationDetailSheet } from "@/components/camps/camp-registration-detail-sheet";
 
 const REGISTRATION_STATUSES: RegistrationStatus[] = [
   "pending",
@@ -95,6 +96,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
   const [payFilter, setPayFilter] = useState<PaymentStatus | "all">("all");
   const [dossierFilter, setDossierFilter] = useState<DossierStatus | "all">("all");
   const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const listQ = useQuery({
     queryKey: ["camp-registrations", campId],
@@ -265,11 +267,19 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
                 t={t}
                 onExtend={() => extendMut.mutate(r.id)}
                 extending={extendMut.isPending && extendMut.variables === r.id}
+                onOpen={() => setOpenId(r.id)}
               />
             ))}
           </tbody>
         </table>
       </div>
+
+      <CampRegistrationDetailSheet
+        campId={campId}
+        registrationId={openId}
+        open={openId !== null}
+        onOpenChange={(o) => !o && setOpenId(null)}
+      />
     </div>
   );
 }
@@ -336,15 +346,20 @@ function RegistrationRow({
   t,
   onExtend,
   extending,
+  onOpen,
 }: {
   row: CampRegistrationRow;
   t: (k: string, o?: any) => string;
   onExtend: () => void;
   extending: boolean;
+  onOpen: () => void;
 }) {
   const age = ageFromBirthDate(row.birth_date);
   return (
-    <tr className="border-t border-border/60 align-top">
+    <tr
+      className="border-t border-border/60 align-top cursor-pointer hover:bg-muted/40"
+      onClick={onOpen}
+    >
       <td className="px-3 py-3">
         <div className="font-medium">
           {row.participant_first_name} {row.participant_last_name}
@@ -417,7 +432,15 @@ function RegistrationRow({
       </td>
       <td className="px-3 py-3 text-right">
         {row.reservation_expired && (
-          <Button size="sm" variant="outline" onClick={onExtend} disabled={extending}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onExtend();
+            }}
+            disabled={extending}
+          >
             {extending ? (
               <Loader2 className="h-3 w-3 mr-1 animate-spin" />
             ) : (
