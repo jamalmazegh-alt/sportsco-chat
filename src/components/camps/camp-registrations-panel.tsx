@@ -96,6 +96,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
   const [payFilter, setPayFilter] = useState<PaymentStatus | "all">("all");
   const [dossierFilter, setDossierFilter] = useState<DossierStatus | "all">("all");
   const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const listQ = useQuery({
     queryKey: ["camp-registrations", campId],
