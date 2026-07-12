@@ -630,7 +630,7 @@ export const runImport = createServerFn({ method: "POST" })
               if (Object.keys(patch).length > 0) {
                 const { error: upErr } = await supabaseAdmin
                   .from("players")
-                  .update(patch)
+                  .update(patch as never)
                   .eq("id", existing.id);
                 if (upErr) throw new Error(upErr.message);
                 playersUpdated++;
