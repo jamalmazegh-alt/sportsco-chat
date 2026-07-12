@@ -34,9 +34,10 @@ function AdminTicketsPage() {
   const [status, setStatus] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
+  const [clubId, setClubId] = useState<string>("all");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-support-tickets", { search, status, priority, category }],
+    queryKey: ["admin-support-tickets", { search, status, priority, category, clubId }],
     queryFn: () =>
       listAllSupportTickets({
         data: {
@@ -44,10 +45,23 @@ function AdminTicketsPage() {
           status: status === "all" ? undefined : (status as "open"),
           priority: priority === "all" ? undefined : (priority as "low"),
           category: category === "all" ? undefined : (category as "bug"),
+          club_id: clubId === "all" ? undefined : clubId,
           limit: 100,
         },
       }),
   });
+
+  // Distinct clubs among currently loaded tickets (drives the filter dropdown).
+  const clubOptions = (() => {
+    const map = new Map<string, string>();
+    for (const t of data ?? []) {
+      if (t.club_id && t.club_name) map.set(t.club_id, t.club_name);
+    }
+    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  })();
+
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
