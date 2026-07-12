@@ -498,7 +498,7 @@ export const setCampRegistrationStatus = createServerFn({ method: "POST" })
       }
     }
 
-    const patch: Record<string, unknown> = {
+    const patch: any = {
       registration_status: next,
       updated_at: new Date().toISOString(),
     };
@@ -567,7 +567,7 @@ export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
       throw new Error("REASON_REQUIRED");
     }
 
-    const patch: Record<string, unknown> = {
+    const patch: any = {
       review_status: data.status,
       rejection_reason: data.status === "rejected" ? data.reason!.trim() : null,
     };
