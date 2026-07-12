@@ -39,6 +39,7 @@ type ExistingPlayer = {
   birth_date: string | null;
   email: string | null;
   phone: string | null;
+  deleted_at: string | null;
 };
 
 type PlayerPatch = {
