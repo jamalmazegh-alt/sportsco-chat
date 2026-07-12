@@ -464,7 +464,75 @@ function EventsPage() {
                 );
               })()}
           </div>
+          {(() => {
+            const myC = myConvocsByEvent?.get(e.id);
+            if (!myC) return null;
+            const styles: Record<
+              string,
+              { bg: string; text: string; accent: string; ring: string }
+            > = {
+              pending: {
+                bg: "bg-gradient-to-b from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600",
+                text: "text-white",
+                accent: "bg-white/25",
+                ring: "ring-amber-300",
+              },
+              present: {
+                bg: "bg-gradient-to-b from-emerald-500 to-emerald-600",
+                text: "text-white",
+                accent: "bg-white/25",
+                ring: "ring-emerald-300",
+              },
+              absent: {
+                bg: "bg-gradient-to-b from-rose-500 to-rose-600",
+                text: "text-white",
+                accent: "bg-white/25",
+                ring: "ring-rose-300",
+              },
+              uncertain: {
+                bg: "bg-gradient-to-b from-violet-500 to-violet-600",
+                text: "text-white",
+                accent: "bg-white/25",
+                ring: "ring-violet-300",
+              },
+            };
+            const s = styles[myC.status] ?? styles.pending;
+            const label =
+              myC.status === "pending"
+                ? t("dashboard.actionRequired", { defaultValue: "Action requise" })
+                : t("events.convokedBadge", { defaultValue: "Convoqué" });
+            const isPending = myC.status === "pending";
+            return (
+              <div
+                className={cn(
+                  "relative shrink-0 flex flex-col items-center justify-center gap-1 w-14 px-1",
+                  s.bg,
+                  s.text,
+                )}
+                title={`${label} · ${myC.playerName}`}
+              >
+                {isPending && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                  </span>
+                )}
+                <div
+                  className={cn(
+                    "flex items-center justify-center h-7 w-7 rounded-full",
+                    s.accent,
+                  )}
+                >
+                  <BellRing className="h-3.5 w-3.5" />
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-wider leading-tight text-center px-0.5">
+                  {label}
+                </span>
+              </div>
+            );
+          })()}
         </Link>
+
       </li>
     );
   }
