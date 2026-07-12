@@ -479,6 +479,82 @@ const PLAYER_OVERWRITABLE_FIELDS = [
   "phone",
 ] as const;
 
+// ---------------------------------------------------------------------------
+// Pure helpers (exported for unit tests) — no DB access, no side effects.
+// ---------------------------------------------------------------------------
+
+/** Same normalization as `public.normalize_name` (unaccent + lower + alnum). */
+export const _normalizeName = normalizeName;
+
+export type ResolveTeamInput = {
+  equipe: string | null | undefined;
+  sport: string | null | undefined;
+  categorie: string | null | undefined;
+  teamOverrides?: Record<string, string>;
+  teamsToCreate?: Set<string>;
+  teamsByNorm: Map<string, string>;
+};
+
+export type ResolveTeamResult =
+  | { kind: "override"; teamKey: string; teamId: string }
+  | { kind: "matched"; teamKey: string; teamId: string }
+  | { kind: "create"; teamKey: string }
+  | { kind: "error"; message: string };
+
+/**
+ * Resolve a team for one player row using the same rules as `runImport`:
+ * override > normalized match > explicit "create" > error.
+ * NEVER creates implicitly.
+ */
+export function resolveTeamForRow(input: ResolveTeamInput): ResolveTeamResult {
+  const { equipe, sport, categorie } = input;
+  if (!equipe || !sport || !categorie) {
+    return { kind: "error", message: "équipe/sport/catégorie manquants" };
+  }
+  const teamKey = `${equipe}|${sport}|${categorie}`;
+  const override = input.teamOverrides?.[teamKey];
+  if (override) return { kind: "override", teamKey, teamId: override };
+  const normKey = `${normalizeName(equipe)}|${normalizeName(sport)}|${normalizeName(categorie)}`;
+  const matched = input.teamsByNorm.get(normKey);
+  if (matched) return { kind: "matched", teamKey, teamId: matched };
+  if (input.teamsToCreate?.has(teamKey)) return { kind: "create", teamKey };
+  return {
+    kind: "error",
+    message: `Équipe non résolue: ${equipe} / ${sport} / ${categorie} — choisir une équipe existante ou cocher "créer".`,
+  };
+}
+
+export type FieldSpec = {
+  col: (typeof PLAYER_OVERWRITABLE_FIELDS)[number];
+  incoming: string | number | null;
+  current: string | number | null;
+  allowBlankFill: boolean;
+};
+
+/**
+ * Compute the patch to apply to an existing player row.
+ * Rules: blank-fill (only when `allowBlankFill` and current is empty),
+ * overwrite ONLY if the field is explicitly in `allowed` AND value differs.
+ * first_name/last_name are identity and cannot be blank-filled.
+ */
+export function computePlayerPatch(
+  specs: FieldSpec[],
+  allowed: Set<string>,
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  for (const s of specs) {
+    if (s.incoming == null || s.incoming === "") continue;
+    const currentEmpty = s.current == null || s.current === "";
+    if (currentEmpty && s.allowBlankFill) {
+      patch[s.col] = s.incoming;
+    } else if (allowed.has(s.col) && s.incoming !== s.current) {
+      patch[s.col] = s.incoming;
+    }
+  }
+  return patch;
+}
+
+
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
