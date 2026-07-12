@@ -629,10 +629,10 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
     if (!Object.keys(patch).length) return { ok: true };
 
-    // Read current status to detect change
+    // Read current row to detect change
     const { data: before } = await supabaseAdmin
       .from("support_tickets")
-      .select("status, user_id, subject")
+      .select("status, priority, assigned_to, user_id, subject")
       .eq("id", data.ticket_id)
       .maybeSingle();
 
@@ -642,8 +642,50 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       .eq("id", data.ticket_id);
     if (error) throw new Error(error.message);
 
-    // Notify ticket owner on status change
-    if (before && patch.status !== undefined && patch.status !== before.status && before.user_id) {
+    const actorRole: "user" | "staff" = isAdmin ? "staff" : "user";
+
+    // Audit — one row per changed field
+    if (before) {
+      if (patch.status !== undefined && patch.status !== before.status) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "status_changed",
+          from_value: before.status,
+          to_value: patch.status,
+        });
+      }
+      if (patch.priority !== undefined && patch.priority !== before.priority) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "priority_changed",
+          from_value: before.priority,
+          to_value: patch.priority,
+        });
+      }
+      if (patch.assigned_to !== undefined && patch.assigned_to !== before.assigned_to) {
+        await logSupportAudit({
+          ticket_id: data.ticket_id,
+          actor_user_id: context.userId,
+          actor_role: actorRole,
+          action: "assigned",
+          from_value: before.assigned_to ?? null,
+          to_value: patch.assigned_to ?? null,
+        });
+      }
+    }
+
+    // Notify ticket owner on status change (staff-initiated)
+    if (
+      before &&
+      patch.status !== undefined &&
+      patch.status !== before.status &&
+      before.user_id &&
+      actorRole === "staff"
+    ) {
       const profile = await getUserProfile(before.user_id);
       const email = await getUserEmail(before.user_id);
       const locale = pickLocale(profile?.preferred_language);
@@ -668,6 +710,7 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-status",
           recipientEmail: email,
+          fromName: SUPPORT_FROM_NAME,
           templateData: {
             name: profile?.first_name ?? profile?.full_name ?? null,
             subject: before.subject,
@@ -681,8 +724,96 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
+    // Notify superadmins when the owner themself resolves / closes / reopens
+    if (
+      before &&
+      patch.status !== undefined &&
+      patch.status !== before.status &&
+      actorRole === "user"
+    ) {
+      const profile = await getUserProfile(context.userId);
+      const authorEmail = await getUserEmail(context.userId);
+      const authorName = profile?.full_name ?? profile?.first_name ?? "Utilisateur";
+      const isReopen = patch.status === "open";
+      const verb = isReopen ? "rouvert" : "clôturé";
+
+      await notifySuperAdmins({
+        title: `Ticket #${shortId(data.ticket_id)} ${verb} par l'utilisateur`,
+        body: `${authorName} — ${before.subject}`,
+        link: `/superadmin/support-tickets/${data.ticket_id}`,
+      });
+
+      await enqueueTransactionalEmailServer({
+        templateName: "support-ticket-internal",
+        recipientEmail: "hello@clubero.app",
+        templateData: {
+          kind: isReopen ? "user_reopened" : "user_resolved",
+          ticketShortId: shortId(data.ticket_id),
+          subject: before.subject,
+          authorName,
+          authorEmail,
+          bodyPreview: `Statut passé de "${before.status}" à "${patch.status}" par l'utilisateur.`,
+          ticketUrl: `${APP_BASE_URL}/superadmin/support-tickets/${data.ticket_id}`,
+        },
+        idempotencyKey: `support-internal-userstatus-${data.ticket_id}-${patch.status}`,
+      }).catch((e) => console.error("[support] internal user-status email failed", e));
+    }
+
     return { ok: true };
   });
+
+// ---------- Audit trail (superadmin) ----------
+
+export const getSupportTicketAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => TicketIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    // Owner OR superadmin (RLS enforces this too, but check explicitly)
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
+    const { data: ticket } = await supabaseAdmin
+      .from("support_tickets")
+      .select("user_id")
+      .eq("id", data.ticket_id)
+      .maybeSingle();
+    if (!ticket) throw new Error("not_found");
+    if (!isAdmin && ticket.user_id !== context.userId) throw new Error("forbidden");
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("support_ticket_audit")
+      .select("id, actor_user_id, actor_role, action, from_value, to_value, meta, created_at")
+      .eq("ticket_id", data.ticket_id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    // Resolve actor names
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r) => r.actor_user_id).filter(Boolean)),
+    ) as string[];
+    const actorNames = new Map<string, string | null>();
+    if (actorIds.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name")
+        .in("id", actorIds);
+      for (const p of profiles ?? []) {
+        actorNames.set(p.id, p.full_name ?? p.first_name ?? null);
+      }
+    }
+
+    return (rows ?? []).map((r) => ({
+      ...r,
+      actor_name:
+        r.actor_role === "staff"
+          ? SUPPORT_FROM_NAME
+          : r.actor_user_id
+            ? (actorNames.get(r.actor_user_id) ?? null)
+            : null,
+    }));
+  });
+
 
 // ---------- Stats for admin dashboard ----------
 
