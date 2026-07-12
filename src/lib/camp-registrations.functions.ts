@@ -39,6 +39,8 @@ export interface CampRegistrationRow {
   participant_first_name: string;
   participant_last_name: string;
   birth_date: string;
+  gender: string | null;
+  club_name: string | null;
   guardian_first_name: string;
   guardian_last_name: string;
   guardian_email: string;
