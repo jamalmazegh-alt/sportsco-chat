@@ -1123,8 +1123,6 @@ function TeamDetail() {
       {isCoach && team?.club_id && (
         <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />
       )}
-        </>
-      )}
 
       <TeamCoaches
         teamId={teamId}
