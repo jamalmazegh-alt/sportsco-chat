@@ -26,7 +26,9 @@ export async function enqueueTransactionalEmailServer(params: {
   recipientEmail?: string;
   templateData?: Record<string, any>;
   idempotencyKey?: string;
+  fromName?: string;
 }) {
+
   const template = TEMPLATES[params.templateName];
   if (!template) throw new Error(`Template '${params.templateName}' not found`);
 
