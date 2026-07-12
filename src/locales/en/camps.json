@@ -286,6 +286,33 @@
     "registerWaitlistCta": "Join the waiting list"
   },
   "registrations": {
+    "status": {
+      "pending": "Pending",
+      "under_review": "Under review",
+      "approved": "Approved",
+      "waitlist": "Waitlist",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "payment": {
+      "not_required": "Not required",
+      "pending": "Pending",
+      "declared": "Declared",
+      "paid": "Paid",
+      "partial": "Partial",
+      "refunded": "Refunded"
+    },
+    "dossier": {
+      "complete": "Complete",
+      "paymentMissing": "Payment missing",
+      "documentsPending": "Awaiting review",
+      "documentsMissing": "Documents missing"
+    },
+    "filters": {
+      "allReg": "All registrations",
+      "allPay": "All payments",
+      "allDossier": "All dossiers"
+    },
     "detail": {
       "title": "Registration record",
       "subtitle": "Check the details, review the documents and change the status.",

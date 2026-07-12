@@ -286,6 +286,33 @@
     "registerWaitlistCta": "Op de wachtlijst"
   },
   "registrations": {
+    "status": {
+      "pending": "In afwachting",
+      "under_review": "In beoordeling",
+      "approved": "Goedgekeurd",
+      "waitlist": "Wachtlijst",
+      "rejected": "Afgewezen",
+      "cancelled": "Geannuleerd"
+    },
+    "payment": {
+      "not_required": "Niet vereist",
+      "pending": "In afwachting",
+      "declared": "Aangegeven",
+      "paid": "Betaald",
+      "partial": "Gedeeltelijk",
+      "refunded": "Terugbetaald"
+    },
+    "dossier": {
+      "complete": "Compleet",
+      "paymentMissing": "Betaling ontbreekt",
+      "documentsPending": "Wacht op controle",
+      "documentsMissing": "Documenten ontbreken"
+    },
+    "filters": {
+      "allReg": "Alle inschrijvingen",
+      "allPay": "Alle betalingen",
+      "allDossier": "Alle dossiers"
+    },
     "detail": {
       "title": "Registration record",
       "subtitle": "Check the details, review the documents and change the status.",

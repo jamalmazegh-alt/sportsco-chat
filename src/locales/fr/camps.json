@@ -286,6 +286,33 @@
     "registerWaitlistCta": "Rejoindre la liste d'attente"
   },
   "registrations": {
+    "status": {
+      "pending": "En attente",
+      "under_review": "En examen",
+      "approved": "Validée",
+      "waitlist": "Liste d'attente",
+      "rejected": "Refusée",
+      "cancelled": "Annulée"
+    },
+    "payment": {
+      "not_required": "Non requis",
+      "pending": "En attente",
+      "declared": "Déclaré",
+      "paid": "Payé",
+      "partial": "Partiel",
+      "refunded": "Remboursé"
+    },
+    "dossier": {
+      "complete": "Complet",
+      "paymentMissing": "Paiement manquant",
+      "documentsPending": "En attente de vérification",
+      "documentsMissing": "Documents manquants"
+    },
+    "filters": {
+      "allReg": "Toutes les inscriptions",
+      "allPay": "Tous les paiements",
+      "allDossier": "Tous les dossiers"
+    },
     "detail": {
       "title": "Fiche d'inscription",
       "subtitle": "Vérifiez les informations, examinez les pièces et changez le statut.",
