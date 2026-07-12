@@ -909,15 +909,55 @@ export const runImport = createServerFn({ method: "POST" })
               if (token) invitationsSent++;
             }
 
-            // Parents
+            // Parents — dédup applicative composite (email → phone → nom
+            // normalisé) contre les parents déjà rattachés au joueur, pour
+            // éviter les doublons à la réimportation (parent_user_id NULL
+            // rend inopérante la contrainte unique DB).
+            const { data: existingParents } = await supabaseAdmin
+              .from("player_parents")
+              .select("full_name, email, phone")
+              .eq("player_id", player.id);
+            const normPhone = (v: string | null | undefined) =>
+              (v ?? "").replace(/[^0-9+]/g, "");
+            const parentKey = (opts: {
+              email: string | null;
+              phone: string | null;
+              fullName: string | null;
+            }): string | null => {
+              const e = (opts.email ?? "").trim().toLowerCase();
+              if (e) return `e:${e}`;
+              const p = normPhone(opts.phone);
+              if (p) return `p:${p}`;
+              const n = normalizeName(opts.fullName);
+              if (n) return `n:${n}`;
+              return null;
+            };
+            const seenParentKeys = new Set<string>();
+            for (const ep of existingParents ?? []) {
+              const k = parentKey({
+                email: (ep as { email: string | null }).email,
+                phone: (ep as { phone: string | null }).phone,
+                fullName: (ep as { full_name: string | null }).full_name,
+              });
+              if (k) seenParentKeys.add(k);
+            }
+
             for (const idx of [1, 2] as const) {
-              const email = r[`email_parent_${idx}`];
-              if (!email) continue;
+              const emailRaw = r[`email_parent_${idx}`];
+              if (!emailRaw) continue;
+              const email = emailRaw.trim().toLowerCase();
               const firstName = r[`prenom_parent_${idx}`] || "";
               const lastName = r[`nom_parent_${idx}`] || "";
               const phone = r[`telephone_parent_${idx}`] || null;
               const fullName = `${firstName} ${lastName}`.trim();
               const lien = r[`lien_parent_${idx}`] || null;
+
+              const key = parentKey({ email, phone, fullName: fullName || null });
+              if (key && seenParentKeys.has(key)) {
+                // Déjà lié à ce joueur (import précédent ou parent 1 == parent 2)
+                continue;
+              }
+              if (key) seenParentKeys.add(key);
 
               let parentUserId = parentCache.get(email) ?? null;
               if (!parentUserId) {
