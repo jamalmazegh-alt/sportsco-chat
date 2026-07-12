@@ -68,10 +68,14 @@ function ymd(d: Date) {
 function TeamAvailabilityCalendar() {
   const { teamId } = Route.useParams();
   const { t, i18n } = useTranslation();
+  const qc = useQueryClient();
   const [cursor, setCursor] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
+  const [absenceOpen, setAbsenceOpen] = useState(false);
+  const [absencePlayerId, setAbsencePlayerId] = useState<string>("");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const monthStart = cursor;
   const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
