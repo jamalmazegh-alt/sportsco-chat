@@ -671,8 +671,10 @@ export const runImport = createServerFn({ method: "POST" })
         let playersCreated = 0;
         let playersUpdated = 0;
         let playersRestored = 0;
+        let playersLinked = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
 
         // Preload club teams for normalized dedupe (case/accents-insensitive).
         const { data: clubTeamsList } = await supabaseAdmin
