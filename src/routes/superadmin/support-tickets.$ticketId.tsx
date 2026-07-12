@@ -59,7 +59,9 @@ function AdminTicketDetail() {
     onSuccess: () => {
       toast.success("Mis à jour");
       refetch();
+      refetchAudit();
     },
+
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
   });
 
