@@ -39,6 +39,8 @@ import { CampCoverUpload } from "@/components/camps/camp-cover-upload";
 import { CampProgramEditor } from "@/components/camps/camp-program-editor";
 import { CampDocumentsEditor } from "@/components/camps/camp-documents-editor";
 import { CampRequiredDocumentsEditor } from "@/components/camps/camp-required-documents-editor";
+import { CampRegistrationsPanel } from "@/components/camps/camp-registrations-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/camps/$campId")({
   component: CampEditPage,
@@ -258,6 +260,32 @@ function CampEditPage() {
           </Badge>
         </div>
       </div>
+
+      <Tabs defaultValue="edit" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="edit">
+            {t("tabs.edit", { defaultValue: "Édition" })}
+          </TabsTrigger>
+          <TabsTrigger value="registrations" disabled={camp.status === "draft"}>
+            {t("tabs.registrations", { defaultValue: "Inscriptions" })}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="registrations" className="space-y-6">
+          {camp.status === "draft" ? (
+            <p className="text-sm text-muted-foreground">
+              {t("registrations.draftHint", {
+                defaultValue:
+                  "Les inscriptions apparaîtront ici après publication du stage.",
+              })}
+            </p>
+          ) : (
+            <CampRegistrationsPanel campId={campId} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="edit" className="space-y-6">
+
 
       {camp.status === "published" && (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
@@ -577,6 +605,8 @@ function CampEditPage() {
           </div>
         </div>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
