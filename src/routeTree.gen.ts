@@ -142,6 +142,7 @@ import { Route as ApiPublicBuildCluberoSaveRouteImport } from './routes/api/publ
 import { Route as ApiPublicBuildCluberoCompleteRouteImport } from './routes/api/public/build-clubero/complete'
 import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
 import { Route as AuthenticatedTeamsTeamIdStatsRouteImport } from './routes/_authenticated/teams/$teamId.stats'
+import { Route as AuthenticatedTeamsTeamIdAvailabilityRouteImport } from './routes/_authenticated/teams/$teamId/availability'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
 import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
@@ -883,6 +884,12 @@ const AuthenticatedTeamsTeamIdStatsRoute =
     path: '/stats',
     getParentRoute: () => AuthenticatedTeamsTeamIdRoute,
   } as any)
+const AuthenticatedTeamsTeamIdAvailabilityRoute =
+  AuthenticatedTeamsTeamIdAvailabilityRouteImport.update({
+    id: '/availability',
+    path: '/availability',
+    getParentRoute: () => AuthenticatedTeamsTeamIdRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdTimelineRoute =
   AuthenticatedPlayersPlayerIdTimelineRouteImport.update({
     id: '/timeline',
@@ -1156,6 +1163,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
@@ -1309,6 +1317,7 @@ export interface FileRoutesByTo {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
@@ -1469,6 +1478,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/_authenticated/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/_authenticated/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
   '/_authenticated/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
@@ -1629,6 +1639,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/teams/$teamId/availability'
     | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
@@ -1782,6 +1793,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/teams/$teamId/availability'
     | '/teams/$teamId/stats'
     | '/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
@@ -1941,6 +1953,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId/feedback'
     | '/_authenticated/players/$playerId/seasons'
     | '/_authenticated/players/$playerId/timeline'
+    | '/_authenticated/teams/$teamId/availability'
     | '/_authenticated/teams/$teamId/stats'
     | '/_authenticated/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
@@ -2990,6 +3003,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsTeamIdStatsRouteImport
       parentRoute: typeof AuthenticatedTeamsTeamIdRoute
     }
+    '/_authenticated/teams/$teamId/availability': {
+      id: '/_authenticated/teams/$teamId/availability'
+      path: '/availability'
+      fullPath: '/teams/$teamId/availability'
+      preLoaderRoute: typeof AuthenticatedTeamsTeamIdAvailabilityRouteImport
+      parentRoute: typeof AuthenticatedTeamsTeamIdRoute
+    }
     '/_authenticated/players/$playerId/timeline': {
       id: '/_authenticated/players/$playerId/timeline'
       path: '/timeline'
@@ -3288,11 +3308,14 @@ const AuthenticatedSupportRouteWithChildren =
   AuthenticatedSupportRoute._addFileChildren(AuthenticatedSupportRouteChildren)
 
 interface AuthenticatedTeamsTeamIdRouteChildren {
+  AuthenticatedTeamsTeamIdAvailabilityRoute: typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   AuthenticatedTeamsTeamIdStatsRoute: typeof AuthenticatedTeamsTeamIdStatsRoute
 }
 
 const AuthenticatedTeamsTeamIdRouteChildren: AuthenticatedTeamsTeamIdRouteChildren =
   {
+    AuthenticatedTeamsTeamIdAvailabilityRoute:
+      AuthenticatedTeamsTeamIdAvailabilityRoute,
     AuthenticatedTeamsTeamIdStatsRoute: AuthenticatedTeamsTeamIdStatsRoute,
   }
 
