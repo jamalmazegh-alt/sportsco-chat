@@ -6,9 +6,10 @@
  * lignes de `club_camp_registration_documents`. Les inscriptions elles-mêmes
  * sont conservées (historique / suivi financier).
  *
- * Auth : `apikey` = clé anon Supabase (route `/api/public/*` déjà en dehors du
- * gate d'auth publié). Le rôle service est chargé côté serveur pour effectuer
- * les suppressions (bypass RLS).
+ * Auth : en-tête `x-cron-secret` obligatoire (variable serveur
+ * `CAMP_PURGE_CRON_SECRET`). La route `/api/public/*` étant hors du gate
+ * d'auth publié, ce secret dédié empêche toute exécution par un tiers
+ * disposant simplement de la clé anon publique.
  *
  * Journalisé dans `club_camp_document_purge_log`.
  */
@@ -21,18 +22,23 @@ interface CampPurgeResult {
   error?: string;
 }
 
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey =
-          request.headers.get("apikey") ??
-          request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-        const expected =
-          process.env.SUPABASE_PUBLISHABLE_KEY ??
-          process.env.SUPABASE_ANON_KEY ??
-          process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        if (!expected || !apikey || apikey !== expected) {
+        const provided =
+          request.headers.get("x-cron-secret") ??
+          request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+          "";
+        const expected = process.env.CAMP_PURGE_CRON_SECRET ?? "";
+        if (!expected || !provided || !timingSafeEqualStr(provided, expected)) {
           return new Response("Forbidden", { status: 403 });
         }
 
@@ -40,11 +46,12 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
           "@/integrations/supabase/client.server"
         );
 
-        // 1. Sélection des stages arrivés à échéance de rétention.
-        const { data: camps, error: campsErr } = await supabaseAdmin
-          .from("club_camps")
-          .select("id, end_date, document_retention_months")
-          .not("end_date", "is", null);
+        // 1. Sélection des stages arrivés à échéance de rétention via RPC
+        //    utilisant l'arithmétique exacte de dates Postgres
+        //    (end_date + make_interval(months => document_retention_months)).
+        const { data: dueCamps, error: campsErr } = await supabaseAdmin.rpc(
+          "get_camps_due_for_document_purge" as any,
+        );
 
         if (campsErr) {
           return Response.json(
@@ -53,14 +60,6 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
           );
         }
 
-        const now = Date.now();
-        const dueCamps = (camps ?? []).filter((c: any) => {
-          if (!c.end_date) return false;
-          const months = Math.max(1, Number(c.document_retention_months ?? 6));
-          const end = new Date(c.end_date).getTime();
-          const cutoff = end + months * 30.44 * 24 * 3600 * 1000; // approx mois
-          return cutoff <= now;
-        });
 
         const results: CampPurgeResult[] = [];
 
