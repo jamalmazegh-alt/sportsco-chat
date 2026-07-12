@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
+import { buildFeatureContext } from "@/lib/llm/feature-context";
 
 type ChatRequestBody = { messages?: unknown };
 
@@ -29,10 +30,8 @@ Règles importantes :
 - **Activer les notifications push après coup** : si l'utilisateur a refusé ou fermé la bannière, il peut toujours activer les push depuis **Profil → carte "Cet appareil" → bouton "Activer les notifications"** (disponible pour TOUS les profils, y compris organisateurs de tournoi et arbitres invités sans club). La carte gère automatiquement les états : non supporté, iOS hors PWA (instructions Partager → Sur l'écran d'accueil), permission refusée (instructions cadenas du navigateur), déjà activée.
 - **Paramètres notifications du club** (admins/dirigeants) : page /admin/settings/notifications, chaque type de notification push peut être activé ou désactivé pour tout le club (convocations, réponses joueurs, mur, rappels tournoi, etc.). Sauvegarde automatique.
 - Module **Tournois** : Clubero permet d'organiser des tournois (poules, élimination directe, double élimination, système Suisse, mixte) avec inscription d'équipes (formulaire public + import CSV), paiement d'inscription en ligne (Stripe), tirage au sort animé, génération automatique du calendrier et des terrains, saisie de scores en direct, gestion des tirs au but (penalty) pour les matchs à élimination directe en cas d'égalité, classements et brackets en temps réel, mode diaporama TV, page publique partageable (filtrable par équipe), règlement PDF, co-organisateurs et arbitres invités par email. On peut aussi créer un tournoi sans club (orga libre) puis le rattacher à un vrai club plus tard. Utilise \`listMyTournaments\` pour lister les tournois de l'utilisateur et \`getTournamentDetails\` pour obtenir équipes, classements, matchs à venir et bracket d'un tournoi précis.
-- Module **Paiements & Cagnottes** : Clubero propose deux moyens d'encaissement pour les cotisations, inscriptions tournois et collectes/cagnottes (équipement, déplacements, projets) :
-  • **Stripe Connect** : encaissement direct sur le compte bancaire du club, commission Clubero 5% (3% pour les clubs abonnés Club) + frais Stripe en sus. Suivi des contributeurs, remboursements gérés depuis le tableau de bord.
-  • **HelloAsso** : 0% de commission Clubero, contribution libre du donateur au moment du paiement. Idéal pour les associations loi 1901. On rattache une campagne HelloAsso existante.
-  Le club choisit l'un ou l'autre (ou les deux) selon la collecte. Tableau de bord paiements pour les admins/dirigeants avec transactions, remboursements, exports.
+- Module **Paiements & Cagnottes club** (cotisations, licences, collectes) : bientôt
+  disponible — ne le présente jamais comme actif aujourd'hui (voir connaissance produit).
 - **Sécurité & limites** : tous les envois d'emails et appels à l'IA sont protégés par des limites anti-abus (rate limiting). Si tu vois un message "trop de demandes", attendre 1 minute et réessayer.
 - Si la question est hors-sujet (politique, conseils médicaux, etc.), redirige poliment vers le sujet de l'app.
 - Format : utilise Markdown (listes, gras) pour la lisibilité, mais reste bref.
@@ -1063,7 +1062,20 @@ export const Route = createFileRoute("/api/chat")({
                 timeZone: "Europe/Paris",
               });
               const isoNow = now.toISOString();
-              return `Date et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}`;
+              // TODO: wire real V2 flags (payments_v2, fundraising_v2, social_network_v2,
+              // public_player_profiles) once a server-side flag reader exists; all OFF
+              // reflects the actual V1 beta state today (see src/config/features.ts).
+              const featureContext = buildFeatureContext({
+                audience: "member",
+                lang: "fr",
+                flags: {
+                  payments_v2: false,
+                  fundraising_v2: false,
+                  social_network_v2: false,
+                  public_player_profiles: false,
+                },
+              });
+              return `Date et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}\n\n---\n\n${featureContext}`;
             })(),
             tools,
             stopWhen: stepCountIs(50),

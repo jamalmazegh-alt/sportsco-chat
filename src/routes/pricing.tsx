@@ -152,6 +152,9 @@ function PricingPage() {
                   </li>
                 ))}
               </ul>
+              <p className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground">
+                {t("pricing.paymentsSoonLine")}
+              </p>
             </div>
 
             {/* Tournaments-only Plan */}

@@ -1,5 +1,7 @@
 /**
  * POST /api/public/build-clubero/start
+ * NOTE: no LLM/system prompt lives in this route (pure RPC-driven wizard
+ * form); feature-context injection is not applicable here.
  * Rate-limit IP réel (CF-Connecting-IP prioritaire) puis appel RPC
  * start_build_clubero_response en service_role. Voir prompt de durcissement.
  */

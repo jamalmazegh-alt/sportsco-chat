@@ -1,6 +1,8 @@
 /**
  * POST /api/public/build-clubero/complete
  * Finalise via complete_build_clubero_response (service_role). Idempotent.
+ * NOTE: no LLM/system prompt lives in this route (pure RPC-driven wizard
+ * form); feature-context injection is not applicable here.
  * Rate-limit IP + validation contact (email valide si opt-in).
  */
 import "@tanstack/react-start";

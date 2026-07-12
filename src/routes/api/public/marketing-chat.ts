@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
+import { buildFeatureContext } from "@/lib/llm/feature-context";
 
 const MARKETING_CHAT_RATE_LIMIT_PER_HOUR = 20;
 const MAX_MESSAGE_CHARS = 2000;
@@ -44,10 +45,8 @@ Connaissance produit :
   - Notifications dans l'app (cloche), par email et via WhatsApp pour les convocations et mentions.
   - Codes d'invitation et liens magiques pour onboarder rapidement les membres.
   - Gestion multi-équipes, multi-saisons.
-  - **Paiements du club — deux options au choix, activables séparément ou ensemble** :
-    - **Stripe Connect** : encaissement direct sur le compte bancaire du club (Stripe Connect Express, onboarding KYC en quelques minutes). Cotisations, licences, équipement, sorties/déplacements, frais d'inscription tournois, paiements famille (un parent règle pour plusieurs enfants), reçus PDF automatiques, relances de paiement, remboursements en un clic depuis le tableau de bord. Tableau de bord financier (encaissements, en attente, exports). Commission Clubero : 5 % par transaction (3 % pour les clubs abonnés Club), Stripe en sus.
-    - **HelloAsso** : pour les associations qui veulent du **0 % de commission** (le don/pourboire libre est laissé au donateur à la fin du paiement). On connecte les URLs HelloAsso du club (adhésions/licences, collectes/cagnottes, boutique, tournois) et Clubero affiche les boutons "Payer / Adhérer / Soutenir" aux bons endroits. Idéal pour les clubs en association loi 1901 en France.
-  - **Collectes et cagnottes (fundraising)** : pour financer un déplacement, un tournoi, du matériel — soit via Stripe (le club encaisse, suivi des contributeurs intégré), soit en branchant une cagnotte HelloAsso existante. Possibilité d'envoyer la collecte au club, aux parents, ou de la rendre publique.
+  - **Paiements du club** : cotisations, licences, encaissement direct au club — bientôt
+    disponible (voir la connaissance produit ci-dessous pour l'état exact des fonctionnalités).
   - **Module Tournois** (inclus dans l'abonnement Club, ou 40 €/tournoi en standalone) : création de tournoi multi-formats (poules, élimination directe, double élimination, Suisse), génération automatique du planning, inscriptions en ligne avec paiement (Stripe ou HelloAsso), gestion des arbitres, brackets en direct, mode TV (affichage grand écran), règlement PDF, page publique de tournoi partageable.
   - **Application installable (PWA) + notifications push natives** : Clubero est une Progressive Web App, installable sur smartphone, tablette ou ordinateur **sans passer par l'App Store ni Google Play**, avec icône sur l'écran d'accueil et lancement plein écran comme une vraie app.
     - **Android (Chrome / Edge / Samsung Internet)** : bannière "Installer" automatique, ou menu ⋮ → "Installer l'application".
@@ -145,10 +144,24 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
 
+        // TODO: wire real V2 flags (payments_v2, fundraising_v2, social_network_v2,
+        // public_player_profiles) once a server-side flag reader exists; all OFF
+        // reflects the actual V1 beta state today (see src/config/features.ts).
+        const featureContext = buildFeatureContext({
+          audience: "visitor",
+          lang: langCode.slice(0, 2) === "en" ? "en" : "fr",
+          flags: {
+            payments_v2: false,
+            fundraising_v2: false,
+            social_network_v2: false,
+            public_player_profiles: false,
+          },
+        });
+
         try {
           const result = streamText({
             model,
-            system: `${SYSTEM_PROMPT}\n\nIMPORTANT: The user's interface language is "${langName}" (code: ${langCode}). You MUST respond in ${langName}, regardless of the language used in previous messages or examples. Internal links (e.g. /demo, /pricing) stay as-is.`,
+            system: `${SYSTEM_PROMPT}\n\n---\n\n${featureContext}\n\nIMPORTANT: The user's interface language is "${langName}" (code: ${langCode}). You MUST respond in ${langName}, regardless of the language used in previous messages or examples. Internal links (e.g. /demo, /pricing) stay as-is.`,
             stopWhen: stepCountIs(3),
             messages: await convertToModelMessages(messages as UIMessage[]),
           });

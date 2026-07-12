@@ -1,6 +1,8 @@
 /**
  * POST /api/public/build-clubero/save
  * Enregistre une réponse via save_build_clubero_answer (service_role).
+ * NOTE: no LLM/system prompt lives in this route (pure RPC-driven wizard
+ * form); feature-context injection is not applicable here.
  * Rate-limit IP, valide question_key ∈ config.
  */
 import "@tanstack/react-start";

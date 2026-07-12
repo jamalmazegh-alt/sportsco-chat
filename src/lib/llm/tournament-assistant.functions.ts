@@ -11,6 +11,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callLLM, cacheGet, cacheSet, checkLlmRateLimit } from "./core.server";
+import { buildFeatureContext } from "./feature-context";
 
 const RecoSchema = z.object({
   pools: z.number().int().min(1).max(16),
@@ -128,8 +129,24 @@ export const answerTournamentQuestion = createServerFn({ method: "POST" })
     const allowed = await checkLlmRateLimit(userId, "tournament_qa", 10);
     if (!allowed) return { ok: false as const };
 
-    const sysFr = `Tu es un assistant d'organisation de tournoi sportif. Tu réponds UNIQUEMENT aux questions concernant : organisation du tournoi, choix du format, durée, nombre de terrains, gestion des équipes, conseils pratiques. Si la question sort de ce cadre, réponds poliment que tu ne peux pas aider. N'invente JAMAIS de fonctionnalités. Maximum 4 phrases. Réponse JSON STRICT : {"answer": "..."}.`;
-    const sysEn = `You are a sports-tournament organisation assistant. Only answer questions about: tournament organisation, format choice, duration, number of courts, team management, practical advice. If the question is off-topic, politely decline. Never invent product features. 4 sentences max. STRICT JSON: {"answer": "..."}.`;
+    const sysFrBase = `Tu es un assistant d'organisation de tournoi sportif. Tu réponds UNIQUEMENT aux questions concernant : organisation du tournoi, choix du format, durée, nombre de terrains, gestion des équipes, conseils pratiques. Si la question sort de ce cadre, réponds poliment que tu ne peux pas aider. N'invente JAMAIS de fonctionnalités. Maximum 4 phrases. Réponse JSON STRICT : {"answer": "..."}.`;
+    const sysEnBase = `You are a sports-tournament organisation assistant. Only answer questions about: tournament organisation, format choice, duration, number of courts, team management, practical advice. If the question is off-topic, politely decline. Never invent product features. 4 sentences max. STRICT JSON: {"answer": "..."}.`;
+
+    // TODO: wire real V2 flags (payments_v2, fundraising_v2, social_network_v2,
+    // public_player_profiles) once a server-side flag reader exists; all OFF
+    // reflects the actual V1 beta state today (see src/config/features.ts).
+    const featureContext = buildFeatureContext({
+      audience: "tournament",
+      lang: data.locale,
+      flags: {
+        payments_v2: false,
+        fundraising_v2: false,
+        social_network_v2: false,
+        public_player_profiles: false,
+      },
+    });
+    const sysFr = `${sysFrBase}\n\n---\n\n${featureContext}`;
+    const sysEn = `${sysEnBase}\n\n---\n\n${featureContext}`;
 
     const historyText = data.history.map((h) => `${h.role.toUpperCase()}: ${h.content}`).join("\n");
     const prompt = `Contexte de la recommandation:\n${JSON.stringify({
