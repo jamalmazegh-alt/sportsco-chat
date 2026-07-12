@@ -136,7 +136,7 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       .from("club_camp_registrations")
       .select(
         `id, camp_id, access_token, participant_first_name, participant_last_name,
-         birth_date, guardian_first_name, guardian_last_name, guardian_email,
+         birth_date, gender, club_name, guardian_first_name, guardian_last_name, guardian_email,
          guardian_phone, registration_status, payment_status, amount_paid,
          reserved_until, created_at, updated_at,
          club_camp_registration_documents ( id, required_document_id, review_status )`,
