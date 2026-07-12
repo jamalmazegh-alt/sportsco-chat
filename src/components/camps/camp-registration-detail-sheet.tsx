@@ -249,6 +249,16 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 
               <Separator />
 
+              <PaymentSection
+                detail={detail}
+                t={t}
+                pending={paymentMut.isPending}
+                onSet={(status, amount) => paymentMut.mutate({ status, amount })}
+              />
+
+              <Separator />
+
+
               <StatusActions
                 detail={detail}
                 t={t}
