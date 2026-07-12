@@ -177,13 +177,14 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
+              aria-label={t("availability.declare", { defaultValue: "Déclarer une absence" })}
+              title={t("availability.declare", { defaultValue: "Déclarer une absence" })}
               className={cn(
-                "shrink-0 text-[11px] font-bold inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full transition-all",
+                "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full transition-all",
                 declareBtnClass,
               )}
             >
-              {t("availability.declare", { defaultValue: "Déclarer" })}
-              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
+              <Plus className="h-5 w-5" strokeWidth={2.8} />
             </button>
           )}
         </div>
