@@ -138,13 +138,15 @@ function PlayerProfile() {
   async function onDeletePlayer() {
     if (!player) return;
     setDeleting(true);
-    const { data: mode, error } = await supabase.rpc("delete_player_smart", { _id: player.id });
+    const { data: mode, error } = await (supabase.rpc as any)("delete_player_smart", {
+      _id: player.id,
+    });
     setDeleting(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    const wasSoft = mode === "soft";
+    const wasSoft = String(mode) === "soft";
     toast(t("players.deleted"), {
       action: wasSoft
         ? {
