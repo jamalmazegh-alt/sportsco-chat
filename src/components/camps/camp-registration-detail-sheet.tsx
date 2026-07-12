@@ -803,6 +803,14 @@ function PaymentSection({
   const isPaid = status === "paid";
   const notRequired = status === "not_required" || price <= 0;
 
+  const [partialAmount, setPartialAmount] = useState<string>(
+    detail.amount_paid > 0 && detail.amount_paid < price ? String(detail.amount_paid) : "",
+  );
+  const partialValue = Number(partialAmount.replace(",", "."));
+  const partialValid =
+    Number.isFinite(partialValue) && partialValue > 0 && partialValue < price;
+  const remaining = Math.max(0, price - (detail.amount_paid ?? 0));
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
@@ -833,48 +841,102 @@ function PaymentSection({
                 })}
               </span>
             )}
+            {status === "partial" && remaining > 0 && (
+              <span className="ml-2 text-amber-700">
+                ·{" "}
+                {t("registrations.detail.paymentRemaining", {
+                  defaultValue: "Reste dû : {{amount}} {{currency}}",
+                  amount: remaining.toFixed(2),
+                  currency,
+                })}
+              </span>
+            )}
           </>
         )}
       </div>
       {!notRequired && (
-        <div className="flex flex-wrap gap-2">
-          {!isPaid && (
-            <Button
-              size="sm"
-              disabled={pending}
-              onClick={() => onSet("paid", price)}
-            >
-              {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-              {t("registrations.detail.markPaid", { defaultValue: "Marquer comme payé" })}
-            </Button>
-          )}
-          {isPaid && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onSet("pending", 0)}
-            >
-              {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
-              {t("registrations.detail.markUnpaid", { defaultValue: "Marquer non payé" })}
-            </Button>
-          )}
-          {isPaid && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onSet("refunded")}
-            >
-              {t("registrations.detail.markRefunded", { defaultValue: "Marquer remboursé" })}
-            </Button>
-          )}
-        </div>
+        <>
+          <div className="flex flex-wrap gap-2">
+            {!isPaid && (
+              <Button size="sm" disabled={pending} onClick={() => onSet("paid", price)}>
+                {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                {t("registrations.detail.markPaid", { defaultValue: "Marquer comme payé" })}
+              </Button>
+            )}
+            {isPaid && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() => onSet("pending", 0)}
+              >
+                {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
+                {t("registrations.detail.markUnpaid", { defaultValue: "Marquer non payé" })}
+              </Button>
+            )}
+            {isPaid && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() => onSet("refunded")}
+              >
+                {t("registrations.detail.markRefunded", { defaultValue: "Marquer remboursé" })}
+              </Button>
+            )}
+          </div>
+
+          <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2">
+            <div className="text-xs font-semibold text-foreground">
+              {t("registrations.detail.markPartialTitle", {
+                defaultValue: "Enregistrer un paiement partiel",
+              })}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  max={price}
+                  value={partialAmount}
+                  onChange={(e) => setPartialAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="h-8 w-28 rounded-md border border-input bg-background px-2 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+                <span className="pointer-events-none absolute right-2 top-1.5 text-xs text-muted-foreground">
+                  {currency}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending || !partialValid}
+                onClick={() => onSet("partial", partialValue)}
+              >
+                {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
+                {t("registrations.detail.markPartial", {
+                  defaultValue: "Marquer comme partiel",
+                })}
+              </Button>
+              {partialValid && (
+                <span className="text-xs text-muted-foreground">
+                  {t("registrations.detail.partialRemainingPreview", {
+                    defaultValue: "Reste dû : {{amount}} {{currency}}",
+                    amount: (price - partialValue).toFixed(2),
+                    currency,
+                  })}
+                </span>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </section>
   );
 }
+
 
 function PaymentPill({ status, t }: { status: PaymentStatus; t: any }) {
   const map: Record<PaymentStatus, string> = {
