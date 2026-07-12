@@ -252,6 +252,18 @@ function CampEditPage() {
           {t("common.back", { defaultValue: "Retour" })}
         </Button>
         <div className="ml-auto flex items-center gap-2">
+          {camp.status !== "draft" && camp.club_slug && (
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`/stages/${camp.club_slug}/${camp.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                {t("lifecycle.openPublic", { defaultValue: "Voir la page publique" })}
+              </a>
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -677,9 +689,7 @@ function PublicCampLinkCard({
   };
   return (
     <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm space-y-2">
-      <div className="font-medium">
-        {t("lifecycle.publicUrl", { defaultValue: "Lien public" })}
-      </div>
+      <div className="font-medium">{t("lifecycle.publicUrl", { defaultValue: "Lien public" })}</div>
       <div className="flex items-center gap-2">
         <Input value={url} readOnly className="text-xs h-8" />
         <Button
