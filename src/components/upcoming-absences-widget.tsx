@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
+import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,10 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   clubId: string;
+  teamId?: string;
   className?: string;
 }
+
 
 type Row = {
   id: string;
