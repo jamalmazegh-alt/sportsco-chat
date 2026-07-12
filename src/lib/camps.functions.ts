@@ -57,6 +57,7 @@ export interface ClubCamp {
 
 export interface ClubCampWithAgeGroups extends ClubCamp {
   age_groups: CampAgeGroup[];
+  club_slug?: string | null;
 }
 
 // ---------------------------------------------------------------------------
