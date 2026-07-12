@@ -6424,6 +6424,14 @@ export type Database = {
         Returns: Json
       }
       get_camp_registration_stats: { Args: { _camp_id: string }; Returns: Json }
+      get_camps_due_for_document_purge: {
+        Args: never
+        Returns: {
+          document_retention_months: number
+          end_date: string
+          id: string
+        }[]
+      }
       get_club_stripe_status: {
         Args: { _club_id: string }
         Returns: {
