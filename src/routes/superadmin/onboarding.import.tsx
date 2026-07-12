@@ -207,11 +207,22 @@ function downloadTemplate(type: ImportType) {
   XLSX.writeFile(wb, `clubero-template-${type}.xlsx`);
 }
 
+const FIELD_LABEL_FR: Record<string, string> = {
+  first_name: "Prénom",
+  last_name: "Nom",
+  jersey_number: "N° maillot",
+  license_number: "N° licence",
+  preferred_position: "Poste",
+  email: "Email",
+  phone: "Téléphone",
+};
+
 function ImportPage() {
   const listClubs = useServerFn(listClubsForImport);
   const getStats = useServerFn(getClubImportStats);
   const aiAnalyze = useServerFn(analyzeFileWithAI);
   const tplParse = useServerFn(parseTemplateFn);
+  const doPreview = useServerFn(previewPlayersImport);
   const doImport = useServerFn(runImport);
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -229,6 +240,13 @@ function ImportPage() {
   const [sendInvitations, setSendInvitations] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Awaited<ReturnType<typeof runImport>> | null>(null);
+
+  // Players preview state.
+  const [preview, setPreview] = useState<PlayerImportPreview | null>(null);
+  /** teamKey → team_id chosen by the operator (or empty string for "create new"). */
+  const [teamChoices, setTeamChoices] = useState<Record<string, string>>({});
+  /** rowIndex → set of overwritable fields authorized to be replaced. */
+  const [fieldOverrides, setFieldOverrides] = useState<Record<number, Set<string>>>({});
 
   // Load all clubs on mount so the dropdown is populated immediately.
   useEffect(() => {
@@ -282,7 +300,9 @@ function ImportPage() {
       setTemplateDetected(isTemplate);
       setStep(3);
       if (isTemplate) {
-        const res = await tplParse({ data: { type: detected.type, headers: hdrs, rawRows: rows } });
+        const res = await tplParse({
+          data: { clubId: club.id, type: detected.type, headers: hdrs, rawRows: rows },
+        });
         setAnalysis(res);
         setIaUsed(false);
         setStep(4);
@@ -311,6 +331,15 @@ function ImportPage() {
 
   const fields = useMemo(() => (type ? getFields(type) : []), [type]);
 
+  const cleanRows = useMemo(() => {
+    if (!analysis) return null;
+    return analysis.rows.map((r) => {
+      const o: Record<string, string | null> = {};
+      for (const f of fields) o[f.key] = r[f.key]?.value ?? null;
+      return o;
+    });
+  }, [analysis, fields]);
+
   const editCell = (rowIdx: number, key: string, val: string) => {
     if (!analysis) return;
     const newRows = [...analysis.rows];
@@ -323,7 +352,6 @@ function ImportPage() {
     const fdef = fields.find((f) => f.key === key);
     cell.error = fdef?.validate ? fdef.validate(cell.value) : null;
     newRows[rowIdx] = { ...newRows[rowIdx], [key]: cell };
-    // recompute summary
     let valid = 0;
     let to_fix = 0;
     const required = fields.filter((f) => f.required).map((f) => f.key);
@@ -333,19 +361,73 @@ function ImportPage() {
       else to_fix++;
     }
     setAnalysis({ ...analysis, rows: newRows, summary: { total: newRows.length, valid, to_fix } });
+    // Any edit invalidates the preview.
+    setPreview(null);
+    setFieldOverrides({});
+    setTeamChoices({});
+  };
+
+  const runPreview = async () => {
+    if (!cleanRows || !club) return;
+    setLoading(true);
+    try {
+      const res = await doPreview({
+        data: { clubId: club.id, rows: cleanRows },
+      });
+      setPreview(res);
+      // Default team choices to the suggested match.
+      const defaults: Record<string, string> = {};
+      for (const tr of res.teamResolutions) {
+        defaults[tr.key] = tr.suggestedTeamId ?? "";
+      }
+      setTeamChoices(defaults);
+      setFieldOverrides({});
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleOverride = (rowIndex: number, field: string, checked: boolean) => {
+    setFieldOverrides((prev) => {
+      const next = { ...prev };
+      const set = new Set(next[rowIndex] ?? []);
+      if (checked) set.add(field);
+      else set.delete(field);
+      next[rowIndex] = set;
+      return next;
+    });
   };
 
   const confirmImport = async () => {
-    if (!analysis || !type || !club) return;
+    if (!cleanRows || !type || !club) return;
     setLoading(true);
     try {
-      const cleanRows = analysis.rows.map((r) => {
-        const o: Record<string, string | null> = {};
-        for (const f of fields) o[f.key] = r[f.key]?.value ?? null;
-        return o;
-      });
+      const teamOverrides: Record<string, string> = {};
+      if (type === "players" && preview) {
+        for (const [key, val] of Object.entries(teamChoices)) {
+          if (val) teamOverrides[key] = val;
+        }
+      }
+      const fieldOverridesPayload: Record<string, string[]> = {};
+      if (type === "players") {
+        for (const [idx, set] of Object.entries(fieldOverrides)) {
+          if (set.size > 0) fieldOverridesPayload[idx] = Array.from(set);
+        }
+      }
       const res = await doImport({
-        data: { clubId: club.id, type, rows: cleanRows, sendInvitations, fileName, iaUsed },
+        data: {
+          clubId: club.id,
+          type,
+          rows: cleanRows,
+          sendInvitations,
+          fileName,
+          iaUsed,
+          teamOverrides: Object.keys(teamOverrides).length > 0 ? teamOverrides : undefined,
+          fieldOverrides:
+            Object.keys(fieldOverridesPayload).length > 0 ? fieldOverridesPayload : undefined,
+        },
       });
       setResult(res);
       setStep(5);
@@ -355,6 +437,7 @@ function ImportPage() {
       setLoading(false);
     }
   };
+
 
   const reset = (keepClub: boolean) => {
     setStep(2);
