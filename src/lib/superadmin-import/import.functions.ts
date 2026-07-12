@@ -33,6 +33,85 @@ async function assertSuperAdmin(userId: string) {
   if (!data) throw new Response("Forbidden", { status: 403 });
 }
 
+/**
+ * Allow super_admin OR admin/coach of the target club.
+ * Used by the shared import server fns so the same pipeline serves both the
+ * superadmin wizard and the coach dialog.
+ */
+async function assertImportAccess(
+  supabase: import("@supabase/supabase-js").SupabaseClient,
+  userId: string,
+  clubId: string,
+) {
+  const { data: sa } = await supabaseAdmin
+    .from("super_admins")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (sa) return;
+  const { data, error } = await supabase
+    .from("club_members")
+    .select("roles, role")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw new Response("Internal error", { status: 500 });
+  if (!data) throw new Response("Forbidden", { status: 403 });
+  const rolesArr = (data as { roles?: string[] | null }).roles ?? [];
+  const roleSingle = (data as { role?: string | null }).role;
+  const roles = new Set<string>([...(rolesArr as string[]), ...(roleSingle ? [roleSingle] : [])]);
+  if (!roles.has("admin") && !roles.has("coach")) {
+    throw new Response("Forbidden", { status: 403 });
+  }
+}
+
+/** Mirrors public.normalize_name(text): unaccent → lower → [^a-z0-9] stripped. */
+function normalizeName(v: string | null | undefined): string {
+  return (v ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * Coach mode: inject equipe/sport/categorie from the target team so the
+ * uploaded file may omit those columns. Also verifies the team belongs to
+ * clubId (defense in depth against a client-forged teamId).
+ */
+async function injectTeamContext(
+  teamId: string,
+  clubId: string,
+  headers: string[],
+  rawRows: Array<Record<string, unknown>>,
+): Promise<{
+  headers: string[];
+  rawRows: Array<Record<string, unknown>>;
+  team: { id: string; name: string; sport: string | null; age_group: string | null };
+}> {
+  const { data: team, error } = await supabaseAdmin
+    .from("teams")
+    .select("id, club_id, name, sport, age_group")
+    .eq("id", teamId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!team || team.club_id !== clubId) throw new Response("Forbidden", { status: 403 });
+  const extra: Record<string, string> = {
+    equipe: team.name,
+    sport: team.sport ?? "",
+    categorie: team.age_group ?? "",
+  };
+  const augmentedHeaders = [...headers];
+  for (const k of Object.keys(extra)) if (!augmentedHeaders.includes(k)) augmentedHeaders.push(k);
+  const augmentedRows = rawRows.map((r) => {
+    const out = { ...r };
+    for (const [k, v] of Object.entries(extra)) if (out[k] == null || out[k] === "") out[k] = v;
+    return out;
+  });
+  return { headers: augmentedHeaders, rawRows: augmentedRows, team };
+}
+
 // ============================================================
 // 1) Liste des clubs (recherche autocomplete)
 // ============================================================
@@ -128,6 +207,7 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     z
       .object({
         clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         headers: z.array(z.string()).min(1).max(50),
         rawRows: z.array(z.record(z.string(), z.unknown())).min(1).max(500),
@@ -135,9 +215,17 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY non configurée");
+
+    let headers = data.headers;
+    let rawRows = data.rawRows;
+    if (data.teamId) {
+      const ctx = await injectTeamContext(data.teamId, data.clubId, headers, rawRows);
+      headers = ctx.headers;
+      rawRows = ctx.rawRows;
+    }
 
     const fields = getFields(data.type);
     const validKeys = new Set(fields.map((f) => f.key));
@@ -148,7 +236,6 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
-    // 1) Demande IA : seulement le mapping (petit, fiable)
     const mapping: Record<string, string> = {};
     try {
       const { object } = await generateObject({
@@ -159,10 +246,10 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
 Clés Clubero valides : ${fieldList}
 
 En-têtes source du fichier :
-${JSON.stringify(data.headers)}
+${JSON.stringify(headers)}
 
 Échantillon des 3 premières lignes (pour aider la désambiguïsation) :
-${JSON.stringify(data.rawRows.slice(0, 3))}
+${JSON.stringify(rawRows.slice(0, 3))}
 
 Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
         abortSignal: AbortSignal.timeout(30_000),
@@ -179,10 +266,16 @@ Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
       );
     }
 
-    // 2) Renomme les en-têtes du dataset selon le mapping IA, puis applique parseTemplate
-    //    (toute la normalisation/validation locale s'applique).
-    const renamedHeaders = data.headers.map((h) => mapping[h] ?? h);
-    const renamedRows = data.rawRows.map((row) => {
+    // In coach mode we already injected equipe/sport/categorie by their
+    // canonical keys — pass them through as-is so parseTemplate finds them.
+    if (data.teamId) {
+      for (const k of ["equipe", "sport", "categorie"]) {
+        if (headers.includes(k) && !mapping[k]) mapping[k] = k;
+      }
+    }
+
+    const renamedHeaders = headers.map((h) => mapping[h] ?? h);
+    const renamedRows = rawRows.map((row) => {
       const out: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(row)) {
         const target = mapping[k];
@@ -192,7 +285,6 @@ Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
     });
 
     const parsed = parseTemplate(data.type, renamedHeaders, renamedRows);
-    // Conserve le mapping IA dans le résultat final pour traçabilité
     parsed.mapping = mapping;
     return parsed as AnalysisResult;
   });
@@ -205,6 +297,8 @@ export const parseTemplateFn = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
+        clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         headers: z.array(z.string()).min(1).max(50),
         rawRows: z.array(z.record(z.string(), z.unknown())).min(1).max(500),
@@ -212,8 +306,15 @@ export const parseTemplateFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
-    return parseTemplate(data.type, data.headers, data.rawRows);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+    let headers = data.headers;
+    let rawRows = data.rawRows;
+    if (data.teamId) {
+      const ctx = await injectTeamContext(data.teamId, data.clubId, headers, rawRows);
+      headers = ctx.headers;
+      rawRows = ctx.rawRows;
+    }
+    return parseTemplate(data.type, headers, rawRows);
   });
 
 // ============================================================
@@ -369,6 +470,7 @@ export const runImport = createServerFn({ method: "POST" })
     z
       .object({
         clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         rows: importRowsSchema,
         sendInvitations: z.boolean().default(false),
@@ -378,7 +480,22 @@ export const runImport = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+
+    // If a teamId is provided, verify it belongs to the club (defense in depth).
+    let fixedTeam:
+      | { id: string; name: string; sport: string | null; age_group: string | null }
+      | null = null;
+    if (data.teamId) {
+      const { data: t } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id, name, sport, age_group")
+        .eq("id", data.teamId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (!t || t.club_id !== data.clubId) throw new Response("Forbidden", { status: 403 });
+      fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
+    }
 
     // Hard limits
     const maxRows = data.type === "planning" ? PLANNING_MAX_ROWS : ENTITY_MAX_ROWS;
@@ -405,51 +522,163 @@ export const runImport = createServerFn({ method: "POST" })
         const parentCache = new Map<string, string>();
         let teamsCreated = 0;
         let playersCreated = 0;
+        let playersUpdated = 0;
+        let playersRestored = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
+        // Load full club roster (active + soft-deleted) once — identity index.
+        type ExistingPlayer = {
+          id: string;
+          first_name: string | null;
+          last_name: string | null;
+          birth_date: string | null;
+          jersey_number: number | null;
+          license_number: string | null;
+          preferred_position: string | null;
+          email: string | null;
+          phone: string | null;
+          deleted_at: string | null;
+        };
+        const { data: clubPlayers, error: rosterErr } = await supabaseAdmin
+          .from("players")
+          .select(
+            "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+          )
+          .eq("club_id", data.clubId);
+        if (rosterErr) throw new Error(rosterErr.message);
+
+        const playersByIdentity = new Map<string, ExistingPlayer>();
+        const identityKey = (
+          first: string | null | undefined,
+          last: string | null | undefined,
+          birth: string | null | undefined,
+        ): string | null => {
+          if (!birth) return null;
+          const f = normalizeName(first);
+          const l = normalizeName(last);
+          if (!f || !l) return null;
+          return `${f}|${l}|${birth}`;
+        };
+        for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
+          const k = identityKey(p.first_name, p.last_name, p.birth_date);
+          if (!k) continue;
+          const prev = playersByIdentity.get(k);
+          if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+        }
 
         for (let i = 0; i < data.rows.length; i++) {
           const r = data.rows[i] as RowMap;
           try {
-            const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
-            let teamId = teamCache.get(teamKey);
-            if (!teamId) {
-              const t = await findOrCreateTeam(
-                data.clubId,
-                r.equipe!,
-                r.sport!,
-                r.categorie!,
-                r.genre,
-                r.saison,
-              );
-              teamId = t.id;
-              teamCache.set(teamKey, teamId);
-              if (t.created) teamsCreated++;
+            // DOB mandatory — identity key requires it.
+            if (!r.date_naissance) {
+              throw new Error("date de naissance requise");
             }
 
-            const { data: player, error: pErr } = await supabaseAdmin
-              .from("players")
-              .insert({
-                club_id: data.clubId,
-                first_name: titleCase(r.prenom_joueur!),
-                last_name: titleCase(r.nom_joueur!),
-                birth_date: r.date_naissance,
-                jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
-                license_number: r.numero_licence || null,
-                preferred_position: r.poste || null,
-                phone: r.telephone_joueur || null,
-                email: r.email_contact?.toLowerCase() || null,
-              })
-              .select("id")
-              .single();
-            if (pErr) throw new Error(pErr.message);
-            playersCreated++;
+            // Resolve team: fixed team (coach mode) or per-row.
+            let teamId: string;
+            if (fixedTeam) {
+              teamId = fixedTeam.id;
+            } else {
+              const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
+              const cached = teamCache.get(teamKey);
+              if (cached) {
+                teamId = cached;
+              } else {
+                const t = await findOrCreateTeam(
+                  data.clubId,
+                  r.equipe!,
+                  r.sport!,
+                  r.categorie!,
+                  r.genre,
+                  r.saison,
+                );
+                teamId = t.id;
+                teamCache.set(teamKey, teamId);
+                if (t.created) teamsCreated++;
+              }
+            }
 
-            await supabaseAdmin.from("team_members").insert({
+            const firstName = titleCase(r.prenom_joueur!);
+            const lastName = titleCase(r.nom_joueur!);
+            const idKey = identityKey(firstName, lastName, r.date_naissance)!;
+
+            let existing = playersByIdentity.get(idKey) ?? null;
+            let playerId: string;
+
+            if (existing && existing.deleted_at) {
+              const { error: restoreErr } = await supabaseAdmin.rpc(
+                "restore_entity" as never,
+                { _kind: "player", _id: existing.id } as never,
+              );
+              if (restoreErr) throw new Error(restoreErr.message);
+              existing = { ...existing, deleted_at: null };
+              playersRestored++;
+            }
+
+            if (existing) {
+              // Non-destructive patch: only fill blanks.
+              const patch: Record<string, unknown> = {};
+              if (existing.jersey_number == null && r.numero_maillot)
+                patch.jersey_number = parseInt(r.numero_maillot, 10);
+              if (!existing.license_number && r.numero_licence)
+                patch.license_number = r.numero_licence;
+              if (!existing.preferred_position && r.poste) patch.preferred_position = r.poste;
+              if (!existing.email && r.email_contact)
+                patch.email = r.email_contact.toLowerCase();
+              if (!existing.phone && r.telephone_joueur) patch.phone = r.telephone_joueur;
+              if (Object.keys(patch).length > 0) {
+                const { error: upErr } = await supabaseAdmin
+                  .from("players")
+                  .update(patch as never)
+                  .eq("id", existing.id);
+                if (upErr) throw new Error(upErr.message);
+                playersUpdated++;
+                existing = { ...existing, ...(patch as Partial<ExistingPlayer>) };
+                playersByIdentity.set(idKey, existing);
+              }
+              playerId = existing.id;
+            } else {
+              const { data: inserted, error: pErr } = await supabaseAdmin
+                .from("players")
+                .insert({
+                  club_id: data.clubId,
+                  first_name: firstName,
+                  last_name: lastName,
+                  birth_date: r.date_naissance,
+                  jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  license_number: r.numero_licence || null,
+                  preferred_position: r.poste || null,
+                  phone: r.telephone_joueur || null,
+                  email: r.email_contact?.toLowerCase() || null,
+                })
+                .select(
+                  "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+                )
+                .single();
+              if (pErr) {
+                if ((pErr as { code?: string }).code === "23505") {
+                  throw new Error("Identité déjà existante dans ce club");
+                }
+                throw new Error(pErr.message);
+              }
+              playersCreated++;
+              playersByIdentity.set(idKey, inserted as ExistingPlayer);
+              playerId = inserted.id;
+            }
+
+            // Link team_members if missing (ignore duplicate errors).
+            const { error: tmErr } = await supabaseAdmin.from("team_members").insert({
               team_id: teamId,
-              player_id: player.id,
+              player_id: playerId,
               role: "player" as never,
             });
+            if (tmErr && (tmErr as { code?: string }).code !== "23505") {
+              throw new Error(tmErr.message);
+            }
+
+            const player = { id: playerId };
+
 
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
@@ -531,9 +760,11 @@ export const runImport = createServerFn({ method: "POST" })
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
         }
-        imported = playersCreated;
+        imported = playersCreated + playersUpdated + playersRestored;
         summary.teams_created = teamsCreated;
         summary.players_created = playersCreated;
+        summary.players_updated = playersUpdated;
+        summary.players_restored = playersRestored;
         summary.parents_created = parentsCreated;
         summary.invitations_sent = invitationsSent;
       } else if (data.type === "coaches") {

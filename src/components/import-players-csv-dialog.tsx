@@ -1,255 +1,86 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useCallback, useMemo, useState, type ChangeEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
+import { Loader2, Upload, Download, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Download } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { downloadCsv } from "@/lib/csv";
+import {
+  analyzeFileWithAI,
+  parseTemplateFn,
+  runImport,
+} from "@/lib/superadmin-import/import.functions";
+import {
+  type AnalysisResult,
+  getFields,
+  templateMatchRatio,
+} from "@/lib/superadmin-import/schemas";
 
-type ParsedRow = {
-  first_name: string;
-  last_name: string;
-  jersey_number: number | null;
-  position: string | null;
-  license_number: string | null;
-  birth_date: string | null;
-  email: string | null;
-  phone: string | null;
-  parent_first: string | null;
-  parent_last: string | null;
-  parent_email: string | null;
-  parent_phone: string | null;
-  parent2_first: string | null;
-  parent2_last: string | null;
-  parent2_email: string | null;
-  parent2_phone: string | null;
-};
+/**
+ * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
+ * import pipeline — no bespoke parsing or DB writes here. The server enforces
+ * authorization (admin/coach of clubId) and scopes writes to `teamId`.
+ */
 
-type ExistingPlayer = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  jersey_number: number | null;
-  license_number: string | null;
-  preferred_position: string | null;
-  birth_date: string | null;
-  email: string | null;
-  phone: string | null;
-  deleted_at: string | null;
-};
-
-type PlayerPatch = {
-  jersey_number?: number;
-  license_number?: string;
-  preferred_position?: string;
-  birth_date?: string;
-  email?: string;
-  phone?: string;
-};
-
-const HEADERS = [
-  "first_name",
-  "last_name",
-  "jersey",
-  "position",
-  "license",
-  "birth_date",
-  "email",
-  "phone",
-  "parent_first",
-  "parent_last",
-  "parent_email",
-  "parent_phone",
-  "parent2_first",
-  "parent2_last",
-  "parent2_email",
-  "parent2_phone",
+const FIELD_KEYS = [
+  "prenom_joueur",
+  "nom_joueur",
+  "date_naissance",
+  "numero_maillot",
+  "numero_licence",
+  "poste",
+  "telephone_joueur",
+  "email_contact",
+  "prenom_parent_1",
+  "nom_parent_1",
+  "email_parent_1",
+  "telephone_parent_1",
+  "prenom_parent_2",
+  "nom_parent_2",
+  "email_parent_2",
+  "telephone_parent_2",
 ] as const;
 
-function splitLine(line: string): string[] {
-  // simple split supporting , ; \t — values trimmed; quoted values respected.
-  const out: string[] = [];
-  let cur = "";
-  let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (inQ) {
-      if (ch === '"' && line[i + 1] === '"') {
-        cur += '"';
-        i++;
-      } else if (ch === '"') inQ = false;
-      else cur += ch;
-    } else {
-      if (ch === '"') inQ = true;
-      else if (ch === "," || ch === ";" || ch === "\t") {
-        out.push(cur.trim());
-        cur = "";
-      } else cur += ch;
-    }
-  }
-  out.push(cur.trim());
-  return out;
+function cleanSheetRows(rows: Array<Record<string, unknown>>) {
+  return rows
+    .map((row) => {
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(row)) {
+        if (k === "__rowNum__" || k.trim() === "") continue;
+        out[k] = typeof v === "string" ? v.trim() : v;
+      }
+      return out;
+    })
+    .filter((row) =>
+      Object.values(row).some((v) => v != null && String(v).trim() !== ""),
+    );
 }
 
-function normHeader(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\s._-]+/g, "");
-}
-
-function parseCsv(
-  text: string,
-  extraAliases: Record<string, (typeof HEADERS)[number]> = {},
-): ParsedRow[] {
-  const lines = text
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  if (lines.length === 0) return [];
-
-  // Detect header line
-  let startIdx = 0;
-  let headerMap: Record<string, number> | null = null;
-  const firstParts = splitLine(lines[0]);
-  const firstLower = firstParts.map((s) => s.toLowerCase());
-  const looksLikeHeader =
-    firstLower.some((p) => /^(first_?name|prenom|prénom|last_?name|nom)$/i.test(p)) ||
-    firstParts.some((p) => extraAliases[normHeader(p)]);
-  if (looksLikeHeader) {
-    headerMap = {};
-    firstParts.forEach((raw, idx) => {
-      const p = raw.toLowerCase();
-      const norm = p.replace(/\s+/g, "_");
-      headerMap![norm] = idx;
-      const aliasKey = extraAliases[normHeader(raw)];
-      if (aliasKey) headerMap![aliasKey] = idx;
-      if (norm === "prenom" || norm === "prénom" || norm === "firstname")
-        headerMap!.first_name = idx;
-      if (norm === "nom" || norm === "lastname") headerMap!.last_name = idx;
-      if (norm === "numero" || norm === "numéro" || norm === "n°") headerMap!.jersey = idx;
-      if (norm === "poste") headerMap!.position = idx;
-      if (norm === "licence") headerMap!.license = idx;
-      if (norm === "date_de_naissance" || norm === "naissance") headerMap!.birth_date = idx;
-      if (norm === "telephone" || norm === "téléphone" || norm === "tel") headerMap!.phone = idx;
-      if (norm === "parent_prenom" || norm === "parent_prénom") headerMap!.parent_first = idx;
-      if (norm === "parent_nom") headerMap!.parent_last = idx;
-      if (norm === "parent_tel" || norm === "parent_telephone") headerMap!.parent_phone = idx;
-      if (norm === "parent2_prenom" || norm === "parent2_prénom" || norm === "prenom_parent_2")
-        headerMap!.parent2_first = idx;
-      if (norm === "parent2_nom" || norm === "nom_parent_2") headerMap!.parent2_last = idx;
-      if (norm === "parent2_email" || norm === "email_parent_2") headerMap!.parent2_email = idx;
-      if (norm === "parent2_tel" || norm === "parent2_telephone" || norm === "telephone_parent_2")
-        headerMap!.parent2_phone = idx;
-    });
-    startIdx = 1;
-  }
-
-  const get = (parts: string[], key: string, fallbackIdx: number) => {
-    const idx = headerMap ? headerMap[key] : fallbackIdx;
-    if (idx === undefined || idx < 0) return "";
-    return (parts[idx] ?? "").trim();
-  };
-
-  const rows: ParsedRow[] = [];
-  for (let i = startIdx; i < lines.length; i++) {
-    const parts = splitLine(lines[i]);
-    const first = get(parts, "first_name", 0);
-    const last = get(parts, "last_name", 1);
-    if (!first || !last) continue;
-    const jerseyRaw = get(parts, "jersey", 2);
-    const jersey = jerseyRaw ? parseInt(jerseyRaw, 10) : NaN;
-    const birth = get(parts, "birth_date", 5);
-    let birthIso: string | null = null;
-    if (birth) {
-      // Accept ISO yyyy-mm-dd or dd/mm/yyyy
-      const m = birth.match(/^(\d{2})[/-](\d{2})[/-](\d{4})$/);
-      if (m) birthIso = `${m[3]}-${m[2]}-${m[1]}`;
-      else if (/^\d{4}-\d{2}-\d{2}$/.test(birth)) birthIso = birth;
-    }
-    rows.push({
-      first_name: first,
-      last_name: last,
-      jersey_number: Number.isFinite(jersey) && jersey >= 0 ? jersey : null,
-      position: get(parts, "position", 3) || null,
-      license_number: get(parts, "license", 4) || null,
-      birth_date: birthIso,
-      email: get(parts, "email", 6) || null,
-      phone: get(parts, "phone", 7) || null,
-      parent_first: get(parts, "parent_first", 8) || null,
-      parent_last: get(parts, "parent_last", 9) || null,
-      parent_email: get(parts, "parent_email", 10) || null,
-      parent_phone: get(parts, "parent_phone", 11) || null,
-      parent2_first: get(parts, "parent2_first", 12) || null,
-      parent2_last: get(parts, "parent2_last", 13) || null,
-      parent2_email: get(parts, "parent2_email", 14) || null,
-      parent2_phone: get(parts, "parent2_phone", 15) || null,
-    });
-  }
-  return rows;
-}
-
-function isMinor(birth: string | null): boolean {
-  if (!birth) return false;
-  const d = new Date(birth);
-  if (isNaN(d.getTime())) return false;
-  const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
-  return age < 18;
-}
-
-// Must mirror public.normalize_name(text) in SQL:
-// unaccent -> lower -> strip everything non alphanumeric.
-function normalizeKey(value: string | null | undefined): string {
-  return (value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-}
-
-function normalizePhone(value: string | null | undefined): string {
-  return (value ?? "").replace(/[^+\d]/g, "");
-}
-
-// Business identity key: first + last (normalized) + birth_date (ISO).
-function identityKey(
-  first: string | null | undefined,
-  last: string | null | undefined,
-  birth: string | null | undefined,
-): string | null {
-  if (!birth) return null;
-  const f = normalizeKey(first);
-  const l = normalizeKey(last);
-  if (!f || !l) return null;
-  return `${f}|${l}|${birth}`;
-}
-
-
-function playerPatch(existing: ExistingPlayer, row: ParsedRow): PlayerPatch {
-  const patch: PlayerPatch = {};
-  if (existing.jersey_number == null && row.jersey_number != null)
-    patch.jersey_number = row.jersey_number;
-  if (!existing.license_number && row.license_number) patch.license_number = row.license_number;
-  if (!existing.preferred_position && row.position) patch.preferred_position = row.position;
-  if (!existing.birth_date && row.birth_date) patch.birth_date = row.birth_date;
-  if (!existing.email && row.email) patch.email = row.email;
-  if (!existing.phone && row.phone) patch.phone = row.phone;
-  return patch;
-}
-
-function parentDedupeKey(parent: {
-  full_name: string | null;
-  email: string | null;
-  phone: string | null;
-}) {
-  return (
-    normalizeKey(parent.email) || normalizePhone(parent.phone) || normalizeKey(parent.full_name)
-  );
+function downloadTemplate() {
+  const headers = FIELD_KEYS.map((k) => k + (k === "prenom_joueur" || k === "nom_joueur" || k === "date_naissance" ? "*" : ""));
+  const example = [
+    "Léa",
+    "Martin",
+    "2010-05-12",
+    "7",
+    "L12345",
+    "GK",
+    "",
+    "",
+    "Sophie",
+    "Martin",
+    "sophie@example.com",
+    "+33600000000",
+    "Marc",
+    "Martin",
+    "marc@example.com",
+    "+33600000002",
+  ];
+  const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Joueurs");
+  XLSX.writeFile(wb, "clubero-import-joueurs.xlsx");
 }
 
 export function ImportPlayersCsvDialog({
@@ -265,467 +96,300 @@ export function ImportPlayersCsvDialog({
   clubId: string;
   onDone: () => void;
 }) {
-  const { t, i18n } = useTranslation();
-  const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const { t } = useTranslation();
+  const aiAnalyze = useServerFn(analyzeFileWithAI);
+  const tplParse = useServerFn(parseTemplateFn);
+  const doImport = useServerFn(runImport);
 
-  const HEADER_TRANSLATIONS: Record<string, Record<(typeof HEADERS)[number], string>> = {
-    fr: {
-      first_name: "Prénom",
-      last_name: "Nom",
-      jersey: "Numéro",
-      position: "Poste",
-      license: "Licence",
-      birth_date: "Date de naissance",
-      email: "Email",
-      phone: "Téléphone",
-      parent_first: "Prénom parent",
-      parent_last: "Nom parent",
-      parent_email: "Email parent",
-      parent_phone: "Téléphone parent",
-      parent2_first: "Prénom parent 2",
-      parent2_last: "Nom parent 2",
-      parent2_email: "Email parent 2",
-      parent2_phone: "Téléphone parent 2",
-    },
-    en: {
-      first_name: "First name",
-      last_name: "Last name",
-      jersey: "Number",
-      position: "Position",
-      license: "License",
-      birth_date: "Date of birth",
-      email: "Email",
-      phone: "Phone",
-      parent_first: "Parent first name",
-      parent_last: "Parent last name",
-      parent_email: "Parent email",
-      parent_phone: "Parent phone",
-      parent2_first: "Parent 2 first name",
-      parent2_last: "Parent 2 last name",
-      parent2_email: "Parent 2 email",
-      parent2_phone: "Parent 2 phone",
-    },
-    es: {
-      first_name: "Nombre",
-      last_name: "Apellido",
-      jersey: "Número",
-      position: "Posición",
-      license: "Licencia",
-      birth_date: "Fecha de nacimiento",
-      email: "Correo",
-      phone: "Teléfono",
-      parent_first: "Nombre del padre",
-      parent_last: "Apellido del padre",
-      parent_email: "Correo del padre",
-      parent_phone: "Teléfono del padre",
-      parent2_first: "Nombre del padre 2",
-      parent2_last: "Apellido del padre 2",
-      parent2_email: "Correo del padre 2",
-      parent2_phone: "Teléfono del padre 2",
-    },
-    de: {
-      first_name: "Vorname",
-      last_name: "Nachname",
-      jersey: "Nummer",
-      position: "Position",
-      license: "Lizenz",
-      birth_date: "Geburtsdatum",
-      email: "E-Mail",
-      phone: "Telefon",
-      parent_first: "Vorname Elternteil",
-      parent_last: "Nachname Elternteil",
-      parent_email: "E-Mail Elternteil",
-      parent_phone: "Telefon Elternteil",
-      parent2_first: "Vorname Elternteil 2",
-      parent2_last: "Nachname Elternteil 2",
-      parent2_email: "E-Mail Elternteil 2",
-      parent2_phone: "Telefon Elternteil 2",
-    },
-    it: {
-      first_name: "Nome",
-      last_name: "Cognome",
-      jersey: "Numero",
-      position: "Ruolo",
-      license: "Licenza",
-      birth_date: "Data di nascita",
-      email: "Email",
-      phone: "Telefono",
-      parent_first: "Nome genitore",
-      parent_last: "Cognome genitore",
-      parent_email: "Email genitore",
-      parent_phone: "Telefono genitore",
-      parent2_first: "Nome genitore 2",
-      parent2_last: "Cognome genitore 2",
-      parent2_email: "Email genitore 2",
-      parent2_phone: "Telefono genitore 2",
-    },
-    nl: {
-      first_name: "Voornaam",
-      last_name: "Achternaam",
-      jersey: "Nummer",
-      position: "Positie",
-      license: "Licentie",
-      birth_date: "Geboortedatum",
-      email: "E-mail",
-      phone: "Telefoon",
-      parent_first: "Voornaam ouder",
-      parent_last: "Achternaam ouder",
-      parent_email: "E-mail ouder",
-      parent_phone: "Telefoon ouder",
-      parent2_first: "Voornaam ouder 2",
-      parent2_last: "Achternaam ouder 2",
-      parent2_email: "E-mail ouder 2",
-      parent2_phone: "Telefoon ouder 2",
-    },
-    pt: {
-      first_name: "Nome",
-      last_name: "Sobrenome",
-      jersey: "Número",
-      position: "Posição",
-      license: "Licença",
-      birth_date: "Data de nascimento",
-      email: "E-mail",
-      phone: "Telefone",
-      parent_first: "Nome do responsável",
-      parent_last: "Sobrenome do responsável",
-      parent_email: "E-mail do responsável",
-      parent_phone: "Telefone do responsável",
-      parent2_first: "Nome do responsável 2",
-      parent2_last: "Sobrenome do responsável 2",
-      parent2_email: "E-mail do responsável 2",
-      parent2_phone: "Telefone do responsável 2",
-    },
+  const [fileName, setFileName] = useState("");
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [rawRows, setRawRows] = useState<Array<Record<string, unknown>>>([]);
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [iaUsed, setIaUsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [busyLabel, setBusyLabel] = useState<string>("");
+  const [result, setResult] =
+    useState<Awaited<ReturnType<typeof runImport>> | null>(null);
+
+  const fields = useMemo(() => getFields("players"), []);
+
+  const reset = () => {
+    setFileName("");
+    setHeaders([]);
+    setRawRows([]);
+    setAnalysis(null);
+    setIaUsed(false);
+    setResult(null);
   };
-  const lang = (i18n.language || "fr").slice(0, 2).toLowerCase();
-  const HEADER_LABELS = HEADER_TRANSLATIONS[lang] ?? HEADER_TRANSLATIONS.fr;
-  const localizedHeaders = HEADERS.map((k) => HEADER_LABELS[k]);
 
-  function onFile(e: ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => setText(String(reader.result ?? ""));
-    reader.readAsText(f);
-    e.target.value = "";
-  }
-
-  function csvEscape(v: string) {
-    return /[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-  }
-
-  function onDownloadTemplate() {
-    const csv =
-      localizedHeaders.map(csvEscape).join(",") +
-      "\r\n" +
-      "Léa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000,Marc,Martin,marc@example.com,+33600000002\r\n" +
-      "Paul,Dupont,10,ATT,,2003-09-01,paul@example.com,+33600000001,,,,,,,,";
-    downloadCsv("players-template.csv", csv);
-  }
-
-  const aliasMap: Record<string, (typeof HEADERS)[number]> = {};
-  HEADERS.forEach((k, i) => {
-    aliasMap[normHeader(localizedHeaders[i])] = k;
-  });
-
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    const rows = parseCsv(text, aliasMap);
-    if (rows.length === 0) {
-      toast.error(
-        t("players.import.noneDetected", {
-          defaultValue: "Aucun joueur détecté dans le fichier.",
-        }),
-      );
-      return;
-    }
-    setBusy(true);
-    setProgress({ done: 0, total: rows.length });
-    let inserted = 0;
-    let failed = 0;
-    const errors: string[] = [];
-
-    // Fetch full club roster (active + soft-deleted) to build the identity index.
-    // Matching is business-unique: normalize(first) + normalize(last) + birth_date, scoped to club.
-    const { data: clubPlayers, error: clubPlayersError } = await supabase
-      .from("players")
-      .select(
-        "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at",
-      )
-      .eq("club_id", clubId);
-
-    if (clubPlayersError) {
-      setBusy(false);
-      toast.error(clubPlayersError.message);
-      return;
-    }
-
-    const playersByIdentity = new Map<string, ExistingPlayer>();
-    for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
-      const key = identityKey(p.first_name, p.last_name, p.birth_date);
-      if (!key) continue;
-      // Prefer active over soft-deleted if collision (shouldn't happen thanks to unique index).
-      const prev = playersByIdentity.get(key);
-      if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(key, p);
-    }
-
-    // Existing team links for quick "already in team" check.
-    const { data: currentMembers, error: currentMembersError } = await supabase
-      .from("team_members")
-      .select("player_id")
-      .eq("team_id", teamId)
-      .eq("role", "player");
-
-    if (currentMembersError) {
-      setBusy(false);
-      toast.error(currentMembersError.message);
-      return;
-    }
-    const teamPlayerIds = new Set<string>(
-      (currentMembers ?? []).map((m: any) => m.player_id).filter(Boolean),
-    );
-
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-
-      // DOB obligatoire pour l'import : sans DOB, pas de clé d'identité fiable.
-      if (!r.birth_date) {
-        failed++;
-        errors.push(
-          `${r.first_name} ${r.last_name}: ${t("players.import.dobRequired", { defaultValue: "date de naissance requise" })}`,
+  const onFile = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      e.target.value = "";
+      setFileName(f.name);
+      setResult(null);
+      setAnalysis(null);
+      setLoading(true);
+      setBusyLabel(t("players.import.reading", { defaultValue: "Lecture du fichier..." }));
+      try {
+        const buf = await f.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array", cellDates: true });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = cleanSheetRows(
+          XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+            defval: "",
+            raw: false,
+            blankrows: false,
+          }),
         );
-        setProgress({ done: i + 1, total: rows.length });
-        continue;
+        if (rows.length === 0) throw new Error(t("players.import.noneDetected", { defaultValue: "Aucun joueur détecté dans le fichier." }));
+        const hdrs = Object.keys(rows[0]);
+        setHeaders(hdrs);
+        setRawRows(rows);
+
+        const isTemplate = templateMatchRatio(hdrs, "players") >= 0.8;
+        if (isTemplate) {
+          setBusyLabel(t("players.import.parsing", { defaultValue: "Analyse du modèle..." }));
+          const res = await tplParse({
+            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
+          });
+          setAnalysis(res);
+          setIaUsed(false);
+        } else {
+          setBusyLabel(t("players.import.ai", { defaultValue: "Analyse IA en cours..." }));
+          const res = await aiAnalyze({
+            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
+          });
+          setAnalysis(res);
+          setIaUsed(true);
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoading(false);
+        setBusyLabel("");
       }
+    },
+    [aiAnalyze, clubId, teamId, tplParse, t],
+  );
 
-      const minor = isMinor(r.birth_date);
-
-      // Build up to 2 parent candidates, then dedupe (email lowercase, then phone, then name)
-      const parentCandidates = [
-        {
-          full_name: `${r.parent_first ?? ""} ${r.parent_last ?? ""}`.trim() || null,
-          email: r.parent_email,
-          phone: r.parent_phone,
-        },
-        {
-          full_name: `${r.parent2_first ?? ""} ${r.parent2_last ?? ""}`.trim() || null,
-          email: r.parent2_email,
-          phone: r.parent2_phone,
-        },
-      ].filter((p) => p.full_name || p.email || p.phone);
-
-      const seen = new Set<string>();
-      const parents = parentCandidates.filter((p) => {
-        const key = (
-          p.email?.trim().toLowerCase() ||
-          p.phone?.trim() ||
-          p.full_name ||
-          ""
-        ).toString();
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        return true;
+  const confirmImport = async () => {
+    if (!analysis) return;
+    setLoading(true);
+    setBusyLabel(t("players.import.importing", { defaultValue: "Import en cours..." }));
+    try {
+      const cleanRows = analysis.rows.map((r) => {
+        const o: Record<string, string | null> = {};
+        for (const f of fields) o[f.key] = r[f.key]?.value ?? null;
+        return o;
       });
-
-      const hasParent = parents.length > 0;
-      if (minor && !hasParent) {
-        failed++;
-        errors.push(`${r.first_name} ${r.last_name}: parent requis (mineur)`);
-        setProgress({ done: i + 1, total: rows.length });
-        continue;
-      }
-
-      const idKey = identityKey(r.first_name, r.last_name, r.birth_date)!;
-      let player: ExistingPlayer | null = playersByIdentity.get(idKey) ?? null;
-
-      // Match soft-deleted → réactivation via restore_entity (RPC déjà existante).
-      if (player && player.deleted_at) {
-        const { error: restoreErr } = await supabase.rpc("restore_entity", {
-          _kind: "player",
-          _id: player.id,
-        });
-        if (restoreErr) {
-          failed++;
-          errors.push(`${r.first_name} ${r.last_name}: ${restoreErr.message}`);
-          setProgress({ done: i + 1, total: rows.length });
-          continue;
-        }
-        player = { ...player, deleted_at: null };
-        playersByIdentity.set(idKey, player);
-      }
-
-      if (player) {
-        const patch = playerPatch(player, r);
-        if (Object.keys(patch).length > 0) {
-          const { error: updateError } = await supabase
-            .from("players")
-            .update(patch)
-            .eq("id", player.id);
-          if (updateError) {
-            failed++;
-            errors.push(`${r.first_name} ${r.last_name}: ${updateError.message}`);
-            setProgress({ done: i + 1, total: rows.length });
-            continue;
-          }
-          player = { ...player, ...patch };
-          playersByIdentity.set(idKey, player);
-        }
-      } else {
-        const { data: newPlayer, error } = await supabase
-          .from("players")
-          .insert({
-            club_id: clubId,
-            first_name: r.first_name,
-            last_name: r.last_name,
-            jersey_number: r.jersey_number,
-            license_number: r.license_number,
-            preferred_position: r.position,
-            phone: r.phone,
-            email: r.email,
-            birth_date: r.birth_date,
-            can_respond: minor ? false : true,
-            child_platform_access: false,
-          })
-          .select(
-            "id, first_name, last_name, jersey_number, license_number, preferred_position, birth_date, email, phone, deleted_at",
-          )
-          .single();
-        if (error || !newPlayer) {
-          failed++;
-          errors.push(`${r.first_name} ${r.last_name}: ${error?.message ?? "insert failed"}`);
-          setProgress({ done: i + 1, total: rows.length });
-          continue;
-        }
-        player = newPlayer as ExistingPlayer;
-        playersByIdentity.set(idKey, player);
-      }
-
-      if (!teamPlayerIds.has(player.id)) {
-        const { error: tmErr } = await supabase
-          .from("team_members")
-          .insert({ team_id: teamId, player_id: player.id, role: "player" });
-        if (tmErr && (tmErr as any).code !== "23505") {
-          failed++;
-          errors.push(`${r.first_name} ${r.last_name}: ${tmErr.message}`);
-          setProgress({ done: i + 1, total: rows.length });
-          continue;
-        }
-        teamPlayerIds.add(player.id);
-      }
-
-
-
-      const { data: currentParents } = await supabase
-        .from("player_parents")
-        .select("full_name, email, phone")
-        .eq("player_id", player.id);
-      const parentKeys = new Set((currentParents ?? []).map(parentDedupeKey).filter(Boolean));
-      for (const p of parents) {
-        const key = parentDedupeKey(p);
-        if (key && parentKeys.has(key)) continue;
-        await supabase.from("player_parents").insert({
-          player_id: player.id,
-          parent_user_id: null,
-          full_name: p.full_name,
-          email: p.email,
-          phone: p.phone,
-          can_respond: true,
-        });
-        if (key) parentKeys.add(key);
-      }
-      inserted++;
-      setProgress({ done: i + 1, total: rows.length });
+      const res = await doImport({
+        data: {
+          clubId,
+          teamId,
+          type: "players",
+          rows: cleanRows,
+          sendInvitations: false,
+          fileName,
+          iaUsed,
+        },
+      });
+      setResult(res);
+      if (res.imported > 0) onDone();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+      setBusyLabel("");
     }
+  };
 
-    setBusy(false);
-    if (inserted > 0) {
-      toast.success(
-        t("players.import.done", {
-          defaultValue: "{{inserted}} joueur(s) importé(s)",
-          inserted,
-        }),
-      );
-    }
-    if (failed > 0) {
-      toast.error(
-        t("players.import.failed", {
-          defaultValue: "{{failed}} ligne(s) en erreur",
-          failed,
-        }) + (errors.length ? ` — ${errors.slice(0, 3).join(" · ")}` : ""),
-      );
-    }
-    if (inserted > 0) {
-      onDone();
-      setText("");
-      onOpenChange(false);
-    }
-  }
+  const handleClose = (v: boolean) => {
+    if (!v) reset();
+    onOpenChange(v);
+  };
 
   return (
     <ResponsiveFormDialog
       open={open}
-      onOpenChange={onOpenChange}
-      title={t("players.import.title", { defaultValue: "Importer des joueurs (CSV)" })}
+      onOpenChange={handleClose}
+      title={t("players.import.title", { defaultValue: "Importer des joueurs" })}
     >
-      <form onSubmit={onSubmit} className="space-y-3 mt-3 pb-6">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">
-            {t("players.import.intro", {
-              defaultValue:
-                "Importez votre liste depuis un fichier CSV. Colonnes attendues : {{cols}}.",
-              cols: localizedHeaders.join(", "),
-            })}
-          </p>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onDownloadTemplate}
-            className="shrink-0"
-          >
-            <Download className="h-4 w-4" />
-            {t("players.import.template", { defaultValue: "Modèle" })}
-          </Button>
-        </div>
-        <p className="text-[11px] text-muted-foreground">
-          {t("players.import.parentsHint", {
-            defaultValue:
-              "Jusqu'à 2 parents par joueur via le fichier. Pour en ajouter davantage, ouvrez la fiche du joueur après l'import.",
-          })}
-        </p>
-        <div className="space-y-1.5">
-          <Label>{t("players.import.fileLabel", { defaultValue: "Fichier CSV" })}</Label>
-          <Input type="file" accept=".csv,text/csv,text/plain" onChange={onFile} />
-        </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.import.pasteLabel", { defaultValue: "ou collez vos lignes" })}</Label>
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={8}
-            className="font-mono text-xs"
-            wrap="soft"
-            placeholder={
-              localizedHeaders.join(",") +
-              "\nLéa,Martin,7,GK,L12345,2010-05-12,,,Sophie,Martin,sophie@example.com,+33600000000,Marc,Martin,marc@example.com,+33600000002"
-            }
-          />
-        </div>
-        {progress && (
-          <p className="text-xs text-muted-foreground">
-            {progress.done}/{progress.total}
-          </p>
+      <div className="space-y-4 mt-3 pb-6">
+        {/* Step 1: upload */}
+        {!analysis && !result && (
+          <>
+            <p className="text-sm text-muted-foreground">
+              {t("players.import.intro2", {
+                defaultValue:
+                  "Importez un fichier Excel (.xlsx) ou CSV. Les colonnes sont détectées automatiquement ; la date de naissance est obligatoire.",
+              })}
+            </p>
+            <div className="flex items-center justify-between gap-2">
+              <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate}>
+                <Download className="h-4 w-4 mr-1" />
+                {t("players.import.template", { defaultValue: "Télécharger le modèle" })}
+              </Button>
+            </div>
+            <label className="block border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <div className="text-sm font-medium">
+                {loading
+                  ? busyLabel
+                  : t("players.import.dropOrClick", { defaultValue: "Cliquez pour choisir un fichier" })}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">.xlsx, .xls, .csv</div>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv,text/csv"
+                className="hidden"
+                onChange={onFile}
+                disabled={loading}
+              />
+            </label>
+            {loading && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> {busyLabel}
+              </div>
+            )}
+          </>
         )}
-        <Button type="submit" className="w-full" disabled={busy || !text.trim()}>
-          {busy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("players.import.submit", { defaultValue: "Importer" })
-          )}
-        </Button>
-      </form>
+
+        {/* Step 2: preview summary */}
+        {analysis && !result && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm">
+              {iaUsed ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-xs">
+                  <Sparkles className="h-3 w-3" /> IA
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs">
+                  {t("players.import.templateBadge", { defaultValue: "Modèle Clubero" })}
+                </span>
+              )}
+              <span className="text-muted-foreground truncate">{fileName}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-lg border p-3">
+                <div className="text-2xl font-semibold">{analysis.summary.total}</div>
+                <div className="text-xs text-muted-foreground">
+                  {t("players.import.rowsTotal", { defaultValue: "lignes" })}
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="text-2xl font-semibold text-green-600">
+                  {analysis.summary.valid}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t("players.import.rowsValid", { defaultValue: "valides" })}
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="text-2xl font-semibold text-amber-600">
+                  {analysis.summary.to_fix}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t("players.import.rowsToFix", { defaultValue: "à corriger" })}
+                </div>
+              </div>
+            </div>
+            {analysis.summary.to_fix > 0 && (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
+                <div className="font-medium flex items-center gap-1">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  {t("players.import.toFixHint", {
+                    defaultValue:
+                      "Certaines lignes ont des erreurs et seront ignorées. Corrigez le fichier puis relancez l'import si besoin.",
+                  })}
+                </div>
+                <ul className="list-disc pl-4">
+                  {analysis.rows.slice(0, 5).flatMap((r, idx) =>
+                    Object.entries(r)
+                      .filter(([, c]) => c.error)
+                      .slice(0, 1)
+                      .map(([k, c]) => (
+                        <li key={`${idx}-${k}`}>
+                          {t("players.import.row", { defaultValue: "Ligne" })} {idx + 2} · {k} :{" "}
+                          {c.error}
+                        </li>
+                      )),
+                  )}
+                </ul>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={reset} disabled={loading}>
+                {t("common.back", { defaultValue: "Retour" })}
+              </Button>
+              <Button
+                onClick={confirmImport}
+                disabled={loading || analysis.summary.valid === 0}
+                className="flex-1"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("players.import.confirm", {
+                    defaultValue: `Importer ${analysis.summary.valid} joueur(s)`,
+                    count: analysis.summary.valid,
+                  })
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: result */}
+        {result && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 className="h-5 w-5" />
+              <span className="font-medium">
+                {t("players.import.doneTitle", { defaultValue: "Import terminé" })}
+              </span>
+            </div>
+            <div className="rounded-md border p-3 text-sm space-y-1">
+              <div>
+                {t("players.import.created", { defaultValue: "Nouveaux joueurs" })} :{" "}
+                <strong>{result.summary.players_created ?? 0}</strong>
+              </div>
+              <div>
+                {t("players.import.updated", { defaultValue: "Mis à jour" })} :{" "}
+                <strong>{result.summary.players_updated ?? 0}</strong>
+              </div>
+              <div>
+                {t("players.import.restored", { defaultValue: "Réactivés" })} :{" "}
+                <strong>{result.summary.players_restored ?? 0}</strong>
+              </div>
+              {result.errors.length > 0 && (
+                <div className="text-amber-700 mt-2">
+                  {result.errors.length}{" "}
+                  {t("players.import.errorRows", { defaultValue: "ligne(s) en erreur" })}
+                </div>
+              )}
+            </div>
+            {result.errors.length > 0 && (
+              <ul className="text-xs text-muted-foreground max-h-32 overflow-y-auto space-y-0.5">
+                {result.errors.slice(0, 10).map((e, i) => (
+                  <li key={i}>
+                    {t("players.import.row", { defaultValue: "Ligne" })} {e.row} : {e.error}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={reset}>
+                {t("players.import.another", { defaultValue: "Nouvel import" })}
+              </Button>
+              <Button className="flex-1" onClick={() => handleClose(false)}>
+                {t("common.close", { defaultValue: "Fermer" })}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </ResponsiveFormDialog>
   );
 }
