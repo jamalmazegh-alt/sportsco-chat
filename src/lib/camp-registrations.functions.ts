@@ -39,6 +39,8 @@ export interface CampRegistrationRow {
   participant_first_name: string;
   participant_last_name: string;
   birth_date: string;
+  gender: string | null;
+  club_name: string | null;
   guardian_first_name: string;
   guardian_last_name: string;
   guardian_email: string;
@@ -134,7 +136,7 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       .from("club_camp_registrations")
       .select(
         `id, camp_id, access_token, participant_first_name, participant_last_name,
-         birth_date, guardian_first_name, guardian_last_name, guardian_email,
+         birth_date, gender, club_name, guardian_first_name, guardian_last_name, guardian_email,
          guardian_phone, registration_status, payment_status, amount_paid,
          reserved_until, created_at, updated_at,
          club_camp_registration_documents ( id, required_document_id, review_status )`,
@@ -178,6 +180,8 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
         participant_first_name: r.participant_first_name,
         participant_last_name: r.participant_last_name,
         birth_date: r.birth_date,
+        gender: r.gender ?? null,
+        club_name: r.club_name ?? null,
         guardian_first_name: r.guardian_first_name,
         guardian_last_name: r.guardian_last_name,
         guardian_email: r.guardian_email,

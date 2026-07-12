@@ -1,0 +1,159 @@
+/**
+ * Phase 3 — Étape 6 : purge quotidienne des documents de stage.
+ *
+ * Pour chaque stage dont `end_date + document_retention_months` est dépassé,
+ * supprime les fichiers du bucket privé `camp-registration-documents` et les
+ * lignes de `club_camp_registration_documents`. Les inscriptions elles-mêmes
+ * sont conservées (historique / suivi financier).
+ *
+ * Auth : `apikey` = clé anon Supabase (route `/api/public/*` déjà en dehors du
+ * gate d'auth publié). Le rôle service est chargé côté serveur pour effectuer
+ * les suppressions (bypass RLS).
+ *
+ * Journalisé dans `club_camp_document_purge_log`.
+ */
+import { createFileRoute } from "@tanstack/react-router";
+
+interface CampPurgeResult {
+  camp_id: string;
+  files_deleted: number;
+  rows_deleted: number;
+  error?: string;
+}
+
+export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const apikey =
+          request.headers.get("apikey") ??
+          request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+        const expected =
+          process.env.SUPABASE_PUBLISHABLE_KEY ??
+          process.env.SUPABASE_ANON_KEY ??
+          process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        if (!expected || !apikey || apikey !== expected) {
+          return new Response("Forbidden", { status: 403 });
+        }
+
+        const { supabaseAdmin } = await import(
+          "@/integrations/supabase/client.server"
+        );
+
+        // 1. Sélection des stages arrivés à échéance de rétention.
+        const { data: camps, error: campsErr } = await supabaseAdmin
+          .from("club_camps")
+          .select("id, end_date, document_retention_months")
+          .not("end_date", "is", null);
+
+        if (campsErr) {
+          return Response.json(
+            { ok: false, error: campsErr.message },
+            { status: 500 },
+          );
+        }
+
+        const now = Date.now();
+        const dueCamps = (camps ?? []).filter((c: any) => {
+          if (!c.end_date) return false;
+          const months = Math.max(1, Number(c.document_retention_months ?? 6));
+          const end = new Date(c.end_date).getTime();
+          const cutoff = end + months * 30.44 * 24 * 3600 * 1000; // approx mois
+          return cutoff <= now;
+        });
+
+        const results: CampPurgeResult[] = [];
+
+        for (const camp of dueCamps) {
+          try {
+            // 2. Récupère les registrations du stage.
+            const { data: regs, error: regErr } = await supabaseAdmin
+              .from("club_camp_registrations")
+              .select("id")
+              .eq("camp_id", camp.id);
+            if (regErr) throw new Error(regErr.message);
+            const regIds = (regs ?? []).map((r: any) => r.id);
+            if (regIds.length === 0) {
+              results.push({ camp_id: camp.id, files_deleted: 0, rows_deleted: 0 });
+              continue;
+            }
+
+            // 3. Récupère les fichiers à supprimer.
+            const { data: docs, error: docsErr } = await supabaseAdmin
+              .from("club_camp_registration_documents")
+              .select("id, file_path")
+              .in("registration_id", regIds);
+            if (docsErr) throw new Error(docsErr.message);
+
+            const paths = (docs ?? [])
+              .map((d: any) => d.file_path as string)
+              .filter(Boolean);
+
+            let filesDeleted = 0;
+            // 4. Supprime par lots de 1000 (limite du client Storage).
+            for (let i = 0; i < paths.length; i += 1000) {
+              const chunk = paths.slice(i, i + 1000);
+              const { data: removed, error: rmErr } = await supabaseAdmin.storage
+                .from("camp-registration-documents")
+                .remove(chunk);
+              if (rmErr) throw new Error(`storage: ${rmErr.message}`);
+              filesDeleted += (removed ?? []).length;
+            }
+
+            // 5. Supprime les lignes.
+            let rowsDeleted = 0;
+            if ((docs ?? []).length > 0) {
+              const { count, error: delErr } = await supabaseAdmin
+                .from("club_camp_registration_documents")
+                .delete({ count: "exact" })
+                .in(
+                  "id",
+                  (docs ?? []).map((d: any) => d.id),
+                );
+              if (delErr) throw new Error(delErr.message);
+              rowsDeleted = count ?? 0;
+            }
+
+            await supabaseAdmin
+              .from("club_camp_document_purge_log" as any)
+              .insert({
+                camp_id: camp.id,
+                files_deleted: filesDeleted,
+                rows_deleted: rowsDeleted,
+                details: { registrations: regIds.length },
+              });
+
+            results.push({
+              camp_id: camp.id,
+              files_deleted: filesDeleted,
+              rows_deleted: rowsDeleted,
+            });
+          } catch (e: any) {
+            const msg = e?.message ?? String(e);
+            await supabaseAdmin
+              .from("club_camp_document_purge_log" as any)
+              .insert({
+                camp_id: camp.id,
+                files_deleted: 0,
+                rows_deleted: 0,
+                error: msg,
+              });
+            results.push({
+              camp_id: camp.id,
+              files_deleted: 0,
+              rows_deleted: 0,
+              error: msg,
+            });
+          }
+        }
+
+        return Response.json({
+          ok: true,
+          scanned: (camps ?? []).length,
+          due: dueCamps.length,
+          results,
+        });
+      },
+    },
+  },
+});

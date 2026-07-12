@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Loader2, Search, Clock, AlertTriangle, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Loader2, Search, Clock, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,7 @@ import {
   type DossierStatus,
 } from "@/lib/camp-registrations.functions";
 import { CampRegistrationDetailSheet } from "@/components/camps/camp-registration-detail-sheet";
+import { downloadRegistrationsCsv } from "@/lib/camp-registrations-csv";
 
 const REGISTRATION_STATUSES: RegistrationStatus[] = [
   "pending",
@@ -228,6 +229,27 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
         >
           <RefreshCw className="h-4 w-4 mr-1" />
           {t("common.refresh", { defaultValue: "Actualiser" })}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            downloadRegistrationsCsv(filtered, { t, campSlug: campId });
+            toast.success(
+              t("registrations.csv.done", {
+                defaultValue: "Export CSV téléchargé ({{count}} lignes).",
+                count: filtered.length,
+              }),
+            );
+          }}
+          title={t("registrations.csv.hint", {
+            defaultValue:
+              "Exporte les inscriptions visibles selon les filtres. Ne contient aucun document.",
+          })}
+        >
+          <Download className="h-4 w-4 mr-1" />
+          {t("registrations.csv.cta", { defaultValue: "Exporter CSV" })}
         </Button>
       </div>
 

@@ -341,6 +341,26 @@
       "capacityFullHelp": "La capacité du stage est atteinte. Voulez-vous placer cette famille sur la liste d'attente ?",
       "placeOnWaitlist": "Placer en liste d'attente",
       "emailsHint": "Les e-mails automatiques aux familles seront ajoutés à l'étape suivante (Phase 3, étape 3)."
+    },
+    "csv": {
+      "cta": "Exporter CSV",
+      "hint": "Exporte les inscriptions visibles selon les filtres. Ne contient aucun document.",
+      "done": "Export CSV téléchargé ({{count}} lignes).",
+      "participantFirstName": "Participant - Prénom",
+      "participantLastName": "Participant - Nom",
+      "birthDate": "Date de naissance",
+      "age": "Âge",
+      "gender": "Genre",
+      "clubName": "Club actuel",
+      "guardianFirstName": "Responsable - Prénom",
+      "guardianLastName": "Responsable - Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "registrationStatus": "Statut inscription",
+      "paymentStatus": "Statut paiement",
+      "dossierStatus": "Statut dossier",
+      "amountPaid": "Montant payé",
+      "requestedAt": "Date de demande"
     }
   }
 }
