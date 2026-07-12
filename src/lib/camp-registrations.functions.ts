@@ -159,11 +159,13 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       // Une pièce required est "approuvée" si au moins une soumission approuvée existe.
       const approvedByReq = new Set<string>();
       const rejectedByReq = new Set<string>();
+      const pendingByReq = new Set<string>();
       const seen = new Set<string>();
       for (const d of docs) {
         seen.add(d.required_document_id);
         if (d.review_status === "approved") approvedByReq.add(d.required_document_id);
         else if (d.review_status === "rejected") rejectedByReq.add(d.required_document_id);
+        else if (d.review_status === "pending") pendingByReq.add(d.required_document_id);
       }
       const approvedCount = approvedByReq.size;
       // Rejeté "actif" = rejeté et pas ré-uploadé (approved n'est pas venu remplacer)
@@ -171,7 +173,12 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
       rejectedByReq.forEach((id) => {
         if (!approvedByReq.has(id)) rejectedCount++;
       });
-      const missing = Math.max(0, required - approvedCount - rejectedCount);
+      // Pending "actif" = en attente et pas déjà approuvé/rejeté effectivement
+      let pendingCount = 0;
+      pendingByReq.forEach((id) => {
+        if (!approvedByReq.has(id) && !rejectedByReq.has(id)) pendingCount++;
+      });
+      const missing = Math.max(0, required - approvedCount - rejectedCount - pendingCount);
       const reservedUntilTs = r.reserved_until ? new Date(r.reserved_until).getTime() : null;
       const reservationExpired =
         r.registration_status === "under_review" &&
@@ -203,6 +210,7 @@ export const listCampRegistrations = createServerFn({ method: "GET" })
           required,
           approvedCount,
           rejectedCount,
+          pendingCount,
           campHasPrice,
         ),
         required_total: required,
