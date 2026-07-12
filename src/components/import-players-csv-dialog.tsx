@@ -697,6 +697,13 @@ export function ImportPlayersCsvDialog({
                 {t("players.import.restored", { defaultValue: "Réactivés" })} :{" "}
                 <strong>{result.summary.players_restored ?? 0}</strong>
               </div>
+              <div>
+                {t("players.import.linked", {
+                  defaultValue: "Rattachés à cette équipe",
+                })}{" "}
+                : <strong>{result.summary.players_linked ?? 0}</strong>
+              </div>
+
               {result.errors.length > 0 && (
                 <div className="text-amber-700 mt-2">
                   {result.errors.length}{" "}

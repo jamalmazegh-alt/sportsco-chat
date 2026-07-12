@@ -671,8 +671,10 @@ export const runImport = createServerFn({ method: "POST" })
         let playersCreated = 0;
         let playersUpdated = 0;
         let playersRestored = 0;
+        let playersLinked = 0;
         let parentsCreated = 0;
         let invitationsSent = 0;
+
 
         // Preload club teams for normalized dedupe (case/accents-insensitive).
         const { data: clubTeamsList } = await supabaseAdmin
@@ -918,9 +920,14 @@ export const runImport = createServerFn({ method: "POST" })
               player_id: playerId,
               role: "player" as never,
             });
-            if (tmErr && (tmErr as { code?: string }).code !== "23505") {
-              throw new Error(tmErr.message);
+            if (tmErr) {
+              if ((tmErr as { code?: string }).code !== "23505") {
+                throw new Error(tmErr.message);
+              }
+            } else {
+              playersLinked++;
             }
+
 
             const player = { id: playerId };
 
@@ -1045,13 +1052,17 @@ export const runImport = createServerFn({ method: "POST" })
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
         }
-        imported = playersCreated + playersUpdated + playersRestored;
+        // A row "counts" as imported if it created/updated/restored a player
+        // OR simply linked an already-existing player to a new team.
+        imported = playersCreated + playersUpdated + playersRestored + playersLinked;
         summary.teams_created = teamsCreated;
         summary.players_created = playersCreated;
         summary.players_updated = playersUpdated;
         summary.players_restored = playersRestored;
+        summary.players_linked = playersLinked;
         summary.parents_created = parentsCreated;
         summary.invitations_sent = invitationsSent;
+
       } else if (data.type === "coaches") {
         const teamCache = new Map<string, string>();
         const toCreate = new Set(data.teamsToCreate ?? []);
