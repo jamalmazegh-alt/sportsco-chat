@@ -1,93 +1,86 @@
-## Phase 2 — Page publique du stage + inscription famille
+## Objectif
 
-Périmètre : rendre les stages `published` visibles publiquement, permettre à une famille (non authentifiée) de préinscrire un enfant avec upload des pièces obligatoires. Aucune modification du back-office Phase 1.
+Aligner la communication (site vitrine) et les prompts des assistants IA sur la liste réelle des features livrées dans l'app, puis propager dans les 7 langues.
 
-### 1. Routes publiques (TanStack file-based, SSR)
+## Phase 1 — Audit & réconciliation (livrable à valider avant écriture)
 
-- `src/routes/stages.$clubSlug.$campSlug.tsx` — page stage.
-  - `loader` → server fn public `getPublicCampBySlug({ clubSlug, campSlug })` (client publishable + policies anon existantes `published`).
-  - `head()` : title `<Camp.title> — <Club.name>`, meta description = `short_description`, `og:image` = `cover_url` absolu, `twitter:card=summary_large_image`.
-  - `errorComponent` + `notFoundComponent`.
-  - Rend : cover, titre, dates, lieu (venue/facility), description longue, tranches d'âge (badges), programme (jours), documents fournis (liens signés éphémères ou publics), pièces à fournir (liste + `is_sensitive` masqué au public), bouton "S'inscrire".
-- `src/routes/stages.$clubSlug.$campSlug.inscription.tsx` — formulaire famille (page dédiée, meilleure ergonomie qu'un modal, permet deep-link + SEO `noindex`).
-  - Champs : enfant (prénom, nom, date de naissance, sexe), parent référent (prénom, nom, email, téléphone), tranche d'âge choisie (select filtré selon date de naissance), notes libres, honeypot caché, consentement RGPD.
-  - Upload des `required_documents` : un `<input type=file>` par pièce obligatoire, PDF/JPG/PNG ≤ 15 MB.
-  - Soumission → `POST /api/public/submit-camp-registration` (voir §3).
+Je vais produire un seul document `docs/beta-v1/feature-inventory.md` qui :
 
-### 2. Server function publique de lecture
+1. Croise `docs/beta-v1/feature-matrix.md` avec ce que je trouve dans le code (`src/routes/_authenticated/*`, `src/modules/tournaments`, `src/lib/*`, migrations Supabase).
+2. Classe chaque feature par module :
+   - Coordination : convocations, réponses, chat événement, rappels, wall
+   - Effectif : joueurs, parents, guardians, historique, follow-ups, feedback coach, défis, suspensions, dispos
+   - Événements : matchs, entraînements, tournois (multi-clubs, flights, brackets), stages, covoiturage
+   - Paiements : cotisations, obligations, reçus, Stripe, tournois payants, pass tournois
+   - Communication : notifications push, emails transactionnels, WhatsApp bridge, wall, réseaux sociaux
+   - Administration : rôles, invites, branding, venues, sponsors, RGPD, exports
+   - Public : pages tournois publiques, TV, inscriptions publiques, profils joueurs publics, stages
+   - IA : assistant coach, création tournoi, build Clubero, marketing-chat
+3. Marque pour chacune : **shipped / partial / roadmap**, + note (« pas dans feature-matrix », « listé mais pas livré », etc.).
+4. Section « écarts » : ce qui est dans le code mais pas sur le site, et l'inverse.
 
-`src/lib/public-camps.functions.ts` (client-safe path, pas de `requireSupabaseAuth`) :
+**→ Je te demande de valider cet inventaire avant de toucher au contenu vitrine ou aux prompts.**
 
-- `getPublicCampBySlug({ clubSlug, campSlug })` : client `SUPABASE_PUBLISHABLE_KEY` (pas admin). SELECT projetés : camp (colonnes publiques), club (name, logo_url, slug), venue/facility, age_groups triés, program_items triés, documents fournis, required_documents (label + type + required, jamais `is_sensitive` côté public).
-- Retourne `notFound()` si aucun résultat (la policy anon filtre déjà `status='published'`).
+## Phase 2 — Site vitrine (FR d'abord dans les JSON, puis traductions)
 
-### 3. Route publique d'inscription
+Fichiers touchés :
 
-`src/routes/api/public/submit-camp-registration.ts` (server route, méthode POST) :
+- `src/locales/fr/marketing.json` — sections `home`, `features`, `pricing`, `faq` réécrites à partir de l'inventaire validé.
+- `src/routes/features.tsx` — restructurer en modules (voir Phase 1) avec pour chaque feature : nom, 1 phrase de valeur, icône Lucide, badge (nouveau/beta/pro).
+- `src/routes/index.tsx` — sections `featuresTitle` + 4 perspectives (coach/parent/joueur/club) mises à jour avec les vrais bénéfices.
+- `src/routes/pricing.tsx` — liste des features par plan alignée sur la matrice (indiquer clairement ce qui est gratuit / beta / à venir).
+- `src/routes/faq.tsx` — ajouter les questions récurrentes (dispos, covoiturage, tournois payants, RGPD, WhatsApp, multi-clubs).
+- Head metadata mise à jour si les titres/descriptions changent.
 
-1. `getClientIp(request)` + `checkRateLimit(ip, 'camp-registration', 5)` — 5/h/IP.
-2. `multipart/form-data` : parse champs + fichiers.
-3. Validation Zod : payload complet + honeypot vide (sinon 200 fake success).
-4. Résolution `club_id` + `camp_id` par slugs, vérif `status='published'` + `registration_open`, âge de l'enfant compatible avec `age_group_id` choisie.
-5. Vérification que **toutes** les `required_documents.required=true` sont fournies. Type MIME + taille (≤ 15 MB).
-6. `supabaseAdmin` (chargé via `await import`) :
-   - Upload chaque fichier vers `camp-registration-documents/<camp_id>/<registration_id>/<slug(label)>.<ext>`.
-   - INSERT `club_camp_registrations` (statut `pending`, données famille, age_group_id).
-   - INSERT `club_camp_registration_documents` (une ligne par pièce, `storage_path`, `is_sensitive` recopié depuis la définition serveur — jamais du client).
-7. Envoi email confirmation via `enqueueTransactionalEmailServer` avec template dédié `camp-registration-received` (à créer) — sujet FR par défaut, i18n via la locale du club.
-8. Réponse `{ ok: true, registrationId }`.
+Contraintes respectées :
+- Aucun texte en dur dans les composants — tout via `useTranslation` sur les clés existantes ou nouvelles dans `marketing.json`.
+- Pas de nouveau design system, on garde les composants existants.
 
-### 4. Emails transactionnels
+## Phase 3 — Traduction 7 langues
 
-- Nouveau template serveur `camp-registration-received` (envoi serveur only, pas dans l'allowlist client).
-- Contenu : merci + récap enfant + stage + statut "en attente de validation" + rappel des pièces reçues.
-- Notification interne aux admins/dirigeants du club : template `camp-new-registration` (lien `/admin/stages/<campId>/inscriptions` — la route existe en Phase 3, on lie vers l'édition du stage pour l'instant).
+- Une seule passe automatisée via `scripts/translate-locales.mjs` (existe déjà) sur `marketing.json` uniquement, à partir du FR mis à jour.
+- Contrôle final : `bun run check:i18n` doit rester vert.
+- Locales cibles : de, en, es, it, nl, pt.
 
-### 5. UI publique et composants
+## Phase 4 — Assistants IA
 
-- `src/components/camps/public/` :
-  - `PublicCampHeader.tsx` (cover + titre + dates + lieu).
-  - `PublicCampContent.tsx` (description, âges, programme, docs fournis).
-  - `PublicRegistrationForm.tsx` (formulaire multi-étapes ou sections, react-hook-form + zodResolver, gestion uploads).
-- Skinning via `ClubThemeProvider` déjà en place (les couleurs du club s'appliquent).
-- État après soumission : écran de confirmation avec numéro de dossier, pas de redirection.
+Quatre prompts à mettre à jour, chacun avec une section « features actuelles » synthétique tirée de l'inventaire :
 
-### 6. i18n (7 langues)
+1. **`src/routes/api/public/marketing-chat.ts`** — prompt orienté prospect. Doit connaître : modules livrés, plans, langues supportées, RGPD/EU, différenciation vs WhatsApp.
+2. **`src/lib/llm/tournament-assistant.functions.ts`** — assistant création tournoi : ajouter les nouveaux formats (flights, double élim, Swiss), options paiement, terrains, fair play.
+3. **`src/routes/api/public/build-clubero/*`** — assistant de feedback produit : mettre la liste des features à jour dans le contexte pour poser des questions pertinentes.
+4. **`src/routes/api/chat.ts`** (assistant in-app coach/club) — enrichir avec la connaissance des modules pour orienter l'utilisateur vers la bonne page.
 
-Étendre `src/locales/*/camps.json` avec un bloc `public` :
-titre section, labels formulaire (enfant, parent, tranche d'âge, pièces), messages d'erreur (rate limit, pièce manquante, âge incompatible), confirmation, RGPD.
+Constantes partagées : je crée `src/lib/llm/feature-context.ts` qui exporte une string `FEATURE_CONTEXT` (dérivée de l'inventaire) importée par les 4 prompts. Une seule source à mettre à jour ensuite.
 
-### 7. Sécurité & garde-fous
+## Phase 5 — Vérifications
 
-- Route publique `/api/public/*` : jamais authentifiée mais toutes les vérifs faites côté serveur.
-- Aucune donnée sensible (`is_sensitive`) exposée en lecture publique.
-- Honeypot `website` champ caché → 200 sans effet.
-- Rate limit 5/h/IP bucket `camp-registration`.
-- MIME + taille contrôlés serveur avant upload (client n'est qu'indicatif).
-- Aucun INSERT anon direct sur Postgres — tout passe par la route publique service_role.
-- Les URLs signées vers `camp-registration-documents` restent réservées Phase 3 (dossier de traitement admin) : Phase 2 n'expose jamais les fichiers uploadés.
+- `bun run test` (609 unit tests)
+- `bun run check:i18n`
+- `bun run check:guards`
+- `bun run lint` sur les fichiers touchés
+- Screenshots Playwright de `/`, `/features`, `/pricing`, `/faq` en FR et EN pour vérifier visuellement.
 
-### 8. Non compris (reste Phase 3)
+## Détails techniques
 
-- Dashboard admin des inscriptions (`/admin/stages/<id>/inscriptions`).
-- Validation/refus, paiement, génération de convocations, purge après stage.
-- Vue signée des pièces sensibles avec restriction `admin|dirigeant`.
+- `src/lib/llm/feature-context.ts` : ~150 lignes, format markdown bullet, versionné dans le repo, importé (pas lu à runtime).
+- `marketing.json` : garder la structure actuelle des clés pour ne pas casser le code ; ajouter de nouvelles sous-clés `features.modules.<module>.<feature>`.
+- Traductions : le script existant utilise Lovable AI ; coût ~6 locales × ~100 clés nouvelles = raisonnable.
+- Pas de migration DB, pas de nouvelle route, pas de nouveau composant UI majeur.
 
-### 9. Détails techniques
+## Ce que je NE fais PAS (sauf si tu le demandes)
 
-- Server route utilise `createFileRoute` avec `server.handlers.POST`.
-- `getPublicCampBySlug` : ne pas utiliser `supabaseAdmin` (bug `Expected 3 parts in JWT` connu). Client publishable + policies anon existantes.
-- Loader du stage : appel de la server fn publique (pas de bearer requis), safe pour SSR / prerender.
-- Route inscription : loader charge le même camp + la liste des `required_documents`.
-- Formatage tailles/MIME : constantes partagées dans `src/lib/camps-content.functions.ts` réexportées.
-- Tests unitaires : ajouter au moins un test sur la validation Zod du payload d'inscription (types MIME, âge, required) — `bun run test`.
+- Refonte visuelle du site vitrine (design system, hero, illustrations).
+- Nouvelle page dédiée par module.
+- Ajout de screenshots produit dans /features.
+- Modifications des textes in-app (autres que les 4 prompts d'assistants).
+- Mise à jour de la doc `docs/` autre que le nouvel inventaire.
 
-### 10. Séquencement
+## Ordre d'exécution recommandé
 
-1. Server fn publique de lecture + route stage publique + `head()` SEO.
-2. i18n `public` × 7 langues.
-3. Composants d'affichage + skinning club.
-4. Route inscription publique (page) + form.
-5. Route API publique `/api/public/submit-camp-registration` + rate-limit + honeypot + uploads.
-6. Templates emails `camp-registration-received` + `camp-new-registration`.
-7. `bun run typecheck` + `bun run test` + `bun run check:i18n`.
+1. Phase 1 seule → validation avec toi.
+2. Phases 2 + 4 en parallèle (contenu FR + prompts, chacun s'appuie sur l'inventaire).
+3. Phase 3 (traductions).
+4. Phase 5 (vérifs + screenshots).
+
+Ça représente ~3-4 tours de messages pour toi selon la profondeur des retours sur l'inventaire.
