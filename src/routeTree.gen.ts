@@ -142,7 +142,7 @@ import { Route as ApiPublicBuildCluberoSaveRouteImport } from './routes/api/publ
 import { Route as ApiPublicBuildCluberoCompleteRouteImport } from './routes/api/public/build-clubero/complete'
 import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
 import { Route as AuthenticatedTeamsTeamIdStatsRouteImport } from './routes/_authenticated/teams/$teamId.stats'
-import { Route as AuthenticatedTeamsTeamIdAvailabilityRouteImport } from './routes/_authenticated/teams/$teamId/availability'
+import { Route as AuthenticatedTeamsTeamIdAvailabilityRouteImport } from './routes/_authenticated/teams/$teamId.availability'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
 import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
