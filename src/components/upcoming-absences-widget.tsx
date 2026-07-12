@@ -33,24 +33,29 @@ function formatRange(start: string, end: string) {
   return s === e ? s : `${s} → ${e}`;
 }
 
-export function UpcomingAbsencesWidget({ clubId, className }: Props) {
+export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const roles = useMyRoles();
-  const canDeclare = roles.includes("player") || roles.includes("parent");
+  const canDeclare =
+    roles.includes("player") ||
+    roles.includes("parent") ||
+    (!!teamId && (roles.includes("coach") || roles.includes("admin")));
 
   const today = new Date().toISOString().slice(0, 10);
   const in14days = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
 
   const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["upcoming-absences", clubId, today],
+    queryKey: ["upcoming-absences", clubId, teamId ?? null, today],
     enabled: !!clubId,
     queryFn: async (): Promise<Row[]> => {
-      // Players of the club (via team_members → teams)
-      const { data: tm } = await supabase
+      // Players of the club (via team_members → teams), optionally filtered to a single team
+      let tmQuery = supabase
         .from("team_members")
-        .select("player_id, teams:team_id(club_id, deleted_at, archived_at)")
+        .select("player_id, teams:team_id(id, club_id, deleted_at, archived_at)")
         .eq("role", "player");
+      if (teamId) tmQuery = tmQuery.eq("team_id", teamId);
+      const { data: tm } = await tmQuery;
       const playerIds = Array.from(
         new Set(
           (tm ?? [])
@@ -85,6 +90,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
     },
     staleTime: 30_000,
   });
+
 
   const total = rows.length;
   const top = rows.slice(0, 4);
