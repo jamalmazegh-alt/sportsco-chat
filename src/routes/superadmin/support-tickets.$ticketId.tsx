@@ -178,7 +178,48 @@ function AdminTicketDetail() {
       </aside>
     </div>
   );
+
+        <section className="space-y-2">
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1">
+            <History className="h-3 w-3" /> Historique
+          </Label>
+          <ol className="rounded-md border bg-card p-3 text-xs space-y-2 max-h-80 overflow-y-auto">
+            {!audit || audit.length === 0 ? (
+              <li className="text-muted-foreground italic">Aucune action enregistrée.</li>
+            ) : (
+              audit.map((row) => {
+                const label = ACTION_LABELS[row.action] ?? row.action;
+                const who = row.actor_name ?? (row.actor_role === "staff" ? "Support" : "—");
+                const when = new Date(row.created_at).toLocaleString();
+                let detail: string | null = null;
+                if (row.action === "status_changed" || row.action === "priority_changed") {
+                  detail = `${row.from_value ?? "—"} → ${row.to_value ?? "—"}`;
+                } else if (row.action === "assigned") {
+                  detail = row.to_value ? "assigné" : "désassigné";
+                } else if (row.action === "reply" || row.action === "internal_note") {
+                  detail = row.to_value ? `« ${row.to_value.slice(0, 80)}${row.to_value.length > 80 ? "…" : ""} »` : null;
+                }
+                return (
+                  <li key={row.id} className="flex flex-col gap-0.5 pb-2 border-b last:border-b-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{label}</span>
+                      <span className="text-muted-foreground">{when}</span>
+                    </div>
+                    <div className="text-muted-foreground">
+                      <span className="font-medium text-foreground">{who}</span>
+                      {detail ? ` · ${detail}` : null}
+                    </div>
+                  </li>
+                );
+              })
+            )}
+          </ol>
+        </section>
+      </aside>
+    </div>
+  );
 }
+
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
