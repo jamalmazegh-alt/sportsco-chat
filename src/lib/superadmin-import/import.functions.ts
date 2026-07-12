@@ -464,6 +464,21 @@ async function createInviteAndEmail(params: {
   }
 }
 
+/**
+ * Fields that can be updated on an existing player when the caller explicitly
+ * authorizes each one via `fieldOverrides` (per-row). Blank-fill still applies
+ * unconditionally for the same columns except first_name/last_name (identity).
+ */
+const PLAYER_OVERWRITABLE_FIELDS = [
+  "first_name",
+  "last_name",
+  "jersey_number",
+  "license_number",
+  "preferred_position",
+  "email",
+  "phone",
+] as const;
+
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -476,6 +491,10 @@ export const runImport = createServerFn({ method: "POST" })
         sendInvitations: z.boolean().default(false),
         fileName: z.string().max(255).optional(),
         iaUsed: z.boolean().default(false),
+        /** teamKey (`equipe|sport|categorie`) → team_id resolved by the caller. */
+        teamOverrides: z.record(z.string(), z.string().uuid()).optional(),
+        /** row index (0-based, as string) → list of columns authorized to overwrite. */
+        fieldOverrides: z.record(z.string(), z.array(z.string())).optional(),
       })
       .parse(input),
   )
@@ -495,6 +514,22 @@ export const runImport = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!t || t.club_id !== data.clubId) throw new Response("Forbidden", { status: 403 });
       fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
+    }
+
+    // Validate teamOverrides — each mapped team_id must belong to clubId.
+    if (data.teamOverrides && Object.keys(data.teamOverrides).length > 0) {
+      const ids = Array.from(new Set(Object.values(data.teamOverrides)));
+      const { data: teamsCheck, error: tcErr } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id")
+        .in("id", ids);
+      if (tcErr) throw new Error(tcErr.message);
+      const okIds = new Set(
+        (teamsCheck ?? []).filter((t) => t.club_id === data.clubId).map((t) => t.id),
+      );
+      for (const id of ids) {
+        if (!okIds.has(id)) throw new Response("Forbidden", { status: 403 });
+      }
     }
 
     // Hard limits
@@ -575,14 +610,18 @@ export const runImport = createServerFn({ method: "POST" })
               throw new Error("date de naissance requise");
             }
 
-            // Resolve team: fixed team (coach mode) or per-row.
+            // Resolve team: fixed team (coach mode), caller override, or per-row lookup.
             let teamId: string;
             if (fixedTeam) {
               teamId = fixedTeam.id;
             } else {
               const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
+              const override = data.teamOverrides?.[teamKey];
               const cached = teamCache.get(teamKey);
-              if (cached) {
+              if (override) {
+                teamId = override;
+                teamCache.set(teamKey, teamId);
+              } else if (cached) {
                 teamId = cached;
               } else {
                 const t = await findOrCreateTeam(
@@ -617,16 +656,68 @@ export const runImport = createServerFn({ method: "POST" })
             }
 
             if (existing) {
-              // Non-destructive patch: only fill blanks.
+              // Non-destructive patch: blank-fill always; overwrite only if caller
+              // authorized that specific field via fieldOverrides[rowIndex].
+              const allowed = new Set(data.fieldOverrides?.[String(i)] ?? []);
+              const specs: Array<{
+                col: (typeof PLAYER_OVERWRITABLE_FIELDS)[number];
+                incoming: string | number | null;
+                current: string | number | null;
+                allowBlankFill: boolean;
+              }> = [
+                {
+                  col: "first_name",
+                  incoming: firstName || null,
+                  current: existing.first_name,
+                  allowBlankFill: false,
+                },
+                {
+                  col: "last_name",
+                  incoming: lastName || null,
+                  current: existing.last_name,
+                  allowBlankFill: false,
+                },
+                {
+                  col: "jersey_number",
+                  incoming: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  current: existing.jersey_number,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "license_number",
+                  incoming: r.numero_licence || null,
+                  current: existing.license_number,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "preferred_position",
+                  incoming: r.poste || null,
+                  current: existing.preferred_position,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "email",
+                  incoming: r.email_contact ? r.email_contact.toLowerCase() : null,
+                  current: existing.email,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "phone",
+                  incoming: r.telephone_joueur || null,
+                  current: existing.phone,
+                  allowBlankFill: true,
+                },
+              ];
               const patch: Record<string, unknown> = {};
-              if (existing.jersey_number == null && r.numero_maillot)
-                patch.jersey_number = parseInt(r.numero_maillot, 10);
-              if (!existing.license_number && r.numero_licence)
-                patch.license_number = r.numero_licence;
-              if (!existing.preferred_position && r.poste) patch.preferred_position = r.poste;
-              if (!existing.email && r.email_contact)
-                patch.email = r.email_contact.toLowerCase();
-              if (!existing.phone && r.telephone_joueur) patch.phone = r.telephone_joueur;
+              for (const s of specs) {
+                if (s.incoming == null || s.incoming === "") continue;
+                const currentEmpty = s.current == null || s.current === "";
+                if (currentEmpty && s.allowBlankFill) {
+                  patch[s.col] = s.incoming;
+                } else if (allowed.has(s.col) && s.incoming !== s.current) {
+                  patch[s.col] = s.incoming;
+                }
+              }
               if (Object.keys(patch).length > 0) {
                 const { error: upErr } = await supabaseAdmin
                   .from("players")
@@ -976,4 +1067,182 @@ export const runImport = createServerFn({ method: "POST" })
     });
 
     return { status, imported, total: data.rows.length, errors, summary };
+  });
+
+// ============================================================
+// 6) Preview import players — team resolutions + per-row diffs
+// ============================================================
+
+export type PlayerImportPreview = {
+  fixedTeam: { id: string; name: string; sport: string | null; age_group: string | null } | null;
+  teamResolutions: Array<{
+    key: string;
+    name: string;
+    sport: string;
+    category: string;
+    suggestedTeamId: string | null;
+    existingTeams: Array<{ id: string; name: string; sport: string | null; age_group: string | null }>;
+  }>;
+  rowPreviews: Array<{
+    index: number;
+    firstName: string;
+    lastName: string;
+    birthDate: string | null;
+    action: "new" | "update" | "restore";
+    existingId: string | null;
+    teamKey: string | null;
+    diffs: Array<{ field: string; current: string | null; incoming: string | null; overwritable: boolean }>;
+  }>;
+  summary: { new: number; update: number; restore: number };
+};
+
+export const previewPlayersImport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
+        rows: importRowsSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<PlayerImportPreview> => {
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+
+    let fixedTeam: PlayerImportPreview["fixedTeam"] = null;
+    if (data.teamId) {
+      const { data: t } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id, name, sport, age_group")
+        .eq("id", data.teamId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (!t || t.club_id !== data.clubId) throw new Response("Forbidden", { status: 403 });
+      fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
+    }
+
+    type ExistingPlayer = {
+      id: string;
+      first_name: string | null;
+      last_name: string | null;
+      birth_date: string | null;
+      jersey_number: number | null;
+      license_number: string | null;
+      preferred_position: string | null;
+      email: string | null;
+      phone: string | null;
+      deleted_at: string | null;
+    };
+
+    const { data: roster, error: rosterErr } = await supabaseAdmin
+      .from("players")
+      .select(
+        "id, first_name, last_name, birth_date, jersey_number, license_number, preferred_position, email, phone, deleted_at",
+      )
+      .eq("club_id", data.clubId);
+    if (rosterErr) throw new Error(rosterErr.message);
+
+    const byIdentity = new Map<string, ExistingPlayer>();
+    const key = (f: string | null, l: string | null, b: string | null) => {
+      if (!b) return null;
+      const nf = normalizeName(f);
+      const nl = normalizeName(l);
+      if (!nf || !nl) return null;
+      return `${nf}|${nl}|${b}`;
+    };
+    for (const p of (roster ?? []) as ExistingPlayer[]) {
+      const k = key(p.first_name, p.last_name, p.birth_date);
+      if (!k) continue;
+      const prev = byIdentity.get(k);
+      if (!prev || (prev.deleted_at && !p.deleted_at)) byIdentity.set(k, p);
+    }
+
+    const { data: clubTeams } = await supabaseAdmin
+      .from("teams")
+      .select("id, name, sport, age_group")
+      .eq("club_id", data.clubId)
+      .is("deleted_at", null);
+    const teamList = clubTeams ?? [];
+
+    const teamTuples = new Map<string, PlayerImportPreview["teamResolutions"][number]>();
+    const summary = { new: 0, update: 0, restore: 0 };
+
+    const rowPreviews: PlayerImportPreview["rowPreviews"] = data.rows.map((r, i) => {
+      const row = r as RowMap;
+      let teamKey: string | null = null;
+      if (!fixedTeam && row.equipe && row.sport && row.categorie) {
+        teamKey = `${row.equipe}|${row.sport}|${row.categorie}`;
+        if (!teamTuples.has(teamKey)) {
+          const exact = teamList.find(
+            (t) => t.name === row.equipe && t.sport === row.sport && t.age_group === row.categorie,
+          );
+          teamTuples.set(teamKey, {
+            key: teamKey,
+            name: row.equipe,
+            sport: row.sport,
+            category: row.categorie,
+            suggestedTeamId: exact?.id ?? null,
+            existingTeams: teamList,
+          });
+        }
+      }
+      const firstName = titleCase(row.prenom_joueur ?? "");
+      const lastName = titleCase(row.nom_joueur ?? "");
+      const idKey = key(firstName, lastName, row.date_naissance ?? null);
+      const existing = idKey ? byIdentity.get(idKey) ?? null : null;
+      let action: "new" | "update" | "restore" = "new";
+      const diffs: PlayerImportPreview["rowPreviews"][number]["diffs"] = [];
+      if (existing) {
+        action = existing.deleted_at ? "restore" : "update";
+        const incomingMap: Record<string, string | null> = {
+          first_name: firstName || null,
+          last_name: lastName || null,
+          jersey_number: row.numero_maillot || null,
+          license_number: row.numero_licence || null,
+          preferred_position: row.poste || null,
+          email: row.email_contact ? row.email_contact.toLowerCase() : null,
+          phone: row.telephone_joueur || null,
+        };
+        const currentMap: Record<string, string | null> = {
+          first_name: existing.first_name,
+          last_name: existing.last_name,
+          jersey_number: existing.jersey_number != null ? String(existing.jersey_number) : null,
+          license_number: existing.license_number,
+          preferred_position: existing.preferred_position,
+          email: existing.email,
+          phone: existing.phone,
+        };
+        for (const f of PLAYER_OVERWRITABLE_FIELDS) {
+          const inc = incomingMap[f];
+          const cur = currentMap[f];
+          if (inc && inc !== cur) {
+            diffs.push({
+              field: f,
+              current: cur,
+              incoming: inc,
+              overwritable: cur != null && cur !== "",
+            });
+          }
+        }
+      }
+      summary[action]++;
+      return {
+        index: i,
+        firstName: row.prenom_joueur ?? "",
+        lastName: row.nom_joueur ?? "",
+        birthDate: row.date_naissance ?? null,
+        action,
+        existingId: existing?.id ?? null,
+        teamKey,
+        diffs,
+      };
+    });
+
+    return {
+      fixedTeam,
+      teamResolutions: Array.from(teamTuples.values()),
+      rowPreviews,
+      summary,
+    };
   });

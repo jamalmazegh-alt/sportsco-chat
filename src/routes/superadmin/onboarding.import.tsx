@@ -15,13 +15,16 @@ import {
   Download,
   CheckCircle2,
   AlertCircle,
+  Eye,
 } from "lucide-react";
 import {
   listClubsForImport,
   getClubImportStats,
   analyzeFileWithAI,
   parseTemplateFn,
+  previewPlayersImport,
   runImport,
+  type PlayerImportPreview,
 } from "@/lib/superadmin-import/import.functions";
 import {
   type AnalysisResult,
@@ -205,11 +208,22 @@ function downloadTemplate(type: ImportType) {
   XLSX.writeFile(wb, `clubero-template-${type}.xlsx`);
 }
 
+const FIELD_LABEL_FR: Record<string, string> = {
+  first_name: "Prénom",
+  last_name: "Nom",
+  jersey_number: "N° maillot",
+  license_number: "N° licence",
+  preferred_position: "Poste",
+  email: "Email",
+  phone: "Téléphone",
+};
+
 function ImportPage() {
   const listClubs = useServerFn(listClubsForImport);
   const getStats = useServerFn(getClubImportStats);
   const aiAnalyze = useServerFn(analyzeFileWithAI);
   const tplParse = useServerFn(parseTemplateFn);
+  const doPreview = useServerFn(previewPlayersImport);
   const doImport = useServerFn(runImport);
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -227,6 +241,13 @@ function ImportPage() {
   const [sendInvitations, setSendInvitations] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Awaited<ReturnType<typeof runImport>> | null>(null);
+
+  // Players preview state.
+  const [preview, setPreview] = useState<PlayerImportPreview | null>(null);
+  /** teamKey → team_id chosen by the operator (or empty string for "create new"). */
+  const [teamChoices, setTeamChoices] = useState<Record<string, string>>({});
+  /** rowIndex → set of overwritable fields authorized to be replaced. */
+  const [fieldOverrides, setFieldOverrides] = useState<Record<number, Set<string>>>({});
 
   // Load all clubs on mount so the dropdown is populated immediately.
   useEffect(() => {
@@ -280,7 +301,9 @@ function ImportPage() {
       setTemplateDetected(isTemplate);
       setStep(3);
       if (isTemplate) {
-        const res = await tplParse({ data: { type: detected.type, headers: hdrs, rawRows: rows } });
+        const res = await tplParse({
+          data: { clubId: club.id, type: detected.type, headers: hdrs, rawRows: rows },
+        });
         setAnalysis(res);
         setIaUsed(false);
         setStep(4);
@@ -309,6 +332,15 @@ function ImportPage() {
 
   const fields = useMemo(() => (type ? getFields(type) : []), [type]);
 
+  const cleanRows = useMemo(() => {
+    if (!analysis) return null;
+    return analysis.rows.map((r) => {
+      const o: Record<string, string | null> = {};
+      for (const f of fields) o[f.key] = r[f.key]?.value ?? null;
+      return o;
+    });
+  }, [analysis, fields]);
+
   const editCell = (rowIdx: number, key: string, val: string) => {
     if (!analysis) return;
     const newRows = [...analysis.rows];
@@ -321,7 +353,6 @@ function ImportPage() {
     const fdef = fields.find((f) => f.key === key);
     cell.error = fdef?.validate ? fdef.validate(cell.value) : null;
     newRows[rowIdx] = { ...newRows[rowIdx], [key]: cell };
-    // recompute summary
     let valid = 0;
     let to_fix = 0;
     const required = fields.filter((f) => f.required).map((f) => f.key);
@@ -331,19 +362,73 @@ function ImportPage() {
       else to_fix++;
     }
     setAnalysis({ ...analysis, rows: newRows, summary: { total: newRows.length, valid, to_fix } });
+    // Any edit invalidates the preview.
+    setPreview(null);
+    setFieldOverrides({});
+    setTeamChoices({});
+  };
+
+  const runPreview = async () => {
+    if (!cleanRows || !club) return;
+    setLoading(true);
+    try {
+      const res = await doPreview({
+        data: { clubId: club.id, rows: cleanRows },
+      });
+      setPreview(res);
+      // Default team choices to the suggested match.
+      const defaults: Record<string, string> = {};
+      for (const tr of res.teamResolutions) {
+        defaults[tr.key] = tr.suggestedTeamId ?? "";
+      }
+      setTeamChoices(defaults);
+      setFieldOverrides({});
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleOverride = (rowIndex: number, field: string, checked: boolean) => {
+    setFieldOverrides((prev) => {
+      const next = { ...prev };
+      const set = new Set(next[rowIndex] ?? []);
+      if (checked) set.add(field);
+      else set.delete(field);
+      next[rowIndex] = set;
+      return next;
+    });
   };
 
   const confirmImport = async () => {
-    if (!analysis || !type || !club) return;
+    if (!cleanRows || !type || !club) return;
     setLoading(true);
     try {
-      const cleanRows = analysis.rows.map((r) => {
-        const o: Record<string, string | null> = {};
-        for (const f of fields) o[f.key] = r[f.key]?.value ?? null;
-        return o;
-      });
+      const teamOverrides: Record<string, string> = {};
+      if (type === "players" && preview) {
+        for (const [key, val] of Object.entries(teamChoices)) {
+          if (val) teamOverrides[key] = val;
+        }
+      }
+      const fieldOverridesPayload: Record<string, string[]> = {};
+      if (type === "players") {
+        for (const [idx, set] of Object.entries(fieldOverrides)) {
+          if (set.size > 0) fieldOverridesPayload[idx] = Array.from(set);
+        }
+      }
       const res = await doImport({
-        data: { clubId: club.id, type, rows: cleanRows, sendInvitations, fileName, iaUsed },
+        data: {
+          clubId: club.id,
+          type,
+          rows: cleanRows,
+          sendInvitations,
+          fileName,
+          iaUsed,
+          teamOverrides: Object.keys(teamOverrides).length > 0 ? teamOverrides : undefined,
+          fieldOverrides:
+            Object.keys(fieldOverridesPayload).length > 0 ? fieldOverridesPayload : undefined,
+        },
       });
       setResult(res);
       setStep(5);
@@ -353,6 +438,7 @@ function ImportPage() {
       setLoading(false);
     }
   };
+
 
   const reset = (keepClub: boolean) => {
     setStep(2);
@@ -364,6 +450,9 @@ function ImportPage() {
     setResult(null);
     setIaUsed(false);
     setSendInvitations(false);
+    setPreview(null);
+    setTeamChoices({});
+    setFieldOverrides({});
     if (!keepClub) {
       setClub(null);
       setStats(null);
@@ -619,18 +708,181 @@ function ImportPage() {
               Envoyer les invitations par email après import
             </label>
           )}
-          <Button
-            onClick={confirmImport}
-            disabled={loading || analysis.summary.to_fix > 0}
-            className="w-full"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
-            Confirmer et importer
-          </Button>
+          {/* Players: two-phase preview → confirm. Other types: single confirm. */}
+          {type === "players" && !preview && (
+            <Button
+              onClick={runPreview}
+              disabled={loading || analysis.summary.to_fix > 0 || analysis.summary.valid === 0}
+              className="w-full"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+              Prévisualiser l'import
+            </Button>
+          )}
+
+          {type === "players" && preview && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-green-600">{preview.summary.new}</div>
+                  <div className="text-muted-foreground">nouveaux</div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-blue-600">{preview.summary.update}</div>
+                  <div className="text-muted-foreground">à mettre à jour</div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xl font-semibold text-amber-600">{preview.summary.restore}</div>
+                  <div className="text-muted-foreground">à réactiver</div>
+                </div>
+              </div>
+
+              {preview.teamResolutions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Résolution des équipes</div>
+                  <div className="rounded-md border divide-y">
+                    {preview.teamResolutions.map((tr) => (
+                      <div
+                        key={tr.key}
+                        className="flex items-center gap-2 p-2 text-xs flex-wrap"
+                      >
+                        <div className="flex-1 min-w-[180px]">
+                          <div className="font-medium">{tr.name}</div>
+                          <div className="text-muted-foreground">
+                            {tr.sport} · {tr.category}
+                          </div>
+                        </div>
+                        <select
+                          className="border rounded px-2 py-1 bg-background text-xs"
+                          value={teamChoices[tr.key] ?? ""}
+                          onChange={(e) =>
+                            setTeamChoices((prev) => ({ ...prev, [tr.key]: e.target.value }))
+                          }
+                        >
+                          <option value="">➕ Créer une nouvelle équipe</option>
+                          {tr.existingTeams.map((et) => (
+                            <option key={et.id} value={et.id}>
+                              {et.name} ({et.sport ?? "?"} · {et.age_group ?? "?"})
+                              {et.id === tr.suggestedTeamId ? " ✓ suggéré" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {preview.rowPreviews.some((r) => r.diffs.length > 0) && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Différences détectées</div>
+                  <div className="rounded-md border border-blue-200 bg-blue-50 p-2 text-xs text-blue-900">
+                    Cochez uniquement les champs à écraser. Par défaut, aucun écrasement — seuls les
+                    champs vides sont complétés.
+                  </div>
+                  <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                    {preview.rowPreviews
+                      .filter((r) => r.diffs.length > 0)
+                      .map((row) => (
+                        <div key={row.index} className="rounded-md border p-2 space-y-1 bg-card">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="font-medium">
+                              {row.firstName} {row.lastName}
+                              {row.birthDate && (
+                                <span className="text-muted-foreground ml-1">
+                                  · {row.birthDate}
+                                </span>
+                              )}
+                            </div>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] uppercase ${
+                                row.action === "restore"
+                                  ? "bg-amber-100 text-amber-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {row.action}
+                            </span>
+                          </div>
+                          <table className="w-full text-xs">
+                            <tbody>
+                              {row.diffs.map((d) => {
+                                const checked =
+                                  fieldOverrides[row.index]?.has(d.field) ?? false;
+                                return (
+                                  <tr key={d.field} className="border-t">
+                                    <td className="py-1 font-medium w-28">
+                                      {FIELD_LABEL_FR[d.field] ?? d.field}
+                                    </td>
+                                    <td className="py-1 text-muted-foreground">
+                                      {d.current ?? <span className="italic">(vide)</span>}
+                                    </td>
+                                    <td className="py-1">→ {d.incoming ?? "—"}</td>
+                                    <td className="py-1 text-right w-20">
+                                      {d.overwritable ? (
+                                        <Checkbox
+                                          checked={checked}
+                                          onCheckedChange={(v) =>
+                                            toggleOverride(row.index, d.field, !!v)
+                                          }
+                                        />
+                                      ) : (
+                                        <span className="text-[10px] text-green-700">auto</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPreview(null);
+                    setFieldOverrides({});
+                    setTeamChoices({});
+                  }}
+                  disabled={loading}
+                >
+                  Retour
+                </Button>
+                <Button onClick={confirmImport} disabled={loading} className="flex-1">
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
+                  Confirmer et importer
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {type !== "players" && (
+            <Button
+              onClick={confirmImport}
+              disabled={loading || analysis.summary.to_fix > 0}
+              className="w-full"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              Confirmer et importer
+            </Button>
+          )}
         </div>
       )}
 
