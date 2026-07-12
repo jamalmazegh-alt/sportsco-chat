@@ -823,10 +823,12 @@ function WallGrouped({
               {sourceMeta && (
                 <span
                   className={cn(
-                    "text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
+                    "inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
                     sourceMeta.cls,
                   )}
+                  title={sourceMeta.label}
                 >
+                  <sourceMeta.icon className="h-3.5 w-3.5" />
                   {sourceMeta.label}
                 </span>
               )}
