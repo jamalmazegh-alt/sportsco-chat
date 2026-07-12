@@ -10,8 +10,8 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
-  Eye,
 } from "lucide-react";
+
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -252,18 +252,53 @@ export function ImportPlayersCsvDialog({
     [aiAnalyze, clubId, teamId, t],
   );
 
-  const runPreview = async () => {
+  const runImportFlow = async (opts: { fromDiffs?: boolean } = {}) => {
     if (!cleanRows) return;
     setLoading(true);
-    setBusyLabel(
-      t("players.import.previewing", { defaultValue: "Prévisualisation..." }),
-    );
     try {
-      const res = await doPreview({
-        data: { clubId, teamId, rows: cleanRows },
+      // 1. Preview to detect conflicts on existing players.
+      let previewRes = preview;
+      if (!previewRes) {
+        setBusyLabel(
+          t("players.import.previewing", { defaultValue: "Vérification..." }),
+        );
+        previewRes = await doPreview({
+          data: { clubId, teamId, rows: cleanRows },
+        });
+        const hasDiffs = previewRes.rowPreviews.some((r) => r.diffs.length > 0);
+        if (hasDiffs && !opts.fromDiffs) {
+          // Stop here and let the user arbitrate conflicts.
+          setPreview(previewRes);
+          setOverrides({});
+          setLoading(false);
+          setBusyLabel("");
+          return;
+        }
+      }
+
+      // 2. Direct import (no conflicts, or user confirmed from diffs step).
+      setBusyLabel(
+        t("players.import.importing", { defaultValue: "Import en cours..." }),
+      );
+      const fieldOverrides: Record<string, string[]> = {};
+      for (const [idx, set] of Object.entries(overrides)) {
+        if (set.size > 0) fieldOverrides[idx] = Array.from(set);
+      }
+      const res = await doImport({
+        data: {
+          clubId,
+          teamId,
+          type: "players",
+          rows: cleanRows,
+          sendInvitations: false,
+          fileName,
+          iaUsed,
+          fieldOverrides:
+            Object.keys(fieldOverrides).length > 0 ? fieldOverrides : undefined,
+        },
       });
-      setPreview(res);
-      setOverrides({});
+      setResult(res);
+      if (res.imported > 0) onDone();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -283,38 +318,6 @@ export function ImportPlayersCsvDialog({
     });
   };
 
-  const confirmImport = async () => {
-    if (!cleanRows) return;
-    setLoading(true);
-    setBusyLabel(
-      t("players.import.importing", { defaultValue: "Import en cours..." }),
-    );
-    try {
-      const fieldOverrides: Record<string, string[]> = {};
-      for (const [idx, set] of Object.entries(overrides)) {
-        if (set.size > 0) fieldOverrides[idx] = Array.from(set);
-      }
-      const res = await doImport({
-        data: {
-          clubId,
-          teamId,
-          type: "players",
-          rows: cleanRows,
-          sendInvitations: false,
-          fileName,
-          iaUsed,
-          fieldOverrides: Object.keys(fieldOverrides).length > 0 ? fieldOverrides : undefined,
-        },
-      });
-      setResult(res);
-      if (res.imported > 0) onDone();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-      setBusyLabel("");
-    }
-  };
 
   const handleClose = (v: boolean) => {
     if (!v) reset();
@@ -482,19 +485,20 @@ export function ImportPlayersCsvDialog({
                 {t("common.back", { defaultValue: "Retour" })}
               </Button>
               <Button
-                onClick={runPreview}
+                onClick={() => runImportFlow()}
                 disabled={loading || analysis.summary.valid === 0}
                 className="flex-1"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>
-                    <Eye className="h-4 w-4 mr-1" />
-                    {t("players.import.preview", { defaultValue: "Prévisualiser" })}
-                  </>
+                  t("players.import.confirm", {
+                    defaultValue: `Importer ${analysis.summary.valid} joueur(s)`,
+                    count: analysis.summary.valid,
+                  })
                 )}
               </Button>
+
             </div>
           </div>
         )}
@@ -654,7 +658,7 @@ export function ImportPlayersCsvDialog({
                 {t("common.back", { defaultValue: "Retour" })}
               </Button>
               <Button
-                onClick={confirmImport}
+                onClick={() => runImportFlow({ fromDiffs: true })}
                 disabled={loading || (analysis?.summary.valid ?? 0) === 0}
                 className="flex-1"
               >
