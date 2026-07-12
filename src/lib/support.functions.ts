@@ -538,10 +538,12 @@ const ListInput = z
     status: z.enum(STATUSES).optional(),
     priority: z.enum(PRIORITIES).optional(),
     category: z.enum(CATEGORIES).optional(),
+    club_id: z.string().uuid().optional(),
     search: z.string().trim().max(120).optional(),
     limit: z.number().int().min(1).max(200).default(50),
   })
   .partial();
+
 
 export const listAllSupportTickets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -562,6 +564,7 @@ export const listAllSupportTickets = createServerFn({ method: "POST" })
     if (data.status) q = q.eq("status", data.status);
     if (data.priority) q = q.eq("priority", data.priority);
     if (data.category) q = q.eq("category", data.category);
+    if (data.club_id) q = q.eq("club_id", data.club_id);
     if (data.search) q = q.ilike("subject", `%${data.search}%`);
 
     const { data: tickets, error } = await q;
@@ -578,11 +581,26 @@ export const listAllSupportTickets = createServerFn({ method: "POST" })
       for (const p of profiles ?? []) profileMap.set(p.id, { full_name: p.full_name });
     }
 
+    // Hydrate club names
+    const clubIds = Array.from(
+      new Set((tickets ?? []).map((t) => t.club_id).filter((v): v is string => !!v)),
+    );
+    const clubMap = new Map<string, { name: string | null }>();
+    if (clubIds.length) {
+      const { data: clubs } = await supabaseAdmin
+        .from("clubs")
+        .select("id, name")
+        .in("id", clubIds);
+      for (const c of clubs ?? []) clubMap.set(c.id, { name: c.name });
+    }
+
     return (tickets ?? []).map((t) => ({
       ...t,
       user_full_name: profileMap.get(t.user_id)?.full_name ?? null,
+      club_name: t.club_id ? (clubMap.get(t.club_id)?.name ?? null) : null,
     }));
   });
+
 
 const UpdateInput = z.object({
   ticket_id: z.string().uuid(),

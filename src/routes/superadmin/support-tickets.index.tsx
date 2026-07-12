@@ -34,9 +34,10 @@ function AdminTicketsPage() {
   const [status, setStatus] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
+  const [clubId, setClubId] = useState<string>("all");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-support-tickets", { search, status, priority, category }],
+    queryKey: ["admin-support-tickets", { search, status, priority, category, clubId }],
     queryFn: () =>
       listAllSupportTickets({
         data: {
@@ -44,10 +45,23 @@ function AdminTicketsPage() {
           status: status === "all" ? undefined : (status as "open"),
           priority: priority === "all" ? undefined : (priority as "low"),
           category: category === "all" ? undefined : (category as "bug"),
+          club_id: clubId === "all" ? undefined : clubId,
           limit: 100,
         },
       }),
   });
+
+  // Distinct clubs among currently loaded tickets (drives the filter dropdown).
+  const clubOptions = (() => {
+    const map = new Map<string, string>();
+    for (const t of data ?? []) {
+      if (t.club_id && t.club_name) map.set(t.club_id, t.club_name);
+    }
+    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  })();
+
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
@@ -96,13 +110,26 @@ function AdminTicketsPage() {
           </SelectContent>
         </Select>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="sm:col-start-4">
+          <SelectTrigger>
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
             {CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>
                 {c === "all" ? "Toutes catégories" : c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={clubId} onValueChange={setClubId}>
+          <SelectTrigger className="sm:col-span-2">
+            <SelectValue placeholder="Club" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous clubs</SelectItem>
+            {clubOptions.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -114,6 +141,7 @@ function AdminTicketsPage() {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : !data || data.length === 0 ? (
+
         <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
           Aucun ticket.
         </div>
@@ -148,8 +176,14 @@ function AdminTicketsPage() {
                     </span>
                     <span>· {t.category}</span>
                     <span>· #{t.id.slice(0, 6).toUpperCase()}</span>
+                    {t.club_name && (
+                      <span className="inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/10 text-blue-700 dark:text-blue-300">
+                        {t.club_name}
+                      </span>
+                    )}
                     {t.user_full_name && <span>· {t.user_full_name}</span>}
                     <span>· {new Date(t.last_activity_at).toLocaleString()}</span>
+
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
