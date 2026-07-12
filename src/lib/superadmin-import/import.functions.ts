@@ -33,6 +33,85 @@ async function assertSuperAdmin(userId: string) {
   if (!data) throw new Response("Forbidden", { status: 403 });
 }
 
+/**
+ * Allow super_admin OR admin/coach of the target club.
+ * Used by the shared import server fns so the same pipeline serves both the
+ * superadmin wizard and the coach dialog.
+ */
+async function assertImportAccess(
+  supabase: import("@supabase/supabase-js").SupabaseClient,
+  userId: string,
+  clubId: string,
+) {
+  const { data: sa } = await supabaseAdmin
+    .from("super_admins")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (sa) return;
+  const { data, error } = await supabase
+    .from("club_members")
+    .select("roles, role")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw new Response("Internal error", { status: 500 });
+  if (!data) throw new Response("Forbidden", { status: 403 });
+  const rolesArr = (data as { roles?: string[] | null }).roles ?? [];
+  const roleSingle = (data as { role?: string | null }).role;
+  const roles = new Set<string>([...(rolesArr as string[]), ...(roleSingle ? [roleSingle] : [])]);
+  if (!roles.has("admin") && !roles.has("coach")) {
+    throw new Response("Forbidden", { status: 403 });
+  }
+}
+
+/** Mirrors public.normalize_name(text): unaccent → lower → [^a-z0-9] stripped. */
+function normalizeName(v: string | null | undefined): string {
+  return (v ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * Coach mode: inject equipe/sport/categorie from the target team so the
+ * uploaded file may omit those columns. Also verifies the team belongs to
+ * clubId (defense in depth against a client-forged teamId).
+ */
+async function injectTeamContext(
+  teamId: string,
+  clubId: string,
+  headers: string[],
+  rawRows: Array<Record<string, unknown>>,
+): Promise<{
+  headers: string[];
+  rawRows: Array<Record<string, unknown>>;
+  team: { id: string; name: string; sport: string | null; age_group: string | null };
+}> {
+  const { data: team, error } = await supabaseAdmin
+    .from("teams")
+    .select("id, club_id, name, sport, age_group")
+    .eq("id", teamId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!team || team.club_id !== clubId) throw new Response("Forbidden", { status: 403 });
+  const extra: Record<string, string> = {
+    equipe: team.name,
+    sport: team.sport ?? "",
+    categorie: team.age_group ?? "",
+  };
+  const augmentedHeaders = [...headers];
+  for (const k of Object.keys(extra)) if (!augmentedHeaders.includes(k)) augmentedHeaders.push(k);
+  const augmentedRows = rawRows.map((r) => {
+    const out = { ...r };
+    for (const [k, v] of Object.entries(extra)) if (out[k] == null || out[k] === "") out[k] = v;
+    return out;
+  });
+  return { headers: augmentedHeaders, rawRows: augmentedRows, team };
+}
+
 // ============================================================
 // 1) Liste des clubs (recherche autocomplete)
 // ============================================================
