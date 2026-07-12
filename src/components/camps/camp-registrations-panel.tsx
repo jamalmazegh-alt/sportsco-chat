@@ -432,7 +432,15 @@ function RegistrationRow({
       </td>
       <td className="px-3 py-3 text-right">
         {row.reservation_expired && (
-          <Button size="sm" variant="outline" onClick={onExtend} disabled={extending}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onExtend();
+            }}
+            disabled={extending}
+          >
             {extending ? (
               <Loader2 className="h-3 w-3 mr-1 animate-spin" />
             ) : (
