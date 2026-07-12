@@ -241,6 +241,24 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
               {t("availability.declare", { defaultValue: "Déclarer une absence" })}
             </Button>
           )}
+
+          {teamId && (
+            <Link
+              to="/teams/$teamId/availability"
+              params={{ teamId }}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-[10px] border-[1.5px] border-border bg-card hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <span className="text-[13px] font-bold">
+                  {t("availability.calendar.open", {
+                    defaultValue: "Voir le calendrier des absences",
+                  })}
+                </span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
         </div>
       )}
 
