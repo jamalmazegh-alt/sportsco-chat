@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   analyzeFileWithAI,
-  parseTemplateFn,
   previewPlayersImport,
   runImport,
   type PlayerImportPreview,
@@ -25,8 +24,8 @@ import {
 import {
   type AnalysisResult,
   getFields,
-  templateMatchRatio,
 } from "@/lib/superadmin-import/schemas";
+
 
 /**
  * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
@@ -123,7 +122,7 @@ export function ImportPlayersCsvDialog({
 }) {
   const { t } = useTranslation();
   const aiAnalyze = useServerFn(analyzeFileWithAI);
-  const tplParse = useServerFn(parseTemplateFn);
+  
   const doPreview = useServerFn(previewPlayersImport);
   const doImport = useServerFn(runImport);
 
@@ -234,26 +233,15 @@ export function ImportPlayersCsvDialog({
         setHeaders(hdrs);
         setRawRows(rows);
 
-        const isTemplate = templateMatchRatio(hdrs, "players") >= 0.8;
-        if (isTemplate) {
-          setBusyLabel(
-            t("players.import.parsing", { defaultValue: "Analyse du modèle..." }),
-          );
-          const res = await tplParse({
-            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
-          });
-          setAnalysis(res);
-          setIaUsed(false);
-        } else {
-          setBusyLabel(
-            t("players.import.ai", { defaultValue: "Analyse IA en cours..." }),
-          );
-          const res = await aiAnalyze({
-            data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
-          });
-          setAnalysis(res);
-          setIaUsed(true);
-        }
+        setBusyLabel(
+          t("players.import.ai", { defaultValue: "Analyse IA en cours..." }),
+        );
+        const res = await aiAnalyze({
+          data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
+        });
+        setAnalysis(res);
+        setIaUsed(true);
+
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
       } finally {
@@ -261,7 +249,7 @@ export function ImportPlayersCsvDialog({
         setBusyLabel("");
       }
     },
-    [aiAnalyze, clubId, teamId, tplParse, t],
+    [aiAnalyze, clubId, teamId, t],
   );
 
   const runPreview = async () => {
@@ -394,62 +382,12 @@ export function ImportPlayersCsvDialog({
         {analysis && !preview && !result && (
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm flex-wrap">
-              {iaUsed ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-xs">
-                  <Sparkles className="h-3 w-3" /> IA
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs">
-                  {t("players.import.templateBadge", {
-                    defaultValue: "Modèle Clubero",
-                  })}
-                </span>
-              )}
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-xs">
+                <Sparkles className="h-3 w-3" /> IA
+              </span>
               <span className="text-muted-foreground truncate flex-1">{fileName}</span>
-              {!iaUsed && headers.length > 0 && rawRows.length > 0 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={loading}
-                  onClick={async () => {
-                    setLoading(true);
-                    setBusyLabel(
-                      t("players.import.ai", {
-                        defaultValue: "Analyse IA en cours...",
-                      }),
-                    );
-                    try {
-                      const res = await aiAnalyze({
-                        data: {
-                          clubId,
-                          teamId,
-                          type: "players",
-                          headers,
-                          rawRows,
-                        },
-                      });
-                      setAnalysis(res);
-                      setIaUsed(true);
-                      setPreview(null);
-                      setOverrides({});
-                    } catch (err) {
-                      toast.error(
-                        err instanceof Error ? err.message : String(err),
-                      );
-                    } finally {
-                      setLoading(false);
-                      setBusyLabel("");
-                    }
-                  }}
-                >
-                  <Sparkles className="h-3.5 w-3.5 mr-1" />
-                  {t("players.import.retryWithAI", {
-                    defaultValue: "Re-analyser avec l'IA",
-                  })}
-                </Button>
-              )}
             </div>
+
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="rounded-lg border p-3">
                 <div className="text-2xl font-semibold">{analysis.summary.total}</div>
