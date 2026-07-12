@@ -760,9 +760,11 @@ export const runImport = createServerFn({ method: "POST" })
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
         }
-        imported = playersCreated;
+        imported = playersCreated + playersUpdated + playersRestored;
         summary.teams_created = teamsCreated;
         summary.players_created = playersCreated;
+        summary.players_updated = playersUpdated;
+        summary.players_restored = playersRestored;
         summary.parents_created = parentsCreated;
         summary.invitations_sent = invitationsSent;
       } else if (data.type === "coaches") {
