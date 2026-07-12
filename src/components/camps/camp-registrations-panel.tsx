@@ -346,15 +346,20 @@ function RegistrationRow({
   t,
   onExtend,
   extending,
+  onOpen,
 }: {
   row: CampRegistrationRow;
   t: (k: string, o?: any) => string;
   onExtend: () => void;
   extending: boolean;
+  onOpen: () => void;
 }) {
   const age = ageFromBirthDate(row.birth_date);
   return (
-    <tr className="border-t border-border/60 align-top">
+    <tr
+      className="border-t border-border/60 align-top cursor-pointer hover:bg-muted/40"
+      onClick={onOpen}
+    >
       <td className="px-3 py-3">
         <div className="font-medium">
           {row.participant_first_name} {row.participant_last_name}
