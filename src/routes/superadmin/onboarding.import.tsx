@@ -596,7 +596,7 @@ function ImportPage() {
               <div className="text-sm">Glissez le fichier ou cliquez (xlsx/xls/csv, max 5 Mo)</div>
               <input
                 type="file"
-                accept=".xlsx,.xls,.csv"
+                accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/comma-separated-values,text/plain,*/*"
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
