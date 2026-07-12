@@ -20,6 +20,9 @@ jobs:
       # --- Checks rapides d'abord (échec en quelques secondes) ---
       - name: Check server function guards
         run: bun run check:guards
+      - name: Check formatting (Prettier)
+        continue-on-error: true
+        run: bun run format:check
       - name: Check i18n parity
         run: bun run check:i18n
       - name: Lint
