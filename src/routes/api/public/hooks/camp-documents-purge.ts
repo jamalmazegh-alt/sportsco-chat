@@ -33,43 +33,27 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const diag = url.searchParams.get("diag") === "1";
         const provided =
           request.headers.get("x-cron-secret") ??
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
           "";
         const expected = process.env.CAMP_PURGE_CRON_SECRET ?? "";
-        const hasExpected = expected.length > 0;
-        const hasProvided = provided.length > 0;
-        const compared = hasExpected && hasProvided;
+        const compared = expected.length > 0 && provided.length > 0;
         const equal = compared && timingSafeEqualStr(provided, expected);
 
-        // Diagnostic sans jamais divulguer la valeur du secret.
+        // Diagnostic serveur uniquement — ne divulgue jamais la valeur.
         console.log("[camp-purge] auth", {
-          expectedType: typeof process.env.CAMP_PURGE_CRON_SECRET,
           expectedLen: expected.length,
-          providedType: typeof request.headers.get("x-cron-secret"),
           providedLen: provided.length,
           compared,
           equal,
         });
 
         if (!equal) {
-          if (diag) {
-            return Response.json(
-              {
-                ok: false,
-                reason: "forbidden",
-                expectedLen: expected.length,
-                providedLen: provided.length,
-                compared,
-              },
-              { status: 403 },
-            );
-          }
           return new Response("Forbidden", { status: 403 });
         }
+
+
 
 
 
