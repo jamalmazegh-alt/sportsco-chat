@@ -249,7 +249,7 @@ export function ImportPlayersCsvDialog({
         setBusyLabel("");
       }
     },
-    [aiAnalyze, clubId, teamId, tplParse, t],
+    [aiAnalyze, clubId, teamId, t],
   );
 
   const runPreview = async () => {
