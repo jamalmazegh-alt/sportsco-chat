@@ -660,7 +660,7 @@ function StatusActions({
   const btn = (
     target: RegistrationStatus,
     label: string,
-    variant: "default" | "outline" | "destructive" = "outline",
+    variant: "default" | "outline" | "destructive" | "ghost" = "outline",
     extra?: React.ReactNode,
     disabled?: boolean,
   ) => (
