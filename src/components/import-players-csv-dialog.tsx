@@ -122,7 +122,7 @@ export function ImportPlayersCsvDialog({
 }) {
   const { t } = useTranslation();
   const aiAnalyze = useServerFn(analyzeFileWithAI);
-  const tplParse = useServerFn(parseTemplateFn);
+  
   const doPreview = useServerFn(previewPlayersImport);
   const doImport = useServerFn(runImport);
 
