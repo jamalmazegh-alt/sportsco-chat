@@ -470,6 +470,7 @@ export const runImport = createServerFn({ method: "POST" })
     z
       .object({
         clubId: z.string().uuid(),
+        teamId: z.string().uuid().optional(),
         type: z.enum(["players", "coaches", "planning"]),
         rows: importRowsSchema,
         sendInvitations: z.boolean().default(false),
@@ -479,7 +480,22 @@ export const runImport = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
+    await assertImportAccess(context.supabase, context.userId, data.clubId);
+
+    // If a teamId is provided, verify it belongs to the club (defense in depth).
+    let fixedTeam:
+      | { id: string; name: string; sport: string | null; age_group: string | null }
+      | null = null;
+    if (data.teamId) {
+      const { data: t } = await supabaseAdmin
+        .from("teams")
+        .select("id, club_id, name, sport, age_group")
+        .eq("id", data.teamId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (!t || t.club_id !== data.clubId) throw new Response("Forbidden", { status: 403 });
+      fixedTeam = { id: t.id, name: t.name, sport: t.sport, age_group: t.age_group };
+    }
 
     // Hard limits
     const maxRows = data.type === "planning" ? PLANNING_MAX_ROWS : ENTITY_MAX_ROWS;
