@@ -1,12 +1,20 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, CalendarDays, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
+import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/availability")({
@@ -60,10 +68,14 @@ function ymd(d: Date) {
 function TeamAvailabilityCalendar() {
   const { teamId } = Route.useParams();
   const { t, i18n } = useTranslation();
+  const qc = useQueryClient();
   const [cursor, setCursor] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
+  const [absenceOpen, setAbsenceOpen] = useState(false);
+  const [absencePlayerId, setAbsencePlayerId] = useState<string>("");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const monthStart = cursor;
   const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
@@ -180,8 +192,69 @@ function TeamAvailabilityCalendar() {
           >
             {t("common.today", { defaultValue: "Aujourd'hui" })}
           </Button>
+          <Button
+            size="sm"
+            className="ml-2"
+            disabled={players.length === 0}
+            onClick={() => {
+              setAbsencePlayerId("");
+              setPickerOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
         </div>
       </div>
+
+      {/* Player picker → drawer */}
+      {pickerOpen && (
+        <Card className="border-primary/40">
+          <CardContent className="p-3 flex items-end gap-2">
+            <div className="flex-1 space-y-1.5">
+              <label className="text-xs font-medium">
+                {t("availability.calendar.pickPlayer", { defaultValue: "Joueur concerné" })}
+              </label>
+              <Select value={absencePlayerId} onValueChange={setAbsencePlayerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  {players.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.first_name} {p.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              size="sm"
+              disabled={!absencePlayerId}
+              onClick={() => {
+                setPickerOpen(false);
+                setAbsenceOpen(true);
+              }}
+            >
+              {t("common.continue", { defaultValue: "Continuer" })}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setPickerOpen(false)}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {absencePlayerId && (
+        <DeclareAbsenceDrawer
+          open={absenceOpen}
+          onOpenChange={setAbsenceOpen}
+          playerId={absencePlayerId}
+          onCreated={() => {
+            qc.invalidateQueries({ queryKey: ["team-availability-month", teamId] });
+          }}
+        />
+      )}
 
       <Card>
         <CardHeader className="pb-2">
