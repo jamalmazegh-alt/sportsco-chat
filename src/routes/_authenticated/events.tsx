@@ -469,15 +469,8 @@ function EventsPage() {
             if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
             if (!myC) return null;
-            const s = myC.status;
-            const bandStatus: "pending" | "present" | "absent" | null =
-              s === "pending" || s === "present" || s === "absent" ? s : null;
-            if (!bandStatus) return null;
             return (
-              <ConvocationBand
-                status={bandStatus}
-                title={`${bandStatus} · ${myC.playerName}`}
-              />
+              <ConvocationBand title={`Convoqué · ${myC.playerName}`} />
             );
           })()}
         </Link>
