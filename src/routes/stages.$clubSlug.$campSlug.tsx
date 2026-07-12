@@ -29,12 +29,18 @@ export const Route = createFileRoute("/stages/$clubSlug/$campSlug")({
       publicCampQuery(params.clubSlug, params.campSlug),
     );
     if (!data) throw notFound();
-    return null;
+    return data;
   },
-  head: ({ loaderData: _l, params }) => {
+  head: ({ loaderData, params }) => {
     const url = `${SITE_URL}/stages/${params.clubSlug}/${params.campSlug}`;
-    const title = "Stage — Clubero";
-    const description = "Découvrez ce stage sportif et inscrivez votre enfant en ligne.";
+    const camp = loaderData?.camp;
+    const club = loaderData?.club;
+    const title = camp && club
+      ? `${camp.title} — ${club.name}`
+      : "Stage — Clubero";
+    const rawDesc = camp?.description?.trim() || "Découvrez ce stage sportif et inscrivez votre enfant en ligne.";
+    const description = rawDesc.length > 160 ? rawDesc.slice(0, 157) + "…" : rawDesc;
+    const ogImage = camp?.cover_image_url || DEFAULT_OG_IMAGE;
     return {
       meta: [
         { title },
@@ -43,8 +49,11 @@ export const Route = createFileRoute("/stages/$clubSlug/$campSlug")({
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
-        { property: "og:image", content: DEFAULT_OG_IMAGE },
+        { property: "og:image", content: ogImage },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
         { rel: "canonical", href: url } as any,
       ],
     };
