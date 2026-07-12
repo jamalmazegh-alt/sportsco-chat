@@ -201,14 +201,8 @@ function HomePage() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
 
-  const playerHomeEvents = useMemo(() => {
-    const byId = new Map<string, any>();
-    for (const e of (upcoming ?? []) as any[]) byId.set(e.id, e);
-    for (const e of (myConvocs ?? []) as any[]) byId.set(e.id, e);
-    return Array.from(byId.values())
-      .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
-      .slice(0, 3);
-  }, [upcoming, myConvocs]);
+
+
 
   const paymentSummary = useMemo(() => {
     const obligations = paymentData?.obligations ?? [];
