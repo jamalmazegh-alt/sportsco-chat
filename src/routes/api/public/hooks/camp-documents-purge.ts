@@ -38,9 +38,24 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
           "";
         const expected = process.env.CAMP_PURGE_CRON_SECRET ?? "";
-        if (!expected || !provided || !timingSafeEqualStr(provided, expected)) {
+        const compared = expected.length > 0 && provided.length > 0;
+        const equal = compared && timingSafeEqualStr(provided, expected);
+
+        // Diagnostic serveur uniquement — ne divulgue jamais la valeur.
+        console.log("[camp-purge] auth", {
+          expectedLen: expected.length,
+          providedLen: provided.length,
+          compared,
+          equal,
+        });
+
+        if (!equal) {
           return new Response("Forbidden", { status: 403 });
         }
+
+
+
+
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
