@@ -605,8 +605,8 @@ function PlayerProfile() {
         )}
       </div>
 
-      {/* Quick action: declare absence for self/child */}
-      {!isCoach && (isSelf || isParentOfThisPlayer) && (
+      {/* Quick action: declare absence (coach, self, parent) */}
+      {(isCoach || isSelf || isParentOfThisPlayer) && (
         <>
           <Button variant="outline" className="w-full h-11" onClick={() => setAbsenceOpen(true)}>
             <Palmtree className="h-4 w-4" />
