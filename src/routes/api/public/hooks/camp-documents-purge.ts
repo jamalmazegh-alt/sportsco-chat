@@ -63,7 +63,7 @@ export const Route = createFileRoute("/api/public/hooks/camp-documents-purge")({
 
         const results: CampPurgeResult[] = [];
 
-        for (const camp of dueCamps) {
+        for (const camp of (dueCamps ?? []) as Array<{ id: string; end_date: string; document_retention_months: number }>) {
           try {
             // 2. Récupère les registrations du stage.
             const { data: regs, error: regErr } = await supabaseAdmin
