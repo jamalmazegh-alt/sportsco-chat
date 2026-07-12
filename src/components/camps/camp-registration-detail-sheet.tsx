@@ -49,11 +49,13 @@ import {
 import {
   getCampRegistrationDetail,
   setCampRegistrationStatus,
+  setCampRegistrationPayment,
   reviewCampRegistrationDocument,
   getRegistrationDocumentSignedUrl,
   type RegistrationDetail,
   type RegistrationDocumentDetail,
   type RegistrationStatus,
+  type PaymentStatus,
 } from "@/lib/camp-registrations.functions";
 
 interface Props {
@@ -69,6 +71,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 
   const detailFn = useServerFn(getCampRegistrationDetail);
   const setStatusFn = useServerFn(setCampRegistrationStatus);
+  const setPaymentFn = useServerFn(setCampRegistrationPayment);
   const reviewDocFn = useServerFn(reviewCampRegistrationDocument);
   const signedUrlFn = useServerFn(getRegistrationDocumentSignedUrl);
 
@@ -162,6 +165,18 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
       }
       toast.error(e.message);
     },
+  });
+
+  const paymentMut = useMutation({
+    mutationFn: (input: { status: PaymentStatus; amount?: number }) =>
+      setPaymentFn({ data: { registrationId: registrationId!, ...input } }),
+    onSuccess: () => {
+      toast.success(
+        t("registrations.detail.paymentUpdated", { defaultValue: "Paiement mis à jour" }),
+      );
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   async function openDoc(doc: RegistrationDocumentDetail) {
