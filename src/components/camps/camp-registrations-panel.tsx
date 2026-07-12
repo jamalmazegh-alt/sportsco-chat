@@ -56,7 +56,12 @@ const PAYMENT_STATUSES: PaymentStatus[] = [
   "partial",
   "refunded",
 ];
-const DOSSIER_STATUSES: DossierStatus[] = ["complete", "payment_missing", "documents_missing"];
+const DOSSIER_STATUSES: DossierStatus[] = [
+  "complete",
+  "payment_missing",
+  "documents_pending",
+  "documents_missing",
+];
 
 function ageFromBirthDate(iso: string): number | null {
   const d = new Date(iso);
