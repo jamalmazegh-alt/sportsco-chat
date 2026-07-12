@@ -261,6 +261,32 @@ function CampEditPage() {
         </div>
       </div>
 
+      <Tabs defaultValue="edit" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="edit">
+            {t("tabs.edit", { defaultValue: "Édition" })}
+          </TabsTrigger>
+          <TabsTrigger value="registrations" disabled={camp.status === "draft"}>
+            {t("tabs.registrations", { defaultValue: "Inscriptions" })}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="registrations" className="space-y-6">
+          {camp.status === "draft" ? (
+            <p className="text-sm text-muted-foreground">
+              {t("registrations.draftHint", {
+                defaultValue:
+                  "Les inscriptions apparaîtront ici après publication du stage.",
+              })}
+            </p>
+          ) : (
+            <CampRegistrationsPanel campId={campId} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="edit" className="space-y-6">
+
+
       {camp.status === "published" && (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
           <div className="font-medium">
