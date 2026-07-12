@@ -23,7 +23,7 @@ const publicCampQuery = (clubSlug: string, campSlug: string) =>
     staleTime: 60_000,
   });
 
-export const Route = createFileRoute("/stages/$clubSlug/$campSlug")({
+export const Route = createFileRoute("/stages/$clubSlug/$campSlug/")({
   loader: async ({ context, params }) => {
     const data = await context.queryClient.ensureQueryData(
       publicCampQuery(params.clubSlug, params.campSlug),
