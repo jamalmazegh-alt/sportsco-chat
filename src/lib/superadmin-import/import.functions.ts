@@ -594,14 +594,18 @@ export const runImport = createServerFn({ method: "POST" })
               throw new Error("date de naissance requise");
             }
 
-            // Resolve team: fixed team (coach mode) or per-row.
+            // Resolve team: fixed team (coach mode), caller override, or per-row lookup.
             let teamId: string;
             if (fixedTeam) {
               teamId = fixedTeam.id;
             } else {
               const teamKey = `${r.equipe}|${r.sport}|${r.categorie}`;
+              const override = data.teamOverrides?.[teamKey];
               const cached = teamCache.get(teamKey);
-              if (cached) {
+              if (override) {
+                teamId = override;
+                teamCache.set(teamKey, teamId);
+              } else if (cached) {
                 teamId = cached;
               } else {
                 const t = await findOrCreateTeam(
@@ -636,16 +640,68 @@ export const runImport = createServerFn({ method: "POST" })
             }
 
             if (existing) {
-              // Non-destructive patch: only fill blanks.
+              // Non-destructive patch: blank-fill always; overwrite only if caller
+              // authorized that specific field via fieldOverrides[rowIndex].
+              const allowed = new Set(data.fieldOverrides?.[String(i)] ?? []);
+              const specs: Array<{
+                col: (typeof PLAYER_OVERWRITABLE_FIELDS)[number];
+                incoming: string | number | null;
+                current: string | number | null;
+                allowBlankFill: boolean;
+              }> = [
+                {
+                  col: "first_name",
+                  incoming: firstName || null,
+                  current: existing.first_name,
+                  allowBlankFill: false,
+                },
+                {
+                  col: "last_name",
+                  incoming: lastName || null,
+                  current: existing.last_name,
+                  allowBlankFill: false,
+                },
+                {
+                  col: "jersey_number",
+                  incoming: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  current: existing.jersey_number,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "license_number",
+                  incoming: r.numero_licence || null,
+                  current: existing.license_number,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "preferred_position",
+                  incoming: r.poste || null,
+                  current: existing.preferred_position,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "email",
+                  incoming: r.email_contact ? r.email_contact.toLowerCase() : null,
+                  current: existing.email,
+                  allowBlankFill: true,
+                },
+                {
+                  col: "phone",
+                  incoming: r.telephone_joueur || null,
+                  current: existing.phone,
+                  allowBlankFill: true,
+                },
+              ];
               const patch: Record<string, unknown> = {};
-              if (existing.jersey_number == null && r.numero_maillot)
-                patch.jersey_number = parseInt(r.numero_maillot, 10);
-              if (!existing.license_number && r.numero_licence)
-                patch.license_number = r.numero_licence;
-              if (!existing.preferred_position && r.poste) patch.preferred_position = r.poste;
-              if (!existing.email && r.email_contact)
-                patch.email = r.email_contact.toLowerCase();
-              if (!existing.phone && r.telephone_joueur) patch.phone = r.telephone_joueur;
+              for (const s of specs) {
+                if (s.incoming == null || s.incoming === "") continue;
+                const currentEmpty = s.current == null || s.current === "";
+                if (currentEmpty && s.allowBlankFill) {
+                  patch[s.col] = s.incoming;
+                } else if (allowed.has(s.col) && s.incoming !== s.current) {
+                  patch[s.col] = s.incoming;
+                }
+              }
               if (Object.keys(patch).length > 0) {
                 const { error: upErr } = await supabaseAdmin
                   .from("players")
