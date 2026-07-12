@@ -436,6 +436,16 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     const messageId = inserted.id;
 
+    // Audit
+    await logSupportAudit({
+      ticket_id: data.ticket_id,
+      actor_user_id: userId,
+      actor_role: senderRole as "user" | "staff",
+      action: data.internal_note ? "internal_note" : "reply",
+      to_value: data.body.slice(0, 200),
+      meta: { message_id: messageId },
+    });
+
     if (!data.internal_note && senderRole === "staff") {
       // Notify ticket owner
       await supabaseAdmin.from("notifications").insert({
@@ -460,6 +470,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-reply",
           recipientEmail: email,
+          fromName: SUPPORT_FROM_NAME,
           templateData: {
             name: profile?.first_name ?? profile?.full_name ?? null,
             subject: ticket.subject,
@@ -473,6 +484,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
         }).catch((e) => console.error("[support] reply email failed", e));
       }
     }
+
 
     if (!data.internal_note && senderRole === "user") {
       // Internal notification to hello@clubero.app on user reply
