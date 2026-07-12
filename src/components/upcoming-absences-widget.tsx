@@ -231,17 +231,6 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             </ul>
           )}
 
-          {canDeclare && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full border-[1.5px] border-border hover:border-[#2d9d5f] hover:bg-[#f0f9f3] hover:text-foreground font-bold rounded-[10px]"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <Plus className="h-4 w-4" strokeWidth={2.4} />
-              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-            </Button>
-          )}
 
           {teamId && (
             <Link
