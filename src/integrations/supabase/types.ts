@@ -548,6 +548,44 @@ export type Database = {
           },
         ]
       }
+      club_camp_document_purge_log: {
+        Row: {
+          camp_id: string | null
+          details: Json | null
+          error: string | null
+          files_deleted: number
+          id: string
+          rows_deleted: number
+          run_at: string
+        }
+        Insert: {
+          camp_id?: string | null
+          details?: Json | null
+          error?: string | null
+          files_deleted?: number
+          id?: string
+          rows_deleted?: number
+          run_at?: string
+        }
+        Update: {
+          camp_id?: string | null
+          details?: Json | null
+          error?: string | null
+          files_deleted?: number
+          id?: string
+          rows_deleted?: number
+          run_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_camp_document_purge_log_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "club_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_camp_documents: {
         Row: {
           camp_id: string
