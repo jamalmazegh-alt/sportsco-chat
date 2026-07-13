@@ -49,8 +49,8 @@ export const instagram = {
   },
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthResult> {
-    const appId = process.env.INSTAGRAM_APP_ID!;
-    const appSecret = process.env.INSTAGRAM_APP_SECRET!;
+    const appId = process.env.FACEBOOK_APP_ID!;
+    const appSecret = process.env.FACEBOOK_APP_SECRET!;
     // 1. short-lived user token
     const tokRes = await fetch(
       `${IG_GRAPH}/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&redirect_uri=${encodeURIComponent(redirectUri)}&code=${code}`,
