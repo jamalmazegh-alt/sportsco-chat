@@ -83,6 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: COMPANY_LEGAL.website,
           logo: `${COMPANY_LEGAL.website}/clubero-logo.png`,
           email: COMPANY_LEGAL.email,
+          telephone: COMPANY_LEGAL.phone,
           foundingDate: COMPANY_LEGAL.incorporationDate,
           address: {
             "@type": "PostalAddress",

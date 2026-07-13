@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { COMPANY_LEGAL } from "@/config/company";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,6 +118,20 @@ function ContactPage() {
                   className="mt-1 block text-sm text-muted-foreground hover:text-foreground"
                 >
                   hello@clubero.app
+                </a>
+              </div>
+              <div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
+                  <Phone className="h-5 w-5" />
+                </div>
+                <h2 className="mt-4 font-display text-base font-semibold">
+                  {t("contact.phoneLabel")}
+                </h2>
+                <a
+                  href={`tel:${COMPANY_LEGAL.phone.replace(/\s/g, "")}`}
+                  className="mt-1 block text-sm text-muted-foreground hover:text-foreground"
+                >
+                  {COMPANY_LEGAL.phone}
                 </a>
               </div>
               <div>
