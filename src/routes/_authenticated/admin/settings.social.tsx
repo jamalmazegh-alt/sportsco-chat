@@ -58,12 +58,16 @@ function SocialSettings() {
 
   useEffect(() => {
     if (search.status === "connected") {
-      toast.success(`${search.network} connecté · synchronisation en cours`);
+      toast.success(t("admin.socialConnectSuccess", { network: search.network }));
       refetch();
     } else if (search.status === "error") {
-      toast.error(`Échec connexion: ${search.reason ?? "inconnue"}`);
+      toast.error(
+        t("admin.socialConnectError", {
+          reason: search.reason ?? t("admin.socialErrorUnknown"),
+        }),
+      );
     }
-  }, [search.status, search.network, search.reason, refetch]);
+  }, [search.status, search.network, search.reason, refetch, t]);
 
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
@@ -76,21 +80,21 @@ function SocialSettings() {
       });
       window.location.href = url;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
       setBusy(null);
     }
   }
 
   async function doDisconnect(network: Network) {
     if (!activeClubId) return;
-    if (!confirm(`Déconnecter ${META[network].label} ? Les posts importés seront masqués.`)) return;
+    if (!confirm(t("admin.socialDisconnectConfirm", { network: META[network].label }))) return;
     setBusy(network);
     try {
       await disconnect({ data: { clubId: activeClubId, network } });
-      toast.success(`${META[network].label} déconnecté`);
+      toast.success(t("admin.socialDisconnectSuccess", { network: META[network].label }));
       refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
     } finally {
       setBusy(null);
     }
@@ -101,14 +105,15 @@ function SocialSettings() {
     setBusy(network);
     try {
       const r = await syncNow({ data: { clubId: activeClubId, network } });
-      toast.success(`${r.imported} importés · ${r.skipped} déjà présents`);
+      toast.success(t("admin.socialSyncResult", { imported: r.imported, skipped: r.skipped }));
       refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
     } finally {
       setBusy(null);
     }
   }
+
 
   if (isLoading) {
     return (
@@ -146,14 +151,15 @@ function SocialSettings() {
                   {conn ? (
                     <>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                        {conn.account_name ?? "—"} · Connecté
+                        {conn.account_name ?? "—"} · {t("admin.socialConnected")}
                       </p>
                       {conn.last_synced_at && (
                         <p className="text-[11px] text-muted-foreground mt-0.5">
-                          Dernière synchro{" "}
-                          {formatDistanceToNow(new Date(conn.last_synced_at), {
-                            addSuffix: true,
-                            locale: dateLocale(),
+                          {t("admin.socialLastSync", {
+                            when: formatDistanceToNow(new Date(conn.last_synced_at), {
+                              addSuffix: true,
+                              locale: dateLocale(),
+                            }),
                           })}
                         </p>
                       )}
@@ -164,7 +170,7 @@ function SocialSettings() {
                       )}
                     </>
                   ) : (
-                    <p className="text-xs text-muted-foreground mt-0.5">Non connecté</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("admin.socialNotConnected")}</p>
                   )}
                 </div>
               </div>
@@ -183,7 +189,7 @@ function SocialSettings() {
                       ) : (
                         <>
                           <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
-                          Synchroniser
+                          {t("admin.socialSync")}
                         </>
                       )}
                     </Button>
@@ -194,7 +200,7 @@ function SocialSettings() {
                       disabled={isBusy}
                     >
                       <Unplug className="h-3.5 w-3.5 mr-1.5" />
-                      Déconnecter
+                      {t("admin.socialDisconnect")}
                     </Button>
                   </>
                 ) : (
@@ -209,7 +215,7 @@ function SocialSettings() {
                     ) : (
                       <>
                         <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                        Connecter
+                        {t("admin.socialConnect")}
                       </>
                     )}
                   </Button>
@@ -221,8 +227,7 @@ function SocialSettings() {
       </ul>
 
       <p className="text-xs text-muted-foreground">
-        La synchronisation automatique tourne toutes les heures. Les nouvelles publications
-        apparaissent directement sur le mur du club, mêlées chronologiquement aux annonces internes.
+        {t("admin.socialAutoNote")}
       </p>
     </div>
   );
