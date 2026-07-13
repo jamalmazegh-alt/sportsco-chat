@@ -66,6 +66,16 @@ function HomePage() {
   const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   const listMyObligationsFn = useServerFn(listMyObligations);
+  const getSponsorsFn = useServerFn(getActiveSponsorsForHome);
+
+  const { data: sponsorsForHome } = useQuery({
+    queryKey: ["sponsors-home", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: () => getSponsorsFn({ data: { clubId: activeClubId! } }),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const hasSponsor = (sponsorsForHome?.length ?? 0) > 0;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
