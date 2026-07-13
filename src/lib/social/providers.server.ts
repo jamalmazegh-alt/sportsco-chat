@@ -29,6 +29,7 @@ function truncate(s: string | null | undefined): string {
   if (!s) return "";
   return s.length > MAX_BODY ? s.slice(0, MAX_BODY - 1) + "…" : s;
 }
+const IG_GRAPH = "https://graph.facebook.com/v19.0";
 
 // ---------- INSTAGRAM (API with Instagram Login, direct) ----------
 export const instagram = {
