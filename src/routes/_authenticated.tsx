@@ -119,7 +119,7 @@ function AuthLayout() {
     <ConsentGate>
       <div className="min-h-screen bg-background pb-[164px]">
         <div className="mx-auto max-w-xl">
-          <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
+          <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
             <div className="relative flex items-center justify-center px-3 py-3">
               <div className="absolute left-2 top-1/2 -translate-y-1/2">
                 <ClubSelector />
