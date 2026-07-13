@@ -278,15 +278,18 @@ const ResponseInput = z.object({
 export const dispatchConvocationResponsePush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ResponseInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { fanoutConvocationResponse, fanoutConvocationComplete } =
       await import("@/lib/push-fanout.server");
-    // No excludeUserId: targets are coaches only; even when a coach responds
-    // on behalf of a player, the coach still wants to see the confirmation.
-    const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId);
+    // Exclude the caller from the coach fanout: when a coach/admin responds on
+    // behalf of a player (or the player themselves does it), they already know
+    // — no need to push them back their own action.
+    const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId, {
+      excludeUserId: context.userId,
+    });
     let complete = 0;
     if (eventId) {
-      const r = await fanoutConvocationComplete(eventId);
+      const r = await fanoutConvocationComplete(eventId, { excludeUserId: context.userId });
       complete = r.dispatched;
     }
     return { dispatched, complete };
