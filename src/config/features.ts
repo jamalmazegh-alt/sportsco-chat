@@ -34,6 +34,14 @@ export const V2_FLAGS = {
 
   /** Collectes et cagnottes uniquement. */
   fundraising_v2: false,
+
+  /**
+   * Connexion X / Twitter dans le mur du club. Masquée car l'API X n'a
+   * plus de tier gratuit (lecture payante à l'usage depuis 2026).
+   * Le code du provider Twitter (OAuth, sync) reste en place ; flip à
+   * true pour réactiver quand le modèle éco le justifie.
+   */
+  social_twitter: false,
 } as const;
 
 export type V2Flag = keyof typeof V2_FLAGS;
