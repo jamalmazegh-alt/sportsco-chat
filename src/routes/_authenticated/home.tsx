@@ -26,6 +26,7 @@ import { EventTypeBadge } from "@/lib/event-type-icon";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UrgencyCenter } from "@/components/urgency-center";
 import { SponsorBanner } from "@/components/sponsors/sponsor-banner";
+import { getActiveSponsorsForHome } from "@/lib/sponsors.functions";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -65,6 +66,16 @@ function HomePage() {
   const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   const listMyObligationsFn = useServerFn(listMyObligations);
+  const getSponsorsFn = useServerFn(getActiveSponsorsForHome);
+
+  const { data: sponsorsForHome } = useQuery({
+    queryKey: ["sponsors-home", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: () => getSponsorsFn({ data: { clubId: activeClubId! } }),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const hasSponsor = (sponsorsForHome?.length ?? 0) > 0;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
@@ -223,7 +234,7 @@ function HomePage() {
   }
 
   return (
-    <div className="px-5 pt-6 space-y-6 pb-4">
+    <div className={cn("px-5 space-y-6 pb-4", hasSponsor ? "pt-6" : "pt-10")}>
       {activeClubId && <SponsorBanner clubId={activeClubId} />}
       {/* Club hero */}
       <header className="relative overflow-hidden rounded-[20px] border-[1.5px] border-border bg-card p-5 shadow-sm">
