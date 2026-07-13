@@ -39,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings/social")({
 });
 
 function SocialSettings() {
+  const { t } = i18nInstance;
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const search = useSearch({ from: "/_authenticated/admin/settings/social" });
