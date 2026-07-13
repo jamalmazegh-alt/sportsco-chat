@@ -103,6 +103,7 @@ export async function fanoutConvocationResponse(
 /* ------------------------------------------------------------------ */
 export async function fanoutConvocationComplete(
   eventId: string,
+  opts: { excludeUserId?: string | null } = {},
 ): Promise<{ dispatched: number; complete: boolean }> {
   const { data: convs } = await supabaseAdmin
     .from("convocations")
@@ -155,7 +156,9 @@ export async function fanoutConvocationComplete(
   const targets = new Set<string>();
   for (const c of coaches ?? []) {
     const uid = (c as any).user_id as string | null;
-    if (uid) targets.add(uid);
+    if (!uid) continue;
+    if (opts.excludeUserId && uid === opts.excludeUserId) continue;
+    targets.add(uid);
   }
   let dispatched = 0;
   await Promise.all(
