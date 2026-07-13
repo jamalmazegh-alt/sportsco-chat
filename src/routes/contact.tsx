@@ -128,7 +128,9 @@ function ContactPage() {
                   {t("contact.phoneLabel")}
                 </h2>
                 <a
-                  href={`tel:${COMPANY_LEGAL.phone.replace(/\s/g, "")}`}
+                  href={`https://wa.me/${COMPANY_LEGAL.phone.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="mt-1 block text-sm text-muted-foreground hover:text-foreground"
                 >
                   {COMPANY_LEGAL.phone}
