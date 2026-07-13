@@ -29,85 +29,77 @@ function truncate(s: string | null | undefined): string {
   if (!s) return "";
   return s.length > MAX_BODY ? s.slice(0, MAX_BODY - 1) + "…" : s;
 }
-
-// ---------- INSTAGRAM (Graph API, Business/Creator account) ----------
 const IG_GRAPH = "https://graph.facebook.com/v19.0";
 
+// ---------- INSTAGRAM (API with Instagram Login, direct) ----------
 export const instagram = {
   getAuthUrl(state: string, redirectUri: string): string {
-    const appId = process.env.FACEBOOK_APP_ID;
-    if (!appId) throw new Error("FACEBOOK_APP_ID missing");
-    const configId = process.env.INSTAGRAM_LOGIN_CONFIG_ID;
-    if (!configId) throw new Error("INSTAGRAM_LOGIN_CONFIG_ID missing");
-    const url = new URL("https://www.facebook.com/v19.0/dialog/oauth");
+    const appId = process.env.INSTAGRAM_APP_ID;
+    if (!appId) throw new Error("INSTAGRAM_APP_ID missing");
+    const url = new URL("https://www.instagram.com/oauth/authorize");
     url.searchParams.set("client_id", appId);
     url.searchParams.set("redirect_uri", redirectUri);
-    url.searchParams.set("state", state);
-    url.searchParams.set("config_id", configId);
     url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", "instagram_business_basic");
+    url.searchParams.set("state", state);
     return url.toString();
   },
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthResult> {
-    const appId = process.env.FACEBOOK_APP_ID!;
-    const appSecret = process.env.FACEBOOK_APP_SECRET!;
-    // 1. short-lived user token
-    const tokRes = await fetch(
-      `${IG_GRAPH}/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&redirect_uri=${encodeURIComponent(redirectUri)}&code=${code}`,
-    );
-    if (!tokRes.ok) throw new Error(`IG token exchange failed: ${await tokRes.text()}`);
-    const tok = (await tokRes.json()) as { access_token: string };
+    const appId = process.env.INSTAGRAM_APP_ID!;
+    const appSecret = process.env.INSTAGRAM_APP_SECRET!;
 
-    // 2. long-lived user token (~60 days)
+    // 1. short-lived token
+    const form = new URLSearchParams({
+      client_id: appId,
+      client_secret: appSecret,
+      grant_type: "authorization_code",
+      redirect_uri: redirectUri,
+      code,
+    });
+    const tokRes = await fetch("https://api.instagram.com/oauth/access_token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form,
+    });
+    if (!tokRes.ok) throw new Error(`IG token exchange failed: ${await tokRes.text()}`);
+    const tok = (await tokRes.json()) as { access_token: string; user_id: number };
+
+    // 2. long-lived token (~60 days)
     const llRes = await fetch(
-      `${IG_GRAPH}/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${tok.access_token}`,
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${tok.access_token}`,
     );
     if (!llRes.ok) throw new Error(`IG long-lived failed: ${await llRes.text()}`);
     const ll = (await llRes.json()) as { access_token: string; expires_in?: number };
 
-    // 3. find the IG business account through the user's pages
-    const pagesRes = await fetch(
-      `${IG_GRAPH}/me/accounts?fields=instagram_business_account,name,id&access_token=${ll.access_token}`,
+    // 3. account info
+    const meRes = await fetch(
+      `https://graph.instagram.com/me?fields=user_id,username&access_token=${ll.access_token}`,
     );
-    const pages = (await pagesRes.json()) as {
-      data?: Array<{ id: string; name: string; instagram_business_account?: { id: string } }>;
-    };
-    const page = pages.data?.find((p) => p.instagram_business_account);
-    if (!page?.instagram_business_account) {
-      throw new Error("Aucun compte Instagram Business lié à une page Facebook trouvé.");
-    }
-
-    const igRes = await fetch(
-      `${IG_GRAPH}/${page.instagram_business_account.id}?fields=username&access_token=${ll.access_token}`,
-    );
-    const ig = (await igRes.json()) as { username?: string };
+    const me = (await meRes.json()) as { user_id?: string; username?: string; id?: string };
 
     return {
       accessToken: ll.access_token,
       refreshToken: null,
       expiresAt: ll.expires_in ? new Date(Date.now() + ll.expires_in * 1000).toISOString() : null,
-      accountId: page.instagram_business_account.id,
-      accountName: ig.username ? `@${ig.username}` : page.name,
+      accountId: String(me.user_id ?? me.id ?? tok.user_id),
+      accountName: me.username ? `@${me.username}` : null,
     };
   },
 
-  async fetchRecentPosts(
-    accessToken: string,
-    accountId: string,
-    _sinceExternalId?: string,
-  ): Promise<ExternalPost[]> {
-    const url = `${IG_GRAPH}/${accountId}/media?fields=id,caption,media_url,thumbnail_url,permalink,timestamp,media_type&limit=30&access_token=${accessToken}`;
+  async fetchRecentPosts(accessToken: string, _accountId: string): Promise<ExternalPost[]> {
+    const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=30&access_token=${accessToken}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`IG media fetch failed: ${await res.text()}`);
     const json = (await res.json()) as {
       data?: Array<{
         id: string;
         caption?: string;
+        media_type?: string;
         media_url?: string;
         thumbnail_url?: string;
         permalink: string;
         timestamp: string;
-        media_type?: string;
       }>;
     };
     return (json.data ?? []).map((m) => ({
@@ -121,7 +113,7 @@ export const instagram = {
   },
 
   async refresh(): Promise<null> {
-    // IG long-lived tokens don't have a refresh token; renew by re-prompting.
+    // Long-lived IG tokens (~60 days) are re-obtained by re-prompting for now.
     return null;
   },
 };

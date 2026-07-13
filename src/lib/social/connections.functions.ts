@@ -70,7 +70,7 @@ export const startSocialConnect = createServerFn({ method: "POST" })
         network: data.network,
         nonce,
       });
-      const provider = getProvider(data.network) as {
+      const provider = getProvider(data.network) as unknown as {
         getAuthUrl: (s: string, r: string) => string;
       };
       url = provider.getAuthUrl(state, redirectUri);
