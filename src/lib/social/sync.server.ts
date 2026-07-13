@@ -55,23 +55,42 @@ export async function syncConnection(conn: ConnRow): Promise<{
     let imported = 0;
     let skipped = 0;
     for (const p of posts) {
-      const { error } = await supabaseAdmin.from("wall_posts").insert({
-        club_id: conn.club_id,
-        author_user_id: null,
-        body: p.body,
-        attachments: [],
-        is_pinned: false,
-        source: conn.network,
-        external_id: p.external_id,
-        external_url: p.external_url,
-        external_media_url: p.external_media_url,
-        created_at: p.created_at,
-      });
+      const { data: inserted, error } = await supabaseAdmin
+        .from("wall_posts")
+        .insert({
+          club_id: conn.club_id,
+          author_user_id: null,
+          body: p.body,
+          attachments: [],
+          is_pinned: false,
+          source: conn.network,
+          external_id: p.external_id,
+          external_url: p.external_url,
+          external_media_url: p.external_media_url,
+          created_at: p.created_at,
+        })
+        .select("id")
+        .maybeSingle();
       if (error) {
         if (error.code === "23505") skipped++;
         else throw error;
       } else {
         imported++;
+        // Fan out push notification (best-effort; failures are logged, not thrown).
+        if (inserted?.id) {
+          try {
+            const { dispatchWallPostPushInternal } = await import(
+              "@/lib/push-dispatch-wall.server"
+            );
+            await dispatchWallPostPushInternal(inserted.id as string);
+          } catch (pushErr) {
+            console.warn(
+              "[social/sync] push dispatch failed",
+              conn.network,
+              (pushErr as Error).message,
+            );
+          }
+        }
       }
     }
 
