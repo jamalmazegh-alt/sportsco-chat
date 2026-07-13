@@ -35,14 +35,15 @@ const IG_GRAPH = "https://graph.facebook.com/v19.0";
 
 export const instagram = {
   getAuthUrl(state: string, redirectUri: string): string {
-    const appId = process.env.INSTAGRAM_APP_ID;
-    if (!appId) throw new Error("INSTAGRAM_APP_ID missing");
-    const scope = ["instagram_basic", "pages_show_list", "pages_read_engagement"].join(",");
+    const appId = process.env.FACEBOOK_APP_ID;
+    if (!appId) throw new Error("FACEBOOK_APP_ID missing");
+    const configId = process.env.INSTAGRAM_LOGIN_CONFIG_ID;
+    if (!configId) throw new Error("INSTAGRAM_LOGIN_CONFIG_ID missing");
     const url = new URL("https://www.facebook.com/v19.0/dialog/oauth");
     url.searchParams.set("client_id", appId);
     url.searchParams.set("redirect_uri", redirectUri);
     url.searchParams.set("state", state);
-    url.searchParams.set("scope", scope);
+    url.searchParams.set("config_id", configId);
     url.searchParams.set("response_type", "code");
     return url.toString();
   },
