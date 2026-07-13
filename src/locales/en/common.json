@@ -1114,6 +1114,8 @@
     "hubConvocationsHint": "Default channels used to send call-ups.",
     "hubCommunications": "Communications",
     "hubCommunicationsHint": "Club wall and per-event chats.",
+    "hubSocial": "Social networks",
+    "hubSocialHint": "Show your Instagram, Facebook and X posts on the club wall.",
     "hubReminders": "Automatic reminders",
     "hubRemindersHint": "Auto-send to players who haven't replied.",
     "back": "Back to settings",
