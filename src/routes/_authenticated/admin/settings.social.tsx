@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ComponentType } from "react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
+import { isV2 } from "@/config/features";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, Unplug, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
@@ -125,7 +126,9 @@ function SocialSettings() {
 
   const conns = data?.connections ?? [];
   const byNetwork = new Map(conns.map((c) => [c.network as Network, c]));
-  const networks: Network[] = ["instagram", "facebook", "twitter"];
+  const networks: Network[] = (["instagram", "facebook", "twitter"] as Network[]).filter(
+    (n) => n !== "twitter" || isV2("social_twitter"),
+  );
 
   return (
     <div className="px-5 py-4 space-y-5">
