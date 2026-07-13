@@ -16,6 +16,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { dateLocale } from "@/lib/date-locale";
 import i18nInstance from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Network = "instagram" | "facebook" | "twitter";
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings/social")({
 });
 
 function SocialSettings() {
-  const { t } = i18nInstance;
+  const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const search = useSearch({ from: "/_authenticated/admin/settings/social" });
