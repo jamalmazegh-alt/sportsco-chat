@@ -1114,6 +1114,8 @@
     "hubConvocationsHint": "Canais padrão para o envio de convocatórias.",
     "hubCommunications": "Comunicações",
     "hubCommunicationsHint": "Mural do clube e chats para cada evento.",
+    "hubSocial": "Redes sociais",
+    "hubSocialHint": "Mostra as tuas publicações do Instagram, Facebook e X no mural do clube.",
     "hubReminders": "Lembretes automáticos",
     "hubRemindersHint": "Envio automático para jogadores sem resposta.",
     "back": "Voltar às definições",

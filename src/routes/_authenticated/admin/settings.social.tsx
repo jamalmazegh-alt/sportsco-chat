@@ -123,8 +123,8 @@ function SocialSettings() {
   return (
     <div className="px-5 py-4 space-y-5">
       <SettingsSubHeader
-        title="Réseaux sociaux"
-        description="Affiche automatiquement les publications de vos comptes Instagram, Facebook et X sur le mur du club."
+        title={t("admin.hubSocial")}
+        description={t("admin.hubSocialHint")}
       />
 
       <ul className="space-y-3">

@@ -128,8 +128,8 @@ function AdminSettingsPage() {
     {
       to: "/admin/settings/social",
       icon: Share2,
-      title: "Réseaux sociaux",
-      hint: "Affichez vos posts Instagram, Facebook et X sur le mur du club",
+      title: t("admin.hubSocial"),
+      hint: t("admin.hubSocialHint"),
       tone: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
       clubOnly: true,
     },
