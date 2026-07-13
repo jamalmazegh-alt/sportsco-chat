@@ -103,6 +103,7 @@ export async function fanoutConvocationResponse(
 /* ------------------------------------------------------------------ */
 export async function fanoutConvocationComplete(
   eventId: string,
+  opts: { excludeUserId?: string | null } = {},
 ): Promise<{ dispatched: number; complete: boolean }> {
   const { data: convs } = await supabaseAdmin
     .from("convocations")
