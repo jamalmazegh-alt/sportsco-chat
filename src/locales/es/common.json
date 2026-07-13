@@ -1114,6 +1114,8 @@
     "hubConvocationsHint": "Canales predeterminados para enviar convocatorias.",
     "hubCommunications": "Comunicaciones",
     "hubCommunicationsHint": "Muro del Club y chats para cada evento.",
+    "hubSocial": "Redes sociales",
+    "hubSocialHint": "Muestra tus publicaciones de Instagram, Facebook y X en el muro del club.",
     "hubReminders": "Recordatorios automáticos",
     "hubRemindersHint": "Envío automático a Jugadores sin respuesta.",
     "back": "Volver a la configuración",

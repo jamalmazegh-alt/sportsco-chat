@@ -16,6 +16,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { dateLocale } from "@/lib/date-locale";
 import i18nInstance from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Network = "instagram" | "facebook" | "twitter";
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings/social")({
 });
 
 function SocialSettings() {
+  const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const search = useSearch({ from: "/_authenticated/admin/settings/social" });
@@ -123,8 +125,8 @@ function SocialSettings() {
   return (
     <div className="px-5 py-4 space-y-5">
       <SettingsSubHeader
-        title="Réseaux sociaux"
-        description="Affiche automatiquement les publications de vos comptes Instagram, Facebook et X sur le mur du club."
+        title={t("admin.hubSocial")}
+        description={t("admin.hubSocialHint")}
       />
 
       <ul className="space-y-3">
