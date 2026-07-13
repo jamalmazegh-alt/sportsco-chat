@@ -30,6 +30,7 @@ export const COMPANY_LEGAL = {
     countryCode: "EE",
   },
   email: "hello@clubero.app",
+  phone: "+372 53686579",
   website: "https://clubero.app",
 } as const;
 
