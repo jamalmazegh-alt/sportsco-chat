@@ -130,8 +130,13 @@ export function MarketingFooter() {
               {COMPANY_LEGAL.email}
             </a>
             {" · "}
-            <a href={`tel:${COMPANY_LEGAL.phone.replace(/\s/g, "")}`} className="hover:text-foreground">
-              {COMPANY_LEGAL.phone}
+            <a
+              href={`https://wa.me/${COMPANY_LEGAL.phone.replace(/[^0-9]/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              {COMPANY_LEGAL.phone} (WhatsApp)
             </a>
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
