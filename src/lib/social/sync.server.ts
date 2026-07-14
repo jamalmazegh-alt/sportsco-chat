@@ -4,6 +4,8 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { decryptToken, encryptToken } from "./crypto.server";
 import { getProvider, type SocialNetwork } from "./providers.server";
+import { logActivity } from "@/lib/observability/log-activity.server";
+
 
 type ConnRow = {
   id: string;
@@ -99,6 +101,16 @@ export async function syncConnection(conn: ConnRow): Promise<{
       .update({ last_synced_at: new Date().toISOString(), last_sync_error: null })
       .eq("id", conn.id);
 
+    void logActivity(supabaseAdmin, {
+      clubId: conn.club_id,
+      actorRole: "system",
+      category: "social",
+      actionType: "social.sync_succeeded",
+      resourceType: "social_connection",
+      resourceId: conn.id,
+      metadata: { network: conn.network, imported, skipped },
+    });
+
     return { imported, skipped };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "unknown_error";
@@ -109,9 +121,22 @@ export async function syncConnection(conn: ConnRow): Promise<{
         last_synced_at: new Date().toISOString(),
       })
       .eq("id", conn.id);
+    void logActivity(supabaseAdmin, {
+      clubId: conn.club_id,
+      actorRole: "system",
+      category: "social",
+      actionType: "social.sync_failed",
+      status: "failure",
+      resourceType: "social_connection",
+      resourceId: conn.id,
+      errorCode: "sync_error",
+      metadata: { network: conn.network },
+      rawError: err,
+    });
     return { imported: 0, skipped: 0, error: message };
   }
 }
+
 
 export async function syncAll(): Promise<{ total: number; results: unknown[] }> {
   const { data, error } = await supabaseAdmin
