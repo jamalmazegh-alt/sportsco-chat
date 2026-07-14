@@ -729,66 +729,46 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               <>
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
-                    {t("eventWizard.range.from", { defaultValue: "Du" })}
+                    {t("eventWizard.range.dates", { defaultValue: "Dates du stage" })}
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="h-10 w-full justify-start font-normal">
+                      <Button variant="outline" className="h-11 w-full justify-start font-normal">
                         <CalendarIcon className="h-4 w-4" />
-                        {state.startDate
-                          ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
-                              locale: dateLocale,
-                            })
-                          : t("eventWizard.pickDate", { defaultValue: "Choisir une date" })}
+                        {state.startDate && state.endDate ? (
+                          <span>
+                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                            {" → "}
+                            {format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                          </span>
+                        ) : state.startDate ? (
+                          <span>
+                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                            {" → "}
+                            <span className="text-muted-foreground">
+                              {t("eventWizard.range.pickEnd", { defaultValue: "date de fin" })}
+                            </span>
+                          </span>
+                        ) : (
+                          t("eventWizard.range.pickBoth", { defaultValue: "Sélectionner début et fin" })
+                        )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                        mode="single"
-                        selected={
-                          state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined
-                        }
-                        onSelect={(d) => {
-                          if (!d) return;
-                          const v = format(d, "yyyy-MM-dd");
-                          patch("startDate", v);
-                          if (state.endDate && state.endDate < v) patch("endDate", undefined);
+                        mode="range"
+                        numberOfMonths={1}
+                        selected={{
+                          from: state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined,
+                          to: state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined,
                         }}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2 pt-2">
-                  <Label className="text-xs text-muted-foreground">
-                    {t("eventWizard.range.to", { defaultValue: "Au" })}
-                  </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="h-10 w-full justify-start font-normal"
-                        disabled={!state.startDate}
-                      >
-                        <CalendarIcon className="h-4 w-4" />
-                        {state.endDate
-                          ? format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", {
-                              locale: dateLocale,
-                            })
-                          : t("eventWizard.pickEndDate", { defaultValue: "Choisir une date de fin" })}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={
-                          state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined
-                        }
-                        onSelect={(d) => d && patch("endDate", format(d, "yyyy-MM-dd"))}
-                        disabled={(d) =>
-                          state.startDate ? d < new Date(`${state.startDate}T00:00:00`) : false
-                        }
+                        onSelect={(range: { from?: Date; to?: Date } | undefined) => {
+                          if (!range) return;
+                          if (range.from) patch("startDate", format(range.from, "yyyy-MM-dd"));
+                          else patch("startDate", undefined);
+                          if (range.to) patch("endDate", format(range.to, "yyyy-MM-dd"));
+                          else if (range.from && !range.to) patch("endDate", undefined);
+                        }}
                         initialFocus
                         className="p-3 pointer-events-auto"
                       />
@@ -811,12 +791,18 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                       {t("eventWizard.range.endTime", { defaultValue: "Heure de fin" })}
                     </Label>
                     <TimePicker
-                      value={state.endTime ?? ""}
+                      value={state.endTime ?? "16:00"}
                       onChange={(v: string) => patch("endTime", v)}
                       className="w-full mt-1"
                     />
                   </div>
                 </div>
+                <p className="text-[11px] text-muted-foreground -mt-1">
+                  {t("eventWizard.range.defaultsHint", {
+                    defaultValue: "Par défaut 10:00 → 16:00. Modifiez selon votre stage.",
+                  })}
+                </p>
+
                 {/* Per-day schedule for multi-day events */}
                 {state.startDate && state.endDate && state.endDate > state.startDate && (
                   <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3 space-y-2">
