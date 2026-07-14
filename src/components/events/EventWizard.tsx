@@ -346,7 +346,20 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
   function setRecurrenceMode(mode: RecurrenceMode) {
     if (mode === "single") {
-      setState((s) => ({ ...s, recurrence: { mode, weekdays: [] }, step: s.step + 1 }));
+      setState((s) => ({
+        ...s,
+        recurrence: { mode, weekdays: [] },
+        endDate: undefined,
+        step: s.step + 1,
+      }));
+      return;
+    }
+    if (mode === "multi_day") {
+      // Multi-day = single event with a start + end date. No weekly recurrence.
+      setState((s) => ({
+        ...s,
+        recurrence: { mode, weekdays: [] },
+      }));
       return;
     }
     const today = state.startDate ?? format(new Date(), "yyyy-MM-dd");
@@ -369,6 +382,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     seriesEligible &&
     !!recurrence &&
     recurrence.mode !== "single" &&
+    recurrence.mode !== "multi_day" &&
     recurrence.weekdays.length > 0 &&
     !!recurrence.startsOn &&
     !!recurrence.endsOn;
