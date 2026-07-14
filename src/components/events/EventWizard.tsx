@@ -488,6 +488,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const stepTitles: Record<Step, { text: string; mark?: string }> = {
     type: { text: t("eventWizard.qShort.type", { defaultValue: "Quel type" }), mark: "?" },
     team: { text: t("eventWizard.qShort.team", { defaultValue: "Quelle équipe" }), mark: "?" },
+    name: { text: t("eventWizard.qShort.name", { defaultValue: "Nom de l'événement" }), mark: "?" },
     when: { text: t("eventWizard.qShort.when", { defaultValue: "Quand" }), mark: "?" },
     duration: {
       text: t("eventWizard.qShort.duration", { defaultValue: "Combien de temps" }),
