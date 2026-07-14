@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, Loader2, Share2, UploadCloud } from "lucide-react";
+import { AlertTriangle, ChevronDown, Loader2, Share2, Timer, UploadCloud } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   listSocialFailures,
   listFailedImports,
   type SocialFailureRow,
   type FailedImportRow,
 } from "@/lib/superadmin/product-activity.functions";
+import {
+  getStalledOnboarding,
+  type StalledOnboardingGroup,
+  type StalledSignal,
+} from "@/lib/superadmin.functions";
 import { redactErrorMessage } from "@/lib/observability/redact";
+import { formatDistanceToNowStrict } from "date-fns";
+import { fr } from "date-fns/locale";
+
+const SIGNAL_LABELS: Record<StalledSignal, string> = {
+  club_no_team: "Club sans équipe",
+  team_no_player: "Équipe sans joueur",
+  players_no_event: "Joueurs mais aucun event",
+  event_no_convocation: "Event sans convocation",
+  invite_not_accepted: "Invitation non acceptée",
+};
+const MAX_ITEMS_SHOWN = 8;
 
 export function WatchlistPanel() {
   const [social, setSocial] = useState<SocialFailureRow[] | null>(null);
