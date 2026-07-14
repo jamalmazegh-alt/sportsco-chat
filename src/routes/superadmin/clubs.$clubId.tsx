@@ -412,6 +412,8 @@ function ClubDetail() {
           </ul>
         </Card>
       </section>
+
+      <ClubObservabilityPanel clubId={clubId} />
     </div>
   );
 }
