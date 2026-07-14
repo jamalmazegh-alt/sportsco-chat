@@ -740,6 +740,56 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 className="w-full"
               />
             </div>
+            {state.type === "other" && (
+              <div className="pt-3 space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  {t("eventWizard.endDateLabel", {
+                    defaultValue: "Date de fin (facultatif — pour un événement sur plusieurs jours)",
+                  })}
+                </Label>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-10 justify-start font-normal flex-1"
+                        disabled={!state.startDate}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        {state.endDate
+                          ? format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })
+                          : t("eventWizard.pickEndDate", { defaultValue: "Même jour" })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined}
+                        onSelect={(d) => d && patch("endDate", format(d, "yyyy-MM-dd"))}
+                        disabled={(d) =>
+                          state.startDate
+                            ? d < new Date(`${state.startDate}T00:00:00`)
+                            : false
+                        }
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {state.endDate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => patch("endDate", undefined)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
             <Button
               className="w-full mt-3"
               disabled={!state.startDate || !state.startTime}
