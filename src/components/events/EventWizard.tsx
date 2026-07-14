@@ -373,9 +373,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }
     if (mode === "multi_day") {
       // Multi-day = single event with a start + end date. No weekly recurrence.
+      // Seed friendly defaults for camps/stages: 10:00 → 16:00.
       setState((s) => ({
         ...s,
         recurrence: { mode, weekdays: [] },
+        startTime: s.startTime && s.startTime !== defaultStartTime((s.type as WizardEventType) || "other") ? s.startTime : "10:00",
+        endTime: s.endTime ?? "16:00",
       }));
       return;
     }
