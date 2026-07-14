@@ -901,27 +901,52 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
         {current === "series" && (
           <StepQuestion
-            title={t("eventWizard.q.series", {
-              defaultValue: "Cet entraînement est-il récurrent ?",
-            })}
+            title={
+              state.type === "other"
+                ? t("eventWizard.q.seriesOther", {
+                    defaultValue: "Date unique ou plusieurs jours ?",
+                  })
+                : t("eventWizard.q.series", {
+                    defaultValue: "Cet entraînement est-il récurrent ?",
+                  })
+            }
           >
             {(
-              [
-                ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
-                [
-                  "weekly_one",
-                  t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" }),
-                ],
-              ] as const
+              (state.type === "other"
+                ? [
+                    ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
+                    [
+                      "multi_day",
+                      t("eventWizard.series.multiDay", {
+                        defaultValue: "Sur plusieurs jours (ex. stage)",
+                      }),
+                    ],
+                    [
+                      "weekly_one",
+                      t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" }),
+                    ],
+                  ]
+                : [
+                    ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
+                    [
+                      "weekly_one",
+                      t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" }),
+                    ],
+                  ]) as ReadonlyArray<readonly [RecurrenceMode, string]>
             ).map(([m, l]) => (
               <DoorButton
                 key={m}
-                icon={m === "single" ? "📅" : "🔁"}
+                icon={m === "single" ? "📅" : m === "multi_day" ? "🗓️" : "🔁"}
                 label={l}
                 active={recurrence?.mode === m}
                 onClick={() => setRecurrenceMode(m)}
               />
             ))}
+            {recurrence?.mode === "multi_day" && (
+              <Button className="w-full mt-2" onClick={() => go(1)}>
+                {t("eventWizard.continue", { defaultValue: "Continuer" })}
+              </Button>
+            )}
             {recurrence && recurrence.mode !== "single" && (
               <div className="mt-3 space-y-3 rounded-xl border border-border bg-card p-3">
                 <div>
