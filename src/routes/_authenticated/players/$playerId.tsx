@@ -818,105 +818,113 @@ function PlayerProfile() {
               );
             })()}
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>{t("players.firstName")}</Label>
-                <Input
-                  required
-                  value={first}
-                  onChange={(e) => setFirst(e.target.value)}
-                  disabled={!isCoach}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("players.lastName")}</Label>
-                <Input
-                  required
-                  value={last}
-                  onChange={(e) => setLast(e.target.value)}
-                  disabled={!isCoach}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>{t("players.jerseyNumber")}</Label>
-                <Input
-                  type="number"
-                  value={jersey}
-                  onChange={(e) => setJersey(e.target.value)}
-                  disabled={!isCoach}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("players.preferredPosition")}</Label>
-                <PositionCombobox
-                  value={position}
-                  onChange={setPosition}
-                  sport={playerSport ?? null}
-                  disabled={!isCoach}
-                />
-              </div>
-            </div>
-            {canSeePrivate && (
-              <div className="space-y-1.5">
-                <Label>{t("players.licenseNumber")}</Label>
-                <Input
-                  value={license}
-                  onChange={(e) => setLicense(e.target.value)}
-                  disabled={!isCoach}
-                  placeholder="FFF-2025-12345"
-                />
-              </div>
-            )}
-            {canSeePrivate && (
-              <>
-                <div className="space-y-1.5">
-                  <Label>{t("players.birthDate")}</Label>
-                  <Input
-                    type="date"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    disabled={!isCoach}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("players.phone")}</Label>
-                  {isCoach ? (
-                    <PhoneInput value={phone} onChange={setPhone} />
-                  ) : (
-                    <Input value={phone} disabled />
+            {(() => {
+              const canEditIdentity = isCoach;
+              const canEditContact = isCoach || isParentOfThisPlayer || isSelf;
+              return (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>{t("players.firstName")}</Label>
+                      <Input
+                        required
+                        value={first}
+                        onChange={(e) => setFirst(e.target.value)}
+                        disabled={!canEditIdentity}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>{t("players.lastName")}</Label>
+                      <Input
+                        required
+                        value={last}
+                        onChange={(e) => setLast(e.target.value)}
+                        disabled={!canEditIdentity}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>{t("players.jerseyNumber")}</Label>
+                      <Input
+                        type="number"
+                        value={jersey}
+                        onChange={(e) => setJersey(e.target.value)}
+                        disabled={!canEditIdentity}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>{t("players.preferredPosition")}</Label>
+                      <PositionCombobox
+                        value={position}
+                        onChange={setPosition}
+                        sport={playerSport ?? null}
+                        disabled={!canEditIdentity}
+                      />
+                    </div>
+                  </div>
+                  {canSeePrivate && (
+                    <div className="space-y-1.5">
+                      <Label>{t("players.licenseNumber")}</Label>
+                      <Input
+                        value={license}
+                        onChange={(e) => setLicense(e.target.value)}
+                        disabled={!canEditIdentity}
+                        placeholder="FFF-2025-12345"
+                      />
+                    </div>
                   )}
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("players.email")}</Label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={!isCoach}
-                  />
-                </div>
-                <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
-                  <span className="text-sm">
-                    {t("players.canRespond")} ({t("players.respondPlayer")})
-                  </span>
-                  <input
-                    type="checkbox"
-                    className="h-5 w-5 accent-primary"
-                    checked={canRespond}
-                    onChange={(e) => setCanRespond(e.target.checked)}
-                    disabled={!isCoach}
-                  />
-                </div>
-              </>
-            )}
+                  {canSeePrivate && (
+                    <>
+                      <div className="space-y-1.5">
+                        <Label>{t("players.birthDate")}</Label>
+                        <Input
+                          type="date"
+                          value={birthDate}
+                          onChange={(e) => setBirthDate(e.target.value)}
+                          disabled={!canEditContact}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>{t("players.phone")}</Label>
+                        {canEditContact ? (
+                          <PhoneInput value={phone} onChange={setPhone} />
+                        ) : (
+                          <Input value={phone} disabled />
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>{t("players.email")}</Label>
+                        <Input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={!canEditContact}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+                        <span className="text-sm">
+                          {t("players.canRespond")} ({t("players.respondPlayer")})
+                        </span>
+                        <input
+                          type="checkbox"
+                          className="h-5 w-5 accent-primary"
+                          checked={canRespond}
+                          onChange={(e) => setCanRespond(e.target.checked)}
+                          disabled={!canEditContact}
+                        />
+                      </div>
+                    </>
+                  )}
 
-            {isCoach && (
-              <Button type="submit" className="w-full h-11" disabled={busy}>
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
-              </Button>
-            )}
+                  {(canEditIdentity || canEditContact) && (
+                    <Button type="submit" className="w-full h-11" disabled={busy}>
+                      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
+                    </Button>
+                  )}
+                </>
+              );
+            })()}
           </form>
 
           {isCoach && player.club_id && (
