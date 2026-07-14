@@ -1220,6 +1220,147 @@ export const getUserDetail = createServerFn({ method: "POST" })
           .limit(10)
       : { data: [] as never[] };
 
+    // --- Family & team relations for full super-admin view (no anonymisation) ---
+    const childPlayerIds = (parentLinks ?? [])
+      .map((r) => r.player_id)
+      .filter((v): v is string => !!v);
+    const allPlayerIds = Array.from(new Set([...playerIds, ...childPlayerIds]));
+
+    const [
+      { data: parentsOfSelf },
+      { data: childPlayers },
+      { data: playerTeamMembers },
+    ] = await Promise.all([
+      playerIds.length
+        ? supabaseAdmin
+            .from("player_parents")
+            .select("player_id, parent_user_id, full_name, email, phone, can_respond")
+            .in("player_id", playerIds)
+        : Promise.resolve({ data: [] as never[] }),
+      childPlayerIds.length
+        ? supabaseAdmin
+            .from("players")
+            .select("id, first_name, last_name, club_id, jersey_number")
+            .in("id", childPlayerIds)
+        : Promise.resolve({ data: [] as never[] }),
+      allPlayerIds.length
+        ? supabaseAdmin
+            .from("team_members")
+            .select("team_id, player_id, role")
+            .in("player_id", allPlayerIds)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    // Load any club referenced by a child player that we haven't fetched yet
+    const extraClubIds = Array.from(
+      new Set(
+        (childPlayers ?? [])
+          .map((p) => p.club_id)
+          .filter((v): v is string => !!v && !clubMap.has(v)),
+      ),
+    );
+    if (extraClubIds.length) {
+      const { data: extraClubs } = await supabaseAdmin
+        .from("clubs")
+        .select("id, name, logo_url, archived_at")
+        .in("id", extraClubIds);
+      for (const c of extraClubs ?? []) clubMap.set(c.id, c);
+    }
+
+    const parentUserIds = Array.from(
+      new Set(
+        (parentsOfSelf ?? [])
+          .map((p) => p.parent_user_id)
+          .filter((v): v is string => !!v),
+      ),
+    );
+    const parentProfileMap = new Map<
+      string,
+      { full_name: string | null; email: string | null; phone: string | null }
+    >();
+    if (parentUserIds.length) {
+      const { data: parentProfiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, phone")
+        .in("id", parentUserIds);
+      for (const p of parentProfiles ?? []) {
+        parentProfileMap.set(p.id, {
+          full_name:
+            p.full_name ?? [p.first_name, p.last_name].filter(Boolean).join(" ") ?? null,
+          email: null,
+          phone: p.phone ?? null,
+        });
+      }
+      // Fetch emails from auth admin API (one per id — small n)
+      await Promise.all(
+        parentUserIds.map(async (id) => {
+          const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
+          const cur = parentProfileMap.get(id) ?? {
+            full_name: null,
+            email: null,
+            phone: null,
+          };
+          parentProfileMap.set(id, { ...cur, email: u?.user?.email ?? null });
+        }),
+      );
+    }
+
+    // Extra team ids referenced via players (may not be in teamIds already)
+    const extraTeamIds = Array.from(
+      new Set(
+        (playerTeamMembers ?? [])
+          .map((t) => t.team_id)
+          .filter((v): v is string => !!v && !teamMap.has(v)),
+      ),
+    );
+    if (extraTeamIds.length) {
+      const { data: extraTeams } = await supabaseAdmin
+        .from("teams")
+        .select("id, name, club_id, sport")
+        .in("id", extraTeamIds);
+      for (const t of extraTeams ?? []) teamMap.set(t.id, t);
+    }
+
+    const teamsByPlayer = new Map<
+      string,
+      Array<{ team_id: string; role: string; team: { id: string; name: string; sport: string | null } | null }>
+    >();
+    for (const tm of playerTeamMembers ?? []) {
+      if (!tm.player_id || !tm.team_id) continue;
+      const list = teamsByPlayer.get(tm.player_id) ?? [];
+      list.push({
+        team_id: tm.team_id,
+        role: tm.role,
+        team: teamMap.get(tm.team_id) ?? null,
+      });
+      teamsByPlayer.set(tm.player_id, list);
+    }
+
+    const parentsByPlayer = new Map<
+      string,
+      Array<{
+        parent_user_id: string | null;
+        full_name: string | null;
+        email: string | null;
+        phone: string | null;
+        can_respond: boolean;
+      }>
+    >();
+    for (const p of parentsOfSelf ?? []) {
+      const acct = p.parent_user_id ? parentProfileMap.get(p.parent_user_id) : null;
+      const list = parentsByPlayer.get(p.player_id) ?? [];
+      list.push({
+        parent_user_id: p.parent_user_id ?? null,
+        full_name: acct?.full_name ?? p.full_name ?? null,
+        email: acct?.email ?? p.email ?? null,
+        phone: acct?.phone ?? p.phone ?? null,
+        can_respond: p.can_respond,
+      });
+      parentsByPlayer.set(p.player_id, list);
+    }
+
+    const childPlayerMap = new Map((childPlayers ?? []).map((p) => [p.id, p]));
+
     // Invite provenance: match member_invites by email (link-based
     // club_invites are NOT tied to any specific recipient, so we never
     // attribute them to a user).
@@ -1311,8 +1452,22 @@ export const getUserDetail = createServerFn({ method: "POST" })
         joined_at: t.created_at,
         team: teamMap.get(t.team_id) ?? null,
       })),
-      players: playerSelf ?? [],
-      parent_of: parentLinks ?? [],
+      players: (playerSelf ?? []).map((p) => ({
+        ...p,
+        club: p.club_id ? (clubMap.get(p.club_id) ?? null) : null,
+        parents: parentsByPlayer.get(p.id) ?? [],
+        teams: teamsByPlayer.get(p.id) ?? [],
+      })),
+      parent_of: (parentLinks ?? []).map((r) => {
+        const child = r.player_id ? (childPlayerMap.get(r.player_id) ?? null) : null;
+        return {
+          player_id: r.player_id,
+          can_respond: r.can_respond,
+          player: child,
+          club: child?.club_id ? (clubMap.get(child.club_id) ?? null) : null,
+          teams: r.player_id ? (teamsByPlayer.get(r.player_id) ?? []) : [],
+        };
+      }),
       recent_convocations: (convos ?? []).map((c) => ({
         ...c,
         event: eventMap.get(c.event_id) ?? null,

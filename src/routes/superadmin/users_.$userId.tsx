@@ -382,10 +382,10 @@ function UserDetail() {
         )}
       </Section>
 
-      {/* Teams */}
-      <Section icon={UsersIcon} title={`Teams (${data.teams.length})`}>
+      {/* Teams (direct staff/member role) */}
+      <Section icon={UsersIcon} title={`Teams — staff/member roles (${data.teams.length})`}>
         {data.teams.length === 0 ? (
-          <Empty>No team assignments.</Empty>
+          <Empty>No direct team assignments.</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.teams.map((t) => (
@@ -405,6 +405,140 @@ function UserDetail() {
           </ul>
         )}
       </Section>
+
+      {/* Player profiles (with parents + teams) */}
+      <Section icon={UsersIcon} title={`Player profiles (${data.players.length})`}>
+        {data.players.length === 0 ? (
+          <Empty>No player profile linked to this user.</Empty>
+        ) : (
+          <ul className="divide-y divide-border">
+            {data.players.map((p) => (
+              <li key={p.id} className="px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {[p.first_name, p.last_name].filter(Boolean).join(" ") || p.id.slice(0, 8)}
+                      {p.jersey_number != null && (
+                        <span className="text-muted-foreground"> · #{p.jersey_number}</span>
+                      )}
+                    </div>
+                    {p.club && (
+                      <div className="text-[11px] text-muted-foreground truncate">{p.club.name}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-2 grid sm:grid-cols-2 gap-2">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                      Teams
+                    </div>
+                    {p.teams.length === 0 ? (
+                      <div className="text-xs text-muted-foreground italic">No team.</div>
+                    ) : (
+                      <ul className="space-y-1">
+                        {p.teams.map((t) => (
+                          <li key={t.team_id + t.role} className="text-xs flex items-center gap-2">
+                            <span className="font-medium">{t.team?.name ?? t.team_id.slice(0, 8)}</span>
+                            <span className="text-muted-foreground">{t.team?.sport ?? "—"}</span>
+                            <StatusBadge tone={roleTone(t.role)}>{t.role}</StatusBadge>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                      Parents
+                    </div>
+                    {p.parents.length === 0 ? (
+                      <div className="text-xs text-muted-foreground italic">No parent linked.</div>
+                    ) : (
+                      <ul className="space-y-1">
+                        {p.parents.map((pa, idx) => (
+                          <li key={idx} className="text-xs">
+                            {pa.parent_user_id ? (
+                              <Link
+                                to="/superadmin/users_/$userId"
+                                params={{ userId: pa.parent_user_id }}
+                                className="font-medium hover:underline"
+                              >
+                                {pa.full_name ?? pa.email ?? pa.parent_user_id.slice(0, 8)}
+                              </Link>
+                            ) : (
+                              <span className="font-medium">{pa.full_name ?? pa.email ?? "—"}</span>
+                            )}
+                            {pa.email && (
+                              <span className="text-muted-foreground"> · {pa.email}</span>
+                            )}
+                            {pa.phone && (
+                              <span className="text-muted-foreground"> · {pa.phone}</span>
+                            )}
+                            {pa.can_respond && (
+                              <StatusBadge tone="success">can respond</StatusBadge>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
+      {/* Children (user is a parent) */}
+      <Section icon={UsersIcon} title={`Children — as parent (${data.parent_of.length})`}>
+        {data.parent_of.length === 0 ? (
+          <Empty>Not linked as a parent to any player.</Empty>
+        ) : (
+          <ul className="divide-y divide-border">
+            {data.parent_of.map((r, idx) => (
+              <li key={(r.player_id ?? "") + idx} className="px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {r.player
+                        ? [r.player.first_name, r.player.last_name].filter(Boolean).join(" ") ||
+                          r.player.id.slice(0, 8)
+                        : (r.player_id ?? "").slice(0, 8)}
+                      {r.player?.jersey_number != null && (
+                        <span className="text-muted-foreground"> · #{r.player.jersey_number}</span>
+                      )}
+                    </div>
+                    {r.club && (
+                      <div className="text-[11px] text-muted-foreground truncate">
+                        {r.club.name}
+                      </div>
+                    )}
+                  </div>
+                  {r.can_respond && <StatusBadge tone="success">can respond</StatusBadge>}
+                </div>
+                <div className="mt-2">
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                    Teams
+                  </div>
+                  {r.teams.length === 0 ? (
+                    <div className="text-xs text-muted-foreground italic">No team.</div>
+                  ) : (
+                    <ul className="space-y-1">
+                      {r.teams.map((t) => (
+                        <li key={t.team_id + t.role} className="text-xs flex items-center gap-2">
+                          <span className="font-medium">{t.team?.name ?? t.team_id.slice(0, 8)}</span>
+                          <span className="text-muted-foreground">{t.team?.sport ?? "—"}</span>
+                          <StatusBadge tone={roleTone(t.role)}>{t.role}</StatusBadge>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
 
       {/* Recent convocations */}
       <Section icon={Calendar} title="Recent convocations">
