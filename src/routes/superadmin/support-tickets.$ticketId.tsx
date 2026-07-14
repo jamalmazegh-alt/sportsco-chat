@@ -75,9 +75,9 @@ function AdminTicketDetail() {
   const ctx = (ticket.context_data ?? {}) as Record<string, unknown>;
 
   return (
-    <div className="flex flex-col md:flex-row h-[100dvh] max-h-screen">
+    <div className="flex flex-col md:flex-row md:h-[100dvh] md:max-h-screen">
       {/* Thread */}
-      <div className="flex-1 flex flex-col overflow-hidden border-r">
+      <div className="flex-1 flex flex-col md:overflow-hidden md:border-r">
         <header className="px-5 pt-6 pb-3 border-b">
           <Link
             to="/superadmin/support-tickets"
@@ -90,7 +90,7 @@ function AdminTicketDetail() {
             #{ticket.id.slice(0, 6).toUpperCase()} · {ticket.category}
           </div>
         </header>
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 md:overflow-y-auto px-5 py-4">
           <TicketThread
             ticketId={ticket.id}
             messages={messages}
@@ -104,7 +104,8 @@ function AdminTicketDetail() {
       </div>
 
       {/* Sidebar */}
-      <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 overflow-y-auto p-5 space-y-5">
+      <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 md:overflow-y-auto p-5 space-y-5">
+
         <section className="space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Statut</Label>
           <Select value={ticket.status} onValueChange={(v) => update.mutate({ status: v })}>
