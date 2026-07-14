@@ -246,7 +246,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     const isRecurring =
       (state.type === "training" || state.type === "other") &&
       !!state.recurrence &&
-      state.recurrence.mode !== "single";
+      state.recurrence.mode !== "single" &&
+      state.recurrence.mode !== "multi_day";
     s.push("when");
     if (state.type === "match") {
       s.push("halves", "gameformat", "homeaway");
@@ -256,6 +257,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       s.push("opponent", "official");
     } else if (!isRecurring) {
       s.push("duration");
+      // "Other" events (e.g. camps): ask home/away for a proper location choice.
+      if (state.type === "other") s.push("homeaway");
     }
     if (state.type === "training" && !isRecurring) {
       s.push("meetingtime");

@@ -18,7 +18,7 @@ export type WizardEventType = "training" | "match" | "meeting" | "other";
 export type IsHome = "home" | "away";
 export type ConvocScope = "all" | "selection" | "none";
 
-export type RecurrenceMode = "single" | "weekly_one" | "weekly_multi" | "custom";
+export type RecurrenceMode = "single" | "multi_day" | "weekly_one" | "weekly_multi" | "custom";
 
 export interface RecurrenceState {
   mode: RecurrenceMode;
