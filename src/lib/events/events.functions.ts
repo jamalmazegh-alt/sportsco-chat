@@ -88,8 +88,31 @@ export const createEvent = createServerFn({ method: "POST" })
       throw new Error(translateEventDbError(error));
     }
 
+    // Journal produit (fire-and-forget, superadmin observability).
+    try {
+      const [{ supabaseAdmin }, { logActivity }] = await Promise.all([
+        import("@/integrations/supabase/client.server"),
+        import("@/lib/observability/log-activity.server"),
+      ]);
+      const { data: team } = await supabaseAdmin
+        .from("teams")
+        .select("club_id")
+        .eq("id", payload.team_id)
+        .maybeSingle();
+      void logActivity(supabaseAdmin, {
+        clubId: (team?.club_id as string | undefined) ?? null,
+        actorUserId: userId,
+        category: "event",
+        actionType: "event.created",
+        resourceType: "event",
+        resourceId: row.id as string,
+        metadata: { team_id: payload.team_id, type: payload.type },
+      });
+    } catch { /* never block the create */ }
+
     return { id: row.id as string };
   });
+
 
 const UpdateEventSchema = CreateEventSchema.extend({
   id: z.string().uuid(),
