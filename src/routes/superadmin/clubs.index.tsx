@@ -234,6 +234,11 @@ function SuperAdminClubs() {
                 const pill = billingPill(c.subscription);
                 const isTest = c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
                 const exempt = c.subscription && isBillingExempt(c.subscription);
+                const act = activity[c.id];
+                const lastAt = act?.last_activity_at ? new Date(act.last_activity_at) : null;
+                const inactive =
+                  !c.archived_at &&
+                  (!lastAt || Date.now() - lastAt.getTime() > INACTIVE_DAYS * 86400_000);
                 return (
                   <tr
                     key={c.id}
