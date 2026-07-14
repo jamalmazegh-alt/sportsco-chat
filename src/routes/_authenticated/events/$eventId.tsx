@@ -1223,15 +1223,18 @@ function EventDetail() {
             playerName,
             `p-${conv.id}`,
           );
-          // Parent emails
+          // Parent emails (fallback to auth email when player_parents.email is empty)
           for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
             const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+            const email =
+              parent.email ||
+              (parent.parent_user_id ? resolvedParentEmails[parent.parent_user_id] : null);
             enqueue(
-              parent.email,
+              email,
               conv.response_token!,
               parentFirst,
               playerName,
-              `parent-${parent.player_id}-${conv.id}`,
+              `parent-${parent.parent_user_id ?? parent.player_id}-${conv.id}`,
             );
           }
         }
