@@ -6575,6 +6575,14 @@ export type Database = {
         Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_player_coparents: {
+        Args: { _player_id: string }
+        Returns: {
+          full_name: string
+          has_account: boolean
+          id: string
+        }[]
+      }
       get_public_camp_by_slug: {
         Args: { _camp_slug: string; _club_slug: string }
         Returns: Json
