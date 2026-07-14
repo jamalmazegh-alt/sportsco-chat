@@ -1458,7 +1458,13 @@ export const getUserDetail = createServerFn({ method: "POST" })
         parents: parentsByPlayer.get(p.id) ?? [],
         teams: teamsByPlayer.get(p.id) ?? [],
       })),
-      parent_of: (parentLinks ?? []).map((r) => {
+      parent_of: Array.from(
+        new Map(
+          (parentLinks ?? [])
+            .filter((r) => !!r.player_id)
+            .map((r) => [r.player_id as string, r]),
+        ).values(),
+      ).map((r) => {
         const child = r.player_id ? (childPlayerMap.get(r.player_id) ?? null) : null;
         return {
           player_id: r.player_id,
