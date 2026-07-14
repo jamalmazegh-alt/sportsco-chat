@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   getClubDetailExtended,
   getClubFinancials,
+  getClubRoster,
   archiveClub,
   unarchiveClub,
 } from "@/lib/superadmin.functions";
