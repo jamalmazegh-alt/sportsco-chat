@@ -256,7 +256,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       if (state.isHome === "away") s.push("places");
       s.push("opponent", "official");
     } else if (!isRecurring) {
-      s.push("duration");
+      // "Other": no separate duration step — end time is captured in the "when" step.
+      if (state.type !== "other") s.push("duration");
       // "Other" events (e.g. camps): ask home/away for a proper location choice.
       if (state.type === "other") s.push("homeaway");
     }
