@@ -308,6 +308,34 @@ function SuperAdminClubs() {
                       )}
                     </td>
                     <td className="px-3 py-2.5 tabular-nums">{c.member_count}</td>
+                    <td className="px-3 py-2.5 align-top">
+                      <Link
+                        to="/superadmin/clubs/$clubId"
+                        params={{ clubId: c.id }}
+                        className="block text-xs"
+                      >
+                        {lastAt ? (
+                          <>
+                            <div className="font-medium">
+                              il y a {formatDistanceToNowStrict(lastAt, { locale: fr })}
+                            </div>
+                            <div className="text-muted-foreground">
+                              {actionLabel(act?.last_action_type ?? null)}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                              {act?.count_7d ?? 0} / 7j · {act?.count_30d ?? 0} / 30j
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                        {inactive && (
+                          <span className="inline-flex items-center rounded-full bg-[#fff5f5] text-[#ef4444] border border-[#fecaca] px-2 py-0.5 text-[10px] font-medium mt-1">
+                            Inactif
+                          </span>
+                        )}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2.5">
                       <Link
                         to="/superadmin/clubs/$clubId"
