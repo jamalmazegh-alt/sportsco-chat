@@ -1640,6 +1640,95 @@ export const getClubDetailExtended = createServerFn({ method: "POST" })
 /** Suspends a club (alias for archive with a reason). */
 export const suspendClub = archiveClub;
 
+/** Roster recap per team: coaches, parents, players, total, plus club totals. */
+export const getClubRoster = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+
+    const [{ data: teams }, { data: allMembers }] = await Promise.all([
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, sport, age_group, archived_at, deleted_at")
+        .eq("club_id", data.club_id)
+        .order("name"),
+      supabaseAdmin
+        .from("team_members")
+        .select("team_id, role, user_id, player_id")
+        .in(
+          "team_id",
+          (
+            await supabaseAdmin.from("teams").select("id").eq("club_id", data.club_id)
+          ).data?.map((t) => t.id) ?? [],
+        ),
+    ]);
+
+    type Role = "coach" | "parent" | "player" | "other";
+    const bucket = (r: string): Role => {
+      if (r === "coach" || r === "admin" || r === "dirigeant") return "coach";
+      if (r === "parent") return "parent";
+      if (r === "player") return "player";
+      return "other";
+    };
+
+    const perTeam = new Map<
+      string,
+      { coaches: Set<string>; parents: Set<string>; players: Set<string>; other: Set<string> }
+    >();
+    for (const t of teams ?? []) {
+      perTeam.set(t.id, {
+        coaches: new Set(),
+        parents: new Set(),
+        players: new Set(),
+        other: new Set(),
+      });
+    }
+    for (const m of allMembers ?? []) {
+      const entry = perTeam.get(m.team_id);
+      if (!entry) continue;
+      const key = m.user_id ?? m.player_id ?? crypto.randomUUID();
+      const b = bucket(m.role as string);
+      entry[b === "coach" ? "coaches" : b === "parent" ? "parents" : b === "player" ? "players" : "other"].add(key);
+    }
+
+    const rows = (teams ?? []).map((t) => {
+      const e = perTeam.get(t.id)!;
+      const coaches = e.coaches.size;
+      const parents = e.parents.size;
+      const players = e.players.size;
+      const other = e.other.size;
+      return {
+        team_id: t.id,
+        name: t.name,
+        sport: t.sport,
+        age_group: t.age_group,
+        archived: !!t.archived_at || !!t.deleted_at,
+        coaches,
+        parents,
+        players,
+        other,
+        total: coaches + parents + players + other,
+      };
+    });
+
+    const totals = rows.reduce(
+      (acc, r) => {
+        if (r.archived) return acc;
+        acc.coaches += r.coaches;
+        acc.parents += r.parents;
+        acc.players += r.players;
+        acc.other += r.other;
+        acc.total += r.total;
+        return acc;
+      },
+      { coaches: 0, parents: 0, players: 0, other: 0, total: 0 },
+    );
+
+    return { rows, totals };
+  });
+
+
 /** Operational alerts surfaced on the Support hub. */
 export const getSupportAlerts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
