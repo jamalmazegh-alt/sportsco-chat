@@ -100,6 +100,7 @@ export function autoTitle(
   t: (k: string, opt?: Record<string, unknown>) => string,
 ): string {
   const name = teamName ?? "";
+  if (state.customTitle?.trim()) return state.customTitle.trim();
   switch (state.type) {
     case "match":
       return state.opponent
