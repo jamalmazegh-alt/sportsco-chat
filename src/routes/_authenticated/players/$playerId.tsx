@@ -300,6 +300,21 @@ function PlayerProfile() {
   });
   const playerSport = playerTeams?.[0]?.sport ?? null;
 
+  // Co-parents: names only, visible to a signed-in parent of this player.
+  // RLS on player_parents hides other parents' contacts; this RPC only returns names.
+  const { data: coParents } = useQuery({
+    queryKey: ["player-coparents", playerId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_player_coparents", {
+        _player_id: playerId,
+      });
+      if (error) throw error;
+      return (data ?? []) as { id: string; full_name: string | null; has_account: boolean }[];
+    },
+    enabled: !!user,
+  });
+
+
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
