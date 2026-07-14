@@ -102,9 +102,9 @@ function AdminUsersPage() {
     // Guard against double-tap: block re-entry synchronously before any await.
     if (submittingRef.current) return;
     // Guard against short-window re-invite of the same email in the same club.
-    const key = `${activeClubId}::${email.trim().toLowerCase()}`;
-    const last = recentInvitesRef.current.get(key) ?? 0;
-    const remaining = Math.ceil((COOLDOWN_MS - (Date.now() - last)) / 1000);
+    const cooldownKey = `${activeClubId}::${email.trim().toLowerCase()}`;
+    const lastSentAt = recentInvitesRef.current.get(cooldownKey) ?? 0;
+    const remaining = Math.ceil((COOLDOWN_MS - (Date.now() - lastSentAt)) / 1000);
     if (remaining > 0) {
       toast.info(
         t("admin.inviteCooldown", {
@@ -118,83 +118,91 @@ function AdminUsersPage() {
     submittingRef.current = true;
     setBusy(true);
     try {
-      const { data: exists } = await supabase.rpc("email_exists", { _email: email });
-      if (exists === true) {
-        setBusy(false);
-        toast.error(
-          t("admin.inviteEmailAlreadyUser", {
-            defaultValue:
-              "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
-          }),
-        );
+      try {
+        const { data: exists } = await supabase.rpc("email_exists", { _email: email });
+        if (exists === true) {
+          toast.error(
+            t("admin.inviteEmailAlreadyUser", {
+              defaultValue:
+                "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
+            }),
+          );
+          return;
+        }
+      } catch {
+        /* non-blocking */
+      }
+
+      const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+      const primaryRole: string = inviteRoles.includes("admin")
+        ? "admin"
+        : inviteRoles.includes("coach")
+          ? "coach"
+          : "dirigeant";
+      const { error: invErr } = await supabase.from("member_invites").insert({
+        club_id: activeClubId,
+        role: primaryRole as any,
+        email,
+        token,
+        created_by: user.id,
+        first_name: first.trim() || null,
+        last_name: last.trim() || null,
+      });
+      if (invErr) {
+        toast.error(invErr.message);
         return;
       }
-    } catch {
-      /* non-blocking */
-    }
 
-    const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
-    const primaryRole: string = inviteRoles.includes("admin")
-      ? "admin"
-      : inviteRoles.includes("coach")
-        ? "coach"
-        : "dirigeant";
-    const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: activeClubId,
-      role: primaryRole as any,
-      email,
-      token,
-      created_by: user.id,
-      first_name: first.trim() || null,
-      last_name: last.trim() || null,
-    });
-    if (invErr) {
-      setBusy(false);
-      toast.error(invErr.message);
-      return;
-    }
+      const { data: clubRow } = await supabase
+        .from("clubs")
+        .select("name, logo_url")
+        .eq("id", activeClubId)
+        .maybeSingle();
+      const clubLabel = clubRow?.name ?? "Clubero";
+      const clubLogoUrl = clubRow?.logo_url ?? undefined;
+      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
 
-    const { data: clubRow } = await supabase
-      .from("clubs")
-      .select("name, logo_url")
-      .eq("id", activeClubId)
-      .maybeSingle();
-    const clubLabel = clubRow?.name ?? "Clubero";
-    const clubLogoUrl = clubRow?.logo_url ?? undefined;
-    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+      const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
 
-    const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
+      try {
+        await sendTransactionalEmail({
+          templateName: "player-invite",
+          recipientEmail: email,
+          idempotencyKey: `staff-invite-${token}`,
+          fromName: `${clubLabel} via Clubero`,
+          templateData: {
+            firstName: first || undefined,
+            clubName: clubLabel,
+            clubLogoUrl,
+            inviteUrl,
+            roleLabel,
+          },
+        });
+      } catch (err: any) {
+        toast.error(
+          t("admin.inviteEmailFailed", {
+            defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
+          }),
+        );
+        qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
+        return;
+      }
 
-    try {
-      await sendTransactionalEmail({
-        templateName: "player-invite",
-        recipientEmail: email,
-        idempotencyKey: `staff-invite-${token}`,
-        fromName: `${clubLabel} via Clubero`,
-        templateData: {
-          firstName: first || undefined,
-          clubName: clubLabel,
-          clubLogoUrl,
-          inviteUrl,
-          roleLabel,
-        },
-      });
-    } catch (err: any) {
-      setBusy(false);
-      toast.error(
-        t("admin.inviteEmailFailed", {
-          defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
+      // Success — record cooldown, close, notify.
+      recentInvitesRef.current.set(cooldownKey, Date.now());
+      setOpen(false);
+      reset();
+      toast.success(
+        t("admin.inviteSentTo", {
+          defaultValue: `Invitation envoyée à ${email}. Renvoi possible dans 60s.`,
+          email,
         }),
       );
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
-      return;
+    } finally {
+      submittingRef.current = false;
+      setBusy(false);
     }
-
-    setBusy(false);
-    setOpen(false);
-    reset();
-    toast.success(t("admin.inviteSent", { defaultValue: "Invitation envoyée" }));
-    qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
   }
 
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
