@@ -45,6 +45,7 @@ function ClubDetail() {
   const { clubId } = Route.useParams();
   const [data, setData] = useState<Awaited<ReturnType<typeof getClubDetailExtended>> | null>(null);
   const [fin, setFin] = useState<Awaited<ReturnType<typeof getClubFinancials>> | null>(null);
+  const [roster, setRoster] = useState<Awaited<ReturnType<typeof getClubRoster>> | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -56,6 +57,9 @@ function ClubDetail() {
     getClubFinancials({ data: { club_id: clubId } })
       .then(setFin)
       .catch((e) => console.error("financials", e));
+    getClubRoster({ data: { club_id: clubId } })
+      .then(setRoster)
+      .catch((e) => console.error("roster", e));
   }, [clubId]);
 
   useEffect(refresh, [refresh]);
