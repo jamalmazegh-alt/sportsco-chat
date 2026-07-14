@@ -1158,9 +1158,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 </div>
               </div>
             )}
-            <Button className="w-full mt-2" onClick={() => go(1)}>
-              {t("eventWizard.continue", { defaultValue: "Continuer" })}
-            </Button>
+            {recurrence?.mode !== "multi_day" && (
+              <Button className="w-full mt-2" onClick={() => go(1)}>
+                {t("eventWizard.continue", { defaultValue: "Continuer" })}
+              </Button>
+            )}
           </StepQuestion>
         )}
 
