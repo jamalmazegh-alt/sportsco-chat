@@ -3796,6 +3796,59 @@ export type Database = {
           },
         ]
       }
+      product_activity_log: {
+        Row: {
+          action_type: string
+          actor_role: string | null
+          actor_user_id: string | null
+          category: string
+          club_id: string | null
+          created_at: string
+          error_code: string | null
+          id: string
+          metadata: Json
+          resource_id: string | null
+          resource_type: string | null
+          status: string
+        }
+        Insert: {
+          action_type: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          category: string
+          club_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string
+        }
+        Update: {
+          action_type?: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          category?: string
+          club_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_activity_log_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
