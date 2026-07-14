@@ -10,7 +10,7 @@ import { format, formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
 
-const INACTIVE_DAYS = 30;
+const INACTIVE_DAYS = 14;
 
 const ACTION_LABELS: Record<string, string> = {
   "event.created": "Événement créé",
