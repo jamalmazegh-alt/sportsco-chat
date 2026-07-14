@@ -175,6 +175,39 @@ export const listAllClubs = createServerFn({ method: "POST" })
     };
   });
 
+/** Per-club activity summary derived from product_activity_log. Superadmin-only. */
+export type ClubActivitySummary = {
+  last_activity_at: string | null;
+  last_action_type: string | null;
+  count_7d: number;
+  count_30d: number;
+};
+
+export const getClubActivitySummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data, error } = await supabaseAdmin.rpc("superadmin_club_activity_summary");
+    if (error) throw new Error(error.message);
+    const map: Record<string, ClubActivitySummary> = {};
+    for (const row of (data ?? []) as Array<{
+      club_id: string;
+      last_activity_at: string | null;
+      last_action_type: string | null;
+      count_7d: number | string;
+      count_30d: number | string;
+    }>) {
+      if (!row.club_id) continue;
+      map[row.club_id] = {
+        last_activity_at: row.last_activity_at,
+        last_action_type: row.last_action_type,
+        count_7d: Number(row.count_7d) || 0,
+        count_30d: Number(row.count_30d) || 0,
+      };
+    }
+    return { byClub: map };
+  });
+
 /** Detailed view for one club. */
 export const getClubDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
