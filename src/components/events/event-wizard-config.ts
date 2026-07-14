@@ -164,7 +164,12 @@ export function toEventPayloadInput(
   if (!state.type || !state.teamId || !state.startDate) return null;
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
-  const endsIso = addMinutesIso(startsIso, state.durationMin);
+  // Multi-day "other" events (e.g. camp): end at endDate + startTime + durationMin
+  const isMultiDay =
+    state.type === "other" && !!state.endDate && state.endDate > state.startDate;
+  const endsIso = isMultiDay
+    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
+    : addMinutesIso(startsIso, state.durationMin);
   const isMatch = state.type === "match";
   const isHomeMatch = isMatch && state.isHome === "home";
   const isAwayMatch = isMatch && state.isHome === "away";
