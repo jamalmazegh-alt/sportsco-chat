@@ -657,6 +657,29 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
+        {current === "name" && (
+          <StepQuestion
+            title={t("eventWizard.q.name", { defaultValue: "Nom de l'événement ?" })}
+          >
+            <Input
+              autoFocus
+              value={state.customTitle ?? ""}
+              onChange={(e) => patch("customTitle", e.target.value)}
+              placeholder={t("eventWizard.namePlaceholder", {
+                defaultValue: "Ex. Stage d'hiver, Tournoi Loisirs…",
+              })}
+              className="h-11"
+            />
+            <Button
+              className="w-full mt-3"
+              disabled={!state.customTitle?.trim()}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
         {current === "when" && (
           <StepQuestion title={t("eventWizard.q.when", { defaultValue: "Quand ?" })}>
             <div className="flex flex-wrap gap-2">
