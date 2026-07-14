@@ -36,7 +36,11 @@ export interface EventWizardState {
   /** User-provided title (used mainly for "other" events, e.g. a camp name). */
   customTitle?: string;
   startTime: string; // HH:mm
+  /** Optional end time (HH:mm). When set, duration is derived from endTime - startTime. */
+  endTime?: string;
   durationMin: number;
+  /** Per-day override for multi-day "other" events. yyyy-mm-dd → { start, end } (HH:mm). */
+  dayTimes?: Record<string, { start: string; end: string }>;
   halvesFormat?: string; // e.g. "2x45"
   gameFormat?: string; // e.g. "11v11"
   isHome?: IsHome;
