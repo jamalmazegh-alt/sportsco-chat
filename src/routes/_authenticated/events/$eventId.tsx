@@ -1022,6 +1022,26 @@ function EventDetail() {
       .from("player_parents")
       .select("parent_user_id, email, full_name, player_id")
       .in("player_id", toInsert);
+    // Fallback: for parents whose player_parents.email is missing but who
+    // have a linked auth account, resolve the auth email server-side so we
+    // don't silently skip them.
+    const missingEmailParentUserIds = Array.from(
+      new Set(
+        (parents ?? [])
+          .filter((p: any) => !p.email && p.parent_user_id)
+          .map((p: any) => p.parent_user_id as string),
+      ),
+    );
+    let resolvedParentEmails: Record<string, string> = {};
+    if (missingEmailParentUserIds.length > 0) {
+      try {
+        const { resolveParentEmails } = await import("@/lib/parent-emails.functions");
+        const res = await resolveParentEmails({ data: { userIds: missingEmailParentUserIds } });
+        resolvedParentEmails = res?.emails ?? {};
+      } catch {
+        // best-effort; missing emails simply won't be delivered
+      }
+    }
     const playerUserIds = (teamPlayers ?? [])
       .filter((tp: any) => toInsert.includes(tp.player_id))
       .map((tp: any) => tp.players?.user_id)
@@ -1203,15 +1223,18 @@ function EventDetail() {
             playerName,
             `p-${conv.id}`,
           );
-          // Parent emails
+          // Parent emails (fallback to auth email when player_parents.email is empty)
           for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
             const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+            const email =
+              parent.email ||
+              (parent.parent_user_id ? resolvedParentEmails[parent.parent_user_id] : null);
             enqueue(
-              parent.email,
+              email,
               conv.response_token!,
               parentFirst,
               playerName,
-              `parent-${parent.player_id}-${conv.id}`,
+              `parent-${parent.parent_user_id ?? parent.player_id}-${conv.id}`,
             );
           }
         }

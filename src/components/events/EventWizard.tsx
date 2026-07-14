@@ -203,6 +203,22 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }));
   }
 
+  /** Enumerate dates (yyyy-mm-dd) from startDate to endDate inclusive. */
+  function enumerateDays(startDate?: string, endDate?: string): string[] {
+    if (!startDate || !endDate || endDate < startDate) return [];
+    const out: string[] = [];
+    const cur = new Date(`${startDate}T00:00:00`);
+    const end = new Date(`${endDate}T00:00:00`);
+    while (cur <= end) {
+      out.push(format(cur, "yyyy-MM-dd"));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  }
+
+  const [perDaySchedule, setPerDaySchedule] = useState(false);
+
+
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
@@ -256,7 +272,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       if (state.isHome === "away") s.push("places");
       s.push("opponent", "official");
     } else if (!isRecurring) {
-      s.push("duration");
+      // "Other": no separate duration step — end time is captured in the "when" step.
+      if (state.type !== "other") s.push("duration");
       // "Other" events (e.g. camps): ask home/away for a proper location choice.
       if (state.type === "other") s.push("homeaway");
     }
@@ -775,16 +792,102 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="pt-2">
-                  <Label className="text-xs text-muted-foreground">
-                    {t("eventWizard.range.startTime", { defaultValue: "Heure de début (chaque jour)" })}
-                  </Label>
-                  <TimePicker
-                    value={state.startTime}
-                    onChange={(v: string) => patch("startTime", v)}
-                    className="w-full mt-1"
-                  />
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">
+                      {t("eventWizard.range.startTime", { defaultValue: "Heure de début" })}
+                    </Label>
+                    <TimePicker
+                      value={state.startTime}
+                      onChange={(v: string) => patch("startTime", v)}
+                      className="w-full mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">
+                      {t("eventWizard.range.endTime", { defaultValue: "Heure de fin" })}
+                    </Label>
+                    <TimePicker
+                      value={state.endTime ?? ""}
+                      onChange={(v: string) => patch("endTime", v)}
+                      className="w-full mt-1"
+                    />
+                  </div>
                 </div>
+                {/* Per-day schedule for multi-day events */}
+                {state.startDate && state.endDate && state.endDate > state.startDate && (
+                  <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-xs">
+                        <div className="font-semibold">
+                          {t("eventWizard.range.sameHoursTitle", {
+                            defaultValue: "Horaires identiques chaque jour",
+                          })}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {t("eventWizard.range.sameHoursHint", {
+                            defaultValue: "Désactivez pour personnaliser jour par jour",
+                          })}
+                        </div>
+                      </div>
+                      <Switch
+                        checked={!perDaySchedule}
+                        onCheckedChange={(v) => {
+                          setPerDaySchedule(!v);
+                          if (v) patch("dayTimes", undefined);
+                          else {
+                            // seed with global times
+                            const days = enumerateDays(state.startDate, state.endDate);
+                            const seed: Record<string, { start: string; end: string }> = {};
+                            const end = state.endTime || state.startTime;
+                            for (const d of days) seed[d] = { start: state.startTime, end };
+                            patch("dayTimes", seed);
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1.5 pt-1">
+                      {enumerateDays(state.startDate, state.endDate).map((d) => {
+                        const dt = state.dayTimes?.[d];
+                        const start = perDaySchedule ? (dt?.start ?? state.startTime) : state.startTime;
+                        const end = perDaySchedule
+                          ? (dt?.end ?? state.endTime ?? "")
+                          : (state.endTime ?? "");
+                        const label = format(new Date(`${d}T00:00:00`), "EEE d MMM", {
+                          locale: dateLocale,
+                        });
+                        return (
+                          <div
+                            key={d}
+                            className="grid grid-cols-[minmax(0,1fr)_90px_90px] items-center gap-2"
+                          >
+                            <span className="text-xs font-medium truncate">{label}</span>
+                            <TimePicker
+                              value={start}
+                              onChange={(v) => {
+                                if (!perDaySchedule) return;
+                                const next = { ...(state.dayTimes ?? {}) };
+                                next[d] = { start: v, end: next[d]?.end ?? end };
+                                patch("dayTimes", next);
+                              }}
+                              className={cn("w-full", !perDaySchedule && "opacity-60 pointer-events-none")}
+                            />
+                            <TimePicker
+                              value={end}
+                              onChange={(v) => {
+                                if (!perDaySchedule) return;
+                                const next = { ...(state.dayTimes ?? {}) };
+                                next[d] = { start: next[d]?.start ?? start, end: v };
+                                patch("dayTimes", next);
+                              }}
+                              className={cn("w-full", !perDaySchedule && "opacity-60 pointer-events-none")}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -1055,9 +1158,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 </div>
               </div>
             )}
-            <Button className="w-full mt-2" onClick={() => go(1)}>
-              {t("eventWizard.continue", { defaultValue: "Continuer" })}
-            </Button>
+            {recurrence?.mode !== "multi_day" && (
+              <Button className="w-full mt-2" onClick={() => go(1)}>
+                {t("eventWizard.continue", { defaultValue: "Continuer" })}
+              </Button>
+            )}
           </StepQuestion>
         )}
 
@@ -1509,13 +1614,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 : t("eventWizard.q.location", { defaultValue: "Où ?" })
             }
           >
-            <VenuePicker
-              clubId={activeClubId ?? undefined}
-              venueId={state.venueId ?? null}
-              facilityId={state.facilityId ?? null}
-              autoApplyDefaults={!state.location}
-              onChange={applyVenuePick}
-            />
+            {/* When "away" for a non-match event, show only a free address input (Google) */}
+            {!(state.type === "other" && state.isHome === "away") && (
+              <VenuePicker
+                clubId={activeClubId ?? undefined}
+                venueId={state.venueId ?? null}
+                facilityId={state.facilityId ?? null}
+                autoApplyDefaults={!state.location}
+                onChange={applyVenuePick}
+              />
+            )}
             <LocationAutocomplete
               value={state.location ?? ""}
               onChange={(v) => {
@@ -1524,11 +1632,15 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 patch("facilityId", null);
               }}
               placeholder={
-                state.type === "match"
-                  ? t("eventWizard.matchLocationPlaceholder", {
-                      defaultValue: "Stade / adresse du match",
+                state.type === "other" && state.isHome === "away"
+                  ? t("eventWizard.awayAddressPlaceholder", {
+                      defaultValue: "Adresse (autocomplétion Google)",
                     })
-                  : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
+                  : state.type === "match"
+                    ? t("eventWizard.matchLocationPlaceholder", {
+                        defaultValue: "Stade / adresse du match",
+                      })
+                    : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
               }
             />
 
