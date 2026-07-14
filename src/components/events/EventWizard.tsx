@@ -239,6 +239,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
     const s: Step[] = ["type", "team"];
+    // "Other" events: ask for a name up-front (e.g. camp/stage title).
+    if (state.type === "other") s.push("name");
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
     const isRecurring =
