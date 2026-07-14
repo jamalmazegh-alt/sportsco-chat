@@ -157,6 +157,29 @@ export function countOccurrences(
   return count;
 }
 
+/** Compute duration (minutes) between two HH:mm times on the same day. Null if invalid or non-positive. */
+export function minutesBetweenTimes(startTime: string, endTime: string): number | null {
+  const parse = (t: string) => {
+    const [h, m] = t.split(":").map((n) => parseInt(n, 10));
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return h * 60 + m;
+  };
+  const a = parse(startTime);
+  const b = parse(endTime);
+  if (a == null || b == null) return null;
+  const d = b - a;
+  return d > 0 ? d : null;
+}
+
+/** Effective duration in minutes: endTime overrides durationMin when set and valid. */
+export function effectiveDuration(state: EventWizardState): number {
+  if (state.endTime) {
+    const d = minutesBetweenTimes(state.startTime, state.endTime);
+    if (d) return d;
+  }
+  return state.durationMin;
+}
+
 /**
  * Map wizard state to the shared builder input (single source of truth).
  * Returns null if mandatory fields are missing.
@@ -168,29 +191,34 @@ export function toEventPayloadInput(
   if (!state.type || !state.teamId || !state.startDate) return null;
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
-  // Multi-day "other" events (e.g. camp): end at endDate + startTime + durationMin
+  const duration = effectiveDuration(state);
+  // Multi-day "other" events (e.g. camp): end at endDate + startTime + duration
   const isMultiDay =
     state.type === "other" && !!state.endDate && state.endDate > state.startDate;
   const endsIso = isMultiDay
-    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
-    : addMinutesIso(startsIso, state.durationMin);
+    ? addMinutesIso(toIso(state.endDate, state.startTime), duration)
+    : addMinutesIso(startsIso, duration);
   const isMatch = state.type === "match";
   const isHomeMatch = isMatch && state.isHome === "home";
   const isAwayMatch = isMatch && state.isHome === "away";
 
-  // Combine game format + user comment into description
+  // Combine game format + per-day schedule + user comment into description
   const descParts: string[] = [];
   if (state.gameFormat) {
     descParts.push(
       `Format: ${state.gameFormat}${state.halvesFormat ? ` · ${state.halvesFormat} min` : ""}`,
     );
   }
+  if (isMultiDay && state.dayTimes && Object.keys(state.dayTimes).length > 0) {
+    const lines = Object.entries(state.dayTimes)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([d, t]) => `${d}: ${t.start} - ${t.end}`);
+    if (lines.length) descParts.push(`Horaires:\n${lines.join("\n")}`);
+  }
   if (state.description?.trim()) descParts.push(state.description.trim());
   const desc = descParts.length ? descParts.join("\n") : null;
 
   // Convocation time = startDate + meetingTime
-  // - Away matches: meeting point + meeting time
-  // - Training/other: meeting time is "be there at" hour
   const convocIso = state.meetingTime ? toIso(state.startDate, state.meetingTime) : null;
 
   return {
@@ -198,8 +226,6 @@ export function toEventPayloadInput(
     type: state.type,
     title,
     description: desc,
-    // Home match: previously forced to null. Now use whatever the VenuePicker
-    // (or manual entry) set on state — falls back to null when nothing chosen.
     location: isHomeMatch ? (state.location ?? null) : (state.location ?? null),
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
