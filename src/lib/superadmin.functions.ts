@@ -187,7 +187,9 @@ export const getClubActivitySummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertSuperAdmin(context.userId);
-    const { data, error } = await supabaseAdmin.rpc("superadmin_club_activity_summary");
+    const { data, error } = await supabaseAdmin.rpc(
+      "superadmin_club_activity_summary" as never,
+    );
     if (error) throw new Error(error.message);
     const map: Record<string, ClubActivitySummary> = {};
     for (const row of (data ?? []) as Array<{
