@@ -1678,6 +1678,7 @@ function Chip({ label, onClick }: { label: string; onClick: () => void }) {
 const STEP_ICONS: Record<Step, LucideIcon> = {
   type: Sparkles,
   team: Users,
+  name: Sparkles,
   when: CalendarDays,
   duration: Timer,
   halves: Hourglass,
