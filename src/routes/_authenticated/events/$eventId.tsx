@@ -2139,21 +2139,37 @@ function EventDetail() {
           <div className="flex items-center gap-3 mb-2.5">
             {/* Date box — green gradient */}
             <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
-              {isMultiDay ? (
-                <>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-                    {fmt(event.starts_at, "MMM") === fmt(event.ends_at!, "MMM")
-                      ? fmt(event.starts_at, "MMM")
-                      : `${fmt(event.starts_at, "MMM")}–${fmt(event.ends_at!, "MMM")}`}
-                  </div>
-                  <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
-                    {fmt(event.starts_at, "d")}–{fmt(event.ends_at!, "d")}
-                  </div>
-                  <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
-                    {fmt(event.starts_at, "EEE")}–{fmt(event.ends_at!, "EEE")}
-                  </div>
-                </>
-              ) : (
+              {isMultiDay ? (() => {
+                const startIso =
+                  event.ends_at &&
+                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                    ? event.starts_at
+                    : (scheduleStartDate
+                        ? `${scheduleStartDate}T00:00:00`
+                        : event.starts_at);
+                const endIso =
+                  event.ends_at &&
+                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                    ? event.ends_at
+                    : (scheduleEndDate
+                        ? `${scheduleEndDate}T00:00:00`
+                        : event.ends_at ?? event.starts_at);
+                return (
+                  <>
+                    <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
+                      {fmt(startIso, "MMM") === fmt(endIso, "MMM")
+                        ? fmt(startIso, "MMM")
+                        : `${fmt(startIso, "MMM")}–${fmt(endIso, "MMM")}`}
+                    </div>
+                    <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
+                      {fmt(startIso, "d")}–{fmt(endIso, "d")}
+                    </div>
+                    <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
+                      {fmt(startIso, "EEE")}–{fmt(endIso, "EEE")}
+                    </div>
+                  </>
+                );
+              })() : (
                 <>
                   <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
                     {fmt(event.starts_at, "MMM")}
@@ -2179,24 +2195,21 @@ function EventDetail() {
                     <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
-                  <Clock className="h-3 w-3" />
-                  {event.type === "match" ? (
-                    <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
-                  ) : event.type === "other" ? (
-                    <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
-                  ) : (
-                    <span>
-                      {t(`events.types.${event.type}`, {
-                        defaultValue: t("events.timeShort", { defaultValue: "Horaire" }),
-                      })}
-                    </span>
-                  )}
-                  <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
-                  {event.ends_at && (
-                    <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
-                  )}
-                </span>
+                {parsedSchedule.items.length === 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                    <Clock className="h-3 w-3" />
+                    {event.type === "match" ? (
+                      <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
+                    ) : (
+                      <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
+                    )}
+                    <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
+                    {event.ends_at &&
+                      fmt(event.starts_at, "yyyy-MM-dd") === fmt(event.ends_at, "yyyy-MM-dd") && (
+                        <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
+                      )}
+                  </span>
+                )}
               </div>
             </div>
           </div>
