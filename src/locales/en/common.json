@@ -758,6 +758,7 @@
     "matchDateTime": "Match date and time",
     "trainingDate": "Training date",
     "convocationTimeShort": "Meet-up",
+    "timeShort": "Time",
     "startTime": "Start",
     "endTime": "End",
     "locationGoogleHelper": "Start typing to select an address from Google Maps.",

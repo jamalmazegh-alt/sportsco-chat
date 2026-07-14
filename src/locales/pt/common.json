@@ -758,6 +758,7 @@
     "matchDateTime": "Data e hora do jogo",
     "trainingDate": "Data do treino",
     "convocationTimeShort": "P.E.",
+    "timeShort": "Horário",
     "startTime": "Início",
     "endTime": "Fim",
     "locationGoogleHelper": "Comece a digitar para selecionar um endereço do Google Maps.",

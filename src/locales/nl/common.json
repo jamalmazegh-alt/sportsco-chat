@@ -758,6 +758,7 @@
     "matchDateTime": "Datum en tijd wedstrijd",
     "trainingDate": "Trainingsdatum",
     "convocationTimeShort": "Verz.",
+    "timeShort": "Tijd",
     "startTime": "Starttijd",
     "endTime": "Eindtijd",
     "locationGoogleHelper": "Begin te typen om een Google Maps-adres te selecteren.",

@@ -724,7 +724,7 @@
       "match": "Match",
       "tournament": "Tournoi",
       "meeting": "Réunion",
-      "other": "Autre"
+      "other": "Stage"
     },
     "status": {
       "draft": "Brouillon",
@@ -758,6 +758,7 @@
     "matchDateTime": "Date et heure du match",
     "trainingDate": "Date de l'entraînement",
     "convocationTimeShort": "RDV",
+    "timeShort": "Horaire",
     "startTime": "Début",
     "endTime": "Fin",
     "locationGoogleHelper": "Commencez à taper pour choisir une adresse Google Maps.",
