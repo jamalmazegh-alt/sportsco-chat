@@ -362,6 +362,85 @@ function ClubDetail() {
         </Card>
       </section>
 
+      <section className="mb-6">
+        <Card title="Roster recap — per team">
+          {!roster ? (
+            <div className="text-sm text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading roster…
+            </div>
+          ) : roster.rows.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No teams.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
+                    <th className="text-left font-medium py-2 pr-3">Team</th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">Coaches</th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">Parents</th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">Players</th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">Other</th>
+                    <th className="text-right font-medium py-2 pl-2 tabular-nums">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {roster.rows.map((r) => (
+                    <tr key={r.team_id} className={r.archived ? "text-muted-foreground" : ""}>
+                      <td className="py-2 pr-3">
+                        <div
+                          className={
+                            r.archived ? "line-through" : "font-medium"
+                          }
+                        >
+                          {r.name}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {[r.sport, r.age_group].filter(Boolean).join(" · ") || "—"}
+                        </div>
+                      </td>
+                      <td className="text-right py-2 px-2 tabular-nums">{r.coaches}</td>
+                      <td className="text-right py-2 px-2 tabular-nums">{r.parents}</td>
+                      <td className="text-right py-2 px-2 tabular-nums">{r.players}</td>
+                      <td className="text-right py-2 px-2 tabular-nums">{r.other}</td>
+                      <td className="text-right py-2 pl-2 tabular-nums font-semibold">
+                        {r.total}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-border font-semibold">
+                    <td className="py-2 pr-3 text-xs uppercase tracking-wide">
+                      Club total (active teams)
+                    </td>
+                    <td className="text-right py-2 px-2 tabular-nums">
+                      {roster.totals.coaches}
+                    </td>
+                    <td className="text-right py-2 px-2 tabular-nums">
+                      {roster.totals.parents}
+                    </td>
+                    <td className="text-right py-2 px-2 tabular-nums">
+                      {roster.totals.players}
+                    </td>
+                    <td className="text-right py-2 px-2 tabular-nums">
+                      {roster.totals.other}
+                    </td>
+                    <td className="text-right py-2 pl-2 tabular-nums">
+                      {roster.totals.total}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Coaches include admin/dirigeant. Counts are distinct users (or player rows).
+                Archived teams are shown but excluded from the club total.
+              </p>
+            </div>
+          )}
+        </Card>
+      </section>
+
+
       <section className="grid lg:grid-cols-2 gap-4 mb-6">
         <Card title="Recent events">
           {recent_events.length === 0 && (
