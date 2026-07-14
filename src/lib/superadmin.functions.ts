@@ -218,12 +218,20 @@ export type StalledSignal =
   | "event_no_convocation"
   | "invite_not_accepted";
 
+export type StalledDetail = {
+  club_name?: string;
+  team_name?: string;
+  team_id?: string;
+  title?: string;
+  starts_at?: string;
+};
+
 export type StalledOnboardingItem = {
   signal: StalledSignal;
   club_id: string | null;
   resource_type: string | null;
   resource_id: string | null;
-  detail: Record<string, unknown> | null;
+  detail: StalledDetail | null;
   since: string | null;
 };
 
