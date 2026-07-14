@@ -1051,10 +1051,14 @@ function PlayerProfile() {
                 })}
               </ul>
 
-              {isCoach && showParentForm && (
-                <form onSubmit={onAddParent} className="space-y-3 pt-3 border-t border-border">
+              {showParentForm && (isCoach || editingParentId) && (
+                <form onSubmit={onSubmitParent} className="space-y-3 pt-3 border-t border-border">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{t("players.addParent")}</p>
+                    <p className="text-sm font-medium">
+                      {editingParentId
+                        ? t("common.edit", { defaultValue: "Modifier" })
+                        : t("players.addParent")}
+                    </p>
                     <Button
                       type="button"
                       size="icon"
@@ -1110,7 +1114,13 @@ function PlayerProfile() {
                     />
                   </div>
                   <Button type="submit" className="w-full h-10" disabled={pBusy}>
-                    {pBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.addParent")}
+                    {pBusy ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : editingParentId ? (
+                      t("common.save")
+                    ) : (
+                      t("players.addParent")
+                    )}
                   </Button>
                 </form>
               )}
