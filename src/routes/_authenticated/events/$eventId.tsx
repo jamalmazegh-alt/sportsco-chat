@@ -3205,25 +3205,19 @@ function EventDetail() {
                   .filter(Boolean) as Array<{ id: string; name: string; remaining: number }>;
                 if (suspendedSelected.length === 0) return null;
                 const isOfficial = (event as any)?.is_official === true && event.type === "match";
+                if (!isOfficial) return null;
                 return (
                   <div
                     className={cn(
                       "rounded-xl border p-3 text-xs space-y-1",
-                      isOfficial
-                        ? "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
-                        : "border-muted bg-muted/40 text-muted-foreground",
+                      "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200",
                     )}
                   >
                     <p className="font-semibold flex items-center gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5" />
-                      {isOfficial
-                        ? t("suspensions.warningOfficial", {
-                            defaultValue: "Joueurs suspendus dans la sélection (match officiel)",
-                          })
-                        : t("suspensions.warningNonOfficial", {
-                            defaultValue:
-                              "Joueurs suspendus dans la sélection (ce match ne décompte pas leur suspension)",
-                          })}
+                      {t("suspensions.warningOfficial", {
+                        defaultValue: "Joueurs suspendus dans la sélection (match officiel)",
+                      })}
                     </p>
                     <ul className="list-disc pl-5">
                       {suspendedSelected.map((s) => (
