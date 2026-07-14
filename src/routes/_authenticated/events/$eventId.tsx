@@ -2019,9 +2019,32 @@ function EventDetail() {
     return <EventDetailSkeleton />;
   }
 
+  // Parse an optional "Horaires:\n..." block from description to detect multi-day
+  // events and to render a dedicated schedule block below.
+  const parsedSchedule = (() => {
+    const raw = (event.description as string | null) ?? "";
+    const m = raw.match(/(^|\n)Horaires:\s*\n?([\s\S]*?)(?=\n\n|$)/);
+    if (!m) return { items: [] as { date: string; start: string; end: string }[], rest: raw };
+    const items = m[2]
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .map((l) => {
+        const mm = l.match(/^(\d{4}-\d{2}-\d{2}):\s*(\d{2}:\d{2})\s*[-–—]\s*(\d{2}:\d{2})/);
+        return mm ? { date: mm[1], start: mm[2], end: mm[3] } : null;
+      })
+      .filter((x): x is { date: string; start: string; end: string } => !!x);
+    return { items, rest: raw.replace(m[0], "").trim() };
+  })();
+
+  const scheduleDates = parsedSchedule.items.map((s) => s.date).sort();
+  const scheduleStartDate = scheduleDates[0];
+  const scheduleEndDate = scheduleDates[scheduleDates.length - 1];
+
   const isMultiDay =
-    !!event.ends_at &&
-    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd");
+    (!!event.ends_at &&
+      fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")) ||
+    (!!scheduleStartDate && !!scheduleEndDate && scheduleStartDate !== scheduleEndDate);
 
   const responsesReadOnly =
     !!event.responses_locked ||
