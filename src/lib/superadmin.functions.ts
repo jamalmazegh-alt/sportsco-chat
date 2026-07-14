@@ -1647,22 +1647,19 @@ export const getClubRoster = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
 
-    const [{ data: teams }, { data: allMembers }] = await Promise.all([
-      supabaseAdmin
-        .from("teams")
-        .select("id, name, sport, age_group, archived_at, deleted_at")
-        .eq("club_id", data.club_id)
-        .order("name"),
-      supabaseAdmin
-        .from("team_members")
-        .select("team_id, role, user_id, player_id")
-        .in(
-          "team_id",
-          (
-            await supabaseAdmin.from("teams").select("id").eq("club_id", data.club_id)
-          ).data?.map((t) => t.id) ?? [],
-        ),
-    ]);
+    const { data: teams } = await supabaseAdmin
+      .from("teams")
+      .select("id, name, sport, age_group, archived_at, deleted_at")
+      .eq("club_id", data.club_id)
+      .order("name");
+    const teamIds = (teams ?? []).map((t) => t.id);
+    const { data: allMembers } = teamIds.length
+      ? await supabaseAdmin
+          .from("team_members")
+          .select("team_id, role, user_id, player_id")
+          .in("team_id", teamIds)
+      : { data: [] as never[] };
+
 
     type Role = "coach" | "parent" | "player" | "other";
     const bucket = (r: string): Role => {
