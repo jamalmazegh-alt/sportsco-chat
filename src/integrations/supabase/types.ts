@@ -6860,6 +6860,16 @@ export type Database = {
         }
         Returns: string
       }
+      superadmin_club_activity_summary: {
+        Args: never
+        Returns: {
+          club_id: string
+          count_30d: number
+          count_7d: number
+          last_action_type: string
+          last_activity_at: string
+        }[]
+      }
       superadmin_product_activity: {
         Args: {
           _actor?: string

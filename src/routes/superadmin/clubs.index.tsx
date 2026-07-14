@@ -1,13 +1,50 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { listAllClubs } from "@/lib/superadmin.functions";
+import { getClubActivitySummary, type ClubActivitySummary } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Mail, Phone, Search, ShieldCheck, User2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
+
+const INACTIVE_DAYS = 30;
+
+const ACTION_LABELS: Record<string, string> = {
+  "event.created": "Événement créé",
+  "event.updated": "Événement modifié",
+  "event.cancelled": "Événement annulé",
+  "convocation.sent": "Convocation envoyée",
+  "convocation.responded": "Réponse convocation",
+  "team.created": "Équipe créée",
+  "team.updated": "Équipe modifiée",
+  "camp.created": "Stage créé",
+  "camp.published": "Stage publié",
+  "camp.registration_received": "Inscription stage",
+  "tournament.created": "Tournoi créé",
+  "social.connected": "Réseau connecté",
+  "social.disconnected": "Réseau déconnecté",
+  "social.sync_succeeded": "Sync réseau OK",
+  "social.sync_failed": "Sync réseau KO",
+  "wall.post_published": "Post publié",
+  "invite.club_sent": "Invitation club",
+  "invite.club_accepted": "Invitation club acceptée",
+  "invite.member_sent": "Invitation membre",
+  "invite.member_accepted": "Invitation membre acceptée",
+  "import.started": "Import démarré",
+  "import.succeeded": "Import réussi",
+  "import.partial": "Import partiel",
+  "import.failed": "Import échoué",
+  "support.ticket_opened": "Ticket support",
+  "impersonation.started": "Impersonation",
+};
+
+function actionLabel(type: string | null): string {
+  if (!type) return "—";
+  return ACTION_LABELS[type] ?? type;
+}
 
 export const Route = createFileRoute("/superadmin/clubs/")({
   component: SuperAdminClubs,
@@ -90,6 +127,7 @@ function SuperAdminClubs() {
   const [includePersonal, setIncludePersonal] = useState(false);
   const [includeSystem, setIncludeSystem] = useState(false);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [activity, setActivity] = useState<Record<string, ClubActivitySummary>>({});
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshKey] = useState(0);
@@ -100,18 +138,22 @@ function SuperAdminClubs() {
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => {
-      listAllClubs({
-        data: {
-          search: search || undefined,
-          limit: 50,
-          offset: 0,
-          include_personal: includePersonal,
-          include_system: includeSystem,
-        },
-      })
-        .then((r) => {
+      Promise.all([
+        listAllClubs({
+          data: {
+            search: search || undefined,
+            limit: 50,
+            offset: 0,
+            include_personal: includePersonal,
+            include_system: includeSystem,
+          },
+        }),
+        getClubActivitySummary().catch(() => ({ byClub: {} })),
+      ])
+        .then(([r, a]) => {
           setClubs(r.items as Club[]);
           setTotal(r.total);
+          setActivity(a.byClub ?? {});
         })
         .finally(() => setLoading(false));
     }, 250);
@@ -166,6 +208,7 @@ function SuperAdminClubs() {
               <th className="text-left font-medium px-3 py-2">Club</th>
               <th className="text-left font-medium px-3 py-2">Contact</th>
               <th className="text-left font-medium px-3 py-2">Membres</th>
+              <th className="text-left font-medium px-3 py-2">Activité</th>
               <th className="text-left font-medium px-3 py-2">Facturation</th>
               <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Créé le</th>
             </tr>
@@ -173,7 +216,7 @@ function SuperAdminClubs() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
                   Chargement…
                 </td>
@@ -181,7 +224,7 @@ function SuperAdminClubs() {
             )}
             {!loading && clubs.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
                   Aucun club trouvé.
                 </td>
               </tr>
@@ -191,6 +234,11 @@ function SuperAdminClubs() {
                 const pill = billingPill(c.subscription);
                 const isTest = c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
                 const exempt = c.subscription && isBillingExempt(c.subscription);
+                const act = activity[c.id];
+                const lastAt = act?.last_activity_at ? new Date(act.last_activity_at) : null;
+                const inactive =
+                  !c.archived_at &&
+                  (!lastAt || Date.now() - lastAt.getTime() > INACTIVE_DAYS * 86400_000);
                 return (
                   <tr
                     key={c.id}
@@ -260,6 +308,34 @@ function SuperAdminClubs() {
                       )}
                     </td>
                     <td className="px-3 py-2.5 tabular-nums">{c.member_count}</td>
+                    <td className="px-3 py-2.5 align-top">
+                      <Link
+                        to="/superadmin/clubs/$clubId"
+                        params={{ clubId: c.id }}
+                        className="block text-xs"
+                      >
+                        {lastAt ? (
+                          <>
+                            <div className="font-medium">
+                              il y a {formatDistanceToNowStrict(lastAt, { locale: fr })}
+                            </div>
+                            <div className="text-muted-foreground">
+                              {actionLabel(act?.last_action_type ?? null)}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                              {act?.count_7d ?? 0} / 7j · {act?.count_30d ?? 0} / 30j
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                        {inactive && (
+                          <span className="inline-flex items-center rounded-full bg-[#fff5f5] text-[#ef4444] border border-[#fecaca] px-2 py-0.5 text-[10px] font-medium mt-1">
+                            Inactif
+                          </span>
+                        )}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2.5">
                       <Link
                         to="/superadmin/clubs/$clubId"
@@ -312,6 +388,11 @@ function SuperAdminClubs() {
           clubs.map((c) => {
             const pill = billingPill(c.subscription);
             const exempt = c.subscription && isBillingExempt(c.subscription);
+            const act = activity[c.id];
+            const lastAt = act?.last_activity_at ? new Date(act.last_activity_at) : null;
+            const inactive =
+              !c.archived_at &&
+              (!lastAt || Date.now() - lastAt.getTime() > INACTIVE_DAYS * 86400_000);
             return (
               <Link
                 key={c.id}
@@ -324,10 +405,25 @@ function SuperAdminClubs() {
                     <div className="font-semibold truncate flex items-center gap-1.5">
                       {c.name}
                       {exempt && <ShieldCheck className="h-3.5 w-3.5 text-[#2563eb]" />}
+                      {inactive && (
+                        <span className="inline-flex items-center rounded-full bg-[#fff5f5] text-[#ef4444] border border-[#fecaca] px-1.5 py-0 text-[10px] font-medium">
+                          Inactif
+                        </span>
+                      )}
                     </div>
                     <div className="text-[11px] text-muted-foreground">
                       {c.member_count} membre{c.member_count > 1 ? "s" : ""} ·{" "}
                       {new Date(c.created_at).toLocaleDateString()}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {lastAt ? (
+                        <>
+                          Activité il y a {formatDistanceToNowStrict(lastAt, { locale: fr })} ·{" "}
+                          {act?.count_7d ?? 0}/7j
+                        </>
+                      ) : (
+                        "Aucune activité"
+                      )}
                     </div>
                   </div>
                   <span
