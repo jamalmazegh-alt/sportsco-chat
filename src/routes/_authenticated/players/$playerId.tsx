@@ -38,6 +38,7 @@ import {
   Globe,
   Copy,
   Palmtree,
+  Pencil,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
