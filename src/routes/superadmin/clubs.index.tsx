@@ -127,6 +127,7 @@ function SuperAdminClubs() {
   const [includePersonal, setIncludePersonal] = useState(false);
   const [includeSystem, setIncludeSystem] = useState(false);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [activity, setActivity] = useState<Record<string, ClubActivitySummary>>({});
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshKey] = useState(0);
@@ -137,18 +138,22 @@ function SuperAdminClubs() {
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => {
-      listAllClubs({
-        data: {
-          search: search || undefined,
-          limit: 50,
-          offset: 0,
-          include_personal: includePersonal,
-          include_system: includeSystem,
-        },
-      })
-        .then((r) => {
+      Promise.all([
+        listAllClubs({
+          data: {
+            search: search || undefined,
+            limit: 50,
+            offset: 0,
+            include_personal: includePersonal,
+            include_system: includeSystem,
+          },
+        }),
+        getClubActivitySummary().catch(() => ({ byClub: {} })),
+      ])
+        .then(([r, a]) => {
           setClubs(r.items as Club[]);
           setTotal(r.total);
+          setActivity(a.byClub ?? {});
         })
         .finally(() => setLoading(false));
     }, 250);
