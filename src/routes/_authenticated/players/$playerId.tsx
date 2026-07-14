@@ -1025,6 +1025,17 @@ function PlayerProfile() {
                           <Send className="h-4 w-4 text-primary" />
                         </Button>
                       )}
+                      {(isCoach || pp.parent_user_id === user?.id) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => startEditParent(pp)}
+                          title={t("common.edit", { defaultValue: "Modifier" })}
+                        >
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      )}
                       {isCoach && (
                         <Button
                           size="icon"
