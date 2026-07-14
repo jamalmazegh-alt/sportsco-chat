@@ -2,7 +2,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -74,6 +74,10 @@ function AdminUsersPage() {
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const submittingRef = useRef(false);
+  // Cooldown to prevent accidental re-invites (double-tap / retry after slow email).
+  const COOLDOWN_MS = 60_000;
+  const recentInvitesRef = useRef<Map<string, number>>(new Map());
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
@@ -95,87 +99,110 @@ function AdminUsersPage() {
   async function onInvite(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
-    setBusy(true);
-
-    // Refuse if email already has a Clubero account in this club
-    try {
-      const { data: exists } = await supabase.rpc("email_exists", { _email: email });
-      if (exists === true) {
-        setBusy(false);
-        toast.error(
-          t("admin.inviteEmailAlreadyUser", {
-            defaultValue:
-              "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
-          }),
-        );
-        return;
-      }
-    } catch {
-      /* non-blocking */
-    }
-
-    const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
-    const primaryRole: string = inviteRoles.includes("admin")
-      ? "admin"
-      : inviteRoles.includes("coach")
-        ? "coach"
-        : "dirigeant";
-    const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: activeClubId,
-      role: primaryRole as any,
-      email,
-      token,
-      created_by: user.id,
-      first_name: first.trim() || null,
-      last_name: last.trim() || null,
-    });
-    if (invErr) {
-      setBusy(false);
-      toast.error(invErr.message);
+    // Guard against double-tap: block re-entry synchronously before any await.
+    if (submittingRef.current) return;
+    // Guard against short-window re-invite of the same email in the same club.
+    const cooldownKey = `${activeClubId}::${email.trim().toLowerCase()}`;
+    const lastSentAt = recentInvitesRef.current.get(cooldownKey) ?? 0;
+    const remaining = Math.ceil((COOLDOWN_MS - (Date.now() - lastSentAt)) / 1000);
+    if (remaining > 0) {
+      toast.info(
+        t("admin.inviteCooldown", {
+          defaultValue: `Invitation déjà envoyée à ${email}. Vous pourrez renvoyer dans ${remaining}s.`,
+          email,
+          seconds: remaining,
+        }),
+      );
       return;
     }
-
-    const { data: clubRow } = await supabase
-      .from("clubs")
-      .select("name, logo_url")
-      .eq("id", activeClubId)
-      .maybeSingle();
-    const clubLabel = clubRow?.name ?? "Clubero";
-    const clubLogoUrl = clubRow?.logo_url ?? undefined;
-    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
-
-    const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
-
+    submittingRef.current = true;
+    setBusy(true);
     try {
-      await sendTransactionalEmail({
-        templateName: "player-invite",
-        recipientEmail: email,
-        idempotencyKey: `staff-invite-${token}`,
-        fromName: `${clubLabel} via Clubero`,
-        templateData: {
-          firstName: first || undefined,
-          clubName: clubLabel,
-          clubLogoUrl,
-          inviteUrl,
-          roleLabel,
-        },
+      try {
+        const { data: exists } = await supabase.rpc("email_exists", { _email: email });
+        if (exists === true) {
+          toast.error(
+            t("admin.inviteEmailAlreadyUser", {
+              defaultValue:
+                "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
+            }),
+          );
+          return;
+        }
+      } catch {
+        /* non-blocking */
+      }
+
+      const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+      const primaryRole: string = inviteRoles.includes("admin")
+        ? "admin"
+        : inviteRoles.includes("coach")
+          ? "coach"
+          : "dirigeant";
+      const { error: invErr } = await supabase.from("member_invites").insert({
+        club_id: activeClubId,
+        role: primaryRole as any,
+        email,
+        token,
+        created_by: user.id,
+        first_name: first.trim() || null,
+        last_name: last.trim() || null,
       });
-    } catch (err: any) {
-      setBusy(false);
-      toast.error(
-        t("admin.inviteEmailFailed", {
-          defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
+      if (invErr) {
+        toast.error(invErr.message);
+        return;
+      }
+
+      const { data: clubRow } = await supabase
+        .from("clubs")
+        .select("name, logo_url")
+        .eq("id", activeClubId)
+        .maybeSingle();
+      const clubLabel = clubRow?.name ?? "Clubero";
+      const clubLogoUrl = clubRow?.logo_url ?? undefined;
+      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+
+      const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
+
+      try {
+        await sendTransactionalEmail({
+          templateName: "player-invite",
+          recipientEmail: email,
+          idempotencyKey: `staff-invite-${token}`,
+          fromName: `${clubLabel} via Clubero`,
+          templateData: {
+            firstName: first || undefined,
+            clubName: clubLabel,
+            clubLogoUrl,
+            inviteUrl,
+            roleLabel,
+          },
+        });
+      } catch (err: any) {
+        toast.error(
+          t("admin.inviteEmailFailed", {
+            defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
+          }),
+        );
+        qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
+        return;
+      }
+
+      // Success — record cooldown, close, notify.
+      recentInvitesRef.current.set(cooldownKey, Date.now());
+      setOpen(false);
+      reset();
+      toast.success(
+        t("admin.inviteSentTo", {
+          defaultValue: `Invitation envoyée à ${email}. Renvoi possible dans 60s.`,
+          email,
         }),
       );
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
-      return;
+    } finally {
+      submittingRef.current = false;
+      setBusy(false);
     }
-
-    setBusy(false);
-    setOpen(false);
-    reset();
-    toast.success(t("admin.inviteSent", { defaultValue: "Invitation envoyée" }));
-    qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
   }
 
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
