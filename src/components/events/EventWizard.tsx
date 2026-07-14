@@ -203,6 +203,22 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }));
   }
 
+  /** Enumerate dates (yyyy-mm-dd) from startDate to endDate inclusive. */
+  function enumerateDays(startDate?: string, endDate?: string): string[] {
+    if (!startDate || !endDate || endDate < startDate) return [];
+    const out: string[] = [];
+    const cur = new Date(`${startDate}T00:00:00`);
+    const end = new Date(`${endDate}T00:00:00`);
+    while (cur <= end) {
+      out.push(format(cur, "yyyy-MM-dd"));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  }
+
+  const [perDaySchedule, setPerDaySchedule] = useState(false);
+
+
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
