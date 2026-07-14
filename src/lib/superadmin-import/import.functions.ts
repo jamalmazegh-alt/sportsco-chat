@@ -11,6 +11,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 import { createLogger } from "@/lib/logger.server";
+import { logActivity } from "@/lib/observability/log-activity.server";
+import { redactErrorMessage } from "@/lib/observability/redact";
 import {
   type AnalysisResult,
   type ImportType,
