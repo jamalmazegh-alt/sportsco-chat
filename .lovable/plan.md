@@ -1,87 +1,80 @@
-## Objectif
+# Observabilité bêta — Dashboard superadmin
 
-Aligner la communication (site vitrine) et les prompts des assistants IA sur la liste réelle des features livrées dans l'app, puis propager dans les 7 langues.
+Objectif : voir en un coup d'œil (1) ce que font les clubs/utilisateurs et (2) ce qui échoue ou bloque. Hors périmètre : croissance, conversion, rétention, health scores.
 
-## Phase 1 — Audit & réconciliation (livrable à valider avant écriture)
+## Principes
 
-Je vais produire un seul document `docs/beta-v1/feature-inventory.md` qui :
+- **Un journal produit unifié** alimenté au fil de l'eau (`product_activity_log`), plutôt qu'agréger 10 tables à chaque chargement.
+- Ne pas toucher aux systèmes existants : `superadmin_audit_logs` (sécurité) reste séparé, `audit_logs` (diff entités) n'est pas réutilisé, `/superadmin/logs` reste le journal sécurité.
+- Écriture **fire-and-forget** côté serveur uniquement — une trace ratée ne casse jamais l'action métier.
+- **Assainissement obligatoire** des messages d'erreur avant stockage (les réponses Meta/Graph peuvent contenir `access_token=…`, les imports peuvent contenir des e-mails).
 
-1. Croise `docs/beta-v1/feature-matrix.md` avec ce que je trouve dans le code (`src/routes/_authenticated/*`, `src/modules/tournaments`, `src/lib/*`, migrations Supabase).
-2. Classe chaque feature par module :
-   - Coordination : convocations, réponses, chat événement, rappels, wall
-   - Effectif : joueurs, parents, guardians, historique, follow-ups, feedback coach, défis, suspensions, dispos
-   - Événements : matchs, entraînements, tournois (multi-clubs, flights, brackets), stages, covoiturage
-   - Paiements : cotisations, obligations, reçus, Stripe, tournois payants, pass tournois
-   - Communication : notifications push, emails transactionnels, WhatsApp bridge, wall, réseaux sociaux
-   - Administration : rôles, invites, branding, venues, sponsors, RGPD, exports
-   - Public : pages tournois publiques, TV, inscriptions publiques, profils joueurs publics, stages
-   - IA : assistant coach, création tournoi, build Clubero, marketing-chat
-3. Marque pour chacune : **shipped / partial / roadmap**, + note (« pas dans feature-matrix », « listé mais pas livré », etc.).
-4. Section « écarts » : ce qui est dans le code mais pas sur le site, et l'inverse.
+## Étape 0 — Socle
 
-**→ Je te demande de valider cet inventaire avant de toucher au contenu vitrine ou aux prompts.**
+Migration :
+- Table `public.product_activity_log` (club_id, actor_user_id, actor_role, category, action_type, resource_type, resource_id, status ∈ success/warning/failure, error_code, metadata jsonb, created_at).
+- Index sur `(club_id, created_at desc)`, `(category, created_at desc)`, `(status, created_at desc) where status <> 'success'`, `(action_type, created_at desc)`, `(actor_user_id, created_at desc)`.
+- RLS : SELECT réservé `has_super_admin(auth.uid())`. Aucune policy INSERT/UPDATE/DELETE → seul `service_role` écrit. Insertion seule (pas d'update/delete côté app).
+- GRANT SELECT à `authenticated`, ALL à `service_role`.
 
-## Phase 2 — Site vitrine (FR d'abord dans les JSON, puis traductions)
+Code (`src/lib/observability/`) :
+- Enum TS des `action_type` (`event.created`, `convocation.sent`, `social.sync_failed`, `import.failed`, …) et `category`.
+- Helper `logActivity(supabaseAdmin, {...})` server-only, typé, try/catch silencieux.
+- Fonction `redactErrorMessage(raw)` : masque `access_token=…`, `client_secret=…`, tokens Bearer, e-mails, tronque à N chars.
 
-Fichiers touchés :
+## Étape 1 — Instrumentation prioritaire
 
-- `src/locales/fr/marketing.json` — sections `home`, `features`, `pricing`, `faq` réécrites à partir de l'inventaire validé.
-- `src/routes/features.tsx` — restructurer en modules (voir Phase 1) avec pour chaque feature : nom, 1 phrase de valeur, icône Lucide, badge (nouveau/beta/pro).
-- `src/routes/index.tsx` — sections `featuresTitle` + 4 perspectives (coach/parent/joueur/club) mises à jour avec les vrais bénéfices.
-- `src/routes/pricing.tsx` — liste des features par plan alignée sur la matrice (indiquer clairement ce qui est gratuit / beta / à venir).
-- `src/routes/faq.tsx` — ajouter les questions récurrentes (dispos, covoiturage, tournois payants, RGPD, WhatsApp, multi-clubs).
-- Head metadata mise à jour si les titres/descriptions changent.
+Câbler `logActivity` (fire-and-forget, dans les server fns existants) sur :
+- **Events** : create / update / cancel.
+- **Convocations** : send / respond.
+- **Social** : connect / disconnect + sync success/fail (dans `src/lib/social/sync.server.ts` et le callback OAuth).
+- **Imports** : lifecycle dans `import.functions.ts` (success/partial/failed avec `error_code`).
+- **Invites** : `club_invites` / `member_invites` sent + accepted.
 
-Contraintes respectées :
+Aucune modification de logique métier — uniquement l'appel au helper après l'action.
 
-- Aucun texte en dur dans les composants — tout via `useTranslation` sur les clés existantes ou nouvelles dans `marketing.json`.
-- Pas de nouveau design system, on garde les composants existants.
+## Étape 2 — Fil d'activité produit
 
-## Phase 3 — Traduction 7 langues
+- RPC `superadmin_product_activity({ club_id?, category?, status?, actor?, from?, to?, cursor, limit })` — pagination curseur `(created_at, id)`, join club + profil acteur.
+- Composant `ProductActivityFeed` (date, club, acteur+rôle, action, badge statut, lien ressource).
+- Filtres serveur : club, catégorie, statut, période, utilisateur.
+- Nouvelle section « Activité & à surveiller » dans `src/routes/superadmin/index.tsx` (au-dessus de RGPD, sous Support). Sections Finance/Ops inchangées.
 
-- Une seule passe automatisée via `scripts/translate-locales.mjs` (existe déjà) sur `marketing.json` uniquement, à partir du FR mis à jour.
-- Contrôle final : `bun run check:i18n` doit rester vert.
-- Locales cibles : de, en, es, it, nl, pt.
+## Étape 3 — Liste des clubs enrichie
 
-## Phase 4 — Assistants IA
+- RPC `superadmin_club_activity_summary({ cursor, limit })` : par club — `last_activity_at`, `last_action_type`, `count_7d`, `count_30d`, `last_sign_in_at` (via `auth.users`).
+- Modif `src/routes/superadmin/clubs.index.tsx` : colonnes dernière activité, type, counts 7j/30j, dernière connexion, badge « inactif » (> 14j).
+- Clic sur un club → historique filtré (réutilise le feed avec `club_id`).
+- Backfill one-shot optionnel : première `last_activity_at` = `max(updated_at)` des tables clés. Sinon la colonne se remplit progressivement (acceptable pour la bêta).
 
-Quatre prompts à mettre à jour, chacun avec une section « features actuelles » synthétique tirée de l'inventaire :
+## Étape 4 — Panneau « À surveiller »
 
-1. **`src/routes/api/public/marketing-chat.ts`** — prompt orienté prospect. Doit connaître : modules livrés, plans, langues supportées, RGPD/EU, différenciation vs WhatsApp.
-2. **`src/lib/llm/tournament-assistant.functions.ts`** — assistant création tournoi : ajouter les nouveaux formats (flights, double élim, Swiss), options paiement, terrains, fair play.
-3. **`src/routes/api/public/build-clubero/*`** — assistant de feedback produit : mettre la liste des features à jour dans le contexte pour poser des questions pertinentes.
-4. **`src/routes/api/chat.ts`** (assistant in-app coach/club) — enrichir avec la connaissance des modules pour orienter l'utilisateur vers la bonne page.
+`WatchlistPanel` sur le dashboard, sous-cartes :
+- **Synchros sociales KO** : RPC `superadmin_watchlist_social_failures()` → `club_social_connections` où `last_sync_error is not null`. Affiche message assaini.
+- **Imports échoués/partiels** : RPC `superadmin_watchlist_failed_imports()` → `superadmin_imports` où `status in ('failed','partial')`, extrait `error_log` assaini.
+- **Onboardings bloqués** : RPC `superadmin_watchlist_stalled_onboarding()` — club sans équipe / équipe sans joueur / joueurs sans event / event sans convocation / invites non acceptées après N jours. **À la demande uniquement**, pagination bornée. Vue matérialisée si trop lourde en pratique.
+- **Tickets support ouverts** : réutilise `getSupportStats()`.
+- **Paiements en échec** : réutilise `past_due` de `getFinanceOverview()`.
 
-Constantes partagées : je crée `src/lib/llm/feature-context.ts` qui exporte une string `FEATURE_CONTEXT` (dérivée de l'inventaire) importée par les 4 prompts. Une seule source à mettre à jour ensuite.
+## Hors périmètre première livraison
 
-## Phase 5 — Vérifications
+Étape 5 (plus tard) : fiche club détaillée (`ClubActivityView` dans `clubs.$clubId.tsx`), instrumentation stages/tournois/mur, rétention/partition.
 
-- `bun run test` (609 unit tests)
-- `bun run check:i18n`
-- `bun run check:guards`
-- `bun run lint` sur les fichiers touchés
-- Screenshots Playwright de `/`, `/features`, `/pricing`, `/faq` en FR et EN pour vérifier visuellement.
+## Risques
 
-## Détails techniques
+- **Fuite de secrets** (risque n°1) : passer chaque message d'erreur par `redactErrorMessage` avant `logActivity`, ne jamais mettre de token/secret dans `metadata`. Ré-assainir à l'affichage par sécurité.
+- **Performance** : index posés dès l'étape 0, pagination curseur partout, watchlist onboarding à la demande.
+- **Rétention** : à traiter en étape 5 (purge 90-180j ou partition mensuelle).
 
-- `src/lib/llm/feature-context.ts` : ~150 lignes, format markdown bullet, versionné dans le repo, importé (pas lu à runtime).
-- `marketing.json` : garder la structure actuelle des clés pour ne pas casser le code ; ajouter de nouvelles sous-clés `features.modules.<module>.<feature>`.
-- Traductions : le script existant utilise Lovable AI ; coût ~6 locales × ~100 clés nouvelles = raisonnable.
-- Pas de migration DB, pas de nouvelle route, pas de nouveau composant UI majeur.
+## Tests
 
-## Ce que je NE fais PAS (sauf si tu le demandes)
+- Unit : `logActivity` ne throw jamais, `redactErrorMessage` masque `access_token=…` et e-mails.
+- RLS (`tests/rls/product-activity.rls.ts`) : superadmin lit, membre de club refusé, insertion client refusée.
+- Intégration : une convocation envoyée crée bien la ligne ; sync sociale KO → `status='failure'` + `error_code` sans secret.
+- UI : filtres feed, états vides, badge « inactif », colonnes clubs.
 
-- Refonte visuelle du site vitrine (design system, hero, illustrations).
-- Nouvelle page dédiée par module.
-- Ajout de screenshots produit dans /features.
-- Modifications des textes in-app (autres que les 4 prompts d'assistants).
-- Mise à jour de la doc `docs/` autre que le nouvel inventaire.
+## Fichiers touchés
 
-## Ordre d'exécution recommandé
-
-1. Phase 1 seule → validation avec toi.
-2. Phases 2 + 4 en parallèle (contenu FR + prompts, chacun s'appuie sur l'inventaire).
-3. Phase 3 (traductions).
-4. Phase 5 (vérifs + screenshots).
-
-Ça représente ~3-4 tours de messages pour toi selon la profondeur des retours sur l'inventaire.
+Nouveaux : migration, `src/lib/observability/{log-activity.server.ts, redact.ts, action-types.ts}`, `src/lib/superadmin/product-activity.functions.ts`, `src/components/superadmin/{ProductActivityFeed.tsx, WatchlistPanel.tsx}`, tests unit + RLS.
+Modifiés : `src/routes/superadmin/index.tsx`, `src/routes/superadmin/clubs.index.tsx`, server fns events/convocations/imports/invites, `src/lib/social/sync.server.ts`, `src/routes/api/public/social/callback.ts`.
+Non touchés : `/superadmin/logs`, `superadmin_audit_logs`, `audit_logs`, sections Finance/Ops du dashboard.

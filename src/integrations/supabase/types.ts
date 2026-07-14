@@ -3796,6 +3796,59 @@ export type Database = {
           },
         ]
       }
+      product_activity_log: {
+        Row: {
+          action_type: string
+          actor_role: string | null
+          actor_user_id: string | null
+          category: string
+          club_id: string | null
+          created_at: string
+          error_code: string | null
+          id: string
+          metadata: Json
+          resource_id: string | null
+          resource_type: string | null
+          status: string
+        }
+        Insert: {
+          action_type: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          category: string
+          club_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string
+        }
+        Update: {
+          action_type?: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          category?: string
+          club_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_activity_log_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -6806,6 +6859,65 @@ export type Database = {
           p_utm?: Json
         }
         Returns: string
+      }
+      superadmin_product_activity: {
+        Args: {
+          _actor?: string
+          _category?: string
+          _club_id?: string
+          _cursor_id?: string
+          _cursor_ts?: string
+          _from?: string
+          _limit?: number
+          _status?: string
+          _to?: string
+        }
+        Returns: {
+          action_type: string
+          actor_full_name: string
+          actor_role: string
+          actor_user_id: string
+          category: string
+          club_id: string
+          club_name: string
+          created_at: string
+          error_code: string
+          id: string
+          metadata: Json
+          resource_id: string
+          resource_type: string
+          status: string
+        }[]
+      }
+      superadmin_watchlist_failed_imports: {
+        Args: never
+        Returns: {
+          club_id: string
+          club_name: string
+          created_at: string
+          error_log: Json
+          file_name: string
+          id: string
+          import_type: string
+          imported_by: string
+          importer_full_name: string
+          rows_imported: number
+          rows_total: number
+          status: string
+        }[]
+      }
+      superadmin_watchlist_social_failures: {
+        Args: never
+        Returns: {
+          account_name: string
+          club_id: string
+          club_name: string
+          connection_id: string
+          is_active: boolean
+          last_sync_error: string
+          last_synced_at: string
+          network: string
+        }[]
       }
       team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
