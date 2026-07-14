@@ -388,6 +388,11 @@ function SuperAdminClubs() {
           clubs.map((c) => {
             const pill = billingPill(c.subscription);
             const exempt = c.subscription && isBillingExempt(c.subscription);
+            const act = activity[c.id];
+            const lastAt = act?.last_activity_at ? new Date(act.last_activity_at) : null;
+            const inactive =
+              !c.archived_at &&
+              (!lastAt || Date.now() - lastAt.getTime() > INACTIVE_DAYS * 86400_000);
             return (
               <Link
                 key={c.id}
@@ -400,10 +405,25 @@ function SuperAdminClubs() {
                     <div className="font-semibold truncate flex items-center gap-1.5">
                       {c.name}
                       {exempt && <ShieldCheck className="h-3.5 w-3.5 text-[#2563eb]" />}
+                      {inactive && (
+                        <span className="inline-flex items-center rounded-full bg-[#fff5f5] text-[#ef4444] border border-[#fecaca] px-1.5 py-0 text-[10px] font-medium">
+                          Inactif
+                        </span>
+                      )}
                     </div>
                     <div className="text-[11px] text-muted-foreground">
                       {c.member_count} membre{c.member_count > 1 ? "s" : ""} ·{" "}
                       {new Date(c.created_at).toLocaleDateString()}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {lastAt ? (
+                        <>
+                          Activité il y a {formatDistanceToNowStrict(lastAt, { locale: fr })} ·{" "}
+                          {act?.count_7d ?? 0}/7j
+                        </>
+                      ) : (
+                        "Aucune activité"
+                      )}
                     </div>
                   </div>
                   <span
