@@ -11,6 +11,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 import { createLogger } from "@/lib/logger.server";
+import { logActivity } from "@/lib/observability/log-activity.server";
+import { redactErrorMessage } from "@/lib/observability/redact";
 import {
   type AnalysisResult,
   type ImportType,
@@ -1278,34 +1280,86 @@ export const runImport = createServerFn({ method: "POST" })
       }
     } catch (e) {
       log.error("import fatal", { error: String(e) });
-      await supabaseAdmin.from("superadmin_imports").insert({
-        club_id: data.clubId,
-        imported_by: context.userId,
-        import_type: data.type,
-        file_name: data.fileName ?? null,
-        rows_total: data.rows.length,
-        rows_imported: 0,
-        ia_used: data.iaUsed,
-        invitations_sent: data.sendInvitations,
-        status: "failed",
-        error_log: { fatal: String(e) } as never,
+      const { data: fatalRun } = await supabaseAdmin
+        .from("superadmin_imports")
+        .insert({
+          club_id: data.clubId,
+          imported_by: context.userId,
+          import_type: data.type,
+          file_name: data.fileName ?? null,
+          rows_total: data.rows.length,
+          rows_imported: 0,
+          ia_used: data.iaUsed,
+          invitations_sent: data.sendInvitations,
+          status: "failed",
+          error_log: { fatal: String(e) } as never,
+        })
+        .select("id")
+        .single();
+      void logActivity(supabaseAdmin, {
+        clubId: data.clubId,
+        actorUserId: context.userId,
+        category: "import",
+        actionType: "import.failed",
+        resourceType: "import",
+        resourceId: fatalRun?.id ?? null,
+        status: "failure",
+        errorCode: "import_fatal",
+        metadata: {
+          type: data.type,
+          imported: 0,
+          failed: data.rows.length,
+          error: redactErrorMessage(e),
+        },
       });
       throw e;
     }
 
     const status = errors.length === 0 ? "success" : imported > 0 ? "partial" : "failed";
-    await supabaseAdmin.from("superadmin_imports").insert({
-      club_id: data.clubId,
-      imported_by: context.userId,
-      import_type: data.type,
-      file_name: data.fileName ?? null,
-      rows_total: data.rows.length,
-      rows_imported: imported,
-      ia_used: data.iaUsed,
-      invitations_sent: data.sendInvitations,
-      status,
-      error_log: errors.length ? ({ errors } as never) : null,
+    const { data: runRow } = await supabaseAdmin
+      .from("superadmin_imports")
+      .insert({
+        club_id: data.clubId,
+        imported_by: context.userId,
+        import_type: data.type,
+        file_name: data.fileName ?? null,
+        rows_total: data.rows.length,
+        rows_imported: imported,
+        ia_used: data.iaUsed,
+        invitations_sent: data.sendInvitations,
+        status,
+        error_log: errors.length ? ({ errors } as never) : null,
+      })
+      .select("id")
+      .single();
+
+    const actionType =
+      status === "success"
+        ? "import.succeeded"
+        : status === "partial"
+          ? "import.partial"
+          : "import.failed";
+    const activityStatus =
+      status === "success" ? "success" : status === "partial" ? "warning" : "failure";
+    void logActivity(supabaseAdmin, {
+      clubId: data.clubId,
+      actorUserId: context.userId,
+      category: "import",
+      actionType,
+      resourceType: "import",
+      resourceId: runRow?.id ?? null,
+      status: activityStatus,
+      errorCode: status === "failed" ? "import_no_rows" : null,
+      metadata: {
+        type: data.type,
+        imported,
+        failed: errors.length,
+        ...(errors.length
+          ? { error: redactErrorMessage({ errors: errors.slice(0, 3) }) }
+          : {}),
+      },
     });
+
 
     return { status, imported, total: data.rows.length, errors, summary };
   });
