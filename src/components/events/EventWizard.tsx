@@ -454,6 +454,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const hints: Record<Step, string> = {
     type: t("eventWizard.hint.type", { defaultValue: "On adapte les questions au type." }),
     team: t("eventWizard.hint.team", { defaultValue: "L'équipe concernée." }),
+    name: t("eventWizard.hint.name", { defaultValue: "Donnez un nom à cet événement." }),
     when: t("eventWizard.hint.when", { defaultValue: "Date et heure de début." }),
     duration: t("eventWizard.hint.duration", { defaultValue: "Combien de temps ?" }),
     halves: t("eventWizard.hint.halves", { defaultValue: "Format du temps de jeu." }),
