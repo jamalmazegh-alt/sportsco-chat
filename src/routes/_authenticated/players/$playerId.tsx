@@ -1004,48 +1004,7 @@ function PlayerProfile() {
             </div>
           )}
 
-          {/* CO-PARENTS — names only, for a parent viewer (contacts stay private) */}
-          {isParentOfThisPlayer && !isCoach && (coParents?.length ?? 0) > 1 && (
-            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {t("players.otherParents", { defaultValue: "Autres parents / tuteurs" })}
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {t("players.otherParentsHint", {
-                  defaultValue:
-                    "Pour la vie privée, seuls les noms sont visibles. Les coordonnées restent confidentielles.",
-                })}
-              </p>
-              <ul className="space-y-2">
-                {coParents!
-                  .filter((p) => p.id !== parents?.find((x) => x.parent_user_id === user?.id)?.id)
-                  .map((p) => (
-                    <li
-                      key={p.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3"
-                    >
-                      <UserCircle2 className="h-5 w-5 text-muted-foreground shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">
-                          {p.full_name ?? t("players.unnamedParent", { defaultValue: "Parent" })}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {p.has_account
-                            ? t("players.parentOnPlatform", {
-                                defaultValue: "Sur la plateforme",
-                              })
-                            : t("players.parentNotOnPlatform", {
-                                defaultValue: "Pas encore inscrit",
-                              })}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          )}
-
-          {/* PARENTS — separate card (private) */}
+          {/* PARENTS — single card grouping the viewer's own record + co-parents */}
 
           {canSeePrivate && (
             <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
