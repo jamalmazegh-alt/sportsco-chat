@@ -97,8 +97,24 @@ export const disconnectSocial = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .eq("network", data.network);
     if (e2) throw new Error(e2.message);
+
+    try {
+      const [{ supabaseAdmin }, { logActivity }] = await Promise.all([
+        import("@/integrations/supabase/client.server"),
+        import("@/lib/observability/log-activity.server"),
+      ]);
+      void logActivity(supabaseAdmin, {
+        clubId: data.clubId,
+        actorUserId: context.userId,
+        category: "social",
+        actionType: "social.disconnected",
+        metadata: { network: data.network },
+      });
+    } catch { /* never block */ }
+
     return { ok: true };
   });
+
 
 export const syncSocialNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
