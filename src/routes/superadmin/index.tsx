@@ -189,7 +189,20 @@ function SuperAdminDashboard() {
         )}
       </section>
 
+      {/* ============== Activité & à surveiller ============== */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+          <TrendingUp className="h-4 w-4" /> Activité & à surveiller
+        </h2>
+        <WatchlistPanel />
+        <div>
+          <div className="text-xs text-muted-foreground mb-2">Fil d'activité produit</div>
+          <ProductActivityFeed />
+        </div>
+      </section>
+
       <PrivacyRequestsSection />
+
 
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">
