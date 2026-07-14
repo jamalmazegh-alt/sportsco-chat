@@ -6929,6 +6929,17 @@ export type Database = {
           network: string
         }[]
       }
+      superadmin_watchlist_stalled_onboarding: {
+        Args: { p_limit_per_signal?: number }
+        Returns: {
+          club_id: string
+          detail: Json
+          resource_id: string
+          resource_type: string
+          signal: string
+          since: string
+        }[]
+      }
       team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
       unarchive_team: { Args: { _id: string }; Returns: undefined }
