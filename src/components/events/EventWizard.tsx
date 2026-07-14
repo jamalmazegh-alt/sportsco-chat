@@ -947,7 +947,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 {t("eventWizard.continue", { defaultValue: "Continuer" })}
               </Button>
             )}
-            {recurrence && recurrence.mode !== "single" && (
+            {recurrence && recurrence.mode !== "single" && recurrence.mode !== "multi_day" && (
               <div className="mt-3 space-y-3 rounded-xl border border-border bg-card p-3">
                 <div>
                   <Label className="text-xs">
