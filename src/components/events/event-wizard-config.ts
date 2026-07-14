@@ -234,7 +234,11 @@ export function toEventFormInitial(
   title: string,
 ): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
-  const endsIso = addMinutesIso(startsIso, state.durationMin);
+  const isMultiDay =
+    state.type === "other" && !!state.endDate && !!state.startDate && state.endDate > state.startDate;
+  const endsIso = isMultiDay
+    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
+    : addMinutesIso(startsIso, state.durationMin);
   const descParts: string[] = [];
   if (state.gameFormat) {
     descParts.push(
