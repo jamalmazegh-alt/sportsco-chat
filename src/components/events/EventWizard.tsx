@@ -1614,13 +1614,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 : t("eventWizard.q.location", { defaultValue: "Où ?" })
             }
           >
-            <VenuePicker
-              clubId={activeClubId ?? undefined}
-              venueId={state.venueId ?? null}
-              facilityId={state.facilityId ?? null}
-              autoApplyDefaults={!state.location}
-              onChange={applyVenuePick}
-            />
+            {/* When "away" for a non-match event, show only a free address input (Google) */}
+            {!(state.type === "other" && state.isHome === "away") && (
+              <VenuePicker
+                clubId={activeClubId ?? undefined}
+                venueId={state.venueId ?? null}
+                facilityId={state.facilityId ?? null}
+                autoApplyDefaults={!state.location}
+                onChange={applyVenuePick}
+              />
+            )}
             <LocationAutocomplete
               value={state.location ?? ""}
               onChange={(v) => {
@@ -1629,11 +1632,15 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 patch("facilityId", null);
               }}
               placeholder={
-                state.type === "match"
-                  ? t("eventWizard.matchLocationPlaceholder", {
-                      defaultValue: "Stade / adresse du match",
+                state.type === "other" && state.isHome === "away"
+                  ? t("eventWizard.awayAddressPlaceholder", {
+                      defaultValue: "Adresse (autocomplétion Google)",
                     })
-                  : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
+                  : state.type === "match"
+                    ? t("eventWizard.matchLocationPlaceholder", {
+                        defaultValue: "Stade / adresse du match",
+                      })
+                    : t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })
               }
             />
 
