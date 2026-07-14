@@ -2019,6 +2019,10 @@ function EventDetail() {
     return <EventDetailSkeleton />;
   }
 
+  const isMultiDay =
+    !!event.ends_at &&
+    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd");
+
   const responsesReadOnly =
     !!event.responses_locked ||
     event.status === "cancelled" ||
