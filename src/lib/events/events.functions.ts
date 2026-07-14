@@ -124,7 +124,7 @@ export const updateEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => UpdateEventSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { id, ...rest } = data;
 
     const payload = buildEventPayload(rest as BuildEventPayloadInput);
@@ -137,5 +137,27 @@ export const updateEvent = createServerFn({ method: "POST" })
       throw new Error(translateEventDbError(error));
     }
 
+    try {
+      const [{ supabaseAdmin }, { logActivity }] = await Promise.all([
+        import("@/integrations/supabase/client.server"),
+        import("@/lib/observability/log-activity.server"),
+      ]);
+      const { data: team } = await supabaseAdmin
+        .from("teams")
+        .select("club_id")
+        .eq("id", payload.team_id)
+        .maybeSingle();
+      void logActivity(supabaseAdmin, {
+        clubId: (team?.club_id as string | undefined) ?? null,
+        actorUserId: userId,
+        category: "event",
+        actionType: "event.updated",
+        resourceType: "event",
+        resourceId: id,
+        metadata: { type: payload.type },
+      });
+    } catch { /* never block */ }
+
     return { id };
   });
+
