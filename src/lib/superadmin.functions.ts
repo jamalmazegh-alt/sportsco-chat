@@ -210,6 +210,71 @@ export const getClubActivitySummary = createServerFn({ method: "GET" })
     return { byClub: map };
   });
 
+/** Onboarding friction signals. Superadmin-only, on-demand (not on dashboard load). */
+export type StalledSignal =
+  | "club_no_team"
+  | "team_no_player"
+  | "players_no_event"
+  | "event_no_convocation"
+  | "invite_not_accepted";
+
+export type StalledDetail = {
+  club_name?: string;
+  team_name?: string;
+  team_id?: string;
+  title?: string;
+  starts_at?: string;
+};
+
+export type StalledOnboardingItem = {
+  signal: StalledSignal;
+  club_id: string | null;
+  resource_type: string | null;
+  resource_id: string | null;
+  detail: StalledDetail | null;
+  since: string | null;
+};
+
+export type StalledOnboardingGroup = {
+  signal: StalledSignal;
+  items: StalledOnboardingItem[];
+  truncated: boolean;
+};
+
+export const getStalledOnboarding = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertSuperAdmin(context.userId);
+    const LIMIT = 50;
+    const { data, error } = await supabaseAdmin.rpc(
+      "superadmin_watchlist_stalled_onboarding" as never,
+      { p_limit_per_signal: LIMIT } as never,
+    );
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as StalledOnboardingItem[];
+    const bySignal = new Map<StalledSignal, StalledOnboardingItem[]>();
+    for (const r of rows) {
+      const arr = bySignal.get(r.signal) ?? [];
+      arr.push(r);
+      bySignal.set(r.signal, arr);
+    }
+    const groups: StalledOnboardingGroup[] = (
+      [
+        "club_no_team",
+        "team_no_player",
+        "players_no_event",
+        "event_no_convocation",
+        "invite_not_accepted",
+      ] as StalledSignal[]
+    ).map((signal) => {
+      const items = bySignal.get(signal) ?? [];
+      return { signal, items, truncated: items.length >= LIMIT };
+    });
+    return { groups, limit: LIMIT };
+  });
+
+
+
 /** Detailed view for one club. */
 export const getClubDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
