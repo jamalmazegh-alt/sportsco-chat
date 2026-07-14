@@ -1103,6 +1103,50 @@ function PlayerProfile() {
                     </li>
                   );
                 })}
+
+                {/* Co-parents (parent viewer only) — names + account status, no private contacts */}
+                {isParentOfThisPlayer &&
+                  !isCoach &&
+                  coParents
+                    ?.filter(
+                      (p) =>
+                        p.id !== parents?.find((x) => x.parent_user_id === user?.id)?.id,
+                    )
+                    .map((p) => (
+                      <li
+                        key={p.id}
+                        className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3"
+                      >
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                          <UserCircle2 className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-medium truncate text-sm">
+                              {p.full_name ??
+                                t("players.unnamedParent", { defaultValue: "Parent" })}
+                            </p>
+                            <span
+                              className={cn(
+                                "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                                p.has_account
+                                  ? "bg-present/15 text-present"
+                                  : "bg-muted text-muted-foreground",
+                              )}
+                            >
+                              {p.has_account
+                                ? t("players.accountActive")
+                                : t("players.accountInactive")}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate mt-0.5">
+                            {t("players.parentContactsHidden", {
+                              defaultValue: "Coordonnées confidentielles",
+                            })}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
               </ul>
 
               {showParentForm && (isCoach || editingParentId) && (
