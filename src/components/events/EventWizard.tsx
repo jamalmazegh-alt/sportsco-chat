@@ -698,78 +698,57 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "when" && (
-          <StepQuestion title={t("eventWizard.q.when", { defaultValue: "Quand ?" })}>
-            <div className="flex flex-wrap gap-2">
-              <Chip
-                label={t("eventWizard.chip.tonight", { defaultValue: "Ce soir" })}
-                onClick={() => {
-                  patch("startDate", format(new Date(), "yyyy-MM-dd"));
-                  patch("startTime", "20:00");
-                }}
-              />
-              <Chip
-                label={t("eventWizard.chip.tomorrow", { defaultValue: "Demain" })}
-                onClick={() => {
-                  patch("startDate", format(addDays(new Date(), 1), "yyyy-MM-dd"));
-                }}
-              />
-              <Chip
-                label={t("eventWizard.chip.saturday", { defaultValue: "Samedi" })}
-                onClick={() => {
-                  patch("startDate", format(nextSaturday(new Date()), "yyyy-MM-dd"));
-                }}
-              />
-              <Chip
-                label={t("eventWizard.chip.nextWeek", { defaultValue: "Sem. prochaine" })}
-                onClick={() => {
-                  patch(
-                    "startDate",
-                    format(addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 7), "yyyy-MM-dd"),
-                  );
-                }}
-              />
-            </div>
-            <div className="grid grid-cols-[1fr_110px] gap-2 pt-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-10 justify-start font-normal">
-                    <CalendarIcon className="h-4 w-4" />
-                    {state.startDate
-                      ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
-                          locale: dateLocale,
-                        })
-                      : t("eventWizard.pickDate", { defaultValue: "Choisir une date" })}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined}
-                    onSelect={(d) => d && patch("startDate", format(d, "yyyy-MM-dd"))}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-              <TimePicker
-                value={state.startTime}
-                onChange={(v: string) => patch("startTime", v)}
-                className="w-full"
-              />
-            </div>
-            {state.type === "other" && (
-              <div className="pt-3 space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  {t("eventWizard.endDateLabel", {
-                    defaultValue: "Date de fin (facultatif — pour un événement sur plusieurs jours)",
-                  })}
-                </Label>
-                <div className="flex gap-2">
+          <StepQuestion
+            title={
+              recurrence?.mode === "multi_day"
+                ? t("eventWizard.q.whenRange", { defaultValue: "Du … au … ?" })
+                : t("eventWizard.q.when", { defaultValue: "Quand ?" })
+            }
+          >
+            {recurrence?.mode === "multi_day" ? (
+              <>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("eventWizard.range.from", { defaultValue: "Du" })}
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-10 w-full justify-start font-normal">
+                        <CalendarIcon className="h-4 w-4" />
+                        {state.startDate
+                          ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })
+                          : t("eventWizard.pickDate", { defaultValue: "Choisir une date" })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined
+                        }
+                        onSelect={(d) => {
+                          if (!d) return;
+                          const v = format(d, "yyyy-MM-dd");
+                          patch("startDate", v);
+                          if (state.endDate && state.endDate < v) patch("endDate", undefined);
+                        }}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-2 pt-2">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("eventWizard.range.to", { defaultValue: "Au" })}
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className="h-10 justify-start font-normal flex-1"
+                        className="h-10 w-full justify-start font-normal"
                         disabled={!state.startDate}
                       >
                         <CalendarIcon className="h-4 w-4" />
@@ -777,39 +756,111 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                           ? format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", {
                               locale: dateLocale,
                             })
-                          : t("eventWizard.pickEndDate", { defaultValue: "Même jour" })}
+                          : t("eventWizard.pickEndDate", { defaultValue: "Choisir une date de fin" })}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined}
+                        selected={
+                          state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined
+                        }
                         onSelect={(d) => d && patch("endDate", format(d, "yyyy-MM-dd"))}
                         disabled={(d) =>
-                          state.startDate
-                            ? d < new Date(`${state.startDate}T00:00:00`)
-                            : false
+                          state.startDate ? d < new Date(`${state.startDate}T00:00:00`) : false
                         }
                         initialFocus
                         className="p-3 pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
-                  {state.endDate && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => patch("endDate", undefined)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
-              </div>
+                <div className="pt-2">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("eventWizard.range.startTime", { defaultValue: "Heure de début (chaque jour)" })}
+                  </Label>
+                  <TimePicker
+                    value={state.startTime}
+                    onChange={(v: string) => patch("startTime", v)}
+                    className="w-full mt-1"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  <Chip
+                    label={t("eventWizard.chip.tonight", { defaultValue: "Ce soir" })}
+                    onClick={() => {
+                      patch("startDate", format(new Date(), "yyyy-MM-dd"));
+                      patch("startTime", "20:00");
+                    }}
+                  />
+                  <Chip
+                    label={t("eventWizard.chip.tomorrow", { defaultValue: "Demain" })}
+                    onClick={() => {
+                      patch("startDate", format(addDays(new Date(), 1), "yyyy-MM-dd"));
+                    }}
+                  />
+                  <Chip
+                    label={t("eventWizard.chip.saturday", { defaultValue: "Samedi" })}
+                    onClick={() => {
+                      patch("startDate", format(nextSaturday(new Date()), "yyyy-MM-dd"));
+                    }}
+                  />
+                  <Chip
+                    label={t("eventWizard.chip.nextWeek", { defaultValue: "Sem. prochaine" })}
+                    onClick={() => {
+                      patch(
+                        "startDate",
+                        format(
+                          addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 7),
+                          "yyyy-MM-dd",
+                        ),
+                      );
+                    }}
+                  />
+                </div>
+                <div className="grid grid-cols-[1fr_110px] gap-2 pt-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-10 justify-start font-normal">
+                        <CalendarIcon className="h-4 w-4" />
+                        {state.startDate
+                          ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })
+                          : t("eventWizard.pickDate", { defaultValue: "Choisir une date" })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined
+                        }
+                        onSelect={(d) => d && patch("startDate", format(d, "yyyy-MM-dd"))}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <TimePicker
+                    value={state.startTime}
+                    onChange={(v: string) => patch("startTime", v)}
+                    className="w-full"
+                  />
+                </div>
+              </>
             )}
             <Button
               className="w-full mt-3"
-              disabled={!state.startDate || !state.startTime}
+              disabled={
+                !state.startDate ||
+                !state.startTime ||
+                (recurrence?.mode === "multi_day" &&
+                  (!state.endDate || state.endDate <= state.startDate))
+              }
               onClick={() => go(1)}
             >
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
