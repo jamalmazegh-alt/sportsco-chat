@@ -266,9 +266,10 @@ export function toEventFormInitial(
   const startsIso = toIso(state.startDate, state.startTime);
   const isMultiDay =
     state.type === "other" && !!state.endDate && !!state.startDate && state.endDate > state.startDate;
+  const duration = effectiveDuration(state);
   const endsIso = isMultiDay
-    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
-    : addMinutesIso(startsIso, state.durationMin);
+    ? addMinutesIso(toIso(state.endDate, state.startTime), duration)
+    : addMinutesIso(startsIso, duration);
   const descParts: string[] = [];
   if (state.gameFormat) {
     descParts.push(
