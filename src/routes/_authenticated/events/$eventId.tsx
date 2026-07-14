@@ -2019,9 +2019,32 @@ function EventDetail() {
     return <EventDetailSkeleton />;
   }
 
+  // Parse an optional "Horaires:\n..." block from description to detect multi-day
+  // events and to render a dedicated schedule block below.
+  const parsedSchedule = (() => {
+    const raw = (event.description as string | null) ?? "";
+    const m = raw.match(/(^|\n)Horaires:\s*\n?([\s\S]*?)(?=\n\n|$)/);
+    if (!m) return { items: [] as { date: string; start: string; end: string }[], rest: raw };
+    const items = m[2]
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .map((l) => {
+        const mm = l.match(/^(\d{4}-\d{2}-\d{2}):\s*(\d{2}:\d{2})\s*[-–—]\s*(\d{2}:\d{2})/);
+        return mm ? { date: mm[1], start: mm[2], end: mm[3] } : null;
+      })
+      .filter((x): x is { date: string; start: string; end: string } => !!x);
+    return { items, rest: raw.replace(m[0], "").trim() };
+  })();
+
+  const scheduleDates = parsedSchedule.items.map((s) => s.date).sort();
+  const scheduleStartDate = scheduleDates[0];
+  const scheduleEndDate = scheduleDates[scheduleDates.length - 1];
+
   const isMultiDay =
-    !!event.ends_at &&
-    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd");
+    (!!event.ends_at &&
+      fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")) ||
+    (!!scheduleStartDate && !!scheduleEndDate && scheduleStartDate !== scheduleEndDate);
 
   const responsesReadOnly =
     !!event.responses_locked ||
@@ -2116,21 +2139,37 @@ function EventDetail() {
           <div className="flex items-center gap-3 mb-2.5">
             {/* Date box — green gradient */}
             <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
-              {isMultiDay ? (
-                <>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-                    {fmt(event.starts_at, "MMM") === fmt(event.ends_at!, "MMM")
-                      ? fmt(event.starts_at, "MMM")
-                      : `${fmt(event.starts_at, "MMM")}–${fmt(event.ends_at!, "MMM")}`}
-                  </div>
-                  <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
-                    {fmt(event.starts_at, "d")}–{fmt(event.ends_at!, "d")}
-                  </div>
-                  <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
-                    {fmt(event.starts_at, "EEE")}–{fmt(event.ends_at!, "EEE")}
-                  </div>
-                </>
-              ) : (
+              {isMultiDay ? (() => {
+                const startIso =
+                  event.ends_at &&
+                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                    ? event.starts_at
+                    : (scheduleStartDate
+                        ? `${scheduleStartDate}T00:00:00`
+                        : event.starts_at);
+                const endIso =
+                  event.ends_at &&
+                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                    ? event.ends_at
+                    : (scheduleEndDate
+                        ? `${scheduleEndDate}T00:00:00`
+                        : event.ends_at ?? event.starts_at);
+                return (
+                  <>
+                    <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
+                      {fmt(startIso, "MMM") === fmt(endIso, "MMM")
+                        ? fmt(startIso, "MMM")
+                        : `${fmt(startIso, "MMM")}–${fmt(endIso, "MMM")}`}
+                    </div>
+                    <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
+                      {fmt(startIso, "d")}–{fmt(endIso, "d")}
+                    </div>
+                    <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
+                      {fmt(startIso, "EEE")}–{fmt(endIso, "EEE")}
+                    </div>
+                  </>
+                );
+              })() : (
                 <>
                   <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
                     {fmt(event.starts_at, "MMM")}
@@ -2156,24 +2195,21 @@ function EventDetail() {
                     <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
-                  <Clock className="h-3 w-3" />
-                  {event.type === "match" ? (
-                    <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
-                  ) : event.type === "other" ? (
-                    <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
-                  ) : (
-                    <span>
-                      {t(`events.types.${event.type}`, {
-                        defaultValue: t("events.timeShort", { defaultValue: "Horaire" }),
-                      })}
-                    </span>
-                  )}
-                  <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
-                  {event.ends_at && (
-                    <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
-                  )}
-                </span>
+                {parsedSchedule.items.length === 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                    <Clock className="h-3 w-3" />
+                    {event.type === "match" ? (
+                      <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
+                    ) : (
+                      <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
+                    )}
+                    <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
+                    {event.ends_at &&
+                      fmt(event.starts_at, "yyyy-MM-dd") === fmt(event.ends_at, "yyyy-MM-dd") && (
+                        <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
+                      )}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -2252,64 +2288,46 @@ function EventDetail() {
                 </div>
               </div>
             )}
-            {event.description && (() => {
-              const raw = event.description as string;
-              // Extract an optional "Horaires:\n..." block and render it as a nice schedule.
-              const scheduleMatch = raw.match(/(^|\n)Horaires:\s*\n?([\s\S]*?)(?=\n\n|$)/);
-              let schedule: { date: string; start: string; end: string }[] = [];
-              let rest = raw;
-              if (scheduleMatch) {
-                const block = scheduleMatch[2];
-                schedule = block
-                  .split("\n")
-                  .map((l) => l.trim())
-                  .filter(Boolean)
-                  .map((l) => {
-                    const m = l.match(/^(\d{4}-\d{2}-\d{2}):\s*(\d{2}:\d{2})\s*[-–—]\s*(\d{2}:\d{2})/);
-                    return m ? { date: m[1], start: m[2], end: m[3] } : null;
-                  })
-                  .filter((x): x is { date: string; start: string; end: string } => !!x);
-                rest = raw.replace(scheduleMatch[0], "").trim();
-              }
-              return (
-                <div className="space-y-3 pt-1">
-                  {schedule.length > 0 && (
-                    <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
-                      <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
-                        <Clock className="h-3.5 w-3.5 text-primary" />
-                        {t("events.scheduleTitle", { defaultValue: "Horaires du stage" })}
-                      </div>
-                      <ul className="divide-y divide-border">
-                        {schedule.map((s) => {
-                          const d = new Date(`${s.date}T00:00:00`);
-                          const label = isNaN(d.getTime())
-                            ? s.date
-                            : d.toLocaleDateString(i18n.language || "fr", {
-                                weekday: "short",
-                                day: "numeric",
-                                month: "short",
-                              });
-                          return (
-                            <li
-                              key={s.date}
-                              className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
-                            >
-                              <span className="font-medium text-foreground capitalize">{label}</span>
-                              <span className="tabular-nums text-foreground/80">
-                                {s.start} <span className="opacity-60">→</span> {s.end}
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
+            {(event.description || parsedSchedule.items.length > 0) && (
+              <div className="space-y-3 pt-1">
+                {parsedSchedule.items.length > 0 && (
+                  <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
+                    <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      {t("events.scheduleTitle", { defaultValue: "Horaires" })}
                     </div>
-                  )}
-                  {rest && (
-                    <p className="text-foreground/90 leading-relaxed whitespace-pre-line">{rest}</p>
-                  )}
-                </div>
-              );
-            })()}
+                    <ul className="divide-y divide-border">
+                      {parsedSchedule.items.map((s) => {
+                        const d = new Date(`${s.date}T00:00:00`);
+                        const label = isNaN(d.getTime())
+                          ? s.date
+                          : d.toLocaleDateString(i18n.language || "fr", {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            });
+                        return (
+                          <li
+                            key={s.date}
+                            className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+                          >
+                            <span className="font-medium text-foreground capitalize">{label}</span>
+                            <span className="tabular-nums text-foreground/80">
+                              {s.start} <span className="opacity-60">→</span> {s.end}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                {parsedSchedule.rest && (
+                  <p className="text-foreground/90 leading-relaxed whitespace-pre-line">
+                    {parsedSchedule.rest}
+                  </p>
+                )}
+              </div>
+            )}
             {(() => {
               const list = (event.attachments as unknown as Attachment[] | null) ?? [];
               return list.length > 0 ? (
