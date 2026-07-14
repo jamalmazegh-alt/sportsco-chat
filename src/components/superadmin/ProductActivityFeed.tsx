@@ -136,11 +136,16 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
                 {r.error_code && (
                   <div className="text-xs text-destructive mt-0.5">code: {r.error_code}</div>
                 )}
-                {(r.metadata?.error as string | undefined) && (
-                  <div className="text-xs text-muted-foreground mt-0.5 truncate">
-                    {redactErrorMessage(r.metadata.error)}
-                  </div>
-                )}
+                {(() => {
+                  const meta = r.metadata as { error?: unknown } | null;
+                  const err = meta && typeof meta === "object" ? meta.error : undefined;
+                  return err ? (
+                    <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                      {redactErrorMessage(err)}
+                    </div>
+                  ) : null;
+                })()}
+
               </div>
             </li>
           ))}
