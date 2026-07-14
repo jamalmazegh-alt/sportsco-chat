@@ -1135,8 +1135,12 @@ function PlayerProfile() {
                               )}
                             >
                               {p.has_account
-                                ? t("players.accountActive")
-                                : t("players.accountInactive")}
+                                ? t("players.parentOnPlatform", {
+                                    defaultValue: "Sur la plateforme",
+                                  })
+                                : t("players.parentNotOnPlatform", {
+                                    defaultValue: "Pas encore inscrit",
+                                  })}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground truncate mt-0.5">
