@@ -2158,11 +2158,17 @@ function EventDetail() {
                 )}
                 <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
                   <Clock className="h-3 w-3" />
-                  {event.type === "match"
-                    ? t("events.matchTimeShort", { defaultValue: "Match" })
-                    : t(`events.types.${event.type}`, {
+                  {event.type === "match" ? (
+                    <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
+                  ) : event.type === "other" ? (
+                    <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
+                  ) : (
+                    <span>
+                      {t(`events.types.${event.type}`, {
                         defaultValue: t("events.timeShort", { defaultValue: "Horaire" }),
-                      })}{" "}
+                      })}
+                    </span>
+                  )}
                   <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
                   {event.ends_at && (
                     <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
