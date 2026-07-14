@@ -2288,64 +2288,46 @@ function EventDetail() {
                 </div>
               </div>
             )}
-            {event.description && (() => {
-              const raw = event.description as string;
-              // Extract an optional "Horaires:\n..." block and render it as a nice schedule.
-              const scheduleMatch = raw.match(/(^|\n)Horaires:\s*\n?([\s\S]*?)(?=\n\n|$)/);
-              let schedule: { date: string; start: string; end: string }[] = [];
-              let rest = raw;
-              if (scheduleMatch) {
-                const block = scheduleMatch[2];
-                schedule = block
-                  .split("\n")
-                  .map((l) => l.trim())
-                  .filter(Boolean)
-                  .map((l) => {
-                    const m = l.match(/^(\d{4}-\d{2}-\d{2}):\s*(\d{2}:\d{2})\s*[-–—]\s*(\d{2}:\d{2})/);
-                    return m ? { date: m[1], start: m[2], end: m[3] } : null;
-                  })
-                  .filter((x): x is { date: string; start: string; end: string } => !!x);
-                rest = raw.replace(scheduleMatch[0], "").trim();
-              }
-              return (
-                <div className="space-y-3 pt-1">
-                  {schedule.length > 0 && (
-                    <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
-                      <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
-                        <Clock className="h-3.5 w-3.5 text-primary" />
-                        {t("events.scheduleTitle", { defaultValue: "Horaires du stage" })}
-                      </div>
-                      <ul className="divide-y divide-border">
-                        {schedule.map((s) => {
-                          const d = new Date(`${s.date}T00:00:00`);
-                          const label = isNaN(d.getTime())
-                            ? s.date
-                            : d.toLocaleDateString(i18n.language || "fr", {
-                                weekday: "short",
-                                day: "numeric",
-                                month: "short",
-                              });
-                          return (
-                            <li
-                              key={s.date}
-                              className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
-                            >
-                              <span className="font-medium text-foreground capitalize">{label}</span>
-                              <span className="tabular-nums text-foreground/80">
-                                {s.start} <span className="opacity-60">→</span> {s.end}
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
+            {(event.description || parsedSchedule.items.length > 0) && (
+              <div className="space-y-3 pt-1">
+                {parsedSchedule.items.length > 0 && (
+                  <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
+                    <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      {t("events.scheduleTitle", { defaultValue: "Horaires" })}
                     </div>
-                  )}
-                  {rest && (
-                    <p className="text-foreground/90 leading-relaxed whitespace-pre-line">{rest}</p>
-                  )}
-                </div>
-              );
-            })()}
+                    <ul className="divide-y divide-border">
+                      {parsedSchedule.items.map((s) => {
+                        const d = new Date(`${s.date}T00:00:00`);
+                        const label = isNaN(d.getTime())
+                          ? s.date
+                          : d.toLocaleDateString(i18n.language || "fr", {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            });
+                        return (
+                          <li
+                            key={s.date}
+                            className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+                          >
+                            <span className="font-medium text-foreground capitalize">{label}</span>
+                            <span className="tabular-nums text-foreground/80">
+                              {s.start} <span className="opacity-60">→</span> {s.end}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                {parsedSchedule.rest && (
+                  <p className="text-foreground/90 leading-relaxed whitespace-pre-line">
+                    {parsedSchedule.rest}
+                  </p>
+                )}
+              </div>
+            )}
             {(() => {
               const list = (event.attachments as unknown as Attachment[] | null) ?? [];
               return list.length > 0 ? (
