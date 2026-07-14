@@ -273,6 +273,241 @@ export const getStalledOnboarding = createServerFn({ method: "GET" })
     return { groups, limit: LIMIT };
   });
 
+/** Per-club 360° observability bundle. Superadmin-only. */
+export type ClubFailureRow = {
+  id: string;
+  created_at: string;
+  action_type: string;
+  category: string;
+  error_code: string | null;
+  error_message: string | null;
+  actor_full_name: string | null;
+};
+export type ClubActiveUserRow = {
+  user_id: string;
+  full_name: string | null;
+  last_action_type: string;
+  last_action_at: string;
+  action_count: number;
+};
+export type ClubFeatureUseRow = {
+  category: string;
+  action_type: string;
+  count: number;
+};
+export type ClubSocialRow = {
+  id: string;
+  network: string;
+  account_name: string | null;
+  is_active: boolean;
+  last_synced_at: string | null;
+  last_sync_error: string | null;
+};
+export type ClubImportRow = {
+  id: string;
+  import_type: string;
+  status: string;
+  rows_total: number;
+  rows_imported: number;
+  created_at: string;
+  file_name: string | null;
+};
+export type ClubInviteRow = {
+  id: string;
+  kind: "member" | "club";
+  role: string | null;
+  state: "accepted" | "expired" | "pending";
+  created_at: string;
+  team_id: string | null;
+};
+export type ClubSupportTicketRow = {
+  id: string;
+  subject: string;
+  status: string;
+  priority: string | null;
+  created_at: string;
+  last_activity_at: string | null;
+};
+
+export const getClubObservability = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const clubId = data.club_id;
+    const since30 = new Date(Date.now() - 30 * 86400_000).toISOString();
+
+    const [failures, activity30, social, imports, mInvites, cInvites, tickets] = await Promise.all([
+      supabaseAdmin
+        .from("product_activity_log")
+        .select("id, created_at, action_type, category, error_code, metadata, actor_user_id")
+        .eq("club_id", clubId)
+        .eq("status", "failure")
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabaseAdmin
+        .from("product_activity_log")
+        .select("id, created_at, action_type, category, actor_user_id")
+        .eq("club_id", clubId)
+        .gte("created_at", since30)
+        .order("created_at", { ascending: false })
+        .limit(1000),
+      supabaseAdmin
+        .from("club_social_connections")
+        .select("id, network, account_name, is_active, last_synced_at, last_sync_error")
+        .eq("club_id", clubId),
+      supabaseAdmin
+        .from("superadmin_imports")
+        .select("id, import_type, status, rows_total, rows_imported, created_at, file_name")
+        .eq("club_id", clubId)
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabaseAdmin
+        .from("member_invites")
+        .select("id, role, team_id, created_at, used_at, expires_at")
+        .eq("club_id", clubId)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabaseAdmin
+        .from("club_invites")
+        .select("id, role, created_at, expires_at, uses_count, max_uses")
+        .eq("club_id", clubId)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabaseAdmin
+        .from("support_tickets")
+        .select("id, subject, status, priority, created_at, last_activity_at")
+        .eq("club_id", clubId)
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+
+    const actorIds = Array.from(
+      new Set(
+        [
+          ...(failures.data ?? []).map((r) => r.actor_user_id),
+          ...(activity30.data ?? []).map((r) => r.actor_user_id),
+        ].filter((v): v is string => !!v),
+      ),
+    );
+    const { data: profs } = actorIds.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, first_name, last_name")
+          .in("id", actorIds)
+      : { data: [] as never[] };
+    const nameById = new Map<string, string | null>();
+    for (const p of profs ?? []) {
+      const n =
+        p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || null;
+      nameById.set(p.id, n);
+    }
+
+    const recent_failures: ClubFailureRow[] = (failures.data ?? []).map((r) => {
+      const meta = (r.metadata ?? null) as { error?: unknown } | null;
+      const err =
+        meta && typeof meta === "object" && meta.error != null
+          ? typeof meta.error === "string"
+            ? meta.error
+            : JSON.stringify(meta.error)
+          : null;
+      return {
+        id: r.id,
+        created_at: r.created_at,
+        action_type: r.action_type,
+        category: r.category,
+        error_code: r.error_code ?? null,
+        error_message: err,
+        actor_full_name: r.actor_user_id ? (nameById.get(r.actor_user_id) ?? null) : null,
+      };
+    });
+
+    // Active users (30d)
+    const byUser = new Map<
+      string,
+      { last_at: string; last_action: string; count: number }
+    >();
+    for (const r of activity30.data ?? []) {
+      if (!r.actor_user_id) continue;
+      const cur = byUser.get(r.actor_user_id);
+      if (!cur) {
+        byUser.set(r.actor_user_id, {
+          last_at: r.created_at,
+          last_action: r.action_type,
+          count: 1,
+        });
+      } else {
+        cur.count += 1;
+        if (r.created_at > cur.last_at) {
+          cur.last_at = r.created_at;
+          cur.last_action = r.action_type;
+        }
+      }
+    }
+    const recent_active_users: ClubActiveUserRow[] = Array.from(byUser.entries())
+      .map(([user_id, v]) => ({
+        user_id,
+        full_name: nameById.get(user_id) ?? null,
+        last_action_type: v.last_action,
+        last_action_at: v.last_at,
+        action_count: v.count,
+      }))
+      .sort((a, b) => (a.last_action_at < b.last_action_at ? 1 : -1))
+      .slice(0, 20);
+
+    // Feature usage (30d)
+    const featMap = new Map<string, ClubFeatureUseRow>();
+    for (const r of activity30.data ?? []) {
+      const key = `${r.category}::${r.action_type}`;
+      const cur = featMap.get(key);
+      if (cur) cur.count += 1;
+      else featMap.set(key, { category: r.category, action_type: r.action_type, count: 1 });
+    }
+    const features_used = Array.from(featMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 30);
+
+    const now = Date.now();
+    const invites: ClubInviteRow[] = [
+      ...((mInvites.data ?? []).map((i) => ({
+        id: i.id,
+        kind: "member" as const,
+        role: i.role ?? null,
+        state: i.used_at
+          ? ("accepted" as const)
+          : i.expires_at && new Date(i.expires_at).getTime() < now
+            ? ("expired" as const)
+            : ("pending" as const),
+        created_at: i.created_at,
+        team_id: i.team_id ?? null,
+      })) ?? []),
+      ...((cInvites.data ?? []).map((i) => ({
+        id: i.id,
+        kind: "club" as const,
+        role: i.role ?? null,
+        state:
+          (i.uses_count ?? 0) > 0
+            ? ("accepted" as const)
+            : i.expires_at && new Date(i.expires_at).getTime() < now
+              ? ("expired" as const)
+              : ("pending" as const),
+        created_at: i.created_at,
+        team_id: null,
+      })) ?? []),
+    ];
+
+    return {
+      recent_failures,
+      recent_active_users,
+      features_used,
+      social_connections: (social.data ?? []) as ClubSocialRow[],
+      imports: (imports.data ?? []) as ClubImportRow[],
+      invites,
+      support_tickets: (tickets.data ?? []) as ClubSupportTicketRow[],
+    };
+  });
+
+
 
 
 /** Detailed view for one club. */

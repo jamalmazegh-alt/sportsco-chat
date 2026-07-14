@@ -34,6 +34,7 @@ import {
   OnboardingProgress,
   type OnboardingStep,
 } from "@/components/superadmin/OnboardingProgress";
+import { ClubObservabilityPanel } from "@/components/superadmin/ClubObservabilityPanel";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
@@ -411,6 +412,8 @@ function ClubDetail() {
           </ul>
         </Card>
       </section>
+
+      <ClubObservabilityPanel clubId={clubId} />
     </div>
   );
 }
