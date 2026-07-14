@@ -18,10 +18,13 @@ import {
 } from "lucide-react";
 import { formatMoney, StatusBadge } from "@/lib/superadmin/ui";
 import { PrivacyRequestsSection } from "@/components/superadmin/privacy-requests-section";
+import { ProductActivityFeed } from "@/components/superadmin/ProductActivityFeed";
+import { WatchlistPanel } from "@/components/superadmin/WatchlistPanel";
 
 export const Route = createFileRoute("/superadmin/")({
   component: SuperAdminDashboard,
 });
+
 
 type Stats = Record<string, number | string>;
 type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
