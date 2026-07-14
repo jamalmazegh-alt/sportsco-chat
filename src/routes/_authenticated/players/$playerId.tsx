@@ -480,8 +480,9 @@ function PlayerProfile() {
     }
   }
 
-  // ---- Parent form (collapsed) ----
+  // ---- Parent form (collapsed) — used for add AND edit ----
   const [showParentForm, setShowParentForm] = useState(false);
+  const [editingParentId, setEditingParentId] = useState<string | null>(null);
   const [pFirstName, setPFirstName] = useState("");
   const [pLastName, setPLastName] = useState("");
   const [pPhone, setPPhone] = useState("");
@@ -490,6 +491,7 @@ function PlayerProfile() {
   const [pBusy, setPBusy] = useState(false);
 
   function resetParentForm() {
+    setEditingParentId(null);
     setPFirstName("");
     setPLastName("");
     setPPhone("");
@@ -497,7 +499,22 @@ function PlayerProfile() {
     setPCanRespond(true);
   }
 
-  async function onAddParent(e: FormEvent) {
+  function startEditParent(pp: PlayerParentRow) {
+    // Best-effort split of full_name into first/last for editing.
+    const raw = (pp.full_name ?? "").trim();
+    const parts = raw ? raw.split(/\s+/) : [];
+    const first = parts.length > 1 ? parts.slice(0, -1).join(" ") : (parts[0] ?? "");
+    const last = parts.length > 1 ? parts[parts.length - 1] : "";
+    setEditingParentId(pp.id);
+    setPFirstName(first);
+    setPLastName(last);
+    setPPhone(pp.phone ?? "");
+    setPEmail(pp.email ?? "");
+    setPCanRespond(!!pp.can_respond);
+    setShowParentForm(true);
+  }
+
+  async function onSubmitParent(e: FormEvent) {
     e.preventDefault();
     if (!playerId) return;
     setPBusy(true);
@@ -505,14 +522,19 @@ function PlayerProfile() {
       .map((s) => s.trim())
       .filter(Boolean)
       .join(" ");
-    const { error } = await supabase.from("player_parents").insert({
-      player_id: playerId,
-      parent_user_id: null,
+    const payload = {
       full_name: fullName || null,
       phone: pPhone || null,
       email: pEmail || null,
       can_respond: pCanRespond,
-    });
+    };
+    const { error } = editingParentId
+      ? await supabase.from("player_parents").update(payload).eq("id", editingParentId)
+      : await supabase.from("player_parents").insert({
+          player_id: playerId,
+          parent_user_id: null,
+          ...payload,
+        });
     setPBusy(false);
     if (error) {
       toast.error(error.message);
