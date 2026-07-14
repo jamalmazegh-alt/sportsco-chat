@@ -758,6 +758,7 @@
     "matchDateTime": "Spiel Datum und Uhrzeit",
     "trainingDate": "Trainingsdatum",
     "convocationTimeShort": "RDV",
+    "timeShort": "Zeit",
     "startTime": "Beginn",
     "endTime": "Ende",
     "locationGoogleHelper": "Beginne zu tippen, um eine Google-Maps-Adresse auszuwählen.",
