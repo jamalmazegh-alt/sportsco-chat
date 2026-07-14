@@ -938,35 +938,42 @@ function PlayerProfile() {
                     </Button>
                   )}
 
-                  {isCoach && !player.user_id && !minor && (
-                    <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
-                      <p className="text-xs text-muted-foreground">
-                        {t("players.inviteAdultHint", {
-                          defaultValue:
-                            "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
-                        })}
-                      </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        disabled={!(email || player.email)}
-                        onClick={() => {
-                          const target = (email || player.email || "").trim();
-                          if (!target) {
-                            toast.warning(t("players.inviteNoContact"));
-                            return;
-                          }
-                          sendChildOnboardingInvite(target);
-                        }}
-                      >
-                        {t("players.invitePlayer", {
-                          defaultValue: "Inviter le joueur à créer son compte",
-                        })}
-                      </Button>
-                    </div>
-                  )}
+                  {(isCoach || isParentOfThisPlayer) &&
+                    !player.user_id &&
+                    (!minor || player.child_platform_access) && (
+                      <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                        <p className="text-xs text-muted-foreground">
+                          {minor
+                            ? t("players.inviteMinorHint", {
+                                defaultValue:
+                                  "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Renvoie-lui l'email d'invitation.",
+                              })
+                            : t("players.inviteAdultHint", {
+                                defaultValue:
+                                  "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
+                              })}
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          disabled={!(email || player.email)}
+                          onClick={() => {
+                            const target = (email || player.email || "").trim();
+                            if (!target) {
+                              toast.warning(t("players.inviteNoContact"));
+                              return;
+                            }
+                            sendChildOnboardingInvite(target);
+                          }}
+                        >
+                          {t("players.invitePlayer", {
+                            defaultValue: "Inviter le joueur à créer son compte",
+                          })}
+                        </Button>
+                      </div>
+                    )}
 
                 </>
               );
