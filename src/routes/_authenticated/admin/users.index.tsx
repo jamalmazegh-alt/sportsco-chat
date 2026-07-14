@@ -99,9 +99,24 @@ function AdminUsersPage() {
   async function onInvite(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
+    // Guard against double-tap: block re-entry synchronously before any await.
+    if (submittingRef.current) return;
+    // Guard against short-window re-invite of the same email in the same club.
+    const key = `${activeClubId}::${email.trim().toLowerCase()}`;
+    const last = recentInvitesRef.current.get(key) ?? 0;
+    const remaining = Math.ceil((COOLDOWN_MS - (Date.now() - last)) / 1000);
+    if (remaining > 0) {
+      toast.info(
+        t("admin.inviteCooldown", {
+          defaultValue: `Invitation déjà envoyée à ${email}. Vous pourrez renvoyer dans ${remaining}s.`,
+          email,
+          seconds: remaining,
+        }),
+      );
+      return;
+    }
+    submittingRef.current = true;
     setBusy(true);
-
-    // Refuse if email already has a Clubero account in this club
     try {
       const { data: exists } = await supabase.rpc("email_exists", { _email: email });
       if (exists === true) {
