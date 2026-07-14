@@ -74,6 +74,10 @@ function AdminUsersPage() {
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const submittingRef = useRef(false);
+  // Cooldown to prevent accidental re-invites (double-tap / retry after slow email).
+  const COOLDOWN_MS = 60_000;
+  const recentInvitesRef = useRef<Map<string, number>>(new Map());
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
