@@ -1,13 +1,50 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { listAllClubs } from "@/lib/superadmin.functions";
+import { getClubActivitySummary, type ClubActivitySummary } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Mail, Phone, Search, ShieldCheck, User2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
+
+const INACTIVE_DAYS = 30;
+
+const ACTION_LABELS: Record<string, string> = {
+  "event.created": "Événement créé",
+  "event.updated": "Événement modifié",
+  "event.cancelled": "Événement annulé",
+  "convocation.sent": "Convocation envoyée",
+  "convocation.responded": "Réponse convocation",
+  "team.created": "Équipe créée",
+  "team.updated": "Équipe modifiée",
+  "camp.created": "Stage créé",
+  "camp.published": "Stage publié",
+  "camp.registration_received": "Inscription stage",
+  "tournament.created": "Tournoi créé",
+  "social.connected": "Réseau connecté",
+  "social.disconnected": "Réseau déconnecté",
+  "social.sync_succeeded": "Sync réseau OK",
+  "social.sync_failed": "Sync réseau KO",
+  "wall.post_published": "Post publié",
+  "invite.club_sent": "Invitation club",
+  "invite.club_accepted": "Invitation club acceptée",
+  "invite.member_sent": "Invitation membre",
+  "invite.member_accepted": "Invitation membre acceptée",
+  "import.started": "Import démarré",
+  "import.succeeded": "Import réussi",
+  "import.partial": "Import partiel",
+  "import.failed": "Import échoué",
+  "support.ticket_opened": "Ticket support",
+  "impersonation.started": "Impersonation",
+};
+
+function actionLabel(type: string | null): string {
+  if (!type) return "—";
+  return ACTION_LABELS[type] ?? type;
+}
 
 export const Route = createFileRoute("/superadmin/clubs/")({
   component: SuperAdminClubs,
