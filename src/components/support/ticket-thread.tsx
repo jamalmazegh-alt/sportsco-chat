@@ -72,10 +72,20 @@ export function TicketThread({
   });
 
   const openAttachment = async (path: string) => {
+    // Ouvre l'onglet de manière synchrone (obligatoire sur Safari/Chrome mobile
+    // qui bloquent window.open appelé après un await), puis on remplace l'URL
+    // une fois la signed URL récupérée.
+    const popup = window.open("about:blank", "_blank");
     try {
       const { url } = await getSupportAttachmentUrl({ data: { path } });
-      window.open(url, "_blank");
+      if (popup && !popup.closed) {
+        popup.location.href = url;
+      } else {
+        // Fallback si la popup a été bloquée : navigation directe.
+        window.location.href = url;
+      }
     } catch (e) {
+      if (popup && !popup.closed) popup.close();
       toast.error(e instanceof Error ? e.message : t("thread.link_unavailable"));
     }
   };
