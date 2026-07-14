@@ -8,6 +8,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  *   `has_super_admin(auth.uid())` (SECURITY DEFINER).
  */
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+
+
 const ProductActivityInputSchema = z.object({
   clubId: z.string().uuid().nullable().optional(),
   category: z.string().max(32).nullable().optional(),
@@ -34,8 +37,9 @@ export type ProductActivityRow = {
   resource_id: string | null;
   status: string;
   error_code: string | null;
-  metadata: Record<string, unknown>;
+  metadata: JsonValue;
 };
+
 
 export const listProductActivity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -87,7 +91,7 @@ export type FailedImportRow = {
   status: string;
   rows_total: number;
   rows_imported: number;
-  error_log: unknown;
+  error_log: JsonValue;
   created_at: string;
 };
 
