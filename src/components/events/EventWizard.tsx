@@ -1923,8 +1923,13 @@ function SummaryCard({
       {teamName && <div className="text-muted-foreground">{teamName}</div>}
       {state.startDate && (
         <div>
-          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.durationMin}{" "}
-          min
+          📅{" "}
+          {state.endDate && state.endDate > state.startDate
+            ? `${format(new Date(`${state.startDate}T00:00:00`), "d MMM")} → ${format(
+                new Date(`${state.endDate}T00:00:00`),
+                "d MMM",
+              )}`
+            : `${format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · ${state.durationMin} min`}
         </div>
       )}
       {state.meetingPoint && (
