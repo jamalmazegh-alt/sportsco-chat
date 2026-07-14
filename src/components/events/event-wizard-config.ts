@@ -31,6 +31,10 @@ export interface EventWizardState {
   type: WizardEventType | "";
   teamId: string;
   startDate?: string; // yyyy-mm-dd
+  /** Optional end date for multi-day "other" events (e.g. team camp). */
+  endDate?: string; // yyyy-mm-dd
+  /** User-provided title (used mainly for "other" events, e.g. a camp name). */
+  customTitle?: string;
   startTime: string; // HH:mm
   durationMin: number;
   halvesFormat?: string; // e.g. "2x45"
