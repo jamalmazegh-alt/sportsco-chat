@@ -724,7 +724,7 @@
       "match": "Match",
       "tournament": "Tournoi",
       "meeting": "Réunion",
-      "other": "Stage"
+      "other": "Autre événement"
     },
     "status": {
       "draft": "Brouillon",
