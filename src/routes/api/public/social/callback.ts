@@ -74,6 +74,18 @@ export const Route = createFileRoute("/api/public/social/callback")({
             await supabaseAdmin.from("club_social_connections").insert(payload);
           }
 
+          // Journal produit (fire-and-forget)
+          try {
+            const { logActivity } = await import("@/lib/observability/log-activity.server");
+            void logActivity(supabaseAdmin, {
+              clubId: state.club_id,
+              category: "social",
+              actionType: "social.connected",
+              resourceType: "social_connection",
+              metadata: { network: state.network, account_name: oauth.accountName ?? null },
+            });
+          } catch { /* never block */ }
+
           // Initial sync (best-effort)
           const { data: fresh } = await supabaseAdmin
             .from("club_social_connections")
@@ -86,6 +98,7 @@ export const Route = createFileRoute("/api/public/social/callback")({
           if (fresh) {
             await syncConnection(fresh as Parameters<typeof syncConnection>[0]);
           }
+
 
           return Response.redirect(
             `${baseRedirect}?status=connected&network=${state.network}`,
