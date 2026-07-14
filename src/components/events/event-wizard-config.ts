@@ -31,6 +31,10 @@ export interface EventWizardState {
   type: WizardEventType | "";
   teamId: string;
   startDate?: string; // yyyy-mm-dd
+  /** Optional end date for multi-day "other" events (e.g. team camp). */
+  endDate?: string; // yyyy-mm-dd
+  /** User-provided title (used mainly for "other" events, e.g. a camp name). */
+  customTitle?: string;
   startTime: string; // HH:mm
   durationMin: number;
   halvesFormat?: string; // e.g. "2x45"
@@ -96,6 +100,7 @@ export function autoTitle(
   t: (k: string, opt?: Record<string, unknown>) => string,
 ): string {
   const name = teamName ?? "";
+  if (state.customTitle?.trim()) return state.customTitle.trim();
   switch (state.type) {
     case "match":
       return state.opponent
@@ -159,7 +164,12 @@ export function toEventPayloadInput(
   if (!state.type || !state.teamId || !state.startDate) return null;
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
-  const endsIso = addMinutesIso(startsIso, state.durationMin);
+  // Multi-day "other" events (e.g. camp): end at endDate + startTime + durationMin
+  const isMultiDay =
+    state.type === "other" && !!state.endDate && state.endDate > state.startDate;
+  const endsIso = isMultiDay
+    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
+    : addMinutesIso(startsIso, state.durationMin);
   const isMatch = state.type === "match";
   const isHomeMatch = isMatch && state.isHome === "home";
   const isAwayMatch = isMatch && state.isHome === "away";
@@ -224,7 +234,11 @@ export function toEventFormInitial(
   title: string,
 ): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
-  const endsIso = addMinutesIso(startsIso, state.durationMin);
+  const isMultiDay =
+    state.type === "other" && !!state.endDate && !!state.startDate && state.endDate > state.startDate;
+  const endsIso = isMultiDay
+    ? addMinutesIso(toIso(state.endDate, state.startTime), state.durationMin)
+    : addMinutesIso(startsIso, state.durationMin);
   const descParts: string[] = [];
   if (state.gameFormat) {
     descParts.push(

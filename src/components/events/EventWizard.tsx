@@ -91,6 +91,7 @@ interface Props {
 type Step =
   | "type"
   | "team"
+  | "name"
   | "when"
   | "duration"
   | "halves"
@@ -238,6 +239,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
     const s: Step[] = ["type", "team"];
+    // "Other" events: ask for a name up-front (e.g. camp/stage title).
+    if (state.type === "other") s.push("name");
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
     const isRecurring =
@@ -453,6 +456,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const hints: Record<Step, string> = {
     type: t("eventWizard.hint.type", { defaultValue: "On adapte les questions au type." }),
     team: t("eventWizard.hint.team", { defaultValue: "L'équipe concernée." }),
+    name: t("eventWizard.hint.name", { defaultValue: "Donnez un nom à cet événement." }),
     when: t("eventWizard.hint.when", { defaultValue: "Date et heure de début." }),
     duration: t("eventWizard.hint.duration", { defaultValue: "Combien de temps ?" }),
     halves: t("eventWizard.hint.halves", { defaultValue: "Format du temps de jeu." }),
@@ -486,6 +490,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const stepTitles: Record<Step, { text: string; mark?: string }> = {
     type: { text: t("eventWizard.qShort.type", { defaultValue: "Quel type" }), mark: "?" },
     team: { text: t("eventWizard.qShort.team", { defaultValue: "Quelle équipe" }), mark: "?" },
+    name: { text: t("eventWizard.qShort.name", { defaultValue: "Nom de l'événement" }), mark: "?" },
     when: { text: t("eventWizard.qShort.when", { defaultValue: "Quand" }), mark: "?" },
     duration: {
       text: t("eventWizard.qShort.duration", { defaultValue: "Combien de temps" }),
@@ -652,6 +657,29 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
+        {current === "name" && (
+          <StepQuestion
+            title={t("eventWizard.q.name", { defaultValue: "Nom de l'événement ?" })}
+          >
+            <Input
+              autoFocus
+              value={state.customTitle ?? ""}
+              onChange={(e) => patch("customTitle", e.target.value)}
+              placeholder={t("eventWizard.namePlaceholder", {
+                defaultValue: "Ex. Stage d'hiver, Tournoi Loisirs…",
+              })}
+              className="h-11"
+            />
+            <Button
+              className="w-full mt-3"
+              disabled={!state.customTitle?.trim()}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
         {current === "when" && (
           <StepQuestion title={t("eventWizard.q.when", { defaultValue: "Quand ?" })}>
             <div className="flex flex-wrap gap-2">
@@ -712,6 +740,56 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 className="w-full"
               />
             </div>
+            {state.type === "other" && (
+              <div className="pt-3 space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  {t("eventWizard.endDateLabel", {
+                    defaultValue: "Date de fin (facultatif — pour un événement sur plusieurs jours)",
+                  })}
+                </Label>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-10 justify-start font-normal flex-1"
+                        disabled={!state.startDate}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        {state.endDate
+                          ? format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })
+                          : t("eventWizard.pickEndDate", { defaultValue: "Même jour" })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined}
+                        onSelect={(d) => d && patch("endDate", format(d, "yyyy-MM-dd"))}
+                        disabled={(d) =>
+                          state.startDate
+                            ? d < new Date(`${state.startDate}T00:00:00`)
+                            : false
+                        }
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {state.endDate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => patch("endDate", undefined)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
             <Button
               className="w-full mt-3"
               disabled={!state.startDate || !state.startTime}
@@ -1675,6 +1753,7 @@ function Chip({ label, onClick }: { label: string; onClick: () => void }) {
 const STEP_ICONS: Record<Step, LucideIcon> = {
   type: Sparkles,
   team: Users,
+  name: Sparkles,
   when: CalendarDays,
   duration: Timer,
   halves: Hourglass,
@@ -1844,8 +1923,13 @@ function SummaryCard({
       {teamName && <div className="text-muted-foreground">{teamName}</div>}
       {state.startDate && (
         <div>
-          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.durationMin}{" "}
-          min
+          📅{" "}
+          {state.endDate && state.endDate > state.startDate
+            ? `${format(new Date(`${state.startDate}T00:00:00`), "d MMM")} → ${format(
+                new Date(`${state.endDate}T00:00:00`),
+                "d MMM",
+              )}`
+            : `${format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · ${state.durationMin} min`}
         </div>
       )}
       {state.meetingPoint && (
