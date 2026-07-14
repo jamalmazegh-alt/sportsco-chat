@@ -91,6 +91,7 @@ interface Props {
 type Step =
   | "type"
   | "team"
+  | "name"
   | "when"
   | "duration"
   | "halves"
