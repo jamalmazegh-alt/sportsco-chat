@@ -392,3 +392,159 @@ describe("RLS: anon — aucun accès direct, même quand la liste est visible", 
     expect(blocked).toBe(true);
   });
 });
+
+/**
+ * Écriture via RPC gardée : negative test symétrique.
+ *
+ * On prouve deux choses en un test :
+ *  1. Un non-staff qui appelle `set_call_up_visibility` se prend 42501.
+ *  2. Après le refus, la colonne n'a PAS bougé — la RPC ne fait pas d'UPDATE
+ *     partiel avant de lever, et aucun autre chemin (policy UPDATE générique
+ *     sur events) ne permet à ce rôle de flipper le réglage.
+ *
+ * Les deux volets comptent : (1) seul prouve que la RPC lève, pas qu'aucune
+ * écriture ne fuit. (2) seul prouve que la colonne n'a pas changé, pas que
+ * la RPC est la porte. Ensemble ils ferment la boucle.
+ */
+describe("RPC set_call_up_visibility — refus non-staff + non-écriture", () => {
+  it("playerA (non-staff) → 42501 et colonne event inchangée", async () => {
+    const fx = getFixtures();
+    // Reset baseline
+    await setEventVisibility(fx.eventA, null);
+
+    const c = await signInAs("playerA");
+    const { error } = await c.rpc("set_call_up_visibility", {
+      _scope: "event",
+      _id: fx.eventA,
+      _choice: "masked",
+    });
+    expect(error).not.toBeNull();
+    expect(error?.code).toBe("42501");
+
+    // Relecture admin : la colonne n'a pas bougé
+    const { data: row } = await admin
+      .from("events")
+      .select("show_called_up_players_override")
+      .eq("id", fx.eventA)
+      .single();
+    expect(row?.show_called_up_players_override).toBeNull();
+  });
+
+  it("coachB (staff d'un autre club) → 42501 sur teamA + colonne inchangée", async () => {
+    const fx = getFixtures();
+    await setTeamVisibility(fx.teamA, null);
+
+    const c = await signInAs("coachB");
+    const { error } = await c.rpc("set_call_up_visibility", {
+      _scope: "team",
+      _id: fx.teamA,
+      _choice: "masked",
+    });
+    expect(error).not.toBeNull();
+    expect(error?.code).toBe("42501");
+
+    const { data: row } = await admin
+      .from("teams")
+      .select("show_called_up_players_override")
+      .eq("id", fx.teamA)
+      .single();
+    expect(row?.show_called_up_players_override).toBeNull();
+  });
+
+  it("club scope rejette 'inherit' avec 22023 (racine de cascade, colonne NOT NULL)", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("adminA");
+    const { error } = await c.rpc("set_call_up_visibility", {
+      _scope: "club",
+      _id: fx.clubA,
+      _choice: "inherit",
+    });
+    expect(error).not.toBeNull();
+    expect(error?.code).toBe("22023");
+  });
+});
+
+/**
+ * Round-trip write→read : prouve que les deux RPC gardées, écrites en miroir,
+ * partagent effectivement le même modèle de cascade en conditions réelles.
+ *
+ * Staff pose team.override='masked' via l'écriture → la lecture event
+ * (event en héritage) doit renvoyer effective=false, source='team'. Ce test
+ * relie set_call_up_visibility et get_call_up_visibility_config au niveau
+ * comportemental, pas juste au niveau syntaxique du bloc de garde copié.
+ */
+describe("Round-trip set → get : propagation team → event en héritage", () => {
+  afterAll(async () => {
+    const fx = getFixtures();
+    await setTeamVisibility(fx.teamA, null);
+    await setEventVisibility(fx.eventA, null);
+    await setClubVisibility(fx.clubA, true);
+  });
+
+  it("coachA masque au niveau équipe → event en héritage lit effective=false, source='team'", async () => {
+    const fx = getFixtures();
+    // Baseline : event et team en héritage, club visible
+    await setEventVisibility(fx.eventA, null);
+    await setTeamVisibility(fx.teamA, null);
+    await setClubVisibility(fx.clubA, true);
+
+    const c = await signInAs("coachA");
+
+    // Écriture team via la RPC gardée
+    const { error: setErr } = await c.rpc("set_call_up_visibility", {
+      _scope: "team",
+      _id: fx.teamA,
+      _choice: "masked",
+    });
+    expect(setErr).toBeNull();
+
+    // Lecture event via la RPC gardée — la cascade doit remonter le team
+    const { data, error: getErr } = await c.rpc("get_call_up_visibility_config", {
+      _scope: "event",
+      _id: fx.eventA,
+    });
+    expect(getErr).toBeNull();
+    const row = Array.isArray(data) ? data[0] : data;
+    expect(row).toBeTruthy();
+    expect(row.event_override).toBeNull();
+    expect(row.team_override).toBe(false);
+    expect(row.club_default).toBe(true);
+    expect(row.effective).toBe(false);
+    expect(row.source).toBe("team");
+
+    // Sanity check : le gate booléen public confirme aussi
+    const { data: gate } = await c.rpc("call_up_list_visible", { p_event_id: fx.eventA });
+    expect(gate).toBe(false);
+  });
+
+  it("puis coachA repasse à 'inherit' au niveau équipe → source retombe sur 'club'", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("coachA");
+
+    const { error: setErr } = await c.rpc("set_call_up_visibility", {
+      _scope: "team",
+      _id: fx.teamA,
+      _choice: "inherit",
+    });
+    expect(setErr).toBeNull();
+
+    // Relecture admin : NULL, pas false — inherit persiste bien comme absence d'override
+    const { data: teamRow } = await admin
+      .from("teams")
+      .select("show_called_up_players_override")
+      .eq("id", fx.teamA)
+      .single();
+    expect(teamRow?.show_called_up_players_override).toBeNull();
+
+    // Et la cascade retombe sur le club
+    const { data } = await c.rpc("get_call_up_visibility_config", {
+      _scope: "event",
+      _id: fx.eventA,
+    });
+    const row = Array.isArray(data) ? data[0] : data;
+    expect(row.team_override).toBeNull();
+    expect(row.effective).toBe(true);
+    expect(row.source).toBe("club");
+  });
+});
+
