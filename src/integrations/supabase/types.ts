@@ -6832,6 +6832,10 @@ export type Database = {
         Args: { _players: Json; _token: string }
         Returns: Json
       }
+      set_call_up_visibility: {
+        Args: { _choice: string; _id: string; _scope: string }
+        Returns: undefined
+      }
       set_player_public_profile: {
         Args: { _enabled: boolean; _player_id: string }
         Returns: Json
