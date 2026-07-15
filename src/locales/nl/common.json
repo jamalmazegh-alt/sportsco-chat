@@ -2286,5 +2286,17 @@
       "facilityPlaceholder": "Kies een veld",
       "noFacilitiesHint": "Geen veld geconfigureerd."
     }
+  },
+  "callUpList": {
+    "masked": "Lijst verborgen",
+    "visible": "Lijst zichtbaar",
+    "settingLabel": "Zichtbaarheid van de opgeroepenlijst",
+    "settingHelp": "Bepaalt wie de opgeroepenlijst kan zien. Live berekend: evenementen die erven volgen elke toekomstige wijziging van de team- of clubinstelling.",
+    "definedHere": "Hier ingesteld",
+    "inheritedFromTeam": "Overgenomen van team",
+    "inheritedFromClub": "Overgenomen van club",
+    "inherit": "Erven",
+    "optionVisible": "Zichtbaar voor iedereen",
+    "optionMasked": "Verborgen (alleen staf)"
   }
 }

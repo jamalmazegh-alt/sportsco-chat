@@ -2286,5 +2286,17 @@
       "facilityPlaceholder": "Platz wählen",
       "noFacilitiesHint": "Kein Platz konfiguriert."
     }
+  },
+  "callUpList": {
+    "masked": "Liste verborgen",
+    "visible": "Liste sichtbar",
+    "settingLabel": "Sichtbarkeit der Aufgebotsliste",
+    "settingHelp": "Legt fest, wer die Aufgebotsliste sieht. Wird live berechnet: Events, die erben, folgen jeder späteren Änderung der Team- oder Vereinseinstellung.",
+    "definedHere": "Hier festgelegt",
+    "inheritedFromTeam": "Vom Team geerbt",
+    "inheritedFromClub": "Vom Verein geerbt",
+    "inherit": "Erben",
+    "optionVisible": "Für alle sichtbar",
+    "optionMasked": "Verborgen (nur Staff)"
   }
 }

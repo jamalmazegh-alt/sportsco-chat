@@ -2286,5 +2286,17 @@
       "facilityPlaceholder": "Escolher um campo",
       "noFacilitiesHint": "Nenhum campo configurado."
     }
+  },
+  "callUpList": {
+    "masked": "Lista oculta",
+    "visible": "Lista visível",
+    "settingLabel": "Visibilidade da lista de convocados",
+    "settingHelp": "Define quem vê a lista de convocados. Cálculo em tempo real: os eventos que herdam seguirão qualquer alteração futura da definição da equipa ou clube.",
+    "definedHere": "Definido aqui",
+    "inheritedFromTeam": "Herdado da equipa",
+    "inheritedFromClub": "Herdado do clube",
+    "inherit": "Herdar",
+    "optionVisible": "Visível para todos",
+    "optionMasked": "Oculta (só staff)"
   }
 }
