@@ -78,3 +78,85 @@ export function useCallUpVisibilityConfig(
     },
   });
 }
+
+/**
+ * UI state for the selector.
+ *  - `event` / `team`: three-way (nullable override in DB).
+ *  - `club`: two-way (non-nullable default in DB).
+ */
+export type CallUpVisibilityChoiceNullable = "inherit" | "visible" | "masked";
+export type CallUpVisibilityChoiceStrict = "visible" | "masked";
+
+/**
+ * Explicit UI → column mapping. The mapping is the whole point of the
+ * three-way selector: "inherit" must persist as NULL, NEVER as the resolved
+ * effective boolean. Writing the effective boolean would freeze the current
+ * cascade result into an override, breaking future propagation from the
+ * parent scope.
+ *
+ *   inherit → null    (delete the override, let cascade decide)
+ *   visible → true    (explicit override)
+ *   masked  → false   (explicit override)
+ *
+ * `club` scope has no `inherit`: the club is the root of the cascade and
+ * its column is NOT NULL. Passing "inherit" for club is a programming error.
+ */
+export function callUpChoiceToColumn(
+  choice: CallUpVisibilityChoiceNullable,
+): boolean | null {
+  if (choice === "inherit") return null;
+  if (choice === "visible") return true;
+  return false;
+}
+
+export function callUpChoiceToClubColumn(
+  choice: CallUpVisibilityChoiceStrict,
+): boolean {
+  return choice === "visible";
+}
+
+/**
+ * Mutation for persisting a visibility choice at any scope.
+ *
+ * On success, invalidates BOTH visibility query families by PREFIX
+ * (`["call-up-visibility-gate"]`, `["call-up-visibility-config"]`), never by
+ * exact key: a team-level change flips the effective value on every event
+ * of that team currently in `inherit`, and we cannot enumerate those event
+ * ids. A club-level change fans out even wider. Both query bodies are tiny
+ * (a boolean / a small object), staff-only, and setting mutations are rare,
+ * so the over-invalidation cost is negligible and it eliminates a whole
+ * class of stale-badge bugs.
+ */
+export function useSetCallUpVisibility() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      args:
+        | { scope: "event"; id: string; choice: CallUpVisibilityChoiceNullable }
+        | { scope: "team"; id: string; choice: CallUpVisibilityChoiceNullable }
+        | { scope: "club"; id: string; choice: CallUpVisibilityChoiceStrict },
+    ) => {
+      if (args.scope === "club") {
+        const value = callUpChoiceToClubColumn(args.choice);
+        const { error } = await supabase
+          .from("clubs")
+          .update({ show_called_up_players_default: value })
+          .eq("id", args.id);
+        if (error) throw error;
+        return;
+      }
+      const value = callUpChoiceToColumn(args.choice);
+      const table = args.scope === "event" ? "events" : "teams";
+      const { error } = await supabase
+        .from(table)
+        .update({ show_called_up_players_override: value })
+        .eq("id", args.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      // Prefix invalidation — see doc block above.
+      qc.invalidateQueries({ queryKey: ["call-up-visibility-gate"] });
+      qc.invalidateQueries({ queryKey: ["call-up-visibility-config"] });
+    },
+  });
+}
