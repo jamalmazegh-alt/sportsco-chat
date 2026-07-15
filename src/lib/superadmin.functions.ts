@@ -1349,6 +1349,24 @@ export const getUserDetail = createServerFn({ method: "POST" })
     for (const p of parentsOfSelf ?? []) {
       const acct = p.parent_user_id ? parentProfileMap.get(p.parent_user_id) : null;
       const list = parentsByPlayer.get(p.player_id) ?? [];
+      const identity =
+        p.parent_user_id ||
+        (p.email && `e:${p.email.toLowerCase().trim()}`) ||
+        (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
+        (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
+        null;
+      if (
+        identity &&
+        list.some(
+          (x) =>
+            (x.parent_user_id && x.parent_user_id === p.parent_user_id) ||
+            (!!p.email && x.email?.toLowerCase().trim() === p.email.toLowerCase().trim()) ||
+            (!!p.phone &&
+              x.phone?.replace(/\s+/g, "") === p.phone.replace(/\s+/g, "")),
+        )
+      ) {
+        continue;
+      }
       list.push({
         parent_user_id: p.parent_user_id ?? null,
         full_name: acct?.full_name ?? p.full_name ?? null,
@@ -1666,14 +1684,40 @@ export const getClubRoster = createServerFn({ method: "POST" })
           .in("team_id", teamIds)
       : { data: [] as never[] };
 
+    // Players attached to each team (via team_members role=player)
+    const playersByTeam = new Map<string, Set<string>>();
+    for (const t of teams ?? []) playersByTeam.set(t.id, new Set());
+    for (const m of allMembers ?? []) {
+      if (m.role === "player" && m.player_id) {
+        playersByTeam.get(m.team_id)?.add(m.player_id);
+      }
+    }
+    const allPlayerIds = Array.from(
+      new Set(Array.from(playersByTeam.values()).flatMap((s) => Array.from(s))),
+    );
 
-    type Role = "coach" | "parent" | "player" | "other";
-    const bucket = (r: string): Role => {
-      if (r === "coach" || r === "admin" || r === "dirigeant") return "coach";
-      if (r === "parent") return "parent";
-      if (r === "player") return "player";
-      return "other";
-    };
+    // Parents live in player_parents (not team_members). Load them for
+    // every player on any team so we can count distinct parents per team.
+    const { data: parentLinks } = allPlayerIds.length
+      ? await supabaseAdmin
+          .from("player_parents")
+          .select("player_id, parent_user_id, email, phone, full_name")
+          .in("player_id", allPlayerIds)
+      : { data: [] as never[] };
+
+    const parentsByPlayer = new Map<string, Set<string>>();
+    for (const p of parentLinks ?? []) {
+      const key =
+        p.parent_user_id ||
+        (p.email && `e:${p.email.toLowerCase().trim()}`) ||
+        (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
+        (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
+        null;
+      if (!key) continue;
+      const set = parentsByPlayer.get(p.player_id) ?? new Set();
+      set.add(key);
+      parentsByPlayer.set(p.player_id, set);
+    }
 
     const perTeam = new Map<
       string,
@@ -1690,9 +1734,27 @@ export const getClubRoster = createServerFn({ method: "POST" })
     for (const m of allMembers ?? []) {
       const entry = perTeam.get(m.team_id);
       if (!entry) continue;
-      const key = m.user_id ?? m.player_id ?? crypto.randomUUID();
-      const b = bucket(m.role as string);
-      entry[b === "coach" ? "coaches" : b === "parent" ? "parents" : b === "player" ? "players" : "other"].add(key);
+      const role = m.role as string;
+      if (role === "coach" || role === "admin" || role === "dirigeant") {
+        if (m.user_id) entry.coaches.add(m.user_id);
+      } else if (role === "player") {
+        if (m.player_id) entry.players.add(m.player_id);
+      } else if (role === "parent") {
+        // Legacy: parent stored directly as team_member
+        if (m.user_id) entry.parents.add(`u:${m.user_id}`);
+      } else {
+        entry.other.add(m.user_id ?? m.player_id ?? crypto.randomUUID());
+      }
+    }
+    // Add parents derived from player_parents for each team's players
+    for (const [teamId, playerSet] of playersByTeam.entries()) {
+      const entry = perTeam.get(teamId);
+      if (!entry) continue;
+      for (const pid of playerSet) {
+        const keys = parentsByPlayer.get(pid);
+        if (!keys) continue;
+        for (const k of keys) entry.parents.add(k);
+      }
     }
 
     const rows = (teams ?? []).map((t) => {
