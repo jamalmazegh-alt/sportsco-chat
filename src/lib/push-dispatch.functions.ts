@@ -2,6 +2,16 @@
  * Client-callable server functions that fan out Web Push notifications.
  * All run fire-and-forget on the server, so callers should not await them
  * blocking the UI (but await is fine — they swallow errors).
+ *
+ * ⚠️ SÉCURITÉ — visibilité liste des convoqués (call_up_list_visible)
+ * Les helpers appelés en aval (`push-fanout.server.ts`) tournent en
+ * service_role et BYPASSENT la RLS, y compris la RESTRICTIVE
+ * `convocations_visibility_gate` / `event_lineups_visibility_gate`.
+ *
+ * NE PAS ajouter ici de payload push contenant un agrégat de convoqués
+ * (compteur "X joueurs convoqués", liste de noms, aperçu de compo, etc.)
+ * destiné à un non-staff sans gating explicite via
+ * `public.call_up_list_visible(event_id)`. La RLS ne rattrapera pas.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
