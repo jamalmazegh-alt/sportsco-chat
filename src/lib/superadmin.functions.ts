@@ -1707,12 +1707,14 @@ export const getClubRoster = createServerFn({ method: "POST" })
 
     const parentsByPlayer = new Map<string, Set<string>>();
     for (const p of parentLinks ?? []) {
-      const key =
-        p.parent_user_id ||
-        (p.email && `e:${p.email.toLowerCase().trim()}`) ||
-        (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
-        (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
-        null;
+      // Use same key namespace as team_members path below so a parent
+      // present in both tables is counted once (u:<uid> vs raw uid mismatched).
+      const key = p.parent_user_id
+        ? `u:${p.parent_user_id}`
+        : (p.email && `e:${p.email.toLowerCase().trim()}`) ||
+          (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
+          (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
+          null;
       if (!key) continue;
       const set = parentsByPlayer.get(p.player_id) ?? new Set();
       set.add(key);
