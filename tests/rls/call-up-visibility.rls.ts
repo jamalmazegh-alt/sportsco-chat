@@ -354,3 +354,41 @@ describe("RLS: event_lineups — masqué = 0 ligne pour les non-staff", () => {
     expect(data ?? []).toHaveLength(0);
   });
 });
+
+describe("RLS: anon — aucun accès direct, même quand la liste est visible", () => {
+  it("anon cannot SELECT convocations", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true); // visible: pire cas pour la fuite
+    const c = anonClient();
+    const { data } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
+    expect(data ?? []).toHaveLength(0);
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("anon cannot SELECT event_lineups", async () => {
+    const fx = getFixtures();
+    const c = anonClient();
+    const { data } = await c.from("event_lineups").select("id").eq("event_id", fx.eventA);
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("anon cannot EXECUTE call_up_list_visible (grant revoked)", async () => {
+    const fx = getFixtures();
+    const c = anonClient();
+    const { data, error } = await c.rpc("call_up_list_visible", { p_event_id: fx.eventA });
+    // anon lost EXECUTE → PostgREST returns an error, or data is null.
+    const blocked = !!error || data === null;
+    expect(blocked, `anon should not be able to call the RPC (data=${data}, err=${error?.message})`).toBe(true);
+  });
+
+  it("anon cannot EXECUTE is_team_staff_of_event", async () => {
+    const fx = getFixtures();
+    const c = anonClient();
+    const { data, error } = await c.rpc("is_team_staff_of_event", {
+      p_event_id: fx.eventA,
+      p_user_id: fx.users.coachA.userId,
+    });
+    const blocked = !!error || data === null;
+    expect(blocked).toBe(true);
+  });
+});
