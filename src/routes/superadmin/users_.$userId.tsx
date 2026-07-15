@@ -293,7 +293,15 @@ function UserDetail() {
           label="Relations"
           rows={[
             ["Clubs", String(data.clubs.length)],
-            ["Teams", String(data.teams.length)],
+            [
+              "Teams",
+              String(
+                new Set([
+                  ...data.teams.map((t) => t.team_id),
+                  ...data.players.flatMap((p) => p.teams.map((t) => t.team_id)),
+                ]).size,
+              ),
+            ],
             ["Player profiles", String(data.players.length)],
             ["Parent links", String(data.parent_of.length)],
           ]}
