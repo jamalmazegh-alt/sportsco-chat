@@ -33,6 +33,7 @@ import { createEvent, updateEvent, type CreateEventInput } from "@/lib/events/ev
 import { ChampionshipPicker } from "@/components/events/championship-picker";
 import { VenuePicker, type VenuePickerValue } from "@/components/events/venue-picker";
 import { useAuth } from "@/lib/auth-context";
+import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -1084,6 +1085,17 @@ export function EventFormSheet({
                   </div>
                 </div>
               </label>
+            )}
+
+            {/*
+             * Event-level override for call-up list visibility. Only shown
+             * when editing an existing event (needs an id to key the
+             * cascade). Read + write go through the staff-gated RPCs.
+             */}
+            {mode === "edit" && initial?.id && (
+              <div className="rounded-xl border border-border bg-card p-4">
+                <CallUpVisibilityField scope="event" id={initial.id} isStaff />
+              </div>
             )}
 
             <Button

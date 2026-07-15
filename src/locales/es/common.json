@@ -2297,6 +2297,7 @@
     "inheritedFromClub": "Heredado del club",
     "inherit": "Heredar",
     "optionVisible": "Visible para todos",
-    "optionMasked": "Oculta (solo staff)"
+    "optionMasked": "Oculta (solo staff)",
+    "saved": "Ajuste guardado"
   }
 }

@@ -2297,6 +2297,7 @@
     "inheritedFromClub": "Vom Verein geerbt",
     "inherit": "Erben",
     "optionVisible": "Für alle sichtbar",
-    "optionMasked": "Verborgen (nur Staff)"
+    "optionMasked": "Verborgen (nur Staff)",
+    "saved": "Einstellung gespeichert"
   }
 }

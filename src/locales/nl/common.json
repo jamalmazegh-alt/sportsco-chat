@@ -2297,6 +2297,7 @@
     "inheritedFromClub": "Overgenomen van club",
     "inherit": "Erven",
     "optionVisible": "Zichtbaar voor iedereen",
-    "optionMasked": "Verborgen (alleen staf)"
+    "optionMasked": "Verborgen (alleen staf)",
+    "saved": "Instelling opgeslagen"
   }
 }
