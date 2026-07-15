@@ -1303,6 +1303,7 @@ export type Database = {
           logo_url: string | null
           looking_for_coach: boolean | null
           name: string
+          show_called_up_players_default: boolean
           slug: string
           stripe_account_created_at: string | null
           stripe_account_id: string | null
@@ -1330,6 +1331,7 @@ export type Database = {
           logo_url?: string | null
           looking_for_coach?: boolean | null
           name: string
+          show_called_up_players_default?: boolean
           slug?: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
@@ -1357,6 +1359,7 @@ export type Database = {
           logo_url?: string | null
           looking_for_coach?: boolean | null
           name?: string
+          show_called_up_players_default?: boolean
           slug?: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
@@ -1963,6 +1966,7 @@ export type Database = {
           series_detached: boolean
           series_id: string | null
           series_slot_id: string | null
+          show_called_up_players_override: boolean | null
           starts_at: string
           status: Database["public"]["Enums"]["event_status"]
           team_id: string
@@ -1999,6 +2003,7 @@ export type Database = {
           series_detached?: boolean
           series_id?: string | null
           series_slot_id?: string | null
+          show_called_up_players_override?: boolean | null
           starts_at: string
           status?: Database["public"]["Enums"]["event_status"]
           team_id: string
@@ -2035,6 +2040,7 @@ export type Database = {
           series_detached?: boolean
           series_id?: string | null
           series_slot_id?: string | null
+          show_called_up_players_override?: boolean | null
           starts_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           team_id?: string
@@ -4747,6 +4753,7 @@ export type Database = {
           image_url: string | null
           name: string
           season: string | null
+          show_called_up_players_override: boolean | null
           sport: string | null
           whatsapp_group_url: string | null
         }
@@ -4763,6 +4770,7 @@ export type Database = {
           image_url?: string | null
           name: string
           season?: string | null
+          show_called_up_players_override?: boolean | null
           sport?: string | null
           whatsapp_group_url?: string | null
         }
@@ -4779,6 +4787,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           season?: string | null
+          show_called_up_players_override?: boolean | null
           sport?: string | null
           whatsapp_group_url?: string | null
         }
@@ -6314,6 +6323,7 @@ export type Database = {
       admin_build_clubero_dashboard: { Args: never; Returns: Json }
       admin_build_clubero_responses: { Args: never; Returns: Json }
       archive_team: { Args: { _id: string }; Returns: undefined }
+      call_up_list_visible: { Args: { p_event_id: string }; Returns: boolean }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
@@ -6659,6 +6669,10 @@ export type Database = {
       is_reserved_club_slug: { Args: { _slug: string }; Returns: boolean }
       is_team_coach: {
         Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_team_staff_of_event: {
+        Args: { p_event_id: string; p_user_id: string }
         Returns: boolean
       }
       is_tournament_co_organizer: {
