@@ -6528,7 +6528,7 @@ export type Database = {
         }
       }
       get_call_up_visibility_config: {
-        Args: { _event_id: string }
+        Args: { _id: string; _scope: string }
         Returns: {
           club_default: boolean
           effective: boolean
