@@ -2286,5 +2286,17 @@
       "facilityPlaceholder": "Pick a field",
       "noFacilitiesHint": "No field configured for this site."
     }
+  },
+  "callUpList": {
+    "masked": "List hidden",
+    "visible": "List visible",
+    "settingLabel": "Call-up list visibility",
+    "settingHelp": "Controls who can see the list of called-up players. Resolved live: events that inherit will follow any future change to the team or club setting.",
+    "definedHere": "Set here",
+    "inheritedFromTeam": "Inherited from team",
+    "inheritedFromClub": "Inherited from club",
+    "inherit": "Inherit",
+    "optionVisible": "Visible to everyone",
+    "optionMasked": "Hidden (staff only)"
   }
 }

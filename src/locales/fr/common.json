@@ -2286,5 +2286,17 @@
       "facilityPlaceholder": "Choisir un terrain",
       "noFacilitiesHint": "Aucun terrain configuré pour ce site."
     }
+  },
+  "callUpList": {
+    "masked": "Liste masquée",
+    "visible": "Liste visible",
+    "settingLabel": "Visibilité de la liste des convoqués",
+    "settingHelp": "Détermine qui peut voir la liste des joueurs convoqués. Le calcul est en direct : les événements en héritage suivront toute modification future du réglage de l'équipe ou du club.",
+    "definedHere": "Défini ici",
+    "inheritedFromTeam": "Hérité de l'équipe",
+    "inheritedFromClub": "Hérité du club",
+    "inherit": "Hériter",
+    "optionVisible": "Visible pour tous",
+    "optionMasked": "Masquée (staff uniquement)"
   }
 }
