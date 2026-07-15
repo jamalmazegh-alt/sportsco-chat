@@ -934,8 +934,20 @@ export const runImport = createServerFn({ method: "POST" })
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
 
-            // Invitation joueur (si email fourni et option activée)
-            if (r.email_contact && data.sendInvitations) {
+            // Invitation joueur — UNIQUEMENT si joueur majeur (>= 18 ans).
+            // Les mineurs ne peuvent être invités qu'après accord parental,
+            // via l'action déclenchée par un parent (ou coach avec accord).
+            const isAdultPlayer = (() => {
+              if (!r.date_naissance) return false;
+              const dob = new Date(r.date_naissance);
+              if (Number.isNaN(dob.getTime())) return false;
+              const now = new Date();
+              let age = now.getFullYear() - dob.getFullYear();
+              const m = now.getMonth() - dob.getMonth();
+              if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+              return age >= 18;
+            })();
+            if (r.email_contact && data.sendInvitations && isAdultPlayer) {
               const token = await createInviteAndEmail({
                 clubId: data.clubId,
                 clubName,
