@@ -528,7 +528,7 @@ function TeamDetail() {
     const [{ data: pl }, { data: parents }] = await Promise.all([
       supabase
         .from("players")
-        .select("id, first_name, email, phone, user_id")
+        .select("id, first_name, email, phone, user_id, birth_date, child_platform_access")
         .eq("id", playerId)
         .maybeSingle(),
       supabase
@@ -537,8 +537,22 @@ function TeamDetail() {
         .eq("player_id", playerId),
     ]);
 
+    // Un joueur mineur ne peut être invité qu'après accord parental
+    // (`child_platform_access = true`). Les parents restent toujours invités.
+    const isAdult = (() => {
+      if (!pl?.birth_date) return false;
+      const dob = new Date(pl.birth_date);
+      if (Number.isNaN(dob.getTime())) return false;
+      const now = new Date();
+      let age = now.getFullYear() - dob.getFullYear();
+      const m = now.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+      return age >= 18;
+    })();
+    const canInvitePlayer = isAdult || !!pl?.child_platform_access;
+
     const targets: InviteTarget[] = [];
-    if (pl && !pl.user_id && (pl.email || pl.phone)) {
+    if (pl && !pl.user_id && (pl.email || pl.phone) && canInvitePlayer) {
       targets.push({
         role: "player",
         firstName: pl.first_name ?? undefined,
