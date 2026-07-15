@@ -229,7 +229,10 @@
     "emailAlreadyRegistered": "Ya existe una cuenta con este correo.",
     "tooManyRequests": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
     "invalidEmail": "Correo electrónico no válido.",
-    "signupError": "No se pudo crear la cuenta. Inténtalo de nuevo."
+    "signupError": "No se pudo crear la cuenta. Inténtalo de nuevo.",
+    "emailNotConfirmed": "Tu correo aún no ha sido confirmado. Revisa tu bandeja de entrada (y spam) para activar tu cuenta.",
+    "resendConfirmation": "Reenviar correo",
+    "confirmationResent": "Correo de confirmación reenviado."
   },
   "common": {
     "save": "Guardar",
@@ -928,8 +931,20 @@
     "pendingCount_plural": "{{count}} Jugadores aún no han respondido",
     "remindAllSent": "{{count}} recordatorios enviados",
     "remindAllSent_plural": "{{count}} recordatorios enviados",
-    "reasonsAbsent": ["Trabajo", "Familia", "Lesión", "Enfermedad", "Estudios", "Otro compromiso"],
-    "reasonsUncertain": ["Por confirmar", "Trabajo", "Familia", "Problema de salud leve"],
+    "reasonsAbsent": [
+      "Trabajo",
+      "Familia",
+      "Lesión",
+      "Enfermedad",
+      "Estudios",
+      "Otro compromiso"
+    ],
+    "reasonsUncertain": [
+      "Por confirmar",
+      "Trabajo",
+      "Familia",
+      "Problema de salud leve"
+    ],
     "suggestedReasons": "Sugerencias",
     "forceResponseTitle": "¿Forzar respuesta?",
     "forceResponseDesc": "{{name}} ya ha respondido {{current}}. ¿De verdad quieres cambiar el estado a {{next}}?",
