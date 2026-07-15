@@ -2,6 +2,17 @@
  * Server-only helpers that compute targets and fan out Web Push for
  * specific business events. Shared between authenticated `createServerFn`
  * dispatchers and public webhook routes (token-protected).
+ *
+ * ⚠️ SÉCURITÉ — visibilité liste des convoqués (call_up_list_visible)
+ * Ce module utilise `supabaseAdmin` (service_role) et BYPASSE la RLS,
+ * y compris la RESTRICTIVE `convocations_visibility_gate` /
+ * `event_lineups_visibility_gate`. Les fan-outs actuels ciblent par
+ * `player_id` sans agréger et ne fuient rien.
+ *
+ * NE PAS ajouter ici d'agrégat de convoqués (compteur "X joueurs convoqués",
+ * liste de noms, aperçu de compo, etc.) exposé à un destinataire non-staff
+ * sans passer explicitement par `public.call_up_list_visible(event_id)`.
+ * La RLS ne rattrapera pas : service_role est hors RLS.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendPushToUser } from "./push-send.server";
