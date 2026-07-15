@@ -63,6 +63,7 @@ import {
   normalizeGroupUrl,
 } from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
+import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { EventChat } from "@/components/event-chat";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -3670,6 +3671,14 @@ function EventDetail() {
           {/* Coach: resend convocations */}
           {isCoach && event.status !== "cancelled" && event.convocations_sent && (
             <div className="p-4 border-b border-border/70">
+              {/*
+               * Call-up visibility badge — never silent. Reads the resolved
+               * effective boolean via `call_up_list_visible` (safe for any
+               * authenticated user). No client recompute of the cascade.
+               */}
+              <div className="mb-3 flex justify-end">
+                <CallUpVisibilityBadge eventId={eventId} />
+              </div>
               <Button
                 onClick={() => setResendOpen(true)}
                 variant={convocChanges.length > 0 ? "default" : "outline"}

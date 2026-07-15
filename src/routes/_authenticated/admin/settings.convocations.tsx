@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
+import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
@@ -102,6 +103,17 @@ function ConvocationsSettings() {
           ))}
         </div>
       </section>
+
+      {/*
+       * Club-level default for call-up list visibility (racine de cascade).
+       * Écriture via RPC gated (set_call_up_visibility) — jamais `.update()`
+       * direct sur clubs.show_called_up_players_default depuis le client.
+       */}
+      {activeClubId && (
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <CallUpVisibilityField scope="club" id={activeClubId} isStaff />
+        </section>
+      )}
 
       <Button className="w-full h-11" onClick={save} disabled={saving}>
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.save")}

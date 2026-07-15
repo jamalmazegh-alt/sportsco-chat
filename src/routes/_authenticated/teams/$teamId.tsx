@@ -66,6 +66,7 @@ import { TeamInviteShareButton } from "@/components/team-invite-share-button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
+import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId")({
   component: TeamDetail,
@@ -1105,6 +1106,15 @@ function TeamDetail() {
                 </Select>
                 <p className="text-xs text-muted-foreground">{t("teams.commModeHint")}</p>
               </div>
+              {/*
+               * Team-level override for call-up list visibility. Read/write
+               * both go through RPCs (staff-gated). No raw select on
+               * teams.show_called_up_players_override anywhere in the UI.
+               */}
+              <div className="pt-2 border-t border-border/60">
+                <CallUpVisibilityField scope="team" id={teamId} isStaff={isCoach} />
+              </div>
+
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
                 {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
               </Button>
