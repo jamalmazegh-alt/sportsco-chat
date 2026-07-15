@@ -1349,6 +1349,24 @@ export const getUserDetail = createServerFn({ method: "POST" })
     for (const p of parentsOfSelf ?? []) {
       const acct = p.parent_user_id ? parentProfileMap.get(p.parent_user_id) : null;
       const list = parentsByPlayer.get(p.player_id) ?? [];
+      const identity =
+        p.parent_user_id ||
+        (p.email && `e:${p.email.toLowerCase().trim()}`) ||
+        (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
+        (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
+        null;
+      if (
+        identity &&
+        list.some(
+          (x) =>
+            (x.parent_user_id && x.parent_user_id === p.parent_user_id) ||
+            (!!p.email && x.email?.toLowerCase().trim() === p.email.toLowerCase().trim()) ||
+            (!!p.phone &&
+              x.phone?.replace(/\s+/g, "") === p.phone.replace(/\s+/g, "")),
+        )
+      ) {
+        continue;
+      }
       list.push({
         parent_user_id: p.parent_user_id ?? null,
         full_name: acct?.full_name ?? p.full_name ?? null,
