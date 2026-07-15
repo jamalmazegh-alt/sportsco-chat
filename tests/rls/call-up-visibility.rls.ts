@@ -15,7 +15,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_admin";
-import { signInAs } from "./_clients";
+import { signInAs, anonClient } from "./_clients";
 import { getFixtures, PASSWORD } from "./_setup";
 
 const PWD = PASSWORD;
