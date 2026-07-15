@@ -35,6 +35,25 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setBusy(false);
+      const code = (error as { code?: string }).code?.toLowerCase() ?? "";
+      const msg = (error.message ?? "").toLowerCase();
+      if (code === "email_not_confirmed" || msg.includes("email not confirmed")) {
+        toast.error(t("auth.emailNotConfirmed"), {
+          duration: 10000,
+          action: {
+            label: t("auth.resendConfirmation"),
+            onClick: async () => {
+              const { error: resendErr } = await supabase.auth.resend({
+                type: "signup",
+                email,
+              });
+              if (resendErr) toast.error(resendErr.message);
+              else toast.success(t("auth.confirmationResent"));
+            },
+          },
+        });
+        return;
+      }
       toast.error(t("auth.loginError"));
       return;
     }

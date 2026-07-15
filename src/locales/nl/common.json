@@ -229,7 +229,10 @@
     "emailAlreadyRegistered": "Er bestaat al een account met dit e-mailadres.",
     "tooManyRequests": "Te veel pogingen. Probeer het over enkele minuten opnieuw.",
     "invalidEmail": "Ongeldig e-mailadres.",
-    "signupError": "Account kon niet worden aangemaakt. Probeer opnieuw."
+    "signupError": "Account kon niet worden aangemaakt. Probeer opnieuw.",
+    "emailNotConfirmed": "Je e-mail is nog niet bevestigd. Controleer je inbox (en spam) om je account te activeren.",
+    "resendConfirmation": "E-mail opnieuw sturen",
+    "confirmationResent": "Bevestigingsmail opnieuw verzonden."
   },
   "common": {
     "save": "Opslaan",
@@ -928,8 +931,20 @@
     "pendingCount_plural": "{{count}} Spelers hebben nog niet geantwoord",
     "remindAllSent": "{{count}} herinnering verzonden",
     "remindAllSent_plural": "{{count}} herinneringen verzonden",
-    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
-    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
+    "reasonsAbsent": [
+      "Werk",
+      "Familie",
+      "Blessure",
+      "Ziekte",
+      "Studie",
+      "Andere verplichting"
+    ],
+    "reasonsUncertain": [
+      "Nog te bevestigen",
+      "Werk",
+      "Familie",
+      "Lichte gezondheidsklachten"
+    ],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",

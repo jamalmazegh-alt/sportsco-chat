@@ -229,7 +229,10 @@
     "emailAlreadyRegistered": "Ein Konto mit dieser E-Mail-Adresse existiert bereits.",
     "tooManyRequests": "Zu viele Versuche. Bitte in einigen Minuten erneut versuchen.",
     "invalidEmail": "Ungültige E-Mail-Adresse.",
-    "signupError": "Konto konnte nicht erstellt werden. Bitte erneut versuchen."
+    "signupError": "Konto konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "emailNotConfirmed": "Ihre E-Mail wurde noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang (und Spam), um Ihr Konto zu aktivieren.",
+    "resendConfirmation": "E-Mail erneut senden",
+    "confirmationResent": "Bestätigungs-E-Mail erneut gesendet."
   },
   "common": {
     "save": "Speichern",
@@ -928,7 +931,14 @@
     "pendingCount_plural": "{{count}} Spieler haben noch nicht geantwortet",
     "remindAllSent": "{{count}} Erinnerung gesendet",
     "remindAllSent_plural": "{{count}} Erinnerungen gesendet",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",

@@ -229,7 +229,10 @@
     "emailAlreadyRegistered": "An account already exists with this email.",
     "tooManyRequests": "Too many attempts. Please try again in a few minutes.",
     "invalidEmail": "Invalid email address.",
-    "signupError": "Could not create the account. Please try again."
+    "signupError": "Could not create the account. Please try again.",
+    "emailNotConfirmed": "Your email hasn't been confirmed yet. Check your inbox (and spam) to activate your account.",
+    "resendConfirmation": "Resend email",
+    "confirmationResent": "Confirmation email resent."
   },
   "common": {
     "save": "Save",
@@ -928,8 +931,20 @@
     "pendingCount_plural": "{{count}} players haven't replied yet",
     "remindAllSent": "{{count}} reminder sent",
     "remindAllSent_plural": "{{count}} reminders sent",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
