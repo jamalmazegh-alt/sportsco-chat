@@ -118,6 +118,19 @@ export function callUpChoiceToClubColumn(
 /**
  * Mutation for persisting a visibility choice at any scope.
  *
+ * WRITE PATH IS A GATED RPC, NOT `.update()`.
+ *
+ * `set_call_up_visibility(scope, id, choice)` is SECURITY DEFINER and re-runs
+ * the exact same staff-gate block as `get_call_up_visibility_config`
+ * (event → `is_team_staff_of_event`; team → `is_team_coach OR
+ * has_club_role(admin)`; club → `is_club_staff`). Read and write share one
+ * guard — a role able to edit an event via the generic events UPDATE
+ * policy CANNOT flip `show_called_up_players_*` here.
+ *
+ * Never re-introduce a direct `supabase.from('events'|'teams'|'clubs').update()`
+ * on `show_called_up_players_*` — Postgres has no column-level gating in
+ * policies and the table-wide UPDATE policies are broader than this field.
+ *
  * On success, invalidates BOTH visibility query families by PREFIX
  * (`["call-up-visibility-gate"]`, `["call-up-visibility-config"]`), never by
  * exact key: a team-level change flips the effective value on every event
@@ -136,21 +149,11 @@ export function useSetCallUpVisibility() {
         | { scope: "team"; id: string; choice: CallUpVisibilityChoiceNullable }
         | { scope: "club"; id: string; choice: CallUpVisibilityChoiceStrict },
     ) => {
-      if (args.scope === "club") {
-        const value = callUpChoiceToClubColumn(args.choice);
-        const { error } = await supabase
-          .from("clubs")
-          .update({ show_called_up_players_default: value })
-          .eq("id", args.id);
-        if (error) throw error;
-        return;
-      }
-      const value = callUpChoiceToColumn(args.choice);
-      const table = args.scope === "event" ? "events" : "teams";
-      const { error } = await supabase
-        .from(table)
-        .update({ show_called_up_players_override: value })
-        .eq("id", args.id);
+      const { error } = await supabase.rpc("set_call_up_visibility", {
+        _scope: args.scope,
+        _id: args.id,
+        _choice: args.choice,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -160,3 +163,4 @@ export function useSetCallUpVisibility() {
     },
   });
 }
+
