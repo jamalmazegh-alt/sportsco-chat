@@ -6527,6 +6527,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_call_up_visibility_config: {
+        Args: { _event_id: string }
+        Returns: {
+          club_default: boolean
+          effective: boolean
+          event_override: boolean
+          source: string
+          team_override: boolean
+        }[]
+      }
       get_camp_registration_by_token: {
         Args: { _token: string }
         Returns: Json
