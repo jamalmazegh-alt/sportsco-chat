@@ -1,0 +1,356 @@
+/**
+ * RLS: visibilité de la liste des convoqués (héritage Club → Équipe → Événement).
+ *
+ * La policy RESTRICTIVE `convocations_visibility_gate` + `event_lineups_visibility_gate`
+ * doit :
+ *   - Laisser passer staff (coach/admin), self, parent lié, quelle que soit la config.
+ *   - Bloquer les pairs (autres joueurs de la même équipe) quand la liste est masquée.
+ *   - Bloquer les parents non liés dans tous les cas.
+ *   - Retourner `false` (jamais NULL) pour un event_id inconnu.
+ *
+ * On seede à la volée un joueur "teammate" (utilisateur + players + convocation)
+ * dans le club A pour tester le cas "pair de la même équipe", que la permissive
+ * `can_view_team` autorise et que la restrictive doit filtrer quand masqué.
+ */
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_admin";
+import { signInAs } from "./_clients";
+import { getFixtures, PASSWORD } from "./_setup";
+
+const PWD = PASSWORD;
+
+let teammateUserId: string;
+let teammatePlayerId: string;
+let teammateConvocationId: string;
+let teammateClient: SupabaseClient;
+const teammateEmail = `__rls_calluptm_${Date.now().toString(36)}@clubero-rls.test`;
+
+async function setEventVisibility(eventId: string, value: boolean | null) {
+  const { error } = await admin
+    .from("events")
+    .update({ show_called_up_players_override: value })
+    .eq("id", eventId);
+  if (error) throw new Error(`setEventVisibility: ${error.message}`);
+}
+
+async function setTeamVisibility(teamId: string, value: boolean | null) {
+  const { error } = await admin
+    .from("teams")
+    .update({ show_called_up_players_override: value })
+    .eq("id", teamId);
+  if (error) throw new Error(`setTeamVisibility: ${error.message}`);
+}
+
+async function setClubVisibility(clubId: string, value: boolean) {
+  const { error } = await admin
+    .from("clubs")
+    .update({ show_called_up_players_default: value })
+    .eq("id", clubId);
+  if (error) throw new Error(`setClubVisibility: ${error.message}`);
+}
+
+beforeAll(async () => {
+  const fx = getFixtures();
+
+  // 1. Teammate user in clubA, teamA
+  const { data: created, error: cErr } = await admin.auth.admin.createUser({
+    email: teammateEmail,
+    password: PWD,
+    email_confirm: true,
+  });
+  if (cErr || !created.user) throw new Error(`create teammate: ${cErr?.message}`);
+  teammateUserId = created.user.id;
+
+  await admin.from("profiles").upsert({
+    id: teammateUserId,
+    full_name: "RLS Teammate",
+    first_name: "RLS",
+    last_name: "teammate",
+  });
+
+  await admin.from("club_members").insert({
+    club_id: fx.clubA,
+    user_id: teammateUserId,
+    role: "player",
+    roles: ["player"],
+  });
+
+  const { data: pl, error: pErr } = await admin
+    .from("players")
+    .insert({
+      club_id: fx.clubA,
+      first_name: "Teammate",
+      last_name: "A",
+      user_id: teammateUserId,
+    })
+    .select("id")
+    .single();
+  if (pErr || !pl) throw new Error(`create teammate player: ${pErr?.message}`);
+  teammatePlayerId = pl.id;
+
+  const { data: conv, error: convErr } = await admin
+    .from("convocations")
+    .insert({ event_id: fx.eventA, player_id: teammatePlayerId, status: "pending" })
+    .select("id")
+    .single();
+  if (convErr || !conv) throw new Error(`create teammate convocation: ${convErr?.message}`);
+  teammateConvocationId = conv.id;
+
+  teammateClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error: signErr } = await teammateClient.auth.signInWithPassword({
+    email: teammateEmail,
+    password: PWD,
+  });
+  if (signErr) throw new Error(`teammate signIn: ${signErr.message}`);
+
+  // Reset to inherited defaults before running matrix
+  await setEventVisibility(fx.eventA, null);
+  await setTeamVisibility(fx.teamA, null);
+  await setClubVisibility(fx.clubA, true);
+});
+
+afterAll(async () => {
+  await admin.from("convocations").delete().eq("id", teammateConvocationId);
+  await admin.from("players").delete().eq("id", teammatePlayerId);
+  await admin.from("club_members").delete().eq("user_id", teammateUserId);
+  await admin.from("profiles").delete().eq("id", teammateUserId);
+  await admin.auth.admin.deleteUser(teammateUserId);
+});
+
+describe("RLS: call-up visibility — fonction call_up_list_visible", () => {
+  it("returns false (never null) for unknown event_id", async () => {
+    const { data, error } = await admin.rpc("call_up_list_visible", {
+      p_event_id: "00000000-0000-0000-0000-000000000000",
+    });
+    expect(error).toBeNull();
+    expect(data).toBe(false);
+  });
+
+  it("returns true when the club default is true and no override", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, null);
+    await setTeamVisibility(fx.teamA, null);
+    await setClubVisibility(fx.clubA, true);
+    const { data } = await admin.rpc("call_up_list_visible", { p_event_id: fx.eventA });
+    expect(data).toBe(true);
+  });
+
+  it("event override wins over team and club", async () => {
+    const fx = getFixtures();
+    await setClubVisibility(fx.clubA, true);
+    await setTeamVisibility(fx.teamA, true);
+    await setEventVisibility(fx.eventA, false);
+    const { data } = await admin.rpc("call_up_list_visible", { p_event_id: fx.eventA });
+    expect(data).toBe(false);
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("team override wins over club when event has no override", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, null);
+    await setTeamVisibility(fx.teamA, false);
+    await setClubVisibility(fx.clubA, true);
+    const { data } = await admin.rpc("call_up_list_visible", { p_event_id: fx.eventA });
+    expect(data).toBe(false);
+    await setTeamVisibility(fx.teamA, null);
+  });
+});
+
+describe("RLS: convocations — restrictive gate quand liste masquée", () => {
+  beforeAll(async () => {
+    const fx = getFixtures();
+    await setClubVisibility(fx.clubA, true);
+    await setTeamVisibility(fx.teamA, null);
+    await setEventVisibility(fx.eventA, false); // masquée pour toute la suite
+  });
+
+  afterAll(async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("coachA (staff) reads all convocations even when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("coachA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    const ids = (data ?? []).map((r) => r.id).sort();
+    expect(ids).toContain(fx.convocationA);
+    expect(ids).toContain(teammateConvocationId);
+  });
+
+  it("adminA (staff) reads all convocations even when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("adminA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("playerA reads their OWN convocation when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("playerA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("id", fx.convocationA);
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+
+  it("playerA CANNOT read teammate convocation when hidden", async () => {
+    const c = await signInAs("playerA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("id", teammateConvocationId);
+    if (error) return; // silently blocked also OK
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("teammate reads their OWN convocation but NOT playerA's", async () => {
+    const fx = getFixtures();
+    const own = await teammateClient
+      .from("convocations")
+      .select("id")
+      .eq("id", teammateConvocationId);
+    expect(own.error).toBeNull();
+    expect((own.data ?? []).length).toBe(1);
+    const other = await teammateClient
+      .from("convocations")
+      .select("id")
+      .eq("id", fx.convocationA);
+    expect((other.data ?? []).length).toBe(0);
+  });
+
+  it("parentA (linked to playerA) reads playerA's convocation", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("parentA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("id", fx.convocationA);
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+
+  it("parentUnlinkedA cannot read any convocation of eventA when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("parentUnlinkedA");
+    const { data } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("playerA can still respond to their own convocation when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("playerA");
+    const { data, error } = await c
+      .from("convocations")
+      .update({ status: "present" })
+      .eq("id", fx.convocationA)
+      .select();
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+
+  it("parentA can respond on behalf of playerA when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("parentA");
+    const { data, error } = await c
+      .from("convocations")
+      .update({ status: "absent" })
+      .eq("id", fx.convocationA)
+      .select();
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+});
+
+describe("RLS: convocations — visible restaure l'accès équipe", () => {
+  beforeAll(async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true);
+  });
+  afterAll(async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("playerA reads teammate convocation when list is visible", async () => {
+    const c = await signInAs("playerA");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("id", teammateConvocationId);
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+});
+
+describe("RLS: event_lineups — masqué = 0 ligne pour les non-staff", () => {
+  let lineupId: string | null = null;
+
+  beforeAll(async () => {
+    const fx = getFixtures();
+    // seed a lineup for eventA
+    const { data, error } = await admin
+      .from("event_lineups")
+      .insert({
+        event_id: fx.eventA,
+        team_id: fx.teamA,
+        club_id: fx.clubA,
+        formation: "4-4-2",
+        slots: [],
+        bench: [],
+        visibility: "team",
+        published_at: new Date().toISOString(),
+        created_by: fx.users.coachA.userId,
+      })
+      .select("id")
+      .single();
+    if (error || !data) throw new Error(`seed lineup: ${error?.message}`);
+    lineupId = data.id;
+
+    await setEventVisibility(fx.eventA, false);
+  });
+
+  afterAll(async () => {
+    const fx = getFixtures();
+    if (lineupId) await admin.from("event_lineups").delete().eq("id", lineupId);
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("coachA sees the lineup when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("coachA");
+    const { data, error } = await c
+      .from("event_lineups")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    expect((data ?? []).length).toBe(1);
+  });
+
+  it("playerA sees NO lineup when hidden (not even their own place)", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("playerA");
+    const { data } = await c.from("event_lineups").select("id").eq("event_id", fx.eventA);
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("parentA sees NO lineup when hidden", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("parentA");
+    const { data } = await c.from("event_lineups").select("id").eq("event_id", fx.eventA);
+    expect(data ?? []).toHaveLength(0);
+  });
+});
