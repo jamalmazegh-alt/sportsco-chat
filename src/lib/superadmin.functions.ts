@@ -1696,26 +1696,74 @@ export const getClubRoster = createServerFn({ method: "POST" })
       new Set(Array.from(playersByTeam.values()).flatMap((s) => Array.from(s))),
     );
 
-    // Parents live in player_parents (not team_members). Load them for
-    // every player on any team so we can count distinct parents per team.
-    const { data: parentLinks } = allPlayerIds.length
+    const [{ data: playerRows }, { data: parentLinks }] = await Promise.all([
+      allPlayerIds.length
+        ? supabaseAdmin
+            .from("players")
+            .select("id, first_name, last_name, license_number")
+            .in("id", allPlayerIds)
+        : Promise.resolve({ data: [] as never[] }),
+      // Parents live in player_parents (not team_members). Load them for
+      // every player on any team, then keep only real parent user accounts.
+      allPlayerIds.length
+        ? supabaseAdmin
+            .from("player_parents")
+            .select("player_id, parent_user_id")
+            .in("player_id", allPlayerIds)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    const playerRowsById = new Map((playerRows ?? []).map((p) => [p.id, p]));
+    const normalizeName = (first?: string | null, last?: string | null) => {
+      const value = `${first ?? ""} ${last ?? ""}`
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+      return value || null;
+    };
+    const normalizeLicense = (license?: string | null) => {
+      const value = (license ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
+        .trim();
+      return value || null;
+    };
+    const playerKey = (playerId: string) => {
+      const p = playerRowsById.get(playerId);
+      const name = normalizeName(p?.first_name, p?.last_name);
+      if (name) return `name:${name}`;
+      const license = normalizeLicense(p?.license_number);
+      if (license) return `license:${license}`;
+      return `id:${playerId}`;
+    };
+
+    const parentUserIds = Array.from(
+      new Set(
+        (parentLinks ?? [])
+          .map((p) => p.parent_user_id)
+          .filter((id): id is string => typeof id === "string" && id.length > 0),
+      ),
+    );
+    const { data: parentClubMembers } = parentUserIds.length
       ? await supabaseAdmin
-          .from("player_parents")
-          .select("player_id, parent_user_id, email, phone, full_name")
-          .in("player_id", allPlayerIds)
+          .from("club_members")
+          .select("user_id, role, roles")
+          .eq("club_id", data.club_id)
+          .in("user_id", parentUserIds)
       : { data: [] as never[] };
+
+    const parentUsersInClub = new Set(
+      (parentClubMembers ?? [])
+        .filter((m) => m.role === "parent" || ((m.roles ?? []) as string[]).includes("parent"))
+        .map((m) => m.user_id),
+    );
 
     const parentsByPlayer = new Map<string, Set<string>>();
     for (const p of parentLinks ?? []) {
-      // Use same key namespace as team_members path below so a parent
-      // present in both tables is counted once (u:<uid> vs raw uid mismatched).
-      const key = p.parent_user_id
-        ? `u:${p.parent_user_id}`
-        : (p.email && `e:${p.email.toLowerCase().trim()}`) ||
-          (p.phone && `p:${p.phone.replace(/\s+/g, "")}`) ||
-          (p.full_name && `n:${p.full_name.toLowerCase().trim()}`) ||
-          null;
-      if (!key) continue;
+      if (!p.parent_user_id || !parentUsersInClub.has(p.parent_user_id)) continue;
+      const key = `u:${p.parent_user_id}`;
       const set = parentsByPlayer.get(p.player_id) ?? new Set();
       set.add(key);
       parentsByPlayer.set(p.player_id, set);
@@ -1740,7 +1788,7 @@ export const getClubRoster = createServerFn({ method: "POST" })
       if (role === "coach" || role === "admin" || role === "dirigeant") {
         if (m.user_id) entry.coaches.add(m.user_id);
       } else if (role === "player") {
-        if (m.player_id) entry.players.add(m.player_id);
+        if (m.player_id) entry.players.add(playerKey(m.player_id));
       } else if (role === "parent") {
         // Legacy: parent stored directly as team_member
         if (m.user_id) entry.parents.add(`u:${m.user_id}`);
@@ -1779,18 +1827,32 @@ export const getClubRoster = createServerFn({ method: "POST" })
       };
     });
 
-    const totals = rows.reduce(
-      (acc, r) => {
-        if (r.archived) return acc;
-        acc.coaches += r.coaches;
-        acc.parents += r.parents;
-        acc.players += r.players;
-        acc.other += r.other;
-        acc.total += r.total;
-        return acc;
-      },
-      { coaches: 0, parents: 0, players: 0, other: 0, total: 0 },
-    );
+    const totalSets = {
+      coaches: new Set<string>(),
+      parents: new Set<string>(),
+      players: new Set<string>(),
+      other: new Set<string>(),
+    };
+    for (const t of teams ?? []) {
+      if (t.archived_at || t.deleted_at) continue;
+      const e = perTeam.get(t.id);
+      if (!e) continue;
+      for (const key of e.coaches) totalSets.coaches.add(key);
+      for (const key of e.parents) totalSets.parents.add(key);
+      for (const key of e.players) totalSets.players.add(key);
+      for (const key of e.other) totalSets.other.add(key);
+    }
+    const totals = {
+      coaches: totalSets.coaches.size,
+      parents: totalSets.parents.size,
+      players: totalSets.players.size,
+      other: totalSets.other.size,
+      total:
+        totalSets.coaches.size +
+        totalSets.parents.size +
+        totalSets.players.size +
+        totalSets.other.size,
+    };
 
     return { rows, totals };
   });
