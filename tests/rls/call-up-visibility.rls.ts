@@ -26,6 +26,14 @@ let teammateConvocationId: string;
 let teammateClient: SupabaseClient;
 const teammateEmail = `__rls_calluptm_${Date.now().toString(36)}@clubero-rls.test`;
 
+let invitedChildUserId: string;
+let invitedParentUserId: string;
+let invitedPlayerId: string;
+let invitedConvocationId: string;
+let invitedParentClient: SupabaseClient;
+const invitedChildEmail = `__rls_invited_child_${Date.now().toString(36)}@clubero-rls.test`;
+const invitedParentEmail = `__rls_invited_parent_${Date.now().toString(36)}@clubero-rls.test`;
+
 async function setEventVisibility(eventId: string, value: boolean | null) {
   const { error } = await admin
     .from("events")
@@ -106,6 +114,92 @@ beforeAll(async () => {
   });
   if (signErr) throw new Error(`teammate signIn: ${signErr.message}`);
 
+  // Parent-linked-only fixture: child is convoked to teamA's event, but neither
+  // child nor parent has a team_members row. This exercises the row-scoped
+  // player_parents branch, not can_view_team(teamA).
+  const { data: invitedChild, error: invitedChildErr } = await admin.auth.admin.createUser({
+    email: invitedChildEmail,
+    password: PWD,
+    email_confirm: true,
+  });
+  if (invitedChildErr || !invitedChild.user) {
+    throw new Error(`create invited child: ${invitedChildErr?.message}`);
+  }
+  invitedChildUserId = invitedChild.user.id;
+
+  const { data: invitedParent, error: invitedParentErr } = await admin.auth.admin.createUser({
+    email: invitedParentEmail,
+    password: PWD,
+    email_confirm: true,
+  });
+  if (invitedParentErr || !invitedParent.user) {
+    throw new Error(`create invited parent: ${invitedParentErr?.message}`);
+  }
+  invitedParentUserId = invitedParent.user.id;
+
+  await admin.from("profiles").upsert([
+    {
+      id: invitedChildUserId,
+      full_name: "RLS Invited Child",
+      first_name: "RLS",
+      last_name: "invited-child",
+    },
+    {
+      id: invitedParentUserId,
+      full_name: "RLS Invited Parent",
+      first_name: "RLS",
+      last_name: "invited-parent",
+    },
+  ]);
+
+  await admin.from("club_members").insert([
+    { club_id: fx.clubA, user_id: invitedChildUserId, role: "player", roles: ["player"] },
+    { club_id: fx.clubA, user_id: invitedParentUserId, role: "parent", roles: ["parent"] },
+  ]);
+
+  const { data: invitedPlayer, error: invitedPlayerErr } = await admin
+    .from("players")
+    .insert({
+      club_id: fx.clubA,
+      first_name: "Invited",
+      last_name: "Child",
+      user_id: invitedChildUserId,
+    })
+    .select("id")
+    .single();
+  if (invitedPlayerErr || !invitedPlayer) {
+    throw new Error(`create invited player: ${invitedPlayerErr?.message}`);
+  }
+  invitedPlayerId = invitedPlayer.id;
+
+  const { error: invitedParentLinkErr } = await admin.from("player_parents").insert({
+    player_id: invitedPlayerId,
+    parent_user_id: invitedParentUserId,
+    can_respond: true,
+  });
+  if (invitedParentLinkErr) {
+    throw new Error(`link invited parent: ${invitedParentLinkErr.message}`);
+  }
+
+  const { data: invitedConvocation, error: invitedConvocationErr } = await admin
+    .from("convocations")
+    .insert({ event_id: fx.eventA, player_id: invitedPlayerId, status: "pending" })
+    .select("id")
+    .single();
+  if (invitedConvocationErr || !invitedConvocation) {
+    throw new Error(`create invited convocation: ${invitedConvocationErr?.message}`);
+  }
+  invitedConvocationId = invitedConvocation.id;
+
+  invitedParentClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error: invitedParentSignErr } = await invitedParentClient.auth.signInWithPassword({
+    email: invitedParentEmail,
+    password: PWD,
+  });
+  if (invitedParentSignErr) throw new Error(`invited parent signIn: ${invitedParentSignErr.message}`);
+
   // Reset to inherited defaults before running matrix
   await setEventVisibility(fx.eventA, null);
   await setTeamVisibility(fx.teamA, null);
@@ -113,6 +207,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await admin.from("convocations").delete().eq("id", invitedConvocationId);
+  await admin.from("player_parents").delete().eq("parent_user_id", invitedParentUserId);
+  await admin.from("players").delete().eq("id", invitedPlayerId);
+  await admin.from("club_members").delete().in("user_id", [invitedChildUserId, invitedParentUserId]);
+  await admin.from("profiles").delete().in("id", [invitedChildUserId, invitedParentUserId]);
+  await admin.auth.admin.deleteUser(invitedChildUserId);
+  await admin.auth.admin.deleteUser(invitedParentUserId);
+
   await admin.from("convocations").delete().eq("id", teammateConvocationId);
   await admin.from("players").delete().eq("id", teammatePlayerId);
   await admin.from("club_members").delete().eq("user_id", teammateUserId);
@@ -293,6 +395,77 @@ describe("RLS: convocations — visible restaure l'accès équipe", () => {
       .eq("id", teammateConvocationId);
     expect(error).toBeNull();
     expect((data ?? []).length).toBe(1);
+  });
+});
+
+describe("RLS: convocations — parent lié pur hors team_members", () => {
+  it("fixture guard: parent and child have no team_members path, so can_view_team is false", async () => {
+    const fx = getFixtures();
+
+    const { count, error: tmErr } = await admin
+      .from("team_members")
+      .select("id", { count: "exact", head: true })
+      .eq("team_id", fx.teamA)
+      .or(`user_id.in.(${invitedChildUserId},${invitedParentUserId}),player_id.eq.${invitedPlayerId}`);
+    expect(tmErr).toBeNull();
+    expect(count).toBe(0);
+
+    const { data: parentCanViewTeam, error: parentErr } = await admin.rpc("can_view_team", {
+      _user_id: invitedParentUserId,
+      _team_id: fx.teamA,
+    });
+    expect(parentErr).toBeNull();
+    expect(parentCanViewTeam).toBe(false);
+
+    const { data: childCanViewTeam, error: childErr } = await admin.rpc("can_view_team", {
+      _user_id: invitedChildUserId,
+      _team_id: fx.teamA,
+    });
+    expect(childErr).toBeNull();
+    expect(childCanViewTeam).toBe(false);
+  });
+
+  it("parent sees the invited child's event and own convocation when the list is visible", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true);
+
+    const eventRead = await invitedParentClient.from("events").select("id").eq("id", fx.eventA);
+    expect(eventRead.error).toBeNull();
+    expect(eventRead.data ?? []).toHaveLength(1);
+
+    const own = await invitedParentClient
+      .from("convocations")
+      .select("id")
+      .eq("id", invitedConvocationId);
+    expect(own.error).toBeNull();
+    expect(own.data ?? []).toHaveLength(1);
+
+    const other = await invitedParentClient
+      .from("convocations")
+      .select("id")
+      .eq("id", teammateConvocationId);
+    expect(other.error).toBeNull();
+    expect(other.data ?? []).toHaveLength(0);
+  });
+
+  it("parent still sees only the invited child's own convocation when the list is hidden", async () => {
+    await setEventVisibility(getFixtures().eventA, false);
+
+    const own = await invitedParentClient
+      .from("convocations")
+      .select("id")
+      .eq("id", invitedConvocationId);
+    expect(own.error).toBeNull();
+    expect(own.data ?? []).toHaveLength(1);
+
+    const other = await invitedParentClient
+      .from("convocations")
+      .select("id")
+      .eq("id", teammateConvocationId);
+    expect(other.error).toBeNull();
+    expect(other.data ?? []).toHaveLength(0);
+
+    await setEventVisibility(getFixtures().eventA, null);
   });
 });
 
