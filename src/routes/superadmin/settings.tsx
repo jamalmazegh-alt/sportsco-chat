@@ -36,8 +36,14 @@ function SettingsPage() {
         const reg = await navigator.serviceWorker.getRegistration();
         clientBits.push(reg ? `SW actif (scope ${reg.scope})` : "Aucun service worker enregistré");
         if (reg) {
-          const sub = await reg.pushManager.getSubscription();
-          clientBits.push(sub ? "Push subscription locale ✓" : "Pas de push subscription locale");
+          if (!("pushManager" in reg) || !reg.pushManager) {
+            clientBits.push(
+              "PushManager indisponible (iOS: installez l'app sur l'écran d'accueil pour activer les notifications)",
+            );
+          } else {
+            const sub = await reg.pushManager.getSubscription();
+            clientBits.push(sub ? "Push subscription locale ✓" : "Pas de push subscription locale");
+          }
         }
       } catch (e) {
         clientBits.push(`SW erreur: ${(e as Error).message}`);
