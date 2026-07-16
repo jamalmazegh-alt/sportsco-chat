@@ -6324,6 +6324,10 @@ export type Database = {
       admin_build_clubero_responses: { Args: never; Returns: Json }
       archive_team: { Args: { _id: string }; Returns: undefined }
       call_up_list_visible: { Args: { p_event_id: string }; Returns: boolean }
+      can_access_event: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
