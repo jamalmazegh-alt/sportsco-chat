@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 import { ConfettiBurst } from "@/components/confetti-burst";
+import { ScoreStepper } from "@/components/score-stepper";
 import { dispatchScorePush } from "@/lib/push-dispatch.functions";
 
 type Goal = {
@@ -418,35 +419,30 @@ export function MatchResultCard({
                 t={t}
               />
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                    {ourSide === "home"
+              <div className="flex items-center justify-around gap-2 py-2 sm:gap-3">
+                <ScoreStepper
+                  label={
+                    ourSide === "home"
                       ? (teamName ?? t("events.home"))
-                      : (opponent ?? t("events.home"))}
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={home}
-                    onChange={(e) => setHome(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                    {ourSide === "home"
+                      : (opponent ?? t("events.home"))
+                  }
+                  value={parseInt(home, 10) || 0}
+                  onChange={(v) => setHome(String(v))}
+                  size="md"
+                  responsiveLg
+                />
+                <span className="text-xl font-semibold text-muted-foreground sm:text-2xl">:</span>
+                <ScoreStepper
+                  label={
+                    ourSide === "home"
                       ? (opponent ?? t("events.away"))
-                      : (teamName ?? t("events.away"))}
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={away}
-                    onChange={(e) => setAway(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
-                  />
-                </div>
+                      : (teamName ?? t("events.away"))
+                  }
+                  value={parseInt(away, 10) || 0}
+                  onChange={(v) => setAway(String(v))}
+                  size="md"
+                  responsiveLg
+                />
               </div>
             )}
 
@@ -731,45 +727,43 @@ function SetScoresEditor({
           const ours = ourSide === "home" ? s[0] : s[1];
           const theirs = ourSide === "home" ? s[1] : s[0];
           return (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-12 shrink-0">
-                {t("match.set")} {i + 1}
-              </span>
-              <Input
-                type="number"
-                min={0}
-                value={ours}
-                onChange={(e) => {
-                  const n = Math.max(0, parseInt(e.target.value, 10) || 0);
-                  const next = [...sets];
-                  next[i] = ourSide === "home" ? [n, s[1]] : [s[0], n];
-                  onChange(next);
-                }}
-                className="h-9"
-                placeholder={teamName ?? ""}
-              />
-              <span className="text-muted-foreground">—</span>
-              <Input
-                type="number"
-                min={0}
-                value={theirs}
-                onChange={(e) => {
-                  const n = Math.max(0, parseInt(e.target.value, 10) || 0);
-                  const next = [...sets];
-                  next[i] = ourSide === "home" ? [s[0], n] : [n, s[1]];
-                  onChange(next);
-                }}
-                className="h-9"
-                placeholder={opponent ?? ""}
-              />
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 shrink-0"
-                onClick={() => onChange(sets.filter((_, j) => j !== i))}
-              >
-                <Trash2 className="h-3.5 w-3.5 text-destructive" />
-              </Button>
+            <div key={i} className="rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {t("match.set")} {i + 1}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => onChange(sets.filter((_, j) => j !== i))}
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </Button>
+              </div>
+              <div className="flex items-center justify-around gap-2">
+                <ScoreStepper
+                  label={teamName ?? undefined}
+                  value={ours}
+                  onChange={(v) => {
+                    const next = [...sets];
+                    next[i] = ourSide === "home" ? [v, s[1]] : [s[0], v];
+                    onChange(next);
+                  }}
+                  size="sm"
+                />
+                <span className="text-xl text-muted-foreground">:</span>
+                <ScoreStepper
+                  label={opponent ?? undefined}
+                  value={theirs}
+                  onChange={(v) => {
+                    const next = [...sets];
+                    next[i] = ourSide === "home" ? [s[0], v] : [v, s[1]];
+                    onChange(next);
+                  }}
+                  size="sm"
+                />
+              </div>
             </div>
           );
         })}
