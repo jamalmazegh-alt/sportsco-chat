@@ -2689,9 +2689,9 @@ function EventDetail() {
           void mode;
           const convocCount = (convocations ?? []).length;
           return (
-            <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-border bg-card shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               {/* Header — green gradient */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-4 py-3 text-white">
                 <svg
                   className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
                   aria-hidden="true"
@@ -2717,7 +2717,9 @@ function EventDetail() {
                     </div>
                     <div className="min-w-0 leading-tight">
                       <div className="text-base font-extrabold tracking-tight">
-                        {t("events.commCard.title", { defaultValue: "Partager la convocation" })}
+                        {t("events.whatsappShare.shareViaWhatsApp", {
+                          defaultValue: "Partager la convocation par WhatsApp",
+                        })}
                       </div>
                       <div className="text-[11px] text-white/75 font-medium mt-0.5">
                         {t("events.commCard.subtitle", {
@@ -2741,7 +2743,7 @@ function EventDetail() {
               </div>
 
               {/* Actions */}
-              <div className="p-4 space-y-2.5">
+              <div className="p-3 space-y-2">
                 {isCancelled ? (
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
@@ -2795,14 +2797,6 @@ function EventDetail() {
                           <span className="block text-sm font-bold">
                             {t("events.whatsappShare.shareConvoc")}
                           </span>
-                          <span className="block text-[11px] text-white/80 truncate">
-                            {t("events.commCard.whatsappHint", {
-                              defaultValue: "Lien de convocation",
-                            })}
-                          </span>
-                        </span>
-                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                          {t("events.commCard.fast", { defaultValue: "Rapide" })}
                         </span>
                       </a>
                     ) : (
@@ -2820,18 +2814,9 @@ function EventDetail() {
                         <span className="relative flex-1 min-w-0">
                           <span className="block text-sm font-bold">
                             {t("events.commCard.invitePlayersFirstTitle", {
-                              defaultValue: "Inviter les joueurs d'abord",
+                              defaultValue: "Inviter les joueurs",
                             })}
                           </span>
-                          <span className="block text-[11px] text-white/85 truncate">
-                            {t("events.commCard.invitePlayersFirstHint", {
-                              defaultValue:
-                                "On génère les convocations, puis tu pourras les partager sur WhatsApp.",
-                            })}
-                          </span>
-                        </span>
-                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                          {t("events.commCard.start", { defaultValue: "Démarrer" })}
                         </span>
                       </button>
                     )}
@@ -2861,11 +2846,8 @@ function EventDetail() {
                         </span>
                         <span className="flex-1 min-w-0">
                           <span className="block text-sm font-bold text-foreground">
-                            {t("events.whatsappShare.shareConvocWithLineup")}
-                          </span>
-                          <span className="block text-[11px] text-muted-foreground truncate">
-                            {t("events.commCard.lineupHint", {
-                              defaultValue: "Inclut la composition en image",
+                            {t("events.whatsappShare.shareLineup", {
+                              defaultValue: "Partager la compo",
                             })}
                           </span>
                         </span>
