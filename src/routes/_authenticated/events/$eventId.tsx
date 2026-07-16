@@ -1191,7 +1191,7 @@ function EventDetail() {
               meetingPointMapsUrl,
               competitionName: competitionLabel,
               coachName,
-              squadList,
+              squadList: emailSquadList,
               teamName,
               clubName,
               clubLogoUrl,
