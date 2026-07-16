@@ -14,7 +14,8 @@ export type UrgencyAction =
   | { kind: "remind-one"; convocationId: string }
   | { kind: "respond"; eventId: string }
   | { kind: "open-event"; eventId: string }
-  | { kind: "open-player"; playerId: string };
+  | { kind: "open-player"; playerId: string }
+  | { kind: "open-team-availability"; teamId: string };
 
 export type UrgencyItem = {
   // Clé stable, doit suffire au dedup inter-collecteurs.
