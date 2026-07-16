@@ -91,6 +91,11 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
         ? ` · ${location}`
         : "";
 
+    console.log("[push:conv-new] dispatch begin", {
+      eventId: data.eventId,
+      playerIds: data.playerIds.length,
+      targets: targets.size,
+    });
     const sends = Array.from(targets).map((uid) =>
       sendPushToUser(uid, {
         title: isMatch ? "⚽ Convocation match" : "📣 Convocation",
@@ -104,6 +109,23 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
     );
     const results = await Promise.all(sends);
     const sent = results.reduce((total, result) => total + result.sent, 0);
+    const pruned = results.reduce((total, result) => total + result.pruned, 0);
+    console.log("[push:conv-new] dispatch done", {
+      eventId: data.eventId,
+      targets: targets.size,
+      sent,
+      pruned,
+    });
+    try {
+      await supabaseAdmin.from("push_dispatch_log").insert({
+        kind: "convocation_new",
+        ref_id: data.eventId,
+        targets_count: targets.size,
+        sent_count: sent,
+      });
+    } catch (e) {
+      console.warn("[push:conv-new] log insert failed", (e as Error).message);
+    }
     return { dispatched: targets.size, sent };
   });
 
