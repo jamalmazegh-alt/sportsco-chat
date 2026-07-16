@@ -3970,62 +3970,81 @@ function EventDetail() {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-0.5 shrink-0">
+                                <div className="flex items-center gap-1.5 shrink-0">
                                   {isCoach ? (
                                     <>
-                                      <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
-                                        {ATTENDANCE_ACTIONS.filter(
-                                          (a) => a.status !== "pending",
-                                        ).map(({ status, Icon, className }) => (
+                                      <div className="flex flex-col items-center gap-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/70">
+                                          {t("attendance.response", { defaultValue: "Réponse" })}
+                                        </span>
+                                        <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
+                                          {ATTENDANCE_ACTIONS.filter(
+                                            (a) => a.status !== "pending",
+                                          ).map(({ status, Icon, className }) => (
+                                            <Button
+                                              key={status}
+                                              type="button"
+                                              size="icon"
+                                              variant="ghost"
+                                              className={cn(
+                                                "h-7 w-7 rounded-full",
+                                                c.status === status
+                                                  ? status === "present"
+                                                    ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
+                                                    : status === "absent"
+                                                      ? "bg-absent text-white hover:bg-absent hover:text-white"
+                                                      : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
+                                                  : className,
+                                              )}
+                                              onClick={() => coachChangeStatus(c, status)}
+                                              title={t(`attendance.${status}`)}
+                                              aria-label={t(`attendance.${status}`)}
+                                            >
+                                              <Icon className="h-3.5 w-3.5" />
+                                            </Button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
                                           <Button
-                                            key={status}
-                                            type="button"
                                             size="icon"
                                             variant="ghost"
-                                            className={cn(
-                                              "h-7 w-7 rounded-full",
-                                              c.status === status
-                                                ? status === "present"
-                                                  ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
-                                                  : status === "absent"
-                                                    ? "bg-absent text-white hover:bg-absent hover:text-white"
-                                                    : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
-                                                : className,
-                                            )}
-                                            onClick={() => coachChangeStatus(c, status)}
-                                            title={t(`attendance.${status}`)}
-                                            aria-label={t(`attendance.${status}`)}
+                                            className="h-8 w-8 text-muted-foreground/80"
+                                            aria-label={t("common.moreActions", {
+                                              defaultValue: "More actions",
+                                            })}
                                           >
-                                            <Icon className="h-3.5 w-3.5" />
+                                            <MoreVertical className="h-4 w-4" />
                                           </Button>
-                                        ))}
-                                      </div>
-                                      {isPending && (
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          className="h-7 w-7 text-amber-600 hover:bg-amber-50"
-                                          onClick={() => remind(c.id)}
-                                          title={t("attendance.remind")}
-                                          aria-label={t("attendance.remind")}
-                                        >
-                                          <Bell className="h-3.5 w-3.5" />
-                                        </Button>
-                                      )}
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-7 w-7 text-muted-foreground/70"
-                                        onClick={() => setDetailConvocId(c.id)}
-                                        title={t("attendance.details")}
-                                      >
-                                        <Info className="h-3.5 w-3.5" />
-                                      </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56">
+                                          {isPending && (
+                                            <DropdownMenuItem onClick={() => remind(c.id)}>
+                                              <Bell className="h-4 w-4" />
+                                              {t("attendance.remind")}
+                                            </DropdownMenuItem>
+                                          )}
+                                          <DropdownMenuItem onClick={() => setDetailConvocId(c.id)}>
+                                            <Info className="h-4 w-4" />
+                                            {t("attendance.details")}
+                                          </DropdownMenuItem>
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuItem
+                                            onClick={() => setCancelTargetId(c.id)}
+                                            className="text-destructive focus:text-destructive"
+                                          >
+                                            <X className="h-4 w-4" />
+                                            {t("attendance.cancelConvocation")}
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
                                     </>
                                   ) : (
                                     <AttendancePill status={c.status} />
                                   )}
                                 </div>
+
                               </div>
                               {c.comment && (isCoach || c.players?.user_id === user?.id) && (
                                 <p className="text-[11px] text-muted-foreground italic truncate mt-1 pl-[44px]">
