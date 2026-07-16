@@ -174,7 +174,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
       ourScore > theirScore ? "win" : ourScore < theirScore ? "loss" : "draw";
     const outcomeLabel =
       outcome === "win" ? "Victoire" : outcome === "loss" ? "Défaite" : "Match nul";
-    const outcomeEmoji = outcome === "win" ? "🎉" : outcome === "loss" ? "💪" : "🤝";
+    const outcomeEmoji = outcome === "win" ? "🎉" : outcome === "loss" ? "😞" : "🤝";
     const title = `${outcomeEmoji} ${outcomeLabel} — ${teamName}`;
     const scoreLine = home ? `${teamName} ${sh}-${sa} ${opp}` : `${opp} ${sh}-${sa} ${teamName}`;
     const body = scoreLine;
