@@ -64,6 +64,7 @@ import {
 } from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
+import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -520,6 +521,11 @@ function EventDetail() {
       return data ?? [];
     },
   });
+
+  // Effective call-up list visibility (server-resolved cascade). Safe for
+  // any authenticated user — used to gate the read-only list rendering for
+  // non-staff. Staff always see the full list regardless.
+  const { data: callUpVisible } = useCallUpVisibilityGate(eventId);
 
   const { data: teamPlayers } = useQuery({
     queryKey: ["team-players", event?.team_id],
