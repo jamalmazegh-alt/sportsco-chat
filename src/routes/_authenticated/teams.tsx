@@ -91,7 +91,11 @@ function TeamsPage() {
 
   const [sport, setSport] = useState("football");
   const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
+  const [callUpVisibility, setCallUpVisibility] = useState<"inherit" | "visible" | "masked">(
+    "inherit",
+  );
   const [busy, setBusy] = useState(false);
+  const setVisibility = useSetCallUpVisibility();
 
   function toggleCompetition(value: string, checked: boolean) {
     setCompetitions((current) =>
@@ -103,24 +107,41 @@ function TeamsPage() {
     e.preventDefault();
     if (!activeClubId) return;
     setBusy(true);
-    const { error } = await supabase.from("teams").insert({
-      club_id: activeClubId,
-      name,
-      age_group: ageGroup || null,
-      sport: sport || null,
-      competitions,
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
+    const { data: created, error } = await supabase
+      .from("teams")
+      .insert({
+        club_id: activeClubId,
+        name,
+        age_group: ageGroup || null,
+        sport: sport || null,
+        competitions,
+      })
+      .select("id")
+      .single();
+    if (error || !created) {
+      setBusy(false);
+      toast.error(error?.message ?? "Error");
       return;
     }
+    if (callUpVisibility !== "inherit") {
+      try {
+        await setVisibility.mutateAsync({
+          scope: "team",
+          id: created.id,
+          choice: callUpVisibility,
+        });
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
+    }
+    setBusy(false);
     setOpen(false);
     setName("");
     setAgeGroup("");
 
     setSport("football");
     setCompetitions(["friendly", "championship", "cup"]);
+    setCallUpVisibility("inherit");
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
   }
