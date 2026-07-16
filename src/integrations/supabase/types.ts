@@ -6651,6 +6651,10 @@ export type Database = {
         Args: { _club_id: string; _role: string; _user_id: string }
         Returns: boolean
       }
+      has_convocation_in_team: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_super_admin: { Args: { _user_id: string }; Returns: boolean }
       increment_rate_limit: {
         Args: { _ip: string; _limit: number; _route: string; _window: string }
