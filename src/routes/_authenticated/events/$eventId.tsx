@@ -44,7 +44,7 @@ import {
   Trophy,
   Timer,
   LayoutGrid,
-  Mail,
+  
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
@@ -2872,30 +2872,7 @@ function EventDetail() {
                       </button>
                     )}
 
-                    {/* Email — only after convocations have been generated */}
-                    {event.convocations_sent && (
-                      <button
-                        type="button"
-                        onClick={() => setResendOpen(true)}
-                        className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
-                      >
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
-                          <Mail className="h-4 w-4 text-sky-700" />
-                        </span>
-                        <span className="flex-1 min-w-0">
-                          <span className="block text-sm font-bold text-foreground">
-                            {t("events.commCard.emailTitle", {
-                              defaultValue: "Renvoyer par email",
-                            })}
-                          </span>
-                          <span className="block text-[11px] text-muted-foreground truncate">
-                            {t("events.commCard.emailHint", {
-                              defaultValue: "Envoie à tous les joueurs",
-                            })}
-                          </span>
-                        </span>
-                      </button>
-                    )}
+                    {/* Email resend removed — use the "Resend call-up" button under the players list. */}
                   </>
                 )}
               </div>
@@ -3741,11 +3718,13 @@ function EventDetail() {
               >
                 <Send className="h-4 w-4" />
                 {convocChanges.length > 0
-                  ? t("events.resend.buttonWithChanges", {
-                      defaultValue: "Resend call-up ({{count}} update(s))",
+                  ? t("events.resend.buttonWithChangesAll", {
+                      defaultValue: "Renvoyer à tous les joueurs ({{count}} mise(s) à jour)",
                       count: convocChanges.length,
                     })
-                  : t("events.resend.button", { defaultValue: "Resend call-up" })}
+                  : t("events.resend.buttonAll", {
+                      defaultValue: "Renvoyer la convocation à tous les joueurs",
+                    })}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
