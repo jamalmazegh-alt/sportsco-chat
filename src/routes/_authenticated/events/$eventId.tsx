@@ -1072,14 +1072,14 @@ function EventDetail() {
       if (notificationError) toast.error(notificationError.message);
     }
 
-    // Web Push fire-and-forget — parallèle à l'email, n'attend pas
-    void (async () => {
-      try {
-        await dispatchConvocationPushFn({ data: { eventId: event.id, playerIds: toInsert } });
-      } catch (e) {
-        console.warn("[push] convocation dispatch failed", e);
-      }
-    })();
+    // Web Push — await pour garantir que la serverFn est bien invoquée
+    // (fire-and-forget côté client était abandonné avant flush réseau).
+    try {
+      await dispatchConvocationPushFn({ data: { eventId: event.id, playerIds: toInsert } });
+    } catch (e) {
+      console.warn("[push] convocation dispatch failed", e);
+    }
+
 
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
     if (useEmail)
