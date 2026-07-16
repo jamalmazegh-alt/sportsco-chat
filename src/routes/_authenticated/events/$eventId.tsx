@@ -1817,13 +1817,18 @@ function EventDetail() {
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
         : undefined;
 
-      const squadList = (convocations as any[])
+      const squadListAll = (convocations as any[])
         .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
         .filter(Boolean);
 
-      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(
-        () => undefined,
-      );
+      // Gate visibilité (voir doc plus haut): pas de squadList ni de compo si masqué.
+      const { data: callUpVisibleUpd } = await supabase.rpc("call_up_list_visible", {
+        p_event_id: event.id,
+      });
+      const squadList = callUpVisibleUpd ? squadListAll : undefined;
+      const lineupEmail = callUpVisibleUpd
+        ? await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined)
+        : undefined;
 
       const idemBase = Date.now();
 
