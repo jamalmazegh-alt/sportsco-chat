@@ -16,6 +16,8 @@ import { Plus, Users, ChevronRight, Loader2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+import { CallUpVisibilitySelector } from "@/components/call-up-visibility-selector";
+import { useSetCallUpVisibility } from "@/hooks/use-call-up-visibility";
 
 import i18n from "@/lib/i18n";
 
