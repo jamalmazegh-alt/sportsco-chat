@@ -2289,6 +2289,7 @@
   },
   "callUpList": {
     "masked": "Elenco nascosto",
+    "maskedBadge": "Oculta para jugadores y padres",
     "visible": "Elenco visibile",
     "settingLabel": "Visibilità dell'elenco convocati",
     "settingHelp": "Definisce chi vede l'elenco dei convocati. Il calcolo è in tempo reale: gli eventi che ereditano seguiranno ogni modifica futura dell'impostazione di squadra o club.",

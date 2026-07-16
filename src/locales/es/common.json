@@ -2289,6 +2289,7 @@
   },
   "callUpList": {
     "masked": "Lista oculta",
+    "maskedBadge": "Oculta para jugadores y padres",
     "visible": "Lista visible",
     "settingLabel": "Visibilidad de la lista de convocados",
     "settingHelp": "Define quién puede ver la lista de convocados. El cálculo es en vivo: los eventos que heredan seguirán cualquier cambio futuro del ajuste de equipo o club.",
