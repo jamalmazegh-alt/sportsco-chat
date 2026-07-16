@@ -419,35 +419,30 @@ export function MatchResultCard({
                 t={t}
               />
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                    {ourSide === "home"
+              <div className="flex items-center justify-around gap-2 py-2 sm:gap-3">
+                <ScoreStepper
+                  label={
+                    ourSide === "home"
                       ? (teamName ?? t("events.home"))
-                      : (opponent ?? t("events.home"))}
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={home}
-                    onChange={(e) => setHome(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                    {ourSide === "home"
+                      : (opponent ?? t("events.home"))
+                  }
+                  value={parseInt(home, 10) || 0}
+                  onChange={(v) => setHome(String(v))}
+                  size="md"
+                  responsiveLg
+                />
+                <span className="text-xl font-semibold text-muted-foreground sm:text-2xl">:</span>
+                <ScoreStepper
+                  label={
+                    ourSide === "home"
                       ? (opponent ?? t("events.away"))
-                      : (teamName ?? t("events.away"))}
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={away}
-                    onChange={(e) => setAway(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
-                  />
-                </div>
+                      : (teamName ?? t("events.away"))
+                  }
+                  value={parseInt(away, 10) || 0}
+                  onChange={(v) => setAway(String(v))}
+                  size="md"
+                  responsiveLg
+                />
               </div>
             )}
 
