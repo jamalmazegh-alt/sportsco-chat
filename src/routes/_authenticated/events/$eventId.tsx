@@ -2743,7 +2743,7 @@ function EventDetail() {
               </div>
 
               {/* Actions */}
-              <div className="p-4 space-y-2.5">
+              <div className="p-3 space-y-2">
                 {isCancelled ? (
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
