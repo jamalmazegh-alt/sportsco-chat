@@ -735,6 +735,7 @@
       "cancelled": "Cancelled"
     },
     "publish": "Publish event",
+    "published": "Event published",
     "sendConvocations": "Send call-ups",
     "convocationsSent": "Call-ups sent",
     "noEvents": "No events scheduled.",

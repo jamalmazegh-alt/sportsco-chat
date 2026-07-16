@@ -456,7 +456,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         );
         onCreated();
       } else {
-        toast.success(t("events.publish", { defaultValue: "Publié" }));
+        toast.success(t("events.published", { defaultValue: "Publié" }));
         onCreated(res.eventId);
       }
     },
