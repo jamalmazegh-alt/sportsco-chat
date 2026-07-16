@@ -1139,10 +1139,17 @@ function EventDetail() {
           .filter(Boolean);
         const squadList = Array.from(new Set([...existingNames, ...newNames]));
 
-        // Composition (si publiée)
-        const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(
-          () => undefined,
-        );
+        // Gate: si la liste des convoqués est masquée (cascade club→équipe→event),
+        // ni la squadList ni la composition ne doivent partir dans l'email.
+        const { data: callUpVisible } = await supabase.rpc("call_up_list_visible", {
+          p_event_id: event.id,
+        });
+        const emailSquadList = callUpVisible ? squadList : undefined;
+
+        // Composition (si publiée) — également masquée si la liste est cachée.
+        const lineupEmail = callUpVisible
+          ? await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined)
+          : undefined;
 
         const competitionLabel =
           (event as any).competition_name ||
