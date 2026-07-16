@@ -2811,18 +2811,9 @@ function EventDetail() {
                         <span className="relative flex-1 min-w-0">
                           <span className="block text-sm font-bold">
                             {t("events.commCard.invitePlayersFirstTitle", {
-                              defaultValue: "Inviter les joueurs d'abord",
+                              defaultValue: "Inviter les joueurs",
                             })}
                           </span>
-                          <span className="block text-[11px] text-white/85 truncate">
-                            {t("events.commCard.invitePlayersFirstHint", {
-                              defaultValue:
-                                "On génère les convocations, puis tu pourras les partager sur WhatsApp.",
-                            })}
-                          </span>
-                        </span>
-                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                          {t("events.commCard.start", { defaultValue: "Démarrer" })}
                         </span>
                       </button>
                     )}
