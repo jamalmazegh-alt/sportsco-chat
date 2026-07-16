@@ -857,7 +857,7 @@ describe("RLS: fallback invité — teams / carpools / event_goals", () => {
 
     const { data: g, error: gErr } = await admin
       .from("event_goals")
-      .insert({ event_id: fx.eventA, team_side: "home", minute: 12 })
+      .insert({ event_id: fx.eventA, scorer_player_id: teammatePlayerId, minute: 12, kind: "goal" })
       .select("id")
       .single();
     if (gErr || !g) throw new Error(`seed goal: ${gErr?.message}`);
