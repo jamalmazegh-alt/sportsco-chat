@@ -2289,6 +2289,7 @@
   },
   "callUpList": {
     "masked": "List hidden",
+    "maskedBadge": "Hidden from players and parents",
     "visible": "List visible",
     "settingLabel": "Call-up list visibility",
     "settingHelp": "Controls who can see the list of called-up players. Resolved live: events that inherit will follow any future change to the team or club setting.",

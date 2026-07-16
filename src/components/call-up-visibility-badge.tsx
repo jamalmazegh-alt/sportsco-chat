@@ -38,10 +38,11 @@ export function CallUpVisibilityBadge({
     <Badge
       variant="outline"
       className={cn("gap-1", className)}
-      aria-label={t("callUpList.masked")}
+      aria-label={t("callUpList.maskedBadge")}
     >
       <Lock className="h-3 w-3" aria-hidden />
-      {t("callUpList.masked")}
+      {t("callUpList.maskedBadge")}
     </Badge>
   );
 }
+

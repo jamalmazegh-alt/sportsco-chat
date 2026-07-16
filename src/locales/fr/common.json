@@ -2289,6 +2289,7 @@
   },
   "callUpList": {
     "masked": "Liste masquée",
+    "maskedBadge": "Masquée aux joueurs et aux parents",
     "visible": "Liste visible",
     "settingLabel": "Visibilité de la liste des convoqués",
     "settingHelp": "Détermine qui peut voir la liste des joueurs convoqués. Le calcul est en direct : les événements en héritage suivront toute modification future du réglage de l'équipe ou du club.",
