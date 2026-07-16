@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 import { ConfettiBurst } from "@/components/confetti-burst";
+import { ScoreStepper } from "@/components/score-stepper";
 import { dispatchScorePush } from "@/lib/push-dispatch.functions";
 
 type Goal = {
