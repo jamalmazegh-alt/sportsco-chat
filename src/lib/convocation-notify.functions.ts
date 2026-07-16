@@ -121,30 +121,23 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
         : undefined;
 
       try {
-        await fetch(`${baseUrl}/lovable/email/transactional/send`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // service role for internal call
-            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+        await enqueueTransactionalEmailServer({
+          templateName: "convocation-response",
+          recipientEmail: email,
+          idempotencyKey: `convoc-resp-${convocationId}-${p.id}-${status}`,
+          templateData: {
+            coachFirstName: (p as any).first_name ?? null,
+            playerName,
+            eventTitle:
+              ev.type === "match" && ev.opponent ? `${ev.title} vs ${ev.opponent}` : ev.title,
+            eventDate,
+            status,
+            reason: conv.comment ?? null,
+            declaredByName,
+            eventUrl: `${baseUrl}/events/${ev.id}`,
+            locale,
           },
-          body: JSON.stringify({
-            templateName: "convocation-response",
-            recipientEmail: email,
-            idempotencyKey: `convoc-resp-${convocationId}-${p.id}-${status}`,
-            templateData: {
-              coachFirstName: (p as any).first_name ?? null,
-              playerName,
-              eventTitle:
-                ev.type === "match" && ev.opponent ? `${ev.title} vs ${ev.opponent}` : ev.title,
-              eventDate,
-              status,
-              reason: conv.comment ?? null,
-              declaredByName,
-              eventUrl: `${baseUrl}/events/${ev.id}`,
-              locale,
-            },
-          }),
         });
         sent += 1;
       } catch (e) {
@@ -153,3 +146,4 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     }
     return { sent };
   });
+
