@@ -721,3 +721,110 @@ describe("Round-trip set → get : propagation team → event en héritage", () 
   });
 });
 
+/**
+ * Non-member exclusion — the exact leak we closed this morning:
+ * an authenticated user with no link to the event (not staff, not player,
+ * not parent, not in the club) MUST see zero convocation rows, even when
+ * the call-up list is visible. If this test passes, the permissive base
+ * (can_view_team OR self OR parent) is doing its job — visibility flags
+ * cannot substitute for a relationship.
+ */
+describe("RLS: convocations — non-membre total exclu même sur event visible", () => {
+  it("adminB (autre club) voit 0 convocation sur eventA quand visible=true", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true);
+    const c = await signInAs("adminB");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("coachB (staff autre club) voit 0 convocation sur eventA quand visible=true", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true);
+    const c = await signInAs("coachB");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+    await setEventVisibility(fx.eventA, null);
+  });
+
+  it("playerB (joueur autre club) voit 0 convocation sur eventA quand visible=true", async () => {
+    const fx = getFixtures();
+    await setEventVisibility(fx.eventA, true);
+    const c = await signInAs("playerB");
+    const { data, error } = await c
+      .from("convocations")
+      .select("id")
+      .eq("event_id", fx.eventA);
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+    await setEventVisibility(fx.eventA, null);
+  });
+});
+
+/**
+ * can_access_event negative test — a new authorization gate needs its own
+ * proof of denial. An authenticated user with zero relationship to the
+ * event (no team membership, no convocation, no parent link) must get
+ * false. Otherwise we would have closed the convocations leak by
+ * opening a wider events door.
+ */
+describe("RLS: can_access_event — refus explicite pour non-relié", () => {
+  it("adminB obtient false sur eventA (aucune relation)", async () => {
+    const fx = getFixtures();
+    const { data, error } = await admin.rpc("can_access_event", {
+      _user_id: fx.users.adminB.userId,
+      _event_id: fx.eventA,
+    });
+    expect(error).toBeNull();
+    expect(data).toBe(false);
+  });
+
+  it("playerB obtient false sur eventA (aucune relation)", async () => {
+    const fx = getFixtures();
+    const { data, error } = await admin.rpc("can_access_event", {
+      _user_id: fx.users.playerB.userId,
+      _event_id: fx.eventA,
+    });
+    expect(error).toBeNull();
+    expect(data).toBe(false);
+  });
+
+  it("parentUnlinkedA obtient false sur eventA (parent sans lien)", async () => {
+    const fx = getFixtures();
+    const { data, error } = await admin.rpc("can_access_event", {
+      _user_id: fx.users.parentUnlinkedA.userId,
+      _event_id: fx.eventA,
+    });
+    expect(error).toBeNull();
+    expect(data).toBe(false);
+  });
+
+  it("adminB refusé côté client: SELECT events retourne 0 ligne sur eventA", async () => {
+    const fx = getFixtures();
+    const c = await signInAs("adminB");
+    const { data, error } = await c.from("events").select("id").eq("id", fx.eventA);
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("adminA (staff club A) obtient true sur eventA (sanity check positif)", async () => {
+    const fx = getFixtures();
+    const { data, error } = await admin.rpc("can_access_event", {
+      _user_id: fx.users.adminA.userId,
+      _event_id: fx.eventA,
+    });
+    expect(error).toBeNull();
+    expect(data).toBe(true);
+  });
+});
+
+
