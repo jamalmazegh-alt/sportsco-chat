@@ -2722,7 +2722,10 @@ function EventDetail() {
                         })}
                       </div>
                       <div className="text-[11px] text-white/75 font-medium mt-0.5">
-                        {convocCount} joueurs convoqués
+                        {t("events.commCard.subtitle", {
+                          defaultValue: "{{count}} joueurs convoqués",
+                          count: convocCount,
+                        })}
                       </div>
                     </div>
                   </div>
