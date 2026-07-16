@@ -3913,6 +3913,11 @@ function EventDetail() {
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
                         </p>
+                        {isCoach && (
+                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 pr-11">
+                            {t("attendance.response", { defaultValue: "Réponse" })}
+                          </p>
+                        )}
                       </div>
 
                       <ul className="px-2 pb-2">
@@ -3973,37 +3978,32 @@ function EventDetail() {
                                 <div className="flex items-center gap-1.5 shrink-0">
                                   {isCoach ? (
                                     <>
-                                      <div className="flex flex-col items-center gap-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/70">
-                                          {t("attendance.response", { defaultValue: "Réponse" })}
-                                        </span>
-                                        <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
-                                          {ATTENDANCE_ACTIONS.filter(
-                                            (a) => a.status !== "pending",
-                                          ).map(({ status, Icon, className }) => (
-                                            <Button
-                                              key={status}
-                                              type="button"
-                                              size="icon"
-                                              variant="ghost"
-                                              className={cn(
-                                                "h-7 w-7 rounded-full",
-                                                c.status === status
-                                                  ? status === "present"
-                                                    ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
-                                                    : status === "absent"
-                                                      ? "bg-absent text-white hover:bg-absent hover:text-white"
-                                                      : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
-                                                  : className,
-                                              )}
-                                              onClick={() => coachChangeStatus(c, status)}
-                                              title={t(`attendance.${status}`)}
-                                              aria-label={t(`attendance.${status}`)}
-                                            >
-                                              <Icon className="h-3.5 w-3.5" />
-                                            </Button>
-                                          ))}
-                                        </div>
+                                      <div className="flex items-center gap-1 rounded-full border bg-background/80 p-1">
+                                        {ATTENDANCE_ACTIONS.filter(
+                                          (a) => a.status !== "pending",
+                                        ).map(({ status, Icon, className }) => (
+                                          <Button
+                                            key={status}
+                                            type="button"
+                                            size="icon"
+                                            variant="ghost"
+                                            className={cn(
+                                              "h-9 w-9 rounded-full",
+                                              c.status === status
+                                                ? status === "present"
+                                                  ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
+                                                  : status === "absent"
+                                                    ? "bg-absent text-white hover:bg-absent hover:text-white"
+                                                    : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
+                                                : className,
+                                            )}
+                                            onClick={() => coachChangeStatus(c, status)}
+                                            title={t(`attendance.${status}`)}
+                                            aria-label={t(`attendance.${status}`)}
+                                          >
+                                            <Icon className="h-4 w-4" />
+                                          </Button>
+                                        ))}
                                       </div>
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
