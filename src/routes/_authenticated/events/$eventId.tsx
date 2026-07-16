@@ -3744,21 +3744,24 @@ function EventDetail() {
               {visibleMyConvocs.map((c: any) => {
                 const playerLabel =
                   `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim();
+                const hasResponded = c.status && c.status !== "pending";
                 return (
                   <div key={c.id}>
-                    <p className="text-sm font-semibold mb-2.5 text-foreground">
-                      {visibleMyConvocs.length > 1 ? (
-                        <>
-                          {t("attendance.respondPrompt")}
-                          <span className="text-muted-foreground font-normal">
-                            {" "}
-                            · {playerLabel}
-                          </span>
-                        </>
-                      ) : (
-                        t("attendance.respondPrompt")
-                      )}
-                    </p>
+                    {!hasResponded && (
+                      <p className="text-sm font-semibold mb-2.5 text-foreground">
+                        {visibleMyConvocs.length > 1 ? (
+                          <>
+                            {t("attendance.respondPrompt")}
+                            <span className="text-muted-foreground font-normal">
+                              {" "}
+                              · {playerLabel}
+                            </span>
+                          </>
+                        ) : (
+                          t("attendance.respondPrompt")
+                        )}
+                      </p>
+                    )}
                     {responsesReadOnly ? (
                       <p className="text-xs text-muted-foreground">
                         {event.responses_locked
@@ -3768,6 +3771,55 @@ function EventDetail() {
                                 "Les réponses ne sont plus modifiables pour cet événement passé.",
                             })}
                       </p>
+                    ) : hasResponded ? (
+                      <div className="flex items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/30 px-3 py-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <AttendancePill status={c.status as AttendanceStatus} />
+                          {visibleMyConvocs.length > 1 && (
+                            <span className="text-xs text-muted-foreground truncate">
+                              {playerLabel}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
+                            const Icon =
+                              s === "present"
+                                ? CheckCircle2
+                                : s === "absent"
+                                  ? XCircle
+                                  : HelpCircle;
+                            const active = c.status === s;
+                            const tone =
+                              s === "present"
+                                ? active
+                                  ? "bg-emerald-500 text-white border-emerald-500"
+                                  : "text-emerald-600 hover:bg-emerald-50 border-transparent"
+                                : s === "absent"
+                                  ? active
+                                    ? "bg-rose-500 text-white border-rose-500"
+                                    : "text-rose-600 hover:bg-rose-50 border-transparent"
+                                  : active
+                                    ? "bg-amber-500 text-white border-amber-500"
+                                    : "text-amber-600 hover:bg-amber-50 border-transparent";
+                            return (
+                              <button
+                                key={s}
+                                type="button"
+                                onClick={() => respond(c.id, s)}
+                                aria-label={t(`attendance.${s}`)}
+                                title={t(`attendance.${s}`)}
+                                className={cn(
+                                  "h-8 w-8 rounded-full border flex items-center justify-center transition-all active:scale-95",
+                                  tone,
+                                )}
+                              >
+                                <Icon className="h-4 w-4" strokeWidth={2.25} />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
                         {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
@@ -3816,6 +3868,7 @@ function EventDetail() {
               })}
             </div>
           )}
+
 
           {/* B. Relancer banner (pending only) */}
           {event.convocations_sent && isCoach && counts.pending > 0 && (
@@ -3867,12 +3920,8 @@ function EventDetail() {
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
                         </p>
-                        {!isCoach && (
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/80">
-                            {t("attendance.readOnly", { defaultValue: "Read-only" })}
-                          </span>
-                        )}
                       </div>
+
                       <ul className="px-2 pb-2">
                         {shown.map((c: any) => {
                           const first = c.players?.first_name ?? "";
