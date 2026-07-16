@@ -3913,6 +3913,11 @@ function EventDetail() {
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
                         </p>
+                        {isCoach && (
+                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 pr-11">
+                            {t("attendance.response", { defaultValue: "Réponse" })}
+                          </p>
+                        )}
                       </div>
 
                       <ul className="px-2 pb-2">
