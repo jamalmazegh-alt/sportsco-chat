@@ -827,4 +827,82 @@ describe("RLS: can_access_event — refus explicite pour non-relié", () => {
   });
 });
 
+/**
+ * Fallback local `has_convocation_in_team` — restaure l'accès invité (parent lié
+ * pur, sans team_members) sur teams / carpools / event_goals sans rouvrir
+ * can_view_team. Chaque test prouve les deux côtés :
+ *   - invité (parent lié à un enfant convoqué à un event de teamA) VOIT
+ *   - non-relié total (adminB, autre club) ne voit PAS
+ * Si un jour la fonction est trop généreuse, la seconde assertion sautera.
+ */
+describe("RLS: fallback invité — teams / carpools / event_goals", () => {
+  let seedCarpoolId: string;
+  let seedGoalId: string;
+
+  beforeAll(async () => {
+    const fx = getFixtures();
+    const { data: cp, error: cpErr } = await admin
+      .from("carpools")
+      .insert({
+        event_id: fx.eventA,
+        driver_user_id: fx.users.coachA.userId,
+        driver_name: "RLS Coach",
+        vehicle_type: "car",
+        total_seats: 3,
+      })
+      .select("id")
+      .single();
+    if (cpErr || !cp) throw new Error(`seed carpool: ${cpErr?.message}`);
+    seedCarpoolId = cp.id;
+
+    const { data: g, error: gErr } = await admin
+      .from("event_goals")
+      .insert({ event_id: fx.eventA, scorer_player_id: teammatePlayerId, minute: 12, kind: "goal" })
+      .select("id")
+      .single();
+    if (gErr || !g) throw new Error(`seed goal: ${gErr?.message}`);
+    seedGoalId = g.id;
+  });
+
+  afterAll(async () => {
+    await admin.from("event_goals").delete().eq("id", seedGoalId);
+    await admin.from("carpools").delete().eq("id", seedCarpoolId);
+  });
+
+  it("teams: invited parent reads teamA row, adminB does not", async () => {
+    const fx = getFixtures();
+    const inv = await invitedParentClient.from("teams").select("id").eq("id", fx.teamA);
+    expect(inv.error).toBeNull();
+    expect(inv.data ?? []).toHaveLength(1);
+
+    const other = await (await signInAs("adminB")).from("teams").select("id").eq("id", fx.teamA);
+    expect(other.data ?? []).toHaveLength(0);
+  });
+
+  it("carpools: invited parent reads carpool of eventA, adminB does not", async () => {
+    const inv = await invitedParentClient.from("carpools").select("id").eq("id", seedCarpoolId);
+    expect(inv.error).toBeNull();
+    expect(inv.data ?? []).toHaveLength(1);
+
+    const other = await (await signInAs("adminB"))
+      .from("carpools")
+      .select("id")
+      .eq("id", seedCarpoolId);
+    expect(other.data ?? []).toHaveLength(0);
+  });
+
+  it("event_goals: invited parent reads goal of eventA, adminB does not", async () => {
+    const inv = await invitedParentClient.from("event_goals").select("id").eq("id", seedGoalId);
+    expect(inv.error).toBeNull();
+    expect(inv.data ?? []).toHaveLength(1);
+
+    const other = await (await signInAs("adminB"))
+      .from("event_goals")
+      .select("id")
+      .eq("id", seedGoalId);
+    expect(other.data ?? []).toHaveLength(0);
+  });
+});
+
+
 
