@@ -3718,11 +3718,13 @@ function EventDetail() {
               >
                 <Send className="h-4 w-4" />
                 {convocChanges.length > 0
-                  ? t("events.resend.buttonWithChanges", {
-                      defaultValue: "Resend call-up ({{count}} update(s))",
+                  ? t("events.resend.buttonWithChangesAll", {
+                      defaultValue: "Renvoyer à tous les joueurs ({{count}} mise(s) à jour)",
                       count: convocChanges.length,
                     })
-                  : t("events.resend.button", { defaultValue: "Resend call-up" })}
+                  : t("events.resend.buttonAll", {
+                      defaultValue: "Renvoyer la convocation à tous les joueurs",
+                    })}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
