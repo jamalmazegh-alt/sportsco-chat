@@ -1,39 +1,18 @@
 import { sendLovableEmail } from "@lovable.dev/email-js";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  getRetryAfterSeconds,
+  isForbidden,
+  isRateLimited,
+  isTransientRunRecipientMismatch,
+} from "@/lib/email/queue-error-classify";
 
 const MAX_RETRIES = 5;
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_SEND_DELAY_MS = 200;
 const DEFAULT_AUTH_TTL_MINUTES = 15;
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60;
-
-// Check if an error is a rate-limit (429) response.
-// Uses EmailAPIError.status when available (email-js >=0.x with structured errors),
-// falls back to parsing the error message for older versions.
-function isRateLimited(error: unknown): boolean {
-  if (error && typeof error === "object" && "status" in error) {
-    return (error as { status: number }).status === 429;
-  }
-  return error instanceof Error && error.message.includes("429");
-}
-
-// Check if an error is a forbidden (403) response. Retrying won't help.
-// Move straight to DLQ.
-function isForbidden(error: unknown): boolean {
-  if (error && typeof error === "object" && "status" in error) {
-    return (error as { status: number }).status === 403;
-  }
-  return error instanceof Error && error.message.includes("403");
-}
-
-// Extract Retry-After seconds from a structured EmailAPIError, or default to 60s.
-function getRetryAfterSeconds(error: unknown): number {
-  if (error && typeof error === "object" && "retryAfterSeconds" in error) {
-    return (error as { retryAfterSeconds: number | null }).retryAfterSeconds ?? 60;
-  }
-  return 60;
-}
 
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
