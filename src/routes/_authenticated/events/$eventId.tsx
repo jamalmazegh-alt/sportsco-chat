@@ -2689,9 +2689,9 @@ function EventDetail() {
           void mode;
           const convocCount = (convocations ?? []).length;
           return (
-            <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-border bg-card shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               {/* Header — green gradient */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-4 py-3 text-white">
                 <svg
                   className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
                   aria-hidden="true"
