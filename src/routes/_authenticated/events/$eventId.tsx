@@ -64,6 +64,7 @@ import {
 } from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
+import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -520,6 +521,11 @@ function EventDetail() {
       return data ?? [];
     },
   });
+
+  // Effective call-up list visibility (server-resolved cascade). Safe for
+  // any authenticated user — used to gate the read-only list rendering for
+  // non-staff. Staff always see the full list regardless.
+  const { data: callUpVisible } = useCallUpVisibilityGate(eventId);
 
   const { data: teamPlayers } = useQuery({
     queryKey: ["team-players", event?.team_id],
@@ -3840,8 +3846,12 @@ function EventDetail() {
             </div>
           )}
 
-          {/* C. Players list */}
-          {event.convocations_sent && (
+          {/* C. Players list — staff always; non-staff only when the
+              server-resolved call-up gate is visible. RLS already filters
+              the rows, but we hide the whole "Called-up players" block for
+              non-staff when masked so a called-up player doesn't see a
+              one-row list of just themselves under that heading. */}
+          {event.convocations_sent && (isCoach || callUpVisible === true) && (
             <>
               {convocations && convocations.length === 0 ? (
                 <div className="p-6 text-center text-sm text-muted-foreground">
@@ -3853,10 +3863,15 @@ function EventDetail() {
                   const shown = truncate ? sortedConvocations.slice(0, 4) : sortedConvocations;
                   return (
                     <>
-                      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+                      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
                         </p>
+                        {!isCoach && (
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/80">
+                            {t("attendance.readOnly", { defaultValue: "Read-only" })}
+                          </span>
+                        )}
                       </div>
                       <ul className="px-2 pb-2">
                         {shown.map((c: any) => {
