@@ -216,7 +216,12 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             try {
               await sendLovableEmail(
                 {
-                  run_id: payload.run_id,
+                  // Force a UNIQUE run per message. Without this, transactional sends
+                  // (payload.run_id is undefined) fall into the provider's auto-created
+                  // run, which groups a concurrent burst under one run bound to the first
+                  // recipient → 403 recipient_mismatch for the siblings. message_id is
+                  // unique per send and stable across retries, so retries stay idempotent.
+                  run_id: payload.run_id ?? payload.message_id,
                   to: payload.to,
                   from: payload.from,
                   sender_domain: payload.sender_domain,
