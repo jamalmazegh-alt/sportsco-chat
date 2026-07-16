@@ -727,45 +727,43 @@ function SetScoresEditor({
           const ours = ourSide === "home" ? s[0] : s[1];
           const theirs = ourSide === "home" ? s[1] : s[0];
           return (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-12 shrink-0">
-                {t("match.set")} {i + 1}
-              </span>
-              <Input
-                type="number"
-                min={0}
-                value={ours}
-                onChange={(e) => {
-                  const n = Math.max(0, parseInt(e.target.value, 10) || 0);
-                  const next = [...sets];
-                  next[i] = ourSide === "home" ? [n, s[1]] : [s[0], n];
-                  onChange(next);
-                }}
-                className="h-9"
-                placeholder={teamName ?? ""}
-              />
-              <span className="text-muted-foreground">—</span>
-              <Input
-                type="number"
-                min={0}
-                value={theirs}
-                onChange={(e) => {
-                  const n = Math.max(0, parseInt(e.target.value, 10) || 0);
-                  const next = [...sets];
-                  next[i] = ourSide === "home" ? [s[0], n] : [n, s[1]];
-                  onChange(next);
-                }}
-                className="h-9"
-                placeholder={opponent ?? ""}
-              />
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 shrink-0"
-                onClick={() => onChange(sets.filter((_, j) => j !== i))}
-              >
-                <Trash2 className="h-3.5 w-3.5 text-destructive" />
-              </Button>
+            <div key={i} className="rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {t("match.set")} {i + 1}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => onChange(sets.filter((_, j) => j !== i))}
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </Button>
+              </div>
+              <div className="flex items-center justify-around gap-2">
+                <ScoreStepper
+                  label={teamName ?? undefined}
+                  value={ours}
+                  onChange={(v) => {
+                    const next = [...sets];
+                    next[i] = ourSide === "home" ? [v, s[1]] : [s[0], v];
+                    onChange(next);
+                  }}
+                  size="sm"
+                />
+                <span className="text-xl text-muted-foreground">:</span>
+                <ScoreStepper
+                  label={opponent ?? undefined}
+                  value={theirs}
+                  onChange={(v) => {
+                    const next = [...sets];
+                    next[i] = ourSide === "home" ? [s[0], v] : [v, s[1]];
+                    onChange(next);
+                  }}
+                  size="sm"
+                />
+              </div>
             </div>
           );
         })}
