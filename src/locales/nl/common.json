@@ -2289,7 +2289,7 @@
   },
   "callUpList": {
     "masked": "Lijst verborgen",
-    "maskedBadge": "Oculta para jugadores y padres",
+    "maskedBadge": "Verborgen voor spelers en ouders",
     "visible": "Lijst zichtbaar",
     "settingLabel": "Zichtbaarheid van de opgeroepenlijst",
     "settingHelp": "Bepaalt wie de opgeroepenlijst kan zien. Live berekend: evenementen die erven volgen elke toekomstige wijziging van de team- of clubinstelling.",

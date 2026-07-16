@@ -2289,7 +2289,7 @@
   },
   "callUpList": {
     "masked": "Liste verborgen",
-    "maskedBadge": "Oculta para jugadores y padres",
+    "maskedBadge": "Für Spieler und Eltern ausgeblendet",
     "visible": "Liste sichtbar",
     "settingLabel": "Sichtbarkeit der Aufgebotsliste",
     "settingHelp": "Legt fest, wer die Aufgebotsliste sieht. Wird live berechnet: Events, die erben, folgen jeder späteren Änderung der Team- oder Vereinseinstellung.",

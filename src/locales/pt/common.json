@@ -2289,7 +2289,7 @@
   },
   "callUpList": {
     "masked": "Lista oculta",
-    "maskedBadge": "Oculta para jugadores y padres",
+    "maskedBadge": "Oculta para jogadores e pais",
     "visible": "Lista visível",
     "settingLabel": "Visibilidade da lista de convocados",
     "settingHelp": "Define quem vê a lista de convocados. Cálculo em tempo real: os eventos que herdam seguirão qualquer alteração futura da definição da equipa ou clube.",
