@@ -1795,6 +1795,29 @@ function EventDetail() {
         .select("parent_user_id, email, full_name, player_id")
         .in("player_id", playerIds);
 
+      // Fallback: for parents whose player_parents.email is missing but who
+      // have a linked auth account, resolve the auth email server-side so we
+      // don't silently skip them (same behaviour as the initial send).
+      const missingEmailParentUserIds = Array.from(
+        new Set(
+          (parents ?? [])
+            .filter((p: any) => !p.email && p.parent_user_id)
+            .map((p: any) => p.parent_user_id as string),
+        ),
+      );
+      let resolvedParentEmails: Record<string, string> = {};
+      if (missingEmailParentUserIds.length > 0) {
+        try {
+          const { resolveParentEmails } = await import("@/lib/parent-emails.functions");
+          const res = await resolveParentEmails({
+            data: { userIds: missingEmailParentUserIds },
+          });
+          resolvedParentEmails = res?.emails ?? {};
+        } catch {
+          // best-effort; missing emails simply won't be delivered
+        }
+      }
+
       const { data: clubRow } = await supabase
         .from("teams")
         .select("name, clubs:club_id(name, logo_url, default_language)")
@@ -1808,6 +1831,7 @@ function EventDetail() {
         | null
         | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+      void eventDateLabel;
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
       const competitionLabel =
@@ -1877,45 +1901,43 @@ function EventDetail() {
             lineup: lineupEmail,
             locale: pickEmailLocale(clubDefaultLang),
           },
-        }).catch(() => undefined);
+        });
 
-      const sends: Promise<unknown>[] = [];
-      const inAppRecipients = new Set<string>();
+      const { planConvocationResendRecipients } = await import(
+        "@/lib/events/resend-convocation-plan"
+      );
+      const plan = planConvocationResendRecipients(
+        (convocations as any[]).map((c: any) => ({
+          id: c.id,
+          player_id: c.player_id,
+          response_token: c.response_token,
+          player: c.players
+            ? {
+                first_name: c.players.first_name ?? null,
+                last_name: c.players.last_name ?? null,
+                email: c.players.email ?? null,
+                user_id: c.players.user_id ?? null,
+              }
+            : null,
+        })),
+        (parents ?? []) as any,
+        resolvedParentEmails,
+      );
+
+      // Build a token map: player_id -> response_token (identical across
+      // recipients of the same convocation), for quick lookup.
+      const tokenByConv = new Map<string, string>();
       for (const c of convocations as any[]) {
-        if (!c.response_token) continue;
-        const player = c.players;
-        const playerName = `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim();
-        if (player?.email) {
-          sends.push(
-            sendOne(
-              c.response_token,
-              player.email,
-              player.first_name ?? undefined,
-              playerName,
-              `p-${c.id}`,
-            ),
-          );
-        }
-        if (player?.user_id) inAppRecipients.add(player.user_id);
-        for (const parent of (parents ?? []).filter((p: any) => p.player_id === c.player_id)) {
-          if (parent.email) {
-            const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-            sends.push(
-              sendOne(
-                c.response_token,
-                parent.email,
-                parentFirst,
-                playerName,
-                `parent-${parent.player_id}-${c.id}`,
-              ),
-            );
-          }
-          if (parent.parent_user_id) inAppRecipients.add(parent.parent_user_id);
-        }
+        if (c.response_token) tokenByConv.set(c.id, c.response_token);
       }
-      if (inAppRecipients.size > 0) {
+
+      const sends = plan.recipients.map((r) =>
+        sendOne(r.token, r.email, r.recipientFirstName, r.playerName, r.idemSuffix),
+      );
+
+      if (plan.inAppUserIds.length > 0) {
         await supabase.from("notifications").insert(
-          Array.from(inAppRecipients).map((uid) => ({
+          plan.inAppUserIds.map((uid) => ({
             user_id: uid,
             type: "convocation",
             title: `🔄 ${event.title}`,
@@ -1930,7 +1952,8 @@ function EventDetail() {
           })),
         );
       }
-      await Promise.allSettled(sends);
+      const results = await Promise.allSettled(sends);
+      const failedCount = results.filter((r) => r.status === "rejected").length;
 
       await supabase
         .from("events")
@@ -1940,12 +1963,21 @@ function EventDetail() {
         })
         .eq("id", event.id);
 
-      toast.success(
-        t("events.resend.success", {
-          defaultValue: "Call-up resent to {{count}} player(s)",
-          count: convocations.length,
-        }),
-      );
+      if (failedCount > 0) {
+        toast.error(
+          t("events.resend.partial" as any, {
+            defaultValue: "Call-up resent with {{failed}} email failure(s)",
+            failed: failedCount,
+          }),
+        );
+      } else {
+        toast.success(
+          t("events.resend.success", {
+            defaultValue: "Call-up resent to {{count}} player(s)",
+            count: convocations.length,
+          }),
+        );
+      }
       setResendOpen(false);
       refetchEvent();
     } catch (e: any) {
