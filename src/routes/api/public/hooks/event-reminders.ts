@@ -145,9 +145,15 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.meeting_point)}`
             : undefined;
 
-          const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(
-            () => undefined,
-          );
+          // Gate visibilité: si la liste des convoqués est masquée pour cet event
+          // (cascade club→équipe→event), la composition ne doit pas partir dans
+          // le rappel (la squadList n'est pas envoyée par le rappel).
+          const { data: callUpVisible } = await supabaseAdmin.rpc("call_up_list_visible", {
+            p_event_id: ev.id,
+          });
+          const lineupEmail = callUpVisible
+            ? await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined)
+            : undefined;
 
           for (const conv of toSend) {
             const player: any = (players ?? []).find((p: any) => p.id === conv.player_id);
