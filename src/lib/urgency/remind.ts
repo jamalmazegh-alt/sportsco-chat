@@ -1,6 +1,6 @@
-// Helper remind-all : envoie un rappel à toutes les convocations pending
-// d'un event. Rate-limit 30min/convocation (réutilise la règle existante
-// de follow-ups.tsx). Retourne le nombre de rappels effectivement envoyés.
+// Helper remind-all : envoie un rappel (email + web push + notification in-app)
+// à toutes les convocations pending d'un event. Rate-limit 30 min / convocation.
+// Retourne le nombre de rappels effectivement envoyés.
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,12 +12,25 @@ export async function remindAllForEvent(
   promptText: string,
   eventTitle: string,
 ): Promise<number> {
+  void senderUserId; // reserved for future auditing; server function records the sender
   const { data: convocs } = await supabase
     .from("convocations")
     .select("id, player_id")
     .eq("event_id", eventId)
     .eq("status", "pending");
   if (!convocs || convocs.length === 0) return 0;
+
+  // Lazy-import the server function once (email + web push dispatch, records
+  // a reminders row with channel="email" server-side).
+  let sendManualConvocationReminder:
+    | ((args: { data: { convocationId: string } }) => Promise<unknown>)
+    | null = null;
+  try {
+    const mod = await import("@/lib/convocation-reminder.functions");
+    sendManualConvocationReminder = mod.sendManualConvocationReminder;
+  } catch (e) {
+    console.error("[remindAllForEvent] dispatch import failed", e);
+  }
 
   let sent = 0;
   for (const c of convocs) {
@@ -31,6 +44,16 @@ export async function remindAllForEvent(
       continue;
     }
 
+    // Email + Web Push (server-side; also handles cooldown + reminders row).
+    if (sendManualConvocationReminder) {
+      try {
+        await sendManualConvocationReminder({ data: { convocationId: c.id } });
+      } catch (e) {
+        console.error("[remindAllForEvent] email/push dispatch failed", e);
+      }
+    }
+
+    // In-app notification (cloche) — parallèle à l'email/push.
     const { data: parents } = await supabase
       .from("player_parents")
       .select("parent_user_id")
@@ -46,12 +69,6 @@ export async function remindAllForEvent(
         ...((parents ?? []).map((p) => p.parent_user_id).filter(Boolean) as string[]),
       ]),
     );
-
-    await supabase.from("reminders").insert({
-      convocation_id: c.id,
-      channel: "in_app",
-      sent_by: senderUserId,
-    });
     if (recipients.length > 0) {
       await supabase.from("notifications").insert(
         recipients.map((uid) => ({
@@ -63,6 +80,7 @@ export async function remindAllForEvent(
         })),
       );
     }
+
     sent += 1;
   }
   return sent;
