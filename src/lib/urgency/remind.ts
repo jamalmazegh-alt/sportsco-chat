@@ -12,6 +12,7 @@ export async function remindAllForEvent(
   promptText: string,
   eventTitle: string,
 ): Promise<number> {
+  void senderUserId; // reserved for future auditing; server function records the sender
   const { data: convocs } = await supabase
     .from("convocations")
     .select("id, player_id")
