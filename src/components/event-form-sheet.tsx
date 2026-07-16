@@ -690,7 +690,7 @@ export function EventFormSheet({
 
         const { id } = await createEventFn({ data: baseInput });
         setBusy(false);
-        toast.success(t("events.publish"));
+        toast.success(t("events.published"));
         invalidateEventsCaches();
         onOpenChange(false);
         onSaved(id);

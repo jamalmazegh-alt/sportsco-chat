@@ -735,6 +735,7 @@
       "cancelled": "Annullato"
     },
     "publish": "Pubblica evento",
+    "published": "Evento pubblicato",
     "sendConvocations": "Invia convocazioni",
     "convocationsSent": "Convocazioni inviate",
     "noEvents": "Nessun evento in programma.",

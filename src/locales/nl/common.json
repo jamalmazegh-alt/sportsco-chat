@@ -735,6 +735,7 @@
       "cancelled": "Geannuleerd"
     },
     "publish": "Evenement publiceren",
+    "published": "Evenement gepubliceerd",
     "sendConvocations": "Uitnodigingen versturen",
     "convocationsSent": "Uitnodigingen verstuurd",
     "noEvents": "Geen evenementen gepland.",
