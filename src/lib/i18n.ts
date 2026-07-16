@@ -147,7 +147,7 @@ if (!i18n.isInitialized) {
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
     // v3 JSON plural format (uses `_plural` suffix) — matches existing locale files.
-    compatibilityJSON: "v3",
+    compatibilityJSON: "v3" as any,
   });
 }
 
