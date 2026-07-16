@@ -2794,14 +2794,6 @@ function EventDetail() {
                           <span className="block text-sm font-bold">
                             {t("events.whatsappShare.shareConvoc")}
                           </span>
-                          <span className="block text-[11px] text-white/80 truncate">
-                            {t("events.commCard.whatsappHint", {
-                              defaultValue: "Lien de convocation",
-                            })}
-                          </span>
-                        </span>
-                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                          {t("events.commCard.fast", { defaultValue: "Rapide" })}
                         </span>
                       </a>
                     ) : (
