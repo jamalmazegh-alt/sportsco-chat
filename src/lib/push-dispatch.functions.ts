@@ -166,9 +166,18 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
     const teamName = ((ev as any).teams?.name as string) || "Équipe";
     const opp = ((ev as any).opponent as string) || "Adversaire";
     const home = (ev as any).is_home !== false;
-    const sh = (result as any).home_score;
-    const sa = (result as any).away_score;
-    const body = home ? `${teamName} ${sh}-${sa} ${opp}` : `${opp} ${sh}-${sa} ${teamName}`;
+    const sh = (result as any).home_score as number;
+    const sa = (result as any).away_score as number;
+    const ourScore = home ? sh : sa;
+    const theirScore = home ? sa : sh;
+    const outcome: "win" | "loss" | "draw" =
+      ourScore > theirScore ? "win" : ourScore < theirScore ? "loss" : "draw";
+    const outcomeLabel =
+      outcome === "win" ? "Victoire" : outcome === "loss" ? "Défaite" : "Match nul";
+    const outcomeEmoji = outcome === "win" ? "🎉" : outcome === "loss" ? "💪" : "🤝";
+    const title = `${outcomeEmoji} ${outcomeLabel} — ${teamName}`;
+    const scoreLine = home ? `${teamName} ${sh}-${sa} ${opp}` : `${opp} ${sh}-${sa} ${teamName}`;
+    const body = scoreLine;
 
     // Fan out to all convoqués + coaches of the team
     const teamId = (ev as any).team_id as string | null;
@@ -202,7 +211,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
 
     const sends = Array.from(targets).map((uid) =>
       sendPushToUser(uid, {
-        title: "🏆 Résultat",
+        title,
         body,
         url: `/events/${data.eventId}`,
         tag: `score-${data.eventId}`,
