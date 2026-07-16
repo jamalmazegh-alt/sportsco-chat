@@ -58,9 +58,9 @@ export function useAbsenceUrgencies(): UrgencyCollectorResult & { isPending: boo
       for (const r of teamRows) {
         const teamId = r.teams.id as string;
         const teamName = (r.teams.name as string) ?? "";
-        if (!unavailablePlayers.has(r.player_id)) continue;
+        if (!unavailablePlayers.has(r.player_id as string)) continue;
         const entry = perTeam.get(teamId) ?? { name: teamName, players: new Set<string>() };
-        entry.players.add(r.player_id);
+        entry.players.add(r.player_id as string);
         perTeam.set(teamId, entry);
       }
 
