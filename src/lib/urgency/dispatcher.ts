@@ -27,6 +27,9 @@ export async function dispatchUrgencyAction(
     case "open-event":
       ctx.navigate(`/events/${action.eventId}`);
       return;
+    case "open-team-availability":
+      ctx.navigate(`/teams/${action.teamId}/availability`);
+      return;
     case "open-player":
       throw new Error("open-player dispatched without handler (no live source emits it yet)");
     case "remind-one":
