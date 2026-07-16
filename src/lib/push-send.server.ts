@@ -359,6 +359,9 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
       endpointUrl.host,
       detail.slice(0, 240) || authHint || apnsId,
     );
+  } else {
+    const apnsId = res.headers.get("apns-id") || "";
+    console.log("[push] provider accepted", res.status, endpointUrl.host, apnsId);
   }
 
   return res.status;
