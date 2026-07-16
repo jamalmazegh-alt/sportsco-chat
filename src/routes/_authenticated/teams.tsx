@@ -196,6 +196,15 @@ function TeamsPage() {
                   ))}
                 </div>
               </div>
+              <div className="rounded-xl border border-border bg-card px-3 py-3">
+                <CallUpVisibilitySelector
+                  level="team"
+                  id=""
+                  isStaff
+                  value={callUpVisibility}
+                  onChange={setCallUpVisibility}
+                />
+              </div>
               <Button type="submit" className="w-full h-11" disabled={busy}>
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
               </Button>
