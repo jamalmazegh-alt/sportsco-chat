@@ -3846,8 +3846,12 @@ function EventDetail() {
             </div>
           )}
 
-          {/* C. Players list */}
-          {event.convocations_sent && (
+          {/* C. Players list — staff always; non-staff only when the
+              server-resolved call-up gate is visible. RLS already filters
+              the rows, but we hide the whole "Called-up players" block for
+              non-staff when masked so a called-up player doesn't see a
+              one-row list of just themselves under that heading. */}
+          {event.convocations_sent && (isCoach || callUpVisible === true) && (
             <>
               {convocations && convocations.length === 0 ? (
                 <div className="p-6 text-center text-sm text-muted-foreground">
