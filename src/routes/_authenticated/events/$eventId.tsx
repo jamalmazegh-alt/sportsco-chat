@@ -2843,11 +2843,8 @@ function EventDetail() {
                         </span>
                         <span className="flex-1 min-w-0">
                           <span className="block text-sm font-bold text-foreground">
-                            {t("events.whatsappShare.shareConvocWithLineup")}
-                          </span>
-                          <span className="block text-[11px] text-muted-foreground truncate">
-                            {t("events.commCard.lineupHint", {
-                              defaultValue: "Inclut la composition en image",
+                            {t("events.whatsappShare.shareLineup", {
+                              defaultValue: "Partager la compo",
                             })}
                           </span>
                         </span>
