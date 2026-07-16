@@ -792,7 +792,17 @@ function EventDetail() {
       })
       .eq("id", convocationId);
     if (error) {
-      toast.error(error.message);
+      const raw = (error.message || "").toLowerCase();
+      if (raw.includes("past_event_locked")) {
+        toast.error(
+          t("attendance.errorPastEventLocked", {
+            defaultValue:
+              "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+          }),
+        );
+      } else {
+        toast.error(error.message);
+      }
       return false;
     }
     refetch();
