@@ -2717,13 +2717,12 @@ function EventDetail() {
                     </div>
                     <div className="min-w-0 leading-tight">
                       <div className="text-base font-extrabold tracking-tight">
-                        {t("events.commCard.title", { defaultValue: "Partager la convocation" })}
+                        {t("events.whatsappShare.shareViaWhatsApp", {
+                          defaultValue: "Partager la convocation par WhatsApp",
+                        })}
                       </div>
                       <div className="text-[11px] text-white/75 font-medium mt-0.5">
-                        {t("events.commCard.subtitle", {
-                          defaultValue: "{{count}} joueurs convoqués",
-                          count: convocCount,
-                        })}
+                        {convocCount} joueurs convoqués
                       </div>
                     </div>
                   </div>
