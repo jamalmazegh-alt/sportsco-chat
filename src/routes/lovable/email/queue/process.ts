@@ -1,39 +1,18 @@
 import { sendLovableEmail } from "@lovable.dev/email-js";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  getRetryAfterSeconds,
+  isForbidden,
+  isRateLimited,
+  isTransientRunRecipientMismatch,
+} from "@/lib/email/queue-error-classify";
 
 const MAX_RETRIES = 5;
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_SEND_DELAY_MS = 200;
 const DEFAULT_AUTH_TTL_MINUTES = 15;
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60;
-
-// Check if an error is a rate-limit (429) response.
-// Uses EmailAPIError.status when available (email-js >=0.x with structured errors),
-// falls back to parsing the error message for older versions.
-function isRateLimited(error: unknown): boolean {
-  if (error && typeof error === "object" && "status" in error) {
-    return (error as { status: number }).status === 429;
-  }
-  return error instanceof Error && error.message.includes("429");
-}
-
-// Check if an error is a forbidden (403) response. Retrying won't help.
-// Move straight to DLQ.
-function isForbidden(error: unknown): boolean {
-  if (error && typeof error === "object" && "status" in error) {
-    return (error as { status: number }).status === 403;
-  }
-  return error instanceof Error && error.message.includes("403");
-}
-
-// Extract Retry-After seconds from a structured EmailAPIError, or default to 60s.
-function getRetryAfterSeconds(error: unknown): number {
-  if (error && typeof error === "object" && "retryAfterSeconds" in error) {
-    return (error as { retryAfterSeconds: number | null }).retryAfterSeconds ?? 60;
-  }
-  return 60;
-}
 
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
@@ -237,7 +216,12 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             try {
               await sendLovableEmail(
                 {
-                  run_id: payload.run_id,
+                  // Force a UNIQUE run per message. Without this, transactional sends
+                  // (payload.run_id is undefined) fall into the provider's auto-created
+                  // run, which groups a concurrent burst under one run bound to the first
+                  // recipient → 403 recipient_mismatch for the siblings. message_id is
+                  // unique per send and stable across retries, so retries stay idempotent.
+                  run_id: payload.run_id ?? payload.message_id,
                   to: payload.to,
                   from: payload.from,
                   sender_domain: payload.sender_domain,
@@ -306,14 +290,21 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 return Response.json({ processed: totalProcessed, stopped: "rate_limited" });
               }
 
-              // 403s are permanent configuration or authorization failures for this
-              // message, so move straight to DLQ and stop processing the rest of the batch.
-              if (isForbidden(error)) {
+              // 403s are normally permanent configuration or authorization failures
+              // for this message, so move straight to DLQ and stop processing the rest
+              // of the batch. EXCEPTION: `recipient_mismatch` is a transient burst-window
+              // collision on the provider's auto-created transactional run (see
+              // isTransientRunRecipientMismatch) — a later isolated retry succeeds, so it
+              // falls through to the retryable path below and stays in the queue.
+              if (isForbidden(error) && !isTransientRunRecipientMismatch(error)) {
                 await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000));
                 return Response.json({ processed: totalProcessed, stopped: "forbidden" });
               }
 
-              // Log non-429 failures to track real retry attempts.
+              // Log non-429 failures (including recipient_mismatch) to track real retry
+              // attempts. The message stays invisible until its VT expires, then is
+              // retried on a later cycle — outside the burst window that caused the
+              // collision. Processing of the rest of the batch continues.
               await supabase.from("email_send_log").insert({
                 message_id: payload.message_id,
                 template_name: payload.label || queue,
