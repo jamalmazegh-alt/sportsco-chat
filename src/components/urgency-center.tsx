@@ -449,7 +449,11 @@ function UrgencyDeck({
                               ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
                               : item.primaryAction.kind === "respond"
                                 ? t("urgency.cta.respond", { defaultValue: "Répondre" })
-                                : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                                : item.primaryAction.kind === "open-team-availability"
+                                  ? t("urgency.cta.openCalendar", {
+                                      defaultValue: "Voir le calendrier",
+                                    })
+                                  : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
                           </Button>
                         </div>
                       </div>
