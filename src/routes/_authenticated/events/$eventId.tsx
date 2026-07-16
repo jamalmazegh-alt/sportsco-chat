@@ -861,7 +861,17 @@ function EventDetail() {
     const playerName = [playerFirstName, playerLastName].filter(Boolean).join(" ") || undefined;
     const { error } = await supabase.from("convocations").delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      const raw = (error.message || "").toLowerCase();
+      if (raw.includes("past_event_locked")) {
+        toast.error(
+          t("attendance.errorPastEventLocked", {
+            defaultValue:
+              "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+          }),
+        );
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     toast.success(t("attendance.convocationCancelled"));
