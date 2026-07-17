@@ -1780,6 +1780,8 @@ export type Database = {
           metadata: Json | null
           mismatch_count: number
           notification_type: string | null
+          provider: string | null
+          provider_message_id: string | null
           recipient_email: string
           recipient_id: string | null
           status: string
@@ -1797,6 +1799,8 @@ export type Database = {
           metadata?: Json | null
           mismatch_count?: number
           notification_type?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
           recipient_email: string
           recipient_id?: string | null
           status: string
@@ -1814,6 +1818,8 @@ export type Database = {
           metadata?: Json | null
           mismatch_count?: number
           notification_type?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
           recipient_email?: string
           recipient_id?: string | null
           status?: string
