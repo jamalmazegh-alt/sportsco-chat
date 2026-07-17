@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   Upload,
   MessageCircleHeart,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ const NAV: NavItem[] = [
   { to: "/superadmin/onboarding/import", label: "Import données", icon: Upload },
   { to: "/superadmin/billing", label: "Billing", icon: CreditCard },
   { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
+  { to: "/superadmin/email-dispatches", label: "Envois emails", icon: Mail },
   { to: "/superadmin/support", label: "Support hub", icon: LifeBuoy },
   { to: "/superadmin/support-tickets", label: "Tickets", icon: LifeBuoy },
   { to: "/superadmin/build-clubero", label: "Construisons Clubero", icon: MessageCircleHeart },
