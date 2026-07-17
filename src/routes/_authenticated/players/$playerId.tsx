@@ -1135,7 +1135,6 @@ function PlayerProfile() {
                             </span>
                           )}
                         </div>
-                        </div>
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
                             .filter(Boolean)
