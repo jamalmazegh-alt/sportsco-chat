@@ -228,6 +228,8 @@ function InviteRow({ row }: { row: ClubInviteStatusRow }) {
     "—";
   const inviteBadge = row.usedAt ? (
     <StatusBadge tone="success">Acceptée</StatusBadge>
+  ) : row.hasActiveAccount ? (
+    <StatusBadge tone="success">Compte actif</StatusBadge>
   ) : row.isExpired ? (
     <StatusBadge tone="danger">Expirée</StatusBadge>
   ) : (
