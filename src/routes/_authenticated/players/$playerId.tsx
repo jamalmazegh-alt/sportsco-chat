@@ -1073,10 +1073,13 @@ function PlayerProfile() {
                   const linked = !!pp.parent_user_id;
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
-                  const inviteSent =
-                    !linked &&
-                    !!pp.email &&
-                    invitedEmails.has(pp.email.trim().toLowerCase());
+                  const emailKey = pp.email?.trim().toLowerCase() ?? "";
+                  const inviteSent = !linked && !!emailKey && invitedEmails.has(emailKey);
+                  const inviteFailedError =
+                    !linked && !!emailKey && !inviteSent
+                      ? (failedEmailsMap.get(emailKey) ?? null)
+                      : undefined;
+                  const inviteFailed = inviteFailedError !== undefined;
                   return (
                     <li
                       key={pp.id}
@@ -1114,6 +1117,24 @@ function PlayerProfile() {
                               })}
                             </span>
                           )}
+                          {inviteFailed && (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive"
+                              title={
+                                inviteFailedError ??
+                                t("players.inviteFailedHint", {
+                                  defaultValue:
+                                    "L'email d'invitation n'a pas pu être délivré",
+                                })
+                              }
+                            >
+                              <X className="h-3 w-3" />
+                              {t("players.inviteFailed", {
+                                defaultValue: "Envoi échoué",
+                              })}
+                            </span>
+                          )}
+                        </div>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
