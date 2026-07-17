@@ -934,7 +934,6 @@ function EventDetail() {
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
-        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
         // ONE dispatch for this convocation-cancelled campaign (player + parents).
         const { dispatchId } = await createEmailDispatchFn({
