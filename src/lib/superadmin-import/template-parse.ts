@@ -12,10 +12,11 @@ import {
 
 const normKey = (s: string) =>
   s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[éèê]/g, "e")
-    .replace(/[^a-z0-9_]/g, "");
+    .replace(/[^a-z0-9]/g, "");
+
 
 function normalizeDate(v: string): string {
   // Accept JJ/MM/AAAA, JJ-MM-AAAA, YYYY-MM-DD, Excel serial (number-as-string)
@@ -90,9 +91,10 @@ export function parseTemplate(
 
   const mapping: Record<string, string> = {};
   for (const f of fields) {
-    const found = headerByNorm.get(normKey(f.key));
+    const found = headerByNorm.get(normKey(f.key)) ?? headerByNorm.get(normKey(f.label));
     if (found) mapping[found] = f.key;
   }
+
 
   const rows: AnalysisResult["rows"] = [];
   const correctionMap = new Map<string, { original: string; corrected: string; count: number }>();

@@ -147,13 +147,16 @@ export function templateMatchRatio(headers: string[], type: ImportType): number 
   const required = fields.filter((f) => f.required);
   const norm = (s: string) =>
     s
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/[éèê]/g, "e")
-      .replace(/[^a-z0-9_]/g, "");
+      .replace(/[^a-z0-9]/g, "");
   const normHeaders = headers.map(norm);
-  const matched = required.filter((f) => normHeaders.includes(norm(f.key)));
+  const matched = required.filter(
+    (f) => normHeaders.includes(norm(f.key)) || normHeaders.includes(norm(f.label)),
+  );
   return required.length === 0 ? 1 : matched.length / required.length;
+
 }
 
 /** Cellule unifiée (sortie IA ou parsing template). */
