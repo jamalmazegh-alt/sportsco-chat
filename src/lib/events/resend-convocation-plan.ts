@@ -43,6 +43,16 @@ export type PlannedRecipient = {
   playerName: string;
   token: string;
   idemSuffix: string;
+  /**
+   * Stable per-campaign recipient identity used for the DB unique index on
+   * (dispatch_id, recipient_id, notification_type). Two parents of the same
+   * player MUST get different recipientIds. Format:
+   *   - player:<playerId>
+   *   - parent:<playerId>:<normalizedEmail>
+   *   - parent-uid:<playerId>:<parentUserId>  (when the parent has no email yet)
+   */
+  recipientId: string;
+  playerId: string;
 };
 
 export type ResendPlan = {
