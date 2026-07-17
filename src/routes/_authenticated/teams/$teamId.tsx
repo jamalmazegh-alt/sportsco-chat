@@ -92,6 +92,7 @@ function TeamDetail() {
   const navigate = useNavigate();
   const isAdmin = roles.includes("admin");
   const sendPlayerInvitationsFn = useServerFn(sendPlayerInvitations);
+  const listTeamInviteFailuresFn = useServerFn(listTeamInviteFailures);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
   const isAvailabilityRoute = pathname.endsWith("/availability");
