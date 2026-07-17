@@ -255,6 +255,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "suppressed",
           });
 
@@ -285,6 +286,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "failed",
             error_message: "Failed to look up unsubscribe token",
           });
@@ -312,6 +314,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
+            ...baseMeta,
               status: "failed",
               error_message: "Failed to create unsubscribe token",
             });
@@ -335,6 +338,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
+            ...baseMeta,
               status: "failed",
               error_message: "Failed to confirm unsubscribe token storage",
             });
@@ -351,6 +355,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "suppressed",
             error_message: "Unsubscribe token used but email missing from suppressed list",
           });
@@ -376,6 +381,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           message_id: messageId,
           template_name: templateName,
           recipient_email: effectiveRecipient,
+            ...baseMeta,
           status: "pending",
         });
 
@@ -394,6 +400,10 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             idempotency_key: idempotencyKey,
             unsubscribe_token: unsubscribeToken,
             queued_at: new Date().toISOString(),
+            dispatch_id: dispatchId,
+            event_id: eventId,
+            recipient_id: recipientId,
+            notification_type: notificationType,
           },
         });
 
@@ -408,6 +418,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "failed",
             error_message: "Failed to enqueue email",
           });
