@@ -1191,7 +1191,7 @@ function PlayerProfile() {
                                   })}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                             {t("players.parentContactsHidden", {
                               defaultValue: "Coordonnées confidentielles",
                             })}
