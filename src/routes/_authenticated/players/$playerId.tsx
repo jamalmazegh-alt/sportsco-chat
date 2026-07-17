@@ -1001,6 +1001,36 @@ function PlayerProfile() {
                   disabled={!isParentOfThisPlayer && !isCoach}
                 />
               </div>
+
+              {player.child_platform_access && !player.user_id && (
+                <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    {t("players.inviteMinorHint", {
+                      defaultValue:
+                        "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Envoie-lui l'email d'invitation.",
+                    })}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    disabled={!(email || player.email)}
+                    onClick={() => {
+                      const target = (email || player.email || "").trim();
+                      if (!target) {
+                        toast.warning(t("players.inviteNoContact"));
+                        return;
+                      }
+                      sendChildOnboardingInvite(target);
+                    }}
+                  >
+                    {t("players.sendChildInvite", {
+                      defaultValue: "Envoyer l'invitation au joueur",
+                    })}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
