@@ -51,56 +51,49 @@ const NT = "convocation-invite";
 let eventA: string;
 let eventB: string;
 
-const dlqRow = (
+/**
+ * `email_send_log.dispatch_id` FK-references `email_dispatches(id)`. Tests
+ * that seed rows with random dispatch UUIDs would trip a 23503 FK violation,
+ * so we insert real dispatch rows on demand and reuse the returned id.
+ * Every dispatch created here is torn down in afterAll via `createdDispatchIds`.
+ */
+const createdDispatchIds = new Set<string>();
+async function mkDispatch(event_id: string): Promise<string> {
+  const { data, error } = await admin
+    .from("email_dispatches")
+    .insert({ event_id, template_name: NT, dispatch_type: "initial" })
+    .select("id")
+    .single();
+  if (error || !data) throw new Error(`mkDispatch failed: ${error?.message}`);
+  createdDispatchIds.add(data.id);
+  return data.id;
+}
+
+function baseRow(
   event_id: string,
   dispatch_id: string | null,
   recipient_id: string | null,
+  status: string,
   created_at: string,
-) => ({
-  message_id: crypto.randomUUID(),
-  template_name: NT,
-  recipient_email: `${recipient_id ?? "orphan"}@replay.test`,
-  status: "dlq",
-  event_id,
-  dispatch_id,
-  recipient_id,
-  notification_type: NT,
-  created_at,
-});
-
-const sentRow = (
-  event_id: string,
-  dispatch_id: string,
-  recipient_id: string,
-  created_at: string,
-) => ({
-  message_id: crypto.randomUUID(),
-  template_name: NT,
-  recipient_email: `${recipient_id}@replay.test`,
-  status: "sent",
-  event_id,
-  dispatch_id,
-  recipient_id,
-  notification_type: NT,
-  created_at,
-});
-
-const pendingRow = (
-  event_id: string,
-  dispatch_id: string,
-  recipient_id: string,
-  created_at: string,
-) => ({
-  message_id: crypto.randomUUID(),
-  template_name: NT,
-  recipient_email: `${recipient_id}@replay.test`,
-  status: "pending",
-  event_id,
-  dispatch_id,
-  recipient_id,
-  notification_type: NT,
-  created_at,
-});
+) {
+  return {
+    message_id: crypto.randomUUID(),
+    template_name: NT,
+    recipient_email: `${recipient_id ?? "orphan"}@replay.test`,
+    status,
+    event_id,
+    dispatch_id,
+    recipient_id,
+    notification_type: NT,
+    created_at,
+  };
+}
+const dlqRow = (e: string, d: string | null, r: string | null, ts: string) =>
+  baseRow(e, d, r, "dlq", ts);
+const sentRow = (e: string, d: string, r: string, ts: string) =>
+  baseRow(e, d, r, "sent", ts);
+const pendingRow = (e: string, d: string, r: string, ts: string) =>
+  baseRow(e, d, r, "pending", ts);
 
 /** Exactly the same key derivation as replayEventDlq.eventLockKey(). */
 async function eventLockKey(eventId: string): Promise<number> {
