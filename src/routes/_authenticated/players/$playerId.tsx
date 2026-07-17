@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { PlayerSuspensions } from "@/components/player-suspensions";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
@@ -42,7 +42,7 @@ import {
   Palmtree,
   Pencil,
 } from "lucide-react";
-import { BackLink } from "@/components/back-link";
+import { BackButton } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
@@ -125,6 +125,7 @@ function PlayerProfile() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isFeedback = pathname === `/players/${playerId}/feedback`;
   const isAchievements = pathname === `/players/${playerId}/achievements`;
@@ -582,7 +583,18 @@ function PlayerProfile() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <BackLink to="/teams" />
+      <BackButton
+        onClick={() => {
+          const canGoBack = router.history.length > 1;
+          if (canGoBack) {
+            router.history.back();
+            return;
+          }
+          const teamId = playerTeams?.[0]?.id;
+          if (teamId) navigate({ to: "/teams/$teamId", params: { teamId } });
+          else navigate({ to: "/teams" });
+        }}
+      />
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
