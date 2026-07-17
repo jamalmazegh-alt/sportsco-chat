@@ -1110,7 +1110,7 @@ function PlayerProfile() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
                             .filter(Boolean)
                             .join(" · ") || "—"}
