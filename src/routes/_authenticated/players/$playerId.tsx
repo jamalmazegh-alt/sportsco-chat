@@ -945,18 +945,13 @@ function PlayerProfile() {
 
                   {(isCoach || isParentOfThisPlayer) &&
                     !player.user_id &&
-                    (!minor || player.child_platform_access) && (
+                    !minor && (
                       <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
                         <p className="text-xs text-muted-foreground">
-                          {minor
-                            ? t("players.inviteMinorHint", {
-                                defaultValue:
-                                  "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Renvoie-lui l'email d'invitation.",
-                              })
-                            : t("players.inviteAdultHint", {
-                                defaultValue:
-                                  "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
-                              })}
+                          {t("players.inviteAdultHint", {
+                            defaultValue:
+                              "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
+                          })}
                         </p>
                         <Button
                           type="button"
