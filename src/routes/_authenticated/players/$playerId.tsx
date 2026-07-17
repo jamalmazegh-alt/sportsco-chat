@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { PlayerSuspensions } from "@/components/player-suspensions";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
