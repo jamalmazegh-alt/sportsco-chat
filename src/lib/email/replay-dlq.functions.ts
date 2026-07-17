@@ -124,10 +124,10 @@ export const replayEventDlq = createServerFn({ method: "POST" })
       await supabaseAdmin.from("email_dispatches").insert({
         id: dispatchId,
         event_id: data.eventId,
-        kind: "dlq_replay",
-        notification_type: data.notificationType,
-        triggered_by: context.userId,
-        recipient_count: dlqEmails.size,
+        dispatch_type: "dlq_replay",
+        template_name: data.notificationType,
+        created_by: context.userId,
+        metadata: { recipient_count: dlqEmails.size },
       });
 
       if (data.notificationType !== "convocation-invite") {
