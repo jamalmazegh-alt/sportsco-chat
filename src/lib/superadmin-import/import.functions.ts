@@ -249,7 +249,7 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     // `maillot`, `license` → `licence`, etc.). Ça couvre le modèle officiel
     // et les libellés humains sans appel IA, et évite qu'une hallucination
     // fasse rater le mapping.
-    const { normalizeHeader } = await import("./schemas");
+
     const keyByNorm = new Map<string, string>();
     const labelByNorm = new Map<string, string>();
     for (const f of fields) {
