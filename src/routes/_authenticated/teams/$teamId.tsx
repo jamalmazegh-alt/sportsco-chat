@@ -1522,7 +1522,22 @@ function TeamDetail() {
                         {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
                       </span>
                     ) : isCoach ? (
-                      hasPendingInvite ? (
+                      hasFailedInvite ? (
+                        <span
+                          className="inline-flex items-center gap-1 text-red-600"
+                          title={failures
+                            .map((f) => `${f.email}${f.error ? ` — ${f.error}` : ""} (${f.status})`)
+                            .join("\n")}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                          {t("players.inviteFailedLabel", {
+                            defaultValue: "Envoi échoué",
+                          })}
+                          <span className="text-muted-foreground truncate">
+                            · {failures.map((f) => f.email).join(", ")}
+                          </span>
+                        </span>
+                      ) : hasPendingInvite ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
