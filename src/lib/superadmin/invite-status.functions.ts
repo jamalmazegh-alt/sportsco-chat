@@ -67,7 +67,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    // Resolve invited player names (for parent invites AND player invites)
+    // Resolve invited player names + child_platform_access + user_id.
     const playerIds = Array.from(
       new Set(
         (invites ?? [])
@@ -76,14 +76,37 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       ),
     );
     const playerNames = new Map<string, string>();
+    const playerInfo = new Map<
+      string,
+      { userId: string | null; childPlatformAccess: boolean }
+    >();
     if (playerIds.length > 0) {
       const { data: players } = await supabaseAdmin
         .from("players")
-        .select("id, first_name, last_name")
+        .select("id, first_name, last_name, user_id, child_platform_access")
         .in("id", playerIds);
       for (const p of players ?? []) {
         const nm = `${(p as any).first_name ?? ""} ${(p as any).last_name ?? ""}`.trim();
         if (nm) playerNames.set((p as any).id, nm);
+        playerInfo.set((p as any).id, {
+          userId: ((p as any).user_id as string | null) ?? null,
+          childPlatformAccess: !!(p as any).child_platform_access,
+        });
+      }
+    }
+
+    // Resolve which parent emails have an active linked account for each player.
+    const activeParentEmails = new Set<string>(); // key: `${playerId}|${email.toLowerCase()}`
+    if (playerIds.length > 0) {
+      const { data: pps } = await supabaseAdmin
+        .from("player_parents")
+        .select("player_id, email, parent_user_id")
+        .in("player_id", playerIds);
+      for (const pp of pps ?? []) {
+        const email = ((pp as any).email as string | null)?.toLowerCase();
+        const pid = (pp as any).player_id as string;
+        const uid = (pp as any).parent_user_id as string | null;
+        if (email && uid) activeParentEmails.add(`${pid}|${email}`);
       }
     }
 
