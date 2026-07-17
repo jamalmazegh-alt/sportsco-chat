@@ -78,17 +78,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         const supabase: SupabaseClient<any, any> = createClient(supabaseUrl, supabaseServiceKey);
 
-        // 1. Check rate-limit cooldown and read queue config
-        const { data: state } = await supabase
-          .from("email_send_state")
-          .select(
-            "retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
-          )
-          .single();
-
-        if (state?.retry_after_until && new Date(state.retry_after_until) > new Date()) {
-          return Response.json({ skipped: true, reason: "rate_limited" });
-        }
 
         // 1. Read queue config + BOTH cooldown gates.
         //    - retry_after_until: provider-wide 429 (applies to both queues)
