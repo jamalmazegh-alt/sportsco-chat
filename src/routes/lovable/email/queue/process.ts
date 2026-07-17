@@ -185,6 +185,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               payload?.message_id && typeof payload.message_id === "string"
                 ? (failedAttemptsByMessageId.get(payload.message_id) ?? 0)
                 : (msg.read_ct ?? 0);
+            const mismatchAttempts =
+              payload?.message_id && typeof payload.message_id === "string"
+                ? (mismatchAttemptsByMessageId.get(payload.message_id) ?? 0)
+                : 0;
 
             // Drop expired messages (TTL exceeded).
             // Prefer payload.queued_at when present; fall back to PGMQ's enqueued_at
@@ -217,6 +221,18 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 queue,
                 msg,
                 `Max retries (${MAX_RETRIES}) exceeded (attempted ${failedAttempts} times)`,
+              );
+              continue;
+            }
+
+            // Bound on recipient_mismatch deferrals: transient bursts should disperse
+            // after a few cooldown cycles. If they don't, DLQ instead of looping forever.
+            if (mismatchAttempts >= MAX_MISMATCH_ATTEMPTS) {
+              await moveToDlq(
+                supabase,
+                queue,
+                msg,
+                `recipient_mismatch persisted after ${mismatchAttempts} cooldown cycles`,
               );
               continue;
             }
