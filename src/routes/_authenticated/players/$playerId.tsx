@@ -292,7 +292,7 @@ function PlayerProfile() {
     (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
   );
 
-
+  // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
   const { data: playerTeams } = useQuery({
     queryKey: ["player-teams", playerId],
