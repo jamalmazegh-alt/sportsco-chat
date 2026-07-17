@@ -219,11 +219,13 @@ function diffSnapshot(
 }
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    send: s.send === 1 || s.send === "1" ? 1 : undefined,
-    preselect: typeof s.preselect === "string" && s.preselect.length > 0 ? s.preselect : undefined,
-    action: typeof s.action === "string" && s.action.length > 0 ? s.action : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { send?: 1; preselect?: string; action?: string } => {
+    const out: { send?: 1; preselect?: string; action?: string } = {};
+    if (s.send === 1 || s.send === "1") out.send = 1;
+    if (typeof s.preselect === "string" && s.preselect.length > 0) out.preselect = s.preselect;
+    if (typeof s.action === "string" && s.action.length > 0) out.action = s.action;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: i18n.t("meta.eventDetail.title") },
@@ -932,7 +934,6 @@ function EventDetail() {
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
-        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
         // ONE dispatch for this convocation-cancelled campaign (player + parents).
         const { dispatchId } = await createEmailDispatchFn({

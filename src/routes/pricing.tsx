@@ -9,12 +9,13 @@ import { trackConversion } from "@/lib/conversion-tracking";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    source: typeof search.source === "string" ? (search.source as string) : undefined,
-    utm_source: typeof search.utm_source === "string" ? (search.utm_source as string) : undefined,
-    tournament_id:
-      typeof search.tournament_id === "string" ? (search.tournament_id as string) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { source?: string; utm_source?: string; tournament_id?: string } => {
+    const out: { source?: string; utm_source?: string; tournament_id?: string } = {};
+    if (typeof search.source === "string") out.source = search.source;
+    if (typeof search.utm_source === "string") out.utm_source = search.utm_source;
+    if (typeof search.tournament_id === "string") out.tournament_id = search.tournament_id;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: i18n.t("meta.pricing.title") },

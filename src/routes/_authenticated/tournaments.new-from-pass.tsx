@@ -18,10 +18,12 @@ import {
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
   component: NewTournamentPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    pass: typeof s.pass === "string" ? s.pass : undefined,
-    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { pass?: string; session_id?: string } => {
+    const out: { pass?: string; session_id?: string } = {};
+    if (typeof s.pass === "string") out.pass = s.pass;
+    if (typeof s.session_id === "string") out.session_id = s.session_id;
+    return out;
+  },
   head: () => ({
     meta: [{ title: i18nInstance.t("newFromPass.metaTitle", { ns: "tournaments" }) }],
   }),
