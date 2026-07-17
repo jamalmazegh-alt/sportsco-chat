@@ -321,6 +321,24 @@ function TeamDetail() {
     },
   });
 
+  // Failed invite emails per player (bounced/failed/dlq/complained/suppressed).
+  const { data: inviteFailuresByPlayer } = useQuery({
+    queryKey: ["team-invite-failures", teamId, activeClubId],
+    enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
+    queryFn: async () => {
+      try {
+        const r = await listTeamInviteFailuresFn({ data: { teamId } });
+        return r.failuresByPlayer ?? {};
+      } catch (e) {
+        console.error("listTeamInviteFailures failed", e);
+        return {} as Record<
+          string,
+          Array<{ email: string; status: string; error: string | null; at: string }>
+        >;
+      }
+    },
+  });
+
   // Parents grouped by player — used to know which contacts remain to invite.
   const { data: parentsByPlayer } = useQuery({
     queryKey: ["team-parents-by-player", teamId],
