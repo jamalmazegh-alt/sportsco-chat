@@ -1,4 +1,4 @@
-import { sendLovableEmail } from "@lovable.dev/email-js";
+import { getEmailSender } from "@/lib/email/senders";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -386,23 +386,27 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             }
 
             try {
-              await sendLovableEmail(
-                {
-                  run_id: payload.run_id,
-                  to: payload.to as string,
-                  from: payload.from as string,
-                  sender_domain: payload.sender_domain as string,
-                  subject: payload.subject as string,
-                  html: payload.html as string,
-                  text: payload.text as string,
-                  purpose: payload.purpose as string,
-                  label: payload.label as string,
-                  idempotency_key: payload.idempotency_key as string,
-                  unsubscribe_token: payload.unsubscribe_token as string,
-                  message_id: payload.message_id as string,
-                },
-                { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
-              );
+              // Phase 1 of the multi-provider migration: the actual send goes
+              // through a pluggable sender resolved from EMAIL_PROVIDER at each
+              // call, so we can flip providers without redeploying. Retry /
+              // recipient_mismatch / DLQ logic stays in this file — the sender
+              // is a pure adapter that either resolves with a provider message
+              // id or throws for the caller to classify.
+              const sender = getEmailSender();
+              const sendResult = await sender.send({
+                runId: payload.run_id,
+                to: payload.to as string,
+                from: payload.from as string,
+                senderDomain: payload.sender_domain as string,
+                subject: payload.subject as string,
+                html: payload.html as string,
+                text: payload.text as string,
+                purpose: payload.purpose as string,
+                label: payload.label as string,
+                idempotencyKey: payload.idempotency_key as string,
+                unsubscribeToken: payload.unsubscribe_token as string,
+                messageId: payload.message_id as string,
+              });
 
               // Log success. If the unique partial index fires (concurrent replay of
               // an already-delivered dispatch/recipient/notification_type), the insert
@@ -415,6 +419,8 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   status: "sent",
                   attempt_count: failedAttempts + mismatchAttempts + 1,
                   mismatch_count: mismatchAttempts,
+                  provider: sender.name,
+                  provider_message_id: sendResult.providerMessageId || null,
                 });
 
 
