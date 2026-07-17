@@ -474,10 +474,9 @@ function PlayerProfile() {
     qc.invalidateQueries({ queryKey: ["team-players"] });
     toast.success(t("common.saved"));
 
-    // If child access is already enabled and the email was added/changed, (re)send onboarding email
-    if (player.child_platform_access && !player.user_id && emailChanged) {
-      await sendChildOnboardingInvite(newEmail);
-    }
+    // Note: sending the onboarding invite is now a manual action
+    // (button under the "child platform access" switch). We never
+    // auto-send emails on save or on toggling access.
   }
 
   async function toggleChildAccess(value: boolean) {
@@ -487,9 +486,6 @@ function PlayerProfile() {
       if (!target) {
         toast.error(t("players.childAccessNeedsEmail"));
         return;
-      }
-      if (player.user_id) {
-        // Already linked — just flip flag
       }
     }
     const { error } = await supabase
@@ -502,11 +498,6 @@ function PlayerProfile() {
     }
     refetchPlayer();
     toast.success(t("common.saved"));
-
-    if (value && !player.user_id) {
-      const target = (email || player.email || "").trim();
-      if (target) await sendChildOnboardingInvite(target);
-    }
   }
 
   // ---- Parent form (collapsed) — used for add AND edit ----
