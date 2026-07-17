@@ -1016,11 +1016,17 @@ function TeamDetail() {
 
       {isCoach && (
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
-          <SheetContent side="bottom" className="rounded-t-3xl">
-            <SheetHeader>
+          <SheetContent
+            side="bottom"
+            className="max-h-[92dvh] rounded-t-3xl p-0 flex flex-col overflow-hidden"
+          >
+            <SheetHeader className="shrink-0 px-6 pt-6 pb-3 pr-14 border-b bg-background">
               <SheetTitle>{t("common.edit")}</SheetTitle>
             </SheetHeader>
-            <form onSubmit={onSaveTeam} className="space-y-4 mt-4 pb-6">
+            <form
+              onSubmit={onSaveTeam}
+              className="flex-1 overflow-y-auto overscroll-contain space-y-4 px-6 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+            >
               <div className="space-y-1.5">
                 <Label>{t("teams.name")}</Label>
                 <Input required value={editName} onChange={(e) => setEditName(e.target.value)} />
