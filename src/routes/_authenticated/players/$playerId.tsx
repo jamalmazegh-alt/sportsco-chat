@@ -125,6 +125,7 @@ function PlayerProfile() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isFeedback = pathname === `/players/${playerId}/feedback`;
   const isAchievements = pathname === `/players/${playerId}/achievements`;
