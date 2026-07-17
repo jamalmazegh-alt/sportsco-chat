@@ -294,17 +294,35 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               // for this message, so move straight to DLQ and stop processing the rest
               // of the batch. EXCEPTION: `recipient_mismatch` is a transient burst-window
               // collision on the provider's auto-created transactional run (see
-              // isTransientRunRecipientMismatch) — a later isolated retry succeeds, so it
-              // falls through to the retryable path below and stays in the queue.
+              // isTransientRunRecipientMismatch) — handled below like a rate limit so the
+              // whole batch backs off and the retry lands outside the burst window.
               if (isForbidden(error) && !isTransientRunRecipientMismatch(error)) {
                 await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000));
                 return Response.json({ processed: totalProcessed, stopped: "forbidden" });
               }
 
-              // Log non-429 failures (including recipient_mismatch) to track real retry
-              // attempts. The message stays invisible until its VT expires, then is
-              // retried on a later cycle — outside the burst window that caused the
-              // collision. Processing of the rest of the batch continues.
+              // recipient_mismatch: same-burst collision on the provider's auto-created
+              // run. Continuing to process siblings in the same cycle re-triggers the
+              // collision and burns the retry budget on every one of them. Treat like a
+              // rate limit: stop the batch, set a short global cooldown, and do NOT log
+              // a `failed` row (which would count toward MAX_RETRIES). VT expires, the
+              // message is retried on a later cycle in isolation and succeeds.
+              if (isTransientRunRecipientMismatch(error)) {
+                const cooldownSecs = 45;
+                await supabase
+                  .from("email_send_state")
+                  .update({
+                    retry_after_until: new Date(Date.now() + cooldownSecs * 1000).toISOString(),
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq("id", 1);
+                return Response.json({
+                  processed: totalProcessed,
+                  stopped: "recipient_mismatch_cooldown",
+                });
+              }
+
+              // Other non-429 failures: log so the retry budget counts, keep processing.
               await supabase.from("email_send_log").insert({
                 message_id: payload.message_id,
                 template_name: payload.label || queue,
