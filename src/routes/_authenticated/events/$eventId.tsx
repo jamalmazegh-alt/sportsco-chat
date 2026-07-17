@@ -287,6 +287,7 @@ function EventDetail() {
   const [sharingLineup, setSharingLineup] = useState(false);
   const [generatingSheet, setGeneratingSheet] = useState(false);
   const generateMatchSheetFn = useServerFn(generateMatchSheet);
+  const createEmailDispatchFn = useServerFn(createEmailDispatch);
   const lineupCardRef = useRef<HTMLDivElement | null>(null);
 
   async function downloadMatchSheet() {
