@@ -557,6 +557,7 @@ function TeamDetail() {
       toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   async function removeFromTeam(playerId: string, fullName: string) {
@@ -616,6 +617,7 @@ function TeamDetail() {
       );
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   // Helper used only for secondary labels. Sending eligibility is decided on
@@ -682,6 +684,7 @@ function TeamDetail() {
       );
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   async function onAdd(e: FormEvent) {
