@@ -1052,6 +1052,10 @@ function PlayerProfile() {
                   const linked = !!pp.parent_user_id;
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
+                  const inviteSent =
+                    !linked &&
+                    !!pp.email &&
+                    invitedEmails.has(pp.email.trim().toLowerCase());
                   return (
                     <li
                       key={pp.id}
@@ -1075,6 +1079,20 @@ function PlayerProfile() {
                           >
                             {linked ? t("players.accountActive") : t("players.accountInactive")}
                           </span>
+                          {inviteSent && (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
+                              title={t("players.inviteSentHint", {
+                                defaultValue:
+                                  "Un email d'invitation a été envoyé à ce parent",
+                              })}
+                            >
+                              <Send className="h-3 w-3" />
+                              {t("players.inviteSent", {
+                                defaultValue: "Invitation envoyée",
+                              })}
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
