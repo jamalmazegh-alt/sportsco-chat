@@ -342,11 +342,14 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
 
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-      const { data: playerRows } = await supabaseAdmin
-        .from("players")
-        .select("id, team_members!inner(team_id)")
-        .eq("team_members.team_id", data.teamId);
-      const playerIds = (playerRows ?? []).map((p: any) => p.id as string);
+      const { data: tmRows } = await supabaseAdmin
+        .from("team_members")
+        .select("player_id")
+        .eq("team_id", data.teamId)
+        .eq("role", "player");
+      const playerIds = Array.from(
+        new Set((tmRows ?? []).map((r: any) => r.player_id as string).filter(Boolean)),
+      );
       if (playerIds.length === 0) return { failuresByPlayer: {} };
 
       const { data: invites } = await supabaseAdmin
