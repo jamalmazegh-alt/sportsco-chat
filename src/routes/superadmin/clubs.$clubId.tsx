@@ -175,13 +175,12 @@ function ClubDetail() {
       </section>
 
       <div className="mb-6">
-        <Link
-          to="/superadmin/clubs/$clubId/invites"
-          params={{ clubId }}
+        <a
+          href={`/superadmin/clubs/${clubId}/invites`}
           className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-muted/50"
         >
           <ExternalLink className="h-3.5 w-3.5" /> Voir le statut des invitations
-        </Link>
+        </a>
       </div>
 
 
