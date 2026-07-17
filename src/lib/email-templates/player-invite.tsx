@@ -100,7 +100,12 @@ export const template = {
   component: PlayerInviteEmail,
   subject: (data) => {
     const club = data.clubName ?? "Votre club";
-    const role = data.roleLabel ?? "joueur";
+    const role = (data.roleLabel ?? "joueur").toLowerCase();
+    if (role === "parent") {
+      return data.playerFirstName
+        ? `${club} vous invite sur Clubero en tant que parent de ${data.playerFirstName}`
+        : `${club} vous invite sur Clubero en tant que parent`;
+    }
     return `${club} vous invite sur Clubero en tant que ${role}`;
   },
   displayName: "Player invitation",
