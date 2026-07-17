@@ -9,6 +9,8 @@ type InviteSendResult = {
   reason?: "no_contact" | "already_active";
 };
 
+const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
+
 export const sendPlayerInvitations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { teamId: string; playerId: string }) =>
@@ -113,7 +115,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
 
     const { data: pendingRows } = await supabaseAdmin
       .from("member_invites")
-      .select("email, phone, email_message_id, used_at, expires_at, created_at")
+      .select("id, email, phone, email_message_id, used_at, expires_at, created_at")
       .eq("club_id", team.club_id)
       .or(`player_id.eq.${player.id},parent_for_player_id.eq.${player.id}`)
       .is("used_at", null);
@@ -167,6 +169,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
 
     const blockedEmails = new Set<string>();
     const blockedPhones = new Set<string>();
+    const orphanInviteIds: string[] = [];
     for (const row of pendingRows ?? []) {
       const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : Number.POSITIVE_INFINITY;
       if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) continue;
@@ -181,11 +184,26 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
           status = legacyLog.status;
         }
       }
-      if (!status || !["pending", "sent", "suppressed"].includes(status)) continue;
+      if (!status) {
+        // Old client-side attempts sometimes inserted member_invites but never
+        // reached the email queue, leaving rows that made the UI look invited
+        // while there is no email_send_log. Mark them expired so retries are
+        // not blocked and the roster state heals after the next send.
+        if (!messageId && row.id) orphanInviteIds.push(row.id);
+        continue;
+      }
+      if (!ACTIVE_INVITE_STATUSES.has(status)) continue;
       const email = normalizeEmail(row.email);
       const phone = normalizePhone(row.phone);
       if (email) blockedEmails.add(email);
       if (phone) blockedPhones.add(phone);
+    }
+
+    if (orphanInviteIds.length > 0) {
+      await supabaseAdmin
+        .from("member_invites")
+        .update({ expires_at: new Date(0).toISOString() } as never)
+        .in("id", orphanInviteIds);
     }
 
     const filtered: typeof targets = [];
