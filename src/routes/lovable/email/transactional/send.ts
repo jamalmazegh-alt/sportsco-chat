@@ -62,6 +62,10 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         let messageId: string;
         let templateData: Record<string, any> = {};
         let fromName: string | undefined;
+        let dispatchId: string | null = null;
+        let eventId: string | null = null;
+        let recipientId: string | null = null;
+        let notificationType: string | null = null;
         try {
           const body = await request.json();
           templateName = body.templateName || body.template_name;
@@ -77,6 +81,18 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               .slice(0, 80)
               .replace(/[\r\n<>"]/g, "");
           }
+          if (typeof body.dispatchId === "string" && body.dispatchId.trim()) {
+            dispatchId = body.dispatchId.trim();
+          }
+          if (typeof body.eventId === "string" && body.eventId.trim()) {
+            eventId = body.eventId.trim();
+          }
+          if (typeof body.recipientId === "string" && body.recipientId.trim()) {
+            recipientId = body.recipientId.trim();
+          }
+          if (typeof body.notificationType === "string" && body.notificationType.trim()) {
+            notificationType = body.notificationType.trim().slice(0, 100);
+          }
         } catch {
           return Response.json({ error: "Invalid JSON in request body" }, { status: 400 });
         }
@@ -84,6 +100,16 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         if (!templateName) {
           return Response.json({ error: "templateName is required" }, { status: 400 });
         }
+
+        // Métadonnées propagées à chaque email_send_log row et au payload pgmq
+        // pour permettre la déduplication par (dispatch_id, recipient_id,
+        // notification_type) et la traçabilité par événement.
+        const baseMeta = {
+          dispatch_id: dispatchId,
+          event_id: eventId,
+          recipient_id: recipientId,
+          notification_type: notificationType,
+        };
 
         // 1. Look up template from registry (early — needed to resolve recipient)
         const template = TEMPLATES[templateName];
@@ -229,6 +255,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "suppressed",
           });
 
@@ -259,6 +286,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "failed",
             error_message: "Failed to look up unsubscribe token",
           });
@@ -286,6 +314,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
+            ...baseMeta,
               status: "failed",
               error_message: "Failed to create unsubscribe token",
             });
@@ -309,6 +338,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
+            ...baseMeta,
               status: "failed",
               error_message: "Failed to confirm unsubscribe token storage",
             });
@@ -325,6 +355,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "suppressed",
             error_message: "Unsubscribe token used but email missing from suppressed list",
           });
@@ -350,6 +381,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           message_id: messageId,
           template_name: templateName,
           recipient_email: effectiveRecipient,
+            ...baseMeta,
           status: "pending",
         });
 
@@ -368,6 +400,10 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             idempotency_key: idempotencyKey,
             unsubscribe_token: unsubscribeToken,
             queued_at: new Date().toISOString(),
+            dispatch_id: dispatchId,
+            event_id: eventId,
+            recipient_id: recipientId,
+            notification_type: notificationType,
           },
         });
 
@@ -382,6 +418,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
+            ...baseMeta,
             status: "failed",
             error_message: "Failed to enqueue email",
           });

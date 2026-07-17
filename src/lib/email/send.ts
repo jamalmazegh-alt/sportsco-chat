@@ -1,11 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
-interface SendTransactionalEmailParams {
+export interface SendTransactionalEmailParams {
   templateName: string;
   recipientEmail: string;
   idempotencyKey?: string;
   templateData?: Record<string, any>;
   fromName?: string;
+  // Anti-doublon / traçabilité métier
+  dispatchId?: string;
+  eventId?: string;
+  recipientId?: string;
+  notificationType?: string;
 }
 
 export async function sendTransactionalEmail(params: SendTransactionalEmailParams) {
@@ -25,6 +30,10 @@ export async function sendTransactionalEmail(params: SendTransactionalEmailParam
       idempotencyKey: params.idempotencyKey,
       templateData: params.templateData,
       fromName: params.fromName,
+      dispatchId: params.dispatchId,
+      eventId: params.eventId,
+      recipientId: params.recipientId,
+      notificationType: params.notificationType,
     }),
   });
   if (!response.ok) {

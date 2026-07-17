@@ -1738,38 +1738,97 @@ export type Database = {
         }
         Relationships: []
       }
-      email_send_log: {
+      email_dispatches: {
         Row: {
           created_at: string
-          error_message: string | null
+          created_by: string | null
+          dispatch_type: string
+          event_id: string | null
           id: string
-          message_id: string | null
-          metadata: Json | null
-          recipient_email: string
-          status: string
+          metadata: Json
           template_name: string
         }
         Insert: {
           created_at?: string
-          error_message?: string | null
+          created_by?: string | null
+          dispatch_type: string
+          event_id?: string | null
           id?: string
-          message_id?: string | null
-          metadata?: Json | null
-          recipient_email: string
-          status: string
+          metadata?: Json
           template_name: string
         }
         Update: {
           created_at?: string
-          error_message?: string | null
+          created_by?: string | null
+          dispatch_type?: string
+          event_id?: string | null
           id?: string
-          message_id?: string | null
-          metadata?: Json | null
-          recipient_email?: string
-          status?: string
+          metadata?: Json
           template_name?: string
         }
         Relationships: []
+      }
+      email_send_log: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          dispatch_id: string | null
+          error_message: string | null
+          event_id: string | null
+          id: string
+          message_id: string | null
+          metadata: Json | null
+          mismatch_count: number
+          notification_type: string | null
+          recipient_email: string
+          recipient_id: string | null
+          status: string
+          template_name: string
+          worker_build: string | null
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          dispatch_id?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          mismatch_count?: number
+          notification_type?: string | null
+          recipient_email: string
+          recipient_id?: string | null
+          status: string
+          template_name: string
+          worker_build?: string | null
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          dispatch_id?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          mismatch_count?: number
+          notification_type?: string | null
+          recipient_email?: string
+          recipient_id?: string | null
+          status?: string
+          template_name?: string
+          worker_build?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_send_log_dispatch_id_fkey"
+            columns: ["dispatch_id"]
+            isOneToOne: false
+            referencedRelation: "email_dispatches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_state: {
         Row: {
@@ -1778,8 +1837,10 @@ export type Database = {
           id: number
           retry_after_until: string | null
           send_delay_ms: number
+          transactional_batch_size: number | null
           transactional_email_ttl_minutes: number
           transactional_retry_after_until: string | null
+          transactional_send_delay_ms: number | null
           updated_at: string
         }
         Insert: {
@@ -1788,8 +1849,10 @@ export type Database = {
           id?: number
           retry_after_until?: string | null
           send_delay_ms?: number
+          transactional_batch_size?: number | null
           transactional_email_ttl_minutes?: number
           transactional_retry_after_until?: string | null
+          transactional_send_delay_ms?: number | null
           updated_at?: string
         }
         Update: {
@@ -1798,8 +1861,10 @@ export type Database = {
           id?: number
           retry_after_until?: string | null
           send_delay_ms?: number
+          transactional_batch_size?: number | null
           transactional_email_ttl_minutes?: number
           transactional_retry_after_until?: string | null
+          transactional_send_delay_ms?: number | null
           updated_at?: string
         }
         Relationships: []

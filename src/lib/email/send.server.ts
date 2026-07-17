@@ -15,19 +15,28 @@ function generateToken(): string {
     .join("");
 }
 
-/**
- * Enqueue a transactional email from a server context that has no user JWT
- * (e.g. webhooks, cron). Uses supabaseAdmin (service role) directly.
- *
- * Templates with a fixed `to` (admin notifications) ignore recipientEmail.
- */
-export async function enqueueTransactionalEmailServer(params: {
+export interface EnqueueTransactionalEmailServerParams {
   templateName: string;
   recipientEmail?: string;
   templateData?: Record<string, any>;
   idempotencyKey?: string;
   fromName?: string;
-}) {
+  // Anti-doublon / traçabilité métier — propagés dans le payload pgmq et
+  // dans email_send_log pour permettre la déduplication par
+  // (dispatch_id, recipient_id, notification_type).
+  dispatchId?: string;
+  eventId?: string;
+  recipientId?: string;
+  notificationType?: string;
+}
+
+/**
+ * Enqueue a transactional email from a server context that has no user JWT
+ * (webhooks, cron, server functions). Uses supabaseAdmin directly.
+ */
+export async function enqueueTransactionalEmailServer(
+  params: EnqueueTransactionalEmailServerParams,
+) {
   const template = TEMPLATES[params.templateName];
   if (!template) throw new Error(`Template '${params.templateName}' not found`);
 
@@ -37,7 +46,6 @@ export async function enqueueTransactionalEmailServer(params: {
   const messageId = crypto.randomUUID();
   const idempotencyKey = params.idempotencyKey || messageId;
 
-  // Step-by-step instrumentation so silent enqueue failures surface in Worker logs.
   const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
     try {
       return await fn();
@@ -54,6 +62,13 @@ export async function enqueueTransactionalEmailServer(params: {
     }
   };
 
+  const baseMeta = {
+    dispatch_id: params.dispatchId ?? null,
+    event_id: params.eventId ?? null,
+    recipient_id: params.recipientId ?? null,
+    notification_type: params.notificationType ?? null,
+  };
+
   // Suppression check
   const { data: suppressed } = await runStep("suppression_check", async () =>
     supabaseAdmin.from("suppressed_emails").select("id").eq("email", normalized).maybeSingle(),
@@ -64,10 +79,27 @@ export async function enqueueTransactionalEmailServer(params: {
       template_name: params.templateName,
       recipient_email: recipient,
       status: "suppressed",
+      ...baseMeta,
     });
     return { success: false, reason: "suppressed" as const, messageId };
   }
 
+  // Idempotence côté serveur : si un envoi 'sent'/'delivered' existe déjà pour
+  // cette clé métier, on ne renqueue pas. L'index unique en base est la
+  // vraie ceinture, ce test est la bretelle qui évite d'enfiler inutilement.
+  if (params.dispatchId && params.recipientId && params.notificationType) {
+    const { data: already } = await supabaseAdmin
+      .from("email_send_log")
+      .select("id")
+      .eq("dispatch_id", params.dispatchId)
+      .eq("recipient_id", params.recipientId)
+      .eq("notification_type", params.notificationType)
+      .in("status", ["sent", "delivered"])
+      .maybeSingle();
+    if (already) {
+      return { success: false, reason: "already_delivered" as const, messageId };
+    }
+  }
 
   // Unsubscribe token (one per email)
   let unsubscribeToken: string;
@@ -113,6 +145,7 @@ export async function enqueueTransactionalEmailServer(params: {
       template_name: params.templateName,
       recipient_email: recipient,
       status: "pending",
+      ...baseMeta,
     }),
   );
 
@@ -131,6 +164,12 @@ export async function enqueueTransactionalEmailServer(params: {
       idempotency_key: idempotencyKey,
       unsubscribe_token: unsubscribeToken,
       queued_at: new Date().toISOString(),
+      // Métadonnées de dispatch propagées au processeur pour qu'il puisse
+      // enregistrer chaque tentative avec ces clés.
+      dispatch_id: params.dispatchId,
+      event_id: params.eventId,
+      recipient_id: params.recipientId,
+      notification_type: params.notificationType,
     },
   });
 
@@ -141,6 +180,7 @@ export async function enqueueTransactionalEmailServer(params: {
       recipient_email: recipient,
       status: "failed",
       error_message: `enqueue_email failed: ${error.message}`,
+      ...baseMeta,
     });
     throw error;
   }
