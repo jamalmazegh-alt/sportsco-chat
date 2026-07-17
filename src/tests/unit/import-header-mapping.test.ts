@@ -104,7 +104,53 @@ describe("parseTemplate — header mapping (players)", () => {
     expect(res.mapping["NOM JOUEUR*"]).toBe("nom_joueur");
     expect(res.mapping["date de naissance*"]).toBe("date_naissance");
   });
+
+  it("maps human-written variants for jersey & licence numbers", () => {
+    // Variants like `N° de maillot`, `Numéro de licence`, `# maillot`, `num
+    // de licence`, `Jersey number`, `License #` regressed silently before the
+    // shared normalizeHeader with token synonyms.
+    const headers = [
+      "Équipe",
+      "Sport",
+      "Catégorie",
+      "Prénom joueur",
+      "Nom joueur",
+      "Date de naissance",
+      "N° de maillot",
+      "Numéro de licence",
+    ];
+    const rows = [
+      {
+        "Équipe": "U15",
+        "Sport": "football",
+        "Catégorie": "U15",
+        "Prénom joueur": "Lucas",
+        "Nom joueur": "Martin",
+        "Date de naissance": "2009-02-02",
+        "N° de maillot": "10",
+        "Numéro de licence": "U1700001",
+      },
+    ];
+    const res = parseTemplate("players", headers, rows);
+    expect(res.mapping["N° de maillot"]).toBe("numero_maillot");
+    expect(res.mapping["Numéro de licence"]).toBe("numero_licence");
+
+    // Also cover EN + hash-based variants.
+    const res2 = parseTemplate("players", ["Jersey number", "License #"], [
+      { "Jersey number": "7", "License #": "ABC" },
+    ]);
+    expect(res2.mapping["Jersey number"]).toBe("numero_maillot");
+    expect(res2.mapping["License #"]).toBe("numero_licence");
+
+    // And `num` / `n°` short forms.
+    const res3 = parseTemplate("players", ["num maillot", "n° licence"], [
+      { "num maillot": "7", "n° licence": "ABC" },
+    ]);
+    expect(res3.mapping["num maillot"]).toBe("numero_maillot");
+    expect(res3.mapping["n° licence"]).toBe("numero_licence");
+  });
 });
+
 
 describe("parseTemplate — header mapping (coaches)", () => {
   it("maps standard coach headers (French labels)", () => {
