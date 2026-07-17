@@ -1796,17 +1796,31 @@ function EventDetail() {
           : { data: [] as any[] };
 
       const idemBase = newDate.getTime();
+      const { dispatchId } = await createEmailDispatchFn({
+        data: {
+          eventId: event.id,
+          templateName: "event-rescheduled",
+          dispatchType: "initial",
+          metadata: { new_date: newDate.toISOString() },
+        },
+      }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
       const sendOne = (
         toEmail: string,
         recipientFirstName: string | undefined,
         playerName: string | undefined,
         idemSuffix: string,
+        recipientId: string,
       ) =>
         sendTransactionalEmail({
           templateName: "event-rescheduled",
           recipientEmail: toEmail,
           fromName: `${clubName ?? "Clubero"} via Clubero`,
           idempotencyKey: `event-rescheduled-${event.id}-${idemBase}-${idemSuffix}`,
+          dispatchId,
+          eventId: event.id,
+          recipientId,
+          notificationType: "event-rescheduled",
           templateData: {
             recipientFirstName,
             playerName,
@@ -1830,14 +1844,27 @@ function EventDetail() {
           : undefined;
         if (player?.email) {
           sends.push(
-            sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`),
+            sendOne(
+              player.email,
+              player.first_name ?? undefined,
+              playerName,
+              `p-${c.id}`,
+              `player:${c.player_id}`,
+            ),
           );
         }
         for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
           if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          const normalizedEmail = parent.email.trim().toLowerCase();
           sends.push(
-            sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`),
+            sendOne(
+              parent.email,
+              parentFirst,
+              playerName,
+              `parent-${parent.player_id}-${c.id}`,
+              `parent:${c.player_id}:${normalizedEmail}`,
+            ),
           );
         }
       }
