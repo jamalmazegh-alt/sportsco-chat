@@ -37,6 +37,7 @@ export type ClubInviteStatusRow = {
   expiresAt: string;
   usedAt: string | null;
   isExpired: boolean;
+  hasActiveAccount: boolean;
   emailStatus: EmailStatus;
   emailError: string | null;
   emailSentAt: string | null;
