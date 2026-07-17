@@ -442,10 +442,14 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
           if (!FAIL.has(status)) continue;
           const info = inviteByMsg.get(mid);
           if (!info) continue;
+          const failedEmail =
+            ((l as any).recipient_email as string | null) ?? info.email ?? "";
+          // Skip stale failures on emails that are no longer any of the
+          // player's or parents' current contacts.
+          if (!isCurrentEmail(info.playerId, failedEmail)) continue;
           const arr = (failuresByPlayer[info.playerId] ??= []);
           arr.push({
-            email:
-              ((l as any).recipient_email as string | null) ?? info.email ?? "",
+            email: failedEmail,
             status,
             error: ((l as any).error_message as string | null) ?? null,
             at: (l as any).created_at as string,
