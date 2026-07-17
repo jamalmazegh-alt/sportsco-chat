@@ -9,10 +9,22 @@ import {
 } from "@/lib/email/queue-error-classify";
 
 const MAX_RETRIES = 5;
+// Recipient_mismatch has its own budget: it is transient (burst-window collision on
+// the provider's auto-created run) so we don't want the 5-attempt failure budget to
+// trip on it. But "never DLQ" is unsafe — if the burst never disperses for some other
+// reason, we'd loop forever. Cap it at MAX_MISMATCH_ATTEMPTS deferrals, then DLQ.
+const MAX_MISMATCH_ATTEMPTS = 8;
+const MISMATCH_COOLDOWN_SECS = 45;
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_SEND_DELAY_MS = 200;
 const DEFAULT_AUTH_TTL_MINUTES = 15;
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60;
+
+// Distinct log status for a deferred recipient_mismatch retry. Not counted toward
+// MAX_RETRIES (the general failure budget); counted separately toward
+// MAX_MISMATCH_ATTEMPTS. Kept as a string literal because email_send_log.status is a
+// free-form text column.
+const STATUS_MISMATCH_DEFERRED = "mismatch_deferred";
 
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
