@@ -474,10 +474,9 @@ function PlayerProfile() {
     qc.invalidateQueries({ queryKey: ["team-players"] });
     toast.success(t("common.saved"));
 
-    // If child access is already enabled and the email was added/changed, (re)send onboarding email
-    if (player.child_platform_access && !player.user_id && emailChanged) {
-      await sendChildOnboardingInvite(newEmail);
-    }
+    // Note: sending the onboarding invite is now a manual action
+    // (button under the "child platform access" switch). We never
+    // auto-send emails on save or on toggling access.
   }
 
   async function toggleChildAccess(value: boolean) {
@@ -487,9 +486,6 @@ function PlayerProfile() {
       if (!target) {
         toast.error(t("players.childAccessNeedsEmail"));
         return;
-      }
-      if (player.user_id) {
-        // Already linked — just flip flag
       }
     }
     const { error } = await supabase
@@ -502,11 +498,6 @@ function PlayerProfile() {
     }
     refetchPlayer();
     toast.success(t("common.saved"));
-
-    if (value && !player.user_id) {
-      const target = (email || player.email || "").trim();
-      if (target) await sendChildOnboardingInvite(target);
-    }
   }
 
   // ---- Parent form (collapsed) — used for add AND edit ----
@@ -954,18 +945,13 @@ function PlayerProfile() {
 
                   {(isCoach || isParentOfThisPlayer) &&
                     !player.user_id &&
-                    (!minor || player.child_platform_access) && (
+                    !minor && (
                       <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
                         <p className="text-xs text-muted-foreground">
-                          {minor
-                            ? t("players.inviteMinorHint", {
-                                defaultValue:
-                                  "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Renvoie-lui l'email d'invitation.",
-                              })
-                            : t("players.inviteAdultHint", {
-                                defaultValue:
-                                  "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
-                              })}
+                          {t("players.inviteAdultHint", {
+                            defaultValue:
+                              "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
+                          })}
                         </p>
                         <Button
                           type="button"
@@ -1015,6 +1001,36 @@ function PlayerProfile() {
                   disabled={!isParentOfThisPlayer && !isCoach}
                 />
               </div>
+
+              {player.child_platform_access && !player.user_id && (
+                <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    {t("players.inviteMinorHint", {
+                      defaultValue:
+                        "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Envoie-lui l'email d'invitation.",
+                    })}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    disabled={!(email || player.email)}
+                    onClick={() => {
+                      const target = (email || player.email || "").trim();
+                      if (!target) {
+                        toast.warning(t("players.inviteNoContact"));
+                        return;
+                      }
+                      sendChildOnboardingInvite(target);
+                    }}
+                  >
+                    {t("players.sendChildInvite", {
+                      defaultValue: "Envoyer l'invitation au joueur",
+                    })}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 

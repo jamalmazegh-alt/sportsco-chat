@@ -10,6 +10,7 @@ interface PlayerInviteProps {
   clubLogoUrl?: string;
   inviteUrl: string;
   roleLabel?: string;
+  playerFirstName?: string;
 }
 
 const PlayerInviteEmail = ({
@@ -19,33 +20,71 @@ const PlayerInviteEmail = ({
   clubLogoUrl,
   inviteUrl,
   roleLabel,
+  playerFirstName,
 }: PlayerInviteProps) => {
   const club = clubName ?? "Votre club";
-  const isStaff = !!roleLabel && roleLabel.toLowerCase() !== "joueur";
-  const role = roleLabel ?? "joueur";
+  const role = (roleLabel ?? "joueur").toLowerCase();
+  const isParent = role === "parent";
+  const isStaff = !!roleLabel && role !== "joueur" && !isParent;
+
+  const roleSentence = isParent
+    ? playerFirstName
+      ? (
+          <>
+            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
+            <strong>parent de {playerFirstName}</strong>
+            {teamName ? (
+              <>
+                {" "}
+                (équipe <strong>{teamName}</strong>)
+              </>
+            ) : null}
+            .
+          </>
+        )
+      : (
+          <>
+            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
+            <strong>parent</strong>
+            {teamName ? (
+              <>
+                {" "}
+                d'un joueur de l'équipe <strong>{teamName}</strong>
+              </>
+            ) : null}
+            .
+          </>
+        )
+    : (
+        <>
+          <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
+          <strong>{role}</strong>
+          {isStaff ? null : teamName ? (
+            <>
+              {" "}
+              au sein de l'équipe <strong>{teamName}</strong>
+            </>
+          ) : null}
+          .
+        </>
+      );
+
+  const bodyText = isParent
+    ? "Acceptez l'invitation pour créer votre compte parent : suivez les convocations, répondez pour votre enfant et restez informé de la vie du club."
+    : isStaff
+      ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
+      : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations.";
+
   return (
     <EmailShell
-      preview={`${club} vous invite à rejoindre Clubero en tant que ${role}`}
+      preview={`${club} vous invite à rejoindre Clubero en tant que ${isParent && playerFirstName ? `parent de ${playerFirstName}` : role}`}
       locale="fr"
       clubName={clubName}
       clubLogoUrl={clubLogoUrl}
     >
       <Heading style={h1}>{firstName ? `Bonjour ${firstName},` : "Bonjour,"}</Heading>
-      <Text style={text}>
-        <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
-        {isStaff ? null : teamName ? (
-          <>
-            {" "}
-            au sein de l'équipe <strong>{teamName}</strong>
-          </>
-        ) : null}
-        .
-      </Text>
-      <Text style={text}>
-        {isStaff
-          ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
-          : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations."}
-      </Text>
+      <Text style={text}>{roleSentence}</Text>
+      <Text style={text}>{bodyText}</Text>
       <Button style={button} href={inviteUrl}>
         Accepter l'invitation
       </Button>
@@ -61,7 +100,12 @@ export const template = {
   component: PlayerInviteEmail,
   subject: (data) => {
     const club = data.clubName ?? "Votre club";
-    const role = data.roleLabel ?? "joueur";
+    const role = (data.roleLabel ?? "joueur").toLowerCase();
+    if (role === "parent") {
+      return data.playerFirstName
+        ? `${club} vous invite sur Clubero en tant que parent de ${data.playerFirstName}`
+        : `${club} vous invite sur Clubero en tant que parent`;
+    }
     return `${club} vous invite sur Clubero en tant que ${role}`;
   },
   displayName: "Player invitation",
