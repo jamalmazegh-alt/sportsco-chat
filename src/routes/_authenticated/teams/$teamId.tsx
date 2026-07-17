@@ -685,7 +685,10 @@ function TeamDetail() {
     setInviting(true);
     const r = await sendInvitesForPlayer(playerId);
     setInviting(false);
-    if (r.skipped) toast.warning(t("players.inviteNoContact"));
+    if (r.skipped)
+      toast.warning(
+        t(r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+      );
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed)
       toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
