@@ -115,7 +115,7 @@ export const previewReplayEventDlq = createServerFn({ method: "POST" })
     return await computePlan(supabaseAdmin, data.eventId, data.notificationType);
   });
 
-async function computePlan(
+export async function computePlan(
   supabaseAdmin: any,
   eventId: string,
   notificationType: string,
