@@ -300,3 +300,162 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
 
     return { sent, failed, skipped: skippedExisting };
   });
+
+/**
+ * List failed invitation emails per player for a team. Returns a map keyed by
+ * playerId with the failed recipient emails and last error message so the UI
+ * can flag which players' invites did not go through.
+ *
+ * "Failed" = latest status per message_id in email_send_log is one of
+ * failed/dlq/bounced/complained/suppressed.
+ */
+export const listTeamInviteFailures = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { teamId: string }) =>
+    z.object({ teamId: z.string().uuid() }).parse(input),
+  )
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      failuresByPlayer: Record<
+        string,
+        Array<{ email: string; status: string; error: string | null; at: string }>
+      >;
+    }> => {
+      const { supabase, userId } = context;
+
+      const { data: team, error: teamError } = await supabase
+        .from("teams")
+        .select("id, club_id")
+        .eq("id", data.teamId)
+        .maybeSingle();
+      if (teamError || !team) throw new Error("Team not found");
+
+      const { data: staffOk } = await supabase.rpc("has_club_role_any", {
+        _user_id: userId,
+        _club_id: team.club_id,
+        _roles: ["admin", "dirigeant", "tournament_manager", "coach", "assistant_coach"],
+      });
+      if (!staffOk) throw new Response("Forbidden", { status: 403 });
+
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+      const { data: tmRows } = await supabaseAdmin
+        .from("team_members")
+        .select("player_id")
+        .eq("team_id", data.teamId)
+        .eq("role", "player");
+      const playerIds = Array.from(
+        new Set((tmRows ?? []).map((r: any) => r.player_id as string).filter(Boolean)),
+      );
+      if (playerIds.length === 0) return { failuresByPlayer: {} };
+
+      const { data: invites } = await supabaseAdmin
+        .from("member_invites")
+        .select("id, player_id, parent_for_player_id, email, email_message_id, created_at")
+        .eq("club_id", team.club_id)
+        .or(
+          `player_id.in.(${playerIds.join(",")}),parent_for_player_id.in.(${playerIds.join(",")})`,
+        );
+
+      const inviteByMsg = new Map<
+        string,
+        { playerId: string; email: string | null }
+      >();
+      const legacyInvites: Array<{
+        playerId: string;
+        email: string;
+        createdAt: string;
+      }> = [];
+      for (const inv of invites ?? []) {
+        const pid = ((inv as any).player_id ?? (inv as any).parent_for_player_id) as
+          | string
+          | null;
+        if (!pid) continue;
+        const mid = (inv as any).email_message_id as string | null;
+        const email = ((inv as any).email as string | null) ?? null;
+        if (mid) {
+          inviteByMsg.set(mid, { playerId: pid, email });
+        } else if (email) {
+          legacyInvites.push({
+            playerId: pid,
+            email: email.toLowerCase(),
+            createdAt: (inv as any).created_at as string,
+          });
+        }
+      }
+
+      const FAIL = new Set(["failed", "dlq", "bounced", "complained", "suppressed"]);
+      const failuresByPlayer: Record<
+        string,
+        Array<{ email: string; status: string; error: string | null; at: string }>
+      > = {};
+
+      const messageIds = Array.from(inviteByMsg.keys());
+      if (messageIds.length > 0) {
+        const { data: logs } = await supabaseAdmin
+          .from("email_send_log")
+          .select("message_id, recipient_email, status, error_message, created_at")
+          .in("message_id", messageIds)
+          .order("created_at", { ascending: false });
+        const seen = new Set<string>();
+        for (const l of logs ?? []) {
+          const mid = (l as any).message_id as string;
+          if (seen.has(mid)) continue;
+          seen.add(mid);
+          const status = (l as any).status as string;
+          if (!FAIL.has(status)) continue;
+          const info = inviteByMsg.get(mid);
+          if (!info) continue;
+          const arr = (failuresByPlayer[info.playerId] ??= []);
+          arr.push({
+            email:
+              ((l as any).recipient_email as string | null) ?? info.email ?? "",
+            status,
+            error: ((l as any).error_message as string | null) ?? null,
+            at: (l as any).created_at as string,
+          });
+        }
+      }
+
+      // Legacy fallback: match by recipient email within a small time window.
+      if (legacyInvites.length > 0) {
+        const emails = Array.from(new Set(legacyInvites.map((i) => i.email)));
+        const { data: logs } = await supabaseAdmin
+          .from("email_send_log")
+          .select("recipient_email, status, error_message, created_at, message_id")
+          .in("recipient_email", emails)
+          .order("created_at", { ascending: false });
+        const latestByMsg = new Map<string, any>();
+        for (const l of logs ?? []) {
+          const mid = (l as any).message_id as string | null;
+          if (mid && latestByMsg.has(mid)) continue;
+          if (mid) latestByMsg.set(mid, l);
+        }
+        for (const inv of legacyInvites) {
+          for (const l of latestByMsg.values()) {
+            if ((l.recipient_email as string).toLowerCase() !== inv.email) continue;
+            const delta = Math.abs(
+              new Date(l.created_at).getTime() - new Date(inv.createdAt).getTime(),
+            );
+            if (delta > 10 * 60_000) continue;
+            const status = l.status as string;
+            if (!FAIL.has(status)) continue;
+            const arr = (failuresByPlayer[inv.playerId] ??= []);
+            if (arr.some((x) => x.email.toLowerCase() === inv.email)) break;
+            arr.push({
+              email: inv.email,
+              status,
+              error: (l.error_message as string | null) ?? null,
+              at: l.created_at as string,
+            });
+            break;
+          }
+        }
+      }
+
+      return { failuresByPlayer };
+    },
+  );

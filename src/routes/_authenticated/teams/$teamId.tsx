@@ -21,7 +21,7 @@ import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
-import { sendPlayerInvitations } from "@/lib/team-invitations.functions";
+import { sendPlayerInvitations, listTeamInviteFailures } from "@/lib/team-invitations.functions";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronRight,
@@ -92,6 +92,7 @@ function TeamDetail() {
   const navigate = useNavigate();
   const isAdmin = roles.includes("admin");
   const sendPlayerInvitationsFn = useServerFn(sendPlayerInvitations);
+  const listTeamInviteFailuresFn = useServerFn(listTeamInviteFailures);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
   const isAvailabilityRoute = pathname.endsWith("/availability");
@@ -320,6 +321,24 @@ function TeamDetail() {
     },
   });
 
+  // Failed invite emails per player (bounced/failed/dlq/complained/suppressed).
+  const { data: inviteFailuresByPlayer } = useQuery({
+    queryKey: ["team-invite-failures", teamId, activeClubId],
+    enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
+    queryFn: async () => {
+      try {
+        const r = await listTeamInviteFailuresFn({ data: { teamId } });
+        return r.failuresByPlayer ?? {};
+      } catch (e) {
+        console.error("listTeamInviteFailures failed", e);
+        return {} as Record<
+          string,
+          Array<{ email: string; status: string; error: string | null; at: string }>
+        >;
+      }
+    },
+  });
+
   // Parents grouped by player — used to know which contacts remain to invite.
   const { data: parentsByPlayer } = useQuery({
     queryKey: ["team-parents-by-player", teamId],
@@ -538,6 +557,7 @@ function TeamDetail() {
       toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   async function removeFromTeam(playerId: string, fullName: string) {
@@ -597,6 +617,7 @@ function TeamDetail() {
       );
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   // Helper used only for secondary labels. Sending eligibility is decided on
@@ -663,6 +684,7 @@ function TeamDetail() {
       );
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+    qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
 
   async function onAdd(e: FormEvent) {
@@ -1438,6 +1460,8 @@ function TeamDetail() {
             const hasContactHint = hasOpenContact(p);
             const canInvite = !p.user_id;
             const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
+            const failures = inviteFailuresByPlayer?.[p.id] ?? [];
+            const hasFailedInvite = failures.length > 0;
             const linked = !!p.user_id;
 
             const checked = selectedIds.has(p.id);
@@ -1465,9 +1489,11 @@ function TeamDetail() {
                         "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
                         linked
                           ? "bg-emerald-500"
-                          : hasPendingInvite
-                            ? "bg-amber-400"
-                            : "bg-muted-foreground/40",
+                          : hasFailedInvite
+                            ? "bg-red-500"
+                            : hasPendingInvite
+                              ? "bg-amber-400"
+                              : "bg-muted-foreground/40",
                       )}
                     />
                   )}
@@ -1501,7 +1527,22 @@ function TeamDetail() {
                         {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
                       </span>
                     ) : isCoach ? (
-                      hasPendingInvite ? (
+                      hasFailedInvite ? (
+                        <span
+                          className="inline-flex items-center gap-1 text-red-600"
+                          title={failures
+                            .map((f) => `${f.email}${f.error ? ` — ${f.error}` : ""} (${f.status})`)
+                            .join("\n")}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                          {t("players.inviteFailedLabel", {
+                            defaultValue: "Envoi échoué",
+                          })}
+                          <span className="text-muted-foreground truncate">
+                            · {failures.map((f) => f.email).join(", ")}
+                          </span>
+                        </span>
+                      ) : hasPendingInvite ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
