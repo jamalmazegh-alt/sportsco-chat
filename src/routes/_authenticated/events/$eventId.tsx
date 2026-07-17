@@ -101,6 +101,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { createEmailDispatch } from "@/lib/email/dispatch.functions";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
 import {
@@ -286,6 +287,7 @@ function EventDetail() {
   const [sharingLineup, setSharingLineup] = useState(false);
   const [generatingSheet, setGeneratingSheet] = useState(false);
   const generateMatchSheetFn = useServerFn(generateMatchSheet);
+  const createEmailDispatchFn = useServerFn(createEmailDispatch);
   const lineupCardRef = useRef<HTMLDivElement | null>(null);
 
   async function downloadMatchSheet() {
@@ -930,16 +932,33 @@ function EventDetail() {
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
+        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+
+        // ONE dispatch for this convocation-cancelled campaign (player + parents).
+        const { dispatchId } = await createEmailDispatchFn({
+          data: {
+            eventId: event.id,
+            templateName: "convocation-cancelled",
+            dispatchType: "initial",
+            metadata: { player_id: playerId },
+          },
+        }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
         const sendOne = (
           toEmail: string,
           recipientFirstName: string | undefined,
           idemSuffix: string,
+          recipientId: string,
         ) =>
           sendTransactionalEmail({
             templateName: "convocation-cancelled",
             recipientEmail: toEmail,
             fromName: `${clubName ?? "Clubero"} via Clubero`,
             idempotencyKey: `convoc-cancel-${id}-${idemSuffix}`,
+            dispatchId,
+            eventId: event.id,
+            recipientId,
+            notificationType: "convocation-cancelled",
             templateData: {
               recipientFirstName,
               playerName,
@@ -954,13 +973,21 @@ function EventDetail() {
           } as any).catch(() => undefined);
 
         const sends: Promise<unknown>[] = [];
-        if (playerEmail) {
-          sends.push(sendOne(playerEmail, playerFirstName, "player"));
+        if (playerEmail && playerId) {
+          sends.push(sendOne(playerEmail, playerFirstName, "player", `player:${playerId}`));
         }
         for (const parent of parentsRows) {
-          if (!parent.email) continue;
+          if (!parent.email || !playerId) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          sends.push(sendOne(parent.email, parentFirst, `parent-${parent.email}`));
+          const normalizedEmail = parent.email.trim().toLowerCase();
+          sends.push(
+            sendOne(
+              parent.email,
+              parentFirst,
+              `parent-${parent.email}`,
+              `parent:${playerId}:${normalizedEmail}`,
+            ),
+          );
         }
         await Promise.allSettled(sends);
       }
@@ -1195,18 +1222,33 @@ function EventDetail() {
           ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
           : undefined;
 
+        // ONE dispatch groups all convocation-invite recipients for this send.
+        const { dispatchId } = await createEmailDispatchFn({
+          data: {
+            eventId: event.id,
+            templateName: "convocation-invite",
+            dispatchType: "initial",
+            metadata: { recipient_count: (insertedConvs ?? []).length },
+          },
+        }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
         const sendOne = async (
           token: string,
           toEmail: string,
           recipientFirstName: string | undefined,
           playerName: string,
           idemSuffix: string,
+          recipientId: string,
         ) =>
           sendTransactionalEmail({
             templateName: "convocation-invite",
             recipientEmail: toEmail,
             fromName: `${clubName ?? "Clubero"} via Clubero`,
             idempotencyKey: `convoc-invite-${event.id}-${idemSuffix}`,
+            dispatchId,
+            eventId: event.id,
+            recipientId,
+            notificationType: "convocation-invite",
             templateData: {
               recipientFirstName,
               playerName,
@@ -1240,13 +1282,16 @@ function EventDetail() {
           firstName: string | undefined,
           playerName: string,
           idemSuffix: string,
+          recipientId: string,
         ) => {
           if (!email) return;
           const key = email.trim().toLowerCase();
           if (!key || sentToEmails.has(key)) return;
           sentToEmails.add(key);
           sends.push(
-            sendOne(token, email, firstName, playerName, idemSuffix).catch(() => undefined),
+            sendOne(token, email, firstName, playerName, idemSuffix, recipientId).catch(
+              () => undefined,
+            ),
           );
         };
         for (const conv of insertedConvs ?? []) {
@@ -1260,6 +1305,7 @@ function EventDetail() {
             player.first_name ?? undefined,
             playerName,
             `p-${conv.id}`,
+            `player:${conv.player_id}`,
           );
           // Parent emails (fallback to auth email when player_parents.email is empty)
           for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
@@ -1267,12 +1313,19 @@ function EventDetail() {
             const email =
               parent.email ||
               (parent.parent_user_id ? resolvedParentEmails[parent.parent_user_id] : null);
+            const normalizedEmail = email ? email.trim().toLowerCase() : null;
+            const recipientId = normalizedEmail
+              ? `parent:${conv.player_id}:${normalizedEmail}`
+              : parent.parent_user_id
+                ? `parent-uid:${conv.player_id}:${parent.parent_user_id}`
+                : `parent-rand:${conv.player_id}:${parent.player_id}`;
             enqueue(
               email,
               conv.response_token!,
               parentFirst,
               playerName,
               `parent-${parent.parent_user_id ?? parent.player_id}-${conv.id}`,
+              recipientId,
             );
           }
         }
@@ -1532,17 +1585,30 @@ function EventDetail() {
               .in("id", playerIds)
           : { data: [] as any[] };
 
+      const { dispatchId } = await createEmailDispatchFn({
+        data: {
+          eventId: event.id,
+          templateName: "event-cancelled",
+          dispatchType: "initial",
+        },
+      }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
       const sendOne = (
         toEmail: string,
         recipientFirstName: string | undefined,
         playerName: string | undefined,
         idemSuffix: string,
+        recipientId: string,
       ) =>
         sendTransactionalEmail({
           templateName: "event-cancelled",
           recipientEmail: toEmail,
           fromName: `${clubName ?? "Clubero"} via Clubero`,
           idempotencyKey: `event-cancelled-${event.id}-${idemSuffix}`,
+          dispatchId,
+          eventId: event.id,
+          recipientId,
+          notificationType: "event-cancelled",
           templateData: {
             recipientFirstName,
             playerName,
@@ -1565,14 +1631,27 @@ function EventDetail() {
           : undefined;
         if (player?.email) {
           sends.push(
-            sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`),
+            sendOne(
+              player.email,
+              player.first_name ?? undefined,
+              playerName,
+              `p-${c.id}`,
+              `player:${c.player_id}`,
+            ),
           );
         }
         for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
           if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          const normalizedEmail = parent.email.trim().toLowerCase();
           sends.push(
-            sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`),
+            sendOne(
+              parent.email,
+              parentFirst,
+              playerName,
+              `parent-${parent.player_id}-${c.id}`,
+              `parent:${c.player_id}:${normalizedEmail}`,
+            ),
           );
         }
       }
@@ -1717,17 +1796,31 @@ function EventDetail() {
           : { data: [] as any[] };
 
       const idemBase = newDate.getTime();
+      const { dispatchId } = await createEmailDispatchFn({
+        data: {
+          eventId: event.id,
+          templateName: "event-rescheduled",
+          dispatchType: "initial",
+          metadata: { new_date: newDate.toISOString() },
+        },
+      }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
       const sendOne = (
         toEmail: string,
         recipientFirstName: string | undefined,
         playerName: string | undefined,
         idemSuffix: string,
+        recipientId: string,
       ) =>
         sendTransactionalEmail({
           templateName: "event-rescheduled",
           recipientEmail: toEmail,
           fromName: `${clubName ?? "Clubero"} via Clubero`,
           idempotencyKey: `event-rescheduled-${event.id}-${idemBase}-${idemSuffix}`,
+          dispatchId,
+          eventId: event.id,
+          recipientId,
+          notificationType: "event-rescheduled",
           templateData: {
             recipientFirstName,
             playerName,
@@ -1751,14 +1844,27 @@ function EventDetail() {
           : undefined;
         if (player?.email) {
           sends.push(
-            sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`),
+            sendOne(
+              player.email,
+              player.first_name ?? undefined,
+              playerName,
+              `p-${c.id}`,
+              `player:${c.player_id}`,
+            ),
           );
         }
         for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
           if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          const normalizedEmail = parent.email.trim().toLowerCase();
           sends.push(
-            sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`),
+            sendOne(
+              parent.email,
+              parentFirst,
+              playerName,
+              `parent-${parent.player_id}-${c.id}`,
+              `parent:${c.player_id}:${normalizedEmail}`,
+            ),
           );
         }
       }
@@ -1886,18 +1992,35 @@ function EventDetail() {
 
       const idemBase = Date.now();
 
+      // Manual resend → NEW dispatch every time (never reuse the initial one).
+      // A retry inside the queue keeps this dispatch_id; only the user
+      // triggering another "resend" opens a fresh campaign.
+      const { dispatchId } = await createEmailDispatchFn({
+        data: {
+          eventId: event.id,
+          templateName: "convocation-invite",
+          dispatchType: "manual_resend",
+          metadata: { change_count: changes.length },
+        },
+      }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
       const sendOne = (
         token: string,
         toEmail: string,
         recipientFirstName: string | undefined,
         playerName: string,
         idemSuffix: string,
+        recipientId: string,
       ) =>
         sendTransactionalEmail({
           templateName: "convocation-invite",
           recipientEmail: toEmail,
           fromName: `${clubName ?? "Clubero"} via Clubero`,
           idempotencyKey: `convoc-update-${event.id}-${idemBase}-${idemSuffix}`,
+          dispatchId,
+          eventId: event.id,
+          recipientId,
+          notificationType: "convocation-invite",
           templateData: {
             recipientFirstName,
             playerName,
@@ -1956,7 +2079,7 @@ function EventDetail() {
       }
 
       const sends = plan.recipients.map((r) =>
-        sendOne(r.token, r.email, r.recipientFirstName, r.playerName, r.idemSuffix),
+        sendOne(r.token, r.email, r.recipientFirstName, r.playerName, r.idemSuffix, r.recipientId),
       );
 
       if (plan.inAppUserIds.length > 0) {

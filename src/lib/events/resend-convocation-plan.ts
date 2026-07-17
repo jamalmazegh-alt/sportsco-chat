@@ -43,6 +43,16 @@ export type PlannedRecipient = {
   playerName: string;
   token: string;
   idemSuffix: string;
+  /**
+   * Stable per-campaign recipient identity used for the DB unique index on
+   * (dispatch_id, recipient_id, notification_type). Two parents of the same
+   * player MUST get different recipientIds. Format:
+   *   - player:<playerId>
+   *   - parent:<playerId>:<normalizedEmail>
+   *   - parent-uid:<playerId>:<parentUserId>  (when the parent has no email yet)
+   */
+  recipientId: string;
+  playerId: string;
 };
 
 export type ResendPlan = {
@@ -74,6 +84,7 @@ export function planConvocationResendRecipients(
       email: string | null | undefined,
       firstName: string | undefined,
       idemSuffix: string,
+      recipientId: string,
     ) => {
       if (!email) return;
       const key = email.trim().toLowerCase();
@@ -85,10 +96,17 @@ export function planConvocationResendRecipients(
         playerName,
         token: c.response_token!,
         idemSuffix,
+        recipientId,
+        playerId: c.player_id,
       });
     };
 
-    push(p?.email ?? null, p?.first_name ?? undefined, `p-${c.id}`);
+    push(
+      p?.email ?? null,
+      p?.first_name ?? undefined,
+      `p-${c.id}`,
+      `player:${c.player_id}`,
+    );
     if (p?.user_id) inApp.add(p.user_id);
 
     for (const parent of parents.filter((pp) => pp.player_id === c.player_id)) {
@@ -99,7 +117,12 @@ export function planConvocationResendRecipients(
         null;
       const parentRecipientKey =
         parent.parent_user_id ?? email?.trim().toLowerCase() ?? newRecipientKey();
-      push(email, parentFirst, `parent-${parentRecipientKey}-${c.id}`);
+      const recipientId = email
+        ? `parent:${c.player_id}:${email.trim().toLowerCase()}`
+        : parent.parent_user_id
+          ? `parent-uid:${c.player_id}:${parent.parent_user_id}`
+          : `parent-rand:${c.player_id}:${parentRecipientKey}`;
+      push(email, parentFirst, `parent-${parentRecipientKey}-${c.id}`, recipientId);
       if (parent.parent_user_id) inApp.add(parent.parent_user_id);
     }
   }
