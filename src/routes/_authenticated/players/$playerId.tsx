@@ -42,7 +42,7 @@ import {
   Palmtree,
   Pencil,
 } from "lucide-react";
-import { BackLink } from "@/components/back-link";
+import { BackButton } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
