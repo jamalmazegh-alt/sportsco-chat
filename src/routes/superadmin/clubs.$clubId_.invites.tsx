@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/superadmin/clubs/$clubId/invites")({
+export const Route = createFileRoute("/superadmin/clubs/$clubId_/invites")({
   component: ClubInvitesPage,
 });
 
