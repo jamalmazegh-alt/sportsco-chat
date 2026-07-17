@@ -593,10 +593,10 @@ function TeamDetail() {
   }
 
   // Helper: does this player still have at least one contact (self or parent)
-  // that is neither linked to an account nor already pending an invite?
+  // that is not linked to an account. Existing failed/pending invites are handled
+  // server-side so coaches can retry without the UI greying everything out.
   const hasOpenContact = useCallback(
     (p: any): boolean => {
-      const isPending = (_email?: string | null, _phone?: string | null) => false;
       // Minor without platform access is managed by parents — the player
       // himself is never invitable, only parents count.
       const isMinor = (() => {
@@ -610,17 +610,10 @@ function TeamDetail() {
         return age < 18;
       })();
       const canInvitePlayer = !isMinor || !!p.child_platform_access;
-      if (
-        canInvitePlayer &&
-        !p.user_id &&
-        (p.email || p.phone) &&
-        !isPending(p.email, p.phone)
-      )
+      if (canInvitePlayer && !p.user_id && (p.email || p.phone))
         return true;
       const parents = parentsByPlayer?.get(p.id) ?? [];
-      return parents.some(
-        (pr) => !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
-      );
+      return parents.some((pr) => !pr.parent_user_id && (pr.email || pr.phone));
     },
     [parentsByPlayer],
   );
