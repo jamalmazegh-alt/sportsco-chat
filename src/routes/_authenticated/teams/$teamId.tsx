@@ -21,7 +21,7 @@ import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
-import { sendPlayerInvitations } from "@/lib/team-invitations.functions";
+import { sendPlayerInvitations, listTeamInviteFailures } from "@/lib/team-invitations.functions";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronRight,
