@@ -293,6 +293,9 @@ function PlayerProfile() {
   const invitedEmails = new Set(
     (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
   );
+  const failedEmailsMap = new Map(
+    (parentInviteStatuses?.failedEmails ?? []).map((f) => [f.email.toLowerCase(), f.error]),
+  );
 
   // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
