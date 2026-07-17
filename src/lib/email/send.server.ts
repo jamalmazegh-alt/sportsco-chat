@@ -55,7 +55,7 @@ export async function enqueueTransactionalEmailServer(params: {
   };
 
   // Suppression check
-  const { data: suppressed } = await runStep("suppression_check", () =>
+  const { data: suppressed } = await runStep("suppression_check", async () =>
     supabaseAdmin.from("suppressed_emails").select("id").eq("email", normalized).maybeSingle(),
   );
   if (suppressed) {
@@ -70,7 +70,7 @@ export async function enqueueTransactionalEmailServer(params: {
 
   // Unsubscribe token (one per email)
   let unsubscribeToken: string;
-  const { data: existing } = await runStep("unsubscribe_lookup", () =>
+  const { data: existing } = await runStep("unsubscribe_lookup", async () =>
     supabaseAdmin
       .from("email_unsubscribe_tokens")
       .select("token, used_at")
@@ -81,7 +81,7 @@ export async function enqueueTransactionalEmailServer(params: {
     unsubscribeToken = existing.token;
   } else {
     unsubscribeToken = generateToken();
-    await runStep("unsubscribe_upsert", () =>
+    await runStep("unsubscribe_upsert", async () =>
       supabaseAdmin
         .from("email_unsubscribe_tokens")
         .upsert(
@@ -89,7 +89,7 @@ export async function enqueueTransactionalEmailServer(params: {
           { onConflict: "email", ignoreDuplicates: true },
         ),
     );
-    const { data: stored } = await runStep("unsubscribe_refetch", () =>
+    const { data: stored } = await runStep("unsubscribe_refetch", async () =>
       supabaseAdmin
         .from("email_unsubscribe_tokens")
         .select("token")
@@ -101,12 +101,12 @@ export async function enqueueTransactionalEmailServer(params: {
 
   const data = params.templateData ?? {};
   const element = React.createElement(template.component, data);
-  const html = await runStep("render_html", () => render(element));
-  const text = await runStep("render_text", () => render(element, { plainText: true }));
+  const html = await runStep("render_html", async () => render(element));
+  const text = await runStep("render_text", async () => render(element, { plainText: true }));
   const subject =
     typeof template.subject === "function" ? template.subject(data) : template.subject;
 
-  await runStep("log_pending", () =>
+  await runStep("log_pending", async () =>
     supabaseAdmin.from("email_send_log").insert({
       message_id: messageId,
       template_name: params.templateName,
