@@ -62,6 +62,10 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         let messageId: string;
         let templateData: Record<string, any> = {};
         let fromName: string | undefined;
+        let dispatchId: string | null = null;
+        let eventId: string | null = null;
+        let recipientId: string | null = null;
+        let notificationType: string | null = null;
         try {
           const body = await request.json();
           templateName = body.templateName || body.template_name;
@@ -76,6 +80,18 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               .trim()
               .slice(0, 80)
               .replace(/[\r\n<>"]/g, "");
+          }
+          if (typeof body.dispatchId === "string" && body.dispatchId.trim()) {
+            dispatchId = body.dispatchId.trim();
+          }
+          if (typeof body.eventId === "string" && body.eventId.trim()) {
+            eventId = body.eventId.trim();
+          }
+          if (typeof body.recipientId === "string" && body.recipientId.trim()) {
+            recipientId = body.recipientId.trim();
+          }
+          if (typeof body.notificationType === "string" && body.notificationType.trim()) {
+            notificationType = body.notificationType.trim().slice(0, 100);
           }
         } catch {
           return Response.json({ error: "Invalid JSON in request body" }, { status: 400 });
