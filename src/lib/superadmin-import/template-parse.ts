@@ -8,14 +8,10 @@ import {
   type FieldDef,
   type ImportType,
   getFields,
+  normalizeHeader,
 } from "./schemas";
 
-const normKey = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+const normKey = normalizeHeader;
 
 
 function normalizeDate(v: string): string {

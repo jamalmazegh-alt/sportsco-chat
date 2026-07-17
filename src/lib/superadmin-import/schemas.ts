@@ -141,22 +141,64 @@ export function getFields(type: ImportType): FieldDef[] {
   return PLANNING_FIELDS;
 }
 
+/**
+ * Normalisation d'en-tête tolérante partagée par le parsing template et le
+ * pré-mapping IA. Enlève accents/casse/ponctuation, retire les mots-outils
+ * FR/EN et unifie les synonymes fréquents (`N°`, `num`, `#` → `numero`,
+ * `tel`/`phone` → `telephone`, `mail` → `email`, `jersey` → `maillot`,
+ * `license` → `licence`, `pere`/`mere` → `parent`, …). Le résultat est une
+ * chaîne compacte comparable directement à la clé Clubero.
+ */
+const STOPWORDS = new Set([
+  "de", "du", "des", "d", "la", "le", "les", "l",
+  "a", "au", "aux", "et", "the", "of", "for",
+]);
+const TOKEN_SYNONYMS: Record<string, string> = {
+  n: "numero", no: "numero", num: "numero", nb: "numero", nbr: "numero",
+  nro: "numero", number: "numero", numer: "numero",
+  tel: "telephone", telephon: "telephone", phone: "telephone",
+  mobile: "telephone", gsm: "telephone", portable: "telephone",
+  mail: "email", courriel: "email",
+  jersey: "maillot", shirt: "maillot", dossard: "maillot",
+  license: "licence", licens: "licence",
+  firstname: "prenom",
+  lastname: "nom", surname: "nom", familyname: "nom", famille: "nom",
+  team: "equipe",
+  category: "categorie", cat: "categorie",
+  season: "saison",
+  birthdate: "datenaissance", birthday: "datenaissance", dob: "datenaissance",
+  pere: "parent", papa: "parent", mere: "parent", maman: "parent",
+  father: "parent", mother: "parent", tuteur: "parent", guardian: "parent",
+};
+
+export function normalizeHeader(s: string): string {
+  const base = s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/#/g, " numero ")
+    .replace(/°/g, " ")
+    .replace(/\*+/g, " ");
+  const tokens = base
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .filter((t) => !STOPWORDS.has(t))
+    .map((t) => TOKEN_SYNONYMS[t] ?? t)
+    .sort();
+  return tokens.join("");
+}
+
 /** Compteur de colonnes obligatoires présentes — sert au seuil 80% de détection template. */
 export function templateMatchRatio(headers: string[], type: ImportType): number {
   const fields = getFields(type);
   const required = fields.filter((f) => f.required);
-  const norm = (s: string) =>
-    s
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
-  const normHeaders = headers.map(norm);
+  const normHeaders = headers.map(normalizeHeader);
   const matched = required.filter(
-    (f) => normHeaders.includes(norm(f.key)) || normHeaders.includes(norm(f.label)),
+    (f) =>
+      normHeaders.includes(normalizeHeader(f.key)) ||
+      normHeaders.includes(normalizeHeader(f.label)),
   );
   return required.length === 0 ? 1 : matched.length / required.length;
-
 }
 
 /** Cellule unifiée (sortie IA ou parsing template). */

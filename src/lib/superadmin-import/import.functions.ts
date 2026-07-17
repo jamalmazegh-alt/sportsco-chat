@@ -20,6 +20,7 @@ import {
   PLANNING_MAX_ROWS,
   RECURRENCE_OCCURRENCE_CAP,
   getFields,
+  normalizeHeader,
 } from "./schemas";
 import { parseTemplate } from "./template-parse";
 
@@ -243,28 +244,23 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
       .map((f) => `${f.key} (${f.required ? "obligatoire" : "optionnel"})`)
       .join(", ");
 
-    // Pré-mapping trivial : normalise l'en-tête et matche exactement une clé Clubero.
-    // Ça couvre le modèle officiel (colonnes suffixées par `*`, accents, casse, espaces)
-    // sans appel IA, et évite qu'une hallucination fasse rater le mapping du template.
-    const normHeader = (s: string) =>
-      s
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/\*+$/g, "")
-        .replace(/[^a-z0-9]/g, "");
+    // Pré-mapping trivial : normalisation partagée avec le parsing template
+    // (tokens, stopwords, synonymes `N°`/`num`/`#` → `numero`, `jersey` →
+    // `maillot`, `license` → `licence`, etc.). Ça couvre le modèle officiel
+    // et les libellés humains sans appel IA, et évite qu'une hallucination
+    // fasse rater le mapping.
+
     const keyByNorm = new Map<string, string>();
     const labelByNorm = new Map<string, string>();
     for (const f of fields) {
-      keyByNorm.set(normHeader(f.key), f.key);
-      labelByNorm.set(normHeader(f.label), f.key);
+      keyByNorm.set(normalizeHeader(f.key), f.key);
+      labelByNorm.set(normalizeHeader(f.label), f.key);
     }
-
 
     const mapping: Record<string, string> = {};
     const unmapped: string[] = [];
     for (const h of headers) {
-      const n = normHeader(h);
+      const n = normalizeHeader(h);
       const hit = keyByNorm.get(n) ?? labelByNorm.get(n);
       if (hit) mapping[h] = hit;
       else unmapped.push(h);
