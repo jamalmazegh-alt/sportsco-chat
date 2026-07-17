@@ -1992,18 +1992,35 @@ function EventDetail() {
 
       const idemBase = Date.now();
 
+      // Manual resend → NEW dispatch every time (never reuse the initial one).
+      // A retry inside the queue keeps this dispatch_id; only the user
+      // triggering another "resend" opens a fresh campaign.
+      const { dispatchId } = await createEmailDispatchFn({
+        data: {
+          eventId: event.id,
+          templateName: "convocation-invite",
+          dispatchType: "manual_resend",
+          metadata: { change_count: changes.length },
+        },
+      }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
       const sendOne = (
         token: string,
         toEmail: string,
         recipientFirstName: string | undefined,
         playerName: string,
         idemSuffix: string,
+        recipientId: string,
       ) =>
         sendTransactionalEmail({
           templateName: "convocation-invite",
           recipientEmail: toEmail,
           fromName: `${clubName ?? "Clubero"} via Clubero`,
           idempotencyKey: `convoc-update-${event.id}-${idemBase}-${idemSuffix}`,
+          dispatchId,
+          eventId: event.id,
+          recipientId,
+          notificationType: "convocation-invite",
           templateData: {
             recipientFirstName,
             playerName,
@@ -2062,7 +2079,7 @@ function EventDetail() {
       }
 
       const sends = plan.recipients.map((r) =>
-        sendOne(r.token, r.email, r.recipientFirstName, r.playerName, r.idemSuffix),
+        sendOne(r.token, r.email, r.recipientFirstName, r.playerName, r.idemSuffix, r.recipientId),
       );
 
       if (plan.inAppUserIds.length > 0) {
