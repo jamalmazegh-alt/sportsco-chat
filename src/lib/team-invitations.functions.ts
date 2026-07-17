@@ -76,6 +76,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       email?: string;
       phone?: string;
       playerId: string;
+      playerFirstName?: string;
     }> = [];
 
     if (canInvitePlayer && !player.user_id && (player.email || player.phone)) {
@@ -85,6 +86,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         email: player.email ?? undefined,
         phone: player.phone ?? undefined,
         playerId: player.id,
+        playerFirstName: player.first_name ?? undefined,
       });
     }
 
@@ -96,6 +98,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
           email: parent.email ?? undefined,
           phone: parent.phone ?? undefined,
           playerId: player.id,
+          playerFirstName: player.first_name ?? undefined,
         });
       }
     }
