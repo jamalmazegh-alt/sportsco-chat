@@ -9,10 +9,10 @@ import {
 } from "@/lib/email/queue-error-classify";
 
 const MAX_RETRIES = 5;
-// Recipient_mismatch has its own budget: it is transient (burst-window collision on
-// the provider's auto-created run) so we don't want the 5-attempt failure budget to
-// trip on it. But "never DLQ" is unsafe — if the burst never disperses for some other
-// reason, we'd loop forever. Cap it at MAX_MISMATCH_ATTEMPTS deferrals, then DLQ.
+// recipient_mismatch has its own budget: transient burst-window collision on the
+// provider's auto-created run. It must not eat the 5-attempt failure budget, but
+// "never DLQ" is unsafe (would loop forever if the burst never disperses).
+// Cap it at MAX_MISMATCH_ATTEMPTS deferrals, then DLQ.
 const MAX_MISMATCH_ATTEMPTS = 8;
 const MISMATCH_COOLDOWN_SECS = 45;
 const DEFAULT_BATCH_SIZE = 10;
@@ -20,23 +20,67 @@ const DEFAULT_SEND_DELAY_MS = 200;
 const DEFAULT_AUTH_TTL_MINUTES = 15;
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60;
 
-// Distinct log status for a deferred recipient_mismatch retry. Not counted toward
-// MAX_RETRIES (the general failure budget); counted separately toward
-// MAX_MISMATCH_ATTEMPTS. Kept as a string literal because email_send_log.status is a
-// free-form text column.
+// email_send_log.status is a free-form text column, so we use string literals.
 const STATUS_MISMATCH_DEFERRED = "mismatch_deferred";
+
+// Short build identifier written to every email_send_log row so we can prove
+// which code version processed a given message when investigating deployment
+// drift or stale workers.
+const WORKER_BUILD: string =
+  process.env.BUILD_SHA ??
+  process.env.VITE_BUILD_SHA ??
+  process.env.CF_PAGES_COMMIT_SHA ??
+  process.env.CLOUDFLARE_DEPLOYMENT_ID ??
+  "unknown";
+
+type QueuePayload = {
+  message_id?: string;
+  to?: string;
+  from?: string;
+  sender_domain?: string;
+  subject?: string;
+  html?: string;
+  text?: string;
+  purpose?: string;
+  label?: string;
+  idempotency_key?: string;
+  unsubscribe_token?: string;
+  queued_at?: string;
+  run_id?: string;
+  dispatch_id?: string;
+  event_id?: string;
+  recipient_id?: string;
+  notification_type?: string;
+};
+
+/**
+ * Build the common metadata fields written to every email_send_log row.
+ * Centralizes propagation of dispatch_id / event_id / recipient_id /
+ * notification_type / worker_build from the queue payload to the log so no
+ * insert site can forget them.
+ */
+function baseLogRow(payload: QueuePayload, queue: string) {
+  return {
+    message_id: payload.message_id,
+    template_name: payload.label || queue,
+    recipient_email: payload.to,
+    dispatch_id: payload.dispatch_id ?? null,
+    event_id: payload.event_id ?? null,
+    recipient_id: payload.recipient_id ?? null,
+    notification_type: payload.notification_type ?? null,
+    worker_build: WORKER_BUILD,
+  };
+}
 
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
   queue: string,
-  msg: { msg_id: number; message: Record<string, unknown> },
+  msg: { msg_id: number; message: QueuePayload },
   reason: string,
 ): Promise<void> {
   const payload = msg.message;
   await supabase.from("email_send_log").insert({
-    message_id: payload.message_id,
-    template_name: (payload.label || queue) as string,
-    recipient_email: payload.to,
+    ...baseLogRow(payload, queue),
     status: "dlq",
     error_message: reason,
   });
@@ -47,7 +91,13 @@ async function moveToDlq(
     payload,
   });
   if (error) {
-    console.error("Failed to move message to DLQ", { queue, msg_id: msg.msg_id, reason, error });
+    console.error("email_queue.dlq_move_failed", {
+      queue,
+      msg_id: msg.msg_id,
+      reason,
+      error,
+      worker_build: WORKER_BUILD,
+    });
   }
 }
 
@@ -60,12 +110,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
-          console.error("Missing required environment variables");
+          console.error("email_queue.missing_env", { worker_build: WORKER_BUILD });
           return Response.json({ error: "Server configuration error" }, { status: 500 });
         }
 
-        // Verify the caller is authorized with the service role key.
-        // In the TanStack stack, the pg_cron job sends the service role key as a Bearer token.
         const authHeader = request.headers.get("Authorization");
         if (!authHeader?.startsWith("Bearer ")) {
           return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -78,16 +126,18 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         const supabase: SupabaseClient<any, any> = createClient(supabaseUrl, supabaseServiceKey);
 
-
-        // 1. Read queue config + BOTH cooldown gates.
-        //    - retry_after_until: provider-wide 429 (applies to both queues)
-        //    - transactional_retry_after_until: transactional-queue-only backoff
-        //      (recipient_mismatch bursts) so auth emails like password reset
-        //      are NOT blocked while a convocation burst backs off.
+        // Read queue config + BOTH cooldown gates.
+        //   - retry_after_until: provider-wide 429 (applies to both queues)
+        //   - transactional_retry_after_until: transactional-queue-only backoff
+        //     (recipient_mismatch bursts) so auth emails like password reset
+        //     keep flowing while this queue backs off.
+        // Per-queue batch_size / send_delay_ms overrides let us serialize the
+        // transactional queue (Étape 6 of the anti-burst plan) without touching
+        // auth queue throughput.
         const { data: state } = await supabase
           .from("email_send_state")
           .select(
-            "retry_after_until, transactional_retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
+            "retry_after_until, transactional_retry_after_until, batch_size, send_delay_ms, transactional_batch_size, transactional_send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
           )
           .single();
 
@@ -99,11 +149,25 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           new Date(state.transactional_retry_after_until) > now;
 
         if (globalCooldownActive) {
-          return Response.json({ skipped: true, reason: "rate_limited" });
+          return Response.json({
+            skipped: true,
+            reason: "rate_limited",
+            worker_build: WORKER_BUILD,
+          });
         }
 
-        const batchSize = state?.batch_size ?? DEFAULT_BATCH_SIZE;
-        const sendDelayMs = state?.send_delay_ms ?? DEFAULT_SEND_DELAY_MS;
+        const defaultBatchSize = state?.batch_size ?? DEFAULT_BATCH_SIZE;
+        const defaultSendDelayMs = state?.send_delay_ms ?? DEFAULT_SEND_DELAY_MS;
+        const paramsByQueue: Record<string, { batchSize: number; sendDelayMs: number }> = {
+          auth_emails: {
+            batchSize: defaultBatchSize,
+            sendDelayMs: defaultSendDelayMs,
+          },
+          transactional_emails: {
+            batchSize: state?.transactional_batch_size ?? defaultBatchSize,
+            sendDelayMs: state?.transactional_send_delay_ms ?? defaultSendDelayMs,
+          },
+        };
         const ttlMinutes: Record<string, number> = {
           auth_emails: state?.auth_email_ttl_minutes ?? DEFAULT_AUTH_TTL_MINUTES,
           transactional_emails:
@@ -112,13 +176,12 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         let totalProcessed = 0;
 
-        // 2. Process auth_emails first (priority), then transactional_emails.
-        // The transactional queue is skipped while its per-queue cooldown is active,
-        // but auth_emails keep flowing.
         for (const queue of ["auth_emails", "transactional_emails"]) {
           if (queue === "transactional_emails" && transactionalCooldownActive) {
             continue;
           }
+
+          const { batchSize, sendDelayMs } = paramsByQueue[queue];
 
           const { data: messages, error: readError } = await supabase.rpc("read_email_batch", {
             queue_name: queue,
@@ -127,7 +190,11 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           });
 
           if (readError) {
-            console.error("Failed to read email batch", { queue, error: readError });
+            console.error("email_queue.read_batch_failed", {
+              queue,
+              error: readError,
+              worker_build: WORKER_BUILD,
+            });
             continue;
           }
 
@@ -155,9 +222,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               .in("status", ["failed", STATUS_MISMATCH_DEFERRED]);
 
             if (attemptRowsError) {
-              console.error("Failed to load attempt counters", {
+              console.error("email_queue.attempt_counter_load_failed", {
                 queue,
                 error: attemptRowsError,
+                worker_build: WORKER_BUILD,
               });
             } else {
               for (const row of attemptRows ?? []) {
@@ -179,7 +247,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           }
 
           for (let i = 0; i < messages.length; i++) {
-            const msg = messages[i];
+            const msg = messages[i] as { msg_id: number; message: QueuePayload; read_ct?: number; enqueued_at?: string };
             const payload = msg.message;
             const failedAttempts =
               payload?.message_id && typeof payload.message_id === "string"
@@ -191,18 +259,19 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 : 0;
 
             // Drop expired messages (TTL exceeded).
-            // Prefer payload.queued_at when present; fall back to PGMQ's enqueued_at
-            // which is always set by the queue.
             const queuedAt = payload.queued_at ?? msg.enqueued_at;
             if (queuedAt) {
               const ageMs = Date.now() - new Date(queuedAt).getTime();
               const maxAgeMs = ttlMinutes[queue] * 60 * 1000;
               if (ageMs > maxAgeMs) {
-                console.warn("Email expired (TTL exceeded)", {
+                console.warn("email_queue.ttl_exceeded", {
                   queue,
                   msg_id: msg.msg_id,
                   queued_at: queuedAt,
                   ttl_minutes: ttlMinutes[queue],
+                  worker_build: WORKER_BUILD,
+                  dispatch_id: payload.dispatch_id,
+                  event_id: payload.event_id,
                 });
                 await moveToDlq(
                   supabase,
@@ -214,7 +283,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               }
             }
 
-            // Move to DLQ if max failed send attempts reached.
             if (failedAttempts >= MAX_RETRIES) {
               await moveToDlq(
                 supabase,
@@ -225,8 +293,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               continue;
             }
 
-            // Bound on recipient_mismatch deferrals: transient bursts should disperse
-            // after a few cooldown cycles. If they don't, DLQ instead of looping forever.
             if (mismatchAttempts >= MAX_MISMATCH_ATTEMPTS) {
               await moveToDlq(
                 supabase,
@@ -237,30 +303,82 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               continue;
             }
 
-            // Guard: skip if another worker already sent this message (VT expired race)
+            // Duplicate protection #1: skip if this exact message_id already succeeded
+            // (VT-expired race on the pgmq layer).
             if (payload.message_id) {
               const { data: alreadySent } = await supabase
                 .from("email_send_log")
                 .select("id")
                 .eq("message_id", payload.message_id)
-                .eq("status", "sent")
+                .in("status", ["sent", "delivered"])
                 .maybeSingle();
 
               if (alreadySent) {
-                console.warn("Skipping duplicate send (already sent)", {
+                console.warn("email_queue.skip_already_sent", {
                   queue,
                   msg_id: msg.msg_id,
                   message_id: payload.message_id,
+                  worker_build: WORKER_BUILD,
                 });
                 const { error: dupDelError } = await supabase.rpc("delete_email", {
                   queue_name: queue,
                   message_id: msg.msg_id,
                 });
                 if (dupDelError) {
-                  console.error("Failed to delete duplicate message from queue", {
+                  console.error("email_queue.duplicate_delete_failed", {
                     queue,
                     msg_id: msg.msg_id,
                     error: dupDelError,
+                    worker_build: WORKER_BUILD,
+                  });
+                }
+                continue;
+              }
+            }
+
+            // Duplicate protection #2: idempotence par (dispatch_id, recipient_id,
+            // notification_type). Empêche un doublon lors d'un replay où le message_id
+            // est différent mais où le destinataire a déjà été livré pour la même
+            // notification métier. Best-effort côté worker; l'index unique en base est
+            // le vrai garde-fou.
+            if (
+              payload.dispatch_id &&
+              payload.recipient_id &&
+              payload.notification_type
+            ) {
+              const { data: alreadyForDispatch } = await supabase
+                .from("email_send_log")
+                .select("id")
+                .eq("dispatch_id", payload.dispatch_id)
+                .eq("recipient_id", payload.recipient_id)
+                .eq("notification_type", payload.notification_type)
+                .in("status", ["sent", "delivered"])
+                .maybeSingle();
+
+              if (alreadyForDispatch) {
+                console.warn("email_queue.skip_duplicate_dispatch", {
+                  queue,
+                  msg_id: msg.msg_id,
+                  dispatch_id: payload.dispatch_id,
+                  recipient_id: payload.recipient_id,
+                  worker_build: WORKER_BUILD,
+                });
+                await supabase.from("email_send_log").insert({
+                  ...baseLogRow(payload, queue),
+                  status: "skipped_duplicate",
+                  error_message:
+                    "Recipient already delivered for this dispatch/notification_type",
+                });
+                const { error: dedupDelError } = await supabase.rpc("delete_email", {
+                  queue_name: queue,
+                  message_id: msg.msg_id,
+                });
+                if (dedupDelError) {
+                  console.error("email_queue.duplicate_dispatch_delete_failed", {
+                    queue,
+                    msg_id: msg.msg_id,
+                    error: dedupDelError,
+                    worker_build: WORKER_BUILD,
                   });
                 }
                 continue;
@@ -270,11 +388,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             try {
               await sendLovableEmail(
                 {
-                  // Do not fabricate run_id here: the email provider treats run_id as a
-                  // pre-existing build run and rejects client-generated IDs with
-                  // run_not_found. If the provider groups a burst and returns
-                  // recipient_mismatch, the retry routing below keeps the message queued
-                  // so it can be resent on a later cycle.
                   run_id: payload.run_id,
                   to: payload.to,
                   from: payload.from,
@@ -291,42 +404,56 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
               );
 
-              // Log success
-              await supabase.from("email_send_log").insert({
-                message_id: payload.message_id,
-                template_name: payload.label || queue,
-                recipient_email: payload.to,
-                status: "sent",
-              });
+              // Log success. If the unique partial index fires (concurrent replay of
+              // an already-delivered dispatch/recipient/notification_type), the insert
+              // fails proprement — we log and continue without deleting the message so
+              // it can be examined; but the standard case is a clean insert.
+              const { error: insertSuccessError } = await supabase
+                .from("email_send_log")
+                .insert({
+                  ...baseLogRow(payload, queue),
+                  status: "sent",
+                });
 
-              // Delete from queue
+              if (insertSuccessError) {
+                console.error("email_queue.insert_sent_failed", {
+                  queue,
+                  msg_id: msg.msg_id,
+                  error: insertSuccessError,
+                  worker_build: WORKER_BUILD,
+                });
+              }
+
               const { error: delError } = await supabase.rpc("delete_email", {
                 queue_name: queue,
                 message_id: msg.msg_id,
               });
               if (delError) {
-                console.error("Failed to delete sent message from queue", {
+                console.error("email_queue.delete_sent_failed", {
                   queue,
                   msg_id: msg.msg_id,
                   error: delError,
+                  worker_build: WORKER_BUILD,
                 });
               }
               totalProcessed++;
             } catch (error) {
               const errorMsg = error instanceof Error ? error.message : String(error);
-              console.error("Email send failed", {
+              console.error("email_queue.send_failed", {
                 queue,
                 msg_id: msg.msg_id,
                 read_ct: msg.read_ct,
                 failed_attempts: failedAttempts,
+                mismatch_attempts: mismatchAttempts,
+                dispatch_id: payload.dispatch_id,
+                event_id: payload.event_id,
                 error: errorMsg,
+                worker_build: WORKER_BUILD,
               });
 
               if (isRateLimited(error)) {
                 await supabase.from("email_send_log").insert({
-                  message_id: payload.message_id,
-                  template_name: payload.label || queue,
-                  recipient_email: payload.to,
+                  ...baseLogRow(payload, queue),
                   status: "failed",
                   error_message: errorMsg.slice(0, 1000),
                 });
@@ -340,39 +467,29 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   })
                   .eq("id", 1);
 
-                // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
-                return Response.json({ processed: totalProcessed, stopped: "rate_limited" });
+                return Response.json({
+                  processed: totalProcessed,
+                  stopped: "rate_limited",
+                  worker_build: WORKER_BUILD,
+                });
               }
 
-              // 403s are normally permanent configuration or authorization failures
-              // for this message, so move straight to DLQ and stop processing the rest
-              // of the batch. EXCEPTION: `recipient_mismatch` is a transient burst-window
-              // collision on the provider's auto-created transactional run (see
-              // isTransientRunRecipientMismatch) — handled below like a rate limit so the
-              // whole batch backs off and the retry lands outside the burst window.
+              // 403s are permanent EXCEPT `recipient_mismatch` which is transient
+              // (burst-window collision on the provider's auto-created run).
               if (isForbidden(error) && !isTransientRunRecipientMismatch(error)) {
                 await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000));
-                return Response.json({ processed: totalProcessed, stopped: "forbidden" });
+                return Response.json({
+                  processed: totalProcessed,
+                  stopped: "forbidden",
+                  worker_build: WORKER_BUILD,
+                });
               }
 
-              // recipient_mismatch: same-burst collision on the provider's auto-created
-              // run. Continuing to process siblings in the same cycle re-triggers the
-              // collision and burns the retry budget on every one of them.
-              //
-              // Handling:
-              //   - stop the transactional batch (siblings would collide too);
-              //   - set the per-queue cooldown `transactional_retry_after_until` only —
-              //     NOT the global one — so auth emails (password reset, magic link)
-              //     keep flowing while this queue backs off;
-              //   - log as STATUS_MISMATCH_DEFERRED, which counts toward MAX_MISMATCH_ATTEMPTS
-              //     but NOT toward the general MAX_RETRIES failure budget. Once
-              //     MAX_MISMATCH_ATTEMPTS is reached (checked at the top of the loop),
-              //     the message is DLQ'd instead of retrying forever.
+              // recipient_mismatch: transient. Log as mismatch_deferred (NOT counted
+              // toward MAX_RETRIES), set per-queue cooldown, stop the batch.
               if (isTransientRunRecipientMismatch(error)) {
                 await supabase.from("email_send_log").insert({
-                  message_id: payload.message_id,
-                  template_name: payload.label || queue,
-                  recipient_email: payload.to,
+                  ...baseLogRow(payload, queue),
                   status: STATUS_MISMATCH_DEFERRED,
                   error_message: errorMsg.slice(0, 1000),
                 });
@@ -395,32 +512,27 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   processed: totalProcessed,
                   stopped: "recipient_mismatch_cooldown",
                   mismatch_attempts: mismatchAttempts + 1,
+                  worker_build: WORKER_BUILD,
                 });
               }
 
-              // Other non-429 failures: log so the retry budget counts, keep processing.
               await supabase.from("email_send_log").insert({
-                message_id: payload.message_id,
-                template_name: payload.label || queue,
-                recipient_email: payload.to,
+                ...baseLogRow(payload, queue),
                 status: "failed",
                 error_message: errorMsg.slice(0, 1000),
               });
               if (payload?.message_id && typeof payload.message_id === "string") {
                 failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1);
               }
-
-              // Non-429 errors: message stays invisible until VT expires, then retried
             }
 
-            // Small delay between sends to smooth bursts
             if (i < messages.length - 1) {
               await new Promise((r) => setTimeout(r, sendDelayMs));
             }
           }
         }
 
-        return Response.json({ processed: totalProcessed });
+        return Response.json({ processed: totalProcessed, worker_build: WORKER_BUILD });
       },
     },
   },
