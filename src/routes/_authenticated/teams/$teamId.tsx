@@ -19,9 +19,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
-import { sendTransactionalEmail } from "@/lib/email/send";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
+import { sendPlayerInvitations } from "@/lib/team-invitations.functions";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronRight,
@@ -91,6 +91,7 @@ function TeamDetail() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const isAdmin = roles.includes("admin");
+  const sendPlayerInvitationsFn = useServerFn(sendPlayerInvitations);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isStatsRoute = pathname.endsWith("/stats");
   const isAvailabilityRoute = pathname.endsWith("/availability");
@@ -511,173 +512,16 @@ function TeamDetail() {
     return data.publicUrl;
   }
 
-  type InviteTarget = {
-    role: "player" | "parent";
-    firstName?: string;
-    email?: string;
-    phone?: string;
-    playerId: string;
-  };
-
-  // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
   async function sendInvitesForPlayer(
     playerId: string,
   ): Promise<{ sent: number; failed: number; skipped: number; reason?: "no_contact" | "already_active" }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
-
-    // Load player + parents
-    const [{ data: pl }, { data: parents }] = await Promise.all([
-      supabase
-        .from("players")
-        .select("id, first_name, email, phone, user_id, birth_date, child_platform_access")
-        .eq("id", playerId)
-        .maybeSingle(),
-      supabase
-        .from("player_parents")
-        .select("id, full_name, email, phone, parent_user_id")
-        .eq("player_id", playerId),
-    ]);
-
-    // Un joueur mineur ne peut être invité qu'après accord parental
-    // (`child_platform_access = true`). Les parents restent toujours invités.
-    const isAdult = (() => {
-      if (!pl?.birth_date) return false;
-      const dob = new Date(pl.birth_date);
-      if (Number.isNaN(dob.getTime())) return false;
-      const now = new Date();
-      let age = now.getFullYear() - dob.getFullYear();
-      const m = now.getMonth() - dob.getMonth();
-      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
-      return age >= 18;
-    })();
-    const canInvitePlayer = isAdult || !!pl?.child_platform_access;
-
-    const targets: InviteTarget[] = [];
-    if (pl && !pl.user_id && (pl.email || pl.phone) && canInvitePlayer) {
-      targets.push({
-        role: "player",
-        firstName: pl.first_name ?? undefined,
-        email: pl.email ?? undefined,
-        phone: pl.phone ?? undefined,
-        playerId,
-      });
+    try {
+      return await sendPlayerInvitationsFn({ data: { teamId, playerId } });
+    } catch (error) {
+      console.error("sendInvitesForPlayer failed", error);
+      return { sent: 0, failed: 1, skipped: 0 };
     }
-    for (const p of parents ?? []) {
-      if (!p.parent_user_id && (p.email || p.phone)) {
-        targets.push({
-          role: "parent",
-          firstName: (p.full_name ?? "").split(" ")[0] || undefined,
-          email: p.email ?? undefined,
-          phone: p.phone ?? undefined,
-          playerId,
-        });
-      }
-    }
-
-    if (targets.length === 0) {
-      // Distinguish "no contact info" from "all contacts already linked to accounts".
-      const playerLinked = !!pl?.user_id || (!canInvitePlayer && !!pl && !pl.user_id);
-      const allParentsLinked =
-        (parents ?? []).length > 0 && (parents ?? []).every((p) => !!p.parent_user_id);
-      const someContactExists =
-        !!(pl?.email || pl?.phone) || (parents ?? []).some((p) => !!(p.email || p.phone));
-      if (someContactExists && (playerLinked || allParentsLinked)) {
-        return { sent: 0, failed: 0, skipped: 1, reason: "already_active" };
-      }
-      return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
-    }
-
-    // Déduplication : sauter les contacts (email/téléphone) qui ont déjà une
-    // invitation en cours pour ce joueur, et ceux dont l'email est déjà lié
-    // à un compte Clubero existant.
-    const { data: pendingRows } = await supabase
-      .from("member_invites")
-      .select("email, phone, player_id, parent_for_player_id, used_at")
-      .eq("club_id", activeClubId)
-      .or(`player_id.eq.${playerId},parent_for_player_id.eq.${playerId}`)
-      .is("used_at", null);
-    const pendingEmails = new Set<string>();
-    const pendingPhones = new Set<string>();
-    (pendingRows ?? []).forEach((r: any) => {
-      if (r.email) pendingEmails.add(String(r.email).toLowerCase().trim());
-      if (r.phone) pendingPhones.add(String(r.phone).trim());
-    });
-
-    const filtered: InviteTarget[] = [];
-    let skippedExisting = 0;
-    for (const target of targets) {
-      const e = (target.email ?? "").toLowerCase().trim();
-      const ph = (target.phone ?? "").trim();
-      if ((e && pendingEmails.has(e)) || (ph && pendingPhones.has(ph))) {
-        skippedExisting += 1;
-        continue;
-      }
-      if (target.email) {
-        const { data: exists } = await supabase.rpc("email_exists", { _email: target.email });
-        if (exists === true) {
-          skippedExisting += 1;
-          continue;
-        }
-      }
-      filtered.push(target);
-    }
-    if (filtered.length === 0) {
-      return { sent: 0, failed: 0, skipped: skippedExisting || 1 };
-    }
-
-    const { data: clubRow } = await supabase
-      .from("clubs")
-      .select("name, logo_url")
-      .eq("id", activeClubId)
-      .maybeSingle();
-    const clubLabel = clubRow?.name ?? "Clubero";
-    const clubLogoUrl = clubRow?.logo_url ?? undefined;
-
-    let sent = 0;
-    let failed = 0;
-    for (const target of filtered) {
-      const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
-      const { error: invErr } = await supabase.from("member_invites").insert({
-        club_id: activeClubId,
-        team_id: teamId,
-        player_id: target.role === "player" ? target.playerId : null,
-        parent_for_player_id: target.role === "parent" ? target.playerId : null,
-        role: target.role === "player" ? "player" : "parent",
-        email: target.email ?? null,
-        phone: target.phone ?? null,
-        token,
-        created_by: user.id,
-      });
-      if (invErr) {
-        failed += 1;
-        continue;
-      }
-      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
-      let dispatched = false;
-      if (target.email) {
-        try {
-          await sendTransactionalEmail({
-            templateName: "player-invite",
-            recipientEmail: target.email,
-            idempotencyKey: `member-invite-${token}`,
-            fromName: `${clubLabel} via Clubero`,
-            templateData: {
-              firstName: target.firstName,
-              teamName: team?.name,
-              clubName: clubLabel,
-              clubLogoUrl,
-              inviteUrl,
-            },
-          });
-          dispatched = true;
-        } catch {
-          /* fallthrough to sms */
-        }
-      }
-      if (dispatched) sent += 1;
-      else failed += 1;
-    }
-    return { sent, failed, skipped: 0 };
   }
 
   async function inviteOne(playerId: string) {
@@ -749,16 +593,10 @@ function TeamDetail() {
   }
 
   // Helper: does this player still have at least one contact (self or parent)
-  // that is neither linked to an account nor already pending an invite?
+  // that is not linked to an account. Existing failed/pending invites are handled
+  // server-side so coaches can retry without the UI greying everything out.
   const hasOpenContact = useCallback(
     (p: any): boolean => {
-      const pending = pendingInvitesByPlayer?.get(p.id);
-      const isPending = (email?: string | null, phone?: string | null) => {
-        if (!pending) return false;
-        const e = (email ?? "").toLowerCase().trim();
-        const ph = (phone ?? "").trim();
-        return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
-      };
       // Minor without platform access is managed by parents — the player
       // himself is never invitable, only parents count.
       const isMinor = (() => {
@@ -772,19 +610,12 @@ function TeamDetail() {
         return age < 18;
       })();
       const canInvitePlayer = !isMinor || !!p.child_platform_access;
-      if (
-        canInvitePlayer &&
-        !p.user_id &&
-        (p.email || p.phone) &&
-        !isPending(p.email, p.phone)
-      )
+      if (canInvitePlayer && !p.user_id && (p.email || p.phone))
         return true;
       const parents = parentsByPlayer?.get(p.id) ?? [];
-      return parents.some(
-        (pr) => !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
-      );
+      return parents.some((pr) => !pr.parent_user_id && (pr.email || pr.phone));
     },
-    [pendingInvitesByPlayer, parentsByPlayer],
+    [parentsByPlayer],
   );
 
   // Players who still need an invite: no linked account, and at least one
@@ -1698,7 +1529,7 @@ function TeamDetail() {
                 <li key={p.id}>
                   {selectMode
                     ? (() => {
-                        const selectable = canInvite && !hasPendingInvite;
+                        const selectable = canInvite;
                         return (
                           <button
                             type="button"
