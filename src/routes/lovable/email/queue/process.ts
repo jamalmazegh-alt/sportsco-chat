@@ -146,26 +146,34 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             ),
           );
           const failedAttemptsByMessageId = new Map<string, number>();
+          const mismatchAttemptsByMessageId = new Map<string, number>();
           if (messageIds.length > 0) {
-            const { data: failedRows, error: failedRowsError } = await supabase
+            const { data: attemptRows, error: attemptRowsError } = await supabase
               .from("email_send_log")
-              .select("message_id")
+              .select("message_id, status")
               .in("message_id", messageIds)
-              .eq("status", "failed");
+              .in("status", ["failed", STATUS_MISMATCH_DEFERRED]);
 
-            if (failedRowsError) {
-              console.error("Failed to load failed-attempt counters", {
+            if (attemptRowsError) {
+              console.error("Failed to load attempt counters", {
                 queue,
-                error: failedRowsError,
+                error: attemptRowsError,
               });
             } else {
-              for (const row of failedRows ?? []) {
+              for (const row of attemptRows ?? []) {
                 const messageId = row?.message_id;
                 if (typeof messageId !== "string" || !messageId) continue;
-                failedAttemptsByMessageId.set(
-                  messageId,
-                  (failedAttemptsByMessageId.get(messageId) ?? 0) + 1,
-                );
+                if (row.status === STATUS_MISMATCH_DEFERRED) {
+                  mismatchAttemptsByMessageId.set(
+                    messageId,
+                    (mismatchAttemptsByMessageId.get(messageId) ?? 0) + 1,
+                  );
+                } else {
+                  failedAttemptsByMessageId.set(
+                    messageId,
+                    (failedAttemptsByMessageId.get(messageId) ?? 0) + 1,
+                  );
+                }
               }
             }
           }
