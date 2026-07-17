@@ -932,16 +932,33 @@ function EventDetail() {
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
+        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+
+        // ONE dispatch for this convocation-cancelled campaign (player + parents).
+        const { dispatchId } = await createEmailDispatchFn({
+          data: {
+            eventId: event.id,
+            templateName: "convocation-cancelled",
+            dispatchType: "initial",
+            metadata: { player_id: playerId },
+          },
+        }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
         const sendOne = (
           toEmail: string,
           recipientFirstName: string | undefined,
           idemSuffix: string,
+          recipientId: string,
         ) =>
           sendTransactionalEmail({
             templateName: "convocation-cancelled",
             recipientEmail: toEmail,
             fromName: `${clubName ?? "Clubero"} via Clubero`,
             idempotencyKey: `convoc-cancel-${id}-${idemSuffix}`,
+            dispatchId,
+            eventId: event.id,
+            recipientId,
+            notificationType: "convocation-cancelled",
             templateData: {
               recipientFirstName,
               playerName,
@@ -956,13 +973,21 @@ function EventDetail() {
           } as any).catch(() => undefined);
 
         const sends: Promise<unknown>[] = [];
-        if (playerEmail) {
-          sends.push(sendOne(playerEmail, playerFirstName, "player"));
+        if (playerEmail && playerId) {
+          sends.push(sendOne(playerEmail, playerFirstName, "player", `player:${playerId}`));
         }
         for (const parent of parentsRows) {
-          if (!parent.email) continue;
+          if (!parent.email || !playerId) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          sends.push(sendOne(parent.email, parentFirst, `parent-${parent.email}`));
+          const normalizedEmail = parent.email.trim().toLowerCase();
+          sends.push(
+            sendOne(
+              parent.email,
+              parentFirst,
+              `parent-${parent.email}`,
+              `parent:${playerId}:${normalizedEmail}`,
+            ),
+          );
         }
         await Promise.allSettled(sends);
       }
