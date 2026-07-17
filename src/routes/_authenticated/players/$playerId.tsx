@@ -583,7 +583,18 @@ function PlayerProfile() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <BackLink to="/teams" />
+      <BackButton
+        onClick={() => {
+          const canGoBack = router.history.length > 1;
+          if (canGoBack) {
+            router.history.back();
+            return;
+          }
+          const teamId = playerTeams?.[0]?.id;
+          if (teamId) navigate({ to: "/teams/$teamId", params: { teamId } });
+          else navigate({ to: "/teams" });
+        }}
+      />
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
