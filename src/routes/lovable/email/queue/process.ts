@@ -9,10 +9,22 @@ import {
 } from "@/lib/email/queue-error-classify";
 
 const MAX_RETRIES = 5;
+// Recipient_mismatch has its own budget: it is transient (burst-window collision on
+// the provider's auto-created run) so we don't want the 5-attempt failure budget to
+// trip on it. But "never DLQ" is unsafe — if the burst never disperses for some other
+// reason, we'd loop forever. Cap it at MAX_MISMATCH_ATTEMPTS deferrals, then DLQ.
+const MAX_MISMATCH_ATTEMPTS = 8;
+const MISMATCH_COOLDOWN_SECS = 45;
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_SEND_DELAY_MS = 200;
 const DEFAULT_AUTH_TTL_MINUTES = 15;
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60;
+
+// Distinct log status for a deferred recipient_mismatch retry. Not counted toward
+// MAX_RETRIES (the general failure budget); counted separately toward
+// MAX_MISMATCH_ATTEMPTS. Kept as a string literal because email_send_log.status is a
+// free-form text column.
+const STATUS_MISMATCH_DEFERRED = "mismatch_deferred";
 
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
@@ -66,15 +78,27 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         const supabase: SupabaseClient<any, any> = createClient(supabaseUrl, supabaseServiceKey);
 
-        // 1. Check rate-limit cooldown and read queue config
+
+        // 1. Read queue config + BOTH cooldown gates.
+        //    - retry_after_until: provider-wide 429 (applies to both queues)
+        //    - transactional_retry_after_until: transactional-queue-only backoff
+        //      (recipient_mismatch bursts) so auth emails like password reset
+        //      are NOT blocked while a convocation burst backs off.
         const { data: state } = await supabase
           .from("email_send_state")
           .select(
-            "retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
+            "retry_after_until, transactional_retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
           )
           .single();
 
-        if (state?.retry_after_until && new Date(state.retry_after_until) > new Date()) {
+        const now = new Date();
+        const globalCooldownActive =
+          state?.retry_after_until && new Date(state.retry_after_until) > now;
+        const transactionalCooldownActive =
+          state?.transactional_retry_after_until &&
+          new Date(state.transactional_retry_after_until) > now;
+
+        if (globalCooldownActive) {
           return Response.json({ skipped: true, reason: "rate_limited" });
         }
 
@@ -88,8 +112,14 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         let totalProcessed = 0;
 
-        // 2. Process auth_emails first (priority), then transactional_emails
+        // 2. Process auth_emails first (priority), then transactional_emails.
+        // The transactional queue is skipped while its per-queue cooldown is active,
+        // but auth_emails keep flowing.
         for (const queue of ["auth_emails", "transactional_emails"]) {
+          if (queue === "transactional_emails" && transactionalCooldownActive) {
+            continue;
+          }
+
           const { data: messages, error: readError } = await supabase.rpc("read_email_batch", {
             queue_name: queue,
             batch_size: batchSize,
@@ -116,26 +146,34 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             ),
           );
           const failedAttemptsByMessageId = new Map<string, number>();
+          const mismatchAttemptsByMessageId = new Map<string, number>();
           if (messageIds.length > 0) {
-            const { data: failedRows, error: failedRowsError } = await supabase
+            const { data: attemptRows, error: attemptRowsError } = await supabase
               .from("email_send_log")
-              .select("message_id")
+              .select("message_id, status")
               .in("message_id", messageIds)
-              .eq("status", "failed");
+              .in("status", ["failed", STATUS_MISMATCH_DEFERRED]);
 
-            if (failedRowsError) {
-              console.error("Failed to load failed-attempt counters", {
+            if (attemptRowsError) {
+              console.error("Failed to load attempt counters", {
                 queue,
-                error: failedRowsError,
+                error: attemptRowsError,
               });
             } else {
-              for (const row of failedRows ?? []) {
+              for (const row of attemptRows ?? []) {
                 const messageId = row?.message_id;
                 if (typeof messageId !== "string" || !messageId) continue;
-                failedAttemptsByMessageId.set(
-                  messageId,
-                  (failedAttemptsByMessageId.get(messageId) ?? 0) + 1,
-                );
+                if (row.status === STATUS_MISMATCH_DEFERRED) {
+                  mismatchAttemptsByMessageId.set(
+                    messageId,
+                    (mismatchAttemptsByMessageId.get(messageId) ?? 0) + 1,
+                  );
+                } else {
+                  failedAttemptsByMessageId.set(
+                    messageId,
+                    (failedAttemptsByMessageId.get(messageId) ?? 0) + 1,
+                  );
+                }
               }
             }
           }
@@ -147,6 +185,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               payload?.message_id && typeof payload.message_id === "string"
                 ? (failedAttemptsByMessageId.get(payload.message_id) ?? 0)
                 : (msg.read_ct ?? 0);
+            const mismatchAttempts =
+              payload?.message_id && typeof payload.message_id === "string"
+                ? (mismatchAttemptsByMessageId.get(payload.message_id) ?? 0)
+                : 0;
 
             // Drop expired messages (TTL exceeded).
             // Prefer payload.queued_at when present; fall back to PGMQ's enqueued_at
@@ -179,6 +221,18 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 queue,
                 msg,
                 `Max retries (${MAX_RETRIES}) exceeded (attempted ${failedAttempts} times)`,
+              );
+              continue;
+            }
+
+            // Bound on recipient_mismatch deferrals: transient bursts should disperse
+            // after a few cooldown cycles. If they don't, DLQ instead of looping forever.
+            if (mismatchAttempts >= MAX_MISMATCH_ATTEMPTS) {
+              await moveToDlq(
+                supabase,
+                queue,
+                msg,
+                `recipient_mismatch persisted after ${mismatchAttempts} cooldown cycles`,
               );
               continue;
             }
@@ -303,22 +357,44 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
               // recipient_mismatch: same-burst collision on the provider's auto-created
               // run. Continuing to process siblings in the same cycle re-triggers the
-              // collision and burns the retry budget on every one of them. Treat like a
-              // rate limit: stop the batch, set a short global cooldown, and do NOT log
-              // a `failed` row (which would count toward MAX_RETRIES). VT expires, the
-              // message is retried on a later cycle in isolation and succeeds.
+              // collision and burns the retry budget on every one of them.
+              //
+              // Handling:
+              //   - stop the transactional batch (siblings would collide too);
+              //   - set the per-queue cooldown `transactional_retry_after_until` only —
+              //     NOT the global one — so auth emails (password reset, magic link)
+              //     keep flowing while this queue backs off;
+              //   - log as STATUS_MISMATCH_DEFERRED, which counts toward MAX_MISMATCH_ATTEMPTS
+              //     but NOT toward the general MAX_RETRIES failure budget. Once
+              //     MAX_MISMATCH_ATTEMPTS is reached (checked at the top of the loop),
+              //     the message is DLQ'd instead of retrying forever.
               if (isTransientRunRecipientMismatch(error)) {
-                const cooldownSecs = 45;
+                await supabase.from("email_send_log").insert({
+                  message_id: payload.message_id,
+                  template_name: payload.label || queue,
+                  recipient_email: payload.to,
+                  status: STATUS_MISMATCH_DEFERRED,
+                  error_message: errorMsg.slice(0, 1000),
+                });
+                if (payload?.message_id && typeof payload.message_id === "string") {
+                  mismatchAttemptsByMessageId.set(
+                    payload.message_id,
+                    mismatchAttempts + 1,
+                  );
+                }
                 await supabase
                   .from("email_send_state")
                   .update({
-                    retry_after_until: new Date(Date.now() + cooldownSecs * 1000).toISOString(),
+                    transactional_retry_after_until: new Date(
+                      Date.now() + MISMATCH_COOLDOWN_SECS * 1000,
+                    ).toISOString(),
                     updated_at: new Date().toISOString(),
                   })
                   .eq("id", 1);
                 return Response.json({
                   processed: totalProcessed,
                   stopped: "recipient_mismatch_cooldown",
+                  mismatch_attempts: mismatchAttempts + 1,
                 });
               }
 

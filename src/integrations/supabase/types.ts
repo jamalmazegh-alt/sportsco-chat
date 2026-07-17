@@ -1779,6 +1779,7 @@ export type Database = {
           retry_after_until: string | null
           send_delay_ms: number
           transactional_email_ttl_minutes: number
+          transactional_retry_after_until: string | null
           updated_at: string
         }
         Insert: {
@@ -1788,6 +1789,7 @@ export type Database = {
           retry_after_until?: string | null
           send_delay_ms?: number
           transactional_email_ttl_minutes?: number
+          transactional_retry_after_until?: string | null
           updated_at?: string
         }
         Update: {
@@ -1797,6 +1799,7 @@ export type Database = {
           retry_after_until?: string | null
           send_delay_ms?: number
           transactional_email_ttl_minutes?: number
+          transactional_retry_after_until?: string | null
           updated_at?: string
         }
         Relationships: []
