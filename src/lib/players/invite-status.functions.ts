@@ -3,14 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
- * Returns the set of parent emails (lowercased) for a given player that have
- * a recorded transactional-email attempt (status 'sent' or 'pending').
+ * Returns per-parent-email delivery status for a given player, computed as
+ * the LATEST row per message_id in email_send_log. Buckets:
+ *  - sentEmails: latest status is 'sent' or 'pending'
+ *  - failedEmails: latest status is 'failed', 'dlq', 'bounced', 'complained',
+ *    or 'suppressed', with an optional error message.
  *
- * Access control: the caller must already be able to read the player's
- * player_parents rows under RLS. We use the user-scoped Supabase client
- * from `requireSupabaseAuth` to list parent emails, so unauthorized callers
- * simply get an empty list. Only then do we consult email_send_log with
- * the admin client (service-role SELECT-only) to check delivery status.
+ * Access control: caller must be able to read the player's player_parents
+ * rows under RLS. Unauthorized callers simply get empty lists.
  */
 export const getParentInviteStatuses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -20,12 +20,13 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
 
-    // 1. Emails the caller is allowed to see for this player (via RLS).
     const { data: parents, error } = await supabase
       .from("player_parents")
       .select("email")
       .eq("player_id", data.playerId);
-    if (error || !parents) return { sentEmails: [] as string[] };
+    if (error || !parents) {
+      return { sentEmails: [] as string[], failedEmails: [] as { email: string; error: string | null }[] };
+    }
 
     const emails = Array.from(
       new Set(
@@ -34,20 +35,74 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
           .filter((e) => e.length > 0),
       ),
     );
-    if (emails.length === 0) return { sentEmails: [] as string[] };
+    if (emails.length === 0) {
+      return { sentEmails: [] as string[], failedEmails: [] as { email: string; error: string | null }[] };
+    }
 
-    // 2. Check the send log with service role (RLS restricts this table).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("email_send_log")
-      .select("recipient_email, status")
+      .select("recipient_email, status, error_message, message_id, created_at")
       .in("recipient_email", emails)
-      .in("status", ["sent", "pending"] as never);
+      .order("created_at", { ascending: false });
 
-    const sent = new Set<string>();
+    // Latest status per message_id
+    const latestByMessage = new Map<
+      string,
+      { recipient_email: string; status: string; error_message: string | null }
+    >();
     for (const r of rows ?? []) {
-      const addr = (r as { recipient_email?: string }).recipient_email;
-      if (addr) sent.add(addr.toLowerCase());
+      const row = r as {
+        recipient_email: string | null;
+        status: string | null;
+        error_message: string | null;
+        message_id: string | null;
+      };
+      if (!row.message_id || !row.recipient_email || !row.status) continue;
+      if (!latestByMessage.has(row.message_id)) {
+        latestByMessage.set(row.message_id, {
+          recipient_email: row.recipient_email,
+          status: row.status,
+          error_message: row.error_message,
+        });
+      }
     }
-    return { sentEmails: Array.from(sent) };
+
+    // Per-email: track the most recent event and whether ANY successful send exists
+    const sent = new Set<string>();
+    const failed = new Map<string, string | null>();
+    const latestPerEmail = new Map<string, { status: string; error: string | null; ts: number }>();
+
+    // Rebuild ordered by created_at desc — rows already ordered desc from query
+    for (const r of rows ?? []) {
+      const row = r as {
+        recipient_email: string | null;
+        status: string | null;
+        error_message: string | null;
+        message_id: string | null;
+        created_at: string | null;
+      };
+      if (!row.recipient_email || !row.status) continue;
+      const email = row.recipient_email.toLowerCase();
+      const ts = row.created_at ? new Date(row.created_at).getTime() : 0;
+      if (!latestPerEmail.has(email)) {
+        latestPerEmail.set(email, { status: row.status, error: row.error_message, ts });
+      }
+    }
+
+    const SUCCESS = new Set(["sent", "pending"]);
+    const FAILURE = new Set(["failed", "dlq", "bounced", "complained", "suppressed"]);
+
+    for (const [email, entry] of latestPerEmail) {
+      if (SUCCESS.has(entry.status)) {
+        sent.add(email);
+      } else if (FAILURE.has(entry.status)) {
+        failed.set(email, entry.error);
+      }
+    }
+
+    return {
+      sentEmails: Array.from(sent),
+      failedEmails: Array.from(failed.entries()).map(([email, error]) => ({ email, error })),
+    };
   });

@@ -227,8 +227,10 @@ function PlayerProfile() {
           },
         });
         toast.success(t("players.inviteSent"));
+        qc.invalidateQueries({ queryKey: ["player-parent-invite-statuses", playerId] });
       } catch (e: any) {
         toast.error(e?.message ?? "Failed");
+        qc.invalidateQueries({ queryKey: ["player-parent-invite-statuses", playerId] });
       }
     } else {
       toast.success(t("players.inviteSent"));
@@ -290,6 +292,9 @@ function PlayerProfile() {
   });
   const invitedEmails = new Set(
     (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
+  );
+  const failedEmailsMap = new Map(
+    (parentInviteStatuses?.failedEmails ?? []).map((f) => [f.email.toLowerCase(), f.error]),
   );
 
   // Used for sport-aware position suggestions. Falls back to free text when
@@ -1068,10 +1073,13 @@ function PlayerProfile() {
                   const linked = !!pp.parent_user_id;
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
-                  const inviteSent =
-                    !linked &&
-                    !!pp.email &&
-                    invitedEmails.has(pp.email.trim().toLowerCase());
+                  const emailKey = pp.email?.trim().toLowerCase() ?? "";
+                  const inviteSent = !linked && !!emailKey && invitedEmails.has(emailKey);
+                  const inviteFailedError =
+                    !linked && !!emailKey && !inviteSent
+                      ? (failedEmailsMap.get(emailKey) ?? null)
+                      : undefined;
+                  const inviteFailed = inviteFailedError !== undefined;
                   return (
                     <li
                       key={pp.id}
@@ -1106,6 +1114,23 @@ function PlayerProfile() {
                               <Send className="h-3 w-3" />
                               {t("players.inviteSent", {
                                 defaultValue: "Invitation envoyée",
+                              })}
+                            </span>
+                          )}
+                          {inviteFailed && (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive"
+                              title={
+                                inviteFailedError ??
+                                t("players.inviteFailedHint", {
+                                  defaultValue:
+                                    "L'email d'invitation n'a pas pu être délivré",
+                                })
+                              }
+                            >
+                              <X className="h-3 w-3" />
+                              {t("players.inviteFailed", {
+                                defaultValue: "Envoi échoué",
                               })}
                             </span>
                           )}
