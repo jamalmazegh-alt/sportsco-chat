@@ -458,9 +458,10 @@ async function createInviteAndEmail(params: {
   roleLabel?: string;
   playerName?: string;
 }): Promise<string | null> {
-  try {
-    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
-    const { error: invErr } = await supabaseAdmin.from("member_invites").insert({
+  const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+  const { data: insertedInvite, error: invErr } = await supabaseAdmin
+    .from("member_invites")
+    .insert({
       club_id: params.clubId,
       team_id: params.teamId ?? null,
       role: params.role as never,
@@ -471,12 +472,19 @@ async function createInviteAndEmail(params: {
       parent_for_player_id: params.parentForPlayerId ?? null,
       token,
       created_by: params.createdBy,
-    } as never);
-    if (invErr) {
-      log.warn("member_invites insert failed", { email: params.email, error: invErr.message });
-      return null;
-    }
+    } as never)
+    .select("id")
+    .single();
+  if (invErr || !insertedInvite) {
+    log.warn("member_invites insert failed", {
+      email: params.email,
+      error: invErr?.message ?? "no row returned",
+    });
+    return null;
+  }
+  const inviteId = (insertedInvite as { id: string }).id;
 
+  try {
     const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token)}`;
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
     await enqueueTransactionalEmailServer({
@@ -494,7 +502,18 @@ async function createInviteAndEmail(params: {
     });
     return token;
   } catch (e) {
-    log.warn("invite+email failed", { email: params.email, error: String(e) });
+    // Silent enqueue failure previously left orphan member_invites rows with no
+    // actual email sent. Log the real error and roll the invite back so the
+    // caller can retry deterministically.
+    const err = e instanceof Error ? e : new Error(String(e));
+    console.error("createInviteAndEmail enqueue failed", {
+      email: params.email,
+      role: params.role,
+      error: err.message,
+      stack: err.stack,
+    });
+    log.warn("invite+email failed", { email: params.email, error: err.message });
+    await supabaseAdmin.from("member_invites").delete().eq("id", inviteId);
     return null;
   }
 }

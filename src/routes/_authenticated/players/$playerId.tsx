@@ -3,6 +3,8 @@ import { PlayerSuspensions } from "@/components/player-suspensions";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getParentInviteStatuses } from "@/lib/players/invite-status.functions";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
@@ -277,6 +279,18 @@ function PlayerProfile() {
       })) satisfies PlayerParentRow[];
     },
   });
+
+  // Which parent emails have a recorded transactional-email attempt
+  // (status "sent" or "pending" in email_send_log).
+  const fetchParentInviteStatuses = useServerFn(getParentInviteStatuses);
+  const { data: parentInviteStatuses } = useQuery({
+    queryKey: ["player-parent-invite-statuses", playerId],
+    queryFn: async () => fetchParentInviteStatuses({ data: { playerId } }),
+    enabled: !!playerId,
+  });
+  const invitedEmails = new Set(
+    (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
+  );
 
   // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
@@ -1038,6 +1052,10 @@ function PlayerProfile() {
                   const linked = !!pp.parent_user_id;
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
+                  const inviteSent =
+                    !linked &&
+                    !!pp.email &&
+                    invitedEmails.has(pp.email.trim().toLowerCase());
                   return (
                     <li
                       key={pp.id}
@@ -1061,6 +1079,20 @@ function PlayerProfile() {
                           >
                             {linked ? t("players.accountActive") : t("players.accountInactive")}
                           </span>
+                          {inviteSent && (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
+                              title={t("players.inviteSentHint", {
+                                defaultValue:
+                                  "Un email d'invitation a été envoyé à ce parent",
+                              })}
+                            >
+                              <Send className="h-3 w-3" />
+                              {t("players.inviteSent", {
+                                defaultValue: "Invitation envoyée",
+                              })}
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
