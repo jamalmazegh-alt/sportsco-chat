@@ -264,10 +264,12 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     const mapping: Record<string, string> = {};
     const unmapped: string[] = [];
     for (const h of headers) {
-      const hit = keyByNorm.get(normHeader(h));
+      const n = normHeader(h);
+      const hit = keyByNorm.get(n) ?? labelByNorm.get(n);
       if (hit) mapping[h] = hit;
       else unmapped.push(h);
     }
+
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
