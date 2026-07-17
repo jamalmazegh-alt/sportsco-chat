@@ -1458,11 +1458,27 @@ function TeamDetail() {
               !isMine &&
               idx === myPlayerIds.size;
             const hasContactHint = hasOpenContact(p);
-            const canInvite = !p.user_id;
-            const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
+            const parentsForP = parentsByPlayer?.get(p.id) ?? [];
+            const isMinorP = (() => {
+              if (!p.birth_date) return false;
+              const dob = new Date(p.birth_date);
+              if (Number.isNaN(dob.getTime())) return false;
+              const now = new Date();
+              let age = now.getFullYear() - dob.getFullYear();
+              const md = now.getMonth() - dob.getMonth();
+              if (md < 0 || (md === 0 && now.getDate() < dob.getDate())) age--;
+              return age < 18;
+            })();
+            // A minor without direct platform access is considered "linked"
+            // as soon as at least one parent has an active account — the
+            // parent handles the child on the platform.
+            const anyParentLinked = parentsForP.some((pp: any) => !!pp.parent_user_id);
+            const coveredByParent = isMinorP && !p.child_platform_access && anyParentLinked;
+            const linked = !!p.user_id || coveredByParent;
+            const canInvite = !linked;
+            const hasPendingInvite = !linked && !!pendingInvitesByPlayer?.get(p.id);
             const failures = inviteFailuresByPlayer?.[p.id] ?? [];
-            const hasFailedInvite = failures.length > 0;
-            const linked = !!p.user_id;
+            const hasFailedInvite = !linked && failures.length > 0;
 
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
