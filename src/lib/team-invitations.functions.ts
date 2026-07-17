@@ -113,7 +113,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
 
     const { data: pendingRows } = await supabaseAdmin
       .from("member_invites")
-      .select("email, phone, email_message_id, used_at, expires_at")
+      .select("email, phone, email_message_id, used_at, expires_at, created_at")
       .eq("club_id", team.club_id)
       .or(`player_id.eq.${player.id},parent_for_player_id.eq.${player.id}`)
       .is("used_at", null);
@@ -135,14 +135,52 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       }
     }
 
+    // Legacy invites created by the old client-side flow do not have an
+    // email_message_id. Reconcile them by recipient/time so a retry only targets
+    // contacts that never actually reached the queue, while already-sent emails
+    // are not duplicated.
+    const legacyInviteEmails = Array.from(
+      new Set(
+        (pendingRows ?? [])
+          .filter((row) => !row.email_message_id)
+          .map((row) => normalizeEmail(row.email))
+          .filter(Boolean),
+      ),
+    );
+    const latestLegacyLogByEmail = new Map<string, { status: string; createdAt: string }>();
+    if (legacyInviteEmails.length > 0) {
+      const { data: legacyLogs } = await supabaseAdmin
+        .from("email_send_log")
+        .select("recipient_email, status, created_at")
+        .in("recipient_email", legacyInviteEmails)
+        .order("created_at", { ascending: false });
+      for (const log of legacyLogs ?? []) {
+        const email = normalizeEmail(log.recipient_email);
+        if (email && !latestLegacyLogByEmail.has(email)) {
+          latestLegacyLogByEmail.set(email, {
+            status: log.status ?? "",
+            createdAt: log.created_at ?? "",
+          });
+        }
+      }
+    }
+
     const blockedEmails = new Set<string>();
     const blockedPhones = new Set<string>();
     for (const row of pendingRows ?? []) {
       const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : Number.POSITIVE_INFINITY;
       if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) continue;
       const messageId = row.email_message_id;
-      if (!messageId) continue;
-      const status = latestStatusByMessageId.get(messageId);
+      let status = messageId ? latestStatusByMessageId.get(messageId) : undefined;
+      if (!messageId) {
+        const email = normalizeEmail(row.email);
+        const legacyLog = email ? latestLegacyLogByEmail.get(email) : undefined;
+        const inviteCreatedAt = row.created_at ? new Date(row.created_at).getTime() : 0;
+        const logCreatedAt = legacyLog?.createdAt ? new Date(legacyLog.createdAt).getTime() : 0;
+        if (legacyLog && logCreatedAt >= inviteCreatedAt - 5 * 60 * 1000) {
+          status = legacyLog.status;
+        }
+      }
       if (!status || !["pending", "sent", "suppressed"].includes(status)) continue;
       const email = normalizeEmail(row.email);
       const phone = normalizePhone(row.phone);
