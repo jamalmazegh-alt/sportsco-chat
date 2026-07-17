@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, Mail, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/superadmin/email-dispatches/$dispatchId")({
+export const Route = createFileRoute("/superadmin/email-dispatches_/$dispatchId")({
   component: DispatchDetailPage,
 });
 
