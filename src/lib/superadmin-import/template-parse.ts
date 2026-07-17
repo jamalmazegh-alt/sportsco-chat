@@ -12,10 +12,11 @@ import {
 
 const normKey = (s: string) =>
   s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[éèê]/g, "e")
-    .replace(/[^a-z0-9_]/g, "");
+    .replace(/[^a-z0-9]/g, "");
+
 
 function normalizeDate(v: string): string {
   // Accept JJ/MM/AAAA, JJ-MM-AAAA, YYYY-MM-DD, Excel serial (number-as-string)
