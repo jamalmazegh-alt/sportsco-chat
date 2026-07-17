@@ -280,7 +280,19 @@ function PlayerProfile() {
     },
   });
 
-  // Used for sport-aware position suggestions. Falls back to free text when
+  // Which parent emails have a recorded transactional-email attempt
+  // (status "sent" or "pending" in email_send_log).
+  const fetchParentInviteStatuses = useServerFn(getParentInviteStatuses);
+  const { data: parentInviteStatuses } = useQuery({
+    queryKey: ["player-parent-invite-statuses", playerId],
+    queryFn: async () => fetchParentInviteStatuses({ data: { playerId } }),
+    enabled: !!playerId,
+  });
+  const invitedEmails = new Set(
+    (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
+  );
+
+
   // the player isn't on any team yet.
   const { data: playerTeams } = useQuery({
     queryKey: ["player-teams", playerId],
