@@ -227,8 +227,10 @@ function PlayerProfile() {
           },
         });
         toast.success(t("players.inviteSent"));
+        qc.invalidateQueries({ queryKey: ["player-parent-invite-statuses", playerId] });
       } catch (e: any) {
         toast.error(e?.message ?? "Failed");
+        qc.invalidateQueries({ queryKey: ["player-parent-invite-statuses", playerId] });
       }
     } else {
       toast.success(t("players.inviteSent"));
