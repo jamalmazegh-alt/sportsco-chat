@@ -130,6 +130,125 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------ */
+/* Convocation resend / update push                                   */
+/* ------------------------------------------------------------------ */
+const ConvocationResendInput = z.object({
+  eventId: z.string().uuid(),
+  playerIds: z.array(z.string().uuid()).max(200),
+  hasChanges: z.boolean().optional(),
+});
+
+export const dispatchConvocationResendPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ConvocationResendInput.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+
+    const { data: ev } = await supabaseAdmin
+      .from("events")
+      .select(
+        "id, title, starts_at, type, team_id, opponent, is_home, location, teams:team_id(name, club_id)",
+      )
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (!ev) return { dispatched: 0 };
+
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+    const clubId = ((ev as any).teams?.club_id as string | null) ?? null;
+    const settings = await getClubNotifSettings(clubId);
+    // Resend reuses the "convocation_on_create" gate — same channel as the
+    // initial send. If the club opted out of that, we skip.
+    if (!settings.convocation_on_create) return { dispatched: 0 };
+
+    const [{ data: players }, { data: parents }] = await Promise.all([
+      supabaseAdmin.from("players").select("id, user_id").in("id", data.playerIds),
+      supabaseAdmin
+        .from("player_parents")
+        .select("player_id, parent_user_id")
+        .in("player_id", data.playerIds),
+    ]);
+
+    const targets = new Set<string>();
+    for (const p of players ?? []) if ((p as any).user_id) targets.add((p as any).user_id);
+    for (const p of parents ?? [])
+      if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+
+    const dt = new Date((ev as any).starts_at);
+    const dateStr = dt.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const isMatch = (ev as any).type === "match";
+    const teamName = ((ev as any).teams?.name as string | null) ?? null;
+    const opponent = ((ev as any).opponent as string | null) ?? null;
+    const isHome = (ev as any).is_home as boolean | null | undefined;
+    const location = ((ev as any).location as string | null) ?? null;
+
+    let headline: string;
+    if (isMatch && opponent) {
+      headline = teamName ? `${teamName} vs ${opponent}` : `vs ${opponent}`;
+    } else if (isMatch) {
+      headline = teamName ? `Match — ${teamName}` : "Match";
+    } else {
+      headline = (ev as any).title || "Événement";
+    }
+    const venueBit = isMatch
+      ? isHome === true
+        ? " · Domicile"
+        : isHome === false
+          ? " · Extérieur"
+          : ""
+      : location
+        ? ` · ${location}`
+        : "";
+
+    const title = data.hasChanges
+      ? "🔄 Convocation mise à jour"
+      : "🔄 Convocation renvoyée";
+
+    console.log("[push:conv-resend] dispatch begin", {
+      eventId: data.eventId,
+      playerIds: data.playerIds.length,
+      targets: targets.size,
+      hasChanges: !!data.hasChanges,
+    });
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
+        title,
+        body: `${headline} — ${dateStr} à ${timeStr}${venueBit}`,
+        url: `/events/${data.eventId}`,
+        tag: `conv-resend-${data.eventId}-${uid}`,
+      }).catch((e) => {
+        console.warn("[push] convocation resend send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((total, result) => total + result.sent, 0);
+    console.log("[push:conv-resend] dispatch done", {
+      eventId: data.eventId,
+      targets: targets.size,
+      sent,
+    });
+    try {
+      await supabaseAdmin.from("push_dispatch_log").insert({
+        kind: "convocation_resend",
+        ref_id: data.eventId,
+        targets_count: targets.size,
+        sent_count: sent,
+      });
+    } catch (e) {
+      console.warn("[push:conv-resend] log insert failed", (e as Error).message);
+    }
+    return { dispatched: targets.size, sent };
+  });
+
+
+
+/* ------------------------------------------------------------------ */
 /* Match score push                                                   */
 /* ------------------------------------------------------------------ */
 const ScoreInput = z.object({

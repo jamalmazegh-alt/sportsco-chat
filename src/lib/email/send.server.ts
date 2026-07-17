@@ -65,8 +65,9 @@ export async function enqueueTransactionalEmailServer(params: {
       recipient_email: recipient,
       status: "suppressed",
     });
-    return { success: false, reason: "suppressed" as const };
+    return { success: false, reason: "suppressed" as const, messageId };
   }
+
 
   // Unsubscribe token (one per email)
   let unsubscribeToken: string;
@@ -143,5 +144,5 @@ export async function enqueueTransactionalEmailServer(params: {
     });
     throw error;
   }
-  return { success: true };
+  return { success: true, messageId };
 }
