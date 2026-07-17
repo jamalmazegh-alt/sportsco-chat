@@ -574,7 +574,18 @@ function TeamDetail() {
       }
     }
 
-    if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
+    if (targets.length === 0) {
+      // Distinguish "no contact info" from "all contacts already linked to accounts".
+      const playerLinked = !!pl?.user_id || (!canInvitePlayer && !!pl && !pl.user_id);
+      const allParentsLinked =
+        (parents ?? []).length > 0 && (parents ?? []).every((p) => !!p.parent_user_id);
+      const someContactExists =
+        !!(pl?.email || pl?.phone) || (parents ?? []).some((p) => !!(p.email || p.phone));
+      if (someContactExists && (playerLinked || allParentsLinked)) {
+        return { sent: 0, failed: 0, skipped: 1, reason: "already_active" };
+      }
+      return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
+    }
 
     // Déduplication : sauter les contacts (email/téléphone) qui ont déjà une
     // invitation en cours pour ce joueur, et ceux dont l'email est déjà lié
