@@ -31,9 +31,8 @@ const inviteStatusesQuery = (clubId: string) =>
 
 function ClubInvitesPage() {
   const { clubId } = Route.useParams();
-  const listFn = useServerFn(listClubInviteStatuses);
-  void listFn; // handled via queryFn above
   const { data, isLoading, error } = useSuspenseQueryOrPending(clubId);
+
 
   const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | EmailStatus>("all");
   const [inviteStatusFilter, setInviteStatusFilter] = useState<
