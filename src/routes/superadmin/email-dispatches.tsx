@@ -110,7 +110,7 @@ function EmailDispatchesPage() {
             return (
               <li key={d.id}>
                 <Link
-                  to="/superadmin/email-dispatches/$dispatchId"
+                  to="/superadmin/email-dispatches_/$dispatchId"
                   params={{ dispatchId: d.id }}
                   className="block rounded-md border border-border bg-card px-3 py-2.5 hover:bg-foreground/[0.03] transition-colors"
                 >
