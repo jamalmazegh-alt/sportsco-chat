@@ -60,7 +60,7 @@ export const Route = createFileRoute("/tournament/$slug_/tv")({
 
 function TvSlideshowPage() {
   const { slug } = Route.useParams();
-  const { refresh } = Route.useSearch();
+  const { refresh = 12 } = Route.useSearch();
   const { t } = useTranslation("tournaments");
   const fn = useServerFn(getPublicTournament);
   const q = useQuery({
