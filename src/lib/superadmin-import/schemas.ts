@@ -183,7 +183,8 @@ export function normalizeHeader(s: string): string {
     .split(/[^a-z0-9]+/)
     .filter(Boolean)
     .filter((t) => !STOPWORDS.has(t))
-    .map((t) => TOKEN_SYNONYMS[t] ?? t);
+    .map((t) => TOKEN_SYNONYMS[t] ?? t)
+    .sort();
   return tokens.join("");
 }
 
