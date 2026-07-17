@@ -522,8 +522,8 @@ function TeamDetail() {
   // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
   async function sendInvitesForPlayer(
     playerId: string,
-  ): Promise<{ sent: number; failed: number; skipped: number }> {
-    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1 };
+  ): Promise<{ sent: number; failed: number; skipped: number; reason?: "no_contact" | "already_active" }> {
+    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
 
     // Load player + parents
     const [{ data: pl }, { data: parents }] = await Promise.all([
