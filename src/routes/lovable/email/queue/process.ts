@@ -357,22 +357,44 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
               // recipient_mismatch: same-burst collision on the provider's auto-created
               // run. Continuing to process siblings in the same cycle re-triggers the
-              // collision and burns the retry budget on every one of them. Treat like a
-              // rate limit: stop the batch, set a short global cooldown, and do NOT log
-              // a `failed` row (which would count toward MAX_RETRIES). VT expires, the
-              // message is retried on a later cycle in isolation and succeeds.
+              // collision and burns the retry budget on every one of them.
+              //
+              // Handling:
+              //   - stop the transactional batch (siblings would collide too);
+              //   - set the per-queue cooldown `transactional_retry_after_until` only —
+              //     NOT the global one — so auth emails (password reset, magic link)
+              //     keep flowing while this queue backs off;
+              //   - log as STATUS_MISMATCH_DEFERRED, which counts toward MAX_MISMATCH_ATTEMPTS
+              //     but NOT toward the general MAX_RETRIES failure budget. Once
+              //     MAX_MISMATCH_ATTEMPTS is reached (checked at the top of the loop),
+              //     the message is DLQ'd instead of retrying forever.
               if (isTransientRunRecipientMismatch(error)) {
-                const cooldownSecs = 45;
+                await supabase.from("email_send_log").insert({
+                  message_id: payload.message_id,
+                  template_name: payload.label || queue,
+                  recipient_email: payload.to,
+                  status: STATUS_MISMATCH_DEFERRED,
+                  error_message: errorMsg.slice(0, 1000),
+                });
+                if (payload?.message_id && typeof payload.message_id === "string") {
+                  mismatchAttemptsByMessageId.set(
+                    payload.message_id,
+                    mismatchAttempts + 1,
+                  );
+                }
                 await supabase
                   .from("email_send_state")
                   .update({
-                    retry_after_until: new Date(Date.now() + cooldownSecs * 1000).toISOString(),
+                    transactional_retry_after_until: new Date(
+                      Date.now() + MISMATCH_COOLDOWN_SECS * 1000,
+                    ).toISOString(),
                     updated_at: new Date().toISOString(),
                   })
                   .eq("id", 1);
                 return Response.json({
                   processed: totalProcessed,
                   stopped: "recipient_mismatch_cooldown",
+                  mismatch_attempts: mismatchAttempts + 1,
                 });
               }
 
