@@ -172,17 +172,19 @@ function ClubInvitesPage() {
   );
 }
 
-function useSuspenseQueryOrPending(clubId: string) {
-  // Suspense-aware read
-  try {
-    const { data } = useSuspenseQuery(inviteStatusesQuery(clubId));
-    return { data, isLoading: false, error: null as unknown as Error | null };
-  } catch (e) {
-    // useSuspenseQuery throws promises for suspense — let it bubble.
-    if (e && typeof e === "object" && "then" in e) throw e;
-    return { data: undefined, isLoading: false, error: e as Error };
-  }
+function useSuspenseQueryOrPending(clubId: string): {
+  data: { rows: ClubInviteStatusRow[] } | undefined;
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const q = useQuery(inviteStatusesQuery(clubId));
+  return {
+    data: q.data,
+    isLoading: q.isLoading,
+    error: (q.error as Error | null) ?? null,
+  };
 }
+
 
 function KPI({
   label,
