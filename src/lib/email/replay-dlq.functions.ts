@@ -259,9 +259,10 @@ export const replayEventDlq = createServerFn({ method: "POST" })
 
       return { ok: true as const, replayed, dispatchId };
     } finally {
-      await supabaseAdmin
-        .rpc("pg_advisory_unlock" as any, { key: lockKey } as any)
-        .then(() => {})
-        .catch(() => {});
+      try {
+        await supabaseAdmin.rpc("pg_advisory_unlock" as any, { key: lockKey } as any);
+      } catch {
+        // best-effort unlock; connection will drop the lock at session end.
+      }
     }
   });
