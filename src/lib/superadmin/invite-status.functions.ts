@@ -37,6 +37,7 @@ export type ClubInviteStatusRow = {
   expiresAt: string;
   usedAt: string | null;
   isExpired: boolean;
+  hasActiveAccount: boolean;
   emailStatus: EmailStatus;
   emailError: string | null;
   emailSentAt: string | null;
@@ -66,7 +67,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    // Resolve invited player names (for parent invites AND player invites)
+    // Resolve invited player names + child_platform_access + user_id.
     const playerIds = Array.from(
       new Set(
         (invites ?? [])
@@ -75,14 +76,37 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       ),
     );
     const playerNames = new Map<string, string>();
+    const playerInfo = new Map<
+      string,
+      { userId: string | null; childPlatformAccess: boolean }
+    >();
     if (playerIds.length > 0) {
       const { data: players } = await supabaseAdmin
         .from("players")
-        .select("id, first_name, last_name")
+        .select("id, first_name, last_name, user_id, child_platform_access")
         .in("id", playerIds);
       for (const p of players ?? []) {
         const nm = `${(p as any).first_name ?? ""} ${(p as any).last_name ?? ""}`.trim();
         if (nm) playerNames.set((p as any).id, nm);
+        playerInfo.set((p as any).id, {
+          userId: ((p as any).user_id as string | null) ?? null,
+          childPlatformAccess: !!(p as any).child_platform_access,
+        });
+      }
+    }
+
+    // Resolve which parent emails have an active linked account for each player.
+    const activeParentEmails = new Set<string>(); // key: `${playerId}|${email.toLowerCase()}`
+    if (playerIds.length > 0) {
+      const { data: pps } = await supabaseAdmin
+        .from("player_parents")
+        .select("player_id, email, parent_user_id")
+        .in("player_id", playerIds);
+      for (const pp of pps ?? []) {
+        const email = ((pp as any).email as string | null)?.toLowerCase();
+        const pid = (pp as any).player_id as string;
+        const uid = (pp as any).parent_user_id as string | null;
+        if (email && uid) activeParentEmails.add(`${pid}|${email}`);
       }
     }
 
@@ -199,6 +223,29 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       const playerId = inv.parent_for_player_id ?? inv.player_id ?? null;
       const invitedPlayerName = playerId ? (playerNames.get(playerId) ?? null) : null;
 
+      // Compute "hasActiveAccount":
+      //  - parent invite: a player_parents row links this email to a real user, OR
+      //    the child does not have platform access and any parent for this child is linked.
+      //  - player invite: the player has a linked user_id, OR the child has no
+      //    platform access (managed by parents) and at least one parent is linked.
+      let hasActiveAccount = false;
+      const info = playerId ? playerInfo.get(playerId) : undefined;
+      if (inv.role === "parent" && playerId && inv.email) {
+        const key = `${playerId}|${(inv.email as string).toLowerCase()}`;
+        if (activeParentEmails.has(key)) hasActiveAccount = true;
+      } else if (inv.player_id && info) {
+        if (info.userId) hasActiveAccount = true;
+        else if (!info.childPlatformAccess) {
+          // child managed by parents: any linked parent counts
+          for (const k of activeParentEmails) {
+            if (k.startsWith(`${inv.player_id}|`)) {
+              hasActiveAccount = true;
+              break;
+            }
+          }
+        }
+      }
+
       return {
         inviteId: inv.id as string,
         email: (inv.email as string | null) ?? null,
@@ -211,6 +258,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
         expiresAt: inv.expires_at as string,
         usedAt: (inv.used_at as string | null) ?? null,
         isExpired: !inv.used_at && new Date(inv.expires_at).getTime() < now,
+        hasActiveAccount,
         emailStatus,
         emailError,
         emailSentAt,
