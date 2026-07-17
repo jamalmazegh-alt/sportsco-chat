@@ -413,7 +413,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 .insert({
                   ...baseLogRow(payload, queue),
                   status: "sent",
+                  attempt_count: failedAttempts + mismatchAttempts + 1,
+                  mismatch_count: mismatchAttempts,
                 });
+
 
               if (insertSuccessError) {
                 console.error("email_queue.insert_sent_failed", {
