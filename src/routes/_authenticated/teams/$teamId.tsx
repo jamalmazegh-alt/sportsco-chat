@@ -522,8 +522,8 @@ function TeamDetail() {
   // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
   async function sendInvitesForPlayer(
     playerId: string,
-  ): Promise<{ sent: number; failed: number; skipped: number }> {
-    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1 };
+  ): Promise<{ sent: number; failed: number; skipped: number; reason?: "no_contact" | "already_active" }> {
+    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
 
     // Load player + parents
     const [{ data: pl }, { data: parents }] = await Promise.all([
@@ -574,7 +574,18 @@ function TeamDetail() {
       }
     }
 
-    if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
+    if (targets.length === 0) {
+      // Distinguish "no contact info" from "all contacts already linked to accounts".
+      const playerLinked = !!pl?.user_id || (!canInvitePlayer && !!pl && !pl.user_id);
+      const allParentsLinked =
+        (parents ?? []).length > 0 && (parents ?? []).every((p) => !!p.parent_user_id);
+      const someContactExists =
+        !!(pl?.email || pl?.phone) || (parents ?? []).some((p) => !!(p.email || p.phone));
+      if (someContactExists && (playerLinked || allParentsLinked)) {
+        return { sent: 0, failed: 0, skipped: 1, reason: "already_active" };
+      }
+      return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
+    }
 
     // Déduplication : sauter les contacts (email/téléphone) qui ont déjà une
     // invitation en cours pour ce joueur, et ceux dont l'email est déjà lié
@@ -674,7 +685,10 @@ function TeamDetail() {
     setInviting(true);
     const r = await sendInvitesForPlayer(playerId);
     setInviting(false);
-    if (r.skipped) toast.warning(t("players.inviteNoContact"));
+    if (r.skipped)
+      toast.warning(
+        t(r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+      );
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed)
       toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
@@ -745,7 +759,26 @@ function TeamDetail() {
         const ph = (phone ?? "").trim();
         return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
       };
-      if (!p.user_id && (p.email || p.phone) && !isPending(p.email, p.phone)) return true;
+      // Minor without platform access is managed by parents — the player
+      // himself is never invitable, only parents count.
+      const isMinor = (() => {
+        if (!p.birth_date) return false;
+        const dob = new Date(p.birth_date);
+        if (Number.isNaN(dob.getTime())) return false;
+        const now = new Date();
+        let age = now.getFullYear() - dob.getFullYear();
+        const m = now.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+        return age < 18;
+      })();
+      const canInvitePlayer = !isMinor || !!p.child_platform_access;
+      if (
+        canInvitePlayer &&
+        !p.user_id &&
+        (p.email || p.phone) &&
+        !isPending(p.email, p.phone)
+      )
+        return true;
       const parents = parentsByPlayer?.get(p.id) ?? [];
       return parents.some(
         (pr) => !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),

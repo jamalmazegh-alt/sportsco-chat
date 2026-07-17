@@ -695,7 +695,8 @@
       "noneDetected": "Aucun joueur détecté dans le fichier.",
       "done": "{{inserted}} joueur(s) importé(s)",
       "failed": "{{failed}} ligne(s) en erreur"
-    }
+    },
+    "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer."
   },
   "events": {
     "isOfficial": "Match officiel",

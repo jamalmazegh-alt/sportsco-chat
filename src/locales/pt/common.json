@@ -695,7 +695,8 @@
       "noneDetected": "Nenhum jogador detectado no arquivo.",
       "done": "{{inserted}} jogador(es) importado(s)",
       "failed": "{{failed}} linha(s) com erros"
-    }
+    },
+    "inviteAlreadyActive": "Conta já ativa — não é preciso reenviar."
   },
   "events": {
     "isOfficial": "Jogo oficial",
