@@ -17,9 +17,11 @@ const NEXT = "/tournaments/new-from-pass";
 
 export const Route = createFileRoute("/tournaments/start")({
   component: StartPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    auth_error: typeof s.auth_error === "string" ? s.auth_error : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { auth_error?: string } => {
+    const out: { auth_error?: string } = {};
+    if (typeof s.auth_error === "string") out.auth_error = s.auth_error;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: i18n.t("tournaments.start.metaTitle", { ns: "marketing" }) },

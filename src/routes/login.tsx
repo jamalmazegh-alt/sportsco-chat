@@ -8,10 +8,12 @@ import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    invite: typeof search.invite === "string" ? search.invite : undefined,
-    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { invite?: string; next?: string } => {
+    const out: { invite?: string; next?: string } = {};
+    if (typeof search.invite === "string") out.invite = search.invite;
+    if (typeof search.next === "string" && search.next.startsWith("/")) out.next = search.next;
+    return out;
+  },
   component: LoginPage,
   head: () => ({
     meta: [

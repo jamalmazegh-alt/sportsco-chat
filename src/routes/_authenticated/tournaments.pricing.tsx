@@ -13,9 +13,11 @@ import {
 
 export const Route = createFileRoute("/_authenticated/tournaments/pricing")({
   component: TournamentPricingPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    canceled: s.canceled === "1" ? ("1" as const) : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { canceled?: "1" } => {
+    const out: { canceled?: "1" } = {};
+    if (s.canceled === "1") out.canceled = "1";
+    return out;
+  },
   head: () => ({
     meta: [
       {
