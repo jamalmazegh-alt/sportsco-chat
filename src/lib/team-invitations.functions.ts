@@ -279,6 +279,8 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
             clubName: clubLabel,
             clubLogoUrl,
             inviteUrl,
+            roleLabel: target.role === "parent" ? "parent" : "joueur",
+            playerFirstName: target.playerFirstName,
           },
         });
 
