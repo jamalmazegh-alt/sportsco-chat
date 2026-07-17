@@ -36,18 +36,26 @@ function ClubInvitesPage() {
 
   const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | EmailStatus>("all");
   const [inviteStatusFilter, setInviteStatusFilter] = useState<
-    "all" | "accepted" | "pending" | "expired"
+    "all" | "accepted" | "active" | "pending" | "expired"
   >("all");
   const [search, setSearch] = useState("");
 
   const rows = data?.rows ?? [];
 
+  const inviteStatusOf = (r: ClubInviteStatusRow) =>
+    r.usedAt
+      ? "accepted"
+      : r.hasActiveAccount
+        ? "active"
+        : r.isExpired
+          ? "expired"
+          : "pending";
+
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       if (emailStatusFilter !== "all" && r.emailStatus !== emailStatusFilter) return false;
       if (inviteStatusFilter !== "all") {
-        const inviteStatus = r.usedAt ? "accepted" : r.isExpired ? "expired" : "pending";
-        if (inviteStatus !== inviteStatusFilter) return false;
+        if (inviteStatusOf(r) !== inviteStatusFilter) return false;
       }
       if (search) {
         const q = search.toLowerCase();
@@ -61,7 +69,7 @@ function ClubInvitesPage() {
 
   const stats = useMemo(() => {
     const total = rows.length;
-    const accepted = rows.filter((r) => r.usedAt).length;
+    const accepted = rows.filter((r) => r.usedAt || r.hasActiveAccount).length;
     const emailSent = rows.filter((r) => r.emailStatus === "sent").length;
     const emailFailed = rows.filter(
       (r) => r.emailStatus === "failed" || r.emailStatus === "dlq",
