@@ -759,7 +759,26 @@ function TeamDetail() {
         const ph = (phone ?? "").trim();
         return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
       };
-      if (!p.user_id && (p.email || p.phone) && !isPending(p.email, p.phone)) return true;
+      // Minor without platform access is managed by parents — the player
+      // himself is never invitable, only parents count.
+      const isMinor = (() => {
+        if (!p.birth_date) return false;
+        const dob = new Date(p.birth_date);
+        if (Number.isNaN(dob.getTime())) return false;
+        const now = new Date();
+        let age = now.getFullYear() - dob.getFullYear();
+        const m = now.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+        return age < 18;
+      })();
+      const canInvitePlayer = !isMinor || !!p.child_platform_access;
+      if (
+        canInvitePlayer &&
+        !p.user_id &&
+        (p.email || p.phone) &&
+        !isPending(p.email, p.phone)
+      )
+        return true;
       const parents = parentsByPlayer?.get(p.id) ?? [];
       return parents.some(
         (pr) => !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
