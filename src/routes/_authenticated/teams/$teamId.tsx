@@ -1486,9 +1486,11 @@ function TeamDetail() {
                         "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
                         linked
                           ? "bg-emerald-500"
-                          : hasPendingInvite
-                            ? "bg-amber-400"
-                            : "bg-muted-foreground/40",
+                          : hasFailedInvite
+                            ? "bg-red-500"
+                            : hasPendingInvite
+                              ? "bg-amber-400"
+                              : "bg-muted-foreground/40",
                       )}
                     />
                   )}
