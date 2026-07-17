@@ -223,6 +223,29 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       const playerId = inv.parent_for_player_id ?? inv.player_id ?? null;
       const invitedPlayerName = playerId ? (playerNames.get(playerId) ?? null) : null;
 
+      // Compute "hasActiveAccount":
+      //  - parent invite: a player_parents row links this email to a real user, OR
+      //    the child does not have platform access and any parent for this child is linked.
+      //  - player invite: the player has a linked user_id, OR the child has no
+      //    platform access (managed by parents) and at least one parent is linked.
+      let hasActiveAccount = false;
+      const info = playerId ? playerInfo.get(playerId) : undefined;
+      if (inv.role === "parent" && playerId && inv.email) {
+        const key = `${playerId}|${(inv.email as string).toLowerCase()}`;
+        if (activeParentEmails.has(key)) hasActiveAccount = true;
+      } else if (inv.player_id && info) {
+        if (info.userId) hasActiveAccount = true;
+        else if (!info.childPlatformAccess) {
+          // child managed by parents: any linked parent counts
+          for (const k of activeParentEmails) {
+            if (k.startsWith(`${inv.player_id}|`)) {
+              hasActiveAccount = true;
+              break;
+            }
+          }
+        }
+      }
+
       return {
         inviteId: inv.id as string,
         email: (inv.email as string | null) ?? null,
@@ -235,6 +258,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
         expiresAt: inv.expires_at as string,
         usedAt: (inv.used_at as string | null) ?? null,
         isExpired: !inv.used_at && new Date(inv.expires_at).getTime() < now,
+        hasActiveAccount,
         emailStatus,
         emailError,
         emailSentAt,
