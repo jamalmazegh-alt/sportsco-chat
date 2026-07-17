@@ -357,6 +357,34 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
       );
       if (playerIds.length === 0) return { failuresByPlayer: {} };
 
+      // Current live contact emails per player (player + parents). Failures
+      // recorded against an email that is no longer any of these are stale
+      // (typo later corrected, parent email changed, etc.) and must NOT be
+      // reported as a current failure.
+      const [{ data: playerRows }, { data: parentRows }] = await Promise.all([
+        supabaseAdmin.from("players").select("id, email").in("id", playerIds),
+        supabaseAdmin
+          .from("player_parents")
+          .select("player_id, email")
+          .in("player_id", playerIds),
+      ]);
+      const currentEmailsByPlayer = new Map<string, Set<string>>();
+      const addEmail = (pid: string, email: string | null | undefined) => {
+        const norm = (email ?? "").trim().toLowerCase();
+        if (!norm) return;
+        const set = currentEmailsByPlayer.get(pid) ?? new Set<string>();
+        set.add(norm);
+        currentEmailsByPlayer.set(pid, set);
+      };
+      for (const r of playerRows ?? []) addEmail((r as any).id, (r as any).email);
+      for (const r of parentRows ?? [])
+        addEmail((r as any).player_id, (r as any).email);
+      const isCurrentEmail = (pid: string, email: string | null | undefined) => {
+        const norm = (email ?? "").trim().toLowerCase();
+        if (!norm) return false;
+        return currentEmailsByPlayer.get(pid)?.has(norm) ?? false;
+      };
+
       const { data: invites } = await supabaseAdmin
         .from("member_invites")
         .select("id, player_id, parent_for_player_id, email, email_message_id, created_at")
@@ -414,10 +442,14 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
           if (!FAIL.has(status)) continue;
           const info = inviteByMsg.get(mid);
           if (!info) continue;
+          const failedEmail =
+            ((l as any).recipient_email as string | null) ?? info.email ?? "";
+          // Skip stale failures on emails that are no longer any of the
+          // player's or parents' current contacts.
+          if (!isCurrentEmail(info.playerId, failedEmail)) continue;
           const arr = (failuresByPlayer[info.playerId] ??= []);
           arr.push({
-            email:
-              ((l as any).recipient_email as string | null) ?? info.email ?? "",
+            email: failedEmail,
             status,
             error: ((l as any).error_message as string | null) ?? null,
             at: (l as any).created_at as string,
@@ -448,6 +480,7 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
             if (delta > 10 * 60_000) continue;
             const status = l.status as string;
             if (!FAIL.has(status)) continue;
+            if (!isCurrentEmail(inv.playerId, inv.email)) break;
             const arr = (failuresByPlayer[inv.playerId] ??= []);
             if (arr.some((x) => x.email.toLowerCase() === inv.email)) break;
             arr.push({
