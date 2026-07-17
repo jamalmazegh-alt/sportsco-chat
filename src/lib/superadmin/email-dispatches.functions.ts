@@ -312,7 +312,7 @@ export const getEmailDispatchDetail = createServerFn({ method: "POST" })
         event_id: dispatch.event_id as string | null,
         created_by: dispatch.created_by as string | null,
         created_by_name: creatorName,
-        metadata: (dispatch.metadata ?? {}) as Record<string, unknown>,
+        metadata_json: JSON.stringify(dispatch.metadata ?? {}),
       },
       event,
       counts,
