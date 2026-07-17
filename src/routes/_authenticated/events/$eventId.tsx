@@ -1222,18 +1222,33 @@ function EventDetail() {
           ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
           : undefined;
 
+        // ONE dispatch groups all convocation-invite recipients for this send.
+        const { dispatchId } = await createEmailDispatchFn({
+          data: {
+            eventId: event.id,
+            templateName: "convocation-invite",
+            dispatchType: "initial",
+            metadata: { recipient_count: (insertedConvs ?? []).length },
+          },
+        }).catch(() => ({ dispatchId: crypto.randomUUID() }));
+
         const sendOne = async (
           token: string,
           toEmail: string,
           recipientFirstName: string | undefined,
           playerName: string,
           idemSuffix: string,
+          recipientId: string,
         ) =>
           sendTransactionalEmail({
             templateName: "convocation-invite",
             recipientEmail: toEmail,
             fromName: `${clubName ?? "Clubero"} via Clubero`,
             idempotencyKey: `convoc-invite-${event.id}-${idemSuffix}`,
+            dispatchId,
+            eventId: event.id,
+            recipientId,
+            notificationType: "convocation-invite",
             templateData: {
               recipientFirstName,
               playerName,
@@ -1267,13 +1282,16 @@ function EventDetail() {
           firstName: string | undefined,
           playerName: string,
           idemSuffix: string,
+          recipientId: string,
         ) => {
           if (!email) return;
           const key = email.trim().toLowerCase();
           if (!key || sentToEmails.has(key)) return;
           sentToEmails.add(key);
           sends.push(
-            sendOne(token, email, firstName, playerName, idemSuffix).catch(() => undefined),
+            sendOne(token, email, firstName, playerName, idemSuffix, recipientId).catch(
+              () => undefined,
+            ),
           );
         };
         for (const conv of insertedConvs ?? []) {
@@ -1287,6 +1305,7 @@ function EventDetail() {
             player.first_name ?? undefined,
             playerName,
             `p-${conv.id}`,
+            `player:${conv.player_id}`,
           );
           // Parent emails (fallback to auth email when player_parents.email is empty)
           for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
@@ -1294,12 +1313,19 @@ function EventDetail() {
             const email =
               parent.email ||
               (parent.parent_user_id ? resolvedParentEmails[parent.parent_user_id] : null);
+            const normalizedEmail = email ? email.trim().toLowerCase() : null;
+            const recipientId = normalizedEmail
+              ? `parent:${conv.player_id}:${normalizedEmail}`
+              : parent.parent_user_id
+                ? `parent-uid:${conv.player_id}:${parent.parent_user_id}`
+                : `parent-rand:${conv.player_id}:${parent.player_id}`;
             enqueue(
               email,
               conv.response_token!,
               parentFirst,
               playerName,
               `parent-${parent.parent_user_id ?? parent.player_id}-${conv.id}`,
+              recipientId,
             );
           }
         }
