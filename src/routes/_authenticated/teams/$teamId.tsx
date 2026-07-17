@@ -1457,6 +1457,8 @@ function TeamDetail() {
             const hasContactHint = hasOpenContact(p);
             const canInvite = !p.user_id;
             const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
+            const failures = inviteFailuresByPlayer?.[p.id] ?? [];
+            const hasFailedInvite = failures.length > 0;
             const linked = !!p.user_id;
 
             const checked = selectedIds.has(p.id);
