@@ -101,6 +101,16 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: "templateName is required" }, { status: 400 });
         }
 
+        // Métadonnées propagées à chaque email_send_log row et au payload pgmq
+        // pour permettre la déduplication par (dispatch_id, recipient_id,
+        // notification_type) et la traçabilité par événement.
+        const baseMeta = {
+          dispatch_id: dispatchId,
+          event_id: eventId,
+          recipient_id: recipientId,
+          notification_type: notificationType,
+        };
+
         // 1. Look up template from registry (early — needed to resolve recipient)
         const template = TEMPLATES[templateName];
 
