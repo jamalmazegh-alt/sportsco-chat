@@ -86,7 +86,7 @@ import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users_.$userId'
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
-import { Route as SuperadminEmailDispatchesDispatchIdRouteImport } from './routes/superadmin/email-dispatches.$dispatchId'
+import { Route as SuperadminEmailDispatchesDispatchIdRouteImport } from './routes/superadmin/email-dispatches_.$dispatchId'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
@@ -567,9 +567,9 @@ const SuperadminOnboardingImportRoute =
   } as any)
 const SuperadminEmailDispatchesDispatchIdRoute =
   SuperadminEmailDispatchesDispatchIdRouteImport.update({
-    id: '/$dispatchId',
-    path: '/$dispatchId',
-    getParentRoute: () => SuperadminEmailDispatchesRoute,
+    id: '/email-dispatches_/$dispatchId',
+    path: '/email-dispatches/$dispatchId',
+    getParentRoute: () => SuperadminRoute,
   } as any)
 const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
   id: '/clubs/$clubId',
@@ -1108,7 +1108,7 @@ export interface FileRoutesByFullPath {
   '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
-  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRouteWithChildren
+  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1266,7 +1266,7 @@ export interface FileRoutesByTo {
   '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
-  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRouteWithChildren
+  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1429,7 +1429,7 @@ export interface FileRoutesById {
   '/register_/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
-  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRouteWithChildren
+  '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -1471,7 +1471,7 @@ export interface FileRoutesById {
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
-  '/superadmin/email-dispatches/$dispatchId': typeof SuperadminEmailDispatchesDispatchIdRoute
+  '/superadmin/email-dispatches_/$dispatchId': typeof SuperadminEmailDispatchesDispatchIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users_/$userId': typeof SuperadminUsersUserIdRoute
@@ -1955,7 +1955,7 @@ export interface FileRouteTypes {
     | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
-    | '/superadmin/email-dispatches/$dispatchId'
+    | '/superadmin/email-dispatches_/$dispatchId'
     | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users_/$userId'
@@ -2653,12 +2653,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminOnboardingImportRouteImport
       parentRoute: typeof SuperadminRoute
     }
-    '/superadmin/email-dispatches/$dispatchId': {
-      id: '/superadmin/email-dispatches/$dispatchId'
-      path: '/$dispatchId'
+    '/superadmin/email-dispatches_/$dispatchId': {
+      id: '/superadmin/email-dispatches_/$dispatchId'
+      path: '/email-dispatches/$dispatchId'
       fullPath: '/superadmin/email-dispatches/$dispatchId'
       preLoaderRoute: typeof SuperadminEmailDispatchesDispatchIdRouteImport
-      parentRoute: typeof SuperadminEmailDispatchesRoute
+      parentRoute: typeof SuperadminRoute
     }
     '/superadmin/clubs/$clubId': {
       id: '/superadmin/clubs/$clubId'
@@ -3505,31 +3505,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface SuperadminEmailDispatchesRouteChildren {
-  SuperadminEmailDispatchesDispatchIdRoute: typeof SuperadminEmailDispatchesDispatchIdRoute
-}
-
-const SuperadminEmailDispatchesRouteChildren: SuperadminEmailDispatchesRouteChildren =
-  {
-    SuperadminEmailDispatchesDispatchIdRoute:
-      SuperadminEmailDispatchesDispatchIdRoute,
-  }
-
-const SuperadminEmailDispatchesRouteWithChildren =
-  SuperadminEmailDispatchesRoute._addFileChildren(
-    SuperadminEmailDispatchesRouteChildren,
-  )
-
 interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
   SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
-  SuperadminEmailDispatchesRoute: typeof SuperadminEmailDispatchesRouteWithChildren
+  SuperadminEmailDispatchesRoute: typeof SuperadminEmailDispatchesRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRoute
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminEmailDispatchesDispatchIdRoute: typeof SuperadminEmailDispatchesDispatchIdRoute
   SuperadminOnboardingImportRoute: typeof SuperadminOnboardingImportRoute
   SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
   SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
@@ -3541,13 +3527,15 @@ interface SuperadminRouteChildren {
 const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminBillingRoute: SuperadminBillingRoute,
   SuperadminBuildCluberoRoute: SuperadminBuildCluberoRoute,
-  SuperadminEmailDispatchesRoute: SuperadminEmailDispatchesRouteWithChildren,
+  SuperadminEmailDispatchesRoute: SuperadminEmailDispatchesRoute,
   SuperadminLogsRoute: SuperadminLogsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRoute,
   SuperadminIndexRoute: SuperadminIndexRoute,
   SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminEmailDispatchesDispatchIdRoute:
+    SuperadminEmailDispatchesDispatchIdRoute,
   SuperadminOnboardingImportRoute: SuperadminOnboardingImportRoute,
   SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
   SuperadminUsersUserIdRoute: SuperadminUsersUserIdRoute,
