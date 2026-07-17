@@ -90,6 +90,29 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           return Response.json({ skipped: true, reason: "rate_limited" });
         }
 
+        // 1. Read queue config + BOTH cooldown gates.
+        //    - retry_after_until: provider-wide 429 (applies to both queues)
+        //    - transactional_retry_after_until: transactional-queue-only backoff
+        //      (recipient_mismatch bursts) so auth emails like password reset
+        //      are NOT blocked while a convocation burst backs off.
+        const { data: state } = await supabase
+          .from("email_send_state")
+          .select(
+            "retry_after_until, transactional_retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes",
+          )
+          .single();
+
+        const now = new Date();
+        const globalCooldownActive =
+          state?.retry_after_until && new Date(state.retry_after_until) > now;
+        const transactionalCooldownActive =
+          state?.transactional_retry_after_until &&
+          new Date(state.transactional_retry_after_until) > now;
+
+        if (globalCooldownActive) {
+          return Response.json({ skipped: true, reason: "rate_limited" });
+        }
+
         const batchSize = state?.batch_size ?? DEFAULT_BATCH_SIZE;
         const sendDelayMs = state?.send_delay_ms ?? DEFAULT_SEND_DELAY_MS;
         const ttlMinutes: Record<string, number> = {
@@ -100,8 +123,14 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
 
         let totalProcessed = 0;
 
-        // 2. Process auth_emails first (priority), then transactional_emails
+        // 2. Process auth_emails first (priority), then transactional_emails.
+        // The transactional queue is skipped while its per-queue cooldown is active,
+        // but auth_emails keep flowing.
         for (const queue of ["auth_emails", "transactional_emails"]) {
+          if (queue === "transactional_emails" && transactionalCooldownActive) {
+            continue;
+          }
+
           const { data: messages, error: readError } = await supabase.rpc("read_email_batch", {
             queue_name: queue,
             batch_size: batchSize,
