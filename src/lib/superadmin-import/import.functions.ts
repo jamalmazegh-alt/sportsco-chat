@@ -20,6 +20,7 @@ import {
   PLANNING_MAX_ROWS,
   RECURRENCE_OCCURRENCE_CAP,
   getFields,
+  normalizeHeader,
 } from "./schemas";
 import { parseTemplate } from "./template-parse";
 
