@@ -252,18 +252,24 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
         .replace(/\*+$/g, "")
-        .replace(/\s+/g, "")
-        .replace(/[^a-z0-9_]/g, "");
+        .replace(/[^a-z0-9]/g, "");
     const keyByNorm = new Map<string, string>();
-    for (const k of validKeys) keyByNorm.set(normHeader(k), k);
+    const labelByNorm = new Map<string, string>();
+    for (const f of fields) {
+      keyByNorm.set(normHeader(f.key), f.key);
+      labelByNorm.set(normHeader(f.label), f.key);
+    }
+
 
     const mapping: Record<string, string> = {};
     const unmapped: string[] = [];
     for (const h of headers) {
-      const hit = keyByNorm.get(normHeader(h));
+      const n = normHeader(h);
+      const hit = keyByNorm.get(n) ?? labelByNorm.get(n);
       if (hit) mapping[h] = hit;
       else unmapped.push(h);
     }
+
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
