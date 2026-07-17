@@ -695,7 +695,8 @@
       "noneDetected": "Geen speler gedetecteerd in het bestand.",
       "done": "{{inserted}} speler(s) geïmporteerd",
       "failed": "{{failed}} regel(s) met fouten"
-    }
+    },
+    "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig."
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",

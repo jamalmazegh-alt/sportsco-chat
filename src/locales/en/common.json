@@ -695,7 +695,8 @@
       "noneDetected": "No player detected in the file.",
       "done": "{{inserted}} player(s) imported",
       "failed": "{{failed}} row(s) with errors"
-    }
+    },
+    "inviteAlreadyActive": "Account already active — no need to resend."
   },
   "events": {
     "isOfficial": "Official match",

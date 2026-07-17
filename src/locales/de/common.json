@@ -695,7 +695,8 @@
       "noneDetected": "Kein Spieler in der Datei erkannt.",
       "done": "{{inserted}} Spieler importiert",
       "failed": "{{failed}} Zeile(n) mit Fehlern"
-    }
+    },
+    "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig."
   },
   "events": {
     "isOfficial": "Pflichtspiel",

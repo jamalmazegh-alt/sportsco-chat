@@ -695,7 +695,8 @@
       "noneDetected": "Nessun giocatore rilevato nel file.",
       "done": "{{inserted}} giocatore(i) importato(i)",
       "failed": "{{failed}} riga(e) con errori"
-    }
+    },
+    "inviteAlreadyActive": "Account già attivo — non serve rinviare."
   },
   "events": {
     "isOfficial": "Ufficiale",
