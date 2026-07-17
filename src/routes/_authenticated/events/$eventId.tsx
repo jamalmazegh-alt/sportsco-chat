@@ -105,10 +105,12 @@ import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
 import {
   dispatchConvocationPush,
+  dispatchConvocationResendPush,
   dispatchConvocationResponsePush,
   dispatchEventCancelPush,
   dispatchEventReschedulePush,
 } from "@/lib/push-dispatch.functions";
+
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -274,6 +276,8 @@ function EventDetail() {
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const dispatchConvocationPushFn = useServerFn(dispatchConvocationPush);
+  const dispatchConvocationResendPushFn = useServerFn(dispatchConvocationResendPush);
+
   const dispatchConvocationResponsePushFn = useServerFn(dispatchConvocationResponsePush);
   const dispatchEventCancelPushFn = useServerFn(dispatchEventCancelPush);
   const dispatchEventReschedulePushFn = useServerFn(dispatchEventReschedulePush);
@@ -1972,6 +1976,19 @@ function EventDetail() {
           })),
         );
       }
+
+      // Fire-and-forget Web Push fan-out — mirrors the initial convocation send
+      // path so parents/players get a native push, not just an in-app row.
+      dispatchConvocationResendPushFn({
+        data: {
+          eventId: event.id,
+          playerIds,
+          hasChanges: changes.length > 0,
+        },
+      }).catch((e) => {
+        console.warn("[resend] push dispatch failed", (e as Error).message);
+      });
+
       const results = await Promise.allSettled(sends);
       const failedCount = results.filter((r) => r.status === "rejected").length;
 

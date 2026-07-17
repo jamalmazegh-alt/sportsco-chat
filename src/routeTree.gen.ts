@@ -120,6 +120,7 @@ import { Route as AuthenticatedAdminCampsIndexRouteImport } from './routes/_auth
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
 import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
+import { Route as SuperadminClubsClubIdInvitesRouteImport } from './routes/superadmin/clubs.$clubId.invites'
 import { Route as StagesClubSlugCampSlugInscriptionRouteImport } from './routes/stages.$clubSlug.$campSlug.inscription'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -757,6 +758,12 @@ const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
   path: '/pay/$registrationId',
   getParentRoute: () => TSlugRoute,
 } as any)
+const SuperadminClubsClubIdInvitesRoute =
+  SuperadminClubsClubIdInvitesRouteImport.update({
+    id: '/invites',
+    path: '/invites',
+    getParentRoute: () => SuperadminClubsClubIdRoute,
+  } as any)
 const StagesClubSlugCampSlugInscriptionRoute =
   StagesClubSlugCampSlugInscriptionRouteImport.update({
     id: '/stages/$clubSlug/$campSlug/inscription',
@@ -1127,7 +1134,7 @@ export interface FileRoutesByFullPath {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRouteWithChildren
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
@@ -1186,6 +1193,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
+  '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1281,7 +1289,7 @@ export interface FileRoutesByTo {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRouteWithChildren
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
@@ -1340,6 +1348,7 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
+  '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1442,7 +1451,7 @@ export interface FileRoutesById {
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRouteWithChildren
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users_/$userId': typeof SuperadminUsersUserIdRoute
@@ -1501,6 +1510,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
+  '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug_/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1662,6 +1672,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
+    | '/superadmin/clubs/$clubId/invites'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -1816,6 +1827,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
+    | '/superadmin/clubs/$clubId/invites'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -1976,6 +1988,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
+    | '/superadmin/clubs/$clubId/invites'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/tournament/$slug_/roster/$token'
@@ -2852,6 +2865,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
       parentRoute: typeof TSlugRoute
     }
+    '/superadmin/clubs/$clubId/invites': {
+      id: '/superadmin/clubs/$clubId/invites'
+      path: '/invites'
+      fullPath: '/superadmin/clubs/$clubId/invites'
+      preLoaderRoute: typeof SuperadminClubsClubIdInvitesRouteImport
+      parentRoute: typeof SuperadminClubsClubIdRoute
+    }
     '/stages/$clubSlug/$campSlug/inscription': {
       id: '/stages/$clubSlug/$campSlug/inscription'
       path: '/stages/$clubSlug/$campSlug/inscription'
@@ -3445,6 +3465,19 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface SuperadminClubsClubIdRouteChildren {
+  SuperadminClubsClubIdInvitesRoute: typeof SuperadminClubsClubIdInvitesRoute
+}
+
+const SuperadminClubsClubIdRouteChildren: SuperadminClubsClubIdRouteChildren = {
+  SuperadminClubsClubIdInvitesRoute: SuperadminClubsClubIdInvitesRoute,
+}
+
+const SuperadminClubsClubIdRouteWithChildren =
+  SuperadminClubsClubIdRoute._addFileChildren(
+    SuperadminClubsClubIdRouteChildren,
+  )
+
 interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
   SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
@@ -3453,7 +3486,7 @@ interface SuperadminRouteChildren {
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRoute
   SuperadminIndexRoute: typeof SuperadminIndexRoute
-  SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRouteWithChildren
   SuperadminOnboardingImportRoute: typeof SuperadminOnboardingImportRoute
   SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
   SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
@@ -3469,7 +3502,7 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRoute,
   SuperadminIndexRoute: SuperadminIndexRoute,
-  SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminClubsClubIdRoute: SuperadminClubsClubIdRouteWithChildren,
   SuperadminOnboardingImportRoute: SuperadminOnboardingImportRoute,
   SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
   SuperadminUsersUserIdRoute: SuperadminUsersUserIdRoute,
@@ -3612,13 +3645,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

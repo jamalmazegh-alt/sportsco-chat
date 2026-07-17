@@ -1,181 +1,55 @@
-# Visibilité de la liste des convoqués — plan
+# Plan
 
-Livraison en **2 lots séparés**. Le lot A ne merge que quand la matrice RLS est verte et le diff policy avant/après montré. Le lot B ne merge qu'après A.
+## 1. Push manquant lors du renvoi d'une convocation
 
-Ligne de fracture : tout ce qui **décide qui voit quoi** → lot A. Tout ce qui est **cosmétique** (champ UI, i18n, badge) → lot B. Le PDF, les compositions et les compteurs agrégés vont en **A** — ce sont des consommateurs de données, pas de la présentation.
+**Cause** : dans `src/routes/_authenticated/events/$eventId.tsx` (fonction de renvoi de convocation, ~L1958), on insère les notifications in-app + on envoie les emails, mais aucun push web n'est déclenché. `push_dispatch_log` confirme : zéro entrée pour l'événement Espanyol Barcelone. Adam a un push subscription actif, mais rien ne l'a alimenté.
 
----
+**Fix** : après l'insertion des notifications, appeler une server function push dédiée au renvoi.
 
-## Lot A — Mur porteur (sécurité)
+- Ajouter dans `src/lib/push-dispatch.functions.ts` une nouvelle server fn `pushConvocationResend({ eventId, playerIds, changedFields })` qui :
+  - Charge event + players + parents (même logique que `pushConvocationNew`)
+  - Respecte le gate `convocation_on_create` (le renvoi est un update de convocation)
+  - Envoie un push avec titre `🔄 Convocation mise à jour` si `changedFields.length > 0`, sinon `🔄 Convocation renvoyée`, body = même format que pour un new (équipe + date + venue)
+  - Log dans `push_dispatch_log` avec `kind='convocation_resend'`, `ref_id=eventId`
+- Dans `$eventId.tsx`, après `plan.inAppUserIds` insert et avant le `Promise.allSettled(sends)` email, appeler la fn (fire-and-forget avec catch silencieux) en passant `playerIds` = joueurs concernés par le renvoi et `changedFields`
 
-### A.1 Migration schéma
+## 2. Dashboard superadmin — statut des invitations par club
 
-Nouvelle migration `supabase/migrations/<ts>_call_up_visibility.sql` :
+**Objectif** : pour chaque club, lister les membres invités avec le statut de l'invitation ET l'état email (envoyé/échec/DLQ/suppressed/accepté).
 
-- `clubs.show_called_up_players_default boolean not null default true`
-- `teams.show_called_up_players_override boolean null default null`
-- `events.show_called_up_players_override boolean null default null`
+**Sources de données** :
+- `member_invites` (token, email, role, accepted_at, expires_at, club_id, invited_player_id)
+- `email_send_log` (statut par `message_id`) → dedup par `message_id` (règle du guide)
+- Corrélation invite ↔ email : les invites parents/joueurs utilisent `idempotencyKey` construit dans l'import → il faut retrouver la ligne email via `recipient_email` + `template_name in ('player-invite', 'convocation-invite')` + fenêtre temporelle proche du `created_at` de l'invite. Alternative plus robuste : stocker le `message_id` dans une nouvelle colonne `member_invites.email_message_id` remplie lors du `createInviteAndEmail`. Je vais **ajouter cette colonne** dans une migration, et la remplir côté code — corrélation exacte, plus de fuzzy match.
 
-Nullables préservés pour l'héritage. Aucun événement existant ne change de comportement (défaut club = `true`).
+**Server function** :
+- `src/lib/superadmin/invite-status.functions.ts` — `listClubInviteStatuses({ clubId })` (protégée par `requireSupabaseAuth` + check `has_role(_, 'superadmin')`)
+- Retourne pour chaque `member_invites` : `{ inviteId, email, role, invitedPlayerName, expiresAt, acceptedAt, emailStatus: 'sent'|'failed'|'dlq'|'suppressed'|'pending'|'none', emailError, emailSentAt }`
 
-### A.2 Fonction source de vérité unique
+**Route/UI** :
+- Route `src/routes/_authenticated/superadmin/clubs/$clubId/invites.tsx`
+- Tableau : Membre / Email / Rôle / Statut invite (En attente / Acceptée / Expirée) / Statut email (badge coloré) / Date envoi / Erreur (si failed)
+- Filtres : statut email, statut invite
+- Bouton "Renvoyer" par ligne (réutilise le path existant `createInviteAndEmail`)
+- Lien depuis la page club superadmin existante
 
-```sql
-create or replace function public.call_up_list_visible(p_event_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select coalesce(
-    (select coalesce(
-      e.show_called_up_players_override,
-      t.show_called_up_players_override,
-      c.show_called_up_players_default)
-     from public.events e
-     join public.teams t on t.id = e.team_id
-     join public.clubs c on c.id = t.club_id
-     where e.id = p_event_id),
-    false
-  );
-$$;
-```
+**Migration** :
+- `ALTER TABLE member_invites ADD COLUMN email_message_id text` + index sur `(club_id, email_message_id)`
 
-`grant execute` à `authenticated` et `anon` (route publique `r.$token`). Owner : `postgres`. Jamais NULL. Événement introuvable → `false`. `events.club_id` non utilisé (le schéma actuel n'a que `events.team_id`, FK NOT NULL vers `teams`).
+## 3. Tests
 
-### A.3 Policy RESTRICTIVE — `convocations` (SELECT)
+- Test unitaire sur la corrélation invite ↔ email_send_log (via message_id)
+- `bun run test` doit rester vert (642+)
 
-Table cible du spec (`call_ups` → `convocations` dans ce projet). Policy permissive actuelle `convocations_select` conservée. Ajout :
+## Fichiers touchés (résumé technique)
 
-```sql
-create policy "convocations_visibility_gate"
-on public.convocations
-as restrictive
-for select
-to authenticated
-using (
-  is_team_staff_of_event(event_id, (select auth.uid()))
-  or public.call_up_list_visible(event_id)
-  or player_id in (select id from public.players where user_id = (select auth.uid()))
-  or player_id in (select player_id from public.player_parents where parent_user_id = (select auth.uid()))
-);
-```
+- `src/lib/push-dispatch.functions.ts` — nouvelle fn `pushConvocationResend`
+- `src/routes/_authenticated/events/$eventId.tsx` — appel push après insertion notifs
+- Migration : `ALTER TABLE member_invites ADD email_message_id text`
+- `src/lib/superadmin-import/import.functions.ts` (et autres call sites de `createInviteAndEmail`) — persister le `messageId` dans `member_invites.email_message_id`
+- `src/lib/superadmin/invite-status.functions.ts` — nouvelle server fn
+- `src/routes/_authenticated/superadmin/clubs/$clubId/invites.tsx` — nouvelle page
+- Lien vers cette page depuis la page club superadmin existante
+- `src/tests/unit/*` — tests corrélation
 
-- `is_team_staff_of_event` = helper SECURITY DEFINER dérivant `events.team_id → teams.club_id`. Renvoie `true` pour admin club / coach équipe / assistant.
-- Parents : uniquement via `player_parents` officielle. Jamais email/téléphone/nom.
-- `(select auth.uid())` systématique.
-- Le staff, self et parent-lié passent **même quand la liste est masquée** → aucune écriture n'est cassée (les policies UPDATE `convocations_player_respond` / `convocations_coach_write` relisent la ligne via la même SELECT + restrictive).
-
-### A.4 Policy RESTRICTIVE — `event_lineups` (SELECT)
-
-Miroir strict : quand la liste est masquée, **aucune ligne de compo** n'est retournée (ni banc, ni titulaire, ni sa propre place — décision figée). Le joueur continue de voir sa `convocation` (répondre). Gating **côté données**, pas côté composant.
-
-```sql
-create policy "event_lineups_visibility_gate"
-on public.event_lineups
-as restrictive
-for select
-to authenticated
-using (
-  is_team_staff_of_event(event_id, (select auth.uid()))
-  or public.call_up_list_visible(event_id)
-);
-```
-
-Note produit : le réglage masque roster+compo. La convocation individuelle reste toujours visible au joueur/parent lié. À vérifier dans l'UI du lot B (label clair pour éviter les tickets "je ne vois rien").
-
-### A.5 Audit consommateurs serveur (fix ou vérification)
-
-Chaque item ci-dessous est **vérifié** que sa lecture passe par un client Supabase RLS (pas `supabaseAdmin` sans re-check), et que ses agrégats respectent la nouvelle policy restrictive :
-
-| Fichier | Consomme | Action |
-|---|---|---|
-| `src/lib/match-sheet/match-sheet.server.ts` | convocations + lineups → PDF | Vérifier RLS (pas admin), sinon re-check `call_up_list_visible` |
-| `src/lib/lineup.functions.ts`, `lineup-email.server.ts`, `lineup-email.ts` | event_lineups → email compo | Idem |
-| `src/lib/push-fanout.server.ts`, `push-dispatch.functions.ts` | convocations → push | Vérifier destinataires |
-| `src/lib/convocation-notify.functions.ts`, `convocation-reminder.functions.ts` | convocations | Idem |
-| `src/lib/insights.server.ts` | agrégats stats | Compteurs par event doivent respecter la fonction |
-| `src/lib/urgency/*`, `use-convocation-urgencies.ts` | Urgency Center | Idem |
-| `src/lib/player-feedback.functions.ts` | ratings/feedback | Vérifier |
-| `src/lib/support-view/*` | admin | Impact via role |
-| `src/routes/api/public/hooks/event-reminders.ts`, `push/convocation-response.ts` | endpoints publics | Respect token / RLS |
-| `src/routes/api/chat.ts` | assistant IA | Ne doit pas fuiter compteurs |
-| `src/components/attendance-heatmap.tsx`, `team-attendance-stats.tsx`, `player-attendance-stats.tsx`, `admin-kpis.tsx`, `match-result-card.tsx` | compteurs/heatmap | Ne doivent renvoyer que ce que RLS autorise (déjà OK si passent par supabase browser client) |
-| `src/routes/_authenticated/{home,events,events/$eventId,events/$eventId/lineup,follow-ups,stats}.tsx` | pages | Vérifier fallback UI quand fetch retourne 0 lignes |
-| `src/routes/superadmin/index.tsx` | superadmin | Roles admin → passent |
-
-Livrable : tableau par fichier avec « lu via RLS user » / « lu via admin, re-check ajouté » / « inchangé ».
-
-### A.6 Tests RLS (bloquants)
-
-Nouveau fichier `tests/rls/call-up-visibility.rls.ts`. Matrice **rôle × visibilité × niveau** :
-
-- Rôles : admin club / coach / assistant / joueur concerné / autre joueur / parent lié / parent non lié / anon.
-- Visibilité : visible / masquée (via override event, override team, defaut club).
-- Assertions :
-  - joueur ne voit pas les pairs (masqué)
-  - parent non lié ne voit pas
-  - joueur voit toujours **sa** convocation (masqué)
-  - parent lié idem
-  - joueur peut répondre (UPDATE) sous visibilité masquée
-  - parent lié idem
-  - compositions invisibles quand masqué (même sa propre place)
-  - `call_up_list_visible(uuid_inconnu) = false`, jamais NULL
-  - staff / self / parent-lié passent tous via la RESTRICTIVE
-  - lecture par UUID connu d'un event masqué d'un autre club → 0 lignes
-
-### A.7 EXPLAIN ANALYZE
-
-Fournir `EXPLAIN (ANALYZE, BUFFERS)` pour :
-- SELECT convocations d'un event 30 convoqués (staff / joueur / event masqué)
-- SELECT event_lineups (staff / joueur / masqué)
-- Comparaison visible vs masqué (surcoût de la function call)
-
-Index à vérifier existent déjà : `convocations(event_id)`, `events(team_id)`, `teams` PK. Créer manquants si besoin.
-
-### A.8 Livrables lot A
-
-- Migration SQL
-- Diff policies **avant / après** sur `convocations` et `event_lineups` (listes complètes permissives + restrictives)
-- Propriétaire + EXECUTE grants de `call_up_list_visible`
-- Résultats `bun run test:rls`, `bun run test`, `bun run typecheck`
-- Résultats EXPLAIN
-- Tableau consommateurs (A.5)
-
----
-
-## Lot B — Surface (UX + i18n)
-
-Merge uniquement après A vert.
-
-### B.1 UX
-
-- Édition événement : sélecteur "Visibilité de la liste des convoqués" (3 options : hériter / afficher / masquer). Affiche valeur effective + source ("héritée de l'équipe", "définie pour cet événement").
-- Édition équipe : même sélecteur (hériter du club / afficher / masquer).
-- Édition club (admin) : toggle par défaut (afficher/masquer).
-- Message d'info sur les 3 écrans : « Les événements en héritage suivront les futures modifications du réglage équipe/club. »
-- Badge coach sur détail événement quand masqué : `🔒 Liste masquée aux joueurs et aux parents`.
-- Distinction stricte code client : `showCalledUpPlayers` (config héritée) ≠ `canViewFullCallUpList` (permission effective, dérivée du résultat serveur, pas recalculée localement).
-
-### B.2 i18n
-
-Clés ajoutées dans `src/locales/{fr,en,de,es,it,nl,pt}/events.json` (ou fichier ad hoc) : options, valeurs effectives, source, message d'info, badge coach.
-
-### B.3 Livrables lot B
-
-- Diff fichiers UI
-- Diff locales 7 langues
-- `bun run test`, `bun run typecheck`, `bun run check:i18n`
-
----
-
-## Ce que je NE fais pas
-
-- Pas de filtrage côté client comme mécanisme de sécurité (RLS seule décide).
-- Pas de nouvelle policy permissive OR (permissives se combinent OR → toujours plus permissif).
-- Pas d'anonymisation partielle des compos pour le MVP.
-- Pas de règle "joueur voit sa propre place" — reportée à un réglage produit distinct plus tard.
-- Pas d'usage de `events.club_id` (colonne absente / non utilisée pour l'autorisation).
-
-Confirme le plan et je démarre le lot A.
+Ok pour ce découpage ?

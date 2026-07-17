@@ -2464,6 +2464,7 @@ export type Database = {
           created_at: string
           created_by: string
           email: string | null
+          email_message_id: string | null
           expires_at: string
           first_name: string | null
           id: string
@@ -2481,6 +2482,7 @@ export type Database = {
           created_at?: string
           created_by: string
           email?: string | null
+          email_message_id?: string | null
           expires_at?: string
           first_name?: string | null
           id?: string
@@ -2498,6 +2500,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           email?: string | null
+          email_message_id?: string | null
           expires_at?: string
           first_name?: string | null
           id?: string

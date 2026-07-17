@@ -487,7 +487,7 @@ async function createInviteAndEmail(params: {
   try {
     const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token)}`;
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
-    await enqueueTransactionalEmailServer({
+    const enqueued = await enqueueTransactionalEmailServer({
       templateName: "player-invite",
       recipientEmail: params.email,
       idempotencyKey: `import-invite-${token}`,
@@ -500,6 +500,12 @@ async function createInviteAndEmail(params: {
         playerName: params.playerName,
       },
     });
+    if (enqueued?.messageId) {
+      await supabaseAdmin
+        .from("member_invites")
+        .update({ email_message_id: enqueued.messageId } as never)
+        .eq("id", inviteId);
+    }
     return token;
   } catch (e) {
     // Silent enqueue failure previously left orphan member_invites rows with no
@@ -516,6 +522,7 @@ async function createInviteAndEmail(params: {
     await supabaseAdmin.from("member_invites").delete().eq("id", inviteId);
     return null;
   }
+
 }
 
 /**
