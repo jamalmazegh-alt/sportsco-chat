@@ -210,7 +210,7 @@ function TeamDetail() {
       const { data: tm } = await supabase
         .from("team_members")
         .select(
-          "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone, deleted_at)",
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone, birth_date, child_platform_access, deleted_at)",
         )
         .eq("team_id", teamId)
         .eq("role", "player");
@@ -570,16 +570,23 @@ function TeamDetail() {
     let totalSent = 0;
     let totalFailed = 0;
     let totalSkipped = 0;
+    let alreadyActiveSkipped = 0;
+    let noContactSkipped = 0;
     for (const id of selectedIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
       totalFailed += r.failed;
       totalSkipped += r.skipped;
+      if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
+      if (r.reason === "no_contact") noContactSkipped += r.skipped;
     }
     setInviting(false);
     setSelectMode(false);
     setSelectedIds(new Set());
-    if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
+    if (totalSent === 0 && totalFailed === 0)
+      toast.warning(
+        t(alreadyActiveSkipped >= noContactSkipped ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+      );
     else if (totalFailed)
       toast.warning(
         t("players.inviteBulkResult", {
@@ -592,9 +599,8 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
-  // Helper: does this player still have at least one contact (self or parent)
-  // that is not linked to an account. Existing failed/pending invites are handled
-  // server-side so coaches can retry without the UI greying everything out.
+  // Helper used only for secondary labels. Sending eligibility is decided on
+  // the server so stale/orphaned invite rows cannot grey out retries.
   const hasOpenContact = useCallback(
     (p: any): boolean => {
       // Minor without platform access is managed by parents — the player
@@ -618,13 +624,13 @@ function TeamDetail() {
     [parentsByPlayer],
   );
 
-  // Players who still need an invite: no linked account, and at least one
-  // contact (self or parent) that isn't already linked or pending.
+  // Players who can be retried from the UI. The server will skip people that
+  // are already active or truly have no usable contact.
   const invitableIds = useMemo(() => {
     return ((players ?? []) as any[])
-      .filter((p) => !p.user_id && hasOpenContact(p))
+      .filter((p) => !p.user_id)
       .map((p) => p.id as string);
-  }, [players, hasOpenContact]);
+  }, [players]);
 
   async function inviteWholeTeam() {
     if (!user || invitableIds.length === 0) return;
@@ -632,14 +638,21 @@ function TeamDetail() {
     let totalSent = 0;
     let totalFailed = 0;
     let totalSkipped = 0;
+    let alreadyActiveSkipped = 0;
+    let noContactSkipped = 0;
     for (const id of invitableIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
       totalFailed += r.failed;
       totalSkipped += r.skipped;
+      if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
+      if (r.reason === "no_contact") noContactSkipped += r.skipped;
     }
     setInviting(false);
-    if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
+    if (totalSent === 0 && totalFailed === 0)
+      toast.warning(
+        t(alreadyActiveSkipped >= noContactSkipped ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+      );
     else if (totalFailed)
       toast.warning(
         t("players.inviteBulkResult", {
@@ -1422,7 +1435,8 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
-            const canInvite = !p.user_id && hasOpenContact(p);
+            const hasContactHint = hasOpenContact(p);
+            const canInvite = !p.user_id;
             const hasPendingInvite = !!pendingInvitesByPlayer?.get(p.id);
             const linked = !!p.user_id;
 
@@ -1494,7 +1508,9 @@ function TeamDetail() {
                         </span>
                       ) : canInvite ? (
                         <span className="text-muted-foreground">
-                          {t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })}
+                          {hasContactHint
+                            ? t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })
+                            : t("players.accountInactive")}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
