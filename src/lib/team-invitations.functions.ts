@@ -480,6 +480,7 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
             if (delta > 10 * 60_000) continue;
             const status = l.status as string;
             if (!FAIL.has(status)) continue;
+            if (!isCurrentEmail(inv.playerId, inv.email)) break;
             const arr = (failuresByPlayer[inv.playerId] ??= []);
             if (arr.some((x) => x.email.toLowerCase() === inv.email)) break;
             arr.push({
