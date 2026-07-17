@@ -43,12 +43,12 @@ type TvTeam = {
 
 export const Route = createFileRoute("/tournament/$slug_/tv")({
   component: TvSlideshowPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    refresh:
-      typeof search.refresh === "string" || typeof search.refresh === "number"
-        ? Math.min(120, Math.max(5, Number(search.refresh) || 12))
-        : 12,
-  }),
+  validateSearch: (search: Record<string, unknown>): { refresh?: number } => {
+    if (typeof search.refresh === "string" || typeof search.refresh === "number") {
+      return { refresh: Math.min(120, Math.max(5, Number(search.refresh) || 12)) };
+    }
+    return {};
+  },
   head: ({ params }) => ({
     meta: [
       {
