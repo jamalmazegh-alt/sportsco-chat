@@ -142,6 +142,7 @@ function ClubInvitesPage() {
           <SelectContent>
             <SelectItem value="all">Toutes invitations</SelectItem>
             <SelectItem value="pending">En attente</SelectItem>
+            <SelectItem value="active">Compte actif</SelectItem>
             <SelectItem value="accepted">Acceptée</SelectItem>
             <SelectItem value="expired">Expirée</SelectItem>
           </SelectContent>
