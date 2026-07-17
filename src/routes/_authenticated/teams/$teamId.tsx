@@ -596,13 +596,7 @@ function TeamDetail() {
   // that is neither linked to an account nor already pending an invite?
   const hasOpenContact = useCallback(
     (p: any): boolean => {
-      const pending = pendingInvitesByPlayer?.get(p.id);
-      const isPending = (email?: string | null, phone?: string | null) => {
-        if (!pending) return false;
-        const e = (email ?? "").toLowerCase().trim();
-        const ph = (phone ?? "").trim();
-        return (!!e && pending.emails.has(e)) || (!!ph && pending.phones.has(ph));
-      };
+      const isPending = (_email?: string | null, _phone?: string | null) => false;
       // Minor without platform access is managed by parents — the player
       // himself is never invitable, only parents count.
       const isMinor = (() => {
@@ -628,7 +622,7 @@ function TeamDetail() {
         (pr) => !pr.parent_user_id && (pr.email || pr.phone) && !isPending(pr.email, pr.phone),
       );
     },
-    [pendingInvitesByPlayer, parentsByPlayer],
+    [parentsByPlayer],
   );
 
   // Players who still need an invite: no linked account, and at least one
@@ -1542,7 +1536,7 @@ function TeamDetail() {
                 <li key={p.id}>
                   {selectMode
                     ? (() => {
-                        const selectable = canInvite && !hasPendingInvite;
+                        const selectable = canInvite;
                         return (
                           <button
                             type="button"
