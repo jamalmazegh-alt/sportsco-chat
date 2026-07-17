@@ -101,6 +101,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { createEmailDispatch } from "@/lib/email/dispatch.functions";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
 import {
