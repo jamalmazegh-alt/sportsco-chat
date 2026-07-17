@@ -37,12 +37,27 @@ export async function enqueueTransactionalEmailServer(params: {
   const messageId = crypto.randomUUID();
   const idempotencyKey = params.idempotencyKey || messageId;
 
+  // Step-by-step instrumentation so silent enqueue failures surface in Worker logs.
+  const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
+    try {
+      return await fn();
+    } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
+      console.error("enqueueTransactionalEmailServer step failed", {
+        step: name,
+        templateName: params.templateName,
+        recipient_redacted: recipient.replace(/^(.).*(@.*)$/, "$1***$2"),
+        error: err.message,
+        stack: err.stack,
+      });
+      throw err;
+    }
+  };
+
   // Suppression check
-  const { data: suppressed } = await supabaseAdmin
-    .from("suppressed_emails")
-    .select("id")
-    .eq("email", normalized)
-    .maybeSingle();
+  const { data: suppressed } = await runStep("suppression_check", () =>
+    supabaseAdmin.from("suppressed_emails").select("id").eq("email", normalized).maybeSingle(),
+  );
   if (suppressed) {
     await supabaseAdmin.from("email_send_log").insert({
       message_id: messageId,
@@ -55,42 +70,50 @@ export async function enqueueTransactionalEmailServer(params: {
 
   // Unsubscribe token (one per email)
   let unsubscribeToken: string;
-  const { data: existing } = await supabaseAdmin
-    .from("email_unsubscribe_tokens")
-    .select("token, used_at")
-    .eq("email", normalized)
-    .maybeSingle();
+  const { data: existing } = await runStep("unsubscribe_lookup", () =>
+    supabaseAdmin
+      .from("email_unsubscribe_tokens")
+      .select("token, used_at")
+      .eq("email", normalized)
+      .maybeSingle(),
+  );
   if (existing && !existing.used_at) {
     unsubscribeToken = existing.token;
   } else {
     unsubscribeToken = generateToken();
-    await supabaseAdmin
-      .from("email_unsubscribe_tokens")
-      .upsert(
-        { token: unsubscribeToken, email: normalized },
-        { onConflict: "email", ignoreDuplicates: true },
-      );
-    const { data: stored } = await supabaseAdmin
-      .from("email_unsubscribe_tokens")
-      .select("token")
-      .eq("email", normalized)
-      .maybeSingle();
+    await runStep("unsubscribe_upsert", () =>
+      supabaseAdmin
+        .from("email_unsubscribe_tokens")
+        .upsert(
+          { token: unsubscribeToken, email: normalized },
+          { onConflict: "email", ignoreDuplicates: true },
+        ),
+    );
+    const { data: stored } = await runStep("unsubscribe_refetch", () =>
+      supabaseAdmin
+        .from("email_unsubscribe_tokens")
+        .select("token")
+        .eq("email", normalized)
+        .maybeSingle(),
+    );
     if (stored?.token) unsubscribeToken = stored.token;
   }
 
   const data = params.templateData ?? {};
   const element = React.createElement(template.component, data);
-  const html = await render(element);
-  const text = await render(element, { plainText: true });
+  const html = await runStep("render_html", () => render(element));
+  const text = await runStep("render_text", () => render(element, { plainText: true }));
   const subject =
     typeof template.subject === "function" ? template.subject(data) : template.subject;
 
-  await supabaseAdmin.from("email_send_log").insert({
-    message_id: messageId,
-    template_name: params.templateName,
-    recipient_email: recipient,
-    status: "pending",
-  });
+  await runStep("log_pending", () =>
+    supabaseAdmin.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: params.templateName,
+      recipient_email: recipient,
+      status: "pending",
+    }),
+  );
 
   const { error } = await supabaseAdmin.rpc("enqueue_email", {
     queue_name: "transactional_emails",
