@@ -333,7 +333,6 @@ function GroupsPage() {
                     allMembers={membersQ.data ?? []}
                     teams={teamsQ.data ?? []}
 
-                    otherGroups={allGroups.filter((x) => x.id !== g.id)}
                   />
                 )}
               </div>
