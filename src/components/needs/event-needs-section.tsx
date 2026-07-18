@@ -148,7 +148,14 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
       </CardHeader>
       <CardContent className="space-y-3">
         {needs.map((need: NeedRowType) => (
-          <NeedRow key={need.id} need={need} isStaff={isStaff} eventId={eventId} onChange={refresh} />
+          <NeedRow
+            key={need.id}
+            need={need}
+            isStaff={isStaff}
+            eventId={eventId}
+            sport={sport ?? null}
+            onChange={refresh}
+          />
         ))}
       </CardContent>
 
@@ -189,11 +196,13 @@ function NeedRow({
   need,
   isStaff,
   eventId,
+  sport,
   onChange,
 }: {
   need: NeedRowType;
   isStaff: boolean;
   eventId: string;
+  sport: string | null;
   onChange: () => void;
 }) {
   const { t } = useTranslation();
@@ -245,11 +254,19 @@ function NeedRow({
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs:actions.cancel"));
+      toast.success(t("needs:cancel.done", { defaultValue: "Besoin annulé" }));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => {
+      console.error("[needs] cancel failed", e);
+      toast.error(
+        t(`needs:errors.${e.message}`, {
+          defaultValue: t("needs:errors.cancelFailed", {
+            defaultValue: "Impossible d'annuler le besoin. Réessaie dans un instant.",
+          }),
+        }),
+      );
+    },
   });
 
   const statusBadge = (
@@ -448,7 +465,7 @@ function NeedRow({
           open={editOpen}
           onOpenChange={setEditOpen}
           eventId={eventId}
-          sport={null}
+          sport={sport}
           teamId={null}
           initial={{
             id: need.id,
@@ -498,11 +515,13 @@ function NeedFormDialog({
   const isEdit = !!initial;
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
+    // Edit mode: expose ALL templates so the user can change to any role.
+    if (initial) return [...NEED_TEMPLATES];
     const s = (sport ?? "").toLowerCase().trim();
     return NEED_TEMPLATES.filter(
       (tpl) => tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s)),
     );
-  }, [sport]);
+  }, [sport, initial]);
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
@@ -862,25 +881,34 @@ function PublishDialog({
           </div>
 
           {/* Club groups */}
-          {ctx && ctx.groups.length > 0 && (
+          {ctx && (
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("needs:audiences.club_group")}
               </Label>
-              <div className="mt-1.5 space-y-1">
-                {ctx.groups.map((g: { id: string; name: string }) => (
-                  <label
-                    key={g.id}
-                    className="flex items-center gap-2 cursor-pointer rounded-md border p-2 hover:bg-muted/40"
-                  >
-                    <Checkbox
-                      checked={groupIds.has(g.id)}
-                      onCheckedChange={() => toggleGroup(g.id)}
-                    />
-                    <span className="text-sm">{g.name}</span>
-                  </label>
-                ))}
-              </div>
+              {ctx.groups.length > 0 ? (
+                <div className="mt-1.5 space-y-1">
+                  {ctx.groups.map((g: { id: string; name: string }) => (
+                    <label
+                      key={g.id}
+                      className="flex items-center gap-2 cursor-pointer rounded-md border p-2 hover:bg-muted/40"
+                    >
+                      <Checkbox
+                        checked={groupIds.has(g.id)}
+                        onCheckedChange={() => toggleGroup(g.id)}
+                      />
+                      <span className="text-sm">{g.name}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1.5 text-xs text-muted-foreground rounded-md border border-dashed p-2">
+                  {t("needs:publish.noGroups", {
+                    defaultValue:
+                      "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
+                  })}
+                </p>
+              )}
             </div>
           )}
 
