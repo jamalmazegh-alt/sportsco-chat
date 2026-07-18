@@ -262,83 +262,41 @@ export const decideSignup = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Récup signup + need (RLS staff_all suffit pour lire).
-    const { data: signup, error: sErr } = await supabase
-      .from("event_need_signups")
-      .select("id, need_id, status, user_id, event_needs:need_id(id, event_id, club_id, capacity)")
-      .eq("id", data.signup_id)
-      .maybeSingle();
-    if (sErr) throw new Error(sErr.message);
-    if (!signup) throw new Error("signup_not_found");
+    // Transaction atomique : verrou event_needs, staff-check, capacity-check
+    // sous verrou → deux staff confirmant simultanément la dernière place ne
+    // peuvent pas produire deux 'confirmed'.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const need = (signup as any).event_needs as {
-      id: string;
-      event_id: string;
-      club_id: string;
-      capacity: number;
-    };
-
-    // Défense en profondeur : staff du club uniquement.
-    const { data: isStaff } = await supabase.rpc("is_club_staff", {
-      _user_id: userId,
-      _club_id: need.club_id,
+    const { data: rpcData, error } = await supabase.rpc("decide_signup_atomic" as any, {
+      _signup_id: data.signup_id,
+      _actor: userId,
+      _decision: data.decision,
     });
-    if (!isStaff) throw new Error("forbidden");
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      signup_id: string;
+      need_id: string;
+      event_id: string;
+      applicant_user_id: string;
+      new_status: "confirmed" | "declined";
+    } | null;
+    if (!row) throw new Error("decide_failed");
 
-    if (data.decision === "confirm") {
-      // Capacité atomique : on confirme sous verrou pour éviter le double-clic
-      // sur la dernière place côté staff aussi.
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: locked } = await supabaseAdmin
-        .from("event_needs")
-        .select("id, capacity, status")
-        .eq("id", need.id)
-        .maybeSingle();
-      if (!locked || locked.status !== "open") {
-        throw new Error("need_not_open");
-      }
-      const { count } = await supabaseAdmin
-        .from("event_need_signups")
-        .select("*", { count: "exact", head: true })
-        .eq("need_id", need.id)
-        .eq("status", "confirmed");
-      if ((count ?? 0) >= locked.capacity) {
-        throw new Error("capacity_reached");
-      }
-      const { error: upErr } = await supabase
-        .from("event_need_signups")
-        .update({
-          status: "confirmed",
-          confirmed_at: new Date().toISOString(),
-          decided_by: userId,
-        })
-        .eq("id", data.signup_id);
-      if (upErr) throw new Error(upErr.message);
-    } else {
-      const { error: upErr } = await supabase
-        .from("event_need_signups")
-        .update({
-          status: "declined",
-          declined_at: new Date().toISOString(),
-          decided_by: userId,
-        })
-        .eq("id", data.signup_id);
-      if (upErr) throw new Error(upErr.message);
+    await recomputeCoverageServiceRole(row.event_id);
+
+    // Notification au candidat (décision reçue) — awaitée.
+    try {
+      const { notifyApplicantOfDecision } = await import("./dispatch.server");
+      await notifyApplicantOfDecision({
+        needId: row.need_id,
+        signupId: row.signup_id,
+        decision: data.decision,
+        applicantUserId: row.applicant_user_id,
+      });
+    } catch (e) {
+      console.error("[decideSignup] notify failed", e);
     }
 
-    await recomputeCoverageServiceRole(need.event_id);
-
-    // Notification au candidat (décision reçue).
-    const { notifyApplicantOfDecision } = await import("./dispatch.server");
-    void notifyApplicantOfDecision({
-      needId: need.id,
-      signupId: data.signup_id,
-      decision: data.decision,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      applicantUserId: (signup as any).user_id as string,
-    }).catch((e) => console.error("[decideSignup] notify failed", e));
-
-    return { ok: true };
+    return { ok: true, status: row.new_status };
   });
 
 /* ------------------------------------------------------------------------ */
