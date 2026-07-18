@@ -203,6 +203,7 @@ function NeedRow({
   const cancel = useServerFn(cancelEventNeed);
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
