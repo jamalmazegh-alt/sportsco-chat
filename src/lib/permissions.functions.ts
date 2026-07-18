@@ -31,15 +31,19 @@ function mergeStaffWithNonStaffRoles(
 async function assertClubAdmin(supabase: any, clubId: string, callerId: string) {
   const { data, error } = await supabase
     .from("club_members")
-    .select("roles")
+    .select("role, roles")
     .eq("club_id", clubId)
     .eq("user_id", callerId)
     .maybeSingle();
   if (error) throw new Response(error.message, { status: 500 });
-  if (!data || !Array.isArray(data.roles) || !data.roles.includes("admin")) {
+  const rolesArr: string[] = Array.isArray(data?.roles) ? (data!.roles as string[]) : [];
+  const singleRole: string | null = (data as { role?: string | null } | null)?.role ?? null;
+  const isAdmin = rolesArr.includes("admin") || singleRole === "admin";
+  if (!data || !isAdmin) {
     throw new Response("Forbidden", { status: 403 });
   }
 }
+
 
 async function assertTournamentAdmin(supabaseAuth: any, tournamentId: string, callerId: string) {
   const { data, error } = await supabaseAuth.rpc("can_manage_tournament_members", {
