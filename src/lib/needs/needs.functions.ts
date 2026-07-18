@@ -234,14 +234,20 @@ export const applyToEventNeed = createServerFn({ method: "POST" })
     if (row.auto_confirmed) {
       await recomputeCoverageServiceRole(need.event_id);
     }
-    // Notification staff (candidature reçue) — fire-and-forget.
-    const { notifyStaffOfSignup } = await import("./dispatch.server");
-    void notifyStaffOfSignup({
-      needId: data.need_id,
-      signupId: row.signup_id,
-      status: row.status,
-      applicantUserId: userId,
-    }).catch((e) => console.error("[applyToEventNeed] notify failed", e));
+    // Notification staff (candidature reçue) — awaité pour éviter la
+    // terminaison prématurée du Worker (les promesses orphelines peuvent être
+    // tuées quand la réponse part). Erreur non bloquante pour l'apply.
+    try {
+      const { notifyStaffOfSignup } = await import("./dispatch.server");
+      await notifyStaffOfSignup({
+        needId: data.need_id,
+        signupId: row.signup_id,
+        status: row.status,
+        applicantUserId: userId,
+      });
+    } catch (e) {
+      console.error("[applyToEventNeed] notify failed", e);
+    }
 
     return row;
   });
