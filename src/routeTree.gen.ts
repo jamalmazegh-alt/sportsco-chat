@@ -78,6 +78,7 @@ import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/supe
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
+import { Route as AuthenticatedNeedsIndexRouteImport } from './routes/_authenticated/needs.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug_.tv'
 import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug_.register'
@@ -524,6 +525,11 @@ const AuthenticatedProfileIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedNeedsIndexRoute = AuthenticatedNeedsIndexRouteImport.update({
+  id: '/needs/',
+  path: '/needs/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1167,6 +1173,7 @@ export interface FileRoutesByFullPath {
   '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/needs/': typeof AuthenticatedNeedsIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
@@ -1325,6 +1332,7 @@ export interface FileRoutesByTo {
   '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/needs': typeof AuthenticatedNeedsIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
@@ -1490,6 +1498,7 @@ export interface FileRoutesById {
   '/tournament/$slug_/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug_/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/needs/': typeof AuthenticatedNeedsIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
@@ -1655,6 +1664,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug/register'
     | '/tournament/$slug/tv'
     | '/admin/'
+    | '/needs/'
     | '/profile/'
     | '/support/'
     | '/superadmin/clubs/'
@@ -1813,6 +1823,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug/register'
     | '/tournament/$slug/tv'
     | '/admin'
+    | '/needs'
     | '/profile'
     | '/support'
     | '/superadmin/clubs'
@@ -1977,6 +1988,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug_/register'
     | '/tournament/$slug_/tv'
     | '/_authenticated/admin/'
+    | '/_authenticated/needs/'
     | '/_authenticated/profile/'
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
@@ -2609,6 +2621,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile/'
       preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/needs/': {
+      id: '/_authenticated/needs/'
+      path: '/needs'
+      fullPath: '/needs/'
+      preLoaderRoute: typeof AuthenticatedNeedsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -3502,6 +3521,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
   AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  AuthenticatedNeedsIndexRoute: typeof AuthenticatedNeedsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -3521,6 +3541,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
+  AuthenticatedNeedsIndexRoute: AuthenticatedNeedsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
