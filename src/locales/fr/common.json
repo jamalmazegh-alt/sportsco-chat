@@ -2319,6 +2319,25 @@
     "memberAdded": "Membre ajouté",
     "memberRemoved": "Membre retiré",
     "backToList": "Retour aux groupes",
-    "openGroups": "Groupes"
+    "openGroups": "Groupes",
+    "addIndividual": "Ajouter individuellement",
+    "addSubgroup": "Ajouter un sous-groupe prédéfini",
+    "bulkPickKind": "Choisir un type…",
+    "bulkPickParam": "Choisir…",
+    "bulkAdd": "Ajouter au groupe",
+    "bulkAdded_one": "{{count}} membre ajouté",
+    "bulkAdded_other": "{{count}} membres ajoutés",
+    "bulkNoneToAdd": "Aucun nouveau membre à ajouter.",
+    "bulk": {
+      "club_members": "Tous les membres du club",
+      "club_staff": "Tout le staff",
+      "club_educators": "Tous les éducateurs",
+      "team_players": "Joueurs d'une équipe",
+      "team_parents": "Parents d'une équipe",
+      "team_educators": "Éducateurs d'une équipe",
+      "category_educators": "Éducateurs d'une catégorie (U11, U12…)",
+      "club_group": "Membres d'un autre groupe"
+    }
   }
 }
+
