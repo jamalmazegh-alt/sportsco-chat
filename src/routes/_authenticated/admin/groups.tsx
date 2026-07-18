@@ -1028,8 +1028,8 @@ function RulePreviewDialog({
   rule: RuleRow | null;
   ruleLabel: string;
   clubId: string;
-  allMembers: ClubMemberRow[];
   onClose: () => void;
+
 }) {
   const { t } = useTranslation();
   const detailsFn = useServerFn(previewGroupRuleDetails);
