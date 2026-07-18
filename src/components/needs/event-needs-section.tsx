@@ -480,6 +480,7 @@ function NeedRow({
           eventId={eventId}
           sport={sport}
           teamId={null}
+          existingRoleKeys={existingRoleKeys}
           initial={{
             id: need.id,
             role_key: need.role_key,
@@ -491,6 +492,7 @@ function NeedRow({
           onSaved={onChange}
         />
       )}
+
     </div>
   );
 }
