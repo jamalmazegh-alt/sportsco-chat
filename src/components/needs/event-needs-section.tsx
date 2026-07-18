@@ -366,11 +366,6 @@ function NeedRow({
             )}
           </Button>
         )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
         {!isStaff && status === "open" && (
           <>
             {mySignup ? (
