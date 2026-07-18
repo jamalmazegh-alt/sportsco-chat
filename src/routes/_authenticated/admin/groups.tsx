@@ -183,6 +183,19 @@ function RoleBadges({
   );
 }
 
+function ParentSubtitle({ children_names }: { children_names?: string[] | null }) {
+  const { t } = useTranslation();
+  if (!children_names || children_names.length === 0) return null;
+  return (
+    <span className="text-xs text-muted-foreground truncate">
+      {t("groups.parentOf", {
+        defaultValue: "Parent de {{names}}",
+        names: children_names.join(", "),
+      })}
+    </span>
+  );
+}
+
 function GroupsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
