@@ -457,7 +457,7 @@ function NeedRow({
           open={editOpen}
           onOpenChange={setEditOpen}
           eventId={eventId}
-          sport={null}
+          sport={sport}
           teamId={null}
           initial={{
             id: need.id,
