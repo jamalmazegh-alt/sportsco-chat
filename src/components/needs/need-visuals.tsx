@@ -31,7 +31,7 @@ type Visual = {
 
 const VISUALS: Record<string, Visual> = {
   // Football
-  ref_center: { Icon: Whistle, chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" },
+  ref_center: { Icon: Megaphone, chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" },
   ref_line: { Icon: Flag, chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300" },
   delegate: { Icon: ClipboardList, chip: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300" },
   // Basket
