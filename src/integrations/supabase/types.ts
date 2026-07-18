@@ -7596,6 +7596,10 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      user_is_need_recipient: {
+        Args: { _need_id: string; _user_id: string }
+        Returns: boolean
+      }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
