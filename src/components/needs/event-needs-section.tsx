@@ -24,6 +24,8 @@ import {
   Baby,
   IdCard,
   Pencil,
+  UserPlus,
+  Search,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr as frLocale, enUS as enLocale } from "date-fns/locale";
@@ -77,6 +79,8 @@ import {
   getNeedAudienceContext,
   getEventAudienceContext,
   previewEventAudience,
+  searchClubMembersForNeed,
+  staffAddManualSignup,
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
@@ -1073,6 +1077,8 @@ function StaffSignupsDialog({
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
+  const searchFn = useServerFn(searchClubMembersForNeed);
+  const addManual = useServerFn(staffAddManualSignup);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -1094,6 +1100,34 @@ function StaffSignupsDialog({
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [addPendingUser, setAddPendingUser] = useState<string | null>(null);
+
+  const { data: memberResults, isFetching: memberSearchLoading } = useQuery({
+    queryKey: ["need-add-members", needId, searchText],
+    queryFn: () => searchFn({ data: { need_id: needId, search: searchText } }),
+    enabled: open && addOpen,
+    staleTime: 15_000,
+  });
+
+  const addManualM = useMutation({
+    mutationFn: (user_id: string) => addManual({ data: { need_id: needId, user_id } }),
+    onMutate: (uid) => setAddPendingUser(uid),
+    onSettled: () => setAddPendingUser(null),
+    onSuccess: (r: { already?: boolean } | null | undefined) => {
+      toast.success(
+        r?.already
+          ? t("needs:staff.alreadyConfirmed", { defaultValue: "Déjà confirmé" })
+          : t("needs:staff.manualAdded", { defaultValue: "Personne ajoutée" }),
+      );
+      refetch();
+      onChanged();
+      qc.invalidateQueries({ queryKey: ["need-add-members", needId] });
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
 
   const signups = (data?.signups ?? []) as StaffSignup[];
   const pending = signups.filter((s) => s.status === "applied");
@@ -1195,6 +1229,79 @@ function StaffSignupsDialog({
             </div>
           </div>
         )}
+
+        <div className="rounded-md border bg-muted/20 p-2 space-y-2">
+          <button
+            type="button"
+            onClick={() => setAddOpen((v) => !v)}
+            className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            {t("needs:staff.addManual", { defaultValue: "Ajouter manuellement" })}
+          </button>
+          {addOpen && (
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <Input
+                  className="pl-7 h-8 text-sm"
+                  placeholder={t("needs:staff.searchPlaceholder", {
+                    defaultValue: "Rechercher un membre…",
+                  })}
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {memberSearchLoading && (
+                  <p className="text-[11px] text-muted-foreground px-1">
+                    <Loader2 className="h-3 w-3 inline animate-spin mr-1" />
+                    {t("common.loading", { defaultValue: "Chargement…" })}
+                  </p>
+                )}
+                {!memberSearchLoading && (memberResults?.members ?? []).length === 0 && (
+                  <p className="text-[11px] text-muted-foreground px-1 py-2">
+                    {t("needs:staff.noMembers", { defaultValue: "Aucun membre trouvé" })}
+                  </p>
+                )}
+                {(memberResults?.members ?? []).map((m) => (
+                  <div
+                    key={m.member_id}
+                    className="flex items-center justify-between gap-2 rounded border bg-background px-2 py-1.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium truncate">
+                        {m.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
+                      </p>
+                      {m.roles.length > 0 && (
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {m.roles
+                            .map((r) => t(`common.roles.${r}`, { defaultValue: r }))
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[11px]"
+                      onClick={() => addManualM.mutate(m.user_id)}
+                      disabled={addPendingUser === m.user_id}
+                    >
+                      {addPendingUser === m.user_id ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Plus className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
 
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {signups.map((s) => {

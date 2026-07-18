@@ -999,6 +999,159 @@ export const previewEventAudience = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------------ */
+/* 12quater. searchClubMembersForNeed — staff picks someone to add manually */
+/* ------------------------------------------------------------------------ */
+
+export const searchClubMembersForNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        need_id: z.string().uuid(),
+        search: z.string().trim().max(80).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Exclude members already signed up (any active status).
+    const { data: existing } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("member_id, status")
+      .eq("need_id", data.need_id);
+    const excludedMemberIds = new Set(
+      (existing ?? [])
+        .filter((s) => s.status === "confirmed" || s.status === "applied")
+        .map((s) => s.member_id as string),
+    );
+
+    const { data: members, error } = await supabaseAdmin
+      .from("club_members")
+      .select("id, user_id, roles")
+      .eq("club_id", need.club_id)
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const userIds = (members ?? []).map((m) => m.user_id).filter(Boolean);
+    const { data: profs } = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+    const nameByUser: Record<string, string | null> = {};
+    for (const p of profs ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+    }
+
+    const q = (data.search ?? "").toLowerCase().trim();
+    const rows = (members ?? [])
+      .filter((m) => !excludedMemberIds.has(m.id))
+      .map((m) => ({
+        member_id: m.id as string,
+        user_id: m.user_id as string,
+        full_name: nameByUser[m.user_id] ?? null,
+        roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
+      }))
+      .filter((r) => (q ? (r.full_name ?? "").toLowerCase().includes(q) : true))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""))
+      .slice(0, 30);
+
+    return { members: rows };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 12quinquies. staffAddManualSignup — staff adds a confirmed participant  */
+/* ------------------------------------------------------------------------ */
+
+export const staffAddManualSignup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        need_id: z.string().uuid(),
+        user_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+    if (need.status !== "open" && need.status !== "draft") {
+      throw new Error("need_not_open");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Resolve member_id (required FK) for this user in this club.
+    const { data: member, error: memErr } = await supabaseAdmin
+      .from("club_members")
+      .select("id")
+      .eq("club_id", need.club_id)
+      .eq("user_id", data.user_id)
+      .maybeSingle();
+    if (memErr) throw new Error(memErr.message);
+    if (!member) throw new Error("user_not_in_club");
+
+    // Capacity check.
+    const { count: confirmedCount } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("*", { count: "exact", head: true })
+      .eq("need_id", data.need_id)
+      .eq("status", "confirmed");
+    if ((confirmedCount ?? 0) >= need.capacity) throw new Error("need_full");
+
+    // Upsert: if a prior signup exists for this member (withdrawn/declined/applied), flip to confirmed.
+    const { data: existing } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("id, status")
+      .eq("need_id", data.need_id)
+      .eq("member_id", member.id)
+      .maybeSingle();
+
+    const nowIso = new Date().toISOString();
+    if (existing) {
+      if (existing.status === "confirmed") return { ok: true, already: true };
+      const { error: upErr } = await supabaseAdmin
+        .from("event_need_signups")
+        .update({
+          status: "confirmed",
+          confirmed_at: nowIso,
+          declined_at: null,
+          withdrawn_at: null,
+          decided_by: userId,
+        })
+        .eq("id", existing.id);
+      if (upErr) throw new Error(upErr.message);
+    } else {
+      const { error: insErr } = await supabaseAdmin.from("event_need_signups").insert({
+        need_id: data.need_id,
+        member_id: member.id,
+        user_id: data.user_id,
+        status: "confirmed",
+        confirmed_at: nowIso,
+        decided_by: userId,
+      });
+      if (insErr) throw new Error(insErr.message);
+    }
+
+    await recomputeCoverageServiceRole(need.event_id);
+    return { ok: true, already: false };
+  });
+
+/* ------------------------------------------------------------------------ */
 /* 10. listMyOpenNeeds — feed membre "Coups de main" (toutes évènements)    */
 /* ------------------------------------------------------------------------ */
 
