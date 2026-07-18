@@ -735,13 +735,15 @@ function GroupMembersPanel({
           </p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
-            {rules.map((r) => (
+            {rules.map((r) => {
+              const { Icon: RuleIcon, cls } = ruleStyle(r.rule_type);
+              return (
               <Badge
                 key={r.id}
                 variant="outline"
-                className="gap-1.5 py-1 pl-2 pr-1 border-primary/40 bg-primary/5"
+                className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
               >
-                <Layers className="h-3 w-3 text-primary" />
+                <RuleIcon className="h-3 w-3" />
                 <button
                   type="button"
                   className="text-xs hover:underline"
