@@ -165,17 +165,30 @@ export function HomeNeedsCard() {
                   </>
                 )}
                 {canApply && (
-                  <Button
-                    size="sm"
-                    className="h-7 px-2.5 text-[11px] font-bold"
-                    disabled={applyMut.isPending}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      applyMut.mutate(n.id);
-                    }}
-                  >
-                    {t("needs:actions.apply")}
-                  </Button>
+                  <>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-[11px] text-muted-foreground"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dismiss(n.id);
+                      }}
+                    >
+                      {t("needs:actions.notAvailable", { defaultValue: "Pas dispo" })}
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] font-bold"
+                      disabled={applyMut.isPending}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        applyMut.mutate(n.id);
+                      }}
+                    >
+                      {t("needs:actions.imIn", { defaultValue: "Je me propose" })}
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
