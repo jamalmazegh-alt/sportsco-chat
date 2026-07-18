@@ -507,11 +507,13 @@ function NeedFormDialog({
   const isEdit = !!initial;
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
+    // Edit mode: expose ALL templates so the user can change to any role.
+    if (initial) return [...NEED_TEMPLATES];
     const s = (sport ?? "").toLowerCase().trim();
     return NEED_TEMPLATES.filter(
       (tpl) => tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s)),
     );
-  }, [sport]);
+  }, [sport, initial]);
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
