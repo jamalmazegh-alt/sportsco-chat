@@ -779,7 +779,7 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
     return {
       club_id: need.club_id,
       event_id: need.event_id,
-      teams: teamsRes.data ?? [],
+      teams,
       groups: groupsRes.data ?? [],
       categories: cats,
     };
