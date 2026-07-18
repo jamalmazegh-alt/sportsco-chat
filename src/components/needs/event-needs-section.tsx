@@ -156,6 +156,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
             isStaff={isStaff}
             eventId={eventId}
             sport={sport ?? null}
+            existingRoleKeys={needs.map((n: NeedRowType) => n.role_key)}
             onChange={refresh}
           />
         ))}
@@ -168,9 +169,11 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           eventId={eventId}
           sport={sport ?? null}
           teamId={teamId ?? null}
+          existingRoleKeys={needs.map((n: NeedRowType) => n.role_key)}
           onSaved={refresh}
         />
       )}
+
     </Card>
   );
 }
