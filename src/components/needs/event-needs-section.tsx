@@ -385,6 +385,12 @@ function NeedRow({
                   : t("needs:actions.republish")}
               </Button>
             )}
+            {status === "draft" && (
+              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-3.5 w-3.5 mr-1" />
+                {t("common.edit", { defaultValue: "Modifier" })}
+              </Button>
+            )}
             {status === "open" && (
               <Button
                 size="sm"
