@@ -847,7 +847,6 @@ function GroupMembersPanel({
         {search.trim() && candidates.length > 0 && (
           <ul className="rounded-md border border-border bg-background divide-y divide-border max-h-64 overflow-auto">
             {candidates.map((m) => {
-              const label = roleLabel(m.role);
               return (
                 <li
                   key={m.id}
@@ -855,11 +854,7 @@ function GroupMembersPanel({
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-sm truncate">{displayName(m)}</span>
-                    {label && (
-                      <Badge variant="secondary" className="text-[10px] shrink-0">
-                        {label}
-                      </Badge>
-                    )}
+                    <RoleBadges roles={m.roles} fallback={m.role} />
                   </div>
                   <Button
                     variant="ghost"
