@@ -94,7 +94,9 @@ type ClubMemberRow = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  children_names?: string[];
 };
+
 
 type TeamRow = {
   id: string;
@@ -227,6 +229,30 @@ function GroupsPage() {
             last_name: string | null;
           }[] };
       const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+      // For parents, fetch the children names
+      const { data: pp } = userIds.length
+        ? await supabase
+            .from("player_parents")
+            .select("parent_user_id, players:player_id(first_name, last_name)")
+            .in("parent_user_id", userIds)
+        : { data: [] as Array<{
+            parent_user_id: string;
+            players: { first_name: string | null; last_name: string | null } | null;
+          }> };
+      const childrenByParent = new Map<string, string[]>();
+      for (const row of (pp ?? []) as Array<{
+        parent_user_id: string;
+        players: { first_name: string | null; last_name: string | null } | null;
+      }>) {
+        const name = [row.players?.first_name, row.players?.last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+        if (!name) continue;
+        const arr = childrenByParent.get(row.parent_user_id) ?? [];
+        arr.push(name);
+        childrenByParent.set(row.parent_user_id, arr);
+      }
       return (members ?? []).map((m) => {
         const p = byId.get(m.user_id);
         return {
@@ -237,8 +263,10 @@ function GroupsPage() {
           full_name: p?.full_name ?? null,
           first_name: p?.first_name ?? null,
           last_name: p?.last_name ?? null,
+          children_names: childrenByParent.get(m.user_id) ?? [],
         };
       });
+
     },
   });
 
