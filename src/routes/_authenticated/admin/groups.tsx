@@ -48,9 +48,13 @@ import {
   listClubGroupMembers,
   addClubGroupMember,
   removeClubGroupMember,
-  previewAudienceCount,
-  type AudienceSelector,
+  listClubGroupRules,
+  addClubGroupRule,
+  removeClubGroupRule,
+  getGroupResolvedCount,
+  type ClubGroupRuleType,
 } from "@/modules/groups/groups.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/groups")({
   component: GroupsPage,
