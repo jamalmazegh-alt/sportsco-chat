@@ -912,10 +912,14 @@ function GroupMembersPanel({
                         last_name: m.profile?.last_name,
                       })}
                     </span>
+                    <ParentSubtitle
+                      children_names={m.user_id ? childrenByUserId.get(m.user_id) : undefined}
+                    />
                     <div className="flex flex-wrap gap-1">
                       <RoleBadges roles={m.roles} fallback={m.role} />
                     </div>
                   </div>
+
 
                   <Button
                     variant="ghost"
@@ -956,10 +960,12 @@ function GroupMembersPanel({
                 >
                   <div className="flex flex-col gap-1 min-w-0 flex-1">
                     <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                    <ParentSubtitle children_names={m.children_names} />
                     <div className="flex flex-wrap gap-1">
                       <RoleBadges roles={m.roles} fallback={m.role} />
                     </div>
                   </div>
+
 
                   <Button
                     variant="ghost"
