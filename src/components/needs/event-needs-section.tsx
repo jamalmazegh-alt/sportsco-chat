@@ -514,10 +514,52 @@ function NeedFormDialog({
   const { t } = useTranslation();
   const create = useServerFn(createEventNeed);
   const update = useServerFn(updateEventNeed);
+  const publish = useServerFn(publishEventNeed);
+  const ctxFn = useServerFn(getEventAudienceContext);
+  const previewFn = useServerFn(previewEventAudience);
   const isEdit = !!initial;
 
+  // Audience picker is only shown at CREATION (before publication).
+  // For existing drafts, the user re-opens the Publish dialog.
+  const { data: audienceCtx } = useQuery({
+    queryKey: ["event-audience-ctx", eventId],
+    queryFn: () => ctxFn({ data: { event_id: eventId } }),
+    enabled: open && !isEdit,
+  });
+
+  const { state: audState, controls: audControls, buildAudiences } = useAudienceState();
+  const audiences = useMemo<AudienceSelector[]>(
+    () => (isEdit ? [] : buildAudiences(eventId)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [audState, eventId, isEdit],
+  );
+
+  const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  useEffect(() => {
+    if (isEdit || audiences.length === 0) {
+      setPreviewCount(0);
+      return;
+    }
+    let cancelled = false;
+    setPreviewLoading(true);
+    const to = setTimeout(async () => {
+      try {
+        const r = await previewFn({ data: { event_id: eventId, audiences } });
+        if (!cancelled) setPreviewCount(r.count);
+      } catch {
+        if (!cancelled) setPreviewCount(null);
+      } finally {
+        if (!cancelled) setPreviewLoading(false);
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(to);
+    };
+  }, [audiences, eventId, previewFn, isEdit]);
+
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
-    // Edit mode: expose ALL templates so the user can change to any role.
     if (initial) return [...NEED_TEMPLATES];
     const s = (sport ?? "").toLowerCase().trim();
     return NEED_TEMPLATES.filter(
@@ -551,35 +593,52 @@ function NeedFormDialog({
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
+  const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
+
   const saveM = useMutation({
-    mutationFn: () =>
-      isEdit
-        ? update({
-            data: {
-              need_id: initial!.id,
-              role_key: currentTpl.key,
-              label: label.trim() || defaultLabel,
-              description: description.trim() || null,
-              capacity,
-              validation_mode: mode,
-            },
-          })
-        : create({
-            data: {
-              event_id: eventId,
-              role_key: currentTpl.key,
-              label: label.trim() || defaultLabel,
-              description: description.trim() || null,
-              capacity,
-              validation_mode: mode,
-            },
-          }),
-    onSuccess: () => {
-      toast.success(
-        isEdit
-          ? t("common.saved", { defaultValue: "Modifications enregistrées" })
-          : t("needs:section.created"),
-      );
+    mutationFn: async () => {
+      if (isEdit) {
+        return update({
+          data: {
+            need_id: initial!.id,
+            role_key: currentTpl.key,
+            label: label.trim() || defaultLabel,
+            description: description.trim() || null,
+            capacity,
+            validation_mode: mode,
+          },
+        });
+      }
+      const created = await create({
+        data: {
+          event_id: eventId,
+          role_key: currentTpl.key,
+          label: label.trim() || defaultLabel,
+          description: description.trim() || null,
+          capacity,
+          validation_mode: mode,
+        },
+      });
+      if (wantsPublish && created?.id) {
+        try {
+          const r = await publish({ data: { need_id: created.id, audiences } });
+          return { ...created, __published: r };
+        } catch (e) {
+          // Draft is created, publication failed — surface the error but keep the draft.
+          throw e;
+        }
+      }
+      return created;
+    },
+    onSuccess: (r) => {
+      if (isEdit) {
+        toast.success(t("common.saved", { defaultValue: "Modifications enregistrées" }));
+      } else if ((r as { __published?: { recipients_count: number } })?.__published) {
+        const rc = (r as { __published: { recipients_count: number } }).__published.recipients_count;
+        toast.success(t("needs:publish.success", { count: rc ?? 0 }));
+      } else {
+        toast.success(t("needs:section.created"));
+      }
       onSaved();
       onOpenChange(false);
     },
@@ -704,6 +763,52 @@ function NeedFormDialog({
               placeholder={t("needs:field.description")}
             />
           </div>
+
+          {/* Audience picker (creation only) */}
+          {!isEdit && (
+            <div className="pt-2 border-t space-y-3">
+              <div>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t("needs:publish.audienceHeader")}
+                </Label>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {t("needs:publish.desc")}
+                </p>
+              </div>
+              <AudiencePickerBody
+                ctx={audienceCtx ?? null}
+                state={audState}
+                controls={audControls}
+              />
+              <div
+                className={cn(
+                  "rounded-md border p-2.5 text-xs",
+                  audiences.length > 0 && (previewCount ?? 0) > 0
+                    ? "border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800"
+                    : "border-muted bg-muted/30",
+                )}
+              >
+                {previewLoading ? (
+                  <span className="inline-flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    {t("needs:publish.previewLoading")}
+                  </span>
+                ) : audiences.length === 0 ? (
+                  <span className="text-muted-foreground">
+                    {t("needs:publish.previewNone")}
+                  </span>
+                ) : (previewCount ?? 0) === 0 ? (
+                  <span className="text-muted-foreground">
+                    {t("needs:publish.previewNone")}
+                  </span>
+                ) : (
+                  <span className="text-emerald-800 dark:text-emerald-200 font-medium">
+                    {t("needs:publish.preview", { count: previewCount ?? 0 })}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -714,7 +819,9 @@ function NeedFormDialog({
             {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
             {isEdit
               ? t("common.save", { defaultValue: "Enregistrer" })
-              : t("common.create", { defaultValue: "Créer" })}
+              : wantsPublish
+                ? t("needs:actions.publish")
+                : t("common.create", { defaultValue: "Créer en brouillon" })}
           </Button>
         </DialogFooter>
       </DialogContent>
