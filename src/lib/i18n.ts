@@ -57,6 +57,14 @@ import nlChallenges from "@/locales/nl/challenges.json";
 import nlBuildClubero from "@/locales/nl/buildClubero.json";
 import nlCamps from "@/locales/nl/camps.json";
 
+import enNeeds from "@/locales/en/needs.json";
+import frNeeds from "@/locales/fr/needs.json";
+import deNeeds from "@/locales/de/needs.json";
+import esNeeds from "@/locales/es/needs.json";
+import ptNeeds from "@/locales/pt/needs.json";
+import itNeeds from "@/locales/it/needs.json";
+import nlNeeds from "@/locales/nl/needs.json";
+
 export const SUPPORTED_LANGS = ["en", "fr", "de", "es", "pt", "it", "nl"] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
@@ -83,6 +91,7 @@ if (!i18n.isInitialized) {
         challenges: enChallenges,
         buildClubero: enBuildClubero,
         camps: enCamps,
+        needs: enNeeds,
       },
       fr: {
         common: frCommon,
@@ -92,6 +101,7 @@ if (!i18n.isInitialized) {
         challenges: frChallenges,
         buildClubero: frBuildClubero,
         camps: frCamps,
+        needs: frNeeds,
       },
       de: {
         common: deCommon,
@@ -101,6 +111,7 @@ if (!i18n.isInitialized) {
         challenges: deChallenges,
         buildClubero: deBuildClubero,
         camps: deCamps,
+        needs: deNeeds,
       },
       es: {
         common: esCommon,
@@ -110,6 +121,7 @@ if (!i18n.isInitialized) {
         challenges: esChallenges,
         buildClubero: esBuildClubero,
         camps: esCamps,
+        needs: esNeeds,
       },
       pt: {
         common: ptCommon,
@@ -119,6 +131,7 @@ if (!i18n.isInitialized) {
         challenges: ptChallenges,
         buildClubero: ptBuildClubero,
         camps: ptCamps,
+        needs: ptNeeds,
       },
       it: {
         common: itCommon,
@@ -128,6 +141,7 @@ if (!i18n.isInitialized) {
         challenges: itChallenges,
         buildClubero: itBuildClubero,
         camps: itCamps,
+        needs: itNeeds,
       },
       nl: {
         common: nlCommon,
@@ -137,13 +151,14 @@ if (!i18n.isInitialized) {
         challenges: nlChallenges,
         buildClubero: nlBuildClubero,
         camps: nlCamps,
+        needs: nlNeeds,
       },
     },
     lng: "en",
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     defaultNS: "common",
-    ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps"],
+    ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps", "needs"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
     // v3 JSON plural format (uses `_plural` suffix) — matches existing locale files.

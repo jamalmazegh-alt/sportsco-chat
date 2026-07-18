@@ -65,6 +65,7 @@ import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog"
 import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
+import { EventNeedsSection } from "@/components/needs/event-needs-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
@@ -4502,7 +4503,15 @@ function EventDetail() {
           />
         )}
 
+      <EventNeedsSection
+        eventId={eventId}
+        eventType={event.type}
+        sport={eventTeam?.sport ?? null}
+        teamId={event.team_id ?? null}
+      />
+
       <EventChat eventId={eventId} />
+
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (
