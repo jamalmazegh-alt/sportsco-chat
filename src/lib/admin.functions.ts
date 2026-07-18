@@ -135,7 +135,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
         .maybeSingle(),
       supabase
         .from("club_members")
-        .select("club_id, role, created_at, clubs:club_id(name)")
+        .select("club_id, role, roles, created_at, clubs:club_id(name)")
         .eq("user_id", data.user_id),
       supabaseAdmin
         .from("players")
@@ -156,10 +156,12 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       profile,
       email: u?.email ?? null,
       last_sign_in_at: u?.last_sign_in_at ?? null,
-      memberships: (memberships ?? []).map((m: { role?: string }) => ({
+      memberships: (memberships ?? []).map((m: { role?: string; roles?: string[] | null }) => ({
         ...m,
-        roles: m.role ? [m.role] : [],
+        roles:
+          Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
       })),
+
       linkedPlayers: linkedPlayers ?? [],
       parentLinks: parentLinks ?? [],
       is_disabled: isDisabled,
