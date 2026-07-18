@@ -886,7 +886,122 @@ function GroupMembersPanel({
           </ul>
         )}
       </div>
+
+      <RulePreviewDialog
+        rule={previewRule}
+        ruleLabel={previewRule ? ruleLabel(previewRule) : ""}
+        clubId={clubId}
+        allMembers={allMembers}
+        onClose={() => setPreviewRule(null)}
+      />
     </div>
+  );
+}
+
+function ruleToSpec(r: RuleRow): AudienceSelector | null {
+  switch (r.rule_type) {
+    case "team_players":
+      return r.team_id ? { type: "team_players", team_id: r.team_id } : null;
+    case "team_parents":
+      return r.team_id ? { type: "team_parents", team_id: r.team_id } : null;
+    case "team_educators":
+      return r.team_id ? { type: "team_educators", team_id: r.team_id } : null;
+    case "category_educators":
+      return r.category ? { type: "category_educators", category: r.category } : null;
+    case "club_educators":
+      return { type: "club_educators" };
+    case "club_staff":
+      return { type: "club_staff" };
+    case "club_members":
+      return { type: "club_members" };
+    default:
+      return null;
+  }
+}
+
+function RulePreviewDialog({
+  rule,
+  ruleLabel,
+  clubId,
+  allMembers,
+  onClose,
+}: {
+  rule: RuleRow | null;
+  ruleLabel: string;
+  clubId: string;
+  allMembers: ClubMemberRow[];
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const previewFn = useServerFn(previewAudienceCount);
+
+  const previewQ = useQuery({
+    queryKey: ["group-rule-preview", rule?.id, clubId],
+    enabled: !!rule,
+    queryFn: async () => {
+      const spec = rule ? ruleToSpec(rule) : null;
+      if (!spec) return { count: 0, user_ids: [] as string[] };
+      return await previewFn({ data: { club_id: clubId, spec: [spec] } });
+    },
+  });
+
+  const byUserId = useMemo(() => {
+    const m = new Map<string, ClubMemberRow>();
+    for (const cm of allMembers) if (cm.user_id) m.set(cm.user_id, cm);
+    return m;
+  }, [allMembers]);
+
+  const rows = useMemo(() => {
+    const ids = previewQ.data?.user_ids ?? [];
+    return ids
+      .map((uid) => byUserId.get(uid))
+      .filter((x): x is ClubMemberRow => !!x)
+      .sort((a, b) => displayName(a).localeCompare(displayName(b)));
+  }, [previewQ.data, byUserId]);
+
+  return (
+    <Dialog open={!!rule} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Layers className="h-4 w-4 text-primary" />
+            {ruleLabel}
+          </DialogTitle>
+          <DialogDescription>
+            {t("groups.rulePreviewDescription", {
+              defaultValue:
+                "Liste résolue à l'instant. La composition se met à jour automatiquement.",
+            })}
+          </DialogDescription>
+        </DialogHeader>
+
+        {previewQ.isLoading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
+        ) : rows.length === 0 ? (
+          <p className="text-sm text-muted-foreground italic py-4">
+            {t("groups.rulePreviewEmpty", { defaultValue: "Aucun membre résolu." })}
+          </p>
+        ) : (
+          <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
+            {rows.map((m) => (
+              <li key={m.id} className="flex items-center gap-2 px-3 py-2">
+                <span className="text-sm truncate flex-1">{displayName(m)}</span>
+                <RoleBadges roles={m.roles} fallback={m.role} />
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <DialogFooter className="text-xs text-muted-foreground">
+          {t("groups.rulePreviewCount", {
+            defaultValue: "{{count}} membre(s)",
+            count: rows.length,
+          })}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
