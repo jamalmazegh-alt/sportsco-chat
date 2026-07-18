@@ -266,7 +266,6 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
       else unmapped.push(h);
     }
 
-
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
@@ -522,7 +521,6 @@ async function createInviteAndEmail(params: {
     await supabaseAdmin.from("member_invites").delete().eq("id", inviteId);
     return null;
   }
-
 }
 
 /**
@@ -1394,12 +1392,9 @@ export const runImport = createServerFn({ method: "POST" })
         type: data.type,
         imported,
         failed: errors.length,
-        ...(errors.length
-          ? { error: redactErrorMessage({ errors: errors.slice(0, 3) }) }
-          : {}),
+        ...(errors.length ? { error: redactErrorMessage({ errors: errors.slice(0, 3) }) } : {}),
       },
     });
-
 
     return { status, imported, total: data.rows.length, errors, summary };
   });

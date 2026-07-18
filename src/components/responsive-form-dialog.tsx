@@ -46,9 +46,7 @@ export function ResponsiveFormDialog({ open, onOpenChange, trigger, title, child
         <DialogHeader className="shrink-0 px-6 pt-6 pb-3 pr-12 border-b bg-background">
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4">{children}</div>
       </DialogContent>
     </Dialog>
   );

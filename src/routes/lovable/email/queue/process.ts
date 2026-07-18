@@ -247,7 +247,12 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           }
 
           for (let i = 0; i < messages.length; i++) {
-            const msg = messages[i] as { msg_id: number; message: QueuePayload; read_ct?: number; enqueued_at?: string };
+            const msg = messages[i] as {
+              msg_id: number;
+              message: QueuePayload;
+              read_ct?: number;
+              enqueued_at?: string;
+            };
             const payload = msg.message;
             const failedAttempts =
               payload?.message_id && typeof payload.message_id === "string"
@@ -341,11 +346,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             // est différent mais où le destinataire a déjà été livré pour la même
             // notification métier. Best-effort côté worker; l'index unique en base est
             // le vrai garde-fou.
-            if (
-              payload.dispatch_id &&
-              payload.recipient_id &&
-              payload.notification_type
-            ) {
+            if (payload.dispatch_id && payload.recipient_id && payload.notification_type) {
               const { data: alreadyForDispatch } = await supabase
                 .from("email_send_log")
                 .select("id")
@@ -366,8 +367,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 await supabase.from("email_send_log").insert({
                   ...baseLogRow(payload, queue),
                   status: "skipped_duplicate",
-                  error_message:
-                    "Recipient already delivered for this dispatch/notification_type",
+                  error_message: "Recipient already delivered for this dispatch/notification_type",
                 });
                 const { error: dedupDelError } = await supabase.rpc("delete_email", {
                   queue_name: queue,
@@ -412,17 +412,14 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               // an already-delivered dispatch/recipient/notification_type), the insert
               // fails proprement — we log and continue without deleting the message so
               // it can be examined; but the standard case is a clean insert.
-              const { error: insertSuccessError } = await supabase
-                .from("email_send_log")
-                .insert({
-                  ...baseLogRow(payload, queue),
-                  status: "sent",
-                  attempt_count: failedAttempts + mismatchAttempts + 1,
-                  mismatch_count: mismatchAttempts,
-                  provider: sender.name,
-                  provider_message_id: sendResult.providerMessageId || null,
-                });
-
+              const { error: insertSuccessError } = await supabase.from("email_send_log").insert({
+                ...baseLogRow(payload, queue),
+                status: "sent",
+                attempt_count: failedAttempts + mismatchAttempts + 1,
+                mismatch_count: mismatchAttempts,
+                provider: sender.name,
+                provider_message_id: sendResult.providerMessageId || null,
+              });
 
               if (insertSuccessError) {
                 console.error("email_queue.insert_sent_failed", {
@@ -503,10 +500,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   error_message: errorMsg.slice(0, 1000),
                 });
                 if (payload?.message_id && typeof payload.message_id === "string") {
-                  mismatchAttemptsByMessageId.set(
-                    payload.message_id,
-                    mismatchAttempts + 1,
-                  );
+                  mismatchAttemptsByMessageId.set(payload.message_id, mismatchAttempts + 1);
                 }
                 await supabase
                   .from("email_send_state")

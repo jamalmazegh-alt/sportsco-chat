@@ -38,7 +38,9 @@ describe("email queue error classification", () => {
 
   it("recognises recipient_mismatch as transient (by error slug and by prose)", () => {
     expect(isTransientRunRecipientMismatch(recipientMismatch)).toBe(true);
-    expect(isTransientRunRecipientMismatch(new Error("403 Recipient does not match run"))).toBe(true);
+    expect(isTransientRunRecipientMismatch(new Error("403 Recipient does not match run"))).toBe(
+      true,
+    );
     expect(
       isTransientRunRecipientMismatch(new FakeEmailAPIError(403, "sender_domain_unverified")),
     ).toBe(false);

@@ -8,8 +8,17 @@ import { redactErrorMessage } from "@/lib/observability/redact";
 import { StatusBadge } from "@/lib/superadmin/ui";
 
 const CATEGORIES = [
-  "team", "event", "convocation", "camp", "tournament",
-  "invite", "social", "wall", "import", "support", "impersonation",
+  "team",
+  "event",
+  "convocation",
+  "camp",
+  "tournament",
+  "invite",
+  "social",
+  "wall",
+  "import",
+  "support",
+  "impersonation",
 ] as const;
 
 const STATUSES = ["success", "warning", "failure"] as const;
@@ -38,8 +47,8 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
             clubId: filters.clubId ?? null,
             category: filters.category ?? null,
             status: filters.status ?? null,
-            cursorTs: reset ? null : cursor?.ts ?? null,
-            cursorId: reset ? null : cursor?.id ?? null,
+            cursorTs: reset ? null : (cursor?.ts ?? null),
+            cursorId: reset ? null : (cursor?.id ?? null),
             limit: 50,
           },
         });
@@ -79,7 +88,9 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
         >
           <option value="">Toutes catégories</option>
           {CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
         <select
@@ -94,7 +105,9 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
         >
           <option value="">Tous statuts</option>
           {STATUSES.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
         {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
@@ -145,7 +158,6 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
                     </div>
                   ) : null;
                 })()}
-
               </div>
             </li>
           ))}

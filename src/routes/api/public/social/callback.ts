@@ -84,7 +84,9 @@ export const Route = createFileRoute("/api/public/social/callback")({
               resourceType: "social_connection",
               metadata: { network: state.network, account_name: oauth.accountName ?? null },
             });
-          } catch { /* never block */ }
+          } catch {
+            /* never block */
+          }
 
           // Initial sync (best-effort)
           const { data: fresh } = await supabaseAdmin
@@ -98,7 +100,6 @@ export const Route = createFileRoute("/api/public/social/callback")({
           if (fresh) {
             await syncConnection(fresh as Parameters<typeof syncConnection>[0]);
           }
-
 
           return Response.redirect(
             `${baseRedirect}?status=connected&network=${state.network}`,

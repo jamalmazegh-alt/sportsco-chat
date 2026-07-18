@@ -193,8 +193,7 @@ export function toEventPayloadInput(
   if (!startsIso) return null;
   const duration = effectiveDuration(state);
   // Multi-day "other" events (e.g. camp): end at endDate + startTime + duration
-  const isMultiDay =
-    state.type === "other" && !!state.endDate && state.endDate > state.startDate;
+  const isMultiDay = state.type === "other" && !!state.endDate && state.endDate > state.startDate;
   const endsIso = isMultiDay
     ? addMinutesIso(toIso(state.endDate, state.startTime), duration)
     : addMinutesIso(startsIso, duration);
@@ -265,7 +264,10 @@ export function toEventFormInitial(
 ): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
   const isMultiDay =
-    state.type === "other" && !!state.endDate && !!state.startDate && state.endDate > state.startDate;
+    state.type === "other" &&
+    !!state.endDate &&
+    !!state.startDate &&
+    state.endDate > state.startDate;
   const duration = effectiveDuration(state);
   const endsIso = isMultiDay
     ? addMinutesIso(toIso(state.endDate, state.startTime), duration)

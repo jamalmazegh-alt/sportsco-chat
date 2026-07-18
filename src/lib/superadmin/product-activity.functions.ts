@@ -10,7 +10,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
 
-
 const ProductActivityInputSchema = z.object({
   clubId: z.string().uuid().nullable().optional(),
   category: z.string().max(32).nullable().optional(),
@@ -39,7 +38,6 @@ export type ProductActivityRow = {
   error_code: string | null;
   metadata: JsonValue;
 };
-
 
 export const listProductActivity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -63,8 +63,7 @@ export const createEmailDispatch = createServerFn({ method: "POST" })
           .eq("user_id", context.userId)
           .maybeSingle();
         const crole = (cm as any)?.role as string | undefined;
-        if (crole === "admin" || crole === "owner" || crole === "dirigeant")
-          authorized = true;
+        if (crole === "admin" || crole === "owner" || crole === "dirigeant") authorized = true;
       }
       if (!authorized) throw new Response("Forbidden", { status: 403 });
     }

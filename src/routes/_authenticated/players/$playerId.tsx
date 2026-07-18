@@ -1,4 +1,11 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useNavigate,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { PlayerSuspensions } from "@/components/player-suspensions";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
@@ -333,7 +340,6 @@ function PlayerProfile() {
     },
     enabled: !!user,
   });
-
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -960,38 +966,35 @@ function PlayerProfile() {
                     </Button>
                   )}
 
-                  {(isCoach || isParentOfThisPlayer) &&
-                    !player.user_id &&
-                    !minor && (
-                      <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
-                        <p className="text-xs text-muted-foreground">
-                          {t("players.inviteAdultHint", {
-                            defaultValue:
-                              "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
-                          })}
-                        </p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          disabled={!(email || player.email)}
-                          onClick={() => {
-                            const target = (email || player.email || "").trim();
-                            if (!target) {
-                              toast.warning(t("players.inviteNoContact"));
-                              return;
-                            }
-                            sendChildOnboardingInvite(target);
-                          }}
-                        >
-                          {t("players.invitePlayer", {
-                            defaultValue: "Inviter le joueur à créer son compte",
-                          })}
-                        </Button>
-                      </div>
-                    )}
-
+                  {(isCoach || isParentOfThisPlayer) && !player.user_id && !minor && (
+                    <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        {t("players.inviteAdultHint", {
+                          defaultValue:
+                            "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
+                        })}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        disabled={!(email || player.email)}
+                        onClick={() => {
+                          const target = (email || player.email || "").trim();
+                          if (!target) {
+                            toast.warning(t("players.inviteNoContact"));
+                            return;
+                          }
+                          sendChildOnboardingInvite(target);
+                        }}
+                      >
+                        {t("players.invitePlayer", {
+                          defaultValue: "Inviter le joueur à créer son compte",
+                        })}
+                      </Button>
+                    </div>
+                  )}
                 </>
               );
             })()}
@@ -1119,8 +1122,7 @@ function PlayerProfile() {
                             <span
                               className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
                               title={t("players.inviteSentHint", {
-                                defaultValue:
-                                  "Un email d'invitation a été envoyé à ce parent",
+                                defaultValue: "Un email d'invitation a été envoyé à ce parent",
                               })}
                             >
                               <Send className="h-3 w-3" />
@@ -1135,8 +1137,7 @@ function PlayerProfile() {
                               title={
                                 inviteFailedError ??
                                 t("players.inviteFailedHint", {
-                                  defaultValue:
-                                    "L'email d'invitation n'a pas pu être délivré",
+                                  defaultValue: "L'email d'invitation n'a pas pu être délivré",
                                 })
                               }
                             >
@@ -1194,8 +1195,7 @@ function PlayerProfile() {
                   !isCoach &&
                   coParents
                     ?.filter(
-                      (p) =>
-                        p.id !== parents?.find((x) => x.parent_user_id === user?.id)?.id,
+                      (p) => p.id !== parents?.find((x) => x.parent_user_id === user?.id)?.id,
                     )
                     .map((p) => (
                       <li

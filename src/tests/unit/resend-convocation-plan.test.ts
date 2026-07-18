@@ -32,7 +32,11 @@ describe("planConvocationResendRecipients", () => {
   });
 
   it("recipientId is stable and distinct per recipient (dedup index key)", () => {
-    const convs = [convoc("c1", "pl1", { player: { first_name: "P", last_name: "1", email: "kid@x.com", user_id: null } })];
+    const convs = [
+      convoc("c1", "pl1", {
+        player: { first_name: "P", last_name: "1", email: "kid@x.com", user_id: null },
+      }),
+    ];
     const parents: ResendPlanParent[] = [
       { parent_user_id: "u-a", email: "Alice@X.com", full_name: "Ann", player_id: "pl1" },
       { parent_user_id: "u-b", email: "bob@x.com", full_name: "Bob", player_id: "pl1" },
@@ -40,11 +44,7 @@ describe("planConvocationResendRecipients", () => {
     const plan = planConvocationResendRecipients(convs, parents, {});
     const ids = plan.recipients.map((r) => r.recipientId);
     // Player + 2 parents → 3 stable recipientIds, all distinct.
-    expect(ids).toEqual([
-      "player:pl1",
-      "parent:pl1:alice@x.com",
-      "parent:pl1:bob@x.com",
-    ]);
+    expect(ids).toEqual(["player:pl1", "parent:pl1:alice@x.com", "parent:pl1:bob@x.com"]);
   });
 
   it("two recipients sharing the same email address are only enqueued once", () => {

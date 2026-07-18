@@ -13,7 +13,10 @@
 const MAX_LEN = 500;
 
 const PATTERNS: Array<[RegExp, string]> = [
-  [/(access_token|refresh_token|client_secret|code|apikey|api_key|token)=[^&\s"']+/gi, "$1=[REDACTED]"],
+  [
+    /(access_token|refresh_token|client_secret|code|apikey|api_key|token)=[^&\s"']+/gi,
+    "$1=[REDACTED]",
+  ],
   [/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [REDACTED]"],
   [/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[EMAIL]"],
   // Basic international-ish phone match (7-15 digits, may have + and spaces/dashes)

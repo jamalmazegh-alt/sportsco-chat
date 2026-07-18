@@ -49,14 +49,7 @@ export type EmailDispatchSummary = {
   is_settled: boolean;
 };
 
-const FINAL_STATUSES = new Set([
-  "sent",
-  "suppressed",
-  "failed",
-  "bounced",
-  "complained",
-  "dlq",
-]);
+const FINAL_STATUSES = new Set(["sent", "suppressed", "failed", "bounced", "complained", "dlq"]);
 
 function emptyCounts(): DispatchStatusCounts {
   return {
@@ -72,7 +65,9 @@ function emptyCounts(): DispatchStatusCounts {
 }
 
 /** Latest row per message_id, plus rows without message_id kept as-is. */
-function dedupByMessage<T extends { message_id: string | null; created_at: string }>(rows: T[]): T[] {
+function dedupByMessage<T extends { message_id: string | null; created_at: string }>(
+  rows: T[],
+): T[] {
   const seen = new Map<string, T>();
   const orphans: T[] = [];
   // rows are pre-sorted DESC by created_at
@@ -128,7 +123,10 @@ export const listEmailDispatches = createServerFn({ method: "POST" })
 
     // Group by dispatch, then dedup by message_id
     const perDispatch = new Map<string, DispatchStatusCounts>();
-    const grouped = new Map<string, Array<{ message_id: string | null; status: string; created_at: string }>>();
+    const grouped = new Map<
+      string,
+      Array<{ message_id: string | null; status: string; created_at: string }>
+    >();
     for (const r of logRows ?? []) {
       if (!r.dispatch_id) continue;
       const arr = grouped.get(r.dispatch_id) ?? [];
@@ -148,7 +146,13 @@ export const listEmailDispatches = createServerFn({ method: "POST" })
     // Events → clubs / teams
     const eventsById = new Map<
       string,
-      { title: string | null; starts_at: string | null; club_id: string | null; club_name: string | null; team_name: string | null }
+      {
+        title: string | null;
+        starts_at: string | null;
+        club_id: string | null;
+        club_name: string | null;
+        team_name: string | null;
+      }
     >();
     if (eventIds.length > 0) {
       const { data: events } = await supabaseAdmin
@@ -156,7 +160,16 @@ export const listEmailDispatches = createServerFn({ method: "POST" })
         .select("id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name))")
         .in("id", eventIds);
       for (const e of events ?? []) {
-        const team = (e as { teams: { name: string | null; club_id: string | null; clubs: { name: string | null } | null } | null }).teams ?? null;
+        const team =
+          (
+            e as {
+              teams: {
+                name: string | null;
+                club_id: string | null;
+                clubs: { name: string | null } | null;
+              } | null;
+            }
+          ).teams ?? null;
         eventsById.set(e.id as string, {
           title: (e as { title: string | null }).title,
           starts_at: (e as { starts_at: string | null }).starts_at,
@@ -174,11 +187,14 @@ export const listEmailDispatches = createServerFn({ method: "POST" })
         .from("profiles")
         .select("id, full_name")
         .in("id", userIds);
-      for (const p of profs ?? []) usersById.set(p.id as string, (p as { full_name: string | null }).full_name);
+      for (const p of profs ?? [])
+        usersById.set(p.id as string, (p as { full_name: string | null }).full_name);
     }
 
     const rows: EmailDispatchSummary[] = dispatches
-      .filter((d) => !data.clubId || (d.event_id && eventsById.get(d.event_id)?.club_id === data.clubId))
+      .filter(
+        (d) => !data.clubId || (d.event_id && eventsById.get(d.event_id)?.club_id === data.clubId),
+      )
       .map((d) => {
         const ev = d.event_id ? eventsById.get(d.event_id) : null;
         const counts = perDispatch.get(d.id) ?? emptyCounts();
@@ -195,7 +211,7 @@ export const listEmailDispatches = createServerFn({ method: "POST" })
           club_name: ev?.club_name ?? null,
           team_name: ev?.team_name ?? null,
           created_by: d.created_by,
-          created_by_name: d.created_by ? usersById.get(d.created_by) ?? null : null,
+          created_by_name: d.created_by ? (usersById.get(d.created_by) ?? null) : null,
           counts,
           is_settled: settled,
         };
@@ -221,9 +237,7 @@ export type DispatchRecipientRow = {
 
 export const getEmailDispatchDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ dispatchId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ dispatchId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
 
@@ -260,7 +274,9 @@ export const getEmailDispatchDetail = createServerFn({ method: "POST" })
         .eq("id", dispatch.event_id)
         .maybeSingle();
       if (ev) {
-        const team = (ev as { teams: { name: string | null; clubs: { name: string | null } | null } | null }).teams ?? null;
+        const team =
+          (ev as { teams: { name: string | null; clubs: { name: string | null } | null } | null })
+            .teams ?? null;
         event = {
           id: ev.id as string,
           title: (ev as { title: string | null }).title,

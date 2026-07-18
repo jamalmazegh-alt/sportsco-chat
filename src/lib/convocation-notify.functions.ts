@@ -146,4 +146,3 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     }
     return { sent };
   });
-

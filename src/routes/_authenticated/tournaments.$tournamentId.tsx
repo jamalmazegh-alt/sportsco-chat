@@ -72,7 +72,9 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
   component: TournamentDetailPage,
   // Backward-compatible search params: previous URLs (?tab=, ?sub=) are still parsed
   // but the Centre de contrôle ignores them and shows the unified workflow.
-  validateSearch: (search: Record<string, unknown>): { tab?: string; sub?: string; focusMatch?: string; display?: "tv" } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { tab?: string; sub?: string; focusMatch?: string; display?: "tv" } => {
     const out: { tab?: string; sub?: string; focusMatch?: string; display?: "tv" } = {};
     if (typeof search.tab === "string") out.tab = search.tab;
     if (typeof search.sub === "string") out.sub = search.sub;

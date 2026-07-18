@@ -187,9 +187,7 @@ export const getClubActivitySummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertSuperAdmin(context.userId);
-    const { data, error } = await supabaseAdmin.rpc(
-      "superadmin_club_activity_summary" as never,
-    );
+    const { data, error } = await supabaseAdmin.rpc("superadmin_club_activity_summary" as never);
     if (error) throw new Error(error.message);
     const map: Record<string, ClubActivitySummary> = {};
     for (const row of (data ?? []) as Array<{
@@ -398,8 +396,7 @@ export const getClubObservability = createServerFn({ method: "POST" })
       : { data: [] as never[] };
     const nameById = new Map<string, string | null>();
     for (const p of profs ?? []) {
-      const n =
-        p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || null;
+      const n = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || null;
       nameById.set(p.id, n);
     }
 
@@ -423,10 +420,7 @@ export const getClubObservability = createServerFn({ method: "POST" })
     });
 
     // Active users (30d)
-    const byUser = new Map<
-      string,
-      { last_at: string; last_action: string; count: number }
-    >();
+    const byUser = new Map<string, { last_at: string; last_action: string; count: number }>();
     for (const r of activity30.data ?? []) {
       if (!r.actor_user_id) continue;
       const cur = byUser.get(r.actor_user_id);
@@ -506,9 +500,6 @@ export const getClubObservability = createServerFn({ method: "POST" })
       support_tickets: (tickets.data ?? []) as ClubSupportTicketRow[],
     };
   });
-
-
-
 
 /** Detailed view for one club. */
 export const getClubDetail = createServerFn({ method: "POST" })
@@ -1226,30 +1217,27 @@ export const getUserDetail = createServerFn({ method: "POST" })
       .filter((v): v is string => !!v);
     const allPlayerIds = Array.from(new Set([...playerIds, ...childPlayerIds]));
 
-    const [
-      { data: parentsOfSelf },
-      { data: childPlayers },
-      { data: playerTeamMembers },
-    ] = await Promise.all([
-      playerIds.length
-        ? supabaseAdmin
-            .from("player_parents")
-            .select("player_id, parent_user_id, full_name, email, phone, can_respond")
-            .in("player_id", playerIds)
-        : Promise.resolve({ data: [] as never[] }),
-      childPlayerIds.length
-        ? supabaseAdmin
-            .from("players")
-            .select("id, first_name, last_name, club_id, jersey_number")
-            .in("id", childPlayerIds)
-        : Promise.resolve({ data: [] as never[] }),
-      allPlayerIds.length
-        ? supabaseAdmin
-            .from("team_members")
-            .select("team_id, player_id, role")
-            .in("player_id", allPlayerIds)
-        : Promise.resolve({ data: [] as never[] }),
-    ]);
+    const [{ data: parentsOfSelf }, { data: childPlayers }, { data: playerTeamMembers }] =
+      await Promise.all([
+        playerIds.length
+          ? supabaseAdmin
+              .from("player_parents")
+              .select("player_id, parent_user_id, full_name, email, phone, can_respond")
+              .in("player_id", playerIds)
+          : Promise.resolve({ data: [] as never[] }),
+        childPlayerIds.length
+          ? supabaseAdmin
+              .from("players")
+              .select("id, first_name, last_name, club_id, jersey_number")
+              .in("id", childPlayerIds)
+          : Promise.resolve({ data: [] as never[] }),
+        allPlayerIds.length
+          ? supabaseAdmin
+              .from("team_members")
+              .select("team_id, player_id, role")
+              .in("player_id", allPlayerIds)
+          : Promise.resolve({ data: [] as never[] }),
+      ]);
 
     // Load any club referenced by a child player that we haven't fetched yet
     const extraClubIds = Array.from(
@@ -1268,11 +1256,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
     }
 
     const parentUserIds = Array.from(
-      new Set(
-        (parentsOfSelf ?? [])
-          .map((p) => p.parent_user_id)
-          .filter((v): v is string => !!v),
-      ),
+      new Set((parentsOfSelf ?? []).map((p) => p.parent_user_id).filter((v): v is string => !!v)),
     );
     const parentProfileMap = new Map<
       string,
@@ -1285,8 +1269,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
         .in("id", parentUserIds);
       for (const p of parentProfiles ?? []) {
         parentProfileMap.set(p.id, {
-          full_name:
-            p.full_name ?? [p.first_name, p.last_name].filter(Boolean).join(" ") ?? null,
+          full_name: p.full_name ?? [p.first_name, p.last_name].filter(Boolean).join(" ") ?? null,
           email: null,
           phone: p.phone ?? null,
         });
@@ -1323,7 +1306,11 @@ export const getUserDetail = createServerFn({ method: "POST" })
 
     const teamsByPlayer = new Map<
       string,
-      Array<{ team_id: string; role: string; team: { id: string; name: string; sport: string | null } | null }>
+      Array<{
+        team_id: string;
+        role: string;
+        team: { id: string; name: string; sport: string | null } | null;
+      }>
     >();
     for (const tm of playerTeamMembers ?? []) {
       if (!tm.player_id || !tm.team_id) continue;
@@ -1361,8 +1348,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
           (x) =>
             (x.parent_user_id && x.parent_user_id === p.parent_user_id) ||
             (!!p.email && x.email?.toLowerCase().trim() === p.email.toLowerCase().trim()) ||
-            (!!p.phone &&
-              x.phone?.replace(/\s+/g, "") === p.phone.replace(/\s+/g, "")),
+            (!!p.phone && x.phone?.replace(/\s+/g, "") === p.phone.replace(/\s+/g, "")),
         )
       ) {
         continue;
@@ -1478,9 +1464,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
       })),
       parent_of: Array.from(
         new Map(
-          (parentLinks ?? [])
-            .filter((r) => !!r.player_id)
-            .map((r) => [r.player_id as string, r]),
+          (parentLinks ?? []).filter((r) => !!r.player_id).map((r) => [r.player_id as string, r]),
         ).values(),
       ).map((r) => {
         const child = r.player_id ? (childPlayerMap.get(r.player_id) ?? null) : null;
@@ -1856,7 +1840,6 @@ export const getClubRoster = createServerFn({ method: "POST" })
 
     return { rows, totals };
   });
-
 
 /** Operational alerts surfaced on the Support hub. */
 export const getSupportAlerts = createServerFn({ method: "GET" })

@@ -108,11 +108,12 @@ export const createEvent = createServerFn({ method: "POST" })
         resourceId: row.id as string,
         metadata: { team_id: payload.team_id, type: payload.type },
       });
-    } catch { /* never block the create */ }
+    } catch {
+      /* never block the create */
+    }
 
     return { id: row.id as string };
   });
-
 
 const UpdateEventSchema = CreateEventSchema.extend({
   id: z.string().uuid(),
@@ -156,8 +157,9 @@ export const updateEvent = createServerFn({ method: "POST" })
         resourceId: id,
         metadata: { type: payload.type },
       });
-    } catch { /* never block */ }
+    } catch {
+      /* never block */
+    }
 
     return { id };
   });
-

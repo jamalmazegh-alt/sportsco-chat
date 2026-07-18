@@ -20,7 +20,7 @@ Avant de merger une migration qui touche une policy `SELECT` :
    → Toute nouvelle `RESTRICTIVE` doit être introduite en même temps que
    la `PERMISSIVE` de base, dans la même migration.
 
-3. **La base permissive doit couvrir *tous* les chemins d'accès légitimes.**
+3. **La base permissive doit couvrir _tous_ les chemins d'accès légitimes.**
    Pas juste le plus évident (équipe / club). Sur `convocations` la base
    avait `can_view_team` mais oubliait `self` et `parent-lié` — le
    parent-pur passait uniquement par le gate restrictif, qui ne peut pas
@@ -34,7 +34,7 @@ Avant de merger une migration qui touche une policy `SELECT` :
    - `rg <fn_name>` sur les migrations pour lister tous les consommateurs
    - décide policy par policy si le resserrement est voulu ou s'il faut un
      fallback local (voir `has_convocation_in_team`)
-   - ajoute un test négatif *et* positif pour chaque policy touchée avant
+   - ajoute un test négatif _et_ positif pour chaque policy touchée avant
      de merger
 
 ## Durcissement d'une nouvelle fonction `SECURITY DEFINER`
@@ -57,7 +57,7 @@ Pour chaque policy qui accorde l'accès à un rôle "invité" (non-membre) :
 - **Isolation entre membres** : membre du club A ne voit pas les données
   du club B.
 - **Exclusion des non-membres** : un authentifié sans lien (autre club,
-  ou parent non-lié) ne voit rien, *même sur ressource visible=true*.
+  ou parent non-lié) ne voit rien, _même sur ressource visible=true_.
 
 Ce sont deux cas distincts. Un seul des deux passe souvent en vert sans
 prouver la fermeture. Les deux tests sont obligatoires sur chaque policy

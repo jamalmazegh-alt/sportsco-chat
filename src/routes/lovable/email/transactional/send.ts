@@ -314,7 +314,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
-            ...baseMeta,
+              ...baseMeta,
               status: "failed",
               error_message: "Failed to create unsubscribe token",
             });
@@ -338,7 +338,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
-            ...baseMeta,
+              ...baseMeta,
               status: "failed",
               error_message: "Failed to confirm unsubscribe token storage",
             });
@@ -381,7 +381,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           message_id: messageId,
           template_name: templateName,
           recipient_email: effectiveRecipient,
-            ...baseMeta,
+          ...baseMeta,
           status: "pending",
         });
 

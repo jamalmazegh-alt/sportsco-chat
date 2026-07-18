@@ -3,7 +3,9 @@ import { redactErrorMessage } from "@/lib/observability/redact";
 
 describe("redactErrorMessage", () => {
   it("masks access_token in URL-encoded params", () => {
-    const out = redactErrorMessage("failed https://graph.facebook.com/v18.0/me?access_token=EAABsecretXYZ&fields=id");
+    const out = redactErrorMessage(
+      "failed https://graph.facebook.com/v18.0/me?access_token=EAABsecretXYZ&fields=id",
+    );
     expect(out).not.toContain("EAABsecretXYZ");
     expect(out).toContain("access_token=[REDACTED]");
   });
@@ -35,7 +37,9 @@ describe("redactErrorMessage", () => {
   });
 
   it("handles Error instances and null", () => {
-    expect(redactErrorMessage(new Error("boom access_token=secret"))).toContain("access_token=[REDACTED]");
+    expect(redactErrorMessage(new Error("boom access_token=secret"))).toContain(
+      "access_token=[REDACTED]",
+    );
     expect(redactErrorMessage(null)).toBe("");
     expect(redactErrorMessage(undefined)).toBe("");
   });

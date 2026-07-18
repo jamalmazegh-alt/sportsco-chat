@@ -6,7 +6,6 @@ import { decryptToken, encryptToken } from "./crypto.server";
 import { getProvider, type SocialNetwork } from "./providers.server";
 import { logActivity } from "@/lib/observability/log-activity.server";
 
-
 type ConnRow = {
   id: string;
   club_id: string;
@@ -81,9 +80,8 @@ export async function syncConnection(conn: ConnRow): Promise<{
         // Fan out push notification (best-effort; failures are logged, not thrown).
         if (inserted?.id) {
           try {
-            const { dispatchWallPostPushInternal } = await import(
-              "@/lib/push-dispatch-wall.server"
-            );
+            const { dispatchWallPostPushInternal } =
+              await import("@/lib/push-dispatch-wall.server");
             await dispatchWallPostPushInternal(inserted.id as string);
           } catch (pushErr) {
             console.warn(
@@ -136,7 +134,6 @@ export async function syncConnection(conn: ConnRow): Promise<{
     return { imported: 0, skipped: 0, error: message };
   }
 }
-
 
 export async function syncAll(): Promise<{ total: number; results: unknown[] }> {
   const { data, error } = await supabaseAdmin

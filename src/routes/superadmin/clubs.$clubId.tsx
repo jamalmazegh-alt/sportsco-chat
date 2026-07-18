@@ -183,8 +183,6 @@ function ClubDetail() {
         </a>
       </div>
 
-
-
       <OnboardingProgress
         title="Club onboarding"
         className="mb-6"
@@ -398,13 +396,7 @@ function ClubDetail() {
                   {roster.rows.map((r) => (
                     <tr key={r.team_id} className={r.archived ? "text-muted-foreground" : ""}>
                       <td className="py-2 pr-3">
-                        <div
-                          className={
-                            r.archived ? "line-through" : "font-medium"
-                          }
-                        >
-                          {r.name}
-                        </div>
+                        <div className={r.archived ? "line-through" : "font-medium"}>{r.name}</div>
                         <div className="text-[11px] text-muted-foreground">
                           {[r.sport, r.age_group].filter(Boolean).join(" · ") || "—"}
                         </div>
@@ -413,9 +405,7 @@ function ClubDetail() {
                       <td className="text-right py-2 px-2 tabular-nums">{r.parents}</td>
                       <td className="text-right py-2 px-2 tabular-nums">{r.players}</td>
                       <td className="text-right py-2 px-2 tabular-nums">{r.other}</td>
-                      <td className="text-right py-2 pl-2 tabular-nums font-semibold">
-                        {r.total}
-                      </td>
+                      <td className="text-right py-2 pl-2 tabular-nums font-semibold">{r.total}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -424,21 +414,11 @@ function ClubDetail() {
                     <td className="py-2 pr-3 text-xs uppercase tracking-wide">
                       Club total (active teams)
                     </td>
-                    <td className="text-right py-2 px-2 tabular-nums">
-                      {roster.totals.coaches}
-                    </td>
-                    <td className="text-right py-2 px-2 tabular-nums">
-                      {roster.totals.parents}
-                    </td>
-                    <td className="text-right py-2 px-2 tabular-nums">
-                      {roster.totals.players}
-                    </td>
-                    <td className="text-right py-2 px-2 tabular-nums">
-                      {roster.totals.other}
-                    </td>
-                    <td className="text-right py-2 pl-2 tabular-nums">
-                      {roster.totals.total}
-                    </td>
+                    <td className="text-right py-2 px-2 tabular-nums">{roster.totals.coaches}</td>
+                    <td className="text-right py-2 px-2 tabular-nums">{roster.totals.parents}</td>
+                    <td className="text-right py-2 px-2 tabular-nums">{roster.totals.players}</td>
+                    <td className="text-right py-2 px-2 tabular-nums">{roster.totals.other}</td>
+                    <td className="text-right py-2 pl-2 tabular-nums">{roster.totals.total}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -450,7 +430,6 @@ function ClubDetail() {
           )}
         </Card>
       </section>
-
 
       <section className="grid lg:grid-cols-2 gap-4 mb-6">
         <Card title="Recent events">

@@ -44,7 +44,6 @@ import {
   Trophy,
   Timer,
   LayoutGrid,
-  
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
@@ -111,7 +110,6 @@ import {
   dispatchEventCancelPush,
   dispatchEventReschedulePush,
 } from "@/lib/push-dispatch.functions";
-
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -219,7 +217,9 @@ function diffSnapshot(
 }
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
-  validateSearch: (s: Record<string, unknown>): { send?: 1; preselect?: string; action?: string } => {
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): { send?: 1; preselect?: string; action?: string } => {
     const out: { send?: 1; preselect?: string; action?: string } = {};
     if (s.send === 1 || s.send === "1") out.send = 1;
     if (typeof s.preselect === "string" && s.preselect.length > 0) out.preselect = s.preselect;
@@ -804,8 +804,7 @@ function EventDetail() {
       if (raw.includes("past_event_locked")) {
         toast.error(
           t("attendance.errorPastEventLocked", {
-            defaultValue:
-              "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+            defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
           }),
         );
       } else {
@@ -873,8 +872,7 @@ function EventDetail() {
       if (raw.includes("past_event_locked")) {
         toast.error(
           t("attendance.errorPastEventLocked", {
-            defaultValue:
-              "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+            defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
           }),
         );
       } else {
@@ -933,7 +931,6 @@ function EventDetail() {
           | null
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
-
 
         // ONE dispatch for this convocation-cancelled campaign (player + parents).
         const { dispatchId } = await createEmailDispatchFn({
@@ -1131,7 +1128,6 @@ function EventDetail() {
     } catch (e) {
       console.warn("[push] convocation dispatch failed", e);
     }
-
 
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
     if (useEmail)
@@ -2051,9 +2047,8 @@ function EventDetail() {
           },
         });
 
-      const { planConvocationResendRecipients } = await import(
-        "@/lib/events/resend-convocation-plan"
-      );
+      const { planConvocationResendRecipients } =
+        await import("@/lib/events/resend-convocation-plan");
       const plan = planConvocationResendRecipients(
         (convocations as any[]).map((c: any) => ({
           id: c.id,
@@ -2254,8 +2249,7 @@ function EventDetail() {
   const scheduleEndDate = scheduleDates[scheduleDates.length - 1];
 
   const isMultiDay =
-    (!!event.ends_at &&
-      fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")) ||
+    (!!event.ends_at && fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")) ||
     (!!scheduleStartDate && !!scheduleEndDate && scheduleStartDate !== scheduleEndDate);
 
   const responsesReadOnly =
@@ -2351,37 +2345,39 @@ function EventDetail() {
           <div className="flex items-center gap-3 mb-2.5">
             {/* Date box — green gradient */}
             <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
-              {isMultiDay ? (() => {
-                const startIso =
-                  event.ends_at &&
-                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
-                    ? event.starts_at
-                    : (scheduleStartDate
+              {isMultiDay ? (
+                (() => {
+                  const startIso =
+                    event.ends_at &&
+                    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                      ? event.starts_at
+                      : scheduleStartDate
                         ? `${scheduleStartDate}T00:00:00`
-                        : event.starts_at);
-                const endIso =
-                  event.ends_at &&
-                  fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
-                    ? event.ends_at
-                    : (scheduleEndDate
+                        : event.starts_at;
+                  const endIso =
+                    event.ends_at &&
+                    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
+                      ? event.ends_at
+                      : scheduleEndDate
                         ? `${scheduleEndDate}T00:00:00`
-                        : event.ends_at ?? event.starts_at);
-                return (
-                  <>
-                    <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-                      {fmt(startIso, "MMM") === fmt(endIso, "MMM")
-                        ? fmt(startIso, "MMM")
-                        : `${fmt(startIso, "MMM")}–${fmt(endIso, "MMM")}`}
-                    </div>
-                    <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
-                      {fmt(startIso, "d")}–{fmt(endIso, "d")}
-                    </div>
-                    <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
-                      {fmt(startIso, "EEE")}–{fmt(endIso, "EEE")}
-                    </div>
-                  </>
-                );
-              })() : (
+                        : (event.ends_at ?? event.starts_at);
+                  return (
+                    <>
+                      <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
+                        {fmt(startIso, "MMM") === fmt(endIso, "MMM")
+                          ? fmt(startIso, "MMM")
+                          : `${fmt(startIso, "MMM")}–${fmt(endIso, "MMM")}`}
+                      </div>
+                      <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
+                        {fmt(startIso, "d")}–{fmt(endIso, "d")}
+                      </div>
+                      <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
+                        {fmt(startIso, "EEE")}–{fmt(endIso, "EEE")}
+                      </div>
+                    </>
+                  );
+                })()
+              ) : (
                 <>
                   <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
                     {fmt(event.starts_at, "MMM")}
@@ -4023,7 +4019,6 @@ function EventDetail() {
             </div>
           )}
 
-
           {/* B. Relancer banner (pending only) */}
           {event.convocations_sent && isCoach && counts.pending > 0 && (
             <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-50/70 dark:bg-amber-950/30 border-b border-amber-100 dark:border-amber-900/50">
@@ -4205,7 +4200,6 @@ function EventDetail() {
                                     <AttendancePill status={c.status} />
                                   )}
                                 </div>
-
                               </div>
                               {c.comment && (isCoach || c.players?.user_id === user?.id) && (
                                 <p className="text-[11px] text-muted-foreground italic truncate mt-1 pl-[44px]">

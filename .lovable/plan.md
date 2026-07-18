@@ -9,6 +9,7 @@ Les phases 2 (DNS), 3 (idempotence), 4 (bascule progressive), 5 (auth Supabase) 
 ### 1. Schéma DB — colonnes de traçabilité
 
 Migration sur `email_send_log` :
+
 - `provider text` — quel sender a été utilisé (`lovable` | `ses` | `brevo` | …)
 - `provider_message_id text` — l'ID retourné par le provider (déjà partiellement présent dans `message_id`, mais on sépare notre clé métier de l'ID provider)
 
@@ -31,7 +32,7 @@ export interface SendResult {
   providerMessageId: string;
 }
 export interface EmailSender {
-  readonly name: 'lovable' | 'ses' | 'brevo';
+  readonly name: "lovable" | "ses" | "brevo";
   send(payload: SendPayload): Promise<SendResult>;
 }
 ```
@@ -50,8 +51,8 @@ Nouveau fichier `src/lib/email/senders/index.ts` :
 
 ```ts
 export function getEmailSender(): EmailSender {
-  const p = process.env.EMAIL_PROVIDER ?? 'lovable';
-  if (p === 'ses') return new SesSender();
+  const p = process.env.EMAIL_PROVIDER ?? "lovable";
+  if (p === "ses") return new SesSender();
   return new LovableSender();
 }
 ```
@@ -74,6 +75,7 @@ Toute la logique existante (dispatch_id, dédup par `recipient_id`, cooldown 45s
 ### 8. Diff avant/après
 
 À la fin, je te fournis explicitement :
+
 - le diff des deux routes d'envoi (avant : appel direct provider ; après : `getEmailSender().send`)
 - la preuve que `EMAIL_PROVIDER=lovable` produit un `email_send_log` identique à aujourd'hui (mêmes statuts, mêmes transitions), avec en plus `provider='lovable'`.
 
@@ -95,6 +97,7 @@ Toute la logique existante (dispatch_id, dédup par `recipient_id`, cooldown 45s
 ## Critère d'acceptation Phase 1
 
 Avec `EMAIL_PROVIDER` non défini :
+
 1. Un renvoi de convocation sur un event réel produit exactement le même comportement qu'avant (mêmes lignes `email_send_log`, mêmes emails livrés).
 2. Les nouvelles lignes ont `provider='lovable'` et `provider_message_id` renseigné.
 3. `bun run test` vert.

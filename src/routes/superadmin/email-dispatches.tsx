@@ -26,7 +26,9 @@ function EmailDispatchesPage() {
     refetchInterval: 20_000,
   });
   const [q, setQ] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "settled" | "in_progress" | "has_failures">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "settled" | "in_progress" | "has_failures"
+  >("all");
 
   const rows: EmailDispatchSummary[] = data?.rows ?? [];
   const filtered = useMemo(() => {
@@ -34,7 +36,11 @@ function EmailDispatchesPage() {
     return rows.filter((r) => {
       if (statusFilter === "settled" && !r.is_settled) return false;
       if (statusFilter === "in_progress" && r.is_settled) return false;
-      if (statusFilter === "has_failures" && r.counts.failed + r.counts.dlq + r.counts.bounced + r.counts.complained === 0) return false;
+      if (
+        statusFilter === "has_failures" &&
+        r.counts.failed + r.counts.dlq + r.counts.bounced + r.counts.complained === 0
+      )
+        return false;
       if (!qq) return true;
       return (
         r.template_name.toLowerCase().includes(qq) ||
@@ -56,8 +62,8 @@ function EmailDispatchesPage() {
           <div>
             <h1 className="text-xl font-semibold">Envois groupés</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Chaque campagne (convocation, invitation…) avec le statut agrégé jusqu'à
-              son état final. Se rafraîchit toutes les 20&nbsp;s.
+              Chaque campagne (convocation, invitation…) avec le statut agrégé jusqu'à son état
+              final. Se rafraîchit toutes les 20&nbsp;s.
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
@@ -106,7 +112,8 @@ function EmailDispatchesPage() {
       {!isLoading && filtered.length > 0 && (
         <ul className="space-y-1.5">
           {filtered.map((d) => {
-            const failures = d.counts.failed + d.counts.dlq + d.counts.bounced + d.counts.complained;
+            const failures =
+              d.counts.failed + d.counts.dlq + d.counts.bounced + d.counts.complained;
             return (
               <li key={d.id}>
                 <Link
@@ -121,7 +128,11 @@ function EmailDispatchesPage() {
                           {d.event_title ?? d.template_name}
                         </span>
                         <StatusBadge tone={d.dispatch_type === "manual_resend" ? "warn" : "info"}>
-                          {d.dispatch_type === "manual_resend" ? "Renvoi" : d.dispatch_type === "dlq_replay" ? "Replay DLQ" : "Initial"}
+                          {d.dispatch_type === "manual_resend"
+                            ? "Renvoi"
+                            : d.dispatch_type === "dlq_replay"
+                              ? "Replay DLQ"
+                              : "Initial"}
                         </StatusBadge>
                         <span className="text-[11px] text-muted-foreground font-mono">
                           {d.template_name}
@@ -142,9 +153,15 @@ function EmailDispatchesPage() {
                       </div>
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         <StatusBadge tone="muted">{d.counts.total} destinataires</StatusBadge>
-                        {d.counts.sent > 0 && <StatusBadge tone="success">✓ {d.counts.sent}</StatusBadge>}
-                        {d.counts.pending > 0 && <StatusBadge tone="info">⏳ {d.counts.pending}</StatusBadge>}
-                        {d.counts.suppressed > 0 && <StatusBadge tone="warn">supp. {d.counts.suppressed}</StatusBadge>}
+                        {d.counts.sent > 0 && (
+                          <StatusBadge tone="success">✓ {d.counts.sent}</StatusBadge>
+                        )}
+                        {d.counts.pending > 0 && (
+                          <StatusBadge tone="info">⏳ {d.counts.pending}</StatusBadge>
+                        )}
+                        {d.counts.suppressed > 0 && (
+                          <StatusBadge tone="warn">supp. {d.counts.suppressed}</StatusBadge>
+                        )}
                         {failures > 0 && <StatusBadge tone="danger">échec {failures}</StatusBadge>}
                       </div>
                     </div>

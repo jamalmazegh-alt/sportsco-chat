@@ -91,9 +91,7 @@ export function CallUpVisibilitySelector(props: CallUpVisibilitySelectorProps) {
             label={t("callUpList.inherit")}
             trailing={
               // Show the resolved effective value alongside the "inherit" choice.
-              config && !isLoading ? (
-                <ResolvedEffective config={config} level={level} />
-              ) : null
+              config && !isLoading ? <ResolvedEffective config={config} level={level} /> : null
             }
           />
         )}

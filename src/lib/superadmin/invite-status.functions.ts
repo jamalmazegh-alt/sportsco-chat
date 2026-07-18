@@ -76,10 +76,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
       ),
     );
     const playerNames = new Map<string, string>();
-    const playerInfo = new Map<
-      string,
-      { userId: string | null; childPlatformAccess: boolean }
-    >();
+    const playerInfo = new Map<string, { userId: string | null; childPlatformAccess: boolean }>();
     if (playerIds.length > 0) {
       const { data: players } = await supabaseAdmin
         .from("players")
@@ -143,9 +140,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
 
     // Best-effort fallback for legacy invites without email_message_id:
     // recipient + template + created_at proximity.
-    const legacyInvites = (invites ?? []).filter(
-      (i: any) => !i.email_message_id && i.email,
-    );
+    const legacyInvites = (invites ?? []).filter((i: any) => !i.email_message_id && i.email);
     const legacyByKey = new Map<
       string,
       { status: string; error_message: string | null; created_at: string }
@@ -155,8 +150,7 @@ export const listClubInviteStatuses = createServerFn({ method: "POST" })
         new Set(legacyInvites.map((i: any) => (i.email as string).toLowerCase())),
       );
       const oldest = legacyInvites.reduce(
-        (min: string, i: any) =>
-          i.created_at < min ? (i.created_at as string) : min,
+        (min: string, i: any) => (i.created_at < min ? (i.created_at as string) : min),
         legacyInvites[0].created_at as string,
       );
       const { data: logs } = await supabaseAdmin

@@ -25,7 +25,6 @@ export const Route = createFileRoute("/superadmin/")({
   component: SuperAdminDashboard,
 });
 
-
 type Stats = Record<string, number | string>;
 type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
 
@@ -202,7 +201,6 @@ function SuperAdminDashboard() {
       </section>
 
       <PrivacyRequestsSection />
-
 
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">

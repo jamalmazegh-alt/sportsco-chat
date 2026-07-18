@@ -27,47 +27,43 @@ const PlayerInviteEmail = ({
   const isParent = role === "parent";
   const isStaff = !!roleLabel && role !== "joueur" && !isParent;
 
-  const roleSentence = isParent
-    ? playerFirstName
-      ? (
+  const roleSentence = isParent ? (
+    playerFirstName ? (
+      <>
+        <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
+        <strong>parent de {playerFirstName}</strong>
+        {teamName ? (
           <>
-            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
-            <strong>parent de {playerFirstName}</strong>
-            {teamName ? (
-              <>
-                {" "}
-                (équipe <strong>{teamName}</strong>)
-              </>
-            ) : null}
-            .
+            {" "}
+            (équipe <strong>{teamName}</strong>)
           </>
-        )
-      : (
+        ) : null}
+        .
+      </>
+    ) : (
+      <>
+        <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>parent</strong>
+        {teamName ? (
           <>
-            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
-            <strong>parent</strong>
-            {teamName ? (
-              <>
-                {" "}
-                d'un joueur de l'équipe <strong>{teamName}</strong>
-              </>
-            ) : null}
-            .
+            {" "}
+            d'un joueur de l'équipe <strong>{teamName}</strong>
           </>
-        )
-    : (
+        ) : null}
+        .
+      </>
+    )
+  ) : (
+    <>
+      <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
+      {isStaff ? null : teamName ? (
         <>
-          <strong>{club}</strong> vous invite à rejoindre Clubero en tant que{" "}
-          <strong>{role}</strong>
-          {isStaff ? null : teamName ? (
-            <>
-              {" "}
-              au sein de l'équipe <strong>{teamName}</strong>
-            </>
-          ) : null}
-          .
+          {" "}
+          au sein de l'équipe <strong>{teamName}</strong>
         </>
-      );
+      ) : null}
+      .
+    </>
+  );
 
   const bodyText = isParent
     ? "Acceptez l'invitation pour créer votre compte parent : suivez les convocations, répondez pour votre enfant et restez informé de la vie du club."

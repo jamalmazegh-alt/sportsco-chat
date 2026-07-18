@@ -22,7 +22,10 @@ import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Network = "instagram" | "facebook" | "twitter";
 
-const META: Record<Network, { label: string; Icon: ComponentType<{ className?: string }>; tint: string }> = {
+const META: Record<
+  Network,
+  { label: string; Icon: ComponentType<{ className?: string }>; tint: string }
+> = {
   instagram: { label: "Instagram", Icon: InstagramIcon, tint: "text-pink-500" },
   facebook: { label: "Facebook", Icon: FacebookIcon, tint: "text-blue-600" },
   twitter: { label: "X / Twitter", Icon: XIcon, tint: "text-foreground" },
@@ -115,7 +118,6 @@ function SocialSettings() {
     }
   }
 
-
   if (isLoading) {
     return (
       <div className="flex justify-center py-20">
@@ -132,10 +134,7 @@ function SocialSettings() {
 
   return (
     <div className="px-5 py-4 space-y-5">
-      <SettingsSubHeader
-        title={t("admin.hubSocial")}
-        description={t("admin.hubSocialHint")}
-      />
+      <SettingsSubHeader title={t("admin.hubSocial")} description={t("admin.hubSocialHint")} />
 
       <ul className="space-y-3">
         {networks.map((net) => {
@@ -173,7 +172,9 @@ function SocialSettings() {
                       )}
                     </>
                   ) : (
-                    <p className="text-xs text-muted-foreground mt-0.5">{t("admin.socialNotConnected")}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("admin.socialNotConnected")}
+                    </p>
                   )}
                 </div>
               </div>
@@ -229,9 +230,7 @@ function SocialSettings() {
         })}
       </ul>
 
-      <p className="text-xs text-muted-foreground">
-        {t("admin.socialAutoNote")}
-      </p>
+      <p className="text-xs text-muted-foreground">{t("admin.socialAutoNote")}</p>
     </div>
   );
 }

@@ -174,12 +174,17 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
                 templateData: {
                   campTitle: camp?.title ?? "",
                   clubName: camp?.club?.name,
-                  participantName: `${(reg as any)?.participant_first_name ?? ""} ${(reg as any)?.participant_last_name ?? ""}`.trim(),
+                  participantName:
+                    `${(reg as any)?.participant_first_name ?? ""} ${(reg as any)?.participant_last_name ?? ""}`.trim(),
                   documentTitle: title,
                   wasRejected,
                   manageUrl: `${origin}/admin/stages/${campId}`,
                 },
-                idempotencyKey: `camp-doc-resub:${registrationId}:${parsed.data.required_document_id}:${Date.now()}`.slice(0, 80),
+                idempotencyKey:
+                  `camp-doc-resub:${registrationId}:${parsed.data.required_document_id}:${Date.now()}`.slice(
+                    0,
+                    80,
+                  ),
               });
             }
           }

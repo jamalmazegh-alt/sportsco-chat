@@ -33,7 +33,6 @@ function ClubInvitesPage() {
   const { clubId } = Route.useParams();
   const { data, isLoading, error } = useSuspenseQueryOrPending(clubId);
 
-
   const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | EmailStatus>("all");
   const [inviteStatusFilter, setInviteStatusFilter] = useState<
     "all" | "accepted" | "active" | "pending" | "expired"
@@ -43,13 +42,7 @@ function ClubInvitesPage() {
   const rows = data?.rows ?? [];
 
   const inviteStatusOf = (r: ClubInviteStatusRow) =>
-    r.usedAt
-      ? "accepted"
-      : r.hasActiveAccount
-        ? "active"
-        : r.isExpired
-          ? "expired"
-          : "pending";
+    r.usedAt ? "accepted" : r.hasActiveAccount ? "active" : r.isExpired ? "expired" : "pending";
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -113,10 +106,7 @@ function ClubInvitesPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
-        <Select
-          value={emailStatusFilter}
-          onValueChange={(v) => setEmailStatusFilter(v as any)}
-        >
+        <Select value={emailStatusFilter} onValueChange={(v) => setEmailStatusFilter(v as any)}>
           <SelectTrigger className="max-w-[200px]">
             <SelectValue placeholder="Statut email" />
           </SelectTrigger>
@@ -132,10 +122,7 @@ function ClubInvitesPage() {
             <SelectItem value="none">Sans trace</SelectItem>
           </SelectContent>
         </Select>
-        <Select
-          value={inviteStatusFilter}
-          onValueChange={(v) => setInviteStatusFilter(v as any)}
-        >
+        <Select value={inviteStatusFilter} onValueChange={(v) => setInviteStatusFilter(v as any)}>
           <SelectTrigger className="max-w-[200px]">
             <SelectValue placeholder="Statut invitation" />
           </SelectTrigger>
@@ -194,7 +181,6 @@ function useSuspenseQueryOrPending(clubId: string): {
   };
 }
 
-
 function KPI({
   label,
   value,
@@ -213,19 +199,14 @@ function KPI({
   };
   return (
     <div className="rounded-lg border border-border bg-card p-3">
-      <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className={`text-2xl font-semibold mt-1 ${colors[tone]}`}>{value}</div>
     </div>
   );
 }
 
 function InviteRow({ row }: { row: ClubInviteStatusRow }) {
-  const name =
-    [row.firstName, row.lastName].filter(Boolean).join(" ").trim() ||
-    row.email ||
-    "—";
+  const name = [row.firstName, row.lastName].filter(Boolean).join(" ").trim() || row.email || "—";
   const inviteBadge = row.usedAt ? (
     <StatusBadge tone="success">Acceptée</StatusBadge>
   ) : row.hasActiveAccount ? (
@@ -240,9 +221,7 @@ function InviteRow({ row }: { row: ClubInviteStatusRow }) {
     <tr className="hover:bg-muted/30">
       <td className="px-3 py-2">
         <div className="font-medium">{name}</div>
-        {row.email && (
-          <div className="text-xs text-muted-foreground">{row.email}</div>
-        )}
+        {row.email && <div className="text-xs text-muted-foreground">{row.email}</div>}
         {row.invitedPlayerName && (
           <div className="text-[11px] text-muted-foreground italic">
             joueur : {row.invitedPlayerName}

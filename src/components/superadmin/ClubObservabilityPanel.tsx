@@ -156,11 +156,7 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
             </ul>
           </Card>
 
-          <Card
-            title="Imports"
-            count={data.imports.length}
-            emptyLabel="Aucun import."
-          >
+          <Card title="Imports" count={data.imports.length} emptyLabel="Aucun import.">
             <ul className="divide-y divide-border">
               {data.imports.map((i) => (
                 <li key={i.id} className="p-2 text-xs">
@@ -192,20 +188,14 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
             </ul>
           </Card>
 
-          <Card
-            title="Invitations"
-            count={data.invites.length}
-            emptyLabel="Aucune invitation."
-          >
+          <Card title="Invitations" count={data.invites.length} emptyLabel="Aucune invitation.">
             <ul className="divide-y divide-border">
               {data.invites.map((i) => (
                 <li key={`${i.kind}-${i.id}`} className="p-2 text-xs">
                   <div className="flex items-center justify-between gap-2">
                     <div className="truncate">
                       <span className="font-medium">{i.kind}</span>
-                      {i.role && (
-                        <span className="text-muted-foreground"> · {i.role}</span>
-                      )}
+                      {i.role && <span className="text-muted-foreground"> · {i.role}</span>}
                     </div>
                     <StatusBadge
                       tone={
