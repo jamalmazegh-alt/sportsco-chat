@@ -152,13 +152,13 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
       </CardContent>
 
       {createOpen && (
-        <CreateNeedDialog
+        <NeedFormDialog
           open={createOpen}
           onOpenChange={setCreateOpen}
           eventId={eventId}
           sport={sport ?? null}
           teamId={teamId ?? null}
-          onCreated={refresh}
+          onSaved={refresh}
         />
       )}
     </Card>
