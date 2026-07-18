@@ -14,7 +14,7 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { admin } from "./_admin";
-import { signInAs } from "./_clients";
+import { signInAs, anonClient } from "./_clients";
 import { getFixtures } from "./_setup";
 import { expectNoAccess } from "./_helpers";
 
@@ -218,5 +218,83 @@ describe("club_groups & resolver (Lot 0)", () => {
     expect(error).toBeNull();
     const uids = (data ?? []).map((r: { user_id: string }) => r.user_id);
     expect(uids).toContain(fx.users.playerA.userId);
+  });
+
+  // ---------- Resolver — internal caller guard (RPC direct) ----------------
+  // Classe de test différente : appel RPC direct par rôle. Une fonction
+  // SECURITY DEFINER exposée à `authenticated` est elle-même une policy ;
+  // la garde applicative en server function est contournable via PostgREST.
+
+  it("non-staff club member CANNOT resolve club_members via direct RPC (silent empty)", async () => {
+    const fx = getFixtures();
+    const cPlayer = await signInAs("playerA");
+    const { data, error } = await cPlayer.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_members" }],
+    });
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("staff of club B CANNOT resolve audiences of club A via direct RPC", async () => {
+    const fx = getFixtures();
+    const cAdminB = await signInAs("adminB");
+    const { data, error } = await cAdminB.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_staff" }, { type: "club_members" }],
+    });
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("non-staff CANNOT resolve convoked_players via direct RPC", async () => {
+    const fx = getFixtures();
+    const cPlayer = await signInAs("playerA");
+    const { data, error } = await cPlayer.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "convoked_players", event_id: fx.eventA }],
+    });
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("staff of club A CAN resolve audiences of club A via direct RPC (non-regression)", async () => {
+    const fx = getFixtures();
+    const cAdmin = await signInAs("adminA");
+    const { data, error } = await cAdmin.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_staff" }],
+    });
+    expect(error).toBeNull();
+    const uids = (data ?? []).map((r: { user_id: string }) => r.user_id);
+    expect(uids).toContain(fx.users.adminA.userId);
+  });
+
+  it("anon CANNOT execute resolve_audience_members (no GRANT to anon)", async () => {
+    const fx = getFixtures();
+    const cAnon = anonClient();
+    const { data, error } = await cAnon.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_members" }],
+    });
+    // Either PostgREST rejects (no GRANT / not authenticated) or returns empty.
+    // Both are acceptable; what matters is that no rows leak.
+    if (error === null) {
+      expect(data ?? []).toHaveLength(0);
+    } else {
+      expect(error).not.toBeNull();
+    }
+  });
+
+  it("service_role CAN resolve any club's audiences via direct RPC (Lot 1 path)", async () => {
+    const fx = getFixtures();
+    // `admin` client uses the service_role key.
+    const { data, error } = await admin.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_staff" }],
+    });
+    expect(error).toBeNull();
+    const uids = (data ?? []).map((r: { user_id: string }) => r.user_id);
+    expect(uids).toContain(fx.users.adminA.userId);
   });
 });
