@@ -6867,6 +6867,15 @@ export type Database = {
       }
       admin_build_clubero_dashboard: { Args: never; Returns: Json }
       admin_build_clubero_responses: { Args: never; Returns: Json }
+      apply_to_event_need_atomic: {
+        Args: { _comment?: string; _need_id: string; _user_id: string }
+        Returns: {
+          auto_confirmed: boolean
+          is_minor: boolean
+          signup_id: string
+          status: string
+        }[]
+      }
       archive_team: { Args: { _id: string }; Returns: undefined }
       call_up_list_visible: { Args: { p_event_id: string }; Returns: boolean }
       can_access_event: {
