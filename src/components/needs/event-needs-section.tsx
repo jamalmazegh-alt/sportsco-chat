@@ -196,11 +196,13 @@ function NeedRow({
   need,
   isStaff,
   eventId,
+  sport,
   onChange,
 }: {
   need: NeedRowType;
   isStaff: boolean;
   eventId: string;
+  sport: string | null;
   onChange: () => void;
 }) {
   const { t } = useTranslation();
