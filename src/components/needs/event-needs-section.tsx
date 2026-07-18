@@ -510,11 +510,13 @@ function PublishDialog({
   open,
   onOpenChange,
   needId,
+  eventId,
   onPublished,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
+  eventId: string;
   onPublished: () => void;
 }) {
   const { t } = useTranslation();
@@ -530,19 +532,11 @@ function PublishDialog({
 
   const publishM = useMutation({
     mutationFn: async () => {
-      // Récupérer event_id depuis need pour audiences liées à l'évènement
-      // (le server-side re-résout ; on passe simplement l'audience courante).
-      // Ici, on n'a pas event_id sous la main : on filtre les audiences globales.
-      const audiences: AudienceSelector[] = Array.from(selected)
-        .filter((k) => !AUDIENCE_OPTIONS.find((o) => o.key === k)?.needsEvent)
-        .map((k) => ({ type: k as any }));
-      // Ajouter les audiences liées à l'évènement (event_id résolu côté serveur).
-      const eventScoped = Array.from(selected).filter(
-        (k) => AUDIENCE_OPTIONS.find((o) => o.key === k)?.needsEvent,
-      );
-      for (const k of eventScoped) {
-        audiences.push({ type: k as any, event_id: "__from_need__" } as any);
-      }
+      const audiences: AudienceSelector[] = Array.from(selected).map((k) => {
+        const opt = AUDIENCE_OPTIONS.find((o) => o.key === k);
+        if (opt?.needsEvent) return { type: k as any, event_id: eventId } as AudienceSelector;
+        return { type: k as any } as AudienceSelector;
+      });
       return publish({ data: { need_id: needId, audiences } });
     },
     onSuccess: (r: any) => {
