@@ -77,6 +77,8 @@ import {
   getNeedAudienceContext,
   getEventAudienceContext,
   previewEventAudience,
+  searchClubMembersForNeed,
+  staffAddManualSignup,
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
