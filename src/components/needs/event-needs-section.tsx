@@ -202,14 +202,17 @@ function NeedRow({
   isStaff,
   eventId,
   sport,
+  existingRoleKeys,
   onChange,
 }: {
   need: NeedRowType;
   isStaff: boolean;
   eventId: string;
   sport: string | null;
+  existingRoleKeys: string[];
   onChange: () => void;
 }) {
+
   const { t } = useTranslation();
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
