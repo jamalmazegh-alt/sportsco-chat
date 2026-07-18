@@ -43,8 +43,8 @@ import {
   createEventNeed,
   publishEventNeed,
   applyToEventNeed,
-  withdrawFromEventNeed,
-  decideEventNeedSignup,
+  withdrawSignup,
+  decideSignup,
   closeEventNeed,
   cancelEventNeed,
 } from "@/lib/needs/needs.functions";
@@ -137,7 +137,7 @@ function NeedRow({
 }) {
   const { t } = useTranslation();
   const apply = useServerFn(applyToEventNeed);
-  const withdraw = useServerFn(withdrawFromEventNeed);
+  const withdraw = useServerFn(withdrawSignup);
   const close = useServerFn(closeEventNeed);
   const cancel = useServerFn(cancelEventNeed);
   const [publishOpen, setPublishOpen] = useState(false);
@@ -618,7 +618,7 @@ function StaffSignupsDialog({
 }) {
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
-  const decide = useServerFn(decideEventNeedSignup);
+  const decide = useServerFn(decideSignup);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
