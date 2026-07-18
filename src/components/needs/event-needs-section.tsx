@@ -576,12 +576,20 @@ function NeedFormDialog({
   }, [audiences, eventId, previewFn, isEdit]);
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
-    if (initial) return [...NEED_TEMPLATES];
     const s = (sport ?? "").toLowerCase().trim();
-    return NEED_TEMPLATES.filter(
-      (tpl) => tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s)),
-    );
-  }, [sport, initial]);
+    const used = new Set(existingRoleKeys ?? []);
+    // Always keep the current role_key visible when editing so it stays selectable.
+    if (initial) used.delete(initial.role_key);
+    return NEED_TEMPLATES.filter((tpl) => {
+      const sportOk =
+        tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
+      if (!sportOk) return false;
+      // "other" is always allowed (multiple custom needs are OK).
+      if (tpl.key === "other") return true;
+      return !used.has(tpl.key);
+    });
+  }, [sport, initial, existingRoleKeys]);
+
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
