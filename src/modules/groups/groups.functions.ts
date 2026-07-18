@@ -403,8 +403,9 @@ export const previewGroupRuleDetails = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await supabase.rpc("preview_group_rule_details", {
       _club_id: data.club_id,
-      _rule: rulePayload,
+      _rule: rulePayload as never,
     });
+
     if (error) throw new Error(error.message);
     return { rows: (rows ?? []) as GroupRuleDetailRow[] };
   });
