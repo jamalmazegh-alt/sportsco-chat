@@ -6971,6 +6971,17 @@ export type Database = {
         Returns: boolean
       }
       player_is_minor: { Args: { _player_id: string }; Returns: boolean }
+      preview_group_rule_details: {
+        Args: { _club_id: string; _rule: Json }
+        Returns: {
+          email: string
+          full_name: string
+          kind: string
+          roles: string[]
+          subtitle: string
+          user_id: string
+        }[]
+      }
       privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }
       purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
