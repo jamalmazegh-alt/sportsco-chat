@@ -94,7 +94,9 @@ type ClubMemberRow = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  children_names?: string[];
 };
+
 
 type TeamRow = {
   id: string;
@@ -181,6 +183,19 @@ function RoleBadges({
   );
 }
 
+function ParentSubtitle({ children_names }: { children_names?: string[] | null }) {
+  const { t } = useTranslation();
+  if (!children_names || children_names.length === 0) return null;
+  return (
+    <span className="text-xs text-muted-foreground truncate">
+      {t("groups.parentOf", {
+        defaultValue: "Parent de {{names}}",
+        names: children_names.join(", "),
+      })}
+    </span>
+  );
+}
+
 function GroupsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
@@ -227,6 +242,30 @@ function GroupsPage() {
             last_name: string | null;
           }[] };
       const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+      // For parents, fetch the children names
+      const { data: pp } = userIds.length
+        ? await supabase
+            .from("player_parents")
+            .select("parent_user_id, players:player_id(first_name, last_name)")
+            .in("parent_user_id", userIds)
+        : { data: [] as Array<{
+            parent_user_id: string;
+            players: { first_name: string | null; last_name: string | null } | null;
+          }> };
+      const childrenByParent = new Map<string, string[]>();
+      for (const row of (pp ?? []) as Array<{
+        parent_user_id: string;
+        players: { first_name: string | null; last_name: string | null } | null;
+      }>) {
+        const name = [row.players?.first_name, row.players?.last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+        if (!name) continue;
+        const arr = childrenByParent.get(row.parent_user_id) ?? [];
+        arr.push(name);
+        childrenByParent.set(row.parent_user_id, arr);
+      }
       return (members ?? []).map((m) => {
         const p = byId.get(m.user_id);
         return {
@@ -237,8 +276,10 @@ function GroupsPage() {
           full_name: p?.full_name ?? null,
           first_name: p?.first_name ?? null,
           last_name: p?.last_name ?? null,
+          children_names: childrenByParent.get(m.user_id) ?? [],
         };
       });
+
     },
   });
 
@@ -587,6 +628,17 @@ function GroupMembersPanel({
     [membersQ.data],
   );
 
+  const childrenByUserId = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const cm of allMembers) {
+      if (cm.user_id && cm.children_names && cm.children_names.length > 0) {
+        m.set(cm.user_id, cm.children_names);
+      }
+    }
+    return m;
+  }, [allMembers]);
+
+
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["club-group-members", groupId] });
     qc.invalidateQueries({ queryKey: ["club-group-rules", groupId] });
@@ -860,10 +912,14 @@ function GroupMembersPanel({
                         last_name: m.profile?.last_name,
                       })}
                     </span>
+                    <ParentSubtitle
+                      children_names={m.user_id ? childrenByUserId.get(m.user_id) : undefined}
+                    />
                     <div className="flex flex-wrap gap-1">
                       <RoleBadges roles={m.roles} fallback={m.role} />
                     </div>
                   </div>
+
 
                   <Button
                     variant="ghost"
@@ -904,10 +960,12 @@ function GroupMembersPanel({
                 >
                   <div className="flex flex-col gap-1 min-w-0 flex-1">
                     <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                    <ParentSubtitle children_names={m.children_names} />
                     <div className="flex flex-wrap gap-1">
                       <RoleBadges roles={m.roles} fallback={m.role} />
                     </div>
                   </div>
+
 
                   <Button
                     variant="ghost"
@@ -1028,11 +1086,13 @@ function RulePreviewDialog({
             {rows.map((m) => (
               <li key={m.id} className="flex flex-col gap-1 px-3 py-2">
                 <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                <ParentSubtitle children_names={m.children_names} />
                 <div className="flex flex-wrap gap-1">
                   <RoleBadges roles={m.roles} fallback={m.role} />
                 </div>
               </li>
             ))}
+
 
           </ul>
         )}
