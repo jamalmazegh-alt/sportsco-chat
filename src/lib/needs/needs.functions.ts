@@ -568,12 +568,32 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const needIds = rows.map((r) => r.id);
     const { data: confirmedRows } = await supabaseAdmin
       .from("event_need_signups")
-      .select("need_id")
+      .select("need_id, user_id")
       .in("need_id", needIds)
       .eq("status", "confirmed");
     const confirmedByNeed: Record<string, number> = {};
+    const confirmedUserIdsByNeed: Record<string, string[]> = {};
     for (const r of confirmedRows ?? []) {
       confirmedByNeed[r.need_id] = (confirmedByNeed[r.need_id] ?? 0) + 1;
+      if (r.user_id) {
+        (confirmedUserIdsByNeed[r.need_id] ??= []).push(r.user_id);
+      }
+    }
+
+    // Résoudre les noms des confirmés (pour afficher qui a été accepté).
+    const allConfirmedUserIds = Array.from(
+      new Set(Object.values(confirmedUserIdsByNeed).flat()),
+    );
+    const nameByUser: Record<string, string | null> = {};
+    if (allConfirmedUserIds.length > 0) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", allConfirmedUserIds);
+      for (const p of profs ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+      }
     }
 
     // Candidatures 'applied' en attente (pour badges staff).
