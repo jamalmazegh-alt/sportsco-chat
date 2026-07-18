@@ -65,6 +65,8 @@ import {
   cancelEventNeed,
   previewEventNeedAudience,
   getNeedAudienceContext,
+  getEventAudienceContext,
+  previewEventAudience,
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
