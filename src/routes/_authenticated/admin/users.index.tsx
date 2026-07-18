@@ -63,9 +63,7 @@ function AdminUsersPage() {
 
   const INCOMPATIBLE_ROLES: Record<string, string[]> = {
     coach: ["assistant_coach"],
-    assistant_coach: ["coach", "admin", "staff"],
-    admin: ["assistant_coach"],
-    staff: ["assistant_coach"],
+    assistant_coach: ["coach"],
   };
 
   const [open, setOpen] = useState(false);
