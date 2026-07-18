@@ -117,5 +117,10 @@
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
-  "confirmCancel": "Cancel this need?"
+  "cancelDialog": {
+    "title": "Bedarf absagen?",
+    "description": "Diese Aktion ist endgültig. Ausstehende Bewerber und bestätigte Helfer werden informiert.",
+    "confirm": "Ja, absagen",
+    "abort": "Nein, behalten"
+  }
 }

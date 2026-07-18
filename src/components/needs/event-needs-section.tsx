@@ -39,6 +39,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -223,6 +233,7 @@ function NeedRow({
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
@@ -458,9 +469,7 @@ function NeedRow({
                 size="sm"
                 variant="ghost"
                 className="text-destructive"
-                onClick={() => {
-                  if (confirm(t("needs:confirmCancel"))) cancelM.mutate();
-                }}
+                onClick={() => setCancelConfirmOpen(true)}
                 disabled={cancelM.isPending}
               >
                 <Trash2 className="h-3.5 w-3.5 mr-1" />
@@ -508,6 +517,29 @@ function NeedRow({
         />
       )}
 
+      <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("needs:cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("needs:cancelDialog.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCancelConfirmOpen(false)}>
+              {t("needs:cancelDialog.abort")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => cancelM.mutate()}
+              disabled={cancelM.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelM.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("needs:cancelDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

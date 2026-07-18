@@ -117,5 +117,10 @@
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
-  "confirmCancel": "Cancel this need?"
+  "cancelDialog": {
+    "title": "Annullare la necessità?",
+    "description": "Questa azione è definitiva. I candidati in attesa e le persone confermate saranno informate.",
+    "confirm": "Sì, annulla",
+    "abort": "No, mantieni"
+  }
 }

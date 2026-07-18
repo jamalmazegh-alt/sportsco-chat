@@ -117,5 +117,10 @@
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
-  "confirmCancel": "Cancel this need?"
+  "cancelDialog": {
+    "title": "Behoefte annuleren?",
+    "description": "Deze actie is definitief. Wachtende kandidaten en bevestigde vrijwilligers worden op de hoogte gebracht.",
+    "confirm": "Ja, annuleren",
+    "abort": "Nee, behouden"
+  }
 }
