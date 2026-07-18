@@ -319,7 +319,7 @@ export const applyToEventNeed = createServerFn({ method: "POST" })
     const { data: result, error } = await supabase.rpc("apply_to_event_need_atomic", {
       _need_id: data.need_id,
       _user_id: userId,
-      _comment: data.comment ?? null,
+      _comment: data.comment ?? undefined,
     });
     if (error) throw new Error(error.message);
     const row = (Array.isArray(result) ? result[0] : result) as {
