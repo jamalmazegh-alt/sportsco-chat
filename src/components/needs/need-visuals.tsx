@@ -4,7 +4,7 @@
  */
 import type { LucideIcon } from "lucide-react";
 import {
-  Whistle,
+  Megaphone,
   Flag,
   ClipboardList,
   Table,
