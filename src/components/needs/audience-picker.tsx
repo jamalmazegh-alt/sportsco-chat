@@ -73,9 +73,7 @@ export type AudienceState = {
   category: string;
 };
 
-export function useAudienceState(
-  defaults: Partial<AudienceState> = { scalar: new Set(["convoked_parents"]) },
-) {
+export function useAudienceState(defaults: Partial<AudienceState> = {}) {
   const [scalar, setScalar] = useState<Set<ScalarAudienceKey>>(
     defaults.scalar ?? new Set(),
   );
@@ -84,6 +82,11 @@ export function useAudienceState(
     defaults.teamPicks ?? [],
   );
   const [category, setCategory] = useState<string>(defaults.category ?? "");
+
+  const state = useMemo<AudienceState>(
+    () => ({ scalar, groupIds, teamPicks, category }),
+    [scalar, groupIds, teamPicks, category],
+  );
 
   const toggleScalar = (k: ScalarAudienceKey) => {
     const next = new Set(scalar);
