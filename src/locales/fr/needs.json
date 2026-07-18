@@ -36,8 +36,8 @@
     "withdrawn": "Retiré"
   },
   "seats": {
-    "remaining": "{{count}} place restante",
-    "remaining_plural": "{{count}} places restantes",
+    "remaining_one": "{{count}} place restante",
+    "remaining_other": "{{count}} places restantes",
     "full": "Complet"
   },
   "actions": {
@@ -57,5 +57,65 @@
     "need_not_publishable": "Ce besoin ne peut pas être publié dans cet état.",
     "signup_not_found": "Candidature introuvable.",
     "already_applied": "Tu as déjà candidaté."
-  }
+  },
+  "section": {
+    "title": "Coups de main",
+    "add": "Ajouter un besoin",
+    "emptyStaff": "Créez un besoin (arbitre, buvette, chronométreur…) pour solliciter des volontaires.",
+    "created": "Besoin créé",
+    "createDesc": "Créez le besoin, puis publiez-le vers l'audience de votre choix.",
+    "coverageAll": "Tout est couvert ✓",
+    "coverageMissing_one": "{{count}} besoin à couvrir",
+    "coverageMissing_other": "{{count}} besoins à couvrir"
+  },
+  "field": {
+    "template": "Type",
+    "label": "Libellé",
+    "capacity": "Nombre de places",
+    "mode": "Validation",
+    "description": "Détails (optionnel)"
+  },
+  "publish": {
+    "title": "Publier le besoin",
+    "desc": "Sélectionnez qui recevra la notification.",
+    "audienceHeader": "Audiences",
+    "chooseGroup": "Choisir un groupe",
+    "chooseTeam": "Choisir une équipe",
+    "chooseCategory": "Choisir une catégorie (U11, U12…)",
+    "categoryPlaceholder": "Ex. U11",
+    "preview_one": "{{count}} personne unique sera prévenue",
+    "preview_other": "{{count}} personnes uniques seront prévenues",
+    "previewNone": "Aucun destinataire — sélectionnez au moins une audience.",
+    "previewLoading": "Calcul du nombre de destinataires…",
+    "success": "Besoin publié · {{count}} destinataire(s)",
+    "successIdempotent": "Publication déjà effectuée (aucun nouvel envoi)."
+  },
+  "publishedBadge": {
+    "at_one": "Publié {{time}} · {{count}} destinataire",
+    "at_other": "Publié {{time}} · {{count}} destinataires",
+    "unpublished": "Non publié"
+  },
+  "audiences": {
+    "convoked_players": "Joueurs convoqués",
+    "convoked_parents": "Parents des joueurs convoqués",
+    "club_members": "Tous les membres du club",
+    "club_educators": "Éducateurs du club",
+    "club_staff": "Staff / bénévoles du club",
+    "club_admins": "Administrateurs du club",
+    "club_tournament_managers": "Responsables tournois",
+    "club_group": "Groupe personnalisé",
+    "team_players": "Joueurs d'une équipe",
+    "team_parents": "Parents d'une équipe",
+    "team_educators": "Éducateurs d'une équipe",
+    "category_educators": "Éducateurs d'une catégorie"
+  },
+  "staff": {
+    "title": "Candidatures",
+    "empty": "Aucune candidature pour le moment.",
+    "minorPending": "Candidat mineur — validation adulte requise",
+    "license": "Licence n° {{n}}"
+  },
+  "pendingApplications_one": "{{count}} en attente",
+  "pendingApplications_other": "{{count}} en attente",
+  "confirmCancel": "Annuler ce besoin ?"
 }
