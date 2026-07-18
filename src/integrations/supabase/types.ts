@@ -2135,6 +2135,349 @@ export type Database = {
         }
         Relationships: []
       }
+      event_need_audience_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          member_id: string
+          need_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          member_id: string
+          need_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          member_id?: string
+          need_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_audience_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "club_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_audience_members_need_id_fkey"
+            columns: ["need_id"]
+            isOneToOne: false
+            referencedRelation: "event_needs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_need_audiences: {
+        Row: {
+          audience_type: string
+          category: string | null
+          created_at: string
+          created_by: string | null
+          group_id: string | null
+          id: string
+          need_id: string
+          team_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          audience_type: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          need_id: string
+          team_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          audience_type?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          need_id?: string
+          team_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_audiences_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_audiences_need_id_fkey"
+            columns: ["need_id"]
+            isOneToOne: false
+            referencedRelation: "event_needs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_audiences_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_need_coverage: {
+        Row: {
+          club_id: string
+          event_id: string
+          is_fully_covered: boolean
+          missing_seats: number
+          open_needs_count: number
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          event_id: string
+          is_fully_covered?: boolean
+          missing_seats?: number
+          open_needs_count?: number
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          event_id?: string
+          is_fully_covered?: boolean
+          missing_seats?: number
+          open_needs_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_coverage_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_coverage_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_need_publication_recipients: {
+        Row: {
+          created_at: string
+          member_id: string
+          publication_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          member_id: string
+          publication_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          member_id?: string
+          publication_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_publication_recipients_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "club_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_publication_recipients_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "event_need_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_need_publications: {
+        Row: {
+          id: string
+          need_id: string
+          published_at: string
+          published_by: string | null
+          recipients_count: number
+        }
+        Insert: {
+          id?: string
+          need_id: string
+          published_at?: string
+          published_by?: string | null
+          recipients_count?: number
+        }
+        Update: {
+          id?: string
+          need_id?: string
+          published_at?: string
+          published_by?: string | null
+          recipients_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_publications_need_id_fkey"
+            columns: ["need_id"]
+            isOneToOne: false
+            referencedRelation: "event_needs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_need_signups: {
+        Row: {
+          applied_at: string
+          comment: string | null
+          confirmed_at: string | null
+          created_at: string
+          decided_by: string | null
+          declined_at: string | null
+          id: string
+          member_id: string
+          need_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+          withdrawn_at: string | null
+        }
+        Insert: {
+          applied_at?: string
+          comment?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          decided_by?: string | null
+          declined_at?: string | null
+          id?: string
+          member_id: string
+          need_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Update: {
+          applied_at?: string
+          comment?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          decided_by?: string | null
+          declined_at?: string | null
+          id?: string
+          member_id?: string
+          need_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_need_signups_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "club_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_need_signups_need_id_fkey"
+            columns: ["need_id"]
+            isOneToOne: false
+            referencedRelation: "event_needs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_needs: {
+        Row: {
+          capacity: number
+          club_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_id: string
+          first_published_at: string | null
+          id: string
+          label: string
+          last_published_at: string | null
+          role_key: string
+          status: string
+          team_id: string | null
+          updated_at: string
+          validation_mode: string
+        }
+        Insert: {
+          capacity: number
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id: string
+          first_published_at?: string | null
+          id?: string
+          label: string
+          last_published_at?: string | null
+          role_key: string
+          status?: string
+          team_id?: string | null
+          updated_at?: string
+          validation_mode: string
+        }
+        Update: {
+          capacity?: number
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string
+          first_published_at?: string | null
+          id?: string
+          label?: string
+          last_published_at?: string | null
+          role_key?: string
+          status?: string
+          team_id?: string | null
+          updated_at?: string
+          validation_mode?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_needs_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_needs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_needs_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attachments: Json
@@ -6532,6 +6875,10 @@ export type Database = {
       }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_apply_to_event_need: {
+        Args: { _need_id: string; _user_id: string }
         Returns: boolean
       }
       can_author_player_feedback: {
