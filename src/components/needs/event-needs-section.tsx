@@ -881,25 +881,34 @@ function PublishDialog({
           </div>
 
           {/* Club groups */}
-          {ctx && ctx.groups.length > 0 && (
+          {ctx && (
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("needs:audiences.club_group")}
               </Label>
-              <div className="mt-1.5 space-y-1">
-                {ctx.groups.map((g: { id: string; name: string }) => (
-                  <label
-                    key={g.id}
-                    className="flex items-center gap-2 cursor-pointer rounded-md border p-2 hover:bg-muted/40"
-                  >
-                    <Checkbox
-                      checked={groupIds.has(g.id)}
-                      onCheckedChange={() => toggleGroup(g.id)}
-                    />
-                    <span className="text-sm">{g.name}</span>
-                  </label>
-                ))}
-              </div>
+              {ctx.groups.length > 0 ? (
+                <div className="mt-1.5 space-y-1">
+                  {ctx.groups.map((g: { id: string; name: string }) => (
+                    <label
+                      key={g.id}
+                      className="flex items-center gap-2 cursor-pointer rounded-md border p-2 hover:bg-muted/40"
+                    >
+                      <Checkbox
+                        checked={groupIds.has(g.id)}
+                        onCheckedChange={() => toggleGroup(g.id)}
+                      />
+                      <span className="text-sm">{g.name}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1.5 text-xs text-muted-foreground rounded-md border border-dashed p-2">
+                  {t("needs:publish.noGroups", {
+                    defaultValue:
+                      "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
+                  })}
+                </p>
+              )}
             </div>
           )}
 
