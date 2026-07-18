@@ -39,6 +39,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   listClubGroups,
@@ -52,7 +53,9 @@ import {
   addClubGroupRule,
   removeClubGroupRule,
   getGroupResolvedCount,
+  previewAudienceCount,
   type ClubGroupRuleType,
+  type AudienceSelector,
 } from "@/modules/groups/groups.functions";
 
 
