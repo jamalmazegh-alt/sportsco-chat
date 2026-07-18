@@ -966,6 +966,86 @@ export type Database = {
           },
         ]
       }
+      club_group_members: {
+        Row: {
+          added_by: string
+          created_at: string
+          group_id: string
+          id: string
+          member_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          group_id: string
+          id?: string
+          member_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_group_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "club_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_groups: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_groups_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_invites: {
         Row: {
           club_id: string
@@ -6866,6 +6946,12 @@ export type Database = {
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
+      resolve_audience_members: {
+        Args: { _club_id: string; _spec: Json }
+        Returns: {
+          user_id: string
+        }[]
+      }
       resolve_camp_registration_document: {
         Args: { _document_id: string; _token: string }
         Returns: string
