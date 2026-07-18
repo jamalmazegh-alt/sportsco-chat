@@ -61,7 +61,10 @@ export type AudienceCtx = {
   teams: { id: string; name: string; age_group?: string | null }[];
   groups: { id: string; name: string }[];
   categories: string[];
+  event_team_id?: string | null;
+  event_category?: string | null;
 };
+
 
 export type AudienceState = {
   scalar: Set<ScalarAudienceKey>;
@@ -312,6 +315,59 @@ export function AudiencePickerBody({
     setParam("");
   }
 
+  // Suggestion chips: custom groups + event-relevant defaults
+  type Suggestion = {
+    id: string;
+    kind: KindKey;
+    label: string;
+    active: boolean;
+    onToggle: () => void;
+  };
+  const customGroupSuggestions: Suggestion[] = useMemo(() => {
+    if (!ctx) return [];
+    return ctx.groups.map((g) => ({
+      id: `sg-g-${g.id}`,
+      kind: "club_group" as KindKey,
+      label: g.name,
+      active: state.groupIds.has(g.id),
+      onToggle: () => controls.toggleGroup(g.id),
+    }));
+  }, [ctx, state.groupIds, controls]);
+
+  const eventSuggestions: Suggestion[] = useMemo(() => {
+    if (!ctx) return [];
+    const list: Suggestion[] = [];
+    const eventTeam = ctx.event_team_id
+      ? ctx.teams.find((t) => t.id === ctx.event_team_id)
+      : null;
+    if (eventTeam) {
+      const teamKinds: TeamKind[] = ["team_players", "team_parents", "team_educators"];
+      for (const kind of teamKinds) {
+        const active = state.teamPicks.some(
+          (p) => p.team_id === eventTeam.id && p.kind === kind,
+        );
+        list.push({
+          id: `sg-t-${eventTeam.id}-${kind}`,
+          kind,
+          label: `${t(`needs:audiences.${kind}`)} · ${eventTeam.name}`,
+          active,
+          onToggle: () => controls.toggleTeam(eventTeam.id, kind),
+        });
+      }
+    }
+    if (ctx.event_category) {
+      const cat = ctx.event_category;
+      list.push({
+        id: `sg-c-${cat}`,
+        kind: "category_educators",
+        label: `${t("needs:audiences.category_educators")} · ${cat}`,
+        active: state.category === cat,
+        onToggle: () => controls.setCategory(state.category === cat ? "" : cat),
+      });
+    }
+    return list;
+  }, [ctx, state.teamPicks, state.category, controls, t]);
+
   return (
     <div className="space-y-3">
       {/* Chips of currently selected audiences */}
@@ -348,11 +404,85 @@ export function AudiencePickerBody({
         </div>
       )}
 
-      {/* Add row */}
+      {/* Custom groups — highlighted */}
+      {customGroupSuggestions.length > 0 && (
+        <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
+          <Label className="text-[11px] uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
+            <UsersRound className="h-3.5 w-3.5" />
+            {t("needs:audiences.customGroups", {
+              defaultValue: "Groupes personnalisés",
+            })}
+          </Label>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {customGroupSuggestions.map((s) => {
+              const { Icon, cls } = KIND_META[s.kind];
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={s.onToggle}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
+                    s.active
+                      ? cls
+                      : "border-border bg-background hover:bg-muted text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  <span>{s.label}</span>
+                  {s.active ? (
+                    <X className="h-3 w-3 opacity-70" />
+                  ) : (
+                    <Plus className="h-3 w-3 opacity-70" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Event-relevant suggestions */}
+      {eventSuggestions.length > 0 && (
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2.5">
+          <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
+            <Tag className="h-3.5 w-3.5" />
+            {t("needs:audiences.eventRelevant", {
+              defaultValue: "Suggéré pour cet événement",
+            })}
+          </Label>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {eventSuggestions.map((s) => {
+              const { Icon, cls } = KIND_META[s.kind];
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={s.onToggle}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
+                    s.active
+                      ? cls
+                      : "border-border bg-background hover:bg-muted text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  <span>{s.label}</span>
+                  {s.active ? (
+                    <X className="h-3 w-3 opacity-70" />
+                  ) : (
+                    <Plus className="h-3 w-3 opacity-70" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Other audiences — generic add row */}
       <div>
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("needs:audiences.addCriterion", {
-            defaultValue: "Ajouter un critère",
+          {t("needs:audiences.otherAudiences", {
+            defaultValue: "Autres audiences",
           })}
         </Label>
         <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
@@ -371,17 +501,19 @@ export function AudiencePickerBody({
               />
             </SelectTrigger>
             <SelectContent>
-              {availableKinds.map((k) => {
-                const { Icon } = KIND_META[k];
-                return (
-                  <SelectItem key={k} value={k}>
-                    <span className="inline-flex items-center gap-2">
-                      <Icon className="h-3.5 w-3.5" />
-                      {kindLabel(k)}
-                    </span>
-                  </SelectItem>
-                );
-              })}
+              {availableKinds
+                .filter((k) => k !== "club_group")
+                .map((k) => {
+                  const { Icon } = KIND_META[k];
+                  return (
+                    <SelectItem key={k} value={k}>
+                      <span className="inline-flex items-center gap-2">
+                        <Icon className="h-3.5 w-3.5" />
+                        {kindLabel(k)}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
             </SelectContent>
           </Select>
 
@@ -449,3 +581,4 @@ export function AudiencePickerBody({
     </div>
   );
 }
+

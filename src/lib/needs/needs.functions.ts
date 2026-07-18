@@ -906,14 +906,22 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
       new Set(teams.map((t) => t.age_group?.trim()).filter((c): c is string => !!c)),
     ).sort();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const eventTeamId = ((ev as any)?.team_id as string | null) ?? null;
+    const eventCategory =
+      teams.find((t) => t.id === eventTeamId)?.age_group?.trim() || null;
+
     return {
       club_id: clubId,
       event_id: data.event_id,
       teams,
       groups: groupsRes.data ?? [],
       categories: cats,
+      event_team_id: eventTeamId,
+      event_category: eventCategory,
     };
   });
+
 
 /* ------------------------------------------------------------------------ */
 /* 12ter. previewEventAudience — preview par event_id (avant création need) */
