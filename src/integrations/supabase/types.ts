@@ -1005,6 +1005,51 @@ export type Database = {
           },
         ]
       }
+      club_group_rules: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          group_id: string
+          id: string
+          rule_type: string
+          team_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id: string
+          id?: string
+          rule_type: string
+          team_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id?: string
+          id?: string
+          rule_type?: string
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_group_rules_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_group_rules_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_groups: {
         Row: {
           club_id: string

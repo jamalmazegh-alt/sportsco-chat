@@ -298,3 +298,116 @@ describe("club_groups & resolver (Lot 0)", () => {
     expect(uids).toContain(fx.users.adminA.userId);
   });
 });
+
+describe("club_group_rules (dynamic sub-groups)", () => {
+  let groupId: string;
+
+  beforeAll(async () => {
+    const fx = getFixtures();
+    const { data: g } = await admin
+      .from("club_groups")
+      .insert({
+        club_id: fx.clubA,
+        name: `__rls_${fx.runId}_dyn_A`,
+        created_by: fx.users.adminA.userId,
+      })
+      .select("id")
+      .single();
+    groupId = g!.id;
+  });
+
+  it("staff CAN create a rule 'team_players' for own team, resolver includes players dynamically", async () => {
+    const fx = getFixtures();
+    const cAdmin = await signInAs("adminA");
+
+    const { data: rule, error } = await cAdmin
+      .from("club_group_rules")
+      .insert({
+        group_id: groupId,
+        rule_type: "team_players",
+        team_id: fx.teamA,
+        created_by: fx.users.adminA.userId,
+      })
+      .select("id")
+      .single();
+    expect(error).toBeNull();
+    expect(rule).not.toBeNull();
+
+    // Resolve the group → playerA (user of playerA) must appear WITHOUT any club_group_members row.
+    const { count: cgmCount } = await admin
+      .from("club_group_members")
+      .select("*", { count: "exact", head: true })
+      .eq("group_id", groupId);
+    expect(cgmCount).toBe(0);
+
+    const { data: rows } = await cAdmin.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_group", group_id: groupId }],
+    });
+    const uids = (rows ?? []).map((r: { user_id: string }) => r.user_id);
+    expect(uids).toContain(fx.users.playerA.userId);
+  });
+
+  it("removing player from team removes them from the resolved group (no writes on group)", async () => {
+    const fx = getFixtures();
+    const cAdmin = await signInAs("adminA");
+
+    // Snapshot team_members row for playerA
+    const { data: tmRows } = await admin
+      .from("team_members")
+      .select("id, player_id")
+      .eq("team_id", fx.teamA)
+      .eq("player_id", fx.playerA);
+    const tmRow = tmRows?.[0];
+    expect(tmRow).toBeDefined();
+
+    // Remove
+    await admin.from("team_members").delete().eq("id", tmRow!.id);
+
+    const { data: rows } = await cAdmin.rpc("resolve_audience_members", {
+      _club_id: fx.clubA,
+      _spec: [{ type: "club_group", group_id: groupId }],
+    });
+    const uids = (rows ?? []).map((r: { user_id: string }) => r.user_id);
+    expect(uids).not.toContain(fx.users.playerA.userId);
+
+    // Restore
+    await admin.from("team_members").insert({
+      team_id: fx.teamA,
+      player_id: fx.playerA,
+      role: tmRow!.player_id ? "player" : "player",
+    });
+  });
+
+  it("cross-club rule refused: staff A cannot attach teamB to a group of club A", async () => {
+    const fx = getFixtures();
+    const cAdmin = await signInAs("adminA");
+    const { error } = await cAdmin.from("club_group_rules").insert({
+      group_id: groupId,
+      rule_type: "team_players",
+      team_id: fx.teamB,
+      created_by: fx.users.adminA.userId,
+    });
+    expect(error).not.toBeNull();
+  });
+
+  it("staff of club B cannot create a rule on a group of club A", async () => {
+    const fx = getFixtures();
+    const cAdminB = await signInAs("adminB");
+    const { error } = await cAdminB.from("club_group_rules").insert({
+      group_id: groupId,
+      rule_type: "club_members",
+      created_by: fx.users.adminB.userId,
+    });
+    expect(error).not.toBeNull();
+  });
+
+  it("player/parent CANNOT read club_group_rules (staff-only)", async () => {
+    const cPlayer = await signInAs("playerA");
+    const cParent = await signInAs("parentA");
+    for (const c of [cPlayer, cParent]) {
+      const { data } = await c.from("club_group_rules").select("id");
+      expect(data ?? []).toHaveLength(0);
+    }
+  });
+});

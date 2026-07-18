@@ -263,7 +263,104 @@ export const previewAudienceCount = createServerFn({ method: "POST" })
       _spec: data.spec,
     });
     if (error) throw new Error(error.message);
-    // rows = [{ user_id }]
     const list = (rows ?? []) as Array<{ user_id: string }>;
     return { count: list.length, user_ids: list.map((r) => r.user_id) };
   });
+
+// ---- Dynamic rules (sub-groups) ------------------------------------------
+
+const RuleTypeSchema = z.enum([
+  "team_players",
+  "team_parents",
+  "team_educators",
+  "category_educators",
+  "club_educators",
+  "club_staff",
+  "club_members",
+]);
+
+export type ClubGroupRuleType = z.infer<typeof RuleTypeSchema>;
+
+export const listClubGroupRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ group_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rules, error } = await supabase
+      .from("club_group_rules")
+      .select("id, group_id, rule_type, team_id, category, created_at")
+      .eq("group_id", data.group_id)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return { rules: rules ?? [] };
+  });
+
+export const addClubGroupRule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        group_id: z.string().uuid(),
+        rule_type: RuleTypeSchema,
+        team_id: z.string().uuid().nullish(),
+        category: z.string().trim().min(1).max(60).nullish(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const teamTypes = ["team_players", "team_parents", "team_educators"];
+    const payload = {
+      group_id: data.group_id,
+      rule_type: data.rule_type,
+      team_id: teamTypes.includes(data.rule_type) ? (data.team_id ?? null) : null,
+      category:
+        data.rule_type === "category_educators" ? (data.category ?? null) : null,
+      created_by: userId,
+    };
+    const { data: row, error } = await supabase
+      .from("club_group_rules")
+      .insert(payload)
+      .select("id, group_id, rule_type, team_id, category, created_at")
+      .single();
+    if (error) {
+      if (error.code === "23505") return null; // idempotent
+      throw new Error(error.message);
+    }
+    return row;
+  });
+
+export const removeClubGroupRule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("club_group_rules").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/**
+ * Composition résolue d'un groupe : nombre total de user_ids uniques
+ * (membres individuels + résolution des règles dynamiques).
+ */
+export const getGroupResolvedCount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        group_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase.rpc("resolve_audience_members", {
+      _club_id: data.club_id,
+      _spec: [{ type: "club_group", group_id: data.group_id }],
+    });
+    if (error) throw new Error(error.message);
+    return { count: (rows ?? []).length };
+  });
+

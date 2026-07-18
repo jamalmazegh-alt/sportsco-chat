@@ -2321,13 +2321,16 @@
     "backToList": "Retour aux groupes",
     "openGroups": "Groupes",
     "addIndividual": "Ajouter individuellement",
-    "addSubgroup": "Ajouter un sous-groupe prédéfini",
+    "individualMembers": "Membres individuels",
+    "dynamicRules": "Sous-groupes dynamiques",
+    "noRules": "Aucune règle. Ajoutez-en une pour inclure automatiquement un sous-groupe.",
+    "addRule": "Ajouter la règle",
+    "ruleAdded": "Règle ajoutée",
+    "ruleRemoved": "Règle retirée",
+    "ruleRemove": "Retirer la règle",
+    "resolvedTotal": "Total résolu : {{count}}",
     "bulkPickKind": "Choisir un type…",
     "bulkPickParam": "Choisir…",
-    "bulkAdd": "Ajouter au groupe",
-    "bulkAdded_one": "{{count}} membre ajouté",
-    "bulkAdded_other": "{{count}} membres ajoutés",
-    "bulkNoneToAdd": "Aucun nouveau membre à ajouter.",
     "bulk": {
       "club_members": "Tous les membres du club",
       "club_staff": "Tout le staff",
@@ -2335,8 +2338,7 @@
       "team_players": "Joueurs d'une équipe",
       "team_parents": "Parents d'une équipe",
       "team_educators": "Éducateurs d'une équipe",
-      "category_educators": "Éducateurs d'une catégorie (U11, U12…)",
-      "club_group": "Membres d'un autre groupe"
+      "category_educators": "Éducateurs d'une catégorie (U11, U12…)"
     }
   }
 }
