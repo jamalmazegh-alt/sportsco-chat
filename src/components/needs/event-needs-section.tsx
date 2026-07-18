@@ -129,10 +129,12 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
 function NeedRow({
   need,
   isStaff,
+  eventId,
   onChange,
 }: {
   need: any;
   isStaff: boolean;
+  eventId: string;
   onChange: () => void;
 }) {
   const { t } = useTranslation();
