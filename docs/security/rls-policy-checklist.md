@@ -62,3 +62,28 @@ Pour chaque policy qui accorde l'accès à un rôle "invité" (non-membre) :
 Ce sont deux cas distincts. Un seul des deux passe souvent en vert sans
 prouver la fermeture. Les deux tests sont obligatoires sur chaque policy
 modifiée.
+
+## Post-mortem — RPC directe sur `SECURITY DEFINER`
+
+Toute fonction `SECURITY DEFINER` exposée en RPC (GRANT EXECUTE à
+`authenticated`) **est elle-même une policy**. La RLS des tables qu'elle
+lit ne la protège pas (le definer bypasse), et une garde applicative
+placée dans la server function TypeScript ne suffit pas : PostgREST
+permet d'appeler la RPC directement depuis un client authentifié.
+
+Règle systématique pour chaque definer accessible à `authenticated` :
+
+- **Garde d'appelant interne** en **première instruction** de la fonction,
+  utilisant `auth.uid()` + un helper de rôle (`is_club_staff`,
+  `is_club_member`, `has_role`, …) et acceptant `service_role` via
+  `coalesce(auth.jwt()->>'role','') = 'service_role'` si le chemin serveur
+  privilégié doit rester ouvert.
+- **Refus SILENCIEUX** (`RETURN;` sans ligne, ou `RETURN NULL`) : ne pas
+  distinguer « interdit » de « vide », sinon la fonction devient un oracle
+  d'énumération.
+- **Test par appel RPC direct** (`supabase.rpc(...)`) pour chaque rôle
+  non autorisé — pas seulement pour le rôle attendu. Les tests via table
+  passent à côté de la surface : c'est la classe de test à ajouter.
+- **Volatilité** : si la fonction alloue de l'état local mutable
+  (tableaux plpgsql, TEMP TABLE), la marquer `VOLATILE` — un appel en
+  transaction read-only peut échouer sur un `STABLE` mal étiqueté.
