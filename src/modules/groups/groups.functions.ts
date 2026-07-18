@@ -20,6 +20,7 @@ export const AudienceSelectorSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("club_educators") }),
   z.object({ type: z.literal("club_staff") }),
   z.object({ type: z.literal("club_admins") }),
+  z.object({ type: z.literal("club_tournament_managers") }),
   z.object({ type: z.literal("club_members") }),
   z.object({ type: z.literal("convoked_players"), event_id: z.string().uuid() }),
   z.object({ type: z.literal("convoked_parents"), event_id: z.string().uuid() }),
@@ -278,6 +279,7 @@ const RuleTypeSchema = z.enum([
   "club_educators",
   "club_staff",
   "club_admins",
+  "club_tournament_managers",
   "club_members",
 ]);
 
