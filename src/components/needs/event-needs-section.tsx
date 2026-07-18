@@ -354,6 +354,20 @@ function NeedRow({
               </span>
             </span>
           </div>
+          {(need.confirmed_signups?.length ?? 0) > 0 && (
+            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+              {need.confirmed_signups!.map((s) => (
+                <Badge
+                  key={s.user_id}
+                  variant="outline"
+                  className="text-[11px] border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                >
+                  {s.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
