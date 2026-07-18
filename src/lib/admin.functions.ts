@@ -31,7 +31,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
     // supabaseAdmin may target a different env in local dev and would return [].
     const { data: members, error } = await supabase
       .from("club_members")
-      .select("user_id, role, created_at")
+      .select("user_id, role, roles, created_at")
       .eq("club_id", data.club_id);
     if (error) throw error;
 
@@ -61,7 +61,12 @@ export const listClubUsers = createServerFn({ method: "POST" })
       { user_id: string; roles: string[]; profile: any; email: string | null }
     >();
     for (const m of members ?? []) {
-      const rolesArr: string[] = m.role ? [m.role] : [];
+      const rolesArr: string[] =
+        Array.isArray((m as any).roles) && (m as any).roles.length > 0
+          ? ((m as any).roles as string[])
+          : m.role
+            ? [m.role]
+            : [];
       const g = grouped.get(m.user_id) ?? {
         user_id: m.user_id,
         roles: [],
@@ -71,6 +76,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
       for (const r of rolesArr) if (!g.roles.includes(r)) g.roles.push(r);
       grouped.set(m.user_id, g);
     }
+
 
     return {
       users: Array.from(grouped.values()).sort((a, b) =>
