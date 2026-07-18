@@ -84,6 +84,7 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
         eventId: need.event_id,
         recipientId: uid,
         notificationType: "event_need_publication",
+        fromName: clubName ? `${clubName} via Clubero` : undefined,
         templateData: {
           recipientFirstName: p?.first_name ?? null,
           locale: (p?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr",
