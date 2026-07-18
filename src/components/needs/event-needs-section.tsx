@@ -171,6 +171,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
 
 type NeedRowType = {
   id: string;
+  role_key: string;
   label: string;
   description: string | null;
   status: string;
