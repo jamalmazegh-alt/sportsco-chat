@@ -800,7 +800,6 @@ function GroupMembersPanel({
         ) : (
           <ul className="space-y-1">
             {(membersQ.data?.members ?? []).map((m) => {
-              const label = roleLabel(m.role);
               return (
                 <li
                   key={m.id}
@@ -814,11 +813,7 @@ function GroupMembersPanel({
                         last_name: m.profile?.last_name,
                       })}
                     </span>
-                    {label && (
-                      <Badge variant="secondary" className="text-[10px] shrink-0">
-                        {label}
-                      </Badge>
-                    )}
+                    <RoleBadges roles={m.roles} fallback={m.role} />
                   </div>
                   <Button
                     variant="ghost"
