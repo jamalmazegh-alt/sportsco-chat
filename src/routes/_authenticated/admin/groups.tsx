@@ -23,7 +23,7 @@ import {
   Users,
   Trophy,
   UserRound,
-  Whistle,
+  Flag,
   Tag,
   type LucideIcon,
 } from "lucide-react";
