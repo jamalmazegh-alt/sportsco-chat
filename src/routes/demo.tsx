@@ -19,7 +19,7 @@ export const Route = createFileRoute("/demo")({
       { property: "og:title", content: i18n.t("meta.demo.title") },
       { property: "og:description", content: i18n.t("meta.demo.ogDescription") },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/demo" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/demo" }],
   }),
 });
 

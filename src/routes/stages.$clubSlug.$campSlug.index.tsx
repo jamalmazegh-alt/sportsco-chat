@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import type { PublicCampBundle } from "@/lib/public-camps.types";
 
-const SITE_URL = "https://www.clubero.app";
+const SITE_URL = "https://clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 const publicCampQuery = (clubSlug: string, campSlug: string) =>

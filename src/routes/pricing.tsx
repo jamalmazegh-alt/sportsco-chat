@@ -25,7 +25,7 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: i18n.t("meta.pricing.title") },
       { property: "og:description", content: i18n.t("meta.pricing.ogDescription") },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/pricing" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/pricing" }],
   }),
 });
 

@@ -22,7 +22,7 @@ export const Route = createFileRoute("/faq")({
       { property: "og:title", content: i18n.t("meta.faq.title") },
       { property: "og:description", content: i18n.t("meta.faq.ogDescription") },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/faq" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/faq" }],
     scripts: [
       {
         type: "application/ld+json",
