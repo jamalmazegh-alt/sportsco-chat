@@ -174,7 +174,8 @@ export const updateEventNeed = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabase
       .from("event_needs")
-      .update(patch)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update(patch as any)
       .eq("id", data.need_id)
       .select("id, event_id, club_id, status, capacity, validation_mode, label, role_key, description")
       .single();
