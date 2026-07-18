@@ -570,6 +570,7 @@ const RULE_TYPES: ClubGroupRuleType[] = [
   "club_staff",
   "club_admins",
   "club_educators",
+  "club_tournament_managers",
   "team_players",
   "team_parents",
   "team_educators",
@@ -727,6 +728,8 @@ function GroupMembersPanel({
         return { Icon: ShieldCheck, cls: "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-300" };
       case "club_staff":
         return { Icon: Shield, cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" };
+      case "club_tournament_managers":
+        return { Icon: Trophy, cls: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-300" };
       case "club_educators":
         return { Icon: GraduationCap, cls: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300" };
       case "club_members":
@@ -1012,6 +1015,10 @@ function ruleToSpec(r: RuleRow): AudienceSelector | null {
       return { type: "club_educators" };
     case "club_staff":
       return { type: "club_staff" };
+    case "club_admins":
+      return { type: "club_admins" };
+    case "club_tournament_managers":
+      return { type: "club_tournament_managers" };
     case "club_members":
       return { type: "club_members" };
     default:
