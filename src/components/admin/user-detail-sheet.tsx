@@ -160,8 +160,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
 
   async function toggleRole(role: ClubRoleKey, checked: boolean) {
     if (!activeClubId || !userId) return;
+    const rolesToRemove = new Set(INCOMPATIBLE_ROLES[role] ?? []);
     const nextStaff = checked
-      ? Array.from(new Set([...currentRoles, role]))
+      ? Array.from(new Set([...currentRoles.filter((r) => !rolesToRemove.has(r)), role]))
       : currentRoles.filter((r) => r !== role);
     const rolesForUpdate = nextStaff.filter((r) => !NON_STAFF_ROLES.has(r));
     if (rolesForUpdate.length === 0) {
@@ -319,18 +320,15 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                     <TooltipProvider delayDuration={150}>
                       <div className="space-y-0.5">
                         {CLUB_ROLE_KEYS.map((r) => {
-                          const blockingRole = currentRoles.find((sel) =>
-                            (INCOMPATIBLE_ROLES[sel] ?? []).includes(r),
+                          const replacedRoles = (INCOMPATIBLE_ROLES[r] ?? []).filter((role) =>
+                            currentRoles.includes(role as ClubRoleKey),
                           );
-                          const incompatible = !!blockingRole && !currentRoles.includes(r);
-                          const isDisabled = acting === "roles" || incompatible;
+                          const isDisabled = acting === "roles";
                           const row = (
                             <label
                               className={
                                 "flex items-center gap-3 p-2 rounded-lg " +
-                                (incompatible
-                                  ? "opacity-50 cursor-not-allowed bg-muted/20"
-                                  : "hover:bg-muted/40 cursor-pointer")
+                                (isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/40 cursor-pointer")
                               }
                             >
                               <Checkbox
@@ -340,20 +338,31 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                               />
                               <span className="text-sm">
                                 {t(`roles.${r}`, { defaultValue: r })}
+                                {!currentRoles.includes(r) && replacedRoles.length > 0 && (
+                                  <span className="ml-2 text-xs text-muted-foreground">
+                                    {t("roles.replaces", {
+                                      roles: replacedRoles
+                                        .map((role) => t(`roles.${role}`, { defaultValue: role }))
+                                        .join(", "),
+                                      defaultValue: `Remplace ${replacedRoles.join(", ")}`,
+                                    })}
+                                  </span>
+                                )}
                               </span>
                             </label>
                           );
-                          if (incompatible && blockingRole) {
+                          if (!currentRoles.includes(r) && replacedRoles.length > 0) {
                             return (
                               <Tooltip key={r}>
                                 <TooltipTrigger asChild>
                                   <div>{row}</div>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  {t("roles.incompatibleWith", {
-                                    role: t(`roles.${blockingRole}`, {
-                                      defaultValue: blockingRole,
-                                    }),
+                                  {t("roles.replaces", {
+                                    roles: replacedRoles
+                                      .map((role) => t(`roles.${role}`, { defaultValue: role }))
+                                      .join(", "),
+                                    defaultValue: `Remplace ${replacedRoles.join(", ")}`,
                                   })}
                                 </TooltipContent>
                               </Tooltip>
