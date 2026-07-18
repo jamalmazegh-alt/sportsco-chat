@@ -436,6 +436,24 @@ function NeedRow({
           onChanged={onChange}
         />
       )}
+      {editOpen && (
+        <NeedFormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          eventId={eventId}
+          sport={null}
+          teamId={null}
+          initial={{
+            id: need.id,
+            role_key: need.role_key,
+            label: need.label,
+            description: need.description,
+            capacity: need.capacity,
+            validation_mode: need.validation_mode as "auto" | "manual",
+          }}
+          onSaved={onChange}
+        />
+      )}
     </div>
   );
 }
