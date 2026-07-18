@@ -19,6 +19,7 @@ import { HomeSkeleton } from "@/components/skeletons";
 
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
+import { HomeNeedsCard } from "@/components/home-needs-card";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
 import { isV2 } from "@/config/features";
 import { EventTypeBadge } from "@/lib/event-type-icon";
@@ -331,6 +332,8 @@ function HomePage() {
       {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit.
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
+
+      {activeClubId && <HomeNeedsCard />}
 
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
