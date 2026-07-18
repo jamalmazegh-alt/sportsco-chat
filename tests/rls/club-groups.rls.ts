@@ -14,7 +14,7 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { admin } from "./_admin";
-import { signInAs } from "./_clients";
+import { signInAs, anonClient } from "./_clients";
 import { getFixtures } from "./_setup";
 import { expectNoAccess } from "./_helpers";
 
