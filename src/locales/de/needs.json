@@ -1,61 +1,61 @@
 {
   "templates": {
-    "ref_center": "Head referee",
-    "ref_line": "Assistant referee",
-    "delegate": "Match delegate",
-    "scoretable": "Scorer's table",
-    "timekeeper": "Timekeeper",
-    "scorer": "Scorer",
-    "shotclock_24": "24-second operator",
-    "table_secretary": "Table secretary",
-    "timekeeper_handball": "Timekeeper",
-    "line_judge": "Line judge",
-    "setup_volley": "Court setup",
-    "concession": "Concession stand",
-    "welcome": "Welcome desk",
-    "setup": "Setup",
-    "teardown": "Teardown",
-    "photographer": "Photographer",
+    "ref_center": "Hauptschiedsrichter",
+    "ref_line": "Linienrichter",
+    "delegate": "Spielbeauftragter",
+    "scoretable": "Anschreibetisch",
+    "timekeeper": "Zeitnehmer",
+    "scorer": "Anschreiber",
+    "shotclock_24": "24-Sekunden-Bediener",
+    "table_secretary": "Sekretär am Zeitnehmertisch",
+    "timekeeper_handball": "Zeitnehmer",
+    "line_judge": "Linienrichter",
+    "setup_volley": "Feldaufbau",
+    "concession": "Vereinsbuffet",
+    "welcome": "Empfang",
+    "setup": "Aufbau",
+    "teardown": "Abbau",
+    "photographer": "Fotograf",
     "animation": "Animation",
-    "other": "Other need"
+    "other": "Anderer Bedarf"
   },
   "status": {
-    "draft": "Draft",
-    "open": "Open",
-    "closed": "Closed",
-    "cancelled": "Cancelled"
+    "draft": "Entwurf",
+    "open": "Offen",
+    "closed": "Geschlossen",
+    "cancelled": "Abgesagt"
   },
   "validationMode": {
-    "auto": "Auto-confirmation",
-    "manual": "Staff review"
+    "auto": "Automatische Bestätigung",
+    "manual": "Bestätigung durch das Trainerteam"
   },
   "signup": {
-    "applied": "Application sent",
-    "confirmed": "Confirmed",
-    "declined": "Declined",
-    "withdrawn": "Withdrawn"
+    "applied": "Anfrage gesendet",
+    "confirmed": "Bestätigt",
+    "declined": "Abgelehnt",
+    "withdrawn": "Zurückgezogen"
   },
   "seats": {
-    "remaining": "{{count}} seat left",
-    "remaining_plural": "{{count}} seats left",
-    "full": "Full"
+    "remaining": "{{count}} Platz frei",
+    "remaining_plural": "{{count}} Plätze frei",
+    "full": "Vollständig besetzt"
   },
   "actions": {
-    "apply": "Volunteer",
-    "withdraw": "Withdraw application",
-    "confirm": "Confirm",
-    "decline": "Decline",
-    "close": "Close need",
-    "cancel": "Cancel need",
-    "publish": "Publish",
-    "republish": "Republish"
+    "apply": "Ich helfe mit",
+    "withdraw": "Anfrage zurückziehen",
+    "confirm": "Bestätigen",
+    "decline": "Ablehnen",
+    "close": "Bedarf schließen",
+    "cancel": "Bedarf absagen",
+    "publish": "Veröffentlichen",
+    "republish": "Erneut veröffentlichen"
   },
   "errors": {
-    "forbidden": "Action not allowed.",
-    "capacity_reached": "All seats are already filled.",
-    "need_not_open": "This need is no longer open.",
-    "need_not_publishable": "This need cannot be published in its current state.",
-    "signup_not_found": "Application not found.",
-    "already_applied": "You have already applied."
+    "forbidden": "Aktion nicht erlaubt.",
+    "capacity_reached": "Alle Plätze sind bereits besetzt.",
+    "need_not_open": "Dieser Bedarf ist nicht mehr offen.",
+    "need_not_publishable": "Dieser Bedarf kann in diesem Zustand nicht veröffentlicht werden.",
+    "signup_not_found": "Anfrage nicht gefunden.",
+    "already_applied": "Du hast dich bereits gemeldet."
   }
 }
