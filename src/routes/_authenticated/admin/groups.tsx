@@ -17,6 +17,15 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
+  ShieldCheck,
+  Shield,
+  GraduationCap,
+  Users,
+  Trophy,
+  UserRound,
+  Flag,
+  Tag,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -658,6 +667,27 @@ function GroupMembersPanel({
     return base;
   }
 
+  const ruleStyle = (rt: ClubGroupRuleType): { Icon: LucideIcon; cls: string } => {
+    switch (rt) {
+      case "club_admins":
+        return { Icon: ShieldCheck, cls: "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-300" };
+      case "club_staff":
+        return { Icon: Shield, cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" };
+      case "club_educators":
+        return { Icon: GraduationCap, cls: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300" };
+      case "club_members":
+        return { Icon: Users, cls: "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300" };
+      case "team_players":
+        return { Icon: Trophy, cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" };
+      case "team_parents":
+        return { Icon: UserRound, cls: "border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300" };
+      case "team_educators":
+        return { Icon: Flag, cls: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300" };
+      case "category_educators":
+        return { Icon: Tag, cls: "border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300" };
+    }
+  };
+
   function canSubmitRule() {
     if (!ruleType) return false;
     if (needsTeam(ruleType) || needsCategory(ruleType)) return !!ruleParam;
@@ -705,13 +735,15 @@ function GroupMembersPanel({
           </p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
-            {rules.map((r) => (
+            {rules.map((r) => {
+              const { Icon: RuleIcon, cls } = ruleStyle(r.rule_type);
+              return (
               <Badge
                 key={r.id}
                 variant="outline"
-                className="gap-1.5 py-1 pl-2 pr-1 border-primary/40 bg-primary/5"
+                className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
               >
-                <Layers className="h-3 w-3 text-primary" />
+                <RuleIcon className="h-3 w-3" />
                 <button
                   type="button"
                   className="text-xs hover:underline"
@@ -731,7 +763,8 @@ function GroupMembersPanel({
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
-            ))}
+              );
+            })}
           </div>
         )}
 
