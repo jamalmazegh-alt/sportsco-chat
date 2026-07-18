@@ -1,61 +1,61 @@
 {
   "templates": {
-    "ref_center": "Head referee",
-    "ref_line": "Assistant referee",
-    "delegate": "Match delegate",
-    "scoretable": "Scorer's table",
-    "timekeeper": "Timekeeper",
-    "scorer": "Scorer",
-    "shotclock_24": "24-second operator",
-    "table_secretary": "Table secretary",
-    "timekeeper_handball": "Timekeeper",
-    "line_judge": "Line judge",
-    "setup_volley": "Court setup",
-    "concession": "Concession stand",
-    "welcome": "Welcome desk",
-    "setup": "Setup",
-    "teardown": "Teardown",
-    "photographer": "Photographer",
-    "animation": "Animation",
-    "other": "Other need"
+    "ref_center": "Hoofdscheidsrechter",
+    "ref_line": "Grensrechter",
+    "delegate": "Wedstrijdgedelegeerde",
+    "scoretable": "Wedstrijdtafel",
+    "timekeeper": "Tijdwaarnemer",
+    "scorer": "Scoreteller",
+    "shotclock_24": "24-secondenbediener",
+    "table_secretary": "Tafelsecretaris",
+    "timekeeper_handball": "Tijdwaarnemer",
+    "line_judge": "Lijnrechter",
+    "setup_volley": "Veldopbouw",
+    "concession": "Kantine",
+    "welcome": "Onthaal",
+    "setup": "Opbouw",
+    "teardown": "Opruimen",
+    "photographer": "Fotograaf",
+    "animation": "Animatie",
+    "other": "Andere behoefte"
   },
   "status": {
-    "draft": "Draft",
+    "draft": "Concept",
     "open": "Open",
-    "closed": "Closed",
-    "cancelled": "Cancelled"
+    "closed": "Gesloten",
+    "cancelled": "Geannuleerd"
   },
   "validationMode": {
-    "auto": "Auto-confirmation",
-    "manual": "Staff review"
+    "auto": "Automatische bevestiging",
+    "manual": "Bevestiging door de staf"
   },
   "signup": {
-    "applied": "Application sent",
-    "confirmed": "Confirmed",
-    "declined": "Declined",
-    "withdrawn": "Withdrawn"
+    "applied": "Aanmelding verzonden",
+    "confirmed": "Bevestigd",
+    "declined": "Afgewezen",
+    "withdrawn": "Ingetrokken"
   },
   "seats": {
-    "remaining": "{{count}} seat left",
-    "remaining_plural": "{{count}} seats left",
-    "full": "Full"
+    "remaining": "{{count}} plek vrij",
+    "remaining_plural": "{{count}} plekken vrij",
+    "full": "Volzet"
   },
   "actions": {
-    "apply": "Volunteer",
-    "withdraw": "Withdraw application",
-    "confirm": "Confirm",
-    "decline": "Decline",
-    "close": "Close need",
-    "cancel": "Cancel need",
-    "publish": "Publish",
-    "republish": "Republish"
+    "apply": "Ik help mee",
+    "withdraw": "Aanmelding intrekken",
+    "confirm": "Bevestigen",
+    "decline": "Afwijzen",
+    "close": "Behoefte sluiten",
+    "cancel": "Behoefte annuleren",
+    "publish": "Publiceren",
+    "republish": "Opnieuw publiceren"
   },
   "errors": {
-    "forbidden": "Action not allowed.",
-    "capacity_reached": "All seats are already filled.",
-    "need_not_open": "This need is no longer open.",
-    "need_not_publishable": "This need cannot be published in its current state.",
-    "signup_not_found": "Application not found.",
-    "already_applied": "You have already applied."
+    "forbidden": "Actie niet toegestaan.",
+    "capacity_reached": "Alle plekken zijn al ingevuld.",
+    "need_not_open": "Deze behoefte is niet meer open.",
+    "need_not_publishable": "Deze behoefte kan in deze status niet worden gepubliceerd.",
+    "signup_not_found": "Aanmelding niet gevonden.",
+    "already_applied": "Je hebt je al aangemeld."
   }
 }

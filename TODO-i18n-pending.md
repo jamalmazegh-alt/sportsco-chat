@@ -1,12 +1,5 @@
 # Pending translations
 
-## Needs (Lot 1) — pending DE/ES/IT/NL/PT translations
-
-`src/locales/{de,es,it,nl,pt}/needs.json` are English-clone placeholders
-for the "Coups de main" feature (Lot 1). The whole file is awaiting the
-master → QA translation pass in those 5 languages. Keys involved:
-`templates.*`, `status.*`, `validationMode.*`, `signup.*`, `seats.*`,
-`actions.*`, `errors.*`. FR/EN are final.
 
 # Challenge templates — pending translations & skipped templates
 
