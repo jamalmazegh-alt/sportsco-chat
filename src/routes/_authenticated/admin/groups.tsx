@@ -991,9 +991,9 @@ function GroupMembersPanel({
         rule={previewRule}
         ruleLabel={previewRule ? ruleLabel(previewRule) : ""}
         clubId={clubId}
-        allMembers={allMembers}
         onClose={() => setPreviewRule(null)}
       />
+
     </div>
   );
 }
