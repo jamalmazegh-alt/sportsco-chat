@@ -366,3 +366,47 @@ export const getGroupResolvedCount = createServerFn({ method: "POST" })
     return { count: (rows ?? []).length };
   });
 
+/**
+ * Aperçu détaillé (nom, email, kind, sous-titre) d'une règle dynamique.
+ * Inclut notamment les parents joignables uniquement par email.
+ */
+const PreviewRuleSchema = z.object({
+  type: RuleTypeSchema,
+  team_id: z.string().uuid().nullish(),
+  category: z.string().min(1).max(60).nullish(),
+});
+
+export type GroupRuleDetailRow = {
+  user_id: string | null;
+  full_name: string | null;
+  email: string | null;
+  kind: string | null;
+  subtitle: string | null;
+  roles: string[] | null;
+};
+
+export const previewGroupRuleDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        rule: PreviewRuleSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const rulePayload: Record<string, unknown> = { type: data.rule.type };
+    if (data.rule.team_id) rulePayload.team_id = data.rule.team_id;
+    if (data.rule.category) rulePayload.category = data.rule.category;
+
+    const { data: rows, error } = await supabase.rpc("preview_group_rule_details", {
+      _club_id: data.club_id,
+      _rule: rulePayload,
+    });
+    if (error) throw new Error(error.message);
+    return { rows: (rows ?? []) as GroupRuleDetailRow[] };
+  });
+
+
