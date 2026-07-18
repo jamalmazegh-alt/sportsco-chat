@@ -34,6 +34,15 @@ const CreateNeedInput = z.object({
   validation_mode: z.enum(["auto", "manual"]),
 });
 
+const UpdateNeedInput = z.object({
+  need_id: z.string().uuid(),
+  role_key: z.string().min(1).max(80).optional(),
+  label: z.string().trim().min(1).max(120).optional(),
+  description: z.string().trim().max(2000).nullish(),
+  capacity: z.number().int().min(1).max(200).optional(),
+  validation_mode: z.enum(["auto", "manual"]).optional(),
+});
+
 const PublishInput = z.object({
   need_id: z.string().uuid(),
   audiences: AudienceSpecSchema,
