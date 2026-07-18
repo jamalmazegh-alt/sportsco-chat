@@ -38,7 +38,7 @@ export const Route = createFileRoute("/features")({
       { property: "og:title", content: i18n.t("meta.features.title") },
       { property: "og:description", content: i18n.t("meta.features.ogDescription") },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/features" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/features" }],
   }),
 });
 

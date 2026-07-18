@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { FollowButton } from "@/components/follow-button";
 import { isV2 } from "@/config/features";
 
-const SITE_URL = "https://www.clubero.app";
+const SITE_URL = "https://clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 type CoachProfile = {

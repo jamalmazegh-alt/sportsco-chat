@@ -19,7 +19,7 @@ import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
 import { isV2 } from "@/config/features";
 
-const SITE_URL = "https://www.clubero.app";
+const SITE_URL = "https://clubero.app";
 const PAGE_SIZE = 24;
 
 type PlayerItem = {

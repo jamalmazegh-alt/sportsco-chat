@@ -16,9 +16,9 @@ export const Route = createFileRoute("/fr/onboarding-club")({
       { property: "og:locale", content: "fr_FR" },
     ],
     links: [
-      { rel: "canonical", href: "https://www.clubero.app/fr/onboarding-club" },
-      { rel: "alternate", hrefLang: "en", href: "https://www.clubero.app/en/club-onboarding" },
-      { rel: "alternate", hrefLang: "fr", href: "https://www.clubero.app/fr/onboarding-club" },
+      { rel: "canonical", href: "https://clubero.app/fr/onboarding-club" },
+      { rel: "alternate", hrefLang: "en", href: "https://clubero.app/en/club-onboarding" },
+      { rel: "alternate", hrefLang: "fr", href: "https://clubero.app/fr/onboarding-club" },
     ],
   }),
 });
