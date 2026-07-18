@@ -583,22 +583,26 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
       .order("applied_at", { ascending: true });
     if (error) throw new Error(error.message);
 
-    const userIds = Array.from(new Set((signups ?? []).map((s) => s.user_id)));
-    const profiles: Record<string, { full_name: string | null; email: string | null }> = {};
+    const userIds = Array.from(
+      new Set(
+        (signups ?? []).map((s) => s.user_id).filter((v): v is string => typeof v === "string"),
+      ),
+    );
+    const profiles: Record<string, { full_name: string | null }> = {};
     if (userIds.length > 0) {
       const { data: profs } = await supabaseAdmin
         .from("profiles")
-        .select("id, full_name, email")
+        .select("id, full_name")
         .in("id", userIds);
       for (const p of profs ?? []) {
-        profiles[p.id] = { full_name: p.full_name ?? null, email: p.email ?? null };
+        profiles[p.id] = { full_name: p.full_name ?? null };
       }
     }
 
     return {
       signups: (signups ?? []).map((s) => ({
         ...s,
-        profile: profiles[s.user_id] ?? { full_name: null, email: null },
+        profile: (s.user_id && profiles[s.user_id]) || { full_name: null },
       })),
     };
   });
