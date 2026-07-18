@@ -278,6 +278,7 @@ const RuleTypeSchema = z.enum([
   "club_educators",
   "club_staff",
   "club_admins",
+  "club_tournament_managers",
   "club_members",
 ]);
 
