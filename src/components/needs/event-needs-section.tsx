@@ -462,22 +462,33 @@ function NeedRow({
 /* CreateNeedDialog                                                           */
 /* -------------------------------------------------------------------------- */
 
-function CreateNeedDialog({
+function NeedFormDialog({
   open,
   onOpenChange,
   eventId,
   sport,
-  onCreated,
+  initial,
+  onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   eventId: string;
   sport: string | null;
   teamId: string | null;
-  onCreated: () => void;
+  initial?: {
+    id: string;
+    role_key: string;
+    label: string;
+    description: string | null;
+    capacity: number;
+    validation_mode: "auto" | "manual";
+  };
+  onSaved: () => void;
 }) {
   const { t } = useTranslation();
   const create = useServerFn(createEventNeed);
+  const update = useServerFn(updateEventNeed);
+  const isEdit = !!initial;
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
     const s = (sport ?? "").toLowerCase().trim();
@@ -486,42 +497,62 @@ function CreateNeedDialog({
     );
   }, [sport]);
 
-  const [templateKey, setTemplateKey] = useState<string>(availableTemplates[0]?.key ?? "other");
+  const [templateKey, setTemplateKey] = useState<string>(
+    initial?.role_key ?? availableTemplates[0]?.key ?? "other",
+  );
   const currentTpl =
     availableTemplates.find((x) => x.key === templateKey) ??
+    NEED_TEMPLATES.find((x) => x.key === templateKey) ??
     NEED_TEMPLATES.find((x) => x.key === "other")!;
 
   const defaultLabel = t(`needs:templates.${currentTpl.key}`);
-  const [label, setLabel] = useState(defaultLabel);
-  const [description, setDescription] = useState("");
-  const [capacity, setCapacity] = useState(currentTpl.suggestedCapacity ?? 1);
+  const [label, setLabel] = useState(initial?.label ?? defaultLabel);
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [capacity, setCapacity] = useState(
+    initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
+  );
   const [mode, setMode] = useState<"auto" | "manual">(
-    currentTpl.suggestedValidationMode ?? "auto",
+    initial?.validation_mode ?? currentTpl.suggestedValidationMode ?? "auto",
   );
 
   const [lastKey, setLastKey] = useState(templateKey);
-  if (lastKey !== templateKey) {
+  if (lastKey !== templateKey && !isEdit) {
     setLastKey(templateKey);
     setLabel(t(`needs:templates.${currentTpl.key}`));
     setCapacity(currentTpl.suggestedCapacity ?? 1);
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
-  const createM = useMutation({
+  const saveM = useMutation({
     mutationFn: () =>
-      create({
-        data: {
-          event_id: eventId,
-          role_key: currentTpl.key,
-          label: label.trim() || defaultLabel,
-          description: description.trim() || null,
-          capacity,
-          validation_mode: mode,
-        },
-      }),
+      isEdit
+        ? update({
+            data: {
+              need_id: initial!.id,
+              role_key: currentTpl.key,
+              label: label.trim() || defaultLabel,
+              description: description.trim() || null,
+              capacity,
+              validation_mode: mode,
+            },
+          })
+        : create({
+            data: {
+              event_id: eventId,
+              role_key: currentTpl.key,
+              label: label.trim() || defaultLabel,
+              description: description.trim() || null,
+              capacity,
+              validation_mode: mode,
+            },
+          }),
     onSuccess: () => {
-      toast.success(t("needs:section.created"));
-      onCreated();
+      toast.success(
+        isEdit
+          ? t("common.saved", { defaultValue: "Modifications enregistrées" })
+          : t("needs:section.created"),
+      );
+      onSaved();
       onOpenChange(false);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -529,46 +560,97 @@ function CreateNeedDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("needs:section.add")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <HandHelping className="h-4 w-4 text-primary" />
+            {isEdit
+              ? t("common.edit", { defaultValue: "Modifier le besoin" })
+              : t("needs:section.add")}
+          </DialogTitle>
           <DialogDescription>{t("needs:section.createDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div>
-            <Label>{t("needs:field.template")}</Label>
-            <Select value={templateKey} onValueChange={setTemplateKey}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTemplates.map((tpl) => (
-                  <SelectItem key={tpl.key} value={tpl.key}>
+
+        <div className="space-y-4 py-1">
+          {/* Template picker as chips (friendly) */}
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+              {t("needs:field.template")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {availableTemplates.map((tpl) => {
+                const active = tpl.key === templateKey;
+                return (
+                  <button
+                    key={tpl.key}
+                    type="button"
+                    onClick={() => setTemplateKey(tpl.key)}
+                    className={cn(
+                      "text-xs font-medium rounded-full border px-3 py-1.5 transition-colors",
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border text-foreground",
+                    )}
+                  >
                     {t(`needs:templates.${tpl.key}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>{t("needs:field.label")}</Label>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={120} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>{t("needs:field.capacity")}</Label>
-              <Input
-                type="number"
-                min={1}
-                max={200}
-                value={capacity}
-                onChange={(e) => setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))}
-              />
+                  </button>
+                );
+              })}
             </div>
-            <div>
-              <Label>{t("needs:field.mode")}</Label>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="need-label">{t("needs:field.label")}</Label>
+            <Input
+              id="need-label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              maxLength={120}
+              placeholder={defaultLabel}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="need-capacity">{t("needs:field.capacity")}</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 shrink-0"
+                  onClick={() => setCapacity((c) => Math.max(1, c - 1))}
+                  aria-label="-"
+                >
+                  −
+                </Button>
+                <Input
+                  id="need-capacity"
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={capacity}
+                  onChange={(e) =>
+                    setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))
+                  }
+                  className="text-center font-semibold"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 shrink-0"
+                  onClick={() => setCapacity((c) => Math.min(200, c + 1))}
+                  aria-label="+"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="need-mode">{t("needs:field.mode")}</Label>
               <Select value={mode} onValueChange={(v) => setMode(v as "auto" | "manual")}>
-                <SelectTrigger>
+                <SelectTrigger id="need-mode">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -578,23 +660,29 @@ function CreateNeedDialog({
               </Select>
             </div>
           </div>
-          <div>
-            <Label>{t("needs:field.description")}</Label>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="need-desc">{t("needs:field.description")}</Label>
             <Textarea
+              id="need-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={2000}
               rows={3}
+              placeholder={t("needs:field.description")}
             />
           </div>
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel", { defaultValue: "Annuler" })}
           </Button>
-          <Button onClick={() => createM.mutate()} disabled={createM.isPending}>
-            {createM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {t("common.create", { defaultValue: "Créer" })}
+          <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
+            {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+            {isEdit
+              ? t("common.save", { defaultValue: "Enregistrer" })
+              : t("common.create", { defaultValue: "Créer" })}
           </Button>
         </DialogFooter>
       </DialogContent>
