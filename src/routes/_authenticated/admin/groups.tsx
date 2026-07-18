@@ -763,7 +763,8 @@ function GroupMembersPanel({
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
-            ))}
+              );
+            })}
           </div>
         )}
 
