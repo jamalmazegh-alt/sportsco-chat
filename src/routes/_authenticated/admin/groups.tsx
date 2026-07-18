@@ -710,7 +710,16 @@ function GroupMembersPanel({
                 className="gap-1.5 py-1 pl-2 pr-1 border-primary/40 bg-primary/5"
               >
                 <Layers className="h-3 w-3 text-primary" />
-                <span className="text-xs">{ruleLabel(r)}</span>
+                <button
+                  type="button"
+                  className="text-xs hover:underline"
+                  onClick={() => setPreviewRule(r)}
+                  aria-label={t("groups.rulePreview", {
+                    defaultValue: "Voir les membres",
+                  })}
+                >
+                  {ruleLabel(r)}
+                </button>
                 <button
                   type="button"
                   className="ml-0.5 rounded hover:bg-muted p-0.5"
