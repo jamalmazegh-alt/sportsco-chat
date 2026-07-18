@@ -851,6 +851,122 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------------ */
+/* 12bis. getEventAudienceContext — staff-only : picker à la CRÉATION       */
+/* (avant qu'un event_need existe → on part de event_id).                   */
+/* ------------------------------------------------------------------------ */
+
+export const getEventAudienceContext = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ event_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: ev, error: evErr } = await supabase
+      .from("events")
+      .select("id, team_id, teams:team_id(club_id)")
+      .eq("id", data.event_id)
+      .maybeSingle();
+    if (evErr) throw new Error(evErr.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clubId = ((ev as any)?.teams?.club_id as string | null) ?? null;
+    if (!clubId) throw new Error("event_needs_require_team_linked_event");
+
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: clubId,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [teamsRes, groupsRes] = await Promise.all([
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, age_group")
+        .eq("club_id", clubId)
+        .order("name", { ascending: true }),
+      supabaseAdmin
+        .from("club_groups")
+        .select("id, name, is_active")
+        .eq("club_id", clubId)
+        .eq("is_active", true)
+        .order("name", { ascending: true }),
+    ]);
+
+    const teams = (teamsRes.data ?? []).map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = r as any;
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        age_group: (row.age_group as string | null) ?? null,
+      };
+    });
+
+    const cats = Array.from(
+      new Set(teams.map((t) => t.age_group?.trim()).filter((c): c is string => !!c)),
+    ).sort();
+
+    return {
+      club_id: clubId,
+      event_id: data.event_id,
+      teams,
+      groups: groupsRes.data ?? [],
+      categories: cats,
+    };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 12ter. previewEventAudience — preview par event_id (avant création need) */
+/* ------------------------------------------------------------------------ */
+
+export const previewEventAudience = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        event_id: z.string().uuid(),
+        audiences: AudienceSpecSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: ev, error: evErr } = await supabase
+      .from("events")
+      .select("id, team_id, teams:team_id(club_id)")
+      .eq("id", data.event_id)
+      .maybeSingle();
+    if (evErr) throw new Error(evErr.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clubId = ((ev as any)?.teams?.club_id as string | null) ?? null;
+    if (!clubId) throw new Error("event_needs_require_team_linked_event");
+
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: clubId,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hydrated = (data.audiences as any[]).map((a) => {
+      if (a?.type === "convoked_players" || a?.type === "convoked_parents") {
+        return { ...a, event_id: data.event_id };
+      }
+      return a;
+    });
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("resolve_audience_members", {
+      _club_id: clubId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _spec: hydrated as any,
+    });
+    if (error) throw new Error(error.message);
+    return { count: (rows ?? []).length };
+  });
+
+/* ------------------------------------------------------------------------ */
 /* 10. listMyOpenNeeds — feed membre "Coups de main" (toutes évènements)    */
 /* ------------------------------------------------------------------------ */
 
