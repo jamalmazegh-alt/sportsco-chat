@@ -17,6 +17,15 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
+  ShieldCheck,
+  Shield,
+  GraduationCap,
+  Users,
+  Trophy,
+  UserRound,
+  Whistle,
+  Tag,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
