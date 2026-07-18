@@ -516,6 +516,7 @@ type RuleRow = {
 const RULE_TYPES: ClubGroupRuleType[] = [
   "club_members",
   "club_staff",
+  "club_admins",
   "club_educators",
   "team_players",
   "team_parents",
