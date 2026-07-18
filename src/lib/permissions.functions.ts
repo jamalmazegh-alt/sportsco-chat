@@ -153,19 +153,29 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
 
     const mergedRoles = mergeStaffWithNonStaffRoles(data.roles, oldRoles);
 
-    // Keep singular `role` (app_role enum) in sync so legacy readers see the update.
-    // Prefer admin, then coach, then the first staff role in the list.
+    // Keep singular `role` (app_role enum: admin/coach/dirigeant/…) in sync so
+    // legacy readers see the update. Fall back to null when no compatible role.
+    const APP_ROLE_ENUM = new Set(["admin", "coach", "dirigeant"]);
     const primary =
-      data.roles.find((r) => r === "admin") ??
-      data.roles.find((r) => r === "coach") ??
-      data.roles[0];
+      (["admin", "coach", "dirigeant"] as const).find((r) => data.roles.includes(r as any)) ??
+      (data.roles.find((r) => APP_ROLE_ENUM.has(r)) as
+        | "admin"
+        | "coach"
+        | "dirigeant"
+        | undefined);
+
+    const updatePayload: { roles: string[]; role?: "admin" | "coach" | "dirigeant" } = {
+      roles: mergedRoles,
+    };
+    if (primary) updatePayload.role = primary;
 
     const { error: upErr } = await supabaseAdmin
       .from("club_members")
-      .update({ roles: mergedRoles, role: primary })
+      .update(updatePayload)
       .eq("club_id", data.club_id)
       .eq("user_id", data.user_id);
     if (upErr) throw new Response(upErr.message, { status: 500 });
+
 
 
     await logPermissionChange({
