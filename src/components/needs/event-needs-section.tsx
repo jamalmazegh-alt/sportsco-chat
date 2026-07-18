@@ -469,9 +469,7 @@ function NeedRow({
                 size="sm"
                 variant="ghost"
                 className="text-destructive"
-                onClick={() => {
-                  if (confirm(t("needs:confirmCancel"))) cancelM.mutate();
-                }}
+                onClick={() => setCancelConfirmOpen(true)}
                 disabled={cancelM.isPending}
               >
                 <Trash2 className="h-3.5 w-3.5 mr-1" />
