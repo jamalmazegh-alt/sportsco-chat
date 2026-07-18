@@ -507,6 +507,7 @@ function NeedFormDialog({
   eventId,
   sport,
   initial,
+  existingRoleKeys,
   onSaved,
 }: {
   open: boolean;
@@ -514,6 +515,7 @@ function NeedFormDialog({
   eventId: string;
   sport: string | null;
   teamId: string | null;
+  existingRoleKeys?: string[];
   initial?: {
     id: string;
     role_key: string;
@@ -525,6 +527,7 @@ function NeedFormDialog({
   onSaved: () => void;
 }) {
   const { t } = useTranslation();
+
   const create = useServerFn(createEventNeed);
   const update = useServerFn(updateEventNeed);
   const publish = useServerFn(publishEventNeed);
