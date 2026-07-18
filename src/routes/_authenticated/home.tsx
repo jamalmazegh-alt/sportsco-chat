@@ -19,6 +19,7 @@ import { HomeSkeleton } from "@/components/skeletons";
 
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
+import { HomeNeedsCard } from "@/components/home-needs-card";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
 import { isV2 } from "@/config/features";
 import { EventTypeBadge } from "@/lib/event-type-icon";
