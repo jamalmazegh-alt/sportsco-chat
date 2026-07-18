@@ -381,11 +381,14 @@ export const cancelEventNeed = createServerFn({ method: "POST" })
 
     await recomputeCoverageServiceRole(need.event_id);
 
-    // Notifier les signups actifs de l'annulation (dispatch fire-and-forget).
-    const { notifyNeedCancelled } = await import("./dispatch.server");
-    void notifyNeedCancelled({ needId: data.need_id }).catch((e) =>
-      console.error("[cancelEventNeed] notify failed", e),
-    );
+    // Notifier les signups actifs de l'annulation — awaité (Cloudflare Workers
+    // peut tuer une promesse orpheline après la réponse).
+    try {
+      const { notifyNeedCancelled } = await import("./dispatch.server");
+      await notifyNeedCancelled({ needId: data.need_id });
+    } catch (e) {
+      console.error("[cancelEventNeed] notify failed", e);
+    }
 
     return { ok: true };
   });
