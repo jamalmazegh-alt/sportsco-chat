@@ -523,13 +523,23 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     }
 
     // My signup (via RLS owner_read).
+    type MySignup = {
+      id: string;
+      need_id: string;
+      status: string;
+      comment: string | null;
+      applied_at: string | null;
+      confirmed_at: string | null;
+      withdrawn_at: string | null;
+      declined_at: string | null;
+    };
     const { data: mySignups } = await supabase
       .from("event_need_signups")
       .select("id, need_id, status, comment, applied_at, confirmed_at, withdrawn_at, declined_at")
       .in("need_id", needIds)
       .eq("user_id", userId);
-    const mySignupByNeed: Record<string, unknown> = {};
-    for (const s of mySignups ?? []) mySignupByNeed[s.need_id] = s;
+    const mySignupByNeed: Record<string, MySignup> = {};
+    for (const s of (mySignups ?? []) as MySignup[]) mySignupByNeed[s.need_id] = s;
 
     // Staff view ?
     const clubId = rows[0]?.club_id;
@@ -544,7 +554,7 @@ export const listEventNeeds = createServerFn({ method: "POST" })
         confirmed_count: confirmedByNeed[n.id] ?? 0,
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
-        my_signup: (mySignupByNeed[n.id] as null | Record<string, unknown>) ?? null,
+        my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,
       })),
     };
   });
