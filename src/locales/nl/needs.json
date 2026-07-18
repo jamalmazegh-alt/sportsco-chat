@@ -36,9 +36,9 @@
     "withdrawn": "Ingetrokken"
   },
   "seats": {
-    "remaining": "{{count}} plek vrij",
-    "remaining_plural": "{{count}} plekken vrij",
-    "full": "Volzet"
+    "full": "Volzet",
+    "remaining_one": "{{count}} plek vrij",
+    "remaining_other": "{{count}} plekken vrij"
   },
   "actions": {
     "apply": "Ik help mee",
@@ -57,5 +57,65 @@
     "need_not_publishable": "Deze behoefte kan in deze status niet worden gepubliceerd.",
     "signup_not_found": "Aanmelding niet gevonden.",
     "already_applied": "Je hebt je al aangemeld."
-  }
+  },
+  "section": {
+    "title": "Volunteer needs",
+    "add": "Add a need",
+    "emptyStaff": "Create a need (referee, concession, timekeeper…) to call for volunteers.",
+    "created": "Need created",
+    "createDesc": "Create the need, then publish it to the audience of your choice.",
+    "coverageAll": "All covered ✓",
+    "coverageMissing_one": "{{count}} need to fill",
+    "coverageMissing_other": "{{count}} needs to fill"
+  },
+  "field": {
+    "template": "Type",
+    "label": "Label",
+    "capacity": "Number of seats",
+    "mode": "Validation",
+    "description": "Details (optional)"
+  },
+  "publish": {
+    "title": "Publish the need",
+    "desc": "Choose who will receive the notification.",
+    "audienceHeader": "Audiences",
+    "chooseGroup": "Pick a group",
+    "chooseTeam": "Pick a team",
+    "chooseCategory": "Pick a category (U11, U12…)",
+    "categoryPlaceholder": "e.g. U11",
+    "preview_one": "{{count}} unique person will be notified",
+    "preview_other": "{{count}} unique people will be notified",
+    "previewNone": "No recipients — pick at least one audience.",
+    "previewLoading": "Computing recipients…",
+    "success": "Need published · {{count}} recipient(s)",
+    "successIdempotent": "Already published (no new notifications sent)."
+  },
+  "publishedBadge": {
+    "at_one": "Published {{time}} · {{count}} recipient",
+    "at_other": "Published {{time}} · {{count}} recipients",
+    "unpublished": "Not published"
+  },
+  "audiences": {
+    "convoked_players": "Called-up players",
+    "convoked_parents": "Parents of called-up players",
+    "club_members": "All club members",
+    "club_educators": "Club educators",
+    "club_staff": "Club staff / volunteers",
+    "club_admins": "Club administrators",
+    "club_tournament_managers": "Tournament managers",
+    "club_group": "Custom group",
+    "team_players": "Players of a team",
+    "team_parents": "Parents of a team",
+    "team_educators": "Educators of a team",
+    "category_educators": "Educators of a category"
+  },
+  "staff": {
+    "title": "Applications",
+    "empty": "No applications yet.",
+    "minorPending": "Minor applicant — adult confirmation required",
+    "license": "Licence #{{n}}"
+  },
+  "pendingApplications_one": "{{count}} pending",
+  "pendingApplications_other": "{{count}} pending",
+  "confirmCancel": "Cancel this need?"
 }

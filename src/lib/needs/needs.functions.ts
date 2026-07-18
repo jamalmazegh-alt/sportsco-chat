@@ -547,6 +547,22 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
       : { data: false };
 
+    // Dernière publication par besoin (recipients_count + published_at).
+    const { data: pubs } = await supabaseAdmin
+      .from("event_need_publications")
+      .select("need_id, recipients_count, published_at")
+      .in("need_id", needIds)
+      .order("published_at", { ascending: false });
+    const lastPubByNeed: Record<string, { recipients_count: number | null; published_at: string }> = {};
+    for (const p of pubs ?? []) {
+      if (!lastPubByNeed[p.need_id]) {
+        lastPubByNeed[p.need_id] = {
+          recipients_count: p.recipients_count ?? null,
+          published_at: p.published_at as string,
+        };
+      }
+    }
+
     return {
       is_staff: Boolean(isStaff),
       needs: rows.map((n) => ({
@@ -555,6 +571,8 @@ export const listEventNeeds = createServerFn({ method: "POST" })
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
         my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,
+        last_recipients_count: lastPubByNeed[n.id]?.recipients_count ?? null,
+        last_published_at: lastPubByNeed[n.id]?.published_at ?? n.last_published_at ?? null,
       })),
     };
   });
@@ -595,15 +613,175 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
         .select("id, full_name")
         .in("id", userIds);
       for (const p of profs ?? []) {
-        profiles[p.id] = { full_name: p.full_name ?? null };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pid = (p as any).id as string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        profiles[pid] = { full_name: ((p as any).full_name as string | null) ?? null };
       }
     }
 
+    // Rôles club pour chaque candidat.
+    const rolesByUser: Record<string, string[]> = {};
+    if (userIds.length > 0) {
+      const { data: memberRows } = await supabaseAdmin
+        .from("club_members")
+        .select("user_id, roles")
+        .eq("club_id", need.club_id)
+        .in("user_id", userIds);
+      for (const m of memberRows ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rolesByUser[m.user_id] = ((m as any).roles as string[] | null) ?? [];
+      }
+    }
+
+    // Licence + date de naissance (via players.user_id).
+    const licenseByUser: Record<string, string | null> = {};
+    const birthByUser: Record<string, string | null> = {};
+    if (userIds.length > 0) {
+      const { data: players } = await supabaseAdmin
+        .from("players")
+        .select("user_id, license_number, birth_date")
+        .in("user_id", userIds);
+      for (const p of players ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const uid = (p as any).user_id as string | null;
+        if (!uid) continue;
+        if (!licenseByUser[uid]) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          licenseByUser[uid] = ((p as any).license_number as string | null) ?? null;
+        }
+        if (!birthByUser[uid]) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          birthByUser[uid] = ((p as any).birth_date as string | null) ?? null;
+        }
+      }
+    }
+
+    const isMinor = (dob: string | null | undefined): boolean => {
+      if (!dob) return false;
+      const d = new Date(dob);
+      if (Number.isNaN(d.getTime())) return false;
+      const now = new Date();
+      let age = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age -= 1;
+      return age < 18;
+    };
+
     return {
-      signups: (signups ?? []).map((s) => ({
-        ...s,
-        profile: (s.user_id && profiles[s.user_id]) || { full_name: null },
-      })),
+      signups: (signups ?? []).map((s) => {
+        const prof = (s.user_id && profiles[s.user_id]) || { full_name: null };
+        const dob = s.user_id ? birthByUser[s.user_id] ?? null : null;
+        return {
+          ...s,
+          profile: { full_name: prof.full_name },
+          roles: (s.user_id && rolesByUser[s.user_id]) || [],
+          license_number: (s.user_id && licenseByUser[s.user_id]) || null,
+          is_minor: isMinor(dob),
+        };
+      }),
+    };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 11. previewEventNeedAudience — compte unique de destinataires (staff)    */
+/* ------------------------------------------------------------------------ */
+
+export const previewEventNeedAudience = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        need_id: z.string().uuid(),
+        audiences: AudienceSpecSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    // Hydrater event_id sur les sélecteurs qui l'exigent.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hydrated = (data.audiences as any[]).map((a) => {
+      if (a?.type === "convoked_players" || a?.type === "convoked_parents") {
+        return { ...a, event_id: need.event_id };
+      }
+      return a;
+    });
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("resolve_audience_members", {
+      _club_id: need.club_id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _spec: hydrated as any,
+    });
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as Array<{ user_id: string }>;
+    return { count: list.length };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 12. getNeedAudienceContext — staff-only : listes pour le picker          */
+/* ------------------------------------------------------------------------ */
+
+export const getNeedAudienceContext = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ need_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const [teamsRes, groupsRes] = await Promise.all([
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, age_group")
+        .eq("club_id", need.club_id)
+        .order("name", { ascending: true }),
+      supabaseAdmin
+        .from("club_groups")
+        .select("id, name, is_active")
+        .eq("club_id", need.club_id)
+        .eq("is_active", true)
+        .order("name", { ascending: true }),
+    ]);
+
+    const teams = (teamsRes.data ?? []).map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = r as any;
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        age_group: (row.age_group as string | null) ?? null,
+      };
+    });
+
+    const cats = Array.from(
+      new Set(
+        teams
+          .map((t) => t.age_group?.trim())
+          .filter((c): c is string => !!c),
+      ),
+    ).sort();
+
+    return {
+      club_id: need.club_id,
+      event_id: need.event_id,
+      teams,
+      groups: groupsRes.data ?? [],
+      categories: cats,
     };
   });
 
