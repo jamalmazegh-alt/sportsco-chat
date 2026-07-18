@@ -292,12 +292,18 @@ function NeedRow({
     return null;
   })();
 
+  const { Icon: NeedIcon, chip: needChip } = getNeedVisual(need.role_key);
+  const displayLabel = resolveNeedLabel(need, t);
+
   return (
     <div className="rounded-lg border bg-background/50 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-semibold text-foreground truncate">{need.label}</p>
+            <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0", needChip)}>
+              <NeedIcon className="h-4 w-4" />
+            </span>
+            <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
             {statusBadge}
             <Badge variant="outline" className="text-[10px]">
               {t(`needs:validationMode.${need.validation_mode}`)}
