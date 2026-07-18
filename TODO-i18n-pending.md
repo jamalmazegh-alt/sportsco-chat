@@ -1,5 +1,27 @@
 # Pending translations
 
+## `needs.json` — Phase B UI extension (DE/ES/IT/NL/PT)
+
+The Phase B UI for "Coups de main" added ~30 UI keys under `needs.json`:
+`section.*` (title, add, emptyStaff, created, createDesc, coverageAll,
+coverageMissing_one, coverageMissing_other), `field.*` (template, label,
+capacity, mode, description), `publish.*` (title, desc, audienceHeader,
+chooseGroup, chooseTeam, chooseCategory, categoryPlaceholder, preview_one,
+preview_other, previewNone, previewLoading, success, successIdempotent),
+`publishedBadge.*` (at_one, at_other, unpublished), `audiences.*`
+(club_group, team_players, team_parents, team_educators, category_educators
++ the 7 existing scalars), `staff.*` (title, empty, minorPending, license),
+`pendingApplications_one`, `pendingApplications_other`, `confirmCancel`.
+
+FR and EN are reviewed and final. DE/ES/IT/NL/PT are **clones of EN** for
+parity — they must be replaced by native translations. Also `seats.remaining`
+was migrated to i18next v4 plural convention (`remaining_one` /
+`remaining_other`) — the 5 non-FR/EN locales inherited the EN plural fallback
+and need native review too.
+
+
+
+
 
 # Challenge templates — pending translations & skipped templates
 
