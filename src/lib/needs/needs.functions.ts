@@ -466,3 +466,182 @@ export const getEventNeedDetail = createServerFn({ method: "POST" })
       is_staff_view: Boolean(isStaff),
     };
   });
+
+/* ------------------------------------------------------------------------ */
+/* 8. listEventNeeds — payload évènement (visible pour user autorisé)       */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Retourne la liste des besoins d'un évènement.
+ * - RLS filtre naturellement : staff voit tout ; membre destinataire voit
+ *   uniquement les besoins ouverts pour lesquels il est dans les recipients
+ *   ou déjà candidat.
+ * - Places restantes calculées en agrégat (service_role) — jamais de liste
+ *   de confirmés retournée côté membre.
+ * - my_signup : la ligne du user courant s'il a déjà candidaté.
+ */
+export const listEventNeeds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ event_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: needs, error } = await supabase
+      .from("event_needs")
+      .select(
+        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, created_at",
+      )
+      .eq("event_id", data.event_id)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    const rows = needs ?? [];
+    if (rows.length === 0) return { needs: [], is_staff: false };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Agrégats confirmés par need (bypass RLS pour ne compter QUE l'agrégat).
+    const needIds = rows.map((r) => r.id);
+    const { data: confirmedRows } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("need_id")
+      .in("need_id", needIds)
+      .eq("status", "confirmed");
+    const confirmedByNeed: Record<string, number> = {};
+    for (const r of confirmedRows ?? []) {
+      confirmedByNeed[r.need_id] = (confirmedByNeed[r.need_id] ?? 0) + 1;
+    }
+
+    // Candidatures 'applied' en attente (pour badges staff).
+    const { data: appliedRows } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("need_id")
+      .in("need_id", needIds)
+      .eq("status", "applied");
+    const appliedByNeed: Record<string, number> = {};
+    for (const r of appliedRows ?? []) {
+      appliedByNeed[r.need_id] = (appliedByNeed[r.need_id] ?? 0) + 1;
+    }
+
+    // My signup (via RLS owner_read).
+    const { data: mySignups } = await supabase
+      .from("event_need_signups")
+      .select("id, need_id, status, comment, applied_at, confirmed_at, withdrawn_at, declined_at")
+      .in("need_id", needIds)
+      .eq("user_id", userId);
+    const mySignupByNeed: Record<string, unknown> = {};
+    for (const s of mySignups ?? []) mySignupByNeed[s.need_id] = s;
+
+    // Staff view ?
+    const clubId = rows[0]?.club_id;
+    const { data: isStaff } = clubId
+      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
+      : { data: false };
+
+    return {
+      is_staff: Boolean(isStaff),
+      needs: rows.map((n) => ({
+        ...n,
+        confirmed_count: confirmedByNeed[n.id] ?? 0,
+        applied_count: appliedByNeed[n.id] ?? 0,
+        remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
+        my_signup: (mySignupByNeed[n.id] as null | Record<string, unknown>) ?? null,
+      })),
+    };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 9. listStaffSignupsForNeed — staff-only, liste détaillée des candidats   */
+/* ------------------------------------------------------------------------ */
+
+export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ need_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signups, error } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("id, user_id, status, comment, applied_at, confirmed_at, declined_at, withdrawn_at")
+      .eq("need_id", data.need_id)
+      .order("applied_at", { ascending: true });
+    if (error) throw new Error(error.message);
+
+    const userIds = Array.from(new Set((signups ?? []).map((s) => s.user_id)));
+    const profiles: Record<string, { full_name: string | null; email: string | null }> = {};
+    if (userIds.length > 0) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+      for (const p of profs ?? []) {
+        profiles[p.id] = { full_name: p.full_name ?? null, email: p.email ?? null };
+      }
+    }
+
+    return {
+      signups: (signups ?? []).map((s) => ({
+        ...s,
+        profile: profiles[s.user_id] ?? { full_name: null, email: null },
+      })),
+    };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 10. listMyOpenNeeds — feed membre "Coups de main" (toutes évènements)    */
+/* ------------------------------------------------------------------------ */
+
+export const listMyOpenNeeds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(() => ({}))
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+
+    // RLS `event_needs_recipient_read` filtre déjà pour ne remonter que les
+    // besoins ouverts dont l'user est destinataire (ou déjà signup).
+    const { data: needs, error } = await supabase
+      .from("event_needs")
+      .select(
+        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, events:event_id(id, title, starts_at, location, type)",
+      )
+      .eq("status", "open")
+      .order("last_published_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    const rows = needs ?? [];
+    if (rows.length === 0) return { needs: [] };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const needIds = rows.map((r) => r.id);
+    const { data: confirmedRows } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("need_id")
+      .in("need_id", needIds)
+      .eq("status", "confirmed");
+    const confirmedByNeed: Record<string, number> = {};
+    for (const r of confirmedRows ?? []) {
+      confirmedByNeed[r.need_id] = (confirmedByNeed[r.need_id] ?? 0) + 1;
+    }
+
+    const { data: mySignups } = await supabase
+      .from("event_need_signups")
+      .select("id, need_id, status")
+      .in("need_id", needIds)
+      .eq("user_id", userId);
+    const mySignupByNeed: Record<string, { id: string; status: string }> = {};
+    for (const s of mySignups ?? []) mySignupByNeed[s.need_id] = { id: s.id, status: s.status };
+
+    return {
+      needs: rows.map((n) => ({
+        ...n,
+        remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
+        my_signup: mySignupByNeed[n.id] ?? null,
+      })),
+    };
+  });
