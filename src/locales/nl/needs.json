@@ -36,8 +36,6 @@
     "withdrawn": "Ingetrokken"
   },
   "seats": {
-    "remaining": "{{count}} plek vrij",
-    "remaining_plural": "{{count}} plekken vrij",
     "full": "Volzet",
     "remaining_one": "{{count}} plek vrij",
     "remaining_other": "{{count}} plekken vrij"

@@ -36,8 +36,6 @@
     "withdrawn": "Retirado"
   },
   "seats": {
-    "remaining": "{{count}} lugar disponível",
-    "remaining_plural": "{{count}} lugares disponíveis",
     "full": "Completo",
     "remaining_one": "{{count}} lugar disponível",
     "remaining_other": "{{count}} lugares disponíveis"
