@@ -1,61 +1,61 @@
 {
   "templates": {
-    "ref_center": "Head referee",
-    "ref_line": "Assistant referee",
-    "delegate": "Match delegate",
-    "scoretable": "Scorer's table",
-    "timekeeper": "Timekeeper",
-    "scorer": "Scorer",
-    "shotclock_24": "24-second operator",
-    "table_secretary": "Table secretary",
-    "timekeeper_handball": "Timekeeper",
-    "line_judge": "Line judge",
-    "setup_volley": "Court setup",
-    "concession": "Concession stand",
-    "welcome": "Welcome desk",
-    "setup": "Setup",
-    "teardown": "Teardown",
-    "photographer": "Photographer",
-    "animation": "Animation",
-    "other": "Other need"
+    "ref_center": "Árbitro principal",
+    "ref_line": "Árbitro assistente",
+    "delegate": "Delegado de jogo",
+    "scoretable": "Mesa de jogo",
+    "timekeeper": "Cronometrista",
+    "scorer": "Marcador de pontos",
+    "shotclock_24": "Operador dos 24 segundos",
+    "table_secretary": "Secretário de mesa",
+    "timekeeper_handball": "Cronometrista",
+    "line_judge": "Juiz de linha",
+    "setup_volley": "Montagem do campo",
+    "concession": "Bar do clube",
+    "welcome": "Receção",
+    "setup": "Montagem",
+    "teardown": "Arrumação",
+    "photographer": "Fotógrafo",
+    "animation": "Animação",
+    "other": "Outra necessidade"
   },
   "status": {
-    "draft": "Draft",
-    "open": "Open",
-    "closed": "Closed",
-    "cancelled": "Cancelled"
+    "draft": "Rascunho",
+    "open": "Aberto",
+    "closed": "Fechado",
+    "cancelled": "Anulado"
   },
   "validationMode": {
-    "auto": "Auto-confirmation",
-    "manual": "Staff review"
+    "auto": "Confirmação automática",
+    "manual": "Validação pela equipa técnica"
   },
   "signup": {
-    "applied": "Application sent",
-    "confirmed": "Confirmed",
-    "declined": "Declined",
-    "withdrawn": "Withdrawn"
+    "applied": "Candidatura enviada",
+    "confirmed": "Confirmado",
+    "declined": "Recusado",
+    "withdrawn": "Retirado"
   },
   "seats": {
-    "remaining": "{{count}} seat left",
-    "remaining_plural": "{{count}} seats left",
-    "full": "Full"
+    "remaining": "{{count}} lugar disponível",
+    "remaining_plural": "{{count}} lugares disponíveis",
+    "full": "Completo"
   },
   "actions": {
-    "apply": "Volunteer",
-    "withdraw": "Withdraw application",
-    "confirm": "Confirm",
-    "decline": "Decline",
-    "close": "Close need",
-    "cancel": "Cancel need",
-    "publish": "Publish",
-    "republish": "Republish"
+    "apply": "Estou disponível",
+    "withdraw": "Retirar a candidatura",
+    "confirm": "Confirmar",
+    "decline": "Recusar",
+    "close": "Fechar a necessidade",
+    "cancel": "Anular a necessidade",
+    "publish": "Publicar",
+    "republish": "Republicar"
   },
   "errors": {
-    "forbidden": "Action not allowed.",
-    "capacity_reached": "All seats are already filled.",
-    "need_not_open": "This need is no longer open.",
-    "need_not_publishable": "This need cannot be published in its current state.",
-    "signup_not_found": "Application not found.",
-    "already_applied": "You have already applied."
+    "forbidden": "Ação não autorizada.",
+    "capacity_reached": "Todos os lugares já estão preenchidos.",
+    "need_not_open": "Esta necessidade já não está aberta.",
+    "need_not_publishable": "Esta necessidade não pode ser publicada neste estado.",
+    "signup_not_found": "Candidatura não encontrada.",
+    "already_applied": "Já te candidataste."
   }
 }
