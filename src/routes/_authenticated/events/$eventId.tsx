@@ -4503,7 +4503,15 @@ function EventDetail() {
           />
         )}
 
+      <EventNeedsSection
+        eventId={eventId}
+        eventType={event.type}
+        sport={eventTeam?.sport ?? null}
+        teamId={event.team_id ?? null}
+      />
+
       <EventChat eventId={eventId} />
+
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (
