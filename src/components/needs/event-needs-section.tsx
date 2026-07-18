@@ -68,6 +68,7 @@ import {
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
+import { getNeedVisual, resolveNeedLabel } from "./need-visuals";
 
 type Props = {
   eventId: string;
@@ -291,12 +292,18 @@ function NeedRow({
     return null;
   })();
 
+  const { Icon: NeedIcon, chip: needChip } = getNeedVisual(need.role_key);
+  const displayLabel = resolveNeedLabel(need, t);
+
   return (
     <div className="rounded-lg border bg-background/50 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-semibold text-foreground truncate">{need.label}</p>
+            <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0", needChip)}>
+              <NeedIcon className="h-4 w-4" />
+            </span>
+            <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
             {statusBadge}
             <Badge variant="outline" className="text-[10px]">
               {t(`needs:validationMode.${need.validation_mode}`)}
@@ -580,18 +587,22 @@ function NeedFormDialog({
             <div className="flex flex-wrap gap-1.5">
               {availableTemplates.map((tpl) => {
                 const active = tpl.key === templateKey;
+                const { Icon: TplIcon, chip } = getNeedVisual(tpl.key);
                 return (
                   <button
                     key={tpl.key}
                     type="button"
                     onClick={() => setTemplateKey(tpl.key)}
                     className={cn(
-                      "text-xs font-medium rounded-full border px-3 py-1.5 transition-colors",
+                      "inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-2.5 py-1.5 transition-colors",
                       active
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background hover:bg-muted border-border text-foreground",
                     )}
                   >
+                    <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
+                      <TplIcon className="h-3 w-3" />
+                    </span>
                     {t(`needs:templates.${tpl.key}`)}
                   </button>
                 );
