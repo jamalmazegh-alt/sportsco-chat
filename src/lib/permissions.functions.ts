@@ -107,11 +107,7 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
     await assertClubAdmin(supabase, data.club_id, userId);
 
     // Enforce incompatible role pairs
-    const INCOMPATIBLE: [string, string][] = [
-      ["coach", "assistant_coach"],
-      ["admin", "assistant_coach"],
-      ["staff", "assistant_coach"],
-    ];
+    const INCOMPATIBLE: [string, string][] = [["coach", "assistant_coach"]];
     for (const [a, b] of INCOMPATIBLE) {
       if (data.roles.includes(a as any) && data.roles.includes(b as any)) {
         throw new Response(`Roles ${a} and ${b} are incompatible`, { status: 400 });
@@ -153,21 +149,18 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
 
     const mergedRoles = mergeStaffWithNonStaffRoles(data.roles, oldRoles);
 
-    // Keep singular `role` (app_role enum: admin/coach/dirigeant/…) in sync so
-    // legacy readers see the update. Fall back to null when no compatible role.
-    const APP_ROLE_ENUM = new Set(["admin", "coach", "dirigeant"]);
-    const primary =
-      (["admin", "coach", "dirigeant"] as const).find((r) => data.roles.includes(r as any)) ??
-      (data.roles.find((r) => APP_ROLE_ENUM.has(r)) as
-        | "admin"
-        | "coach"
-        | "dirigeant"
-        | undefined);
+    // Keep singular `role` (legacy app_role enum) in sync for older readers.
+    // `assistant_coach`, `staff`, and `tournament_manager` all map to `dirigeant`.
+    const primary: "admin" | "coach" | "dirigeant" = data.roles.includes("admin")
+      ? "admin"
+      : data.roles.includes("coach")
+        ? "coach"
+        : "dirigeant";
 
-    const updatePayload: { roles: string[]; role?: "admin" | "coach" | "dirigeant" } = {
+    const updatePayload: { roles: string[]; role: "admin" | "coach" | "dirigeant" } = {
       roles: mergedRoles,
+      role: primary,
     };
-    if (primary) updatePayload.role = primary;
 
     const { error: upErr } = await supabaseAdmin
       .from("club_members")
