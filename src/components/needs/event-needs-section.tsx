@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Baby,
   IdCard,
+  Pencil,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr as frLocale, enUS as enLocale } from "date-fns/locale";
@@ -55,6 +56,7 @@ import {
   listEventNeeds,
   listStaffSignupsForNeed,
   createEventNeed,
+  updateEventNeed,
   publishEventNeed,
   applyToEventNeed,
   withdrawSignup,
@@ -111,12 +113,12 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <HandHelping className="h-4 w-4 text-primary" />
-            {t("needs.section.title")}
+            {t("needs:section.title")}
           </CardTitle>
           {isStaff && (
             <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)}>
               <Plus className="h-3.5 w-3.5 mr-1" />
-              {t("needs.section.add")}
+              {t("needs:section.add")}
             </Button>
           )}
         </div>
@@ -126,12 +128,12 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
             {missingSeats === 0 ? (
               <Badge className="bg-emerald-600 text-white">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
-                {t("needs.section.coverageAll")}
+                {t("needs:section.coverageAll")}
               </Badge>
             ) : (
               <Badge variant="outline" className="border-amber-300 text-amber-700 dark:text-amber-300">
                 <AlertCircle className="h-3 w-3 mr-1" />
-                {t("needs.section.coverageMissing", { count: missingSeats })}
+                {t("needs:section.coverageMissing", { count: missingSeats })}
               </Badge>
             )}
           </div>
@@ -139,7 +141,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
 
         {isStaff && needs.length === 0 && (
           <p className="text-xs text-muted-foreground mt-1">
-            {t("needs.section.emptyStaff")}
+            {t("needs:section.emptyStaff")}
           </p>
         )}
       </CardHeader>
@@ -150,13 +152,13 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
       </CardContent>
 
       {createOpen && (
-        <CreateNeedDialog
+        <NeedFormDialog
           open={createOpen}
           onOpenChange={setCreateOpen}
           eventId={eventId}
           sport={sport ?? null}
           teamId={teamId ?? null}
-          onCreated={refresh}
+          onSaved={refresh}
         />
       )}
     </Card>
@@ -169,6 +171,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
 
 type NeedRowType = {
   id: string;
+  role_key: string;
   label: string;
   description: string | null;
   status: string;
@@ -200,6 +203,7 @@ function NeedRow({
   const cancel = useServerFn(cancelEventNeed);
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
@@ -211,40 +215,40 @@ function NeedRow({
     onSuccess: (r: { status: string } | null | undefined) => {
       toast.success(
         r?.status === "confirmed"
-          ? t("needs.signup.confirmed")
-          : t("needs.signup.applied"),
+          ? t("needs:signup.confirmed")
+          : t("needs:signup.applied"),
       );
       onChange();
     },
     onError: (e: Error) =>
-      toast.error(t(`needs.errors.${e.message}`, { defaultValue: e.message })),
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const withdrawM = useMutation({
     mutationFn: () => withdraw({ data: { signup_id: mySignup!.id } }),
     onSuccess: () => {
-      toast.success(t("needs.signup.withdrawn"));
+      toast.success(t("needs:signup.withdrawn"));
       onChange();
     },
     onError: (e: Error) =>
-      toast.error(t(`needs.errors.${e.message}`, { defaultValue: e.message })),
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const closeM = useMutation({
     mutationFn: () => close({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs.actions.close"));
+      toast.success(t("needs:actions.close"));
       onChange();
     },
     onError: (e: Error) =>
-      toast.error(t(`needs.errors.${e.message}`, { defaultValue: e.message })),
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs.actions.cancel"));
+      toast.success(t("needs:actions.cancel"));
       onChange();
     },
     onError: (e: Error) =>
-      toast.error(t(`needs.errors.${e.message}`, { defaultValue: e.message })),
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const statusBadge = (
@@ -260,7 +264,7 @@ function NeedRow({
         status === "cancelled" && "border-red-300 text-red-700",
       )}
     >
-      {t(`needs.status.${status}`)}
+      {t(`needs:status.${status}`)}
     </Badge>
   );
 
@@ -268,7 +272,7 @@ function NeedRow({
     if (status === "draft") {
       return (
         <Badge variant="outline" className="text-[10px] text-muted-foreground">
-          {t("needs.publishedBadge.unpublished")}
+          {t("needs:publishedBadge.unpublished")}
         </Badge>
       );
     }
@@ -280,7 +284,7 @@ function NeedRow({
       const count = need.last_recipients_count ?? 0;
       return (
         <Badge variant="outline" className="text-[10px] text-muted-foreground">
-          {t("needs.publishedBadge.at", { time, count })}
+          {t("needs:publishedBadge.at", { time, count })}
         </Badge>
       );
     }
@@ -295,7 +299,7 @@ function NeedRow({
             <p className="text-sm font-semibold text-foreground truncate">{need.label}</p>
             {statusBadge}
             <Badge variant="outline" className="text-[10px]">
-              {t(`needs.validationMode.${need.validation_mode}`)}
+              {t(`needs:validationMode.${need.validation_mode}`)}
             </Badge>
             {publishedBadge}
           </div>
@@ -312,8 +316,8 @@ function NeedRow({
               </span>
               <span>
                 {remaining === 0
-                  ? t("needs.seats.full")
-                  : t("needs.seats.remaining", { count: remaining })}
+                  ? t("needs:seats.full")
+                  : t("needs:seats.remaining", { count: remaining })}
               </span>
             </span>
             {isStaff && need.applied_count > 0 && (
@@ -323,7 +327,7 @@ function NeedRow({
                 className="inline-flex items-center gap-1 text-primary underline-offset-2 hover:underline"
               >
                 <span className="tabular-nums font-semibold">{need.applied_count}</span>
-                {t("needs.pendingApplications", { count: need.applied_count })}
+                {t("needs:pendingApplications", { count: need.applied_count })}
               </button>
             )}
           </div>
@@ -343,7 +347,7 @@ function NeedRow({
                     mySignup.status === "declined" && "bg-slate-500",
                   )}
                 >
-                  {t(`needs.signup.${mySignup.status}`)}
+                  {t(`needs:signup.${mySignup.status}`)}
                 </Badge>
                 {(mySignup.status === "applied" || mySignup.status === "confirmed") && (
                   <Button
@@ -355,7 +359,7 @@ function NeedRow({
                     {withdrawM.isPending && (
                       <Loader2 className="h-3 w-3 mr-1 animate-spin" />
                     )}
-                    {t("needs.actions.withdraw")}
+                    {t("needs:actions.withdraw")}
                   </Button>
                 )}
               </>
@@ -366,7 +370,7 @@ function NeedRow({
                 disabled={applyM.isPending || remaining === 0}
               >
                 {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                {t("needs.actions.apply")}
+                {t("needs:actions.apply")}
               </Button>
             )}
           </>
@@ -377,8 +381,14 @@ function NeedRow({
               <Button size="sm" variant="default" onClick={() => setPublishOpen(true)}>
                 <Send className="h-3.5 w-3.5 mr-1" />
                 {status === "draft"
-                  ? t("needs.actions.publish")
-                  : t("needs.actions.republish")}
+                  ? t("needs:actions.publish")
+                  : t("needs:actions.republish")}
+              </Button>
+            )}
+            {status === "draft" && (
+              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-3.5 w-3.5 mr-1" />
+                {t("common.edit", { defaultValue: "Modifier" })}
               </Button>
             )}
             {status === "open" && (
@@ -388,7 +398,7 @@ function NeedRow({
                 onClick={() => closeM.mutate()}
                 disabled={closeM.isPending}
               >
-                {t("needs.actions.close")}
+                {t("needs:actions.close")}
               </Button>
             )}
             {(status === "draft" || status === "open") && (
@@ -397,12 +407,12 @@ function NeedRow({
                 variant="ghost"
                 className="text-destructive"
                 onClick={() => {
-                  if (confirm(t("needs.confirmCancel"))) cancelM.mutate();
+                  if (confirm(t("needs:confirmCancel"))) cancelM.mutate();
                 }}
                 disabled={cancelM.isPending}
               >
                 <Trash2 className="h-3.5 w-3.5 mr-1" />
-                {t("needs.actions.cancel")}
+                {t("needs:actions.cancel")}
               </Button>
             )}
           </>
@@ -426,6 +436,24 @@ function NeedRow({
           onChanged={onChange}
         />
       )}
+      {editOpen && (
+        <NeedFormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          eventId={eventId}
+          sport={null}
+          teamId={null}
+          initial={{
+            id: need.id,
+            role_key: need.role_key,
+            label: need.label,
+            description: need.description,
+            capacity: need.capacity,
+            validation_mode: need.validation_mode as "auto" | "manual",
+          }}
+          onSaved={onChange}
+        />
+      )}
     </div>
   );
 }
@@ -434,22 +462,33 @@ function NeedRow({
 /* CreateNeedDialog                                                           */
 /* -------------------------------------------------------------------------- */
 
-function CreateNeedDialog({
+function NeedFormDialog({
   open,
   onOpenChange,
   eventId,
   sport,
-  onCreated,
+  initial,
+  onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   eventId: string;
   sport: string | null;
   teamId: string | null;
-  onCreated: () => void;
+  initial?: {
+    id: string;
+    role_key: string;
+    label: string;
+    description: string | null;
+    capacity: number;
+    validation_mode: "auto" | "manual";
+  };
+  onSaved: () => void;
 }) {
   const { t } = useTranslation();
   const create = useServerFn(createEventNeed);
+  const update = useServerFn(updateEventNeed);
+  const isEdit = !!initial;
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
     const s = (sport ?? "").toLowerCase().trim();
@@ -458,42 +497,62 @@ function CreateNeedDialog({
     );
   }, [sport]);
 
-  const [templateKey, setTemplateKey] = useState<string>(availableTemplates[0]?.key ?? "other");
+  const [templateKey, setTemplateKey] = useState<string>(
+    initial?.role_key ?? availableTemplates[0]?.key ?? "other",
+  );
   const currentTpl =
     availableTemplates.find((x) => x.key === templateKey) ??
+    NEED_TEMPLATES.find((x) => x.key === templateKey) ??
     NEED_TEMPLATES.find((x) => x.key === "other")!;
 
-  const defaultLabel = t(`needs.templates.${currentTpl.key}`);
-  const [label, setLabel] = useState(defaultLabel);
-  const [description, setDescription] = useState("");
-  const [capacity, setCapacity] = useState(currentTpl.suggestedCapacity ?? 1);
+  const defaultLabel = t(`needs:templates.${currentTpl.key}`);
+  const [label, setLabel] = useState(initial?.label ?? defaultLabel);
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [capacity, setCapacity] = useState(
+    initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
+  );
   const [mode, setMode] = useState<"auto" | "manual">(
-    currentTpl.suggestedValidationMode ?? "auto",
+    initial?.validation_mode ?? currentTpl.suggestedValidationMode ?? "auto",
   );
 
   const [lastKey, setLastKey] = useState(templateKey);
-  if (lastKey !== templateKey) {
+  if (lastKey !== templateKey && !isEdit) {
     setLastKey(templateKey);
-    setLabel(t(`needs.templates.${currentTpl.key}`));
+    setLabel(t(`needs:templates.${currentTpl.key}`));
     setCapacity(currentTpl.suggestedCapacity ?? 1);
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
-  const createM = useMutation({
+  const saveM = useMutation({
     mutationFn: () =>
-      create({
-        data: {
-          event_id: eventId,
-          role_key: currentTpl.key,
-          label: label.trim() || defaultLabel,
-          description: description.trim() || null,
-          capacity,
-          validation_mode: mode,
-        },
-      }),
+      isEdit
+        ? update({
+            data: {
+              need_id: initial!.id,
+              role_key: currentTpl.key,
+              label: label.trim() || defaultLabel,
+              description: description.trim() || null,
+              capacity,
+              validation_mode: mode,
+            },
+          })
+        : create({
+            data: {
+              event_id: eventId,
+              role_key: currentTpl.key,
+              label: label.trim() || defaultLabel,
+              description: description.trim() || null,
+              capacity,
+              validation_mode: mode,
+            },
+          }),
     onSuccess: () => {
-      toast.success(t("needs.section.created"));
-      onCreated();
+      toast.success(
+        isEdit
+          ? t("common.saved", { defaultValue: "Modifications enregistrées" })
+          : t("needs:section.created"),
+      );
+      onSaved();
       onOpenChange(false);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -501,72 +560,129 @@ function CreateNeedDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("needs.section.add")}</DialogTitle>
-          <DialogDescription>{t("needs.section.createDesc")}</DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <HandHelping className="h-4 w-4 text-primary" />
+            {isEdit
+              ? t("common.edit", { defaultValue: "Modifier le besoin" })
+              : t("needs:section.add")}
+          </DialogTitle>
+          <DialogDescription>{t("needs:section.createDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div>
-            <Label>{t("needs.field.template")}</Label>
-            <Select value={templateKey} onValueChange={setTemplateKey}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTemplates.map((tpl) => (
-                  <SelectItem key={tpl.key} value={tpl.key}>
-                    {t(`needs.templates.${tpl.key}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>{t("needs.field.label")}</Label>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={120} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>{t("needs.field.capacity")}</Label>
-              <Input
-                type="number"
-                min={1}
-                max={200}
-                value={capacity}
-                onChange={(e) => setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))}
-              />
+
+        <div className="space-y-4 py-1">
+          {/* Template picker as chips (friendly) */}
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+              {t("needs:field.template")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {availableTemplates.map((tpl) => {
+                const active = tpl.key === templateKey;
+                return (
+                  <button
+                    key={tpl.key}
+                    type="button"
+                    onClick={() => setTemplateKey(tpl.key)}
+                    className={cn(
+                      "text-xs font-medium rounded-full border px-3 py-1.5 transition-colors",
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border text-foreground",
+                    )}
+                  >
+                    {t(`needs:templates.${tpl.key}`)}
+                  </button>
+                );
+              })}
             </div>
-            <div>
-              <Label>{t("needs.field.mode")}</Label>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="need-label">{t("needs:field.label")}</Label>
+            <Input
+              id="need-label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              maxLength={120}
+              placeholder={defaultLabel}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="need-capacity">{t("needs:field.capacity")}</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 shrink-0"
+                  onClick={() => setCapacity((c) => Math.max(1, c - 1))}
+                  aria-label="-"
+                >
+                  −
+                </Button>
+                <Input
+                  id="need-capacity"
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={capacity}
+                  onChange={(e) =>
+                    setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))
+                  }
+                  className="text-center font-semibold"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 shrink-0"
+                  onClick={() => setCapacity((c) => Math.min(200, c + 1))}
+                  aria-label="+"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="need-mode">{t("needs:field.mode")}</Label>
               <Select value={mode} onValueChange={(v) => setMode(v as "auto" | "manual")}>
-                <SelectTrigger>
+                <SelectTrigger id="need-mode">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="auto">{t("needs.validationMode.auto")}</SelectItem>
-                  <SelectItem value="manual">{t("needs.validationMode.manual")}</SelectItem>
+                  <SelectItem value="auto">{t("needs:validationMode.auto")}</SelectItem>
+                  <SelectItem value="manual">{t("needs:validationMode.manual")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div>
-            <Label>{t("needs.field.description")}</Label>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="need-desc">{t("needs:field.description")}</Label>
             <Textarea
+              id="need-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={2000}
               rows={3}
+              placeholder={t("needs:field.description")}
             />
           </div>
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel", { defaultValue: "Annuler" })}
           </Button>
-          <Button onClick={() => createM.mutate()} disabled={createM.isPending}>
-            {createM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {t("common.create", { defaultValue: "Créer" })}
+          <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
+            {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+            {isEdit
+              ? t("common.save", { defaultValue: "Enregistrer" })
+              : t("common.create", { defaultValue: "Créer" })}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -697,10 +813,10 @@ function PublishDialog({
     mutationFn: () => publish({ data: { need_id: needId, audiences } }),
     onSuccess: (r: { recipients_count: number; was_idempotent_skip: boolean } | null | undefined) => {
       if (r?.was_idempotent_skip) {
-        toast.success(t("needs.publish.successIdempotent"));
+        toast.success(t("needs:publish.successIdempotent"));
       } else {
         toast.success(
-          t("needs.publish.success", { count: r?.recipients_count ?? 0 }),
+          t("needs:publish.success", { count: r?.recipients_count ?? 0 }),
         );
       }
       onPublished();
@@ -713,8 +829,8 @@ function PublishDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("needs.publish.title")}</DialogTitle>
-          <DialogDescription>{t("needs.publish.desc")}</DialogDescription>
+          <DialogTitle>{t("needs:publish.title")}</DialogTitle>
+          <DialogDescription>{t("needs:publish.desc")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -729,7 +845,7 @@ function PublishDialog({
                   checked={selected.has(opt.key)}
                   onCheckedChange={() => toggleScalar(opt.key)}
                 />
-                <span className="text-sm">{t(`needs.audiences.${opt.key}`)}</span>
+                <span className="text-sm">{t(`needs:audiences.${opt.key}`)}</span>
               </label>
             ))}
           </div>
@@ -738,7 +854,7 @@ function PublishDialog({
           {ctx && ctx.groups.length > 0 && (
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("needs.audiences.club_group")}
+                {t("needs:audiences.club_group")}
               </Label>
               <div className="mt-1.5 space-y-1">
                 {ctx.groups.map((g: { id: string; name: string }) => (
@@ -761,7 +877,7 @@ function PublishDialog({
           {ctx && ctx.teams.length > 0 && (
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("needs.publish.chooseTeam")}
+                {t("needs:publish.chooseTeam")}
               </Label>
               <div className="mt-1.5 space-y-1.5">
                 {ctx.teams.map((tm: { id: string; name: string }) => (
@@ -782,7 +898,7 @@ function PublishDialog({
                                 checked={active}
                                 onCheckedChange={() => toggleTeam(tm.id, kind)}
                               />
-                              <span>{t(`needs.audiences.${kind}`)}</span>
+                              <span>{t(`needs:audiences.${kind}`)}</span>
                             </label>
                           );
                         },
@@ -798,14 +914,14 @@ function PublishDialog({
           {ctx && ctx.categories.length > 0 && (
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("needs.audiences.category_educators")}
+                {t("needs:audiences.category_educators")}
               </Label>
               <Select
                 value={category || "__none"}
                 onValueChange={(v) => setCategory(v === "__none" ? "" : v)}
               >
                 <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder={t("needs.publish.chooseCategory")} />
+                  <SelectValue placeholder={t("needs:publish.chooseCategory")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">—</SelectItem>
@@ -831,15 +947,15 @@ function PublishDialog({
             {previewLoading ? (
               <span className="inline-flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                {t("needs.publish.previewLoading")}
+                {t("needs:publish.previewLoading")}
               </span>
             ) : audiences.length === 0 || (previewCount ?? 0) === 0 ? (
               <span className="text-amber-800 dark:text-amber-200">
-                {t("needs.publish.previewNone")}
+                {t("needs:publish.previewNone")}
               </span>
             ) : (
               <span className="text-emerald-800 dark:text-emerald-200 font-medium">
-                {t("needs.publish.preview", { count: previewCount ?? 0 })}
+                {t("needs:publish.preview", { count: previewCount ?? 0 })}
               </span>
             )}
           </div>
@@ -858,7 +974,7 @@ function PublishDialog({
             }
           >
             {publishM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {t("needs.actions.publish")}
+            {t("needs:actions.publish")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -927,7 +1043,7 @@ function StaffSignupsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("needs.staff.title")}</DialogTitle>
+          <DialogTitle>{t("needs:staff.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {((data?.signups ?? []) as StaffSignup[]).map((s) => (
@@ -952,18 +1068,18 @@ function StaffSignupsDialog({
                   ))}
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {t(`needs.signup.${s.status}`)}
+                  {t(`needs:signup.${s.status}`)}
                 </p>
                 {s.license_number && (
                   <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1">
                     <IdCard className="h-3 w-3" />
-                    {t("needs.staff.license", { n: s.license_number })}
+                    {t("needs:staff.license", { n: s.license_number })}
                   </p>
                 )}
                 {s.is_minor && s.status === "applied" && (
                   <p className="text-[11px] mt-1 inline-flex items-center gap-1 text-amber-700 dark:text-amber-300">
                     <Baby className="h-3 w-3" />
-                    {t("needs.staff.minorPending")}
+                    {t("needs:staff.minorPending")}
                   </p>
                 )}
                 {s.comment && (
@@ -994,7 +1110,7 @@ function StaffSignupsDialog({
           ))}
           {((data?.signups ?? []) as StaffSignup[]).length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">
-              {t("needs.staff.empty")}
+              {t("needs:staff.empty")}
             </p>
           )}
         </div>

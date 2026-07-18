@@ -34,11 +34,11 @@ function NeedsFeedPage() {
       <div className="flex items-center gap-2">
         <HandHelping className="h-5 w-5 text-primary" />
         <h1 className="text-xl font-extrabold tracking-tight">
-          {t("needs.feed.title", { defaultValue: "Coups de main" })}
+          {t("needs:feed.title", { defaultValue: "Coups de main" })}
         </h1>
       </div>
       <p className="text-sm text-muted-foreground">
-        {t("needs.feed.desc", {
+        {t("needs:feed.desc", {
           defaultValue:
             "Besoins ouverts qui vous sont adressés. Cliquez pour candidater depuis la page de l'évènement.",
         })}
@@ -49,7 +49,7 @@ function NeedsFeedPage() {
       {!isLoading && needs.length === 0 && (
         <Card>
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            {t("needs.feed.empty", { defaultValue: "Aucun besoin ouvert pour vous en ce moment." })}
+            {t("needs:feed.empty", { defaultValue: "Aucun besoin ouvert pour vous en ce moment." })}
           </CardContent>
         </Card>
       )}
@@ -81,12 +81,12 @@ function NeedsFeedPage() {
                 <span className="inline-flex items-center gap-1 text-muted-foreground">
                   <Users className="h-3.5 w-3.5" />
                   {n.remaining_seats === 0
-                    ? t("needs.seats.full")
-                    : t("needs.seats.remaining", { count: n.remaining_seats })}
+                    ? t("needs:seats.full")
+                    : t("needs:seats.remaining", { count: n.remaining_seats })}
                 </span>
                 {n.my_signup && (
                   <Badge variant="outline" className="text-[10px]">
-                    {t(`needs.signup.${n.my_signup.status}`)}
+                    {t(`needs:signup.${n.my_signup.status}`)}
                   </Badge>
                 )}
               </CardContent>
