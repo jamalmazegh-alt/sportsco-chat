@@ -531,9 +531,7 @@ function TeamDetail() {
     return data.publicUrl;
   }
 
-  async function sendInvitesForPlayer(
-    playerId: string,
-  ): Promise<{
+  async function sendInvitesForPlayer(playerId: string): Promise<{
     sent: number;
     failed: number;
     skipped: number;
