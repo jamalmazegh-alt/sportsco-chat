@@ -63,9 +63,11 @@ import {
   removeClubGroupRule,
   getGroupResolvedCount,
   previewAudienceCount,
+  previewGroupRuleDetails,
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+
 
 
 export const Route = createFileRoute("/_authenticated/admin/groups")({
@@ -989,9 +991,9 @@ function GroupMembersPanel({
         rule={previewRule}
         ruleLabel={previewRule ? ruleLabel(previewRule) : ""}
         clubId={clubId}
-        allMembers={allMembers}
         onClose={() => setPreviewRule(null)}
       />
+
     </div>
   );
 }
@@ -1021,41 +1023,41 @@ function RulePreviewDialog({
   rule,
   ruleLabel,
   clubId,
-  allMembers,
   onClose,
 }: {
   rule: RuleRow | null;
   ruleLabel: string;
   clubId: string;
-  allMembers: ClubMemberRow[];
   onClose: () => void;
+
 }) {
   const { t } = useTranslation();
-  const previewFn = useServerFn(previewAudienceCount);
+  const detailsFn = useServerFn(previewGroupRuleDetails);
 
   const previewQ = useQuery({
-    queryKey: ["group-rule-preview", rule?.id, clubId],
+    queryKey: ["group-rule-details", rule?.id, clubId],
     enabled: !!rule,
     queryFn: async () => {
-      const spec = rule ? ruleToSpec(rule) : null;
-      if (!spec) return { count: 0, user_ids: [] as string[] };
-      return await previewFn({ data: { club_id: clubId, spec: [spec] } });
+      if (!rule) return { rows: [] };
+      return await detailsFn({
+        data: {
+          club_id: clubId,
+          rule: {
+            type: rule.rule_type,
+            team_id: rule.team_id ?? null,
+            category: rule.category ?? null,
+          },
+        },
+      });
     },
   });
 
-  const byUserId = useMemo(() => {
-    const m = new Map<string, ClubMemberRow>();
-    for (const cm of allMembers) if (cm.user_id) m.set(cm.user_id, cm);
-    return m;
-  }, [allMembers]);
-
   const rows = useMemo(() => {
-    const ids = previewQ.data?.user_ids ?? [];
-    return ids
-      .map((uid) => byUserId.get(uid))
-      .filter((x): x is ClubMemberRow => !!x)
-      .sort((a, b) => displayName(a).localeCompare(displayName(b)));
-  }, [previewQ.data, byUserId]);
+    const list = previewQ.data?.rows ?? [];
+    return [...list].sort((a, b) =>
+      (a.full_name ?? "").localeCompare(b.full_name ?? ""),
+    );
+  }, [previewQ.data]);
 
   return (
     <Dialog open={!!rule} onOpenChange={(o) => !o && onClose()}>
@@ -1083,17 +1085,37 @@ function RulePreviewDialog({
           </p>
         ) : (
           <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
-            {rows.map((m) => (
-              <li key={m.id} className="flex flex-col gap-1 px-3 py-2">
-                <span className="text-sm font-medium truncate">{displayName(m)}</span>
-                <ParentSubtitle children_names={m.children_names} />
+            {rows.map((m, idx) => (
+              <li
+                key={`${m.user_id ?? "noacct"}-${m.email ?? ""}-${idx}`}
+                className="flex flex-col gap-1 px-3 py-2"
+              >
+                <span className="text-sm font-medium truncate">
+                  {m.full_name?.trim() || m.email || "—"}
+                </span>
+                {m.subtitle ? (
+                  <span className="text-xs text-muted-foreground truncate">
+                    {m.subtitle}
+                  </span>
+                ) : null}
+                {m.email ? (
+                  <span className="text-xs text-muted-foreground truncate">
+                    {m.email}
+                  </span>
+                ) : null}
                 <div className="flex flex-wrap gap-1">
-                  <RoleBadges roles={m.roles} fallback={m.role} />
+                  <RoleBadges roles={m.roles ?? []} fallback={null} />
+                  {!m.user_id ? (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] py-0 h-4 border-amber-300 text-amber-700 dark:text-amber-300 dark:border-amber-700/60"
+                    >
+                      {t("groups.emailOnly", { defaultValue: "email uniquement" })}
+                    </Badge>
+                  ) : null}
                 </div>
               </li>
             ))}
-
-
           </ul>
         )}
 
@@ -1107,4 +1129,5 @@ function RulePreviewDialog({
     </Dialog>
   );
 }
+
 
