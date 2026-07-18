@@ -587,18 +587,22 @@ function NeedFormDialog({
             <div className="flex flex-wrap gap-1.5">
               {availableTemplates.map((tpl) => {
                 const active = tpl.key === templateKey;
+                const { Icon: TplIcon, chip } = getNeedVisual(tpl.key);
                 return (
                   <button
                     key={tpl.key}
                     type="button"
                     onClick={() => setTemplateKey(tpl.key)}
                     className={cn(
-                      "text-xs font-medium rounded-full border px-3 py-1.5 transition-colors",
+                      "inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-2.5 py-1.5 transition-colors",
                       active
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background hover:bg-muted border-border text-foreground",
                     )}
                   >
+                    <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
+                      <TplIcon className="h-3 w-3" />
+                    </span>
                     {t(`needs:templates.${tpl.key}`)}
                   </button>
                 );
