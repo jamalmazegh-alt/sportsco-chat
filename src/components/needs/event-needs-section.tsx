@@ -254,11 +254,19 @@ function NeedRow({
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs:actions.cancel"));
+      toast.success(t("needs:cancel.done", { defaultValue: "Besoin annulé" }));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => {
+      console.error("[needs] cancel failed", e);
+      toast.error(
+        t(`needs:errors.${e.message}`, {
+          defaultValue: t("needs:errors.cancelFailed", {
+            defaultValue: "Impossible d'annuler le besoin. Réessaie dans un instant.",
+          }),
+        }),
+      );
+    },
   });
 
   const statusBadge = (
