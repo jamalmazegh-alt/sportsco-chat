@@ -346,16 +346,26 @@ function NeedRow({
                   : t("needs:seats.remaining", { count: remaining })}
               </span>
             </span>
-            {isStaff && need.applied_count > 0 && (
-              <button
-                type="button"
-                onClick={() => setStaffOpen(true)}
-                className="inline-flex items-center gap-1 text-primary underline-offset-2 hover:underline"
-              >
-                <span className="tabular-nums font-semibold">{need.applied_count}</span>
-                {t("needs:pendingApplications", { count: need.applied_count })}
-              </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {isStaff && status === "open" && (
+          <Button
+            size="sm"
+            variant={need.applied_count > 0 ? "default" : "outline"}
+            onClick={() => setStaffOpen(true)}
+          >
+            <Users className="h-3.5 w-3.5 mr-1" />
+            {need.applied_count > 0
+              ? t("needs:pendingApplications", { count: need.applied_count })
+              : t("needs:actions.viewSignups", { defaultValue: "Voir candidatures" })}
+            {need.applied_count > 0 && (
+              <span className="ml-1 tabular-nums font-semibold">({need.applied_count})</span>
             )}
+          </Button>
+        )}
           </div>
         </div>
       </div>
