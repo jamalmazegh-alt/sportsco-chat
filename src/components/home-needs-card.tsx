@@ -169,7 +169,7 @@ export function HomeNeedsCard() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-7 px-2 text-[11px] text-muted-foreground"
+                      className="h-7 px-2 text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
                       onClick={(e) => {
                         e.preventDefault();
                         dismiss(n.id);
