@@ -117,5 +117,10 @@
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
-  "confirmCancel": "Cancel this need?"
+  "cancelDialog": {
+    "title": "Cancel this need?",
+    "description": "This action is final. Pending applicants and confirmed volunteers will be notified.",
+    "confirm": "Yes, cancel",
+    "abort": "No, keep it"
+  }
 }
