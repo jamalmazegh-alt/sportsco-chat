@@ -363,10 +363,10 @@ describeIfPg("advisory-lock guarantee (concurrent replays)", () => {
     } finally {
       try {
         await c1.query("ROLLBACK");
-      } catch {}
+      } catch { /* ignore */ }
       try {
         await c2.query("ROLLBACK");
-      } catch {}
+      } catch { /* ignore */ }
       await c1.end();
       await c2.end();
     }
@@ -417,10 +417,10 @@ describeIfPg("advisory-lock guarantee (concurrent replays)", () => {
     } finally {
       try {
         await c1.query("ROLLBACK");
-      } catch {}
+      } catch { /* ignore */ }
       try {
         await c2.query("ROLLBACK");
-      } catch {}
+      } catch { /* ignore */ }
       await c1.end();
       await c2.end();
     }
