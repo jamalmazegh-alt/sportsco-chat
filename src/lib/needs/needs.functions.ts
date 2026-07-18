@@ -497,13 +497,21 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const rows = needs ?? [];
     if (rows.length === 0) {
       // Pas de besoin encore : on doit quand même dire si l'appelant est staff,
-      // pour afficher le bouton "Ajouter" côté UI. On résout le club via l'event.
+      // pour afficher le bouton "Ajouter" côté UI. Le club est résolu via l'équipe de l'event.
       const { data: ev } = await supabase
         .from("events")
-        .select("club_id")
+        .select("team_id")
         .eq("id", data.event_id)
         .maybeSingle();
-      const clubId = ev?.club_id ?? null;
+      let clubId: string | null = null;
+      if (ev?.team_id) {
+        const { data: team } = await supabase
+          .from("teams")
+          .select("club_id")
+          .eq("id", ev.team_id)
+          .maybeSingle();
+        clubId = team?.club_id ?? null;
+      }
       const { data: isStaff } = clubId
         ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
         : { data: false };
