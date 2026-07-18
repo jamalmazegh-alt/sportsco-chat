@@ -7024,6 +7024,16 @@ export type Database = {
         }
       }
       current_user_has_tournament_collab: { Args: never; Returns: boolean }
+      decide_signup_atomic: {
+        Args: { _actor: string; _decision: string; _signup_id: string }
+        Returns: {
+          applicant_user_id: string
+          event_id: string
+          need_id: string
+          new_status: string
+          signup_id: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -7339,6 +7349,16 @@ export type Database = {
         }[]
       }
       privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }
+      publish_event_need_atomic: {
+        Args: { _actor: string; _audiences: Json; _need_id: string }
+        Returns: {
+          publication_id: string
+          recipient_user_ids: string[]
+          recipients_count: number
+          status: string
+          was_idempotent_skip: boolean
+        }[]
+      }
       purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
