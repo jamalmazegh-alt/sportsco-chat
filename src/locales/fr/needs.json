@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "ref_center": "Arbitre central",
+    "ref_line": "Arbitre de touche",
+    "delegate": "Délégué de match",
+    "scoretable": "Table de marque",
+    "timekeeper": "Chronométreur",
+    "scorer": "Marqueur",
+    "shotclock_24": "Opérateur 24 secondes",
+    "table_secretary": "Secrétaire de table",
+    "timekeeper_handball": "Chronométreur",
+    "line_judge": "Juge de ligne",
+    "setup_volley": "Montage terrain",
+    "concession": "Buvette",
+    "welcome": "Accueil",
+    "setup": "Installation",
+    "teardown": "Rangement",
+    "photographer": "Photographe",
+    "animation": "Animation",
+    "other": "Autre besoin"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "cancelled": "Annulé"
+  },
+  "validationMode": {
+    "auto": "Confirmation automatique",
+    "manual": "Validation par le staff"
+  },
+  "signup": {
+    "applied": "Candidature envoyée",
+    "confirmed": "Confirmé",
+    "declined": "Décliné",
+    "withdrawn": "Retiré"
+  },
+  "seats": {
+    "remaining": "{{count}} place restante",
+    "remaining_plural": "{{count}} places restantes",
+    "full": "Complet"
+  },
+  "actions": {
+    "apply": "Je me propose",
+    "withdraw": "Retirer ma candidature",
+    "confirm": "Confirmer",
+    "decline": "Décliner",
+    "close": "Fermer le besoin",
+    "cancel": "Annuler le besoin",
+    "publish": "Publier",
+    "republish": "Republier"
+  },
+  "errors": {
+    "forbidden": "Action non autorisée.",
+    "capacity_reached": "Toutes les places sont déjà pourvues.",
+    "need_not_open": "Ce besoin n'est plus ouvert.",
+    "need_not_publishable": "Ce besoin ne peut pas être publié dans cet état.",
+    "signup_not_found": "Candidature introuvable.",
+    "already_applied": "Tu as déjà candidaté."
+  }
+}
