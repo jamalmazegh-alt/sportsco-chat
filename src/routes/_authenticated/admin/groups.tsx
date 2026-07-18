@@ -63,9 +63,11 @@ import {
   removeClubGroupRule,
   getGroupResolvedCount,
   previewAudienceCount,
+  previewGroupRuleDetails,
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+
 
 
 export const Route = createFileRoute("/_authenticated/admin/groups")({
