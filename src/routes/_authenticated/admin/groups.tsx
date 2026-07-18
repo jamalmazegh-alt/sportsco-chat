@@ -628,6 +628,17 @@ function GroupMembersPanel({
     [membersQ.data],
   );
 
+  const childrenByUserId = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const cm of allMembers) {
+      if (cm.user_id && cm.children_names && cm.children_names.length > 0) {
+        m.set(cm.user_id, cm.children_names);
+      }
+    }
+    return m;
+  }, [allMembers]);
+
+
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["club-group-members", groupId] });
     qc.invalidateQueries({ queryKey: ["club-group-rules", groupId] });
