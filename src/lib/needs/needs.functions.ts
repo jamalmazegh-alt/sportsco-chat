@@ -151,8 +151,8 @@ export const publishEventNeed = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // 1) Vérifier que l'appelant est staff du club portant ce besoin. La RLS
-    //    l'imposerait quand même sur les UPDATE, mais on veut un refus explicite.
+    // Défense en profondeur : la RPC re-vérifie is_club_staff sous verrou,
+    // mais on refuse tôt côté client pour un message clair.
     const need = await loadNeedCore(data.need_id);
     const { data: isStaff } = await supabase.rpc("is_club_staff", {
       _user_id: userId,
@@ -160,148 +160,47 @@ export const publishEventNeed = createServerFn({ method: "POST" })
     });
     if (!isStaff) throw new Error("forbidden");
 
-    // 2) Résolution des audiences en service_role — le resolver gère la garde
-    //    interne (club_id lisible seulement par staff/service_role).
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const allUserIds = new Set<string>();
-    for (const selector of data.audiences) {
-      const { data: rows, error } = await supabaseAdmin.rpc("resolve_audience_members", {
-        _club_id: need.club_id,
-        _spec: [selector],
-      });
-      if (error) {
-        console.error("[publishEventNeed] resolve failed", { selector, error });
-        throw new Error(`resolve_audience_members failed: ${error.message}`);
-      }
-      for (const r of (rows ?? []) as Array<{ user_id: string | null }>) {
-        if (r.user_id) allUserIds.add(r.user_id);
-      }
-    }
-
-    const userIds = [...allUserIds];
-    if (userIds.length === 0) {
-      // On publie quand même (draft→open) : un besoin sans destinataire peut
-      // devenir visible plus tard via une reprise/relance. Mais on trace.
-      console.warn("[publishEventNeed] audience resolved empty", { needId: data.need_id });
-    }
-
-    // 3) Map user_id -> club_members.id (member_id NOT NULL sur recipients).
-    let memberByUser = new Map<string, string>();
-    if (userIds.length > 0) {
-      const { data: members, error: mErr } = await supabaseAdmin
-        .from("club_members")
-        .select("id, user_id")
-        .eq("club_id", need.club_id)
-        .in("user_id", userIds);
-      if (mErr) throw new Error(mErr.message);
-      memberByUser = new Map(
-        (members ?? [])
-          .filter((m) => m.user_id)
-          .map((m) => [m.user_id as string, m.id as string]),
-      );
-    }
-
-    // 4) Transaction : audiences (idempotent), publication, recipients, status='open'.
-    //    Note : Supabase JS n'expose pas les transactions ; on chaîne
-    //    les inserts en service_role et on nettoie si un pas échoue.
-    //    L'invariant "notification après commit" est respecté car le dispatch
-    //    n'est appelé qu'après le UPDATE final de status.
-    // 4a) Snapshot des audience-selectors (utile pour l'UI et l'audit).
-    await supabaseAdmin
-      .from("event_need_audiences")
-      .delete()
-      .eq("need_id", data.need_id);
-    if (data.audiences.length > 0) {
-      const audienceRows = data.audiences.map((sel) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const s = sel as any;
-        return {
-          need_id: data.need_id,
-          audience_type: s.type,
-          group_id: s.group_id ?? null,
-          team_id: s.team_id ?? null,
-          category: s.category ?? null,
-          created_by: userId,
-        };
-      });
-      const { error: audErr } = await supabaseAdmin
-        .from("event_need_audiences")
-        .insert(audienceRows);
-      if (audErr) {
-        console.error("[publishEventNeed] audiences insert failed", audErr);
-        throw new Error(audErr.message);
-      }
-    }
-
-    // 4b) Publication row.
-    const { data: pub, error: pubErr } = await supabaseAdmin
-      .from("event_need_publications")
-      .insert({
-        need_id: data.need_id,
-        published_by: userId,
-        recipients_count: memberByUser.size,
-      })
-      .select("id")
-      .single();
-    if (pubErr) throw new Error(pubErr.message);
-
-    // 4c) Recipients.
-    if (memberByUser.size > 0) {
-      const rcpRows = [...memberByUser.entries()].map(([uid, mid]) => ({
-        publication_id: pub.id,
-        member_id: mid,
-        user_id: uid,
-      }));
-      // Chunk pour éviter d'exploser la requête si audience très large.
-      const chunkSize = 500;
-      for (let i = 0; i < rcpRows.length; i += chunkSize) {
-        const { error: rcpErr } = await supabaseAdmin
-          .from("event_need_publication_recipients")
-          .insert(rcpRows.slice(i, i + chunkSize));
-        if (rcpErr) {
-          // Nettoyage best-effort : on annule la publication pour ne pas laisser
-          // un state incohérent (publication sans recipients).
-          await supabaseAdmin.from("event_need_publications").delete().eq("id", pub.id);
-          throw new Error(rcpErr.message);
-        }
-      }
-    }
-
-    // 4d) Passage draft → open (l'invariant 4 sur le CHECK status l'autorise).
-    const nowIso = new Date().toISOString();
-    const { error: statusErr } = await supabaseAdmin
-      .from("event_needs")
-      .update({
-        status: "open",
-        first_published_at: need.status === "draft" ? nowIso : undefined,
-        last_published_at: nowIso,
-      })
-      .eq("id", data.need_id);
-    if (statusErr) {
-      // On garde la publication même si le passage open échoue — mais on
-      // remonte l'erreur ; l'UI pourra relancer la republication.
-      throw new Error(statusErr.message);
-    }
-
-    // 5) COMMIT effectif ici (toutes les writes admin sont individuelles →
-    //    déjà commit). Dispatch APRÈS.
-    const { dispatchEventNeedPublication } = await import("./dispatch.server");
-    // Fire-and-forget : on ne bloque pas la réponse UI sur push/email.
-    void dispatchEventNeedPublication({
-      needId: data.need_id,
-      publicationId: pub.id,
-      recipientUserIds: [...memberByUser.keys()],
-    }).catch((e) => {
-      console.error("[publishEventNeed] dispatch failed", e);
+    // Transaction atomique : verrou event_needs, résolution audiences,
+    // audiences/publication/recipients/open en un bloc, idempotence <15 s.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error } = await supabase.rpc("publish_event_need_atomic" as any, {
+      _need_id: data.need_id,
+      _actor: userId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _audiences: data.audiences as any,
     });
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      publication_id: string;
+      recipients_count: number;
+      recipient_user_ids: string[] | null;
+      was_idempotent_skip: boolean;
+      status: string;
+    } | null;
+    if (!row) throw new Error("publish_failed");
 
-    // 6) Recompute coverage (transition possible : open_needs_count passe de 0 → 1+).
+    // Dispatch UNIQUEMENT si nouvelle publication (idempotence double-tap).
+    if (!row.was_idempotent_skip && (row.recipient_user_ids?.length ?? 0) > 0) {
+      const { dispatchEventNeedPublication } = await import("./dispatch.server");
+      try {
+        await dispatchEventNeedPublication({
+          needId: data.need_id,
+          publicationId: row.publication_id,
+          recipientUserIds: row.recipient_user_ids ?? [],
+        });
+      } catch (e) {
+        console.error("[publishEventNeed] dispatch failed", e);
+      }
+    }
+
+    // Recompute coverage après commit.
     await recomputeCoverageServiceRole(need.event_id);
 
     return {
-      publication_id: pub.id,
-      recipients_count: memberByUser.size,
-      status: "open" as const,
+      publication_id: row.publication_id,
+      recipients_count: row.recipients_count,
+      status: row.status,
+      was_idempotent_skip: row.was_idempotent_skip,
     };
   });
 
