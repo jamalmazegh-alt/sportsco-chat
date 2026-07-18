@@ -120,7 +120,9 @@ export interface NotifyStaffOfSignupParams {
 export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
-    .select("id, label, club_id, event_id")
+    .select(
+      "id, label, club_id, event_id, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name))",
+    )
     .eq("id", params.needId)
     .maybeSingle();
   if (!need) return;
@@ -148,9 +150,36 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
 
   if (staffUserIds.length === 0) return;
 
+  // Fetch applicant profile for first name.
+  const { data: applicantProfile } = await supabaseAdmin
+    .from("profiles")
+    .select("first_name")
+    .eq("id", params.applicantUserId)
+    .maybeSingle();
+  const applicantFirstName = (applicantProfile?.first_name as string | null) ?? "Quelqu'un";
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ev = (need as any).events;
+  const eventTitle = (ev?.title as string) ?? "Événement";
+  const isMatch = (ev?.type as string) === "match";
+  const opponent = (ev?.opponent as string | null) ?? null;
+  const teamName = (ev?.teams?.name as string | null) ?? null;
+  const isHome = ev?.is_home as boolean | null | undefined;
+
+  let matchLine = eventTitle;
+  if (isMatch && teamName) {
+    const homeTeam = isHome === false ? opponent : teamName;
+    const awayTeam = isHome === false ? teamName : opponent;
+    if (opponent) {
+      matchLine = `${homeTeam} vs ${awayTeam}`;
+    } else {
+      matchLine = `Match — ${teamName}`;
+    }
+  }
+
   const { sendPushToUser } = await import("@/lib/push-send.server");
-  const title = params.status === "confirmed" ? `Nouveau volontaire confirmé` : `Nouvelle candidature`;
-  const body = `${need.label}`;
+  const title = params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
+  const body = `${matchLine} — ${applicantFirstName}`;
   await Promise.allSettled(
     staffUserIds.map((uid) =>
       sendPushToUser(uid, {
