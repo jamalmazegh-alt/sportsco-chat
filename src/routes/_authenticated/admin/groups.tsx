@@ -121,6 +121,54 @@ function useRoleLabel() {
   };
 }
 
+const ROLE_COLORS: Record<string, string> = {
+  admin:
+    "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800/60",
+  coach:
+    "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-800/60",
+  assistant_coach:
+    "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-900/40 dark:text-sky-200 dark:border-sky-800/60",
+  staff:
+    "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/40 dark:text-purple-200 dark:border-purple-800/60",
+  dirigeant:
+    "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-800/60",
+  tournament_manager:
+    "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/40 dark:text-orange-200 dark:border-orange-800/60",
+  financial_admin:
+    "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-200 dark:border-emerald-800/60",
+  player:
+    "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/40 dark:text-teal-200 dark:border-teal-800/60",
+  parent:
+    "bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/40 dark:text-pink-200 dark:border-pink-800/60",
+};
+
+function RoleBadges({
+  roles,
+  fallback,
+}: {
+  roles: string[] | null | undefined;
+  fallback: string | null;
+}) {
+  const { t } = useTranslation();
+  const list = (roles && roles.length > 0 ? roles : fallback ? [fallback] : []).filter(
+    (r, i, arr) => r && arr.indexOf(r) === i,
+  );
+  if (list.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1 shrink-0">
+      {list.map((r) => (
+        <Badge
+          key={r}
+          variant="outline"
+          className={`text-[10px] border ${ROLE_COLORS[r] ?? "bg-muted text-muted-foreground border-border"}`}
+        >
+          {t(`roles.${r}`, { defaultValue: r })}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
 function GroupsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
