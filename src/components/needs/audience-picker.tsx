@@ -122,7 +122,7 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
   };
 
   return {
-    state: { scalar, groupIds, teamPicks, category },
+    state,
     controls: { toggleScalar, toggleGroup, toggleTeam, setCategory },
     buildAudiences,
   };
