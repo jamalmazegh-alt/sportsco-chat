@@ -68,6 +68,7 @@ import {
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
+import { getNeedVisual, resolveNeedLabel } from "./need-visuals";
 
 type Props = {
   eventId: string;
