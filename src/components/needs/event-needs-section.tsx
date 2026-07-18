@@ -1077,6 +1077,8 @@ function StaffSignupsDialog({
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
+  const searchFn = useServerFn(searchClubMembersForNeed);
+  const addManual = useServerFn(staffAddManualSignup);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -1098,6 +1100,34 @@ function StaffSignupsDialog({
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [addPendingUser, setAddPendingUser] = useState<string | null>(null);
+
+  const { data: memberResults, isFetching: memberSearchLoading } = useQuery({
+    queryKey: ["need-add-members", needId, searchText],
+    queryFn: () => searchFn({ data: { need_id: needId, search: searchText } }),
+    enabled: open && addOpen,
+    staleTime: 15_000,
+  });
+
+  const addManualM = useMutation({
+    mutationFn: (user_id: string) => addManual({ data: { need_id: needId, user_id } }),
+    onMutate: (uid) => setAddPendingUser(uid),
+    onSettled: () => setAddPendingUser(null),
+    onSuccess: (r: { already?: boolean } | null | undefined) => {
+      toast.success(
+        r?.already
+          ? t("needs:staff.alreadyConfirmed", { defaultValue: "Déjà confirmé" })
+          : t("needs:staff.manualAdded", { defaultValue: "Personne ajoutée" }),
+      );
+      refetch();
+      onChanged();
+      qc.invalidateQueries({ queryKey: ["need-add-members", needId] });
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
 
   const signups = (data?.signups ?? []) as StaffSignup[];
   const pending = signups.filter((s) => s.status === "applied");
