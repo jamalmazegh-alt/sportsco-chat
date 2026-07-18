@@ -114,6 +114,7 @@ import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_aut
 import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
+import { Route as AuthenticatedAdminGroupsRouteImport } from './routes/_authenticated/admin/groups'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as StagesClubSlugCampSlugIndexRouteImport } from './routes/stages.$clubSlug.$campSlug.index'
@@ -725,6 +726,12 @@ const AuthenticatedClubDisciplineRoute =
     path: '/club/discipline',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminGroupsRoute =
+  AuthenticatedAdminGroupsRouteImport.update({
+    id: '/groups',
+    path: '/groups',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminBillingRoute =
   AuthenticatedAdminBillingRouteImport.update({
     id: '/billing',
@@ -1123,6 +1130,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/': typeof SuperadminIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/admin/groups': typeof AuthenticatedAdminGroupsRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1280,6 +1288,7 @@ export interface FileRoutesByTo {
   '/superadmin': typeof SuperadminIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/admin/groups': typeof AuthenticatedAdminGroupsRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1444,6 +1453,7 @@ export interface FileRoutesById {
   '/superadmin/': typeof SuperadminIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/_authenticated/admin/groups': typeof AuthenticatedAdminGroupsRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1608,6 +1618,7 @@ export interface FileRouteTypes {
     | '/superadmin/'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
+    | '/admin/groups'
     | '/club/discipline'
     | '/events/$eventId'
     | '/payments/family'
@@ -1765,6 +1776,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
+    | '/admin/groups'
     | '/club/discipline'
     | '/events/$eventId'
     | '/payments/family'
@@ -1928,6 +1940,7 @@ export interface FileRouteTypes {
     | '/superadmin/'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/billing'
+    | '/_authenticated/admin/groups'
     | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/payments/family'
@@ -2849,6 +2862,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClubDisciplineRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/groups': {
+      id: '/_authenticated/admin/groups'
+      path: '/groups'
+      fullPath: '/admin/groups'
+      preLoaderRoute: typeof AuthenticatedAdminGroupsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/billing': {
       id: '/_authenticated/admin/billing'
       path: '/billing'
@@ -3246,6 +3266,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
+  AuthenticatedAdminGroupsRoute: typeof AuthenticatedAdminGroupsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminCampsCampIdRoute: typeof AuthenticatedAdminCampsCampIdRoute
   AuthenticatedAdminPaymentsDashboardRoute: typeof AuthenticatedAdminPaymentsDashboardRoute
@@ -3266,6 +3287,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
+  AuthenticatedAdminGroupsRoute: AuthenticatedAdminGroupsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminCampsCampIdRoute: AuthenticatedAdminCampsCampIdRoute,
   AuthenticatedAdminPaymentsDashboardRoute:

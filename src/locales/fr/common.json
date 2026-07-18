@@ -2292,5 +2292,33 @@
     "optionVisible": "Visible pour tous",
     "optionMasked": "Masquée (staff uniquement)",
     "saved": "Réglage enregistré"
+  },
+  "groups": {
+    "title": "Groupes du club",
+    "subtitle": "Créez des groupes personnalisés (CODIR, bureau, bénévoles…) pour cibler vos communications.",
+    "empty": "Aucun groupe pour le moment.",
+    "create": "Créer un groupe",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ce groupe ? Les membres associés seront retirés.",
+    "name": "Nom",
+    "namePlaceholder": "Ex. CODIR, Bureau, Bénévoles",
+    "description": "Description",
+    "descriptionPlaceholder": "Optionnel",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "membersCount_one": "{{count}} membre",
+    "membersCount_other": "{{count}} membres",
+    "manageMembers": "Gérer les membres",
+    "addMember": "Ajouter un membre",
+    "remove": "Retirer",
+    "searchMembers": "Rechercher un membre…",
+    "noMembers": "Aucun membre dans ce groupe.",
+    "saved": "Groupe enregistré",
+    "deleted": "Groupe supprimé",
+    "memberAdded": "Membre ajouté",
+    "memberRemoved": "Membre retiré",
+    "backToList": "Retour aux groupes",
+    "openGroups": "Groupes"
   }
 }
