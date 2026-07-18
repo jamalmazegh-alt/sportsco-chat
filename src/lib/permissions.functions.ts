@@ -31,15 +31,19 @@ function mergeStaffWithNonStaffRoles(
 async function assertClubAdmin(supabase: any, clubId: string, callerId: string) {
   const { data, error } = await supabase
     .from("club_members")
-    .select("roles")
+    .select("role, roles")
     .eq("club_id", clubId)
     .eq("user_id", callerId)
     .maybeSingle();
   if (error) throw new Response(error.message, { status: 500 });
-  if (!data || !Array.isArray(data.roles) || !data.roles.includes("admin")) {
+  const rolesArr: string[] = Array.isArray(data?.roles) ? (data!.roles as string[]) : [];
+  const singleRole: string | null = (data as { role?: string | null } | null)?.role ?? null;
+  const isAdmin = rolesArr.includes("admin") || singleRole === "admin";
+  if (!data || !isAdmin) {
     throw new Response("Forbidden", { status: 403 });
   }
 }
+
 
 async function assertTournamentAdmin(supabaseAuth: any, tournamentId: string, callerId: string) {
   const { data, error } = await supabaseAuth.rpc("can_manage_tournament_members", {
@@ -149,12 +153,30 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
 
     const mergedRoles = mergeStaffWithNonStaffRoles(data.roles, oldRoles);
 
+    // Keep singular `role` (app_role enum: admin/coach/dirigeant/…) in sync so
+    // legacy readers see the update. Fall back to null when no compatible role.
+    const APP_ROLE_ENUM = new Set(["admin", "coach", "dirigeant"]);
+    const primary =
+      (["admin", "coach", "dirigeant"] as const).find((r) => data.roles.includes(r as any)) ??
+      (data.roles.find((r) => APP_ROLE_ENUM.has(r)) as
+        | "admin"
+        | "coach"
+        | "dirigeant"
+        | undefined);
+
+    const updatePayload: { roles: string[]; role?: "admin" | "coach" | "dirigeant" } = {
+      roles: mergedRoles,
+    };
+    if (primary) updatePayload.role = primary;
+
     const { error: upErr } = await supabaseAdmin
       .from("club_members")
-      .update({ roles: mergedRoles })
+      .update(updatePayload)
       .eq("club_id", data.club_id)
       .eq("user_id", data.user_id);
     if (upErr) throw new Response(upErr.message, { status: 500 });
+
+
 
     await logPermissionChange({
       actorId: userId,

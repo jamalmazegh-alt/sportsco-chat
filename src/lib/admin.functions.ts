@@ -31,7 +31,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
     // supabaseAdmin may target a different env in local dev and would return [].
     const { data: members, error } = await supabase
       .from("club_members")
-      .select("user_id, role, created_at")
+      .select("user_id, role, roles, created_at")
       .eq("club_id", data.club_id);
     if (error) throw error;
 
@@ -61,7 +61,12 @@ export const listClubUsers = createServerFn({ method: "POST" })
       { user_id: string; roles: string[]; profile: any; email: string | null }
     >();
     for (const m of members ?? []) {
-      const rolesArr: string[] = m.role ? [m.role] : [];
+      const rolesArr: string[] =
+        Array.isArray((m as any).roles) && (m as any).roles.length > 0
+          ? ((m as any).roles as string[])
+          : m.role
+            ? [m.role]
+            : [];
       const g = grouped.get(m.user_id) ?? {
         user_id: m.user_id,
         roles: [],
@@ -71,6 +76,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
       for (const r of rolesArr) if (!g.roles.includes(r)) g.roles.push(r);
       grouped.set(m.user_id, g);
     }
+
 
     return {
       users: Array.from(grouped.values()).sort((a, b) =>
@@ -129,7 +135,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
         .maybeSingle(),
       supabase
         .from("club_members")
-        .select("club_id, role, created_at, clubs:club_id(name)")
+        .select("club_id, role, roles, created_at, clubs:club_id(name)")
         .eq("user_id", data.user_id),
       supabaseAdmin
         .from("players")
@@ -150,10 +156,12 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       profile,
       email: u?.email ?? null,
       last_sign_in_at: u?.last_sign_in_at ?? null,
-      memberships: (memberships ?? []).map((m: { role?: string }) => ({
+      memberships: (memberships ?? []).map((m: { role?: string; roles?: string[] | null }) => ({
         ...m,
-        roles: m.role ? [m.role] : [],
+        roles:
+          Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
       })),
+
       linkedPlayers: linkedPlayers ?? [],
       parentLinks: parentLinks ?? [],
       is_disabled: isDisabled,
