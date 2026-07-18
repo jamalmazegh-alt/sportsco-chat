@@ -56,6 +56,7 @@ import {
   listEventNeeds,
   listStaffSignupsForNeed,
   createEventNeed,
+  updateEventNeed,
   publishEventNeed,
   applyToEventNeed,
   withdrawSignup,
