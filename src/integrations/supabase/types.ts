@@ -7470,6 +7470,10 @@ export type Database = {
         Args: { _id: string; _kind: string }
         Returns: undefined
       }
+      staff_owns_need_signup: {
+        Args: { _need_id: string; _user_id: string }
+        Returns: boolean
+      }
       start_build_clubero_response: {
         Args: {
           p_device?: string
@@ -7582,6 +7586,10 @@ export type Database = {
       }
       user_can_manage_camp_storage: {
         Args: { _name: string; _user: string }
+        Returns: boolean
+      }
+      user_has_signup_on_need: {
+        Args: { _need_id: string; _user_id: string }
         Returns: boolean
       }
       user_in_wall_audience: {
