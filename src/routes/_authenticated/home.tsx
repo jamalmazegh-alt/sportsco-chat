@@ -333,6 +333,8 @@ function HomePage() {
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
 
+      {activeClubId && <HomeNeedsCard />}
+
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
         <section>
