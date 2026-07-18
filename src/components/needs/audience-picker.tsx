@@ -537,19 +537,23 @@ export function AudiencePickerBody({
                     </SelectItem>
                   ))}
                 {needsTeam(kind) &&
-                  (ctx?.teams ?? [])
-                    .filter(
-                      (tm) =>
-                        !state.teamPicks.some(
-                          (p) => p.team_id === tm.id && p.kind === kind,
-                        ),
-                    )
-                    .map((tm) => (
-                      <SelectItem key={tm.id} value={tm.id}>
-                        {tm.name}
-                        {tm.age_group ? ` · ${tm.age_group}` : ""}
-                      </SelectItem>
-                    ))}
+                  Array.from(
+                    new Map(
+                      (ctx?.teams ?? [])
+                        .filter(
+                          (tm) =>
+                            !state.teamPicks.some(
+                              (p) => p.team_id === tm.id && p.kind === kind,
+                            ),
+                        )
+                        .map((tm) => [tm.id, tm]),
+                    ).values(),
+                  ).map((tm) => (
+                    <SelectItem key={tm.id} value={tm.id}>
+                      {tm.name}
+                      {tm.age_group ? ` · ${tm.age_group}` : ""}
+                    </SelectItem>
+                  ))}
                 {needsCategory(kind) &&
                   (ctx?.categories ?? []).map((c) => (
                     <SelectItem key={c} value={c}>
