@@ -7339,6 +7339,15 @@ export type Database = {
           read_ct: number
         }[]
       }
+      recompute_event_need_coverage: {
+        Args: { _event_id: string }
+        Returns: {
+          did_transition: boolean
+          is_fully_covered: boolean
+          missing_seats: number
+          open_needs_count: number
+        }[]
+      }
       record_sponsor_click: {
         Args: { p_sponsor_id: string }
         Returns: undefined
