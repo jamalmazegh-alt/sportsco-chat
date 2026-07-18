@@ -2297,5 +2297,33 @@
     "optionVisible": "Für alle sichtbar",
     "optionMasked": "Verborgen (nur Staff)",
     "saved": "Einstellung gespeichert"
+  },
+  "groups": {
+    "title": "Club groups",
+    "subtitle": "Create custom groups (board, volunteers…) to target your communications.",
+    "empty": "No groups yet.",
+    "create": "Create group",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this group? Associated members will be removed.",
+    "name": "Name",
+    "namePlaceholder": "E.g. Board, Volunteers",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional",
+    "active": "Active",
+    "inactive": "Inactive",
+    "membersCount_one": "{{count}} member",
+    "membersCount_other": "{{count}} members",
+    "manageMembers": "Manage members",
+    "addMember": "Add member",
+    "remove": "Remove",
+    "searchMembers": "Search a member…",
+    "noMembers": "No members in this group.",
+    "saved": "Group saved",
+    "deleted": "Group deleted",
+    "memberAdded": "Member added",
+    "memberRemoved": "Member removed",
+    "backToList": "Back to groups",
+    "openGroups": "Groups"
   }
 }
