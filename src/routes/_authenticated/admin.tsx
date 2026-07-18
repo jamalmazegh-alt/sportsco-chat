@@ -20,6 +20,7 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
+    { to: "/admin/groups", icon: UsersRound, label: t("groups.openGroups"), exact: false },
     {
       to: "/admin/billing",
       icon: CreditCard,
