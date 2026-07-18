@@ -156,6 +156,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
             isStaff={isStaff}
             eventId={eventId}
             sport={sport ?? null}
+            existingRoleKeys={needs.map((n: NeedRowType) => n.role_key)}
             onChange={refresh}
           />
         ))}
@@ -168,9 +169,11 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           eventId={eventId}
           sport={sport ?? null}
           teamId={teamId ?? null}
+          existingRoleKeys={needs.map((n: NeedRowType) => n.role_key)}
           onSaved={refresh}
         />
       )}
+
     </Card>
   );
 }
@@ -199,14 +202,17 @@ function NeedRow({
   isStaff,
   eventId,
   sport,
+  existingRoleKeys,
   onChange,
 }: {
   need: NeedRowType;
   isStaff: boolean;
   eventId: string;
   sport: string | null;
+  existingRoleKeys: string[];
   onChange: () => void;
 }) {
+
   const { t } = useTranslation();
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
@@ -474,6 +480,7 @@ function NeedRow({
           eventId={eventId}
           sport={sport}
           teamId={null}
+          existingRoleKeys={existingRoleKeys}
           initial={{
             id: need.id,
             role_key: need.role_key,
@@ -485,6 +492,7 @@ function NeedRow({
           onSaved={onChange}
         />
       )}
+
     </div>
   );
 }
@@ -499,6 +507,7 @@ function NeedFormDialog({
   eventId,
   sport,
   initial,
+  existingRoleKeys,
   onSaved,
 }: {
   open: boolean;
@@ -506,6 +515,7 @@ function NeedFormDialog({
   eventId: string;
   sport: string | null;
   teamId: string | null;
+  existingRoleKeys?: string[];
   initial?: {
     id: string;
     role_key: string;
@@ -517,6 +527,7 @@ function NeedFormDialog({
   onSaved: () => void;
 }) {
   const { t } = useTranslation();
+
   const create = useServerFn(createEventNeed);
   const update = useServerFn(updateEventNeed);
   const publish = useServerFn(publishEventNeed);
@@ -565,12 +576,20 @@ function NeedFormDialog({
   }, [audiences, eventId, previewFn, isEdit]);
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
-    if (initial) return [...NEED_TEMPLATES];
     const s = (sport ?? "").toLowerCase().trim();
-    return NEED_TEMPLATES.filter(
-      (tpl) => tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s)),
-    );
-  }, [sport, initial]);
+    const used = new Set(existingRoleKeys ?? []);
+    // Always keep the current role_key visible when editing so it stays selectable.
+    if (initial) used.delete(initial.role_key);
+    return NEED_TEMPLATES.filter((tpl) => {
+      const sportOk =
+        tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
+      if (!sportOk) return false;
+      // "other" is always allowed (multiple custom needs are OK).
+      if (tpl.key === "other") return true;
+      return !used.has(tpl.key);
+    });
+  }, [sport, initial, existingRoleKeys]);
+
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
