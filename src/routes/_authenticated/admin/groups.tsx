@@ -1086,11 +1086,13 @@ function RulePreviewDialog({
             {rows.map((m) => (
               <li key={m.id} className="flex flex-col gap-1 px-3 py-2">
                 <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                <ParentSubtitle children_names={m.children_names} />
                 <div className="flex flex-wrap gap-1">
                   <RoleBadges roles={m.roles} fallback={m.role} />
                 </div>
               </li>
             ))}
+
 
           </ul>
         )}
