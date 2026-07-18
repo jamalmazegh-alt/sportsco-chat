@@ -744,10 +744,10 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [teamsRes, groupsRes, catsRes] = await Promise.all([
+    const [teamsRes, groupsRes] = await Promise.all([
       supabaseAdmin
         .from("teams")
-        .select("id, name, category")
+        .select("id, name, age_group")
         .eq("club_id", need.club_id)
         .order("name", { ascending: true }),
       supabaseAdmin
@@ -756,18 +756,22 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
         .eq("club_id", need.club_id)
         .eq("is_active", true)
         .order("name", { ascending: true }),
-      supabaseAdmin
-        .from("teams")
-        .select("category")
-        .eq("club_id", need.club_id)
-        .not("category", "is", null),
     ]);
+
+    const teams = (teamsRes.data ?? []).map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = r as any;
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        age_group: (row.age_group as string | null) ?? null,
+      };
+    });
 
     const cats = Array.from(
       new Set(
-        (catsRes.data ?? [])
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .map((r: any) => (r.category as string | null)?.trim())
+        teams
+          .map((t) => t.age_group?.trim())
           .filter((c): c is string => !!c),
       ),
     ).sort();
