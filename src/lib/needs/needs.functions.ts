@@ -151,8 +151,8 @@ export const publishEventNeed = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // 1) Vérifier que l'appelant est staff du club portant ce besoin. La RLS
-    //    l'imposerait quand même sur les UPDATE, mais on veut un refus explicite.
+    // Défense en profondeur : la RPC re-vérifie is_club_staff sous verrou,
+    // mais on refuse tôt côté client pour un message clair.
     const need = await loadNeedCore(data.need_id);
     const { data: isStaff } = await supabase.rpc("is_club_staff", {
       _user_id: userId,
@@ -160,148 +160,47 @@ export const publishEventNeed = createServerFn({ method: "POST" })
     });
     if (!isStaff) throw new Error("forbidden");
 
-    // 2) Résolution des audiences en service_role — le resolver gère la garde
-    //    interne (club_id lisible seulement par staff/service_role).
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const allUserIds = new Set<string>();
-    for (const selector of data.audiences) {
-      const { data: rows, error } = await supabaseAdmin.rpc("resolve_audience_members", {
-        _club_id: need.club_id,
-        _spec: [selector],
-      });
-      if (error) {
-        console.error("[publishEventNeed] resolve failed", { selector, error });
-        throw new Error(`resolve_audience_members failed: ${error.message}`);
-      }
-      for (const r of (rows ?? []) as Array<{ user_id: string | null }>) {
-        if (r.user_id) allUserIds.add(r.user_id);
-      }
-    }
-
-    const userIds = [...allUserIds];
-    if (userIds.length === 0) {
-      // On publie quand même (draft→open) : un besoin sans destinataire peut
-      // devenir visible plus tard via une reprise/relance. Mais on trace.
-      console.warn("[publishEventNeed] audience resolved empty", { needId: data.need_id });
-    }
-
-    // 3) Map user_id -> club_members.id (member_id NOT NULL sur recipients).
-    let memberByUser = new Map<string, string>();
-    if (userIds.length > 0) {
-      const { data: members, error: mErr } = await supabaseAdmin
-        .from("club_members")
-        .select("id, user_id")
-        .eq("club_id", need.club_id)
-        .in("user_id", userIds);
-      if (mErr) throw new Error(mErr.message);
-      memberByUser = new Map(
-        (members ?? [])
-          .filter((m) => m.user_id)
-          .map((m) => [m.user_id as string, m.id as string]),
-      );
-    }
-
-    // 4) Transaction : audiences (idempotent), publication, recipients, status='open'.
-    //    Note : Supabase JS n'expose pas les transactions ; on chaîne
-    //    les inserts en service_role et on nettoie si un pas échoue.
-    //    L'invariant "notification après commit" est respecté car le dispatch
-    //    n'est appelé qu'après le UPDATE final de status.
-    // 4a) Snapshot des audience-selectors (utile pour l'UI et l'audit).
-    await supabaseAdmin
-      .from("event_need_audiences")
-      .delete()
-      .eq("need_id", data.need_id);
-    if (data.audiences.length > 0) {
-      const audienceRows = data.audiences.map((sel) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const s = sel as any;
-        return {
-          need_id: data.need_id,
-          audience_type: s.type,
-          group_id: s.group_id ?? null,
-          team_id: s.team_id ?? null,
-          category: s.category ?? null,
-          created_by: userId,
-        };
-      });
-      const { error: audErr } = await supabaseAdmin
-        .from("event_need_audiences")
-        .insert(audienceRows);
-      if (audErr) {
-        console.error("[publishEventNeed] audiences insert failed", audErr);
-        throw new Error(audErr.message);
-      }
-    }
-
-    // 4b) Publication row.
-    const { data: pub, error: pubErr } = await supabaseAdmin
-      .from("event_need_publications")
-      .insert({
-        need_id: data.need_id,
-        published_by: userId,
-        recipients_count: memberByUser.size,
-      })
-      .select("id")
-      .single();
-    if (pubErr) throw new Error(pubErr.message);
-
-    // 4c) Recipients.
-    if (memberByUser.size > 0) {
-      const rcpRows = [...memberByUser.entries()].map(([uid, mid]) => ({
-        publication_id: pub.id,
-        member_id: mid,
-        user_id: uid,
-      }));
-      // Chunk pour éviter d'exploser la requête si audience très large.
-      const chunkSize = 500;
-      for (let i = 0; i < rcpRows.length; i += chunkSize) {
-        const { error: rcpErr } = await supabaseAdmin
-          .from("event_need_publication_recipients")
-          .insert(rcpRows.slice(i, i + chunkSize));
-        if (rcpErr) {
-          // Nettoyage best-effort : on annule la publication pour ne pas laisser
-          // un state incohérent (publication sans recipients).
-          await supabaseAdmin.from("event_need_publications").delete().eq("id", pub.id);
-          throw new Error(rcpErr.message);
-        }
-      }
-    }
-
-    // 4d) Passage draft → open (l'invariant 4 sur le CHECK status l'autorise).
-    const nowIso = new Date().toISOString();
-    const { error: statusErr } = await supabaseAdmin
-      .from("event_needs")
-      .update({
-        status: "open",
-        first_published_at: need.status === "draft" ? nowIso : undefined,
-        last_published_at: nowIso,
-      })
-      .eq("id", data.need_id);
-    if (statusErr) {
-      // On garde la publication même si le passage open échoue — mais on
-      // remonte l'erreur ; l'UI pourra relancer la republication.
-      throw new Error(statusErr.message);
-    }
-
-    // 5) COMMIT effectif ici (toutes les writes admin sont individuelles →
-    //    déjà commit). Dispatch APRÈS.
-    const { dispatchEventNeedPublication } = await import("./dispatch.server");
-    // Fire-and-forget : on ne bloque pas la réponse UI sur push/email.
-    void dispatchEventNeedPublication({
-      needId: data.need_id,
-      publicationId: pub.id,
-      recipientUserIds: [...memberByUser.keys()],
-    }).catch((e) => {
-      console.error("[publishEventNeed] dispatch failed", e);
+    // Transaction atomique : verrou event_needs, résolution audiences,
+    // audiences/publication/recipients/open en un bloc, idempotence <15 s.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error } = await supabase.rpc("publish_event_need_atomic" as any, {
+      _need_id: data.need_id,
+      _actor: userId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _audiences: data.audiences as any,
     });
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      publication_id: string;
+      recipients_count: number;
+      recipient_user_ids: string[] | null;
+      was_idempotent_skip: boolean;
+      status: string;
+    } | null;
+    if (!row) throw new Error("publish_failed");
 
-    // 6) Recompute coverage (transition possible : open_needs_count passe de 0 → 1+).
+    // Dispatch UNIQUEMENT si nouvelle publication (idempotence double-tap).
+    if (!row.was_idempotent_skip && (row.recipient_user_ids?.length ?? 0) > 0) {
+      const { dispatchEventNeedPublication } = await import("./dispatch.server");
+      try {
+        await dispatchEventNeedPublication({
+          needId: data.need_id,
+          publicationId: row.publication_id,
+          recipientUserIds: row.recipient_user_ids ?? [],
+        });
+      } catch (e) {
+        console.error("[publishEventNeed] dispatch failed", e);
+      }
+    }
+
+    // Recompute coverage après commit.
     await recomputeCoverageServiceRole(need.event_id);
 
     return {
-      publication_id: pub.id,
-      recipients_count: memberByUser.size,
-      status: "open" as const,
+      publication_id: row.publication_id,
+      recipients_count: row.recipients_count,
+      status: row.status,
+      was_idempotent_skip: row.was_idempotent_skip,
     };
   });
 
@@ -335,14 +234,20 @@ export const applyToEventNeed = createServerFn({ method: "POST" })
     if (row.auto_confirmed) {
       await recomputeCoverageServiceRole(need.event_id);
     }
-    // Notification staff (candidature reçue) — fire-and-forget.
-    const { notifyStaffOfSignup } = await import("./dispatch.server");
-    void notifyStaffOfSignup({
-      needId: data.need_id,
-      signupId: row.signup_id,
-      status: row.status,
-      applicantUserId: userId,
-    }).catch((e) => console.error("[applyToEventNeed] notify failed", e));
+    // Notification staff (candidature reçue) — awaité pour éviter la
+    // terminaison prématurée du Worker (les promesses orphelines peuvent être
+    // tuées quand la réponse part). Erreur non bloquante pour l'apply.
+    try {
+      const { notifyStaffOfSignup } = await import("./dispatch.server");
+      await notifyStaffOfSignup({
+        needId: data.need_id,
+        signupId: row.signup_id,
+        status: row.status,
+        applicantUserId: userId,
+      });
+    } catch (e) {
+      console.error("[applyToEventNeed] notify failed", e);
+    }
 
     return row;
   });
@@ -357,83 +262,41 @@ export const decideSignup = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Récup signup + need (RLS staff_all suffit pour lire).
-    const { data: signup, error: sErr } = await supabase
-      .from("event_need_signups")
-      .select("id, need_id, status, user_id, event_needs:need_id(id, event_id, club_id, capacity)")
-      .eq("id", data.signup_id)
-      .maybeSingle();
-    if (sErr) throw new Error(sErr.message);
-    if (!signup) throw new Error("signup_not_found");
+    // Transaction atomique : verrou event_needs, staff-check, capacity-check
+    // sous verrou → deux staff confirmant simultanément la dernière place ne
+    // peuvent pas produire deux 'confirmed'.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const need = (signup as any).event_needs as {
-      id: string;
-      event_id: string;
-      club_id: string;
-      capacity: number;
-    };
-
-    // Défense en profondeur : staff du club uniquement.
-    const { data: isStaff } = await supabase.rpc("is_club_staff", {
-      _user_id: userId,
-      _club_id: need.club_id,
+    const { data: rpcData, error } = await supabase.rpc("decide_signup_atomic" as any, {
+      _signup_id: data.signup_id,
+      _actor: userId,
+      _decision: data.decision,
     });
-    if (!isStaff) throw new Error("forbidden");
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      signup_id: string;
+      need_id: string;
+      event_id: string;
+      applicant_user_id: string;
+      new_status: "confirmed" | "declined";
+    } | null;
+    if (!row) throw new Error("decide_failed");
 
-    if (data.decision === "confirm") {
-      // Capacité atomique : on confirme sous verrou pour éviter le double-clic
-      // sur la dernière place côté staff aussi.
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: locked } = await supabaseAdmin
-        .from("event_needs")
-        .select("id, capacity, status")
-        .eq("id", need.id)
-        .maybeSingle();
-      if (!locked || locked.status !== "open") {
-        throw new Error("need_not_open");
-      }
-      const { count } = await supabaseAdmin
-        .from("event_need_signups")
-        .select("*", { count: "exact", head: true })
-        .eq("need_id", need.id)
-        .eq("status", "confirmed");
-      if ((count ?? 0) >= locked.capacity) {
-        throw new Error("capacity_reached");
-      }
-      const { error: upErr } = await supabase
-        .from("event_need_signups")
-        .update({
-          status: "confirmed",
-          confirmed_at: new Date().toISOString(),
-          decided_by: userId,
-        })
-        .eq("id", data.signup_id);
-      if (upErr) throw new Error(upErr.message);
-    } else {
-      const { error: upErr } = await supabase
-        .from("event_need_signups")
-        .update({
-          status: "declined",
-          declined_at: new Date().toISOString(),
-          decided_by: userId,
-        })
-        .eq("id", data.signup_id);
-      if (upErr) throw new Error(upErr.message);
+    await recomputeCoverageServiceRole(row.event_id);
+
+    // Notification au candidat (décision reçue) — awaitée.
+    try {
+      const { notifyApplicantOfDecision } = await import("./dispatch.server");
+      await notifyApplicantOfDecision({
+        needId: row.need_id,
+        signupId: row.signup_id,
+        decision: data.decision,
+        applicantUserId: row.applicant_user_id,
+      });
+    } catch (e) {
+      console.error("[decideSignup] notify failed", e);
     }
 
-    await recomputeCoverageServiceRole(need.event_id);
-
-    // Notification au candidat (décision reçue).
-    const { notifyApplicantOfDecision } = await import("./dispatch.server");
-    void notifyApplicantOfDecision({
-      needId: need.id,
-      signupId: data.signup_id,
-      decision: data.decision,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      applicantUserId: (signup as any).user_id as string,
-    }).catch((e) => console.error("[decideSignup] notify failed", e));
-
-    return { ok: true };
+    return { ok: true, status: row.new_status };
   });
 
 /* ------------------------------------------------------------------------ */
@@ -518,11 +381,14 @@ export const cancelEventNeed = createServerFn({ method: "POST" })
 
     await recomputeCoverageServiceRole(need.event_id);
 
-    // Notifier les signups actifs de l'annulation (dispatch fire-and-forget).
-    const { notifyNeedCancelled } = await import("./dispatch.server");
-    void notifyNeedCancelled({ needId: data.need_id }).catch((e) =>
-      console.error("[cancelEventNeed] notify failed", e),
-    );
+    // Notifier les signups actifs de l'annulation — awaité (Cloudflare Workers
+    // peut tuer une promesse orpheline après la réponse).
+    try {
+      const { notifyNeedCancelled } = await import("./dispatch.server");
+      await notifyNeedCancelled({ needId: data.need_id });
+    } catch (e) {
+      console.error("[cancelEventNeed] notify failed", e);
+    }
 
     return { ok: true };
   });

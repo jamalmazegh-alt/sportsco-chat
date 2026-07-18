@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "ref_center": "Head referee",
+    "ref_line": "Assistant referee",
+    "delegate": "Match delegate",
+    "scoretable": "Scorer's table",
+    "timekeeper": "Timekeeper",
+    "scorer": "Scorer",
+    "shotclock_24": "24-second operator",
+    "table_secretary": "Table secretary",
+    "timekeeper_handball": "Timekeeper",
+    "line_judge": "Line judge",
+    "setup_volley": "Court setup",
+    "concession": "Concession stand",
+    "welcome": "Welcome desk",
+    "setup": "Setup",
+    "teardown": "Teardown",
+    "photographer": "Photographer",
+    "animation": "Animation",
+    "other": "Other need"
+  },
+  "status": {
+    "draft": "Draft",
+    "open": "Open",
+    "closed": "Closed",
+    "cancelled": "Cancelled"
+  },
+  "validationMode": {
+    "auto": "Auto-confirmation",
+    "manual": "Staff review"
+  },
+  "signup": {
+    "applied": "Application sent",
+    "confirmed": "Confirmed",
+    "declined": "Declined",
+    "withdrawn": "Withdrawn"
+  },
+  "seats": {
+    "remaining": "{{count}} seat left",
+    "remaining_plural": "{{count}} seats left",
+    "full": "Full"
+  },
+  "actions": {
+    "apply": "Volunteer",
+    "withdraw": "Withdraw application",
+    "confirm": "Confirm",
+    "decline": "Decline",
+    "close": "Close need",
+    "cancel": "Cancel need",
+    "publish": "Publish",
+    "republish": "Republish"
+  },
+  "errors": {
+    "forbidden": "Action not allowed.",
+    "capacity_reached": "All seats are already filled.",
+    "need_not_open": "This need is no longer open.",
+    "need_not_publishable": "This need cannot be published in its current state.",
+    "signup_not_found": "Application not found.",
+    "already_applied": "You have already applied."
+  }
+}
