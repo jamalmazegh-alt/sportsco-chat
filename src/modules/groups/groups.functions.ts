@@ -254,6 +254,17 @@ export const previewAudienceCount = createServerFn({ method: "POST" })
     const { data: staff, error: staffErr } = await supabase.rpc("is_club_staff", {
       _user_id: context.userId,
       _club_id: data.club_id,
+    });
+    if (staffErr) throw new Error(staffErr.message);
+    if (!staff) throw new Error("forbidden");
+
+    const { data: rows, error } = await supabase.rpc("resolve_audience_members", {
+      _club_id: data.club_id,
+      _spec: data.spec,
+    });
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as Array<{ user_id: string }>;
+    return { count: list.length, user_ids: list.map((r) => r.user_id) };
   });
 
 // ---- Dynamic rules (sub-groups) ------------------------------------------
@@ -303,7 +314,8 @@ export const addClubGroupRule = createServerFn({ method: "POST" })
       group_id: data.group_id,
       rule_type: data.rule_type,
       team_id: teamTypes.includes(data.rule_type) ? (data.team_id ?? null) : null,
-      category: data.rule_type === "category_educators" ? (data.category ?? null) : null,
+      category:
+        data.rule_type === "category_educators" ? (data.category ?? null) : null,
       created_by: userId,
     };
     const { data: row, error } = await supabase
@@ -352,15 +364,3 @@ export const getGroupResolvedCount = createServerFn({ method: "POST" })
     return { count: (rows ?? []).length };
   });
 
-    if (staffErr) throw new Error(staffErr.message);
-    if (!staff) throw new Error("forbidden");
-
-    const { data: rows, error } = await supabase.rpc("resolve_audience_members", {
-      _club_id: data.club_id,
-      _spec: data.spec,
-    });
-    if (error) throw new Error(error.message);
-    // rows = [{ user_id }]
-    const list = (rows ?? []) as Array<{ user_id: string }>;
-    return { count: list.length, user_ids: list.map((r) => r.user_id) };
-  });
