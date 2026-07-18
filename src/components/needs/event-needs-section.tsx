@@ -327,6 +327,7 @@ function NeedRow({
           open={publishOpen}
           onOpenChange={setPublishOpen}
           needId={need.id}
+          eventId={eventId}
           onPublished={onChange}
         />
       )}
