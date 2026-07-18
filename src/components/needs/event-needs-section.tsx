@@ -517,6 +517,29 @@ function NeedRow({
         />
       )}
 
+      <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("needs:cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("needs:cancelDialog.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCancelConfirmOpen(false)}>
+              {t("needs:cancelDialog.abort")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => cancelM.mutate()}
+              disabled={cancelM.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelM.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("needs:cancelDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
