@@ -148,7 +148,14 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
       </CardHeader>
       <CardContent className="space-y-3">
         {needs.map((need: NeedRowType) => (
-          <NeedRow key={need.id} need={need} isStaff={isStaff} eventId={eventId} onChange={refresh} />
+          <NeedRow
+            key={need.id}
+            need={need}
+            isStaff={isStaff}
+            eventId={eventId}
+            sport={sport ?? null}
+            onChange={refresh}
+          />
         ))}
       </CardContent>
 
