@@ -555,6 +555,7 @@ function GroupMembersPanel({
   const [search, setSearch] = useState("");
   const [ruleType, setRuleType] = useState<ClubGroupRuleType | "">("");
   const [ruleParam, setRuleParam] = useState<string>("");
+  const [previewRule, setPreviewRule] = useState<RuleRow | null>(null);
 
   const membersQ = useQuery({
     queryKey: ["club-group-members", groupId],
