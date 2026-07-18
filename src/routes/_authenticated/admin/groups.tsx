@@ -852,16 +852,19 @@ function GroupMembersPanel({
                   key={m.id}
                   className="flex items-center justify-between gap-2 rounded-md bg-background border border-border px-3 py-2"
                 >
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm truncate">
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
+                    <span className="text-sm font-medium truncate">
                       {displayName({
                         full_name: m.profile?.full_name,
                         first_name: m.profile?.first_name,
                         last_name: m.profile?.last_name,
                       })}
                     </span>
-                    <RoleBadges roles={m.roles} fallback={m.role} />
+                    <div className="flex flex-wrap gap-1">
+                      <RoleBadges roles={m.roles} fallback={m.role} />
+                    </div>
                   </div>
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -899,10 +902,13 @@ function GroupMembersPanel({
                   key={m.id}
                   className="flex items-center justify-between gap-2 px-3 py-2"
                 >
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm truncate">{displayName(m)}</span>
-                    <RoleBadges roles={m.roles} fallback={m.role} />
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
+                    <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                    <div className="flex flex-wrap gap-1">
+                      <RoleBadges roles={m.roles} fallback={m.role} />
+                    </div>
                   </div>
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1020,11 +1026,14 @@ function RulePreviewDialog({
         ) : (
           <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
             {rows.map((m) => (
-              <li key={m.id} className="flex items-center gap-2 px-3 py-2">
-                <span className="text-sm truncate flex-1">{displayName(m)}</span>
-                <RoleBadges roles={m.roles} fallback={m.role} />
+              <li key={m.id} className="flex flex-col gap-1 px-3 py-2">
+                <span className="text-sm font-medium truncate">{displayName(m)}</span>
+                <div className="flex flex-wrap gap-1">
+                  <RoleBadges roles={m.roles} fallback={m.role} />
+                </div>
               </li>
             ))}
+
           </ul>
         )}
 
