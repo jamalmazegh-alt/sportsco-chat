@@ -65,6 +65,7 @@ import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog"
 import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
+import { EventNeedsSection } from "@/components/needs/event-needs-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
