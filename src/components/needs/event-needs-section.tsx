@@ -195,6 +195,7 @@ type NeedRowType = {
   last_published_at: string | null;
   last_recipients_count: number | null;
   my_signup: { id: string; status: string } | null;
+  confirmed_signups?: { user_id: string; full_name: string | null }[];
 };
 
 function NeedRow({
@@ -353,6 +354,20 @@ function NeedRow({
               </span>
             </span>
           </div>
+          {(need.confirmed_signups?.length ?? 0) > 0 && (
+            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+              {need.confirmed_signups!.map((s) => (
+                <Badge
+                  key={s.user_id}
+                  variant="outline"
+                  className="text-[11px] border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                >
+                  {s.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1045,76 +1060,188 @@ function StaffSignupsDialog({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
+
+  const signups = (data?.signups ?? []) as StaffSignup[];
+  const pending = signups.filter((s) => s.status === "applied");
+  const pendingIds = pending.map((s) => s.id);
+  const allPendingSelected =
+    pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
+
+  const toggleOne = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const toggleAll = () => {
+    setSelected(allPendingSelected ? new Set() : new Set(pendingIds));
+  };
+
+  const bulk = async (decision: "confirm" | "decline") => {
+    const ids = Array.from(selected).filter((id) => pendingIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(
+        ids.map((signup_id) => decide({ data: { signup_id, decision } })),
+      );
+      const failed = results.filter((r) => r.status === "rejected").length;
+      const ok = results.length - failed;
+      if (ok > 0) {
+        toast.success(
+          decision === "confirm"
+            ? t("needs:staff.bulkConfirmed", {
+                count: ok,
+                defaultValue: "{{count}} candidat(s) confirmé(s)",
+              })
+            : t("needs:staff.bulkDeclined", {
+                count: ok,
+                defaultValue: "{{count}} candidat(s) refusé(s)",
+              }),
+        );
+      }
+      if (failed > 0) toast.error(t("common.error", { defaultValue: "Erreur" }));
+      setSelected(new Set());
+      await refetch();
+      onChanged();
+      qc.invalidateQueries({ queryKey: ["need-signups", needId] });
+    } finally {
+      setBulkPending(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("needs:staff.title")}</DialogTitle>
         </DialogHeader>
+
+        {pending.length > 0 && (
+          <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/40 p-2">
+            <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+              <Checkbox
+                checked={allPendingSelected}
+                onCheckedChange={toggleAll}
+              />
+              {allPendingSelected
+                ? t("common.deselectAll", { defaultValue: "Tout désélectionner" })
+                : t("needs:staff.selectAllPending", {
+                    count: pending.length,
+                    defaultValue: "Sélectionner tout ({{count}})",
+                  })}
+            </label>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="default"
+                disabled={selected.size === 0 || bulkPending}
+                onClick={() => bulk("confirm")}
+              >
+                {bulkPending ? (
+                  <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                ) : (
+                  <Check className="h-3.5 w-3.5 mr-1" />
+                )}
+                {t("needs:staff.confirmSelection", {
+                  defaultValue: "Confirmer",
+                })}
+                {selected.size > 0 && ` (${selected.size})`}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={selected.size === 0 || bulkPending}
+                onClick={() => bulk("decline")}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-          {((data?.signups ?? []) as StaffSignup[]).map((s) => (
-            <div
-              key={s.id}
-              className="flex items-start justify-between gap-2 rounded-md border p-2"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-medium truncate">
-                    {s.profile?.full_name ??
-                      t("common.unknown", { defaultValue: "Sans nom" })}
+          {signups.map((s) => {
+            const isPending = s.status === "applied";
+            const checked = selected.has(s.id);
+            return (
+              <div
+                key={s.id}
+                className={cn(
+                  "flex items-start gap-2 rounded-md border p-2",
+                  checked && "bg-primary/5 border-primary/40",
+                )}
+              >
+                {isPending && (
+                  <Checkbox
+                    className="mt-1"
+                    checked={checked}
+                    onCheckedChange={() => toggleOne(s.id)}
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium truncate">
+                      {s.profile?.full_name ??
+                        t("common.unknown", { defaultValue: "Sans nom" })}
+                    </p>
+                    {s.roles.map((r) => (
+                      <Badge
+                        key={r}
+                        variant="outline"
+                        className={cn("text-[10px]", ROLE_COLORS[r] ?? "")}
+                      >
+                        {t(`common.roles.${r}`, { defaultValue: r })}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {t(`needs:signup.${s.status}`)}
                   </p>
-                  {s.roles.map((r) => (
-                    <Badge
-                      key={r}
-                      variant="outline"
-                      className={cn("text-[10px]", ROLE_COLORS[r] ?? "")}
-                    >
-                      {t(`common.roles.${r}`, { defaultValue: r })}
-                    </Badge>
-                  ))}
+                  {s.license_number && (
+                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1">
+                      <IdCard className="h-3 w-3" />
+                      {t("needs:staff.license", { n: s.license_number })}
+                    </p>
+                  )}
+                  {s.is_minor && s.status === "applied" && (
+                    <p className="text-[11px] mt-1 inline-flex items-center gap-1 text-amber-700 dark:text-amber-300">
+                      <Baby className="h-3 w-3" />
+                      {t("needs:staff.minorPending")}
+                    </p>
+                  )}
+                  {s.comment && (
+                    <p className="text-xs text-muted-foreground mt-1 italic">"{s.comment}"</p>
+                  )}
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {t(`needs:signup.${s.status}`)}
-                </p>
-                {s.license_number && (
-                  <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1">
-                    <IdCard className="h-3 w-3" />
-                    {t("needs:staff.license", { n: s.license_number })}
-                  </p>
-                )}
-                {s.is_minor && s.status === "applied" && (
-                  <p className="text-[11px] mt-1 inline-flex items-center gap-1 text-amber-700 dark:text-amber-300">
-                    <Baby className="h-3 w-3" />
-                    {t("needs:staff.minorPending")}
-                  </p>
-                )}
-                {s.comment && (
-                  <p className="text-xs text-muted-foreground mt-1 italic">"{s.comment}"</p>
+                {isPending && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => decideM.mutate({ signup_id: s.id, decision: "confirm" })}
+                      disabled={decideM.isPending || bulkPending}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => decideM.mutate({ signup_id: s.id, decision: "decline" })}
+                      disabled={decideM.isPending || bulkPending}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 )}
               </div>
-              {s.status === "applied" && (
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => decideM.mutate({ signup_id: s.id, decision: "confirm" })}
-                    disabled={decideM.isPending}
-                  >
-                    <Check className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => decideM.mutate({ signup_id: s.id, decision: "decline" })}
-                    disabled={decideM.isPending}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
-          {((data?.signups ?? []) as StaffSignup[]).length === 0 && (
+            );
+          })}
+          {signups.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">
               {t("needs:staff.empty")}
             </p>
