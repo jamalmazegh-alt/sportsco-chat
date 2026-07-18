@@ -105,7 +105,6 @@ function AdminTicketDetail() {
 
       {/* Sidebar */}
       <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 bg-muted/20 md:overflow-y-auto p-5 space-y-5">
-
         <section className="space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">Statut</Label>
           <Select value={ticket.status} onValueChange={(v) => update.mutate({ status: v })}>

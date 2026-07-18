@@ -6,10 +6,7 @@
  * that mistake.
  */
 import { describe, it, expect } from "vitest";
-import {
-  callUpChoiceToColumn,
-  callUpChoiceToClubColumn,
-} from "@/hooks/use-call-up-visibility";
+import { callUpChoiceToColumn, callUpChoiceToClubColumn } from "@/hooks/use-call-up-visibility";
 
 describe("callUpChoiceToColumn (event / team scopes)", () => {
   it("inherit → null (never the resolved effective boolean)", () => {

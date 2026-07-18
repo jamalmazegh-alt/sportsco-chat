@@ -46,7 +46,7 @@ export async function enqueueTransactionalEmailServer(
   const messageId = crypto.randomUUID();
   const idempotencyKey = params.idempotencyKey || messageId;
 
-  const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
+  const runStep = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {
     try {
       return await fn();
     } catch (e) {

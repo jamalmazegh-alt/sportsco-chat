@@ -101,17 +101,13 @@ export type CallUpVisibilityChoiceStrict = "visible" | "masked";
  * `club` scope has no `inherit`: the club is the root of the cascade and
  * its column is NOT NULL. Passing "inherit" for club is a programming error.
  */
-export function callUpChoiceToColumn(
-  choice: CallUpVisibilityChoiceNullable,
-): boolean | null {
+export function callUpChoiceToColumn(choice: CallUpVisibilityChoiceNullable): boolean | null {
   if (choice === "inherit") return null;
   if (choice === "visible") return true;
   return false;
 }
 
-export function callUpChoiceToClubColumn(
-  choice: CallUpVisibilityChoiceStrict,
-): boolean {
+export function callUpChoiceToClubColumn(choice: CallUpVisibilityChoiceStrict): boolean {
   return choice === "visible";
 }
 
@@ -163,4 +159,3 @@ export function useSetCallUpVisibility() {
     },
   });
 }
-

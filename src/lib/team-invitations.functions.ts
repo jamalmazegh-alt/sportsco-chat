@@ -107,12 +107,16 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       const someContactExists =
         !!(player.email || player.phone) || (parents ?? []).some((p) => !!(p.email || p.phone));
       const playerAlreadyCovered = !!player.user_id || (!canInvitePlayer && !player.user_id);
-      const allParentsLinked = (parents ?? []).length > 0 && (parents ?? []).every((p) => !!p.parent_user_id);
+      const allParentsLinked =
+        (parents ?? []).length > 0 && (parents ?? []).every((p) => !!p.parent_user_id);
       return {
         sent: 0,
         failed: 0,
         skipped: 1,
-        reason: someContactExists && (playerAlreadyCovered || allParentsLinked) ? "already_active" : "no_contact",
+        reason:
+          someContactExists && (playerAlreadyCovered || allParentsLinked)
+            ? "already_active"
+            : "no_contact",
       };
     }
 
@@ -174,7 +178,9 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     const blockedPhones = new Set<string>();
     const orphanInviteIds: string[] = [];
     for (const row of pendingRows ?? []) {
-      const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : Number.POSITIVE_INFINITY;
+      const expiresAt = row.expires_at
+        ? new Date(row.expires_at).getTime()
+        : Number.POSITIVE_INFINITY;
       if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) continue;
       const messageId = row.email_message_id;
       let status = messageId ? latestStatusByMessageId.get(messageId) : undefined;
@@ -219,7 +225,9 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         continue;
       }
       if (email) {
-        const { data: existingAccount } = await supabaseAdmin.rpc("email_exists", { _email: email });
+        const { data: existingAccount } = await supabaseAdmin.rpc("email_exists", {
+          _email: email,
+        });
         if (existingAccount === true) {
           skippedExisting += 1;
           continue;
@@ -293,7 +301,10 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         if (enqueued?.success) sent += 1;
         else failed += 1;
       } catch (error) {
-        await supabaseAdmin.from("member_invites").delete().eq("id", (invite as { id: string }).id);
+        await supabaseAdmin
+          .from("member_invites")
+          .delete()
+          .eq("id", (invite as { id: string }).id);
         failed += 1;
         console.error("sendPlayerInvitations enqueue failed", {
           role: target.role,
@@ -363,10 +374,7 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
       // reported as a current failure.
       const [{ data: playerRows }, { data: parentRows }] = await Promise.all([
         supabaseAdmin.from("players").select("id, email").in("id", playerIds),
-        supabaseAdmin
-          .from("player_parents")
-          .select("player_id, email")
-          .in("player_id", playerIds),
+        supabaseAdmin.from("player_parents").select("player_id, email").in("player_id", playerIds),
       ]);
       const currentEmailsByPlayer = new Map<string, Set<string>>();
       const addEmail = (pid: string, email: string | null | undefined) => {
@@ -377,8 +385,7 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
         currentEmailsByPlayer.set(pid, set);
       };
       for (const r of playerRows ?? []) addEmail((r as any).id, (r as any).email);
-      for (const r of parentRows ?? [])
-        addEmail((r as any).player_id, (r as any).email);
+      for (const r of parentRows ?? []) addEmail((r as any).player_id, (r as any).email);
       const isCurrentEmail = (pid: string, email: string | null | undefined) => {
         const norm = (email ?? "").trim().toLowerCase();
         if (!norm) return false;
@@ -393,19 +400,14 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
           `player_id.in.(${playerIds.join(",")}),parent_for_player_id.in.(${playerIds.join(",")})`,
         );
 
-      const inviteByMsg = new Map<
-        string,
-        { playerId: string; email: string | null }
-      >();
+      const inviteByMsg = new Map<string, { playerId: string; email: string | null }>();
       const legacyInvites: Array<{
         playerId: string;
         email: string;
         createdAt: string;
       }> = [];
       for (const inv of invites ?? []) {
-        const pid = ((inv as any).player_id ?? (inv as any).parent_for_player_id) as
-          | string
-          | null;
+        const pid = ((inv as any).player_id ?? (inv as any).parent_for_player_id) as string | null;
         if (!pid) continue;
         const mid = (inv as any).email_message_id as string | null;
         const email = ((inv as any).email as string | null) ?? null;
@@ -442,8 +444,7 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
           if (!FAIL.has(status)) continue;
           const info = inviteByMsg.get(mid);
           if (!info) continue;
-          const failedEmail =
-            ((l as any).recipient_email as string | null) ?? info.email ?? "";
+          const failedEmail = ((l as any).recipient_email as string | null) ?? info.email ?? "";
           // Skip stale failures on emails that are no longer any of the
           // player's or parents' current contacts.
           if (!isCurrentEmail(info.playerId, failedEmail)) continue;

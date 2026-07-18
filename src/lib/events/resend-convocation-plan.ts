@@ -101,12 +101,7 @@ export function planConvocationResendRecipients(
       });
     };
 
-    push(
-      p?.email ?? null,
-      p?.first_name ?? undefined,
-      `p-${c.id}`,
-      `player:${c.player_id}`,
-    );
+    push(p?.email ?? null, p?.first_name ?? undefined, `p-${c.id}`, `player:${c.player_id}`);
     if (p?.user_id) inApp.add(p.user_id);
 
     for (const parent of parents.filter((pp) => pp.player_id === c.player_id)) {

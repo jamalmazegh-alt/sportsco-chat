@@ -59,7 +59,11 @@ export function CallUpVisibilityField(props: Props) {
   const { scope, id, disabled, className } = props;
   const isStaff = props.isStaff ?? true;
 
-  const { data: config, isLoading, error } = useCallUpVisibilityConfig(scope, id, {
+  const {
+    data: config,
+    isLoading,
+    error,
+  } = useCallUpVisibilityConfig(scope, id, {
     enabled: isStaff && Boolean(id),
   });
   const setVisibility = useSetCallUpVisibility();

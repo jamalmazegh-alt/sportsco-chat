@@ -22,7 +22,9 @@ import logo from "@/assets/clubero-logo.png";
 type SignupRole = "club_admin" | "player" | "parent";
 
 export const Route = createFileRoute("/register")({
-  validateSearch: (search: Record<string, unknown>): { invite?: string; email?: string; next?: string } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { invite?: string; email?: string; next?: string } => {
     const out: { invite?: string; email?: string; next?: string } = {};
     if (typeof search.invite === "string") out.invite = search.invite;
     if (typeof search.email === "string") out.email = search.email;

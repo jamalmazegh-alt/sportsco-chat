@@ -13,7 +13,6 @@ import {
 
 const normKey = normalizeHeader;
 
-
 function normalizeDate(v: string): string {
   // Accept JJ/MM/AAAA, JJ-MM-AAAA, YYYY-MM-DD, Excel serial (number-as-string)
   const trimmed = v.trim();
@@ -90,7 +89,6 @@ export function parseTemplate(
     const found = headerByNorm.get(normKey(f.key)) ?? headerByNorm.get(normKey(f.label));
     if (found) mapping[found] = f.key;
   }
-
 
   const rows: AnalysisResult["rows"] = [];
   const correctionMap = new Map<string, { original: string; corrected: string; count: number }>();

@@ -218,7 +218,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
   const [perDaySchedule, setPerDaySchedule] = useState(false);
 
-
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
@@ -377,7 +376,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       setState((s) => ({
         ...s,
         recurrence: { mode, weekdays: [] },
-        startTime: s.startTime && s.startTime !== defaultStartTime((s.type as WizardEventType) || "other") ? s.startTime : "10:00",
+        startTime:
+          s.startTime && s.startTime !== defaultStartTime((s.type as WizardEventType) || "other")
+            ? s.startTime
+            : "10:00",
         endTime: s.endTime ?? "16:00",
       }));
       return;
@@ -695,9 +697,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "name" && (
-          <StepQuestion
-            title={t("eventWizard.q.name", { defaultValue: "Nom de l'événement ?" })}
-          >
+          <StepQuestion title={t("eventWizard.q.name", { defaultValue: "Nom de l'événement ?" })}>
             <Input
               autoFocus
               value={state.customTitle ?? ""}
@@ -737,20 +737,28 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                         <CalendarIcon className="h-4 w-4" />
                         {state.startDate && state.endDate ? (
                           <span>
-                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })}
                             {" → "}
-                            {format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                            {format(new Date(`${state.endDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })}
                           </span>
                         ) : state.startDate ? (
                           <span>
-                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })}
+                            {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
+                              locale: dateLocale,
+                            })}
                             {" → "}
                             <span className="text-muted-foreground">
                               {t("eventWizard.range.pickEnd", { defaultValue: "date de fin" })}
                             </span>
                           </span>
                         ) : (
-                          t("eventWizard.range.pickBoth", { defaultValue: "Sélectionner début et fin" })
+                          t("eventWizard.range.pickBoth", {
+                            defaultValue: "Sélectionner début et fin",
+                          })
                         )}
                       </Button>
                     </PopoverTrigger>
@@ -759,7 +767,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                         mode="range"
                         numberOfMonths={1}
                         selected={{
-                          from: state.startDate ? new Date(`${state.startDate}T00:00:00`) : undefined,
+                          from: state.startDate
+                            ? new Date(`${state.startDate}T00:00:00`)
+                            : undefined,
                           to: state.endDate ? new Date(`${state.endDate}T00:00:00`) : undefined,
                         }}
                         onSelect={(range: { from?: Date; to?: Date } | undefined) => {
@@ -838,7 +848,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     <div className="space-y-1.5 pt-1">
                       {enumerateDays(state.startDate, state.endDate).map((d) => {
                         const dt = state.dayTimes?.[d];
-                        const start = perDaySchedule ? (dt?.start ?? state.startTime) : state.startTime;
+                        const start = perDaySchedule
+                          ? (dt?.start ?? state.startTime)
+                          : state.startTime;
                         const end = perDaySchedule
                           ? (dt?.end ?? state.endTime ?? "")
                           : (state.endTime ?? "");
@@ -859,7 +871,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                                 next[d] = { start: v, end: next[d]?.end ?? end };
                                 patch("dayTimes", next);
                               }}
-                              className={cn("w-full", !perDaySchedule && "opacity-60 pointer-events-none")}
+                              className={cn(
+                                "w-full",
+                                !perDaySchedule && "opacity-60 pointer-events-none",
+                              )}
                             />
                             <TimePicker
                               value={end}
@@ -869,7 +884,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                                 next[d] = { start: next[d]?.start ?? start, end: v };
                                 patch("dayTimes", next);
                               }}
-                              className={cn("w-full", !perDaySchedule && "opacity-60 pointer-events-none")}
+                              className={cn(
+                                "w-full",
+                                !perDaySchedule && "opacity-60 pointer-events-none",
+                              )}
                             />
                           </div>
                         );
@@ -1006,7 +1024,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             {(
               (state.type === "other"
                 ? [
-                    ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
+                    [
+                      "single",
+                      t("eventWizard.series.single", { defaultValue: "Événement unique" }),
+                    ],
                     [
                       "multi_day",
                       t("eventWizard.series.multiDay", {
@@ -1019,7 +1040,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     ],
                   ]
                 : [
-                    ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
+                    [
+                      "single",
+                      t("eventWizard.series.single", { defaultValue: "Événement unique" }),
+                    ],
                     [
                       "weekly_one",
                       t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" }),

@@ -533,7 +533,12 @@ function TeamDetail() {
 
   async function sendInvitesForPlayer(
     playerId: string,
-  ): Promise<{ sent: number; failed: number; skipped: number; reason?: "no_contact" | "already_active" }> {
+  ): Promise<{
+    sent: number;
+    failed: number;
+    skipped: number;
+    reason?: "no_contact" | "already_active";
+  }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
     try {
       return await sendPlayerInvitationsFn({ data: { teamId, playerId } });
@@ -550,7 +555,9 @@ function TeamDetail() {
     setInviting(false);
     if (r.skipped)
       toast.warning(
-        t(r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+        t(
+          r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact",
+        ),
       );
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed)
@@ -605,7 +612,11 @@ function TeamDetail() {
     setSelectedIds(new Set());
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
-        t(alreadyActiveSkipped >= noContactSkipped ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+        t(
+          alreadyActiveSkipped >= noContactSkipped
+            ? "players.inviteAlreadyActive"
+            : "players.inviteNoContact",
+        ),
       );
     else if (totalFailed)
       toast.warning(
@@ -637,8 +648,7 @@ function TeamDetail() {
         return age < 18;
       })();
       const canInvitePlayer = !isMinor || !!p.child_platform_access;
-      if (canInvitePlayer && !p.user_id && (p.email || p.phone))
-        return true;
+      if (canInvitePlayer && !p.user_id && (p.email || p.phone)) return true;
       const parents = parentsByPlayer?.get(p.id) ?? [];
       return parents.some((pr) => !pr.parent_user_id && (pr.email || pr.phone));
     },
@@ -648,9 +658,7 @@ function TeamDetail() {
   // Players who can be retried from the UI. The server will skip people that
   // are already active or truly have no usable contact.
   const invitableIds = useMemo(() => {
-    return ((players ?? []) as any[])
-      .filter((p) => !p.user_id)
-      .map((p) => p.id as string);
+    return ((players ?? []) as any[]).filter((p) => !p.user_id).map((p) => p.id as string);
   }, [players]);
 
   async function inviteWholeTeam() {
@@ -672,7 +680,11 @@ function TeamDetail() {
     setInviting(false);
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
-        t(alreadyActiveSkipped >= noContactSkipped ? "players.inviteAlreadyActive" : "players.inviteNoContact"),
+        t(
+          alreadyActiveSkipped >= noContactSkipped
+            ? "players.inviteAlreadyActive"
+            : "players.inviteNoContact",
+        ),
       );
     else if (totalFailed)
       toast.warning(

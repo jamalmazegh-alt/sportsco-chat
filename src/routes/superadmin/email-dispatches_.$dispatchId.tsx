@@ -143,7 +143,9 @@ function DispatchDetailPage() {
             <StatCard label="En attente" value={data.counts.pending} tone="info" />
             <StatCard
               label="Échecs"
-              value={data.counts.failed + data.counts.dlq + data.counts.bounced + data.counts.complained}
+              value={
+                data.counts.failed + data.counts.dlq + data.counts.bounced + data.counts.complained
+              }
               tone="danger"
             />
           </div>
@@ -163,19 +165,28 @@ function DispatchDetailPage() {
           </div>
 
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {(["all", "sent", "pending", "failed", "dlq", "bounced", "suppressed", "complained"] as const).map(
-              (s) => (
-                <Button
-                  key={s}
-                  size="sm"
-                  variant={statusFilter === s ? "default" : "outline"}
-                  className="h-7 text-xs"
-                  onClick={() => setStatusFilter(s)}
-                >
-                  {s === "all" ? "Tous" : statusLabel(s)}
-                </Button>
-              ),
-            )}
+            {(
+              [
+                "all",
+                "sent",
+                "pending",
+                "failed",
+                "dlq",
+                "bounced",
+                "suppressed",
+                "complained",
+              ] as const
+            ).map((s) => (
+              <Button
+                key={s}
+                size="sm"
+                variant={statusFilter === s ? "default" : "outline"}
+                className="h-7 text-xs"
+                onClick={() => setStatusFilter(s)}
+              >
+                {s === "all" ? "Tous" : statusLabel(s)}
+              </Button>
+            ))}
           </div>
 
           <Input
@@ -205,11 +216,11 @@ function DispatchDetailPage() {
                 <tbody>
                   {filtered.map((r) => (
                     <tr key={r.id} className="border-t border-border">
-                      <td className="px-3 py-2 font-mono text-xs break-all">
-                        {r.recipient_email}
-                      </td>
+                      <td className="px-3 py-2 font-mono text-xs break-all">{r.recipient_email}</td>
                       <td className="px-3 py-2">
-                        <StatusBadge tone={statusTone(r.status)}>{statusLabel(r.status)}</StatusBadge>
+                        <StatusBadge tone={statusTone(r.status)}>
+                          {statusLabel(r.status)}
+                        </StatusBadge>
                       </td>
                       <td className="px-3 py-2 text-xs text-muted-foreground">
                         {r.notification_type ?? "—"}
@@ -223,7 +234,10 @@ function DispatchDetailPage() {
                       <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
                         {fmtDate(r.created_at)}
                       </td>
-                      <td className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate" title={r.error_message ?? undefined}>
+                      <td
+                        className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate"
+                        title={r.error_message ?? undefined}
+                      >
                         {r.error_message ?? ""}
                       </td>
                     </tr>
@@ -238,15 +252,7 @@ function DispatchDetailPage() {
   );
 }
 
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: Tone;
-}) {
+function StatCard({ label, value, tone }: { label: string; value: number; tone: Tone }) {
   const toneClass: Record<Tone, string> = {
     success: "text-emerald-600 dark:text-emerald-400",
     info: "text-blue-600 dark:text-blue-400",

@@ -431,7 +431,9 @@ function UserDetail() {
                       )}
                     </div>
                     {p.club && (
-                      <div className="text-[11px] text-muted-foreground truncate">{p.club.name}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">
+                        {p.club.name}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -446,7 +448,9 @@ function UserDetail() {
                       <ul className="space-y-1">
                         {p.teams.map((t) => (
                           <li key={t.team_id + t.role} className="text-xs flex items-center gap-2">
-                            <span className="font-medium">{t.team?.name ?? t.team_id.slice(0, 8)}</span>
+                            <span className="font-medium">
+                              {t.team?.name ?? t.team_id.slice(0, 8)}
+                            </span>
                             <span className="text-muted-foreground">{t.team?.sport ?? "—"}</span>
                             <StatusBadge tone={roleTone(t.role)}>{t.role}</StatusBadge>
                           </li>
@@ -533,7 +537,9 @@ function UserDetail() {
                     <ul className="space-y-1">
                       {r.teams.map((t) => (
                         <li key={t.team_id + t.role} className="text-xs flex items-center gap-2">
-                          <span className="font-medium">{t.team?.name ?? t.team_id.slice(0, 8)}</span>
+                          <span className="font-medium">
+                            {t.team?.name ?? t.team_id.slice(0, 8)}
+                          </span>
                           <span className="text-muted-foreground">{t.team?.sport ?? "—"}</span>
                           <StatusBadge tone={roleTone(t.role)}>{t.role}</StatusBadge>
                         </li>
@@ -546,7 +552,6 @@ function UserDetail() {
           </ul>
         )}
       </Section>
-
 
       {/* Recent convocations */}
       <Section icon={Calendar} title="Recent convocations">

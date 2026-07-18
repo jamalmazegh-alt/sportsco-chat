@@ -71,8 +71,7 @@ async function authorize(context: any, eventId: string, userId: string) {
       .eq("user_id", userId)
       .maybeSingle();
     const role = (tm as any)?.role as string | undefined;
-    if (role === "coach" || role === "assistant_coach")
-      return { authorized: true as const };
+    if (role === "coach" || role === "assistant_coach") return { authorized: true as const };
   }
   if (clubId) {
     const { data: cm } = await context.supabase
@@ -234,9 +233,12 @@ export const replayEventDlq = createServerFn({ method: "POST" })
 
     // Advisory lock — serializes concurrent replays on the same event.
     const lockKey = await eventLockKey(data.eventId);
-    const { data: lockData } = await supabaseAdmin.rpc("pg_try_advisory_lock" as any, {
-      key: lockKey,
-    } as any);
+    const { data: lockData } = await supabaseAdmin.rpc(
+      "pg_try_advisory_lock" as any,
+      {
+        key: lockKey,
+      } as any,
+    );
     const lockAcquired = lockData === true || lockData === undefined;
     if (!lockAcquired) {
       return {
@@ -254,11 +256,7 @@ export const replayEventDlq = createServerFn({ method: "POST" })
     let unlockErr: unknown = null;
     try {
       // Compute the plan — re-checks delivery/in-flight state inside the lock.
-      const plan = await computePlan(
-        supabaseAdmin,
-        data.eventId,
-        data.notificationType,
-      );
+      const plan = await computePlan(supabaseAdmin, data.eventId, data.notificationType);
       if (plan.rows.length === 0) {
         return {
           ok: true,

@@ -30,9 +30,9 @@ describe("parseTemplate — header mapping (players)", () => {
     ];
     const rows = [
       {
-        "Équipe": "U15 R1",
-        "Sport": "football",
-        "Catégorie": "U15",
+        Équipe: "U15 R1",
+        Sport: "football",
+        Catégorie: "U15",
         "Prenom joueur": "Lucas",
         "Nom joueur": "Martin",
         "Date naissance": "2009-02-02",
@@ -47,9 +47,9 @@ describe("parseTemplate — header mapping (players)", () => {
     const res = parseTemplate("players", headers, rows);
     // Every source header must be mapped to a Clubero key.
     expect(res.mapping).toMatchObject({
-      "Équipe": "equipe",
-      "Sport": "sport",
-      "Catégorie": "categorie",
+      Équipe: "equipe",
+      Sport: "sport",
+      Catégorie: "categorie",
       "Prenom joueur": "prenom_joueur",
       "Nom joueur": "nom_joueur",
       "Date naissance": "date_naissance",
@@ -67,7 +67,14 @@ describe("parseTemplate — header mapping (players)", () => {
   });
 
   it("maps canonical technical keys as well (equipe / prenom_joueur / …)", () => {
-    const headers = ["equipe", "sport", "categorie", "prenom_joueur", "nom_joueur", "date_naissance"];
+    const headers = [
+      "equipe",
+      "sport",
+      "categorie",
+      "prenom_joueur",
+      "nom_joueur",
+      "date_naissance",
+    ];
     const rows = [
       {
         equipe: "U15",
@@ -86,11 +93,18 @@ describe("parseTemplate — header mapping (players)", () => {
   });
 
   it("is resilient to casse, accents stripped, and asterisk suffix on required cols", () => {
-    const headers = ["EQUIPE*", "SPORT", "categorie*", "PRENOM JOUEUR*", "NOM JOUEUR*", "date de naissance*"];
+    const headers = [
+      "EQUIPE*",
+      "SPORT",
+      "categorie*",
+      "PRENOM JOUEUR*",
+      "NOM JOUEUR*",
+      "date de naissance*",
+    ];
     const rows = [
       {
         "EQUIPE*": "U13",
-        "SPORT": "football",
+        SPORT: "football",
         "categorie*": "U13",
         "PRENOM JOUEUR*": "Bob",
         "NOM JOUEUR*": "Smith",
@@ -121,9 +135,9 @@ describe("parseTemplate — header mapping (players)", () => {
     ];
     const rows = [
       {
-        "Équipe": "U15",
-        "Sport": "football",
-        "Catégorie": "U15",
+        Équipe: "U15",
+        Sport: "football",
+        Catégorie: "U15",
         "Prénom joueur": "Lucas",
         "Nom joueur": "Martin",
         "Date de naissance": "2009-02-02",
@@ -136,43 +150,46 @@ describe("parseTemplate — header mapping (players)", () => {
     expect(res.mapping["Numéro de licence"]).toBe("numero_licence");
 
     // Also cover EN + hash-based variants.
-    const res2 = parseTemplate("players", ["Jersey number", "License #"], [
-      { "Jersey number": "7", "License #": "ABC" },
-    ]);
+    const res2 = parseTemplate(
+      "players",
+      ["Jersey number", "License #"],
+      [{ "Jersey number": "7", "License #": "ABC" }],
+    );
     expect(res2.mapping["Jersey number"]).toBe("numero_maillot");
     expect(res2.mapping["License #"]).toBe("numero_licence");
 
     // And `num` / `n°` short forms.
-    const res3 = parseTemplate("players", ["num maillot", "n° licence"], [
-      { "num maillot": "7", "n° licence": "ABC" },
-    ]);
+    const res3 = parseTemplate(
+      "players",
+      ["num maillot", "n° licence"],
+      [{ "num maillot": "7", "n° licence": "ABC" }],
+    );
     expect(res3.mapping["num maillot"]).toBe("numero_maillot");
     expect(res3.mapping["n° licence"]).toBe("numero_licence");
   });
 });
-
 
 describe("parseTemplate — header mapping (coaches)", () => {
   it("maps standard coach headers (French labels)", () => {
     const headers = ["Équipe", "Sport", "Catégorie", "Prénom", "Nom", "Email", "Rôle"];
     const rows = [
       {
-        "Équipe": "U15",
-        "Sport": "football",
-        "Catégorie": "U15",
-        "Prénom": "Coach",
-        "Nom": "Dupont",
-        "Email": "coach@example.com",
-        "Rôle": "coach",
+        Équipe: "U15",
+        Sport: "football",
+        Catégorie: "U15",
+        Prénom: "Coach",
+        Nom: "Dupont",
+        Email: "coach@example.com",
+        Rôle: "coach",
       },
     ];
     const res = parseTemplate("coaches", headers, rows);
     expect(res.mapping).toMatchObject({
-      "Équipe": "equipe",
-      "Prénom": "prenom",
-      "Nom": "nom",
-      "Email": "email",
-      "Rôle": "role",
+      Équipe: "equipe",
+      Prénom: "prenom",
+      Nom: "nom",
+      Email: "email",
+      Rôle: "role",
     });
     expect(res.summary.valid).toBe(1);
   });
@@ -183,12 +200,12 @@ describe("parseTemplate — header mapping (planning)", () => {
     const headers = ["Équipe", "Type", "Date début", "Heure début", "Heure fin", "Lieu"];
     const rows = [
       {
-        "Équipe": "U15",
-        "Type": "Entraînement",
+        Équipe: "U15",
+        Type: "Entraînement",
         "Date début": "2026-09-01",
         "Heure début": "18:00",
         "Heure fin": "19:30",
-        "Lieu": "Stade",
+        Lieu: "Stade",
       },
     ];
     const res = parseTemplate("planning", headers, rows);
@@ -203,12 +220,26 @@ describe("parseTemplate — header mapping (planning)", () => {
 
 describe("templateMatchRatio — required-field detection", () => {
   it("reaches 100% when all required labels are present (players)", () => {
-    const headers = ["Équipe", "Sport", "Catégorie", "Prénom joueur", "Nom joueur", "Date de naissance"];
+    const headers = [
+      "Équipe",
+      "Sport",
+      "Catégorie",
+      "Prénom joueur",
+      "Nom joueur",
+      "Date de naissance",
+    ];
     expect(templateMatchRatio(headers, "players")).toBe(1);
   });
 
   it("reaches 100% when required technical keys are used (players)", () => {
-    const headers = ["equipe", "sport", "categorie", "prenom_joueur", "nom_joueur", "date_naissance"];
+    const headers = [
+      "equipe",
+      "sport",
+      "categorie",
+      "prenom_joueur",
+      "nom_joueur",
+      "date_naissance",
+    ];
     expect(templateMatchRatio(headers, "players")).toBe(1);
   });
 

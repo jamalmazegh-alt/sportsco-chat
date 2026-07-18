@@ -198,7 +198,8 @@ beforeAll(async () => {
     email: invitedParentEmail,
     password: PWD,
   });
-  if (invitedParentSignErr) throw new Error(`invited parent signIn: ${invitedParentSignErr.message}`);
+  if (invitedParentSignErr)
+    throw new Error(`invited parent signIn: ${invitedParentSignErr.message}`);
 
   // Reset to inherited defaults before running matrix
   await setEventVisibility(fx.eventA, null);
@@ -210,7 +211,10 @@ afterAll(async () => {
   await admin.from("convocations").delete().eq("id", invitedConvocationId);
   await admin.from("player_parents").delete().eq("parent_user_id", invitedParentUserId);
   await admin.from("players").delete().eq("id", invitedPlayerId);
-  await admin.from("club_members").delete().in("user_id", [invitedChildUserId, invitedParentUserId]);
+  await admin
+    .from("club_members")
+    .delete()
+    .in("user_id", [invitedChildUserId, invitedParentUserId]);
   await admin.from("profiles").delete().in("id", [invitedChildUserId, invitedParentUserId]);
   await admin.auth.admin.deleteUser(invitedChildUserId);
   await admin.auth.admin.deleteUser(invitedParentUserId);
@@ -277,10 +281,7 @@ describe("RLS: convocations — restrictive gate quand liste masquée", () => {
   it("coachA (staff) reads all convocations even when hidden", async () => {
     const fx = getFixtures();
     const c = await signInAs("coachA");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     const ids = (data ?? []).map((r) => r.id).sort();
     expect(ids).toContain(fx.convocationA);
@@ -290,10 +291,7 @@ describe("RLS: convocations — restrictive gate quand liste masquée", () => {
   it("adminA (staff) reads all convocations even when hidden", async () => {
     const fx = getFixtures();
     const c = await signInAs("adminA");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     expect((data ?? []).length).toBeGreaterThanOrEqual(2);
   });
@@ -301,10 +299,7 @@ describe("RLS: convocations — restrictive gate quand liste masquée", () => {
   it("playerA reads their OWN convocation when hidden", async () => {
     const fx = getFixtures();
     const c = await signInAs("playerA");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("id", fx.convocationA);
+    const { data, error } = await c.from("convocations").select("id").eq("id", fx.convocationA);
     expect(error).toBeNull();
     expect((data ?? []).length).toBe(1);
   });
@@ -327,20 +322,14 @@ describe("RLS: convocations — restrictive gate quand liste masquée", () => {
       .eq("id", teammateConvocationId);
     expect(own.error).toBeNull();
     expect((own.data ?? []).length).toBe(1);
-    const other = await teammateClient
-      .from("convocations")
-      .select("id")
-      .eq("id", fx.convocationA);
+    const other = await teammateClient.from("convocations").select("id").eq("id", fx.convocationA);
     expect((other.data ?? []).length).toBe(0);
   });
 
   it("parentA (linked to playerA) reads playerA's convocation", async () => {
     const fx = getFixtures();
     const c = await signInAs("parentA");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("id", fx.convocationA);
+    const { data, error } = await c.from("convocations").select("id").eq("id", fx.convocationA);
     expect(error).toBeNull();
     expect((data ?? []).length).toBe(1);
   });
@@ -406,7 +395,9 @@ describe("RLS: convocations — parent lié pur hors team_members", () => {
       .from("team_members")
       .select("id", { count: "exact", head: true })
       .eq("team_id", fx.teamA)
-      .or(`user_id.in.(${invitedChildUserId},${invitedParentUserId}),player_id.eq.${invitedPlayerId}`);
+      .or(
+        `user_id.in.(${invitedChildUserId},${invitedParentUserId}),player_id.eq.${invitedPlayerId}`,
+      );
     expect(tmErr).toBeNull();
     expect(count).toBe(0);
 
@@ -505,10 +496,7 @@ describe("RLS: event_lineups — masqué = 0 ligne pour les non-staff", () => {
   it("coachA sees the lineup when hidden", async () => {
     const fx = getFixtures();
     const c = await signInAs("coachA");
-    const { data, error } = await c
-      .from("event_lineups")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("event_lineups").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     expect((data ?? []).length).toBe(1);
   });
@@ -551,7 +539,10 @@ describe("RLS: anon — aucun accès direct, même quand la liste est visible", 
     const { data, error } = await c.rpc("call_up_list_visible", { p_event_id: fx.eventA });
     // anon lost EXECUTE → PostgREST returns an error, or data is null.
     const blocked = !!error || data === null;
-    expect(blocked, `anon should not be able to call the RPC (data=${data}, err=${error?.message})`).toBe(true);
+    expect(
+      blocked,
+      `anon should not be able to call the RPC (data=${data}, err=${error?.message})`,
+    ).toBe(true);
   });
 
   it("anon cannot EXECUTE is_team_staff_of_event", async () => {
@@ -734,10 +725,7 @@ describe("RLS: convocations — non-membre total exclu même sur event visible",
     const fx = getFixtures();
     await setEventVisibility(fx.eventA, true);
     const c = await signInAs("adminB");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     expect(data ?? []).toHaveLength(0);
     await setEventVisibility(fx.eventA, null);
@@ -747,10 +735,7 @@ describe("RLS: convocations — non-membre total exclu même sur event visible",
     const fx = getFixtures();
     await setEventVisibility(fx.eventA, true);
     const c = await signInAs("coachB");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     expect(data ?? []).toHaveLength(0);
     await setEventVisibility(fx.eventA, null);
@@ -760,10 +745,7 @@ describe("RLS: convocations — non-membre total exclu même sur event visible",
     const fx = getFixtures();
     await setEventVisibility(fx.eventA, true);
     const c = await signInAs("playerB");
-    const { data, error } = await c
-      .from("convocations")
-      .select("id")
-      .eq("event_id", fx.eventA);
+    const { data, error } = await c.from("convocations").select("id").eq("event_id", fx.eventA);
     expect(error).toBeNull();
     expect(data ?? []).toHaveLength(0);
     await setEventVisibility(fx.eventA, null);
@@ -903,6 +885,3 @@ describe("RLS: fallback invité — teams / carpools / event_goals", () => {
     expect(other.data ?? []).toHaveLength(0);
   });
 });
-
-
-

@@ -25,18 +25,20 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
       .select("email")
       .eq("player_id", data.playerId);
     if (error || !parents) {
-      return { sentEmails: [] as string[], failedEmails: [] as { email: string; error: string | null }[] };
+      return {
+        sentEmails: [] as string[],
+        failedEmails: [] as { email: string; error: string | null }[],
+      };
     }
 
     const emails = Array.from(
-      new Set(
-        parents
-          .map((p) => (p.email ?? "").trim().toLowerCase())
-          .filter((e) => e.length > 0),
-      ),
+      new Set(parents.map((p) => (p.email ?? "").trim().toLowerCase()).filter((e) => e.length > 0)),
     );
     if (emails.length === 0) {
-      return { sentEmails: [] as string[], failedEmails: [] as { email: string; error: string | null }[] };
+      return {
+        sentEmails: [] as string[],
+        failedEmails: [] as { email: string; error: string | null }[],
+      };
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

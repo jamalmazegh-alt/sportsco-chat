@@ -258,7 +258,6 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 
               <Separator />
 
-
               <StatusActions
                 detail={detail}
                 t={t}
@@ -807,8 +806,7 @@ function PaymentSection({
     detail.amount_paid > 0 && detail.amount_paid < price ? String(detail.amount_paid) : "",
   );
   const partialValue = Number(partialAmount.replace(",", "."));
-  const partialValid =
-    Number.isFinite(partialValue) && partialValue > 0 && partialValue < price;
+  const partialValid = Number.isFinite(partialValue) && partialValue > 0 && partialValue < price;
   const remaining = Math.max(0, price - (detail.amount_paid ?? 0));
 
   return (
@@ -937,7 +935,6 @@ function PaymentSection({
   );
 }
 
-
 function PaymentPill({ status, t }: { status: PaymentStatus; t: any }) {
   const map: Record<PaymentStatus, string> = {
     not_required: "bg-slate-500/10 text-slate-700 border-slate-500/30",
@@ -953,4 +950,3 @@ function PaymentPill({ status, t }: { status: PaymentStatus; t: any }) {
     </Badge>
   );
 }
-

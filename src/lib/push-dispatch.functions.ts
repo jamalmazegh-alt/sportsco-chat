@@ -205,9 +205,7 @@ export const dispatchConvocationResendPush = createServerFn({ method: "POST" })
         ? ` · ${location}`
         : "";
 
-    const title = data.hasChanges
-      ? "🔄 Convocation mise à jour"
-      : "🔄 Convocation renvoyée";
+    const title = data.hasChanges ? "🔄 Convocation mise à jour" : "🔄 Convocation renvoyée";
 
     console.log("[push:conv-resend] dispatch begin", {
       eventId: data.eventId,
@@ -245,8 +243,6 @@ export const dispatchConvocationResendPush = createServerFn({ method: "POST" })
     }
     return { dispatched: targets.size, sent };
   });
-
-
 
 /* ------------------------------------------------------------------ */
 /* Match score push                                                   */

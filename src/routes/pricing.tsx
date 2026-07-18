@@ -9,7 +9,9 @@ import { trackConversion } from "@/lib/conversion-tracking";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
-  validateSearch: (search: Record<string, unknown>): { source?: string; utm_source?: string; tournament_id?: string } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { source?: string; utm_source?: string; tournament_id?: string } => {
     const out: { source?: string; utm_source?: string; tournament_id?: string } = {};
     if (typeof search.source === "string") out.source = search.source;
     if (typeof search.utm_source === "string") out.utm_source = search.utm_source;

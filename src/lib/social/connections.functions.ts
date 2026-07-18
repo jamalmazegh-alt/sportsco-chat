@@ -110,11 +110,12 @@ export const disconnectSocial = createServerFn({ method: "POST" })
         actionType: "social.disconnected",
         metadata: { network: data.network },
       });
-    } catch { /* never block */ }
+    } catch {
+      /* never block */
+    }
 
     return { ok: true };
   });
-
 
 export const syncSocialNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

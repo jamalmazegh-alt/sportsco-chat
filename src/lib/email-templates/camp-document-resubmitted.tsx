@@ -20,10 +20,7 @@ const CampDocumentResubmitted = ({
   wasRejected,
   manageUrl,
 }: Props) => (
-  <EmailShell
-    preview={`Document renvoyé : ${documentTitle} — ${participantName}`}
-    locale="fr"
-  >
+  <EmailShell preview={`Document renvoyé : ${documentTitle} — ${participantName}`} locale="fr">
     <Section style={header}>
       <Img
         src="https://www.clubero.app/clubero-logo.png"

@@ -64,9 +64,7 @@ export async function dispatchWallPostPushInternal(
 
   const { data: post } = await supabaseAdmin
     .from("wall_posts")
-    .select(
-      "id, club_id, author_user_id, deleted_at, audience_team_ids, audience_type, source",
-    )
+    .select("id, club_id, author_user_id, deleted_at, audience_team_ids, audience_type, source")
     .eq("id", postId)
     .maybeSingle();
   if (!post || (post as any).deleted_at) {

@@ -406,7 +406,6 @@ export function MatchResultCard({
           </p>
         )}
 
-
         {editing && (
           <div className="space-y-3">
             {cfg.setScoresEnabled ? (

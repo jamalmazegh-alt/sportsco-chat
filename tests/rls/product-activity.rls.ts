@@ -39,10 +39,7 @@ describe("RLS: product_activity_log", () => {
   });
 
   it("service_role can read the seeded row (sanity)", async () => {
-    const { data, error } = await admin
-      .from("product_activity_log")
-      .select("id")
-      .eq("id", rowId);
+    const { data, error } = await admin.from("product_activity_log").select("id").eq("id", rowId);
     expect(error).toBeNull();
     expect(data?.length).toBe(1);
   });
@@ -63,10 +60,7 @@ describe("RLS: product_activity_log", () => {
 
   it("superadmin CAN read", async () => {
     const c = await signInAs("superadmin");
-    const { data, error } = await c
-      .from("product_activity_log")
-      .select("id")
-      .eq("id", rowId);
+    const { data, error } = await c.from("product_activity_log").select("id").eq("id", rowId);
     expect(error).toBeNull();
     expect(data?.length).toBe(1);
   });
