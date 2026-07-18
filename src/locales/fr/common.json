@@ -2334,6 +2334,7 @@
     "bulk": {
       "club_members": "Tous les membres du club",
       "club_staff": "Tout le staff",
+      "club_admins": "Tous les admins du club",
       "club_educators": "Tous les éducateurs",
       "team_players": "Joueurs d'une équipe",
       "team_parents": "Parents d'une équipe",
