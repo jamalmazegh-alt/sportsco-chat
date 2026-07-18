@@ -195,6 +195,7 @@ type NeedRowType = {
   last_published_at: string | null;
   last_recipients_count: number | null;
   my_signup: { id: string; status: string } | null;
+  confirmed_signups?: { user_id: string; full_name: string | null }[];
 };
 
 function NeedRow({
