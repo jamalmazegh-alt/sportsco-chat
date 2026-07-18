@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState, useCallback } from "react";
 import { ChevronRight, HandHelping, Check, X } from "lucide-react";
 import { listMyOpenNeeds, applyToEventNeed, withdrawSignup } from "@/lib/needs/needs.functions";
 import { getNeedVisual, resolveNeedLabel } from "@/components/needs/need-visuals";
@@ -10,12 +11,40 @@ import { Badge } from "@/components/ui/badge";
 import { fmt } from "@/lib/date-locale";
 import { toast } from "sonner";
 
+const DISMISS_KEY = "clubero:needs:dismissed";
+
+function readDismissed(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(DISMISS_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function HomeNeedsCard() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const listFn = useServerFn(listMyOpenNeeds);
   const applyFn = useServerFn(applyToEventNeed);
   const withdrawFn = useServerFn(withdrawSignup);
+
+  const [dismissed, setDismissed] = useState<string[]>([]);
+  useEffect(() => setDismissed(readDismissed()), []);
+
+  const dismiss = useCallback((needId: string) => {
+    setDismissed((prev) => {
+      if (prev.includes(needId)) return prev;
+      const next = [...prev, needId];
+      try {
+        window.localStorage.setItem(DISMISS_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }, []);
 
   const { data } = useQuery({
     queryKey: ["home-my-open-needs"],
@@ -43,7 +72,8 @@ export function HomeNeedsCard() {
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
-  const needs = (data?.needs ?? []) as any[];
+  const allNeeds = (data?.needs ?? []) as any[];
+  const needs = allNeeds.filter((n) => !dismissed.includes(n.id));
   // Prioritize needs where user hasn't decided yet
   const sorted = [...needs].sort((a, b) => {
     const aPending = !a.my_signup ? 0 : 1;
@@ -135,17 +165,30 @@ export function HomeNeedsCard() {
                   </>
                 )}
                 {canApply && (
-                  <Button
-                    size="sm"
-                    className="h-7 px-2.5 text-[11px] font-bold"
-                    disabled={applyMut.isPending}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      applyMut.mutate(n.id);
-                    }}
-                  >
-                    {t("needs:actions.apply")}
-                  </Button>
+                  <>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-[11px] text-muted-foreground"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dismiss(n.id);
+                      }}
+                    >
+                      {t("needs:actions.notAvailable", { defaultValue: "Pas dispo" })}
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] font-bold"
+                      disabled={applyMut.isPending}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        applyMut.mutate(n.id);
+                      }}
+                    >
+                      {t("needs:actions.imIn", { defaultValue: "Je me propose" })}
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
