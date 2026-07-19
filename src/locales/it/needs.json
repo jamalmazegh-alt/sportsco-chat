@@ -297,5 +297,10 @@
   },
   "recentlyFilled": {
     "title": "Coperte di recente"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} posto",
+    "seatsRemaining_other": "{{count}} posti",
+    "fallbackTitle": "Aiuto"
   }
 }

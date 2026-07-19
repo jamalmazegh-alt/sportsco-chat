@@ -297,5 +297,10 @@
   },
   "recentlyFilled": {
     "title": "Preenchidas recentemente"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} vaga",
+    "seatsRemaining_other": "{{count}} vagas",
+    "fallbackTitle": "Ajuda"
   }
 }
