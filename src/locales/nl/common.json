@@ -2195,6 +2195,10 @@
       "checkFailed": "Kan meldingen niet controleren"
     },
     "partialError": "Sommige bronnen zijn niet beschikbaar, de lijst kan onvolledig zijn.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Reageren",
       "open": "Openen"
