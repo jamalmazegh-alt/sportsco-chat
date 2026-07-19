@@ -297,5 +297,10 @@
   },
   "recentlyFilled": {
     "title": "Recent ingevuld"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} plek",
+    "seatsRemaining_other": "{{count}} plekken",
+    "fallbackTitle": "Hulp"
   }
 }
