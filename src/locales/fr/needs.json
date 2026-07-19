@@ -105,6 +105,22 @@
     "convoked_players": "Joueurs convoqués",
     "convoked_parents": "Parents des joueurs convoqués",
     "clubAudiences": "Audiences du club",
+    "customGroups": "Groupes personnalisés",
+    "eventRelevant": "Suggéré pour cet événement",
+    "otherAudiences": "Autres audiences",
+    "pickKind": "Choisir un type…",
+    "pickParam": "Choisir…",
+    "noGroups": "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
+    "selected": {
+      "title": "Audience sélectionnée",
+      "empty": "Aucune audience sélectionnée — ajoutez au moins un critère ci-dessous.",
+      "emptyConvocation": "La convocation n'est pas encore faite — convoquez d'abord, ou choisissez une autre audience.",
+      "loading": "Calcul en cours…",
+      "count_one": "{{count}} personne sera prévenue",
+      "count_other": "{{count}} personnes seront prévenues",
+      "removeAria": "Retirer {{label}}",
+      "takenAria": "Déjà sélectionné"
+    },
     "club_members": "Tous les membres du club",
     "club_educators": "Éducateurs du club",
     "club_staff": "Staff / bénévoles du club",
@@ -116,6 +132,8 @@
     "team_educators": "Éducateurs d'une équipe",
     "category_educators": "Éducateurs d'une catégorie"
   },
+
+
   "staff": {
     "title": "Candidatures",
     "empty": "Aucune candidature pour le moment.",

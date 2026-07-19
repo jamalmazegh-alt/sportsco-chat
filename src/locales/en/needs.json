@@ -105,6 +105,23 @@
     "convoked_players": "Called-up players",
     "convoked_parents": "Parents of called-up players",
     "clubAudiences": "Club audiences",
+    "customGroups": "Custom groups",
+    "eventRelevant": "Suggested for this event",
+    "otherAudiences": "Other audiences",
+    "pickKind": "Pick a type…",
+    "pickParam": "Pick one…",
+    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "selected": {
+      "title": "Selected audience",
+      "empty": "No audience selected — add at least one criterion below.",
+      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
+      "loading": "Computing…",
+      "count_one": "{{count}} person will be notified",
+      "count_other": "{{count}} people will be notified",
+      "removeAria": "Remove {{label}}",
+      "takenAria": "Already selected"
+    },
+
     "club_members": "All club members",
     "club_educators": "Club educators",
     "club_staff": "Club staff / volunteers",

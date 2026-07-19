@@ -22,11 +22,13 @@ import {
   UserCheck,
   Plus,
   X,
+  Check,
+  Loader2,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+
 import {
   Select,
   SelectContent,
@@ -216,6 +218,7 @@ export function AudiencePickerBody({
   ctx,
   state,
   controls,
+  preview,
 }: {
   ctx: AudienceCtx | null | undefined;
   state: AudienceState;
@@ -225,10 +228,12 @@ export function AudiencePickerBody({
     toggleTeam: (id: string, kind: TeamKind) => void;
     setCategory: (v: string) => void;
   };
+  preview?: { count: number | null; loading: boolean };
 }) {
   const { t } = useTranslation();
   const [kind, setKind] = useState<KindKey | "">("");
   const [param, setParam] = useState<string>("");
+
 
   const teamNameById = useMemo(
     () => new Map((ctx?.teams ?? []).map((tm) => [tm.id, tm])),
@@ -340,6 +345,17 @@ export function AudiencePickerBody({
   const eventSuggestions: Suggestion[] = useMemo(() => {
     if (!ctx) return [];
     const list: Suggestion[] = [];
+    // Convocation audiences first — primary use case for a match
+    const convokedKeys: ScalarAudienceKey[] = ["convoked_players", "convoked_parents"];
+    for (const k of convokedKeys) {
+      list.push({
+        id: `sg-s-${k}`,
+        kind: k as KindKey,
+        label: t(`needs:audiences.${k}`),
+        active: state.scalar.has(k),
+        onToggle: () => controls.toggleScalar(k),
+      });
+    }
     const eventTeam = ctx.event_team_id
       ? ctx.teams.find((t) => t.id === ctx.event_team_id)
       : null;
@@ -369,7 +385,8 @@ export function AudiencePickerBody({
       });
     }
     return list;
-  }, [ctx, state.teamPicks, state.category, controls, t]);
+  }, [ctx, state.scalar, state.teamPicks, state.category, controls, t]);
+
 
   const clubAudienceSuggestions: Suggestion[] = useMemo(() => {
     const clubKeys: ScalarAudienceKey[] = [
@@ -388,54 +405,133 @@ export function AudiencePickerBody({
     }));
   }, [state.scalar, controls, t]);
 
+  // Also remove club_staff/etc. keys from the club audiences box so that
+  // convocation scalars only appear in the "event-relevant" box.
+  const hasConvocationScalar =
+    state.scalar.has("convoked_players") || state.scalar.has("convoked_parents");
+  const showEmptyConvocation =
+    hasConvocationScalar &&
+    !!preview &&
+    !preview.loading &&
+    (preview.count ?? 0) === 0 &&
+    // Only convocation scalars picked → convocation-not-done wording
+    state.groupIds.size === 0 &&
+    state.teamPicks.length === 0 &&
+    !state.category &&
+    [...state.scalar].every(
+      (k) => k === "convoked_players" || k === "convoked_parents",
+    );
+
+  type SuggestionT = {
+    id: string;
+    kind: KindKey;
+    label: string;
+    active: boolean;
+    onToggle: () => void;
+  };
+  const SuggestionChip = ({ s, takenLabel }: { s: SuggestionT; takenLabel: string }) => {
+    const { Icon } = KIND_META[s.kind];
+    return (
+      <button
+        type="button"
+        onClick={s.onToggle}
+        aria-pressed={s.active}
+        aria-label={s.active ? `${takenLabel} — ${s.label}` : s.label}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs motion-safe:transition-colors ${
+          s.active
+            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200 opacity-75 hover:opacity-100"
+            : "border-border bg-background hover:bg-muted text-foreground"
+        }`}
+      >
+        <Icon className="h-3 w-3" />
+        <span>{s.label}</span>
+        {s.active ? (
+          <Check className="h-3 w-3 opacity-80" />
+        ) : (
+          <Plus className="h-3 w-3 opacity-70" />
+        )}
+      </button>
+    );
+  };
+
   return (
     <div className="space-y-3">
-      {/* Selected audiences — prominent block */}
-      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 shadow-sm">
-        <Label className="text-[11px] uppercase tracking-wide text-primary flex items-center gap-1.5 font-semibold">
-          <UserCheck className="h-3.5 w-3.5" />
-          {t("needs:audiences.selectedTitle", {
-            defaultValue: "Audience sélectionnée",
-          })}
-          {chips.length > 0 && (
-            <span className="ml-1 rounded-full bg-primary/15 text-primary px-1.5 py-0.5 text-[10px] font-bold">
-              {chips.length}
-            </span>
-          )}
-        </Label>
+
+
+
+      {/* Selected audiences — sticky, high-visibility */}
+      <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
         {chips.length === 0 ? (
-          <p className="mt-2 text-xs text-muted-foreground italic">
-            {t("needs:audiences.emptyHint", {
-              defaultValue:
-                "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
-            })}
-          </p>
+          <div
+            className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center"
+            role="status"
+          >
+            {t("needs:audiences.selected.empty")}
+          </div>
         ) : (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {chips.map((c) => {
-              const { Icon, cls } = KIND_META[c.kind];
-              return (
-                <Badge
-                  key={c.id}
-                  variant="outline"
-                  className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span className="text-xs">{c.label}</span>
-                  <button
-                    type="button"
-                    className="ml-0.5 rounded hover:bg-muted p-0.5"
-                    onClick={c.onRemove}
-                    aria-label={t("common.remove", { defaultValue: "Retirer" })}
+          <div
+            className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)] motion-safe:transition-shadow"
+          >
+            <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold">
+              <UserCheck className="h-3.5 w-3.5" />
+              {t("needs:audiences.selected.title")}
+              <span className="ml-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 text-[10px] font-bold">
+                {chips.length}
+              </span>
+            </Label>
+            <div className="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
+              {chips.map((c) => {
+                const { Icon } = KIND_META[c.kind];
+                return (
+                  <span
+                    key={c.id}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white pl-2.5 pr-1 py-1 text-xs font-medium shadow-sm"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              );
-            })}
+                    <Icon className="h-3 w-3" />
+                    <span>{c.label}</span>
+                    <button
+                      type="button"
+                      className="ml-0.5 rounded-full hover:bg-emerald-700/60 p-0.5 motion-safe:transition-colors"
+                      onClick={c.onRemove}
+                      aria-label={t("needs:audiences.selected.removeAria", {
+                        label: c.label,
+                      })}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+            {/* Counter pill inside selected block */}
+            {preview && (
+              <div className="mt-2.5">
+                {preview.loading ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground px-2.5 py-1 text-[11px]">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    {t("needs:audiences.selected.loading")}
+                  </span>
+                ) : showEmptyConvocation ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px] font-medium">
+                    {t("needs:audiences.selected.emptyConvocation")}
+                  </span>
+                ) : (preview.count ?? 0) === 0 ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px] font-medium">
+                    {t("needs:publish.previewNone")}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+                    {t("needs:audiences.selected.count", {
+                      count: preview.count ?? 0,
+                    })}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
+
 
 
       {/* Custom groups — highlighted */}
@@ -443,34 +539,12 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
             <UsersRound className="h-3.5 w-3.5" />
-            {t("needs:audiences.customGroups", {
-              defaultValue: "Groupes personnalisés",
-            })}
+            {t("needs:audiences.customGroups")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {customGroupSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {customGroupSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
@@ -480,34 +554,12 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
             <Tag className="h-3.5 w-3.5" />
-            {t("needs:audiences.eventRelevant", {
-              defaultValue: "Suggéré pour cet événement",
-            })}
+            {t("needs:audiences.eventRelevant")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {eventSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {eventSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
@@ -517,44 +569,21 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5" />
-            {t("needs:audiences.clubAudiences", {
-              defaultValue: "Audiences du club",
-            })}
+            {t("needs:audiences.clubAudiences")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {clubAudienceSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {clubAudienceSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
 
+
       {/* Other audiences — generic add row */}
       <div>
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("needs:audiences.otherAudiences", {
-            defaultValue: "Autres audiences",
-          })}
+          {t("needs:audiences.otherAudiences")}
         </Label>
         <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
           <Select
@@ -566,9 +595,7 @@ export function AudiencePickerBody({
           >
             <SelectTrigger>
               <SelectValue
-                placeholder={t("needs:audiences.pickKind", {
-                  defaultValue: "Choisir un type…",
-                })}
+                placeholder={t("needs:audiences.pickKind")}
               />
             </SelectTrigger>
             <SelectContent>
@@ -592,9 +619,7 @@ export function AudiencePickerBody({
             <Select value={param} onValueChange={setParam}>
               <SelectTrigger>
                 <SelectValue
-                  placeholder={t("needs:audiences.pickParam", {
-                    defaultValue: "Choisir…",
-                  })}
+                  placeholder={t("needs:audiences.pickParam")}
                 />
               </SelectTrigger>
               <SelectContent>
@@ -641,15 +666,12 @@ export function AudiencePickerBody({
             onClick={submit}
           >
             <Plus className="h-4 w-4 mr-1" />
-            {t("common.add", { defaultValue: "Ajouter" })}
+            {t("common.add")}
           </Button>
         </div>
         {ctx && ctx.groups.length === 0 && (
           <p className="mt-2 text-[11px] text-muted-foreground">
-            {t("needs:publish.noGroups", {
-              defaultValue:
-                "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
-            })}
+            {t("needs:audiences.noGroups")}
           </p>
         )}
       </div>
