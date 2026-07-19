@@ -52,6 +52,7 @@ import { template as campNewRegistrationTemplate } from "./camp-new-registration
 import { template as campDocumentRejectedTemplate } from "./camp-document-rejected";
 import { template as campDocumentResubmittedTemplate } from "./camp-document-resubmitted";
 import { template as eventNeedInviteTemplate } from "./event-need-invite";
+import { template as eventNeedDecisionTemplate } from "./event-need-decision";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
@@ -89,4 +90,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "camp-document-rejected": campDocumentRejectedTemplate,
   "camp-document-resubmitted": campDocumentResubmittedTemplate,
   "event-need-invite": eventNeedInviteTemplate,
+  "event-need-decision": eventNeedDecisionTemplate,
 };
