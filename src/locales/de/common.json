@@ -267,7 +267,9 @@
     "clear": "Leeren",
     "listen": "Anhören",
     "stop": "Stoppen",
-    "errorOccurred": "Ein Fehler ist aufgetreten"
+    "errorOccurred": "Ein Fehler ist aufgetreten",
+    "unknown": "Kein Name",
+    "deselectAll": "Alle abwählen"
   },
   "notFound": {
     "code": "404",

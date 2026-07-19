@@ -267,7 +267,9 @@
     "clear": "Effacer",
     "listen": "Écouter",
     "stop": "Arrêter",
-    "errorOccurred": "Une erreur est survenue"
+    "errorOccurred": "Une erreur est survenue",
+    "unknown": "Sans nom",
+    "deselectAll": "Tout désélectionner"
   },
   "notFound": {
     "code": "404",
