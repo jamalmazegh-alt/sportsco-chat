@@ -2195,6 +2195,10 @@
       "checkFailed": "Unable to check alerts"
     },
     "partialError": "Some sources are unavailable, the list may be incomplete.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Respond",
       "open": "Open"

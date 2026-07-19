@@ -2195,6 +2195,10 @@
       "checkFailed": "Impossible de vérifier les alertes"
     },
     "partialError": "Certaines sources sont indisponibles, la liste peut être incomplète.",
+    "deck": {
+      "showMore_one": "+ {{count}} autre échéance",
+      "showMore_other": "+ {{count}} autres échéances"
+    },
     "cta": {
       "respond": "Répondre",
       "open": "Ouvrir"
