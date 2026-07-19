@@ -7,14 +7,17 @@ import {
   AlertTriangle,
   Bell,
   BellRing,
+  Check,
   CheckCircle2,
   ChevronRight,
   Clock,
   HandHelping,
+  HelpCircle,
   Loader2,
   RefreshCw,
   Sparkles,
   X,
+  XCircle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
