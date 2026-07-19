@@ -115,12 +115,16 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         if (myPlayerIds.size > 0) {
           // Dedup parent multi-enfants : un item par event où ≥1 de mes
           // joueurs n'a pas répondu. sourceId = eventId.
-          const eventsForMe = new Set<string>();
+          const convocIdsByEvent = new Map<string, string[]>();
           for (const c of convocs) {
-            if (myPlayerIds.has(c.player_id)) eventsForMe.add(c.event_id);
+            if (myPlayerIds.has(c.player_id)) {
+              const list = convocIdsByEvent.get(c.event_id) ?? [];
+              list.push(c.id);
+              convocIdsByEvent.set(c.event_id, list);
+            }
           }
           const role: UrgencyRole = isPlayer ? "player" : "parent";
-          for (const eventId of eventsForMe) {
+          for (const [eventId, convocIds] of convocIdsByEvent) {
             const ev = eventById.get(eventId)!;
             const sev = severityForStart(ev.starts_at) ?? "medium";
             items.push({
@@ -135,6 +139,8 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
               }),
               anchorAt: ev.starts_at,
               primaryAction: { kind: "respond", eventId },
+              quickRespondConvocationId:
+                convocIds.length === 1 ? convocIds[0] : undefined,
             });
           }
         }
