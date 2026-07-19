@@ -50,7 +50,13 @@ export const listClubGroups = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const ids = (groups ?? []).map((g) => g.id);
-    if (ids.length === 0) return { groups: [], counts: {} as Record<string, number> };
+    if (ids.length === 0) {
+      return {
+        groups: [],
+        counts: {} as Record<string, number>,
+        resolved_counts: {} as Record<string, number>,
+      };
+    }
 
     const { data: rows } = await supabase
       .from("club_group_members")
@@ -59,7 +65,19 @@ export const listClubGroups = createServerFn({ method: "POST" })
     const counts: Record<string, number> = {};
     for (const r of rows ?? []) counts[r.group_id] = (counts[r.group_id] ?? 0) + 1;
 
-    return { groups: groups ?? [], counts };
+    // Resolved counts (individual members + dynamic rules) per group.
+    const resolved_counts: Record<string, number> = {};
+    await Promise.all(
+      ids.map(async (gid) => {
+        const { data: resolved } = await supabase.rpc("resolve_audience_members", {
+          _club_id: data.club_id,
+          _spec: [{ type: "club_group", group_id: gid }],
+        });
+        resolved_counts[gid] = (resolved ?? []).length;
+      }),
+    );
+
+    return { groups: groups ?? [], counts, resolved_counts };
   });
 
 // ---- Create / update / delete --------------------------------------------
