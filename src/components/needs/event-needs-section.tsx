@@ -1316,7 +1316,9 @@ function PublishDialog({
             }
           >
             {publishM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {t("needs:actions.publish")}
+            {t(republish ? "needs:actions.saveAudience" : "needs:actions.publish", {
+              defaultValue: republish ? "Enregistrer" : undefined,
+            })}
           </Button>
         </DialogFooter>
       </DialogContent>
