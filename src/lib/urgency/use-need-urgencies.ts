@@ -136,7 +136,7 @@ export function useNeedUrgencies(): UrgencyCollectorResult & { isPending: boolea
         role,
         formatWhen: (iso: string) => format(new Date(iso), "EEE d MMM, HH:mm", { locale }),
         labelForRole: (key: string) =>
-          t(`needs:roles.${key}`, { defaultValue: key.replace(/_/g, " ") }),
+          t(`needs:templates.${key}`, { defaultValue: key.replace(/_/g, " ") }),
         seatsSuffix: (remaining: number) =>
           remaining > 1
             ? ` · ${t("needs:urgency.seatsRemaining", {
