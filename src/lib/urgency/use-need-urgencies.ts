@@ -18,7 +18,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { listMyOpenNeeds } from "@/lib/needs/needs.functions";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
-import { getDateLocale } from "@/lib/date-locale";
+import { dateLocale } from "@/lib/date-locale";
 import type {
   UrgencyCollectorResult,
   UrgencyItem,
