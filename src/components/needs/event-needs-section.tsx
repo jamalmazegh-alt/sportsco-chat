@@ -245,6 +245,7 @@ function NeedRow({
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
   const withdraw = useServerFn(withdrawSignup);
+  const declareUnavail = useServerFn(declareUnavailable);
   const close = useServerFn(closeEventNeed);
   const cancel = useServerFn(cancelEventNeed);
   const deleteFn = useServerFn(deleteEventNeed);
