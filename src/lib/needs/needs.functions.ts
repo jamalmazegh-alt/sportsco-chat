@@ -49,6 +49,17 @@ const PublishInput = z.object({
   audiences: AudienceSpecSchema,
 });
 
+const RepublishInput = z.object({
+  need_id: z.string().uuid(),
+  audiences: AudienceSpecSchema,
+  // "delta"  : notify only user_ids not present in any prior publication
+  //            → intent "Modifier les destinataires" (correct an audience mistake
+  //            without re-spamming those already reached).
+  // "resend" : notify the full new snapshot (may re-notify prior recipients)
+  //            → intent "Relancer" (nudge everyone again).
+  mode: z.enum(["delta", "resend"]).default("resend"),
+});
+
 const ApplyInput = z.object({
   need_id: z.string().uuid(),
   comment: z.string().trim().max(1000).optional(),
