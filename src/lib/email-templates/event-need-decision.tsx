@@ -15,7 +15,7 @@ import type { TemplateEntry } from "./registry";
 interface Props {
   recipientFirstName?: string | null;
   locale?: "fr" | "en";
-  decision: "confirm" | "decline";
+  decision: "confirm" | "decline" | "unassign";
   needLabel: string;
   eventTitle: string;
   eventStartsAt?: string | null;
