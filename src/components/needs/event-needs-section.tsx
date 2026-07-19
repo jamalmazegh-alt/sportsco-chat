@@ -1186,15 +1186,18 @@ function PublishDialog({
   needId,
   eventId,
   onPublished,
+  republish = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
   eventId: string;
   onPublished: () => void;
+  republish?: boolean;
 }) {
   const { t } = useTranslation();
   const publish = useServerFn(publishEventNeed);
+  const republishFn = useServerFn(republishEventNeed);
   const preview = useServerFn(previewEventNeedAudience);
   const ctxFn = useServerFn(getNeedAudienceContext);
 
