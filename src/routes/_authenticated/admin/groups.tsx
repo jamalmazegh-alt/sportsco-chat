@@ -1017,10 +1017,7 @@ function GroupMembersPanel({
                     roles={roleList}
                     subline={
                       m.children_names && m.children_names.length > 0
-                        ? t("groups.parentOf", {
-                            defaultValue: "Parent de {{names}}",
-                            names: m.children_names.join(", "),
-                          })
+                        ? t("groups.parentOf", { names: m.children_names.join(", ") })
                         : undefined
                     }
                     action={
@@ -1168,7 +1165,7 @@ function RulePreviewDialog({
                       variant="outline"
                       className="text-[10px] py-0 h-4 border-amber-300 text-amber-700 dark:text-amber-300 dark:border-amber-700/60"
                     >
-                      {t("groups.emailOnly", { defaultValue: "email uniquement" })}
+                      {t("groups.emailOnly")}
                     </Badge>
                   ) : null}
                 </div>
