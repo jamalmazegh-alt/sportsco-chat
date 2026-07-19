@@ -3560,12 +3560,12 @@ function EventDetail() {
           <MatchResultCard
             eventId={event.id}
             teamId={event.team_id}
-            teamName={teams?.[0]?.name ?? null}
+            teamName={eventTeam?.name ?? null}
             isHome={event.is_home}
             opponent={event.opponent}
             isCoach={isCoach}
             startsAt={event.starts_at}
-            sport={teams?.[0]?.sport ?? null}
+            sport={eventTeam?.sport ?? null}
           />
         )}
 
