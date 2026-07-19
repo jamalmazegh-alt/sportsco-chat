@@ -32,7 +32,7 @@
   "signup": {
     "applied": "Aanmelding verzonden",
     "confirmed": "Bevestigd",
-    "declined": "Afgewezen",
+    "declined": "Aanmelding geweigerd",
     "withdrawn": "Ingetrokken"
   },
   "seats": {
@@ -289,5 +289,9 @@
   "feed": {
     "title": "Hulpvragen",
     "empty": "Op dit moment geen open oproepen voor jou."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} geweigerd",
+    "sectionTitleCount_other": "{{count}} geweigerd"
   }
 }

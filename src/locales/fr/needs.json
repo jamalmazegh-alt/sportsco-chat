@@ -32,7 +32,7 @@
   "signup": {
     "applied": "Candidature envoyée",
     "confirmed": "Confirmé",
-    "declined": "Décliné",
+    "declined": "Candidature refusée",
     "withdrawn": "Retiré"
   },
   "seats": {
@@ -289,5 +289,9 @@
   "feed": {
     "title": "Coups de main",
     "empty": "Aucun besoin ouvert pour vous en ce moment."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} refusée",
+    "sectionTitleCount_other": "{{count}} refusées"
   }
 }
