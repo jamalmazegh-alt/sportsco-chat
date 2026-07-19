@@ -1143,10 +1143,7 @@ function RulePreviewDialog({
             {ruleLabel}
           </DialogTitle>
           <DialogDescription>
-            {t("groups.rulePreviewDescription", {
-              defaultValue:
-                "Liste résolue à l'instant. La composition se met à jour automatiquement.",
-            })}
+            {t("groups.subgroupPreviewDescription")}
           </DialogDescription>
         </DialogHeader>
 
