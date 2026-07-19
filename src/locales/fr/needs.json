@@ -49,7 +49,9 @@
     "cancel": "Annuler le besoin",
     "publish": "Publier",
     "republish": "Republier",
-    "assign": "Assigner"
+    "assign": "Assigner",
+    "resend": "Relancer tout le monde",
+    "notifyNew": "Notifier les nouveaux"
   },
   "errors": {
     "forbidden": "Action non autorisée.",
@@ -282,7 +284,8 @@
     "edit": "Modifier",
     "closeNeed": "Fermer le besoin",
     "cancelNeed": "Annuler le besoin",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "editAudience": "Modifier les destinataires"
   },
   "assignNotification": {
     "assignedAs": "Vous avez été inscrit comme {{role}}"
@@ -305,5 +308,18 @@
   },
   "myFeed": {
     "title": "Mes coups de main"
+  },
+  "resend": {
+    "title": "Relancer le besoin",
+    "success_one": "{{count}} destinataire relancé",
+    "success_other": "{{count}} destinataires relancés"
+  },
+  "editAudience": {
+    "title": "Modifier les destinataires",
+    "desc": "Ajoutez ou remplacez des audiences. Seules les personnes qui n'ont jamais été prévenues recevront une notification.",
+    "deltaHint": "Seules les nouvelles personnes seront notifiées. Celles déjà prévenues ne recevront pas de nouvelle alerte.",
+    "success_one": "{{count}} nouveau destinataire notifié",
+    "success_other": "{{count}} nouveaux destinataires notifiés",
+    "successNoDelta": "Sélection mise à jour — personne à notifier en plus."
   }
 }

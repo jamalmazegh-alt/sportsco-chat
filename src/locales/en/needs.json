@@ -49,7 +49,9 @@
     "cancel": "Cancel need",
     "publish": "Publish",
     "republish": "Republish",
-    "assign": "Assign"
+    "assign": "Assign",
+    "resend": "Notify everyone again",
+    "notifyNew": "Notify new recipients"
   },
   "errors": {
     "forbidden": "Action not allowed.",
@@ -282,7 +284,8 @@
     "edit": "Edit",
     "closeNeed": "Close need",
     "cancelNeed": "Cancel need",
-    "delete": "Delete"
+    "delete": "Delete",
+    "editAudience": "Edit recipients"
   },
   "assignNotification": {
     "assignedAs": "You've been assigned as {{role}}"
@@ -305,5 +308,18 @@
   },
   "myFeed": {
     "title": "My helping hands"
+  },
+  "resend": {
+    "title": "Re-notify recipients",
+    "success_one": "{{count}} recipient re-notified",
+    "success_other": "{{count}} recipients re-notified"
+  },
+  "editAudience": {
+    "title": "Edit recipients",
+    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
+    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
+    "success_one": "{{count}} new recipient notified",
+    "success_other": "{{count}} new recipients notified",
+    "successNoDelta": "Selection updated — nobody new to notify."
   }
 }
