@@ -253,6 +253,7 @@ function NeedRow({
   const deleteFn = useServerFn(deleteEventNeed);
 
   const [publishOpen, setPublishOpen] = useState(false);
+  const [republishOpen, setRepublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   
   const [editOpen, setEditOpen] = useState(false);
