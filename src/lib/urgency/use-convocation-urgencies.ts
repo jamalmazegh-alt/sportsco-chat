@@ -22,7 +22,6 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
   const isPlayer = roles.includes("player");
   const isParent = roles.includes("parent");
 
-  const horizonIso = new Date(Date.now() + 3 * DAY_MS).toISOString();
   const nowIso = new Date().toISOString();
 
   const q = useQuery({
