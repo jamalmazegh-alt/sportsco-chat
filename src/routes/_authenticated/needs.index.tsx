@@ -74,10 +74,14 @@ function NeedsFeedPage() {
 
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [unavailOpen, setUnavailOpen] = useState(false);
+  const [declinedOpen, setDeclinedOpen] = useState(false);
 
   const allNeeds = (data?.needs ?? []) as any[];
-  const activeNeeds = allNeeds.filter((n) => n.my_signup?.status !== "unavailable");
+  const activeNeeds = allNeeds.filter(
+    (n) => n.my_signup?.status !== "unavailable" && n.my_signup?.status !== "declined",
+  );
   const unavailNeeds = allNeeds.filter((n) => n.my_signup?.status === "unavailable");
+  const declinedNeeds = allNeeds.filter((n) => n.my_signup?.status === "declined");
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-4">
