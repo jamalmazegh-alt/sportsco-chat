@@ -1607,7 +1607,8 @@ function StaffSignupsDialog({
                             onClick={() =>
                               decideM.mutate({ signup_id: s.id, decision: "confirm" })
                             }
-                            disabled={decideM.isPending || bulkPending}
+                            disabled={decideM.isPending || bulkPending || isFull}
+                            title={isFull ? t("needs:staff.fullTitle", { defaultValue: "Capacité atteinte" }) : undefined}
                           >
                             <Check className="h-3.5 w-3.5" />
                           </Button>
@@ -1622,6 +1623,20 @@ function StaffSignupsDialog({
                             <X className="h-3.5 w-3.5" />
                           </Button>
                         </div>
+                      ) : s.status === "confirmed" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => unassignM.mutate(s.id)}
+                          disabled={unassignM.isPending}
+                          title={t("needs:staff.unassignCta", { defaultValue: "Retirer" })}
+                        >
+                          {unassignM.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <X className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
                       ) : null
                     }
                   />
