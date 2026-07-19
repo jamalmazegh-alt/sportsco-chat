@@ -808,12 +808,11 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       needs: rows.map((n) => ({
         ...n,
         confirmed_count: confirmedByNeed[n.id] ?? 0,
-        confirmed_signups: isStaff
-          ? (confirmedUserIdsByNeed[n.id] ?? []).map((uid) => ({
-              user_id: uid,
-              full_name: nameByUser[uid] ?? null,
-            }))
-          : [],
+        confirmed_signups: projectConfirmedSignups(
+          Boolean(isStaff),
+          confirmedUserIdsByNeed[n.id] ?? [],
+          nameByUser,
+        ),
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
         my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,
