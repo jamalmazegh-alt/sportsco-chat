@@ -15,7 +15,7 @@ import type { TemplateEntry } from "./registry";
 interface Props {
   recipientFirstName?: string | null;
   locale?: "fr" | "en";
-  decision: "confirm" | "decline";
+  decision: "confirm" | "decline" | "unassign";
   needLabel: string;
   eventTitle: string;
   eventStartsAt?: string | null;
@@ -27,11 +27,14 @@ const T = {
   fr: {
     previewConfirm: (label: string) => `Candidature confirmée : ${label}`,
     previewDecline: (label: string) => `Candidature déclinée : ${label}`,
+    previewUnassign: (label: string) => `Ce n'est plus nécessaire : ${label}`,
     hello: (n?: string | null) => (n ? `Bonjour ${n},` : "Bonjour,"),
     introConfirm: (club: string | null | undefined, event: string) =>
       `${club ?? "Le club"} a confirmé ta candidature pour ${event}. Merci pour ton coup de main !`,
     introDecline: (club: string | null | undefined, event: string) =>
       `${club ?? "Le club"} n'a pas retenu ta candidature pour ${event}. Merci quand même de t'être proposé·e.`,
+    introUnassign: (club: string | null | undefined, event: string) =>
+      `${club ?? "Le club"} n'a finalement plus besoin de toi pour ${event}. Merci quand même de t'être rendu·e disponible !`,
     role: "Rôle",
     when: "Quand",
     cta: "Voir l'événement",
@@ -40,11 +43,14 @@ const T = {
   en: {
     previewConfirm: (label: string) => `Application confirmed: ${label}`,
     previewDecline: (label: string) => `Application declined: ${label}`,
+    previewUnassign: (label: string) => `No longer needed: ${label}`,
     hello: (n?: string | null) => (n ? `Hi ${n},` : "Hi,"),
     introConfirm: (club: string | null | undefined, event: string) =>
       `${club ?? "The club"} confirmed your application for ${event}. Thanks for helping out!`,
     introDecline: (club: string | null | undefined, event: string) =>
       `${club ?? "The club"} did not select your application for ${event}. Thanks for volunteering anyway.`,
+    introUnassign: (club: string | null | undefined, event: string) =>
+      `${club ?? "The club"} no longer needs you for ${event}. Thanks for making yourself available!`,
     role: "Role",
     when: "When",
     cta: "View event",
@@ -79,8 +85,17 @@ const Email = ({
 }: Props) => {
   const t = T[locale] ?? T.fr;
   const isConfirm = decision === "confirm";
-  const preview = isConfirm ? t.previewConfirm(needLabel) : t.previewDecline(needLabel);
-  const intro = isConfirm ? t.introConfirm(clubName, eventTitle) : t.introDecline(clubName, eventTitle);
+  const isUnassign = decision === "unassign";
+  const preview = isUnassign
+    ? t.previewUnassign(needLabel)
+    : isConfirm
+      ? t.previewConfirm(needLabel)
+      : t.previewDecline(needLabel);
+  const intro = isUnassign
+    ? t.introUnassign(clubName, eventTitle)
+    : isConfirm
+      ? t.introConfirm(clubName, eventTitle)
+      : t.introDecline(clubName, eventTitle);
   const whenStr = fmtDate(eventStartsAt, locale);
   return (
     <Html lang={locale} dir="ltr">
@@ -118,9 +133,11 @@ export const template = {
   subject: (data: Record<string, any>) => {
     const loc = (data.locale as string) === "en" ? "en" : "fr";
     const t = T[loc];
+    const label = (data.needLabel as string) ?? "";
+    if (data.decision === "unassign") return t.previewUnassign(label);
     return data.decision === "confirm"
-      ? t.previewConfirm((data.needLabel as string) ?? "")
-      : t.previewDecline((data.needLabel as string) ?? "");
+      ? t.previewConfirm(label)
+      : t.previewDecline(label);
   },
   displayName: "Event need — decision",
   previewData: {

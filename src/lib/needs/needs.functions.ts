@@ -1368,6 +1368,80 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
 /* 9c. staffUnassignSignup — staff retire une candidature confirmée         */
 /* ------------------------------------------------------------------------ */
 
+// Exported for unit testing — pure orchestration around injected deps.
+// The real server-fn handler wires supabase/admin/dispatch below.
+export async function _staffUnassignSignupImpl(deps: {
+  signupId: string;
+  actorUserId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabaseAdmin: any;
+  recomputeCoverage: (eventId: string) => Promise<unknown>;
+  notify: (params: {
+    needId: string;
+    signupId: string;
+    decision: "unassign";
+    applicantUserId: string;
+  }) => Promise<void>;
+  now?: () => string;
+}) {
+  const now = deps.now ?? (() => new Date().toISOString());
+  const { data: signup, error: sErr } = await deps.supabaseAdmin
+    .from("event_need_signups")
+    .select("id, need_id, user_id, status, event_needs:need_id(club_id, event_id)")
+    .eq("id", deps.signupId)
+    .maybeSingle();
+  if (sErr) throw new Error(sErr.message);
+  if (!signup) throw new Error("signup_not_found");
+
+  const clubId = signup.event_needs?.club_id ?? null;
+  const eventId = signup.event_needs?.event_id ?? null;
+  if (!clubId) throw new Error("club_not_found");
+
+  const { data: isStaff } = await deps.supabase.rpc("is_club_staff", {
+    _user_id: deps.actorUserId,
+    _club_id: clubId,
+  });
+  if (!isStaff) throw new Error("forbidden");
+
+  if (signup.status !== "confirmed") return { ok: true, already: true };
+
+  // Le retrait par le staff = decline serveur (maquette S4-2), pas withdraw.
+  // withdrawn = « s'est désisté soi-même » ; ici c'est le staff qui retire.
+  // decided_by porte l'ID du staff pour tracer qui a fait quoi.
+  const { error: upErr } = await deps.supabaseAdmin
+    .from("event_need_signups")
+    .update({
+      status: "declined",
+      declined_at: now(),
+      confirmed_at: null,
+      withdrawn_at: null,
+      decided_by: deps.actorUserId,
+    })
+    .eq("id", deps.signupId);
+  if (upErr) throw new Error(upErr.message);
+
+  if (eventId) await deps.recomputeCoverage(eventId);
+
+  // Notification obligatoire au retiré (push + email). Sans ça la personne
+  // se présente au match. Routage mineur → parent via le pipeline habituel.
+  if (signup.user_id) {
+    try {
+      await deps.notify({
+        needId: signup.need_id,
+        signupId: signup.id,
+        decision: "unassign",
+        applicantUserId: signup.user_id,
+      });
+    } catch (e) {
+      console.error("[staffUnassignSignup] notify failed", e);
+    }
+  }
+
+  return { ok: true, already: false };
+}
+
 export const staffUnassignSignup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -1375,43 +1449,16 @@ export const staffUnassignSignup = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: signup, error: sErr } = await supabaseAdmin
-      .from("event_need_signups")
-      .select("id, need_id, status, event_needs:need_id(club_id, event_id)")
-      .eq("id", data.signup_id)
-      .maybeSingle();
-    if (sErr) throw new Error(sErr.message);
-    if (!signup) throw new Error("signup_not_found");
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clubId = ((signup as any).event_needs?.club_id as string | undefined) ?? null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const eventId = ((signup as any).event_needs?.event_id as string | undefined) ?? null;
-    if (!clubId) throw new Error("club_not_found");
-
-    const { data: isStaff } = await supabase.rpc("is_club_staff", {
-      _user_id: userId,
-      _club_id: clubId,
+    const { notifyApplicantOfDecision } = await import("./dispatch.server");
+    return _staffUnassignSignupImpl({
+      signupId: data.signup_id,
+      actorUserId: userId,
+      supabase,
+      supabaseAdmin,
+      recomputeCoverage: recomputeCoverageServiceRole,
+      notify: notifyApplicantOfDecision,
     });
-    if (!isStaff) throw new Error("forbidden");
-
-    if (signup.status !== "confirmed") return { ok: true, already: true };
-
-    const { error: upErr } = await supabaseAdmin
-      .from("event_need_signups")
-      .update({
-        status: "withdrawn",
-        withdrawn_at: new Date().toISOString(),
-        confirmed_at: null,
-        decided_by: userId,
-      })
-      .eq("id", data.signup_id);
-    if (upErr) throw new Error(upErr.message);
-
-    if (eventId) await recomputeCoverageServiceRole(eventId);
-    return { ok: true, already: false };
   });
 
 
