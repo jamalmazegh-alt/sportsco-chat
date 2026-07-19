@@ -534,13 +534,8 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Assigner directement (quand il reste de la place) */}
-        {isStaff && (isDraft || isOpen) && remaining > 0 && (
-          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
-            <UserPlus className="h-3.5 w-3.5 mr-1" />
-            {t("needs:actions.assign")}
-          </Button>
-        )}
+        {/* S1-5 : « Assigner » vit DANS le dialog Candidatures (StaffSignupsDialog), pas sur la carte. */}
+
 
         {/* Membre — J'apply / Retirer */}
         {!isStaff && isOpen && (
