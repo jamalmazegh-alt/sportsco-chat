@@ -1599,12 +1599,20 @@ function TeamDetail() {
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
                         </span>
+                      ) : showParentActivationPending ? (
+                        <span className="inline-flex items-center gap-1 text-amber-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          {t("players.parentActivationPending", {
+                            defaultValue: "En attente d'activation du compte parent",
+                          })}
+                        </span>
                       ) : canInvite ? (
                         <span className="text-muted-foreground">
                           {hasContactHint
                             ? t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })
                             : t("players.accountInactive")}
                         </span>
+
                       ) : (
                         <span className="text-muted-foreground">
                           {p.preferred_position ?? t("players.accountInactive")}
