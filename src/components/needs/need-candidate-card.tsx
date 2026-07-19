@@ -31,6 +31,7 @@ export type NeedCandidateCardNeed = {
     title?: string | null;
     starts_at?: string | null;
   } | null;
+  updated_at?: string | null;
   my_signup?: { id: string; status: string } | null;
 };
 
