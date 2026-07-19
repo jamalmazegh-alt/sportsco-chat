@@ -253,7 +253,7 @@ export const deleteEventNeed = createServerFn({ method: "POST" })
 
 export const republishEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => PublishInput.parse(input))
+  .inputValidator((input) => RepublishInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -284,13 +284,31 @@ export const republishEventNeed = createServerFn({ method: "POST" })
     } | null;
     if (!row) throw new Error("republish_failed");
 
-    if (!row.was_idempotent_skip && (row.recipient_user_ids?.length ?? 0) > 0) {
+    // Décide qui recevra vraiment la notification :
+    //  - "delta"  → only user_ids never notified in a prior publication of this need
+    //  - "resend" → the full new snapshot (may re-notify prior recipients)
+    let toNotify: string[] = row.recipient_user_ids ?? [];
+    if (!row.was_idempotent_skip && data.mode === "delta" && toNotify.length > 0) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: prior } = await supabaseAdmin
+        .from("event_need_publication_recipients")
+        .select("user_id, publication_id, event_need_publications!inner(need_id)")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq("event_need_publications.need_id" as any, data.need_id)
+        .neq("publication_id", row.publication_id);
+      const alreadyNotified = new Set(
+        (prior ?? []).map((r: { user_id: string | null }) => r.user_id).filter(Boolean) as string[],
+      );
+      toNotify = toNotify.filter((uid) => !alreadyNotified.has(uid));
+    }
+
+    if (!row.was_idempotent_skip && toNotify.length > 0) {
       const { dispatchEventNeedPublication } = await import("./dispatch.server");
       try {
         await dispatchEventNeedPublication({
           needId: data.need_id,
           publicationId: row.publication_id,
-          recipientUserIds: row.recipient_user_ids ?? [],
+          recipientUserIds: toNotify,
         });
       } catch (e) {
         console.error("[republishEventNeed] dispatch failed", e);
@@ -301,8 +319,10 @@ export const republishEventNeed = createServerFn({ method: "POST" })
     return {
       publication_id: row.publication_id,
       recipients_count: row.recipients_count,
+      notified_count: toNotify.length,
       status: row.status,
       was_idempotent_skip: row.was_idempotent_skip,
+      mode: data.mode,
     };
   });
 
