@@ -490,6 +490,10 @@ function NeedRow({
               </DropdownMenuItem>
               {isOpen && (
                 <>
+                  <DropdownMenuItem onClick={() => setRepublishOpen(true)}>
+                    <Users className="h-3.5 w-3.5 mr-2" />
+                    {t("needs:menu.editAudience", { defaultValue: "Modifier les destinataires" })}
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setCloseConfirmOpen(true)}>
                     <CheckCircle2 className="h-3.5 w-3.5 mr-2" />
