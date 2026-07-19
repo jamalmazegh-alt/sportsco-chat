@@ -785,11 +785,6 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const mySignupByNeed: Record<string, MySignup> = {};
     for (const s of (mySignups ?? []) as MySignup[]) mySignupByNeed[s.need_id] = s;
 
-    // Staff view ?
-    const clubId = rows[0]?.club_id;
-    const { data: isStaff } = clubId
-      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
-      : { data: false };
 
     // Dernière publication par besoin (recipients_count + published_at).
     const { data: pubs } = await supabaseAdmin
