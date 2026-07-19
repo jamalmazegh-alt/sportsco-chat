@@ -440,7 +440,7 @@ function NeedRow({
           {/* Pill places + confirmés visibles (S1 · pastille 4 + 5) */}
           <div className="mt-2.5 flex items-center gap-2 flex-wrap">
             {seatsPill}
-            {(need.confirmed_signups?.length ?? 0) > 0 && (
+            {isStaff && (need.confirmed_signups?.length ?? 0) > 0 && (
               <div className="flex items-center gap-1 flex-wrap">
                 {need.confirmed_signups!.map((s) => (
                   <Badge
