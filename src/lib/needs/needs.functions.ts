@@ -908,6 +908,7 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
         .from("teams")
         .select("id, name, age_group")
         .eq("club_id", clubId)
+        .is("deleted_at", null)
         .order("name", { ascending: true }),
       supabaseAdmin
         .from("club_groups")
