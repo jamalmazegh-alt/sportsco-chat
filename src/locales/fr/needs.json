@@ -117,7 +117,18 @@
     "title": "Candidatures",
     "empty": "Aucune candidature pour le moment.",
     "minorPending": "Candidat mineur — validation adulte requise",
-    "license": "Licence n° {{n}}"
+    "license": "Licence n° {{n}}",
+    "alreadyConfirmed": "Déjà confirmé",
+    "manualAdded": "Personne ajoutée",
+    "bulkConfirmed_one": "{{count}} candidat confirmé",
+    "bulkConfirmed_other": "{{count}} candidats confirmés",
+    "bulkDeclined_one": "{{count}} candidat refusé",
+    "bulkDeclined_other": "{{count}} candidats refusés",
+    "selectAllPending": "Sélectionner tout ({{count}})",
+    "confirmSelection": "Confirmer",
+    "noMembers": "Aucun membre trouvé",
+    "editNeed": "Modifier le besoin",
+    "createDraft": "Créer en brouillon"
   },
   "pendingApplications_one": "{{count}} en attente",
   "pendingApplications_other": "{{count}} en attente",
@@ -274,5 +285,9 @@
   },
   "assignNotification": {
     "assignedAs": "Vous avez été inscrit comme {{role}}"
+  },
+  "feed": {
+    "title": "Coups de main",
+    "empty": "Aucun besoin ouvert pour vous en ce moment."
   }
 }

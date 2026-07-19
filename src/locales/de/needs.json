@@ -117,7 +117,18 @@
     "title": "Applications",
     "empty": "No applications yet.",
     "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "license": "Licence #{{n}}",
+    "alreadyConfirmed": "Bereits bestätigt",
+    "manualAdded": "Person hinzugefügt",
+    "bulkConfirmed_one": "{{count}} Bewerber bestätigt",
+    "bulkConfirmed_other": "{{count}} Bewerber bestätigt",
+    "bulkDeclined_one": "{{count}} Bewerber abgelehnt",
+    "bulkDeclined_other": "{{count}} Bewerber abgelehnt",
+    "selectAllPending": "Alle auswählen ({{count}})",
+    "confirmSelection": "Bestätigen",
+    "noMembers": "Keine Mitglieder gefunden",
+    "editNeed": "Bedarf bearbeiten",
+    "createDraft": "Als Entwurf speichern"
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
@@ -274,5 +285,9 @@
   },
   "assignNotification": {
     "assignedAs": "You've been assigned as {{role}}"
+  },
+  "feed": {
+    "title": "Helferbedarf",
+    "empty": "Aktuell keine offenen Anfragen für dich."
   }
 }

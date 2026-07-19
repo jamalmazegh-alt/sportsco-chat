@@ -117,7 +117,18 @@
     "title": "Applications",
     "empty": "No applications yet.",
     "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "license": "Licence #{{n}}",
+    "alreadyConfirmed": "Already confirmed",
+    "manualAdded": "Person added",
+    "bulkConfirmed_one": "{{count}} applicant confirmed",
+    "bulkConfirmed_other": "{{count}} applicants confirmed",
+    "bulkDeclined_one": "{{count}} applicant declined",
+    "bulkDeclined_other": "{{count}} applicants declined",
+    "selectAllPending": "Select all ({{count}})",
+    "confirmSelection": "Confirm",
+    "noMembers": "No members found",
+    "editNeed": "Edit need",
+    "createDraft": "Save as draft"
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
@@ -274,5 +285,9 @@
   },
   "assignNotification": {
     "assignedAs": "You've been assigned as {{role}}"
+  },
+  "feed": {
+    "title": "Volunteer needs",
+    "empty": "No open needs for you right now."
   }
 }
