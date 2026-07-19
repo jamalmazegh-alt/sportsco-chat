@@ -1129,32 +1129,11 @@ function NeedFormDialog({
                 ctx={audienceCtx ?? null}
                 state={audState}
                 controls={audControls}
+                preview={{ count: previewCount, loading: previewLoading }}
               />
-              <div
-                className={cn(
-                  "rounded-md border p-2.5 text-xs",
-                  audiences.length > 0 && (previewCount ?? 0) > 0
-                    ? "border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800"
-                    : "border-muted bg-muted/30",
-                )}
-              >
-                {previewLoading ? (
-                  <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    {t("needs:publish.previewLoading")}
-                  </span>
-                ) : audiences.length === 0 || (previewCount ?? 0) === 0 ? (
-                  <span className="text-muted-foreground">
-                    {t("needs:publish.previewNone")}
-                  </span>
-                ) : (
-                  <span className="text-emerald-800 dark:text-emerald-200 font-medium">
-                    {t("needs:publish.preview", { count: previewCount ?? 0 })}
-                  </span>
-                )}
-              </div>
             </div>
           )}
+
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
