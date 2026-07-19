@@ -152,3 +152,15 @@ Clones EN → DE/ES/IT/NL/PT pour :
 - needs.myFeed.nextLabel
 - needs.myFeed.plusOthers_one/other
 - needs.withdrawDialog.title/description/confirm/abort
+
+## publications.json — Communications & sondages de groupe (2026-07-19)
+
+Nouveau namespace `publications` (Phase A backend). FR et EN sont finaux et
+soignés. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par des
+traductions natives lors de Phase B.
+
+Blocs concernés :
+- `type.*`, `delivery.*`, `actions.*`, `poll.*`, `state.*`
+- `confirm.close/delete/resend/refresh.*`, `confirm.confirm/cancel`
+- `audience.*` (dont `audience.types.*` pour les 10 audiences)
+- `form.*`, `email.*`, `push.*`, `errors.*`
