@@ -1373,10 +1373,8 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
 export async function _staffUnassignSignupImpl(deps: {
   signupId: string;
   actorUserId: string;
-  supabase: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rpc: (name: any, args: Record<string, unknown>) => Promise<{ data: unknown }>;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseAdmin: any;
   recomputeCoverage: (eventId: string) => Promise<unknown>;
