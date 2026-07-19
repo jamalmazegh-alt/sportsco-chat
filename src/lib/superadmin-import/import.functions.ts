@@ -738,6 +738,11 @@ export const runImport = createServerFn({ method: "POST" })
         if (rosterErr) throw new Error(rosterErr.message);
 
         const playersByIdentity = new Map<string, ExistingPlayer>();
+        // Fallback dedup: same club + normalized (first_name, last_name, jersey_number).
+        // Rattrape les cas où la date de naissance diffère entre imports
+        // (format JJ/MM vs MM/JJ, valeur manquante...) qui produiraient sinon
+        // des fiches en double pour le même joueur.
+        const playersByNameJersey = new Map<string, ExistingPlayer>();
         const identityKey = (
           first: string | null | undefined,
           last: string | null | undefined,
@@ -749,11 +754,28 @@ export const runImport = createServerFn({ method: "POST" })
           if (!f || !l) return null;
           return `${f}|${l}|${birth}`;
         };
+        const nameJerseyKey = (
+          first: string | null | undefined,
+          last: string | null | undefined,
+          jersey: number | null | undefined,
+        ): string | null => {
+          if (jersey == null) return null;
+          const f = normalizeName(first);
+          const l = normalizeName(last);
+          if (!f || !l) return null;
+          return `${f}|${l}|#${jersey}`;
+        };
         for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
           const k = identityKey(p.first_name, p.last_name, p.birth_date);
-          if (!k) continue;
-          const prev = playersByIdentity.get(k);
-          if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+          if (k) {
+            const prev = playersByIdentity.get(k);
+            if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+          }
+          const nk = nameJerseyKey(p.first_name, p.last_name, p.jersey_number);
+          if (nk) {
+            const prev = playersByNameJersey.get(nk);
+            if (!prev || (prev.deleted_at && !p.deleted_at)) playersByNameJersey.set(nk, p);
+          }
         }
 
         for (let i = 0; i < data.rows.length; i++) {
@@ -821,8 +843,16 @@ export const runImport = createServerFn({ method: "POST" })
             const firstName = titleCase(r.prenom_joueur!);
             const lastName = titleCase(r.nom_joueur!);
             const idKey = identityKey(firstName, lastName, r.date_naissance)!;
+            const jerseyNum = r.numero_maillot ? parseInt(r.numero_maillot, 10) : null;
 
             let existing = playersByIdentity.get(idKey) ?? null;
+            // Fallback: same name + jersey in the same club → treat as the same
+            // player (override), même si la date de naissance a été parsée
+            // différemment entre deux imports.
+            if (!existing) {
+              const nk = nameJerseyKey(firstName, lastName, jerseyNum);
+              if (nk) existing = playersByNameJersey.get(nk) ?? null;
+            }
             let playerId: string;
 
             if (existing && existing.deleted_at) {
@@ -862,7 +892,7 @@ export const runImport = createServerFn({ method: "POST" })
                 },
                 {
                   col: "jersey_number",
-                  incoming: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  incoming: jerseyNum,
                   current: existing.jersey_number,
                   allowBlankFill: true,
                 },
@@ -920,7 +950,7 @@ export const runImport = createServerFn({ method: "POST" })
                   first_name: firstName,
                   last_name: lastName,
                   birth_date: r.date_naissance,
-                  jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  jersey_number: jerseyNum,
                   license_number: r.numero_licence || null,
                   preferred_position: r.poste || null,
                   phone: r.telephone_joueur || null,
@@ -938,6 +968,8 @@ export const runImport = createServerFn({ method: "POST" })
               }
               playersCreated++;
               playersByIdentity.set(idKey, inserted as ExistingPlayer);
+              const nk = nameJerseyKey(firstName, lastName, jerseyNum);
+              if (nk) playersByNameJersey.set(nk, inserted as ExistingPlayer);
               playerId = inserted.id;
             }
 
