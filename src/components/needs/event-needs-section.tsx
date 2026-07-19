@@ -510,6 +510,16 @@ function NeedRow({
           onChanged={onChange}
         />
       )}
+      {assignOpen && (
+        <StaffSignupsDialog
+          open={assignOpen}
+          onOpenChange={setAssignOpen}
+          needId={need.id}
+          onChanged={onChange}
+          defaultAddOpen
+        />
+      )}
+
       {editOpen && (
         <NeedFormDialog
           open={editOpen}
