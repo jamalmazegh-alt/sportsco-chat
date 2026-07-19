@@ -732,10 +732,17 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       }
     }
 
-    // Résoudre les noms des confirmés (pour afficher qui a été accepté).
-    const allConfirmedUserIds = Array.from(
-      new Set(Object.values(confirmedUserIdsByNeed).flat()),
-    );
+    // Staff view ? (déterminé tôt : gate la résolution des noms de confirmés)
+    const clubId = rows[0]?.club_id;
+    const { data: isStaff } = clubId
+      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
+      : { data: false };
+
+    // Résoudre les noms des confirmés — STAFF UNIQUEMENT (invariant 2 : les
+    // membres ne doivent pas voir les noms des autres volontaires).
+    const allConfirmedUserIds = isStaff
+      ? Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()))
+      : [];
     const nameByUser: Record<string, string | null> = {};
     if (allConfirmedUserIds.length > 0) {
       const { data: profs } = await supabaseAdmin
