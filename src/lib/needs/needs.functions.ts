@@ -807,10 +807,12 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       needs: rows.map((n) => ({
         ...n,
         confirmed_count: confirmedByNeed[n.id] ?? 0,
-        confirmed_signups: (confirmedUserIdsByNeed[n.id] ?? []).map((uid) => ({
-          user_id: uid,
-          full_name: nameByUser[uid] ?? null,
-        })),
+        confirmed_signups: isStaff
+          ? (confirmedUserIdsByNeed[n.id] ?? []).map((uid) => ({
+              user_id: uid,
+              full_name: nameByUser[uid] ?? null,
+            }))
+          : [],
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
         my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,
