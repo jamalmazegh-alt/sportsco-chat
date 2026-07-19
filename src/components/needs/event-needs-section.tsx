@@ -1594,9 +1594,7 @@ function StaffSignupsDialog({
           >
             <span className="inline-flex items-center gap-2">
               <UserPlus className="h-3.5 w-3.5" />
-              {t("needs:applications.assignSection", {
-                defaultValue: "Assigner directement",
-              })}
+              {t("needs:applications.assignSection")}
             </span>
             <span className="text-[10px] text-muted-foreground">
               {addOpen ? "−" : "+"}
