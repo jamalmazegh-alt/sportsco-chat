@@ -77,8 +77,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         }
         for (const [eventId, count] of byEvent) {
           const ev = eventById.get(eventId)!;
-          const sev = severityForStart(ev.starts_at);
-          if (!sev) continue;
+          const sev = severityForStart(ev.starts_at) ?? "medium";
           items.push({
             id: `convocation-silence:${eventId}:coach`,
             source: "convocation-silence",
