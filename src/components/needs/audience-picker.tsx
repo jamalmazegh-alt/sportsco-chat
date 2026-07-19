@@ -345,6 +345,17 @@ export function AudiencePickerBody({
   const eventSuggestions: Suggestion[] = useMemo(() => {
     if (!ctx) return [];
     const list: Suggestion[] = [];
+    // Convocation audiences first — primary use case for a match
+    const convokedKeys: ScalarAudienceKey[] = ["convoked_players", "convoked_parents"];
+    for (const k of convokedKeys) {
+      list.push({
+        id: `sg-s-${k}`,
+        kind: k as KindKey,
+        label: t(`needs:audiences.${k}`),
+        active: state.scalar.has(k),
+        onToggle: () => controls.toggleScalar(k),
+      });
+    }
     const eventTeam = ctx.event_team_id
       ? ctx.teams.find((t) => t.id === ctx.event_team_id)
       : null;
@@ -374,7 +385,8 @@ export function AudiencePickerBody({
       });
     }
     return list;
-  }, [ctx, state.teamPicks, state.category, controls, t]);
+  }, [ctx, state.scalar, state.teamPicks, state.category, controls, t]);
+
 
   const clubAudienceSuggestions: Suggestion[] = useMemo(() => {
     const clubKeys: ScalarAudienceKey[] = [
