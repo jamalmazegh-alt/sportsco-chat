@@ -373,39 +373,53 @@ export function AudiencePickerBody({
 
   return (
     <div className="space-y-3">
-      {/* Chips of currently selected audiences */}
-      {chips.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic rounded-md border border-dashed p-3">
-          {t("needs:audiences.emptyHint", {
-            defaultValue:
-              "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
+      {/* Selected audiences — prominent block */}
+      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 shadow-sm">
+        <Label className="text-[11px] uppercase tracking-wide text-primary flex items-center gap-1.5 font-semibold">
+          <UserCheck className="h-3.5 w-3.5" />
+          {t("needs:audiences.selectedTitle", {
+            defaultValue: "Audience sélectionnée",
           })}
-        </p>
-      ) : (
-        <div className="flex flex-wrap gap-1.5">
-          {chips.map((c) => {
-            const { Icon, cls } = KIND_META[c.kind];
-            return (
-              <Badge
-                key={c.id}
-                variant="outline"
-                className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
-              >
-                <Icon className="h-3 w-3" />
-                <span className="text-xs">{c.label}</span>
-                <button
-                  type="button"
-                  className="ml-0.5 rounded hover:bg-muted p-0.5"
-                  onClick={c.onRemove}
-                  aria-label={t("common.remove", { defaultValue: "Retirer" })}
+          {chips.length > 0 && (
+            <span className="ml-1 rounded-full bg-primary/15 text-primary px-1.5 py-0.5 text-[10px] font-bold">
+              {chips.length}
+            </span>
+          )}
+        </Label>
+        {chips.length === 0 ? (
+          <p className="mt-2 text-xs text-muted-foreground italic">
+            {t("needs:audiences.emptyHint", {
+              defaultValue:
+                "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
+            })}
+          </p>
+        ) : (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {chips.map((c) => {
+              const { Icon, cls } = KIND_META[c.kind];
+              return (
+                <Badge
+                  key={c.id}
+                  variant="outline"
+                  className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-        </div>
-      )}
+                  <Icon className="h-3 w-3" />
+                  <span className="text-xs">{c.label}</span>
+                  <button
+                    type="button"
+                    className="ml-0.5 rounded hover:bg-muted p-0.5"
+                    onClick={c.onRemove}
+                    aria-label={t("common.remove", { defaultValue: "Retirer" })}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
 
       {/* Custom groups — highlighted */}
       {customGroupSuggestions.length > 0 && (
