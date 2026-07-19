@@ -698,7 +698,8 @@
       "done": "{{inserted}} speler(s) geïmporteerd",
       "failed": "{{failed}} regel(s) met fouten"
     },
-    "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig."
+    "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig.",
+    "parentActivationPending": "Wacht op activering van ouderaccount"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -2385,6 +2386,11 @@
       "team_parents": "Ouders van een team",
       "team_educators": "Trainers van een team",
       "category_educators": "Trainers van een categorie"
-    }
+    },
+    "dynamicRules": "Dynamische subgroepen",
+    "noRules": "Geen subgroepen. Voeg er een toe om automatisch leden op te nemen.",
+    "resolvedTotal": "Totaal opgelost: {{count}}",
+    "bulkPickKind": "Kies een type…",
+    "bulkPickParam": "Kies…"
   }
 }

@@ -698,7 +698,8 @@
       "done": "{{inserted}} giocatore(i) importato(i)",
       "failed": "{{failed}} riga(e) con errori"
     },
-    "inviteAlreadyActive": "Account già attivo — non serve rinviare."
+    "inviteAlreadyActive": "Account già attivo — non serve rinviare.",
+    "parentActivationPending": "In attesa dell'attivazione dell'account genitore"
   },
   "events": {
     "isOfficial": "Ufficiale",
@@ -2385,6 +2386,11 @@
       "team_parents": "Genitori di una squadra",
       "team_educators": "Allenatori di una squadra",
       "category_educators": "Allenatori di una categoria"
-    }
+    },
+    "dynamicRules": "Sottogruppi dinamici",
+    "noRules": "Nessun sottogruppo. Aggiungine uno per includere automaticamente i membri.",
+    "resolvedTotal": "Totale risolto: {{count}}",
+    "bulkPickKind": "Scegli un tipo…",
+    "bulkPickParam": "Scegli…"
   }
 }
