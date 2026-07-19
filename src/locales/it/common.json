@@ -2195,6 +2195,10 @@
       "checkFailed": "Impossibile verificare gli avvisi"
     },
     "partialError": "Alcune fonti non sono disponibili, l'elenco potrebbe essere incompleto.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Rispondi",
       "open": "Apri"

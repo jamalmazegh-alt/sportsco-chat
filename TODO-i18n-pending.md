@@ -95,3 +95,10 @@ Clones EN → DE/ES/IT/NL/PT pour les namespaces ajoutés :
 `card`, `badge`, `wizard`, `audiencePicker`, `publishStep`, `applications`, `memberCard`, `unavailable`, `editDialog`, `deleteDraft`, `closeDialog2`, `cancelDialog2`, `menu`, `assignNotification`.
 
 → Traductions natives DE/ES/IT/NL/PT à fournir.
+
+## common.json — urgency.deck (Lot 0)
+
+Clones EN → DE/ES/IT/NL/PT pour :
+`urgency.deck.showMore_one`, `urgency.deck.showMore_other`.
+
+→ Traductions natives DE/ES/IT/NL/PT à fournir.
