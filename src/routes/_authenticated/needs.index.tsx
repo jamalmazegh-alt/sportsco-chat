@@ -81,6 +81,16 @@ function NeedsFeedPage() {
   const activeNeeds = allNeeds.filter(
     (n) => n.my_signup?.status !== "unavailable" && n.my_signup?.status !== "declined",
   );
+  const hasActiveSignup = (n: any) =>
+    n.my_signup &&
+    n.my_signup.status !== "withdrawn" &&
+    n.my_signup.status !== "declined";
+  const recentlyFilled = activeNeeds.filter(
+    (n) => !hasActiveSignup(n) && isRecentlyFilledVisible(n),
+  );
+  const primaryActive = activeNeeds.filter(
+    (n) => !recentlyFilled.some((rf) => rf.id === n.id),
+  );
   const unavailNeeds = allNeeds.filter((n) => n.my_signup?.status === "unavailable");
   const declinedNeeds = allNeeds.filter((n) => n.my_signup?.status === "declined");
 
