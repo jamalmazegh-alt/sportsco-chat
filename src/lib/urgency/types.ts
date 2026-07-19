@@ -1,7 +1,7 @@
 // Urgency model — single shape for the "Centre d'urgence" surface.
 // Pure types: no React, no Supabase. Sérialisable, testable en isolation.
 
-export type UrgencySource = "convocation-silence" | "reduced-squad";
+export type UrgencySource = "convocation-silence" | "reduced-squad" | "open-need";
 
 export type UrgencyRole = "coach" | "player" | "parent";
 
@@ -15,7 +15,8 @@ export type UrgencyAction =
   | { kind: "respond"; eventId: string }
   | { kind: "open-event"; eventId: string }
   | { kind: "open-player"; playerId: string }
-  | { kind: "open-team-availability"; teamId: string };
+  | { kind: "open-team-availability"; teamId: string }
+  | { kind: "open-need"; needId: string; eventId: string };
 
 export type UrgencyItem = {
   // Clé stable, doit suffire au dedup inter-collecteurs.
