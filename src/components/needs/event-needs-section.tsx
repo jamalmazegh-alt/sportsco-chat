@@ -1495,77 +1495,8 @@ function StaffSignupsDialog({
           </div>
         )}
 
-        <div className="rounded-md border bg-muted/20 p-2 space-y-2">
-          <button
-            type="button"
-            onClick={() => setAddOpen((v) => !v)}
-            className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
-          >
-            <UserPlus className="h-3.5 w-3.5" />
-            {t("needs:staff.addManual", { defaultValue: "Ajouter manuellement" })}
-          </button>
-          {addOpen && (
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                <Input
-                  className="pl-7 h-8 text-sm"
-                  placeholder={t("needs:staff.searchPlaceholder", {
-                    defaultValue: "Rechercher un membre…",
-                  })}
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <div className="max-h-40 overflow-y-auto space-y-1">
-                {memberSearchLoading && (
-                  <p className="text-[11px] text-muted-foreground px-1">
-                    <Loader2 className="h-3 w-3 inline animate-spin mr-1" />
-                    {t("common.loading", { defaultValue: "Chargement…" })}
-                  </p>
-                )}
-                {!memberSearchLoading && (memberResults?.members ?? []).length === 0 && (
-                  <p className="text-[11px] text-muted-foreground px-1 py-2">
-                    {t("needs:staff.noMembers", { defaultValue: "Aucun membre trouvé" })}
-                  </p>
-                )}
-                {(memberResults?.members ?? []).map((m) => (
-                  <div
-                    key={m.member_id}
-                    className="flex items-center justify-between gap-2 rounded border bg-background px-2 py-1.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium truncate">
-                        {m.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
-                      </p>
-                      {m.roles.length > 0 && (
-                        <p className="text-[10px] text-muted-foreground truncate">
-                          {m.roles
-                            .map((r) => t(`common.roles.${r}`, { defaultValue: r }))
-                            .join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-[11px]"
-                      onClick={() => addManualM.mutate(m.user_id)}
-                      disabled={addPendingUser === m.user_id}
-                    >
-                      {addPendingUser === m.user_id ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Plus className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* S4-4 : Assigner section moved below signups list */}
+
 
 
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
