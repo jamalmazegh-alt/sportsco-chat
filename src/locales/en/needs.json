@@ -294,5 +294,8 @@
   "declined": {
     "sectionTitleCount_one": "{{count}} declined",
     "sectionTitleCount_other": "{{count}} declined"
+  },
+  "recentlyFilled": {
+    "title": "Recently filled"
   }
 }
