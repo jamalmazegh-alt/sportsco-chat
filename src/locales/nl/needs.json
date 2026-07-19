@@ -117,7 +117,18 @@
     "title": "Applications",
     "empty": "No applications yet.",
     "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "license": "Licence #{{n}}",
+    "alreadyConfirmed": "Al bevestigd",
+    "manualAdded": "Persoon toegevoegd",
+    "bulkConfirmed_one": "{{count}} kandidaat bevestigd",
+    "bulkConfirmed_other": "{{count}} kandidaten bevestigd",
+    "bulkDeclined_one": "{{count}} kandidaat afgewezen",
+    "bulkDeclined_other": "{{count}} kandidaten afgewezen",
+    "selectAllPending": "Alles selecteren ({{count}})",
+    "confirmSelection": "Bevestigen",
+    "noMembers": "Geen leden gevonden",
+    "editNeed": "Behoefte bewerken",
+    "createDraft": "Opslaan als concept"
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
@@ -274,5 +285,9 @@
   },
   "assignNotification": {
     "assignedAs": "You've been assigned as {{role}}"
+  },
+  "feed": {
+    "title": "Hulpvragen",
+    "empty": "Op dit moment geen open oproepen voor jou."
   }
 }

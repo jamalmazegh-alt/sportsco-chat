@@ -56,6 +56,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { PersonRow } from "@/components/shared/person-row";
 import {
   Select,
   SelectContent,
@@ -923,7 +924,7 @@ function NeedFormDialog({
     },
     onSuccess: (r) => {
       if (isEdit) {
-        toast.success(t("common.saved", { defaultValue: "Modifications enregistrées" }));
+        toast.success(t("common.saved"));
       } else if ((r as { __published?: { recipients_count: number } })?.__published) {
         const rc = (r as { __published: { recipients_count: number } }).__published.recipients_count;
         toast.success(t("needs:publish.success", { count: rc ?? 0 }));
@@ -951,7 +952,7 @@ function NeedFormDialog({
           <DialogTitle className="flex items-center gap-2">
             <HandHelping className="h-4 w-4 text-primary" />
             {isEdit
-              ? t("common.edit", { defaultValue: "Modifier le besoin" })
+              ? t("common.edit")
               : step === 1
                 ? t("needs:wizard.step1Title")
                 : t("needs:wizard.step2Title")}
@@ -1131,18 +1132,18 @@ function NeedFormDialog({
                 {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                 {wantsPublish
                   ? t("needs:actions.publish")
-                  : t("common.create", { defaultValue: "Créer en brouillon" })}
+                  : t("common.create")}
               </Button>
             </>
           ) : (
             <>
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                {t("common.cancel", { defaultValue: "Annuler" })}
+                {t("common.cancel")}
               </Button>
               {isEdit ? (
                 <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
                   {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                  {t("common.save", { defaultValue: "Enregistrer" })}
+                  {t("common.save")}
                 </Button>
               ) : (
                 <Button onClick={() => setStep(2)}>
@@ -1273,7 +1274,7 @@ function PublishDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={() => publishM.mutate()}
@@ -1374,8 +1375,8 @@ function StaffSignupsDialog({
     onSuccess: (r: { already?: boolean } | null | undefined) => {
       toast.success(
         r?.already
-          ? t("needs:staff.alreadyConfirmed", { defaultValue: "Déjà confirmé" })
-          : t("needs:staff.manualAdded", { defaultValue: "Personne ajoutée" }),
+          ? t("needs:staff.alreadyConfirmed")
+          : t("needs:staff.manualAdded"),
       );
       refetch();
       onChanged();
@@ -1417,16 +1418,14 @@ function StaffSignupsDialog({
         toast.success(
           decision === "confirm"
             ? t("needs:staff.bulkConfirmed", {
-                count: ok,
-                defaultValue: "{{count}} candidat(s) confirmé(s)",
+                count: ok
               })
             : t("needs:staff.bulkDeclined", {
-                count: ok,
-                defaultValue: "{{count}} candidat(s) refusé(s)",
+                count: ok
               }),
         );
       }
-      if (failed > 0) toast.error(t("common.error", { defaultValue: "Erreur" }));
+      if (failed > 0) toast.error(t("common.error"));
       setSelected(new Set());
       await refetch();
       onChanged();
@@ -1446,8 +1445,7 @@ function StaffSignupsDialog({
               count: pending.length + signups.filter((s) => s.status === "confirmed").length,
               pending: pending.length,
               confirmed: signups.filter((s) => s.status === "confirmed").length,
-              seats: signups.filter((s) => s.status === "confirmed").length,
-              defaultValue: "{{pending}} en attente · {{confirmed}} confirmé(s)",
+              seats: signups.filter((s) => s.status === "confirmed").length
             })}
           </p>
         </DialogHeader>
@@ -1460,10 +1458,9 @@ function StaffSignupsDialog({
                 onCheckedChange={toggleAll}
               />
               {allPendingSelected
-                ? t("common.deselectAll", { defaultValue: "Tout désélectionner" })
+                ? t("common.deselectAll")
                 : t("needs:staff.selectAllPending", {
-                    count: pending.length,
-                    defaultValue: "Sélectionner tout ({{count}})",
+                    count: pending.length
                   })}
             </label>
             <div className="flex items-center gap-1">
@@ -1478,9 +1475,7 @@ function StaffSignupsDialog({
                 ) : (
                   <Check className="h-3.5 w-3.5 mr-1" />
                 )}
-                {t("needs:staff.confirmSelection", {
-                  defaultValue: "Confirmer",
-                })}
+                {t("needs:staff.confirmSelection")}
                 {selected.size > 0 && ` (${selected.size})`}
               </Button>
               <Button
@@ -1499,80 +1494,86 @@ function StaffSignupsDialog({
 
 
 
-        <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+        <div className="space-y-1 max-h-[60vh] overflow-y-auto">
           {signups.map((s) => {
             const isPending = s.status === "applied";
             const checked = selected.has(s.id);
+            const name = s.profile?.full_name ?? t("common.unknown");
+            const sublineParts: React.ReactNode[] = [];
+            sublineParts.push(t(`needs:signup.${s.status}`));
+            if (s.license_number) {
+              sublineParts.push(
+                <span key="lic" className="inline-flex items-center gap-1">
+                  <IdCard className="h-3 w-3" />
+                  {t("needs:applications.licenseLabel", { n: s.license_number })}
+                </span>,
+              );
+            }
+            if (s.comment) {
+              sublineParts.push(<em key="c">« {s.comment} »</em>);
+            }
             return (
               <div
                 key={s.id}
                 className={cn(
-                  "flex items-start gap-2 rounded-md border p-2",
+                  "rounded-md border px-2",
                   checked && "bg-primary/5 border-primary/40",
                 )}
               >
-                {isPending && (
-                  <Checkbox
-                    className="mt-1"
-                    checked={checked}
-                    onCheckedChange={() => toggleOne(s.id)}
+                <div className="flex items-start gap-2">
+                  {isPending && (
+                    <Checkbox
+                      className="mt-3"
+                      checked={checked}
+                      onCheckedChange={() => toggleOne(s.id)}
+                    />
+                  )}
+                  <PersonRow
+                    className="flex-1"
+                    name={name}
+                    roles={s.roles}
+                    isMinor={s.is_minor && s.status === "applied"}
+                    minorLabel={t("needs:applications.minorTag")}
+                    subline={
+                      sublineParts.length ? (
+                        <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          {sublineParts.map((p, i) => (
+                            <span key={i}>
+                              {i > 0 && <span className="mx-1">·</span>}
+                              {p}
+                            </span>
+                          ))}
+                        </span>
+                      ) : null
+                    }
+                    action={
+                      isPending ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() =>
+                              decideM.mutate({ signup_id: s.id, decision: "confirm" })
+                            }
+                            disabled={decideM.isPending || bulkPending}
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              decideM.mutate({ signup_id: s.id, decision: "decline" })
+                            }
+                            disabled={decideM.isPending || bulkPending}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ) : null
+                    }
                   />
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium truncate">
-                      {s.profile?.full_name ??
-                        t("common.unknown", { defaultValue: "Sans nom" })}
-                    </p>
-                    {s.roles.map((r) => (
-                      <Badge
-                        key={r}
-                        variant="outline"
-                        className={cn("text-[10px]", ROLE_COLORS[r] ?? "")}
-                      >
-                        {t(`common.roles.${r}`, { defaultValue: r })}
-                      </Badge>
-                    ))}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {t(`needs:signup.${s.status}`)}
-                  </p>
-                  {s.license_number && (
-                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1">
-                      <IdCard className="h-3 w-3" />
-                      {t("needs:staff.license", { n: s.license_number })}
-                    </p>
-                  )}
-                  {s.is_minor && s.status === "applied" && (
-                    <p className="text-[11px] mt-1 inline-flex items-center gap-1 text-amber-700 dark:text-amber-300">
-                      <Baby className="h-3 w-3" />
-                      {t("needs:staff.minorPending")}
-                    </p>
-                  )}
-                  {s.comment && (
-                    <p className="text-xs text-muted-foreground mt-1 italic">"{s.comment}"</p>
-                  )}
                 </div>
-                {isPending && (
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => decideM.mutate({ signup_id: s.id, decision: "confirm" })}
-                      disabled={decideM.isPending || bulkPending}
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => decideM.mutate({ signup_id: s.id, decision: "decline" })}
-                      disabled={decideM.isPending || bulkPending}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -1582,6 +1583,7 @@ function StaffSignupsDialog({
             </p>
           )}
         </div>
+
 
         {/* S4-4 : Assigner replié en bas — notification automatique à l'assigné */}
         <div className="rounded-md border bg-muted/20 p-2 space-y-2 mt-2">
@@ -1622,48 +1624,40 @@ function StaffSignupsDialog({
                   {memberSearchLoading && (
                     <p className="text-[11px] text-muted-foreground px-1">
                       <Loader2 className="h-3 w-3 inline animate-spin mr-1" />
-                      {t("common.loading", { defaultValue: "Chargement…" })}
+                      {t("common.loading")}
                     </p>
                   )}
                   {!memberSearchLoading && (memberResults?.members ?? []).length === 0 && (
                     <p className="text-[11px] text-muted-foreground px-1 py-2">
-                      {t("needs:staff.noMembers", { defaultValue: "Aucun membre trouvé" })}
+                      {t("needs:staff.noMembers")}
                     </p>
                   )}
                   {(memberResults?.members ?? []).map((m) => (
-                    <div
+                    <PersonRow
                       key={m.member_id}
-                      className="flex items-center justify-between gap-2 rounded border bg-background px-2 py-1.5"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium truncate">
-                          {m.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
-                        </p>
-                        {m.roles.length > 0 && (
-                          <p className="text-[10px] text-muted-foreground truncate">
-                            {m.roles
-                              .map((r) => t(`common.roles.${r}`, { defaultValue: r }))
-                              .join(" · ")}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 text-[11px]"
-                        onClick={() => addManualM.mutate(m.user_id)}
-                        disabled={addPendingUser === m.user_id}
-                      >
-                        {addPendingUser === m.user_id ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <>
-                            <Plus className="h-3 w-3 mr-1" />
-                            {t("needs:applications.assignCta", { defaultValue: "Assigner" })}
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                      className="rounded border bg-background px-2"
+                      compact
+                      name={m.full_name ?? t("common.unknown")}
+                      roles={m.roles}
+                      action={
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-[11px]"
+                          onClick={() => addManualM.mutate(m.user_id)}
+                          disabled={addPendingUser === m.user_id}
+                        >
+                          {addPendingUser === m.user_id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <>
+                              <Plus className="h-3 w-3 mr-1" />
+                              {t("needs:applications.assignCta")}
+                            </>
+                          )}
+                        </Button>
+                      }
+                    />
                   ))}
                 </div>
               </div>
@@ -1673,7 +1667,7 @@ function StaffSignupsDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.close", { defaultValue: "Fermer" })}
+            {t("common.close")}
           </Button>
         </DialogFooter>
       </DialogContent>
