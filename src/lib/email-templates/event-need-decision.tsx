@@ -27,11 +27,14 @@ const T = {
   fr: {
     previewConfirm: (label: string) => `Candidature confirmée : ${label}`,
     previewDecline: (label: string) => `Candidature déclinée : ${label}`,
+    previewUnassign: (label: string) => `Ce n'est plus nécessaire : ${label}`,
     hello: (n?: string | null) => (n ? `Bonjour ${n},` : "Bonjour,"),
     introConfirm: (club: string | null | undefined, event: string) =>
       `${club ?? "Le club"} a confirmé ta candidature pour ${event}. Merci pour ton coup de main !`,
     introDecline: (club: string | null | undefined, event: string) =>
       `${club ?? "Le club"} n'a pas retenu ta candidature pour ${event}. Merci quand même de t'être proposé·e.`,
+    introUnassign: (club: string | null | undefined, event: string) =>
+      `${club ?? "Le club"} n'a finalement plus besoin de toi pour ${event}. Merci quand même de t'être rendu·e disponible !`,
     role: "Rôle",
     when: "Quand",
     cta: "Voir l'événement",
