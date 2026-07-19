@@ -115,3 +115,15 @@ Added the following keys to distinguish two staff intents on a published need:
 
 FR and EN are final. DE/ES/IT/NL/PT are **clones of EN** and need native
 translations.
+
+## `common.json` — groups defaultValue removal (DE/ES/IT/NL/PT)
+
+Added `common.actions` scalar. All groups.* keys referenced in
+`src/routes/_authenticated/admin/groups.tsx` (parentOf, emailOnly,
+individualMembers, addIndividual, errors.nameTaken, common.cancel/save)
+already existed with native translations. `common.actions` was added
+natively (Aktionen/Acciones/Azioni/Acties/Ações) — no clone tracking needed.
+
+Removed dead keys from every locale (FR + EN + DE/ES/IT/NL/PT):
+`groups.dynamicRules`, `groups.noRules`, `groups.resolvedTotal` (leftover
+from the rules → subgroups rename).

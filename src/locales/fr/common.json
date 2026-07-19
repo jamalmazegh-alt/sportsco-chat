@@ -269,7 +269,8 @@
     "stop": "Arrêter",
     "errorOccurred": "Une erreur est survenue",
     "unknown": "Sans nom",
-    "deselectAll": "Tout désélectionner"
+    "deselectAll": "Tout désélectionner",
+    "actions": "Actions"
   },
   "notFound": {
     "code": "404",
@@ -2346,9 +2347,6 @@
     "openGroups": "Groupes",
     "addIndividual": "Ajouter individuellement",
     "individualMembers": "Membres individuels",
-    "dynamicRules": "Sous-groupes dynamiques",
-    "noRules": "Aucun sous-groupe. Ajoutez-en un pour inclure automatiquement des membres.",
-    "resolvedTotal": "Total résolu : {{count}}",
     "bulkPickKind": "Choisir un type…",
     "bulkPickParam": "Choisir…",
     "bulk": {

@@ -269,7 +269,8 @@
     "stop": "Stoppen",
     "errorOccurred": "Er is een fout opgetreden",
     "unknown": "Geen naam",
-    "deselectAll": "Alles deselecteren"
+    "deselectAll": "Alles deselecteren",
+    "actions": "Acties"
   },
   "notFound": {
     "code": "404",
@@ -2391,9 +2392,6 @@
       "team_educators": "Trainers van een team",
       "category_educators": "Trainers van een categorie"
     },
-    "dynamicRules": "Dynamische subgroepen",
-    "noRules": "Geen subgroepen. Voeg er een toe om automatisch leden op te nemen.",
-    "resolvedTotal": "Totaal opgelost: {{count}}",
     "bulkPickKind": "Kies een type…",
     "bulkPickParam": "Kies…"
   }

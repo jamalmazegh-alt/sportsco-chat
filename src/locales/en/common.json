@@ -269,7 +269,8 @@
     "stop": "Stop",
     "errorOccurred": "An error occurred",
     "unknown": "No name",
-    "deselectAll": "Deselect all"
+    "deselectAll": "Deselect all",
+    "actions": "Actions"
   },
   "notFound": {
     "code": "404",
@@ -2391,9 +2392,6 @@
       "team_educators": "Coaches of a team",
       "category_educators": "Coaches of a category"
     },
-    "dynamicRules": "Dynamic subgroups",
-    "noRules": "No subgroups. Add one to automatically include members.",
-    "resolvedTotal": "Total resolved: {{count}}",
     "bulkPickKind": "Choose a type…",
     "bulkPickParam": "Choose…"
   }

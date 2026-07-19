@@ -141,7 +141,8 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
   if (isLoading) return null;
 
   return (
-    <Card className="border-[1.5px]">
+    <Card id="needs" className="border-[1.5px] scroll-mt-24">
+
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base">
