@@ -833,6 +833,11 @@ function NeedFormDialog({
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
+  // 2-step wizard state (creation only). Edit stays single-step.
+  const [step, setStep] = useState<1 | 2>(1);
+  useEffect(() => {
+    if (open) setStep(1);
+  }, [open]);
 
   const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
 
@@ -861,13 +866,8 @@ function NeedFormDialog({
         },
       });
       if (wantsPublish && created?.id) {
-        try {
-          const r = await publish({ data: { need_id: created.id, audiences } });
-          return { ...created, __published: r };
-        } catch (e) {
-          // Draft is created, publication failed — surface the error but keep the draft.
-          throw e;
-        }
+        const r = await publish({ data: { need_id: created.id, audiences } });
+        return { ...created, __published: r };
       }
       return created;
     },
@@ -886,143 +886,159 @@ function NeedFormDialog({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const totalSteps = isEdit ? 1 : 2;
+  const currentStep = isEdit ? 1 : step;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
+          {!isEdit && (
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              {t("needs:wizard.step", { current: currentStep, total: totalSteps })}
+            </div>
+          )}
           <DialogTitle className="flex items-center gap-2">
             <HandHelping className="h-4 w-4 text-primary" />
             {isEdit
               ? t("common.edit", { defaultValue: "Modifier le besoin" })
-              : t("needs:section.add")}
+              : step === 1
+                ? t("needs:wizard.step1Title")
+                : t("needs:wizard.step2Title")}
           </DialogTitle>
-          <DialogDescription>{t("needs:section.createDesc")}</DialogDescription>
+          <DialogDescription>
+            {isEdit
+              ? t("needs:section.createDesc")
+              : step === 1
+                ? t("needs:section.createDesc")
+                : t("needs:publish.desc")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-1">
-          {/* Template picker as chips (friendly) */}
-          <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-              {t("needs:field.template")}
-            </Label>
-            <div className="flex flex-wrap gap-1.5">
-              {availableTemplates.map((tpl) => {
-                const active = tpl.key === templateKey;
-                const { Icon: TplIcon, chip } = getNeedVisual(tpl.key);
-                return (
-                  <button
-                    key={tpl.key}
-                    type="button"
-                    disabled={templateLocked}
-                    onClick={() => setTemplateKey(tpl.key)}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-2.5 py-1.5 transition-colors",
-                      active
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background hover:bg-muted border-border text-foreground",
-                      templateLocked && "opacity-60 cursor-not-allowed",
-                    )}
-                  >
-                    <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
-                      <TplIcon className="h-3 w-3" />
-                    </span>
-                    {t(`needs:templates.${tpl.key}`)}
-                  </button>
-                );
-              })}
-            </div>
-            {templateLocked && (
-              <p className="text-xs text-muted-foreground">
-                {t("needs:edit.templateLocked", { defaultValue: "Le type de besoin ne peut pas être modifié après publication." })}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="need-label">{t("needs:field.label")}</Label>
-            <Input
-              id="need-label"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              maxLength={120}
-              placeholder={defaultLabel}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="need-capacity">{t("needs:field.capacity")}</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="outline"
-                  className="h-9 w-9 shrink-0"
-                  onClick={() => setCapacity((c) => Math.max(1, c - 1))}
-                  aria-label="-"
-                >
-                  −
-                </Button>
-                <Input
-                  id="need-capacity"
-                  type="number"
-                  min={1}
-                  max={200}
-                  value={capacity}
-                  onChange={(e) =>
-                    setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))
-                  }
-                  className="text-center font-semibold"
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="outline"
-                  className="h-9 w-9 shrink-0"
-                  onClick={() => setCapacity((c) => Math.min(200, c + 1))}
-                  aria-label="+"
-                >
-                  +
-                </Button>
+          {(isEdit || step === 1) && (
+            <>
+              {/* Permanent minor reminder */}
+              <div className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+                {t("needs:wizard.minorReminder")}
               </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="need-mode">{t("needs:field.mode")}</Label>
-              <Select value={mode} onValueChange={(v) => setMode(v as "auto" | "manual")}>
-                <SelectTrigger id="need-mode">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="auto">{t("needs:validationMode.auto")}</SelectItem>
-                  <SelectItem value="manual">{t("needs:validationMode.manual")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="need-desc">{t("needs:field.description")}</Label>
-            <Textarea
-              id="need-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              maxLength={2000}
-              rows={3}
-              placeholder={t("needs:field.description")}
-            />
-          </div>
-
-          {/* Audience picker (creation only) */}
-          {!isEdit && (
-            <div className="pt-2 border-t space-y-3">
-              <div>
+              {/* Template picker as chips */}
+              <div className="space-y-1.5">
                 <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t("needs:publish.audienceHeader")}
+                  {t("needs:field.template")}
                 </Label>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {t("needs:publish.desc")}
-                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {availableTemplates.map((tpl) => {
+                    const active = tpl.key === templateKey;
+                    const { Icon: TplIcon, chip } = getNeedVisual(tpl.key);
+                    return (
+                      <button
+                        key={tpl.key}
+                        type="button"
+                        disabled={templateLocked}
+                        onClick={() => setTemplateKey(tpl.key)}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-2.5 py-1.5 transition-colors",
+                          active
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background hover:bg-muted border-border text-foreground",
+                          templateLocked && "opacity-60 cursor-not-allowed",
+                        )}
+                      >
+                        <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
+                          <TplIcon className="h-3 w-3" />
+                        </span>
+                        {t(`needs:templates.${tpl.key}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+                {templateLocked && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("needs:edit.templateLocked")}
+                  </p>
+                )}
               </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="need-label">{t("needs:field.label")}</Label>
+                <Input
+                  id="need-label"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  maxLength={120}
+                  placeholder={defaultLabel}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="need-capacity">{t("needs:field.capacity")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-9 w-9 shrink-0"
+                      onClick={() => setCapacity((c) => Math.max(1, c - 1))}
+                      aria-label="-"
+                    >
+                      −
+                    </Button>
+                    <Input
+                      id="need-capacity"
+                      type="number"
+                      min={1}
+                      max={200}
+                      value={capacity}
+                      onChange={(e) =>
+                        setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))
+                      }
+                      className="text-center font-semibold"
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-9 w-9 shrink-0"
+                      onClick={() => setCapacity((c) => Math.min(200, c + 1))}
+                      aria-label="+"
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="need-mode">{t("needs:field.mode")}</Label>
+                  <Select value={mode} onValueChange={(v) => setMode(v as "auto" | "manual")}>
+                    <SelectTrigger id="need-mode">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">{t("needs:validationMode.auto")}</SelectItem>
+                      <SelectItem value="manual">{t("needs:validationMode.manual")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="need-desc">{t("needs:wizard.commentLabel")}</Label>
+                <Textarea
+                  id="need-desc"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  maxLength={2000}
+                  rows={3}
+                  placeholder={t("needs:wizard.commentPlaceholder")}
+                />
+              </div>
+            </>
+          )}
+
+          {!isEdit && step === 2 && (
+            <div className="space-y-3">
               <AudiencePickerBody
                 ctx={audienceCtx ?? null}
                 state={audState}
@@ -1041,11 +1057,7 @@ function NeedFormDialog({
                     <Loader2 className="h-3 w-3 animate-spin" />
                     {t("needs:publish.previewLoading")}
                   </span>
-                ) : audiences.length === 0 ? (
-                  <span className="text-muted-foreground">
-                    {t("needs:publish.previewNone")}
-                  </span>
-                ) : (previewCount ?? 0) === 0 ? (
+                ) : audiences.length === 0 || (previewCount ?? 0) === 0 ? (
                   <span className="text-muted-foreground">
                     {t("needs:publish.previewNone")}
                   </span>
@@ -1059,18 +1071,36 @@ function NeedFormDialog({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
-          </Button>
-          <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
-            {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {isEdit
-              ? t("common.save", { defaultValue: "Enregistrer" })
-              : wantsPublish
-                ? t("needs:actions.publish")
-                : t("common.create", { defaultValue: "Créer en brouillon" })}
-          </Button>
+        <DialogFooter className="gap-2 sm:gap-2">
+          {!isEdit && step === 2 ? (
+            <>
+              <Button variant="outline" onClick={() => setStep(1)}>
+                {t("needs:wizard.back")}
+              </Button>
+              <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
+                {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                {wantsPublish
+                  ? t("needs:actions.publish")
+                  : t("common.create", { defaultValue: "Créer en brouillon" })}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                {t("common.cancel", { defaultValue: "Annuler" })}
+              </Button>
+              {isEdit ? (
+                <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
+                  {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("common.save", { defaultValue: "Enregistrer" })}
+                </Button>
+              ) : (
+                <Button onClick={() => setStep(2)}>
+                  {t("needs:wizard.continueToRecipients")}
+                </Button>
+              )}
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
