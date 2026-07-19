@@ -454,6 +454,10 @@ export function AudiencePickerBody({
     );
   };
 
+  return (
+    <div className="space-y-3">
+
+
 
       {/* Selected audiences — sticky, high-visibility */}
       <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
