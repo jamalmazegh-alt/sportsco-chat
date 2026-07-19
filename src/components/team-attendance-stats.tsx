@@ -39,10 +39,14 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number)")
+        .select(
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, deleted_at)",
+        )
         .eq("team_id", teamId)
         .eq("role", "player");
-      const players = (tm ?? []).map((r: any) => r.players).filter(Boolean);
+      const players = (tm ?? [])
+        .map((r: any) => r.players)
+        .filter((p: any) => p && !p.deleted_at);
 
       const { data: events } = await supabase
         .from("events")

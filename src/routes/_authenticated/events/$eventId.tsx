@@ -523,11 +523,12 @@ function EventDetail() {
       const { data, error } = await supabase
         .from("convocations")
         .select(
-          "id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)",
+          "id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email, deleted_at)",
         )
         .eq("event_id", eventId);
       if (error) throw error;
-      return data ?? [];
+      // Filter out convocations attached to soft-deleted player records (ghost duplicates).
+      return (data ?? []).filter((c: any) => c.players && !c.players.deleted_at);
     },
   });
 
