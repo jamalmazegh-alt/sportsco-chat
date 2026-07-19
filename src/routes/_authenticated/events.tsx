@@ -76,6 +76,7 @@ function EventsPage() {
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: club } = useQuery({
