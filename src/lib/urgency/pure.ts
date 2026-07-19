@@ -1,9 +1,54 @@
 // Pure logic for the urgency center — no React, no Supabase.
 // Extracted so the lattice / merge / status can be table-tested in isolation.
 
-import { SEVERITY_ORDER, type UrgencyItem, type UrgencySource, type UrgencyStatus } from "./types";
+import {
+  SEVERITY_ORDER,
+  type UrgencyItem,
+  type UrgencySeverity,
+  type UrgencySource,
+  type UrgencyStatus,
+} from "./types";
 
 export type SurfaceState = "pending" | "error" | "partial" | "empty" | "list";
+
+const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
+
+export type SeverityThresholds = {
+  /** Delta strictement inférieur → `critical`. Défaut : 24 h. */
+  criticalHours: number;
+  /** Delta strictement inférieur (et ≥ critical) → `high`. Défaut : 3 j = 72 h. */
+  highHours: number;
+};
+
+const DEFAULT_THRESHOLDS: SeverityThresholds = {
+  criticalHours: 24,
+  highHours: 72,
+};
+
+/**
+ * Sévérité graduée basée sur le temps restant avant `startsAt`.
+ *
+ * Contrat unique et paramétrable — pas de seuil d'exclusion :
+ * - `null` si et seulement si l'événement est déjà commencé (delta ≤ 0).
+ * - `critical` si delta < `criticalHours` heures.
+ * - `high` si delta < `highHours` heures.
+ * - `medium` au-delà (visibilité maintenue quel que soit l'horizon).
+ *
+ * Les collecteurs consomment tous cette fonction ; les besoins ouverts
+ * (`use-need-urgencies`) passent leurs propres seuils (48 h / 7 j).
+ */
+export function severityForStart(
+  startsAt: string,
+  now: Date = new Date(),
+  thresholds: SeverityThresholds = DEFAULT_THRESHOLDS,
+): UrgencySeverity | null {
+  const delta = new Date(startsAt).getTime() - now.getTime();
+  if (delta <= 0) return null;
+  if (delta < thresholds.criticalHours * HOUR_MS) return "critical";
+  if (delta < thresholds.highHours * HOUR_MS) return "high";
+  return "medium";
+}
 
 /**
  * Lattice de surface (5 branches, mutuellement exclusives).
