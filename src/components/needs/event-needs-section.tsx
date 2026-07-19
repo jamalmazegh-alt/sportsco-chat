@@ -548,46 +548,85 @@ function NeedRow({
         {/* S1-5 : « Assigner » vit DANS le dialog Candidatures (StaffSignupsDialog), pas sur la carte. */}
 
 
-        {/* Membre — J'apply / Retirer */}
+        {/* Membre — S5 : 3 états normalisés + « Je me propose » / « Pas dispo » permanent */}
         {!isStaff && isOpen && (
           <>
-            {mySignup ? (
+            {mySignup?.status === "confirmed" && (
               <>
-                <Badge
-                  className={cn(
-                    "text-[11px] px-2 py-1",
-                    mySignup.status === "confirmed" && "bg-emerald-600",
-                    mySignup.status === "applied" && "bg-amber-500",
-                    mySignup.status === "declined" && "bg-slate-500",
-                  )}
-                >
-                  {t(`needs:signup.${mySignup.status}`)}
+                <Badge className="text-[11px] px-2 py-1 bg-emerald-600">
+                  {t("needs:memberCard.confirmed")}
                 </Badge>
-                {(mySignup.status === "applied" || mySignup.status === "confirmed") && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => withdrawM.mutate()}
-                    disabled={withdrawM.isPending}
-                  >
-                    {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                    {t("needs:actions.withdraw")}
-                  </Button>
-                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => withdrawM.mutate()}
+                  disabled={withdrawM.isPending}
+                >
+                  {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:actions.withdraw")}
+                </Button>
               </>
-            ) : (
-              <Button
-                size="sm"
-                onClick={() => applyM.mutate()}
-                disabled={applyM.isPending || remaining === 0}
-              >
-                {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                {t("needs:memberCard.applyCta")}
-              </Button>
+            )}
+            {mySignup?.status === "applied" && (
+              <>
+                <Badge className="text-[11px] px-2 py-1 bg-amber-500">
+                  {t("needs:memberCard.pending")}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => withdrawM.mutate()}
+                  disabled={withdrawM.isPending}
+                >
+                  {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:actions.withdraw")}
+                </Button>
+              </>
+            )}
+            {mySignup?.status === "unavailable" && (
+              <>
+                <Badge variant="outline" className="text-[11px] px-2 py-1">
+                  {t("needs:memberCard.unavailableCta")}
+                </Badge>
+                <Button
+                  size="sm"
+                  onClick={() => applyM.mutate()}
+                  disabled={applyM.isPending || remaining === 0}
+                >
+                  {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:unavailable.backToApply")}
+                </Button>
+              </>
+            )}
+            {(!mySignup ||
+              (mySignup.status !== "confirmed" &&
+                mySignup.status !== "applied" &&
+                mySignup.status !== "unavailable")) && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => applyM.mutate()}
+                  disabled={applyM.isPending || remaining === 0}
+                >
+                  {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:memberCard.applyCta")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => declareUnavailM.mutate()}
+                  disabled={declareUnavailM.isPending}
+                >
+                  {declareUnavailM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:memberCard.unavailableCta")}
+                </Button>
+              </>
             )}
           </>
         )}
       </div>
+
+
 
       {publishOpen && (
         <PublishDialog
