@@ -175,6 +175,14 @@ export function NeedCandidateCard({
             )}
           </>
         )}
+        {declined && (
+          <Badge
+            variant="outline"
+            className="text-[10px] font-bold border-red-300 text-red-700 dark:text-red-300 dark:border-red-800/60"
+          >
+            {t("needs:signup.declined")}
+          </Badge>
+        )}
         {canApply && (
           <>
             {onUnavailable && (
