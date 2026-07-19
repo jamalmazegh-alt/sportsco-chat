@@ -100,6 +100,7 @@ if (!i18n.isInitialized) {
         buildClubero: enBuildClubero,
         camps: enCamps,
         needs: enNeeds,
+        publications: enPublications,
       },
       fr: {
         common: frCommon,
@@ -110,6 +111,7 @@ if (!i18n.isInitialized) {
         buildClubero: frBuildClubero,
         camps: frCamps,
         needs: frNeeds,
+        publications: frPublications,
       },
       de: {
         common: deCommon,
@@ -120,6 +122,7 @@ if (!i18n.isInitialized) {
         buildClubero: deBuildClubero,
         camps: deCamps,
         needs: deNeeds,
+        publications: dePublications,
       },
       es: {
         common: esCommon,
@@ -130,6 +133,7 @@ if (!i18n.isInitialized) {
         buildClubero: esBuildClubero,
         camps: esCamps,
         needs: esNeeds,
+        publications: esPublications,
       },
       pt: {
         common: ptCommon,
@@ -140,6 +144,7 @@ if (!i18n.isInitialized) {
         buildClubero: ptBuildClubero,
         camps: ptCamps,
         needs: ptNeeds,
+        publications: ptPublications,
       },
       it: {
         common: itCommon,
@@ -150,6 +155,7 @@ if (!i18n.isInitialized) {
         buildClubero: itBuildClubero,
         camps: itCamps,
         needs: itNeeds,
+        publications: itPublications,
       },
       nl: {
         common: nlCommon,
@@ -160,13 +166,14 @@ if (!i18n.isInitialized) {
         buildClubero: nlBuildClubero,
         camps: nlCamps,
         needs: nlNeeds,
+        publications: nlPublications,
       },
     },
     lng: "en",
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     defaultNS: "common",
-    ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps", "needs"],
+    ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps", "needs", "publications"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
