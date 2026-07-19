@@ -130,7 +130,7 @@ export function useNeedUrgencies(): UrgencyCollectorResult & { isPending: boolea
       const res = await listFn({ data: {} });
       const needs = (res?.needs ?? []) as unknown as OpenNeedInput[];
       const role: UrgencyRole = isCoach ? "coach" : isPlayer ? "player" : "parent";
-      const locale = getDateLocale(i18n.language);
+      const locale = dateLocale();
       return computeOpenNeedUrgencies({
         needs,
         role,
