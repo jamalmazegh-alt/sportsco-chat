@@ -599,6 +599,24 @@ function EventsPage() {
                 : t("events.showCancelled", { defaultValue: "Voir annulés" })}
             </button>
           )}
+          {view === "list" && (
+            <button
+              type="button"
+              onClick={() => setHideTrainings((s) => !s)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+                hideTrainings
+                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+              )}
+              title={t("events.trainingsToggle", { defaultValue: "Entraînements" })}
+            >
+              <Dumbbell className="h-3.5 w-3.5" />
+              {hideTrainings
+                ? t("events.showTrainings", { defaultValue: "Voir entraînements" })
+                : t("events.hideTrainings", { defaultValue: "Masquer entraînements" })}
+            </button>
+          )}
         </div>
       </div>
 
