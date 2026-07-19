@@ -1280,6 +1280,7 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const nowIso = new Date().toISOString();
+    let signupId: string | null = null;
     if (existing) {
       if (existing.status === "confirmed") return { ok: true, already: true };
       const { error: upErr } = await supabaseAdmin
@@ -1293,19 +1294,42 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
         })
         .eq("id", existing.id);
       if (upErr) throw new Error(upErr.message);
+      signupId = existing.id;
     } else {
-      const { error: insErr } = await supabaseAdmin.from("event_need_signups").insert({
-        need_id: data.need_id,
-        member_id: member.id,
-        user_id: data.user_id,
-        status: "confirmed",
-        confirmed_at: nowIso,
-        decided_by: userId,
-      });
+      const { data: inserted, error: insErr } = await supabaseAdmin
+        .from("event_need_signups")
+        .insert({
+          need_id: data.need_id,
+          member_id: member.id,
+          user_id: data.user_id,
+          status: "confirmed",
+          confirmed_at: nowIso,
+          decided_by: userId,
+        })
+        .select("id")
+        .single();
       if (insErr) throw new Error(insErr.message);
+      signupId = inserted?.id ?? null;
     }
 
     await recomputeCoverageServiceRole(need.event_id);
+
+    // Notifier la personne assignée manuellement : même parcours que la
+    // confirmation d'une candidature (push + email "confirm").
+    if (signupId) {
+      try {
+        const { notifyApplicantOfDecision } = await import("./dispatch.server");
+        await notifyApplicantOfDecision({
+          needId: data.need_id,
+          signupId,
+          decision: "confirm",
+          applicantUserId: data.user_id,
+        });
+      } catch (e) {
+        console.error("[staffAddManualSignup] notify failed", e);
+      }
+    }
+
     return { ok: true, already: false };
   });
 
