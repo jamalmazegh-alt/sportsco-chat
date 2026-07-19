@@ -7,6 +7,7 @@ import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -24,6 +25,7 @@ import {
   Eye,
   EyeOff,
   Clock,
+  Search,
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
@@ -73,6 +75,7 @@ function EventsPage() {
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: club } = useQuery({
@@ -144,15 +147,23 @@ function EventsPage() {
 
   const visibleEvents = useMemo(() => {
     if (!events) return [];
+    const q = searchQuery.trim().toLowerCase();
     return events.filter((e) => {
       if (!showCancelled && e.status === "cancelled") return false;
       if (!showPast) {
         const d = new Date(e.starts_at);
         if (isPast(d) && !isToday(d)) return false;
       }
+      if (q) {
+        const haystack = [e.title, e.opponent, e.team_name, e.competition_name, e.location]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
-  }, [events, showPast, showCancelled]);
+  }, [events, showPast, showCancelled, searchQuery]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
@@ -589,6 +600,19 @@ function EventsPage() {
         </div>
       </div>
 
+      {view === "list" && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("events.searchPlaceholder", { defaultValue: "Rechercher un événement…" })}
+            className="pl-9"
+          />
+        </div>
+      )}
+
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
           <Link
@@ -610,20 +634,32 @@ function EventsPage() {
       ) : !visibleEvents || visibleEvents.length === 0 ? (
         <EmptyState
           icon={<Calendar className="h-6 w-6" />}
-          title={t("events.noEvents")}
+          title={
+            searchQuery.trim()
+              ? t("events.noSearchResults", { defaultValue: "Aucun résultat" })
+              : t("events.noEvents")
+          }
           description={
-            isCoach
-              ? t("events.emptyHintCoach", {
-                  defaultValue:
-                    "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+            searchQuery.trim()
+              ? t("events.noSearchResultsHint", {
+                  defaultValue: "Aucun événement ne correspond à ta recherche.",
                 })
-              : t("events.emptyHintPlayer", {
-                  defaultValue:
-                    "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
-                })
+              : isCoach
+                ? t("events.emptyHintCoach", {
+                    defaultValue:
+                      "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+                  })
+                : t("events.emptyHintPlayer", {
+                    defaultValue:
+                      "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
+                  })
           }
           action={
-            isCoach && user ? (
+            searchQuery.trim() ? (
+              <Button size="sm" variant="outline" className="h-9" onClick={() => setSearchQuery("")}>
+                {t("events.clearSearch", { defaultValue: "Effacer la recherche" })}
+              </Button>
+            ) : isCoach && user ? (
               <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
                 <Plus className="h-4 w-4" />
                 {t("events.create")}
