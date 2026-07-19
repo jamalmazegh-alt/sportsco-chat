@@ -221,9 +221,13 @@ export function UrgencyCenter({ className }: Props) {
     }
   }
 
+  const VISIBLE_LIMIT = 5;
+  const visibleItems = expanded ? items : items.slice(0, VISIBLE_LIMIT);
+  const hiddenCount = Math.max(0, items.length - VISIBLE_LIMIT);
+
   return (
     <UrgencyDeck
-      items={items}
+      items={visibleItems}
       hasFailures={hasFailures}
       busyIds={busyIds}
       onAction={handleAction}
@@ -232,6 +236,20 @@ export function UrgencyCenter({ className }: Props) {
       }}
       onRefresh={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
       className={className}
+      footer={
+        hiddenCount > 0 && !expanded ? (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="w-full mt-1 inline-flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-2 hover:border-[#2d9d5f] hover:text-[#0f4a26] transition-colors"
+          >
+            {t("urgency.deck.showMore", {
+              count: hiddenCount,
+              defaultValue: "+ {{count}} autres échéances",
+            })}
+          </button>
+        ) : null
+      }
     />
   );
 }
