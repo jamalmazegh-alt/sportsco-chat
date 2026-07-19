@@ -512,6 +512,43 @@ export function AudiencePickerBody({
         </div>
       )}
 
+      {/* Club-wide audiences — quick chips */}
+      {clubAudienceSuggestions.length > 0 && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
+          <Label className="text-[11px] uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+            <Shield className="h-3.5 w-3.5" />
+            {t("needs:audiences.clubAudiences", {
+              defaultValue: "Audiences du club",
+            })}
+          </Label>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {clubAudienceSuggestions.map((s) => {
+              const { Icon, cls } = KIND_META[s.kind];
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={s.onToggle}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
+                    s.active
+                      ? cls
+                      : "border-border bg-background hover:bg-muted text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  <span>{s.label}</span>
+                  {s.active ? (
+                    <X className="h-3 w-3 opacity-70" />
+                  ) : (
+                    <Plus className="h-3 w-3 opacity-70" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Other audiences — generic add row */}
       <div>
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
