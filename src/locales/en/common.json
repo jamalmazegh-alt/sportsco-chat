@@ -935,12 +935,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "pendingCount": "{{count}} player hasn't replied yet",
-    "pendingCount_plural": "{{count}} players haven't replied yet",
-    "remindAllSent": "{{count}} reminder sent",
-    "remindAllSent_plural": "{{count}} reminders sent",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -950,7 +958,11 @@
     "reviewBeforeSend": "Review before sending",
     "reviewBeforeSendHint": "Check the recipients and details — sending is final.",
     "cooldownHint": "{{m}} min before you can remind again",
-    "remindIn": "Remind in {{m}} min"
+    "remindIn": "Remind in {{m}} min",
+    "pendingCount_one": "{{count}} player hasn't replied yet",
+    "pendingCount_other": "{{count}} players haven't replied yet",
+    "remindAllSent_one": "{{count}} reminder sent",
+    "remindAllSent_other": "{{count}} reminders sent"
   },
   "stats": {
     "title": "Stats",
