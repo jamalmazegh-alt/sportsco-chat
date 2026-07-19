@@ -164,6 +164,32 @@ function NeedsFeedPage() {
           )}
         </div>
       )}
+
+      {declinedNeeds.length > 0 && (
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setDeclinedOpen((v) => !v)}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground h-7 px-2"
+          >
+            {declinedOpen ? (
+              <ChevronDown className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5" />
+            )}
+            {t("needs:declined.sectionTitleCount", { count: declinedNeeds.length })}
+          </Button>
+          {declinedOpen && (
+            <div className="space-y-2.5 mt-2">
+              {declinedNeeds.map((n) => (
+                <NeedCandidateCard key={n.id} need={n} showDescription />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
