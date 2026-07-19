@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { listMyOpenNeeds } from "@/lib/needs/needs.functions";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { dateLocale } from "@/lib/date-locale";
+import { severityForStart as pureSeverityForStart, type SeverityThresholds } from "./pure";
 import type {
   UrgencyCollectorResult,
   UrgencyItem,
@@ -43,6 +44,13 @@ export type OpenNeedInput = {
   } | null;
 };
 
+// Seuils spécifiques aux besoins ouverts : la fenêtre d'organisation
+// est plus large que pour les convocations (24 h / 3 j).
+const NEED_THRESHOLDS: SeverityThresholds = {
+  criticalHours: 48,
+  highHours: 24 * 7,
+};
+
 export type ComputeOpenNeedUrgenciesArgs = {
   needs: readonly OpenNeedInput[];
   role: UrgencyRole;
@@ -54,15 +62,15 @@ export type ComputeOpenNeedUrgenciesArgs = {
   fallbackTitle: string;
 };
 
+/**
+ * Ré-export local pour compat des tests. Délègue à la fonction pure
+ * partagée avec les seuils propres aux besoins (48 h / 7 j).
+ */
 export function severityForStart(
   startsAt: string,
   now: Date = new Date(),
 ): UrgencySeverity | null {
-  const delta = new Date(startsAt).getTime() - now.getTime();
-  if (delta <= 0) return null; // événement démarré/passé
-  if (delta <= 2 * DAY_MS) return "critical"; // < 48h
-  if (delta <= 7 * DAY_MS) return "high"; // < 7j
-  return "medium";
+  return pureSeverityForStart(startsAt, now, NEED_THRESHOLDS);
 }
 
 /**
