@@ -87,7 +87,10 @@ export const createClubGroup = createServerFn({ method: "POST" })
       })
       .select("id, name, description, is_active, created_at, updated_at, created_by")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (error.code === "23505") throw new Error("group_name_taken");
+      throw new Error(error.message);
+    }
     return row;
   });
 
@@ -120,7 +123,10 @@ export const updateClubGroup = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .select("id, name, description, is_active, created_at, updated_at, created_by")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (error.code === "23505") throw new Error("group_name_taken");
+      throw new Error(error.message);
+    }
     return row;
   });
 
