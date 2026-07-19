@@ -2195,6 +2195,10 @@
       "checkFailed": "Warnungen konnten nicht geprüft werden"
     },
     "partialError": "Einige Quellen sind nicht verfügbar, die Liste kann unvollständig sein.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Antworten",
       "open": "Öffnen"
