@@ -492,9 +492,9 @@ function NeedRow({
               </DropdownMenuItem>
               {isOpen && (
                 <>
-                  <DropdownMenuItem onClick={() => setRepublishOpen(true)}>
+                  <DropdownMenuItem onClick={() => setEditAudienceOpen(true)}>
                     <Users className="h-3.5 w-3.5 mr-2" />
-                    {t("needs:menu.editAudience", { defaultValue: "Modifier les destinataires" })}
+                    {t("needs:menu.editAudience")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setCloseConfirmOpen(true)}>
