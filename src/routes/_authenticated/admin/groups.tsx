@@ -1192,8 +1192,7 @@ function RulePreviewDialog({
         )}
 
         <DialogFooter className="text-xs text-muted-foreground">
-          {t("groups.rulePreviewCount", {
-            defaultValue: "{{count}} membre(s)",
+          {t("groups.subgroupPreviewCount", {
             count: rows.length,
           })}
         </DialogFooter>
