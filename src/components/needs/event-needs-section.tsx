@@ -644,6 +644,16 @@ function NeedRow({
           onPublished={onChange}
         />
       )}
+      {republishOpen && (
+        <PublishDialog
+          open={republishOpen}
+          onOpenChange={setRepublishOpen}
+          needId={need.id}
+          eventId={eventId}
+          onPublished={onChange}
+          republish
+        />
+      )}
       {staffOpen && (
         <StaffSignupsDialog
           open={staffOpen}
