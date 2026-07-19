@@ -1610,9 +1610,7 @@ function StaffSignupsDialog({
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
                     className="pl-7 h-8 text-sm"
-                    placeholder={t("needs:applications.searchPlaceholder", {
-                      defaultValue: "Rechercher un membre…",
-                    })}
+                    placeholder={t("needs:applications.searchPlaceholder")}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     autoFocus
