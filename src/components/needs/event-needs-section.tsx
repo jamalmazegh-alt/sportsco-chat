@@ -26,7 +26,9 @@ import {
   Pencil,
   UserPlus,
   Search,
+  MoreHorizontal,
 } from "lucide-react";
+
 import { formatDistanceToNow } from "date-fns";
 import { fr as frLocale, enUS as enLocale } from "date-fns/locale";
 
@@ -61,8 +63,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+
 
 import {
   listEventNeeds,
@@ -75,6 +85,7 @@ import {
   decideSignup,
   closeEventNeed,
   cancelEventNeed,
+  deleteEventNeed,
   previewEventNeedAudience,
   getNeedAudienceContext,
   getEventAudienceContext,
@@ -85,6 +96,7 @@ import {
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { getNeedVisual, resolveNeedLabel } from "./need-visuals";
+
 
 type Props = {
   eventId: string;
@@ -228,24 +240,31 @@ function NeedRow({
   existingRoleKeys: string[];
   onChange: () => void;
 }) {
-
   const { t } = useTranslation();
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
   const withdraw = useServerFn(withdrawSignup);
   const close = useServerFn(closeEventNeed);
   const cancel = useServerFn(cancelEventNeed);
+  const deleteFn = useServerFn(deleteEventNeed);
+
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
-
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
   const status = need.status;
   const mySignup = need.my_signup;
+  const confirmedCount = need.confirmed_count;
+  const pendingCount = need.applied_count;
+  const isReadOnly = status === "closed" || status === "cancelled";
+  const isDraft = status === "draft";
+  const isOpen = status === "open";
 
   const applyM = useMutation({
     mutationFn: () => apply({ data: { need_id: need.id } }),
@@ -272,7 +291,8 @@ function NeedRow({
   const closeM = useMutation({
     mutationFn: () => close({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs:actions.close"));
+      toast.success(t("needs:status.closed"));
+      setCloseConfirmOpen(false);
       onChange();
     },
     onError: (e: Error) =>
@@ -281,138 +301,249 @@ function NeedRow({
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs:cancel.done", { defaultValue: "Besoin annulé" }));
+      toast.success(t("needs:status.cancelled"));
+      setCancelConfirmOpen(false);
       onChange();
     },
-    onError: (e: Error) => {
-      console.error("[needs] cancel failed", e);
-      toast.error(
-        t(`needs:errors.${e.message}`, {
-          defaultValue: t("needs:errors.cancelFailed", {
-            defaultValue: "Impossible d'annuler le besoin. Réessaie dans un instant.",
-          }),
-        }),
-      );
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
+  const deleteM = useMutation({
+    mutationFn: () => deleteFn({ data: { need_id: need.id } }),
+    onSuccess: () => {
+      toast.success(t("needs:deleteDraft.success"));
+      setDeleteConfirmOpen(false);
+      onChange();
     },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
-  const statusBadge = (
-    <Badge
-      variant="outline"
-      className={cn(
-        "text-[10px] font-semibold uppercase",
-        status === "open" &&
-          "border-emerald-300 text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300",
-        status === "draft" &&
-          "border-amber-300 text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-300",
-        status === "closed" && "border-slate-300 text-slate-600",
-        status === "cancelled" && "border-red-300 text-red-700",
-      )}
-    >
-      {t(`needs:status.${status}`)}
-    </Badge>
-  );
+  /* -------------------- badges (S1 · pastille 2) -------------------- */
 
-  const publishedBadge = (() => {
-    if (status === "draft") {
+  const statusBadge = (() => {
+    if (isDraft) {
       return (
-        <Badge variant="outline" className="text-[10px] text-muted-foreground">
-          {t("needs:publishedBadge.unpublished")}
+        <Badge
+          variant="outline"
+          className="text-[10px] font-semibold uppercase border-amber-300 text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-300"
+        >
+          {t("needs:badge.unpublished")}
         </Badge>
       );
     }
-    if (need.last_published_at) {
-      const time = formatDistanceToNow(new Date(need.last_published_at), {
-        addSuffix: true,
-        locale,
-      });
-      const count = need.last_recipients_count ?? 0;
+    if (status === "closed") {
       return (
-        <Badge variant="outline" className="text-[10px] text-muted-foreground">
-          {t("needs:publishedBadge.at", { time, count })}
+        <Badge
+          variant="outline"
+          className="text-[10px] font-semibold uppercase border-slate-300 text-slate-600 dark:text-slate-300"
+        >
+          {t("needs:badge.closed")}
+        </Badge>
+      );
+    }
+    if (status === "cancelled") {
+      return (
+        <Badge
+          variant="outline"
+          className="text-[10px] font-semibold uppercase border-red-300 text-red-700 dark:text-red-300"
+        >
+          {t("needs:badge.cancelled")}
         </Badge>
       );
     }
     return null;
   })();
 
+  /* -------------------- meta line (S1 · pastille 3) -------------------- */
+
+  const metaLine = (() => {
+    if (isDraft) return t("needs:card.unpublishedMeta");
+    if (need.last_published_at) {
+      const time = formatDistanceToNow(new Date(need.last_published_at), {
+        addSuffix: false,
+        locale,
+      });
+      return t("needs:card.publishedAt", {
+        time,
+        count: need.last_recipients_count ?? 0,
+      });
+    }
+    return null;
+  })();
+
+  /* -------------------- seats pill (S1 · pastille 4) -------------------- */
+
+  const seatsPill = (() => {
+    if (remaining === 0) {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 text-[11px] font-semibold">
+          <CheckCircle2 className="h-3 w-3" />
+          {t("needs:card.seatsFullConfirmed", { count: confirmedCount })}
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 px-2 py-0.5 text-[11px] font-semibold">
+        <Users className="h-3 w-3" />
+        {t("needs:card.seatsRemaining", { count: remaining })}
+        <span className="opacity-70">
+          · {confirmedCount}/{capacity}
+        </span>
+      </span>
+    );
+  })();
+
   const { Icon: NeedIcon, chip: needChip } = getNeedVisual(need.role_key);
   const displayLabel = resolveNeedLabel(need, t);
 
+  /* -------------------- contextual ⋯ menu (S7 · pastille 1) -------------------- */
+  // Draft:              Modifier · Supprimer
+  // Published (open):   Modifier · Fermer · Annuler
+  // Closed / Cancelled: no menu (read-only)
+  const showMenu = isStaff && !isReadOnly;
+
   return (
-    <div className="rounded-lg border bg-background/50 p-3">
+    <div
+      className={cn(
+        "rounded-lg border bg-background/50 p-3 transition-colors",
+        isReadOnly && "opacity-70",
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
+          {/* Ligne titre : icône · libellé · badge d'état */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0", needChip)}>
               <NeedIcon className="h-4 w-4" />
             </span>
             <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
             {statusBadge}
-            <Badge variant="outline" className="text-[10px]">
-              {t(`needs:validationMode.${need.validation_mode}`)}
-            </Badge>
-            {publishedBadge}
           </div>
+
+          {/* Description (optionnelle) */}
           {need.description && (
-            <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">
+            <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-line">
               {need.description}
             </p>
           )}
-          <div className="mt-2 flex items-center gap-3 text-xs flex-wrap">
-            <span className="inline-flex items-center gap-1 text-muted-foreground">
-              <Users className="h-3.5 w-3.5" />
-              <span className="tabular-nums font-semibold text-foreground">
-                {capacity - remaining}/{capacity}
-              </span>
-              <span>
-                {remaining === 0
-                  ? t("needs:seats.full")
-                  : t("needs:seats.remaining", { count: remaining })}
-              </span>
-            </span>
-          </div>
-          {(need.confirmed_signups?.length ?? 0) > 0 && (
-            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-              {need.confirmed_signups!.map((s) => (
-                <Badge
-                  key={s.user_id}
-                  variant="outline"
-                  className="text-[11px] border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
-                >
-                  {s.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
-                </Badge>
-              ))}
+
+          {/* Ligne méta unique — publication + mode (S1 · pastille 3) */}
+          {(metaLine || !isDraft) && (
+            <div className="mt-2 text-[11px] text-muted-foreground flex items-center gap-1.5 flex-wrap">
+              {metaLine && <span>{metaLine}</span>}
+              {metaLine && <span aria-hidden>·</span>}
+              <span>{t(`needs:validationMode.${need.validation_mode}`)}</span>
             </div>
           )}
+
+          {/* Pill places + confirmés visibles (S1 · pastille 4 + 5) */}
+          <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+            {seatsPill}
+            {(need.confirmed_signups?.length ?? 0) > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {need.confirmed_signups!.map((s) => (
+                  <Badge
+                    key={s.user_id}
+                    variant="outline"
+                    className="text-[11px] border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  >
+                    {s.full_name ?? t("common.unknown")}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Menu ⋯ contextuel — dernier élément aligné en top-right */}
+        {showMenu && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 shrink-0"
+                aria-label={t("needs:card.menuLabel")}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                <Pencil className="h-3.5 w-3.5 mr-2" />
+                {t("needs:menu.edit")}
+              </DropdownMenuItem>
+              {isOpen && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setCloseConfirmOpen(true)}>
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-2" />
+                    {t("needs:menu.closeNeed")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCancelConfirmOpen(true)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <AlertCircle className="h-3.5 w-3.5 mr-2" />
+                    {t("needs:menu.cancelNeed")}
+                  </DropdownMenuItem>
+                </>
+              )}
+              {isDraft && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setDeleteConfirmOpen(true)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-2" />
+                    {t("needs:menu.delete")}
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
+      {/* Actions ligne — primaire d'abord (Candidatures / Publier / Relancer), puis secondaires */}
       <div className="mt-3 flex flex-wrap gap-2">
-        {isStaff && status === "open" && (
+        {/* Staff — Candidatures (primaire quand il y a des candidatures en attente) */}
+        {isStaff && isOpen && (
           <Button
             size="sm"
-            variant={need.applied_count > 0 ? "default" : "outline"}
+            variant={pendingCount > 0 ? "default" : "outline"}
             onClick={() => setStaffOpen(true)}
           >
             <Users className="h-3.5 w-3.5 mr-1" />
-            {need.applied_count > 0
-              ? t("needs:pendingApplications", { count: need.applied_count })
-              : t("needs:actions.viewSignups", { defaultValue: "Voir candidatures" })}
-            {need.applied_count > 0 && (
-              <span className="ml-1 tabular-nums font-semibold">({need.applied_count})</span>
+            {t("needs:card.applicationsCta")}
+            {pendingCount > 0 && (
+              <span className="ml-1.5 tabular-nums font-semibold">
+                · {pendingCount}
+              </span>
             )}
           </Button>
         )}
-        {isStaff && (status === "open" || status === "draft") && remaining > 0 && (
-          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
-            <UserPlus className="h-3.5 w-3.5 mr-1" />
-            {t("needs:actions.assign", { defaultValue: "Assigner" })}
+
+        {/* Staff — Publier (draft) / Relancer (open) */}
+        {isStaff && (isDraft || isOpen) && (
+          <Button size="sm" variant={isDraft ? "default" : "outline"} onClick={() => setPublishOpen(true)}>
+            <Send className="h-3.5 w-3.5 mr-1" />
+            {isDraft ? t("needs:actions.publish") : t("needs:card.republish")}
           </Button>
         )}
 
-        {!isStaff && status === "open" && (
+        {/* Staff — Assigner directement (quand il reste de la place) */}
+        {isStaff && (isDraft || isOpen) && remaining > 0 && (
+          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
+            <UserPlus className="h-3.5 w-3.5 mr-1" />
+            {t("needs:actions.assign")}
+          </Button>
+        )}
+
+        {/* Membre — J'apply / Retirer */}
+        {!isStaff && isOpen && (
           <>
             {mySignup ? (
               <>
@@ -433,9 +564,7 @@ function NeedRow({
                     onClick={() => withdrawM.mutate()}
                     disabled={withdrawM.isPending}
                   >
-                    {withdrawM.isPending && (
-                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                    )}
+                    {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                     {t("needs:actions.withdraw")}
                   </Button>
                 )}
@@ -447,47 +576,7 @@ function NeedRow({
                 disabled={applyM.isPending || remaining === 0}
               >
                 {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                {t("needs:actions.apply")}
-              </Button>
-            )}
-          </>
-        )}
-        {isStaff && (
-          <>
-            {(status === "draft" || status === "open") && (
-              <Button size="sm" variant="default" onClick={() => setPublishOpen(true)}>
-                <Send className="h-3.5 w-3.5 mr-1" />
-                {status === "draft"
-                  ? t("needs:actions.publish")
-                  : t("needs:actions.republish")}
-              </Button>
-            )}
-            {(status === "draft" || status === "open") && (
-              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
-                <Pencil className="h-3.5 w-3.5 mr-1" />
-                {t("common.edit", { defaultValue: "Modifier" })}
-              </Button>
-            )}
-            {status === "open" && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => closeM.mutate()}
-                disabled={closeM.isPending}
-              >
-                {t("needs:actions.close")}
-              </Button>
-            )}
-            {(status === "draft" || status === "open") && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-destructive"
-                onClick={() => setCancelConfirmOpen(true)}
-                disabled={cancelM.isPending}
-              >
-                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                {t("needs:actions.cancel")}
+                {t("needs:memberCard.applyCta")}
               </Button>
             )}
           </>
@@ -543,25 +632,86 @@ function NeedRow({
         />
       )}
 
-      <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+      {/* Fermer le besoin — S7 · pastille 3 */}
+      <AlertDialog open={closeConfirmOpen} onOpenChange={setCloseConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("needs:cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogTitle>{t("needs:closeDialog2.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("needs:cancelDialog.description")}
+              {confirmedCount === 0
+                ? t("needs:closeDialog2.descriptionEmpty")
+                : t("needs:closeDialog2.description", { count: confirmedCount, confirmed: confirmedCount })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCancelConfirmOpen(false)}>
-              {t("needs:cancelDialog.abort")}
-            </AlertDialogCancel>
+            <AlertDialogCancel>{t("needs:closeDialog2.abort")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => cancelM.mutate()}
+              onClick={(e) => {
+                e.preventDefault();
+                closeM.mutate();
+              }}
+              disabled={closeM.isPending}
+            >
+              {closeM.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("needs:closeDialog2.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Annuler le besoin — S7 · pastille 3 (notifie confirmés + en attente) */}
+      <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("needs:cancelDialog2.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmedCount === 0 && pendingCount === 0
+                ? t("needs:cancelDialog2.descriptionNone")
+                : confirmedCount > 0 && pendingCount === 0
+                  ? t("needs:cancelDialog2.descriptionOnlyConfirmed", { count: confirmedCount, confirmed: confirmedCount })
+                  : confirmedCount === 0 && pendingCount > 0
+                    ? t("needs:cancelDialog2.descriptionOnlyPending", { count: pendingCount, pending: pendingCount })
+                    : t("needs:cancelDialog2.descriptionMany", { confirmed: confirmedCount, pending: pendingCount })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("needs:cancelDialog2.abort")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                cancelM.mutate();
+              }}
               disabled={cancelM.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {cancelM.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("needs:cancelDialog.confirm")}
+              {t("needs:cancelDialog2.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Supprimer un brouillon — S7 · pastille 2 (aucun destinataire prévenu) */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("needs:deleteDraft.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("needs:deleteDraft.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("needs:deleteDraft.abort")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                deleteM.mutate();
+              }}
+              disabled={deleteM.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteM.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("needs:deleteDraft.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -569,6 +719,7 @@ function NeedRow({
     </div>
   );
 }
+
 
 /* -------------------------------------------------------------------------- */
 /* CreateNeedDialog                                                           */

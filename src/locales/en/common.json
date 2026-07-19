@@ -267,7 +267,9 @@
     "clear": "Clear",
     "listen": "Listen",
     "stop": "Stop",
-    "errorOccurred": "An error occurred"
+    "errorOccurred": "An error occurred",
+    "unknown": "No name",
+    "deselectAll": "Deselect all"
   },
   "notFound": {
     "code": "404",

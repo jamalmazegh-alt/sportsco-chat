@@ -267,7 +267,9 @@
     "clear": "Wissen",
     "listen": "Luisteren",
     "stop": "Stoppen",
-    "errorOccurred": "Er is een fout opgetreden"
+    "errorOccurred": "Er is een fout opgetreden",
+    "unknown": "Geen naam",
+    "deselectAll": "Alles deselecteren"
   },
   "notFound": {
     "code": "404",

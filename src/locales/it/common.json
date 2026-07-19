@@ -267,7 +267,9 @@
     "clear": "Cancella",
     "listen": "Ascolta",
     "stop": "Ferma",
-    "errorOccurred": "Si è verificato un errore"
+    "errorOccurred": "Si è verificato un errore",
+    "unknown": "Senza nome",
+    "deselectAll": "Deseleziona tutto"
   },
   "notFound": {
     "code": "404",
