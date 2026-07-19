@@ -64,7 +64,11 @@ export function NeedCandidateCard({
   const applied = status === "applied";
   const confirmed = status === "confirmed";
   const unavailable = status === "unavailable";
-  const canApply = !need.my_signup && need.remaining_seats > 0;
+  const declined = status === "declined";
+  const withdrawn = status === "withdrawn";
+  // withdrawn = user retracted; treat as "no signup" so he can re-apply.
+  const noActiveSignup = !need.my_signup || withdrawn;
+  const canApply = noActiveSignup && need.remaining_seats > 0;
 
   return (
     <div
