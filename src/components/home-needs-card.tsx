@@ -6,48 +6,45 @@ import { useState } from "react";
 import { ChevronRight, HandHelping } from "lucide-react";
 import {
   listMyOpenNeeds,
-  applyToEventNeed,
   withdrawSignup,
-  declareUnavailable,
 } from "@/lib/needs/needs.functions";
 import { NeedCandidateCard } from "@/components/needs/need-candidate-card";
-import { Badge } from "@/components/ui/badge";
+import { severityForStart } from "@/lib/urgency/pure";
+import { fmt } from "@/lib/date-locale";
+import { resolveNeedLabel } from "@/components/needs/need-visuals";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
-const FILLED_VISIBILITY_MS = 48 * 60 * 60 * 1000;
-
 /**
- * Compute the cut-off after which a filled need should disappear from the
- * "Récemment complétés" subsection. Spec:
- *   visibleUntil = min(completedAt + 48h, eventStartAt)
- * We approximate `completedAt` with the row's `updated_at` (the seat count
- * hitting zero comes through a signup mutation which touches the need row).
+ * Sépare les engagements « imminents » (< 48 h) des autres.
+ * Réutilise `severityForStart` en surchargeant le seuil critical à 48 h.
+ * Un engagement est imminent ssi la sévérité vaut `critical` (delta > 0 et < 48 h).
+ * Exporté pour les tests unitaires.
  */
-export function isRecentlyFilledVisible(
-  need: {
-    remaining_seats: number;
-    updated_at?: string | null;
-    events?: { starts_at?: string | null } | null;
-  },
+export function isImminentEngagement(
+  startsAt: string | null | undefined,
   now: Date = new Date(),
 ): boolean {
-  if (need.remaining_seats !== 0) return false;
-  const completedAt = need.updated_at ? new Date(need.updated_at).getTime() : NaN;
-  if (!Number.isFinite(completedAt)) return false;
-  const eventStart = need.events?.starts_at
-    ? new Date(need.events.starts_at).getTime()
-    : Number.POSITIVE_INFINITY;
-  const visibleUntil = Math.min(completedAt + FILLED_VISIBILITY_MS, eventStart);
-  return now.getTime() < visibleUntil;
+  if (!startsAt) return false;
+  return (
+    severityForStart(startsAt, now, { criticalHours: 48, highHours: 48 }) === "critical"
+  );
 }
 
 export function HomeNeedsCard() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const listFn = useServerFn(listMyOpenNeeds);
-  const applyFn = useServerFn(applyToEventNeed);
   const withdrawFn = useServerFn(withdrawSignup);
-  const unavailFn = useServerFn(declareUnavailable);
 
   const { data } = useQuery({
     queryKey: ["home-my-open-needs"],
@@ -61,16 +58,12 @@ export function HomeNeedsCard() {
   };
 
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmWithdraw, setConfirmWithdraw] = useState<{
+    signupId: string;
+    needLabel: string;
+    eventLabel: string;
+  } | null>(null);
 
-  const applyMut = useMutation({
-    mutationFn: (need_id: string) => applyFn({ data: { need_id } }),
-    onSuccess: () => {
-      toast.success(t("needs:signup.applied"));
-      invalidate();
-    },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
-  });
   const withdrawMut = useMutation({
     mutationFn: (signup_id: string) => withdrawFn({ data: { signup_id } }),
     onSuccess: () => {
@@ -80,107 +73,126 @@ export function HomeNeedsCard() {
     onError: (e: Error) =>
       toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
-  const unavailMut = useMutation({
-    mutationFn: (need_id: string) => unavailFn({ data: { need_id } }),
-    onSuccess: () => {
-      toast.success(t("needs:unavailable.confirmed"));
-      invalidate();
-    },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
-  });
 
   const allNeeds = (data?.needs ?? []) as any[];
-
-  // Hide needs the user marked unavailable (persisted server-side).
-  const relevant = allNeeds.filter((n) => n.my_signup?.status !== "unavailable");
 
   const hasActiveSignup = (n: any) =>
     n.my_signup &&
     n.my_signup.status !== "withdrawn" &&
-    n.my_signup.status !== "declined";
+    n.my_signup.status !== "declined" &&
+    n.my_signup.status !== "unavailable";
 
-  // Section principale : UNIQUEMENT les engagements en cours (applied/confirmed).
-  // Les besoins ouverts non répondus vont désormais dans l'UrgencyCenter — pas
-  // de doublon. Un besoin non répondu = action en attente → urgence.
-  // Un besoin engagé = statut à suivre → cette carte.
-  const primary = relevant.filter((n) => hasActiveSignup(n));
+  // Engagements en cours uniquement, triés par date d'événement (le plus proche d'abord).
+  const engagements = allNeeds
+    .filter(hasActiveSignup)
+    .slice()
+    .sort((a, b) => {
+      const ta = a.events?.starts_at ? new Date(a.events.starts_at).getTime() : Number.POSITIVE_INFINITY;
+      const tb = b.events?.starts_at ? new Date(b.events.starts_at).getTime() : Number.POSITIVE_INFINITY;
+      return ta - tb;
+    });
 
-  // Sous-section "Récemment complétés" : plus de place, l'utilisateur n'est pas
-  // engagé, complété il y a moins de 48h et avant le début de l'événement.
-  const recentlyFilled = relevant.filter(
-    (n) => !hasActiveSignup(n) && isRecentlyFilledVisible(n),
-  );
+  if (engagements.length === 0) return null;
 
-  const primaryVisible = primary.slice(0, 3);
-  const filledVisible = recentlyFilled.slice(0, 2);
+  const now = new Date();
+  const firstIsImminent = isImminentEngagement(engagements[0]?.events?.starts_at, now);
+  const imminent = firstIsImminent ? engagements[0] : null;
+  const others = firstIsImminent ? engagements.slice(1) : engagements;
 
-  // Le bloc disparaît entièrement s'il n'a rien à afficher (pas d'état vide décoratif).
-  if (primaryVisible.length === 0 && filledVisible.length === 0) return null;
+  const next = others[0] ?? null;
+  const nextLabel = next ? resolveNeedLabel(next, t) : null;
+
+  const openWithdrawConfirm = (need: any) => {
+    if (!need?.my_signup) return;
+    setConfirmWithdraw({
+      signupId: need.my_signup.id,
+      needLabel: resolveNeedLabel(need, t),
+      eventLabel: need.events?.title ?? "",
+    });
+  };
 
   return (
     <section>
       <div className="flex items-center justify-between mb-2.5 px-0.5">
         <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em] inline-flex items-center gap-1.5">
           <HandHelping className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
-          {t("needs:myFeed.title", { defaultValue: "Mes coups de main" })}
-          {primaryVisible.length > 0 && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-              {primary.length}
-            </Badge>
-          )}
+          {t("needs:myFeed.title")}
+          <span className="text-muted-foreground font-semibold normal-case tracking-normal">
+            · {t("needs:myFeed.engagementsCount", { count: engagements.length })}
+          </span>
         </h2>
-        <Link
-          to="/needs"
-          className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors"
-        >
-          {t("common.seeAll", { defaultValue: "Tout voir" })}
-          <ChevronRight className="h-3 w-3" />
-        </Link>
       </div>
 
-
-      {primaryVisible.length > 0 && (
-        <div className="space-y-2">
-          {primaryVisible.map((n) => (
-            <NeedCandidateCard
-              key={n.id}
-              need={n}
-              onApply={() => {
-                setPendingId(n.id);
-                applyMut.mutate(n.id);
-              }}
-              onWithdraw={() => {
-                if (!n.my_signup) return;
-                setPendingId(n.id);
-                withdrawMut.mutate(n.my_signup.id);
-              }}
-              onUnavailable={() => {
-                setPendingId(n.id);
-                unavailMut.mutate(n.id);
-              }}
-              applyPending={pendingId === n.id && applyMut.isPending}
-              withdrawPending={pendingId === n.id && withdrawMut.isPending}
-              unavailablePending={pendingId === n.id && unavailMut.isPending}
-            />
-          ))}
+      {imminent && (
+        <div className="mb-2">
+          <NeedCandidateCard
+            need={imminent}
+            onWithdraw={() => openWithdrawConfirm(imminent)}
+            withdrawPending={pendingId === imminent.id && withdrawMut.isPending}
+          />
         </div>
       )}
 
-      {filledVisible.length > 0 && (
-        <div className="mt-3">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] px-0.5 mb-1.5">
-            {t("needs:recentlyFilled.title", {
-              defaultValue: "Récemment complétés",
-            })}
-          </p>
-          <div className="space-y-2">
-            {filledVisible.map((n) => (
-              <NeedCandidateCard key={n.id} need={n} />
-            ))}
+      {others.length > 0 && (
+        <Link
+          to="/needs"
+          className="flex items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-border bg-card px-3 py-2.5 hover:bg-muted/40 transition-colors"
+        >
+          <div className="min-w-0 flex-1">
+            {next && (
+              <p className="text-[12px] text-foreground truncate">
+                <span className="font-semibold">{t("needs:myFeed.nextLabel")} : </span>
+                <span>{nextLabel}</span>
+                {next.events?.title && <span> — {next.events.title}</span>}
+                {next.events?.starts_at && (
+                  <span className="text-muted-foreground">
+                    , {fmt(next.events.starts_at, "d MMM · HH:mm")}
+                  </span>
+                )}
+              </p>
+            )}
+            {others.length > 1 && (
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {t("needs:myFeed.plusOthers", { count: others.length - 1 })}
+              </p>
+            )}
           </div>
-        </div>
+          <span className="text-[11px] font-bold text-foreground inline-flex items-center gap-0.5 shrink-0">
+            {t("common.seeAll", { defaultValue: "Tout voir" })}
+            <ChevronRight className="h-3 w-3" />
+          </span>
+        </Link>
       )}
+
+      <AlertDialog
+        open={!!confirmWithdraw}
+        onOpenChange={(open) => !open && setConfirmWithdraw(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("needs:withdrawDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("needs:withdrawDialog.description", {
+                need: confirmWithdraw?.needLabel ?? "",
+                event: confirmWithdraw?.eventLabel ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("needs:withdrawDialog.abort")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!confirmWithdraw) return;
+                setPendingId(confirmWithdraw.signupId);
+                withdrawMut.mutate(confirmWithdraw.signupId);
+                setConfirmWithdraw(null);
+              }}
+            >
+              {t("needs:withdrawDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
