@@ -36,6 +36,10 @@ export type UrgencyItem = {
   anchorAt: string;
   primaryAction: UrgencyAction;
   secondaryAction?: UrgencyAction;
+  // Optional shortcut for player/parent convocation-silence items with a single
+  // pending convocation: allows inline Yes/Maybe/No response from the card,
+  // without navigating to the event page.
+  quickRespondConvocationId?: string;
 };
 
 // Status à deux dimensions — encode indépendamment "ça charge encore"
