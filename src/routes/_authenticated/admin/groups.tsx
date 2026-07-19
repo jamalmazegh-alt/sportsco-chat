@@ -313,7 +313,12 @@ function GroupsPage() {
       setCreating(false);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) =>
+      toast.error(
+        e.message === "group_name_taken"
+          ? t("groups.errors.nameTaken", { defaultValue: "Un groupe avec ce nom existe déjà." })
+          : e.message,
+      ),
   });
 
   const updateMut = useMutation({
