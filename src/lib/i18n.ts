@@ -161,8 +161,6 @@ if (!i18n.isInitialized) {
     ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps", "needs"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
-    // v3 JSON plural format (uses `_plural` suffix) — matches existing locale files.
-    compatibilityJSON: "v3" as any,
   });
 }
 
