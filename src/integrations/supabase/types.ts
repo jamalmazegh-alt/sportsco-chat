@@ -14,6 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
+      _backup_u15_merge_20260719_convocations: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          event_id: string | null
+          id: string | null
+          player_id: string | null
+          responded_at: string | null
+          response_token: string | null
+          status: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          player_id?: string | null
+          responded_at?: string | null
+          response_token?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          player_id?: string | null
+          responded_at?: string | null
+          response_token?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_guardians: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          id: string | null
+          is_primary_payer: boolean | null
+          player_id: string | null
+          relation: string | null
+          user_id: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_primary_payer?: boolean | null
+          player_id?: string | null
+          relation?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_primary_payer?: boolean | null
+          player_id?: string | null
+          relation?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_parents: {
+        Row: {
+          can_respond: boolean | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          parent_user_id: string | null
+          phone: string | null
+          player_id: string | null
+        }
+        Insert: {
+          can_respond?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          parent_user_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+        }
+        Update: {
+          can_respond?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          parent_user_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_players: {
+        Row: {
+          birth_date: string | null
+          can_respond: boolean | null
+          child_platform_access: boolean | null
+          claim_requested_at: string | null
+          claim_requested_by: string | null
+          claim_status: string | null
+          club_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          jersey_number: number | null
+          last_name: string | null
+          license_number: string | null
+          media_consent_status:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone: string | null
+          photo_url: string | null
+          position: string | null
+          preferred_position: string | null
+          public_profile_enabled: boolean | null
+          public_slug: string | null
+          user_id: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          can_respond?: boolean | null
+          child_platform_access?: boolean | null
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          jersey_number?: number | null
+          last_name?: string | null
+          license_number?: string | null
+          media_consent_status?:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          preferred_position?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          can_respond?: boolean | null
+          child_platform_access?: boolean | null
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          jersey_number?: number | null
+          last_name?: string | null
+          license_number?: string | null
+          media_consent_status?:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          preferred_position?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_team_members: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          player_id: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          team_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_timeline: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          created_by: string | null
+          dedup_key: string | null
+          description: string | null
+          event_date: string | null
+          event_type: string | null
+          id: string | null
+          player_id: string | null
+          related_achievement_id: string | null
+          related_event_id: string | null
+          source: string | null
+          team_id: string | null
+          title: string | null
+          visibility: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date?: string | null
+          event_type?: string | null
+          id?: string | null
+          player_id?: string | null
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string | null
+          team_id?: string | null
+          title?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date?: string | null
+          event_type?: string | null
+          id?: string | null
+          player_id?: string | null
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string | null
+          team_id?: string | null
+          title?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       account_deletion_requests: {
         Row: {
           approved_at: string | null
