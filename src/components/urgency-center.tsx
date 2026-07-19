@@ -225,6 +225,46 @@ export function UrgencyCenter({ className }: Props) {
     }
   }
 
+  async function handleQuickRespond(
+    item: UrgencyItem,
+    status: "present" | "uncertain" | "absent",
+  ) {
+    const convocationId = item.quickRespondConvocationId;
+    if (!convocationId) return;
+    setBusyIds((s) => new Set(s).add(item.id));
+    try {
+      const { error } = await supabase
+        .from("convocations")
+        .update({ status, responded_at: new Date().toISOString() })
+        .eq("id", convocationId);
+      if (error) {
+        const raw = (error.message || "").toLowerCase();
+        if (raw.includes("past_event_locked")) {
+          toast.error(
+            t("attendance.errorPastEventLocked", {
+              defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+            }),
+          );
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
+      toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
+      dismissItem(item.id);
+      qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
+      qc.invalidateQueries({ queryKey: ["myConvocs"], exact: false });
+    } catch (e) {
+      toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+    } finally {
+      setBusyIds((s) => {
+        const n = new Set(s);
+        n.delete(item.id);
+        return n;
+      });
+    }
+  }
+
   const VISIBLE_LIMIT = 5;
   const visibleItems = expanded ? items : items.slice(0, VISIBLE_LIMIT);
   const hiddenCount = Math.max(0, items.length - VISIBLE_LIMIT);
@@ -235,6 +275,7 @@ export function UrgencyCenter({ className }: Props) {
       hasFailures={hasFailures}
       busyIds={busyIds}
       onAction={handleAction}
+      onQuickRespond={handleQuickRespond}
       onDismiss={(id) => {
         dismissItem(id);
       }}
