@@ -190,7 +190,11 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   }
 
   const { sendPushToUser } = await import("@/lib/push-send.server");
-  const title = params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
+  const roleLabel = (need.label as string | null) ?? "";
+  const title =
+    params.status === "confirmed"
+      ? `✅ Volontaire confirmé${roleLabel ? ` · ${roleLabel}` : ""}`
+      : `📝 Nouvelle candidature${roleLabel ? ` · ${roleLabel}` : ""}`;
   const startsAt = ev?.starts_at as string | null;
   const dateStr = startsAt
     ? new Date(startsAt).toLocaleDateString("fr-FR", {
