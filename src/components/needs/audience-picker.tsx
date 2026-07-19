@@ -539,9 +539,7 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
             <UsersRound className="h-3.5 w-3.5" />
-            {t("needs:audiences.customGroups", {
-              defaultValue: "Groupes personnalisés",
-            })}
+            {t("needs:audiences.customGroups")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {customGroupSuggestions.map((s) => (
@@ -585,9 +583,7 @@ export function AudiencePickerBody({
       {/* Other audiences — generic add row */}
       <div>
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("needs:audiences.otherAudiences", {
-            defaultValue: "Autres audiences",
-          })}
+          {t("needs:audiences.otherAudiences")}
         </Label>
         <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
           <Select
@@ -599,9 +595,7 @@ export function AudiencePickerBody({
           >
             <SelectTrigger>
               <SelectValue
-                placeholder={t("needs:audiences.pickKind", {
-                  defaultValue: "Choisir un type…",
-                })}
+                placeholder={t("needs:audiences.pickKind")}
               />
             </SelectTrigger>
             <SelectContent>
@@ -625,9 +619,7 @@ export function AudiencePickerBody({
             <Select value={param} onValueChange={setParam}>
               <SelectTrigger>
                 <SelectValue
-                  placeholder={t("needs:audiences.pickParam", {
-                    defaultValue: "Choisir…",
-                  })}
+                  placeholder={t("needs:audiences.pickParam")}
                 />
               </SelectTrigger>
               <SelectContent>
@@ -679,10 +671,7 @@ export function AudiencePickerBody({
         </div>
         {ctx && ctx.groups.length === 0 && (
           <p className="mt-2 text-[11px] text-muted-foreground">
-            {t("needs:publish.noGroups", {
-              defaultValue:
-                "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
-            })}
+            {t("needs:audiences.noGroups")}
           </p>
         )}
       </div>
