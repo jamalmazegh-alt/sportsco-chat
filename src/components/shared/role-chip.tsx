@@ -48,8 +48,23 @@ export function canonicalizeRole(raw: string | null | undefined): CanonicalRole 
   if (!raw) return null;
   const r = raw.toLowerCase().trim();
   if (r === "admin" || r === "administrator" || r === "administrateur") return "admin";
-  if (r === "staff" || r === "volunteer" || r === "benevole" || r === "bénévole") return "staff";
-  if (r === "coach" || r === "educator" || r === "educateur" || r === "éducateur") return "coach";
+  if (
+    r === "staff" ||
+    r === "volunteer" ||
+    r === "benevole" ||
+    r === "bénévole" ||
+    r === "dirigeant" ||
+    r === "financial_admin"
+  )
+    return "staff";
+  if (
+    r === "coach" ||
+    r === "educator" ||
+    r === "educateur" ||
+    r === "éducateur" ||
+    r === "assistant_coach"
+  )
+    return "coach";
   if (
     r === "tournament_manager" ||
     r === "tournament-manager" ||
