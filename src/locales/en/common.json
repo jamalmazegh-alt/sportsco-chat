@@ -698,7 +698,8 @@
       "done": "{{inserted}} player(s) imported",
       "failed": "{{failed}} row(s) with errors"
     },
-    "inviteAlreadyActive": "Account already active — no need to resend."
+    "inviteAlreadyActive": "Account already active — no need to resend.",
+    "parentActivationPending": "Waiting for parent account activation"
   },
   "events": {
     "isOfficial": "Official match",
@@ -2385,6 +2386,11 @@
       "team_parents": "Parents of a team",
       "team_educators": "Coaches of a team",
       "category_educators": "Coaches of a category"
-    }
+    },
+    "dynamicRules": "Dynamic subgroups",
+    "noRules": "No subgroups. Add one to automatically include members.",
+    "resolvedTotal": "Total resolved: {{count}}",
+    "bulkPickKind": "Choose a type…",
+    "bulkPickParam": "Choose…"
   }
 }

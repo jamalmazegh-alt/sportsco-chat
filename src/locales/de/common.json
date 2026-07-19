@@ -698,7 +698,8 @@
       "done": "{{inserted}} Spieler importiert",
       "failed": "{{failed}} Zeile(n) mit Fehlern"
     },
-    "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig."
+    "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig.",
+    "parentActivationPending": "Warten auf Aktivierung des Elternkontos"
   },
   "events": {
     "isOfficial": "Pflichtspiel",
@@ -2385,6 +2386,11 @@
       "team_parents": "Eltern einer Mannschaft",
       "team_educators": "Trainer einer Mannschaft",
       "category_educators": "Trainer einer Kategorie"
-    }
+    },
+    "dynamicRules": "Dynamische Untergruppen",
+    "noRules": "Keine Untergruppen. Fügen Sie eine hinzu, um Mitglieder automatisch einzuschließen.",
+    "resolvedTotal": "Aufgelöste Gesamtzahl: {{count}}",
+    "bulkPickKind": "Typ wählen…",
+    "bulkPickParam": "Wählen…"
   }
 }
