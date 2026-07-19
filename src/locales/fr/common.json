@@ -935,12 +935,20 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "pendingCount": "{{count}} joueur n'a pas encore répondu",
-    "pendingCount_plural": "{{count}} joueurs n'ont pas encore répondu",
-    "remindAllSent": "{{count}} relance envoyée",
-    "remindAllSent_plural": "{{count}} relances envoyées",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
@@ -950,7 +958,11 @@
     "reviewBeforeSend": "Vérifier avant envoi",
     "reviewBeforeSendHint": "Vérifie les destinataires et les détails — l'envoi est définitif.",
     "cooldownHint": "Encore {{m}} min avant de pouvoir relancer",
-    "remindIn": "Relancer dans {{m}} min"
+    "remindIn": "Relancer dans {{m}} min",
+    "pendingCount_one": "{{count}} joueur n'a pas encore répondu",
+    "pendingCount_other": "{{count}} joueurs n'ont pas encore répondu",
+    "remindAllSent_one": "{{count}} relance envoyée",
+    "remindAllSent_other": "{{count}} relances envoyées"
   },
   "stats": {
     "title": "Statistiques",
@@ -2348,4 +2360,3 @@
     }
   }
 }
-

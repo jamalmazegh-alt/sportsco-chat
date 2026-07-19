@@ -935,12 +935,20 @@
     "confirmResponse": "Conferma risposta",
     "responseRecorded": "Risposta registrata",
     "coachNotified": "L'Allenatore è stato informato.",
-    "pendingCount": "{{count}} Giocatore non ha ancora risposto",
-    "pendingCount_plural": "{{count}} Giocatori non hanno ancora risposto",
-    "remindAllSent": "{{count}} promemoria inviato",
-    "remindAllSent_plural": "{{count}} promemoria inviati",
-    "reasonsAbsent": ["Lavoro", "Famiglia", "Infortunio", "Malattia", "Studio", "Altro impegno"],
-    "reasonsUncertain": ["Da confermare", "Lavoro", "Famiglia", "Leggero problema di salute"],
+    "reasonsAbsent": [
+      "Lavoro",
+      "Famiglia",
+      "Infortunio",
+      "Malattia",
+      "Studio",
+      "Altro impegno"
+    ],
+    "reasonsUncertain": [
+      "Da confermare",
+      "Lavoro",
+      "Famiglia",
+      "Leggero problema di salute"
+    ],
     "suggestedReasons": "Suggerimenti",
     "forceResponseTitle": "Forzare la risposta?",
     "forceResponseDesc": "{{name}} ha già risposto {{current}}. Vuoi davvero impostare lo stato su {{next}}?",
@@ -950,7 +958,11 @@
     "reviewBeforeSend": "Rivedi prima di inviare",
     "reviewBeforeSendHint": "Controlla i destinatari e i dettagli — l'invio è definitivo.",
     "cooldownHint": "Ancora {{m}} min. prima di poter inviare un altro promemoria",
-    "remindIn": "Ricorda tra {{m}} min."
+    "remindIn": "Ricorda tra {{m}} min.",
+    "pendingCount_one": "{{count}} Giocatore non ha ancora risposto",
+    "pendingCount_other": "{{count}} Giocatori non hanno ancora risposto",
+    "remindAllSent_one": "{{count}} promemoria inviato",
+    "remindAllSent_other": "{{count}} promemoria inviati"
   },
   "stats": {
     "title": "Statistiche",

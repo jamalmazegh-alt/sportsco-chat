@@ -935,11 +935,14 @@
     "confirmResponse": "Antwort bestätigen",
     "responseRecorded": "Antwort gespeichert",
     "coachNotified": "Der Trainer wurde informiert.",
-    "pendingCount": "{{count}} Spieler hat noch nicht geantwortet",
-    "pendingCount_plural": "{{count}} Spieler haben noch nicht geantwortet",
-    "remindAllSent": "{{count}} Erinnerung gesendet",
-    "remindAllSent_plural": "{{count}} Erinnerungen gesendet",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",
@@ -955,7 +958,11 @@
     "reviewBeforeSend": "Vor dem Senden prüfen",
     "reviewBeforeSendHint": "Prüfe die Empfänger und die Details — das Senden ist endgültig.",
     "cooldownHint": "Noch {{m}} Min., bevor du erneut erinnern kannst",
-    "remindIn": "In {{m}} Min. erinnern"
+    "remindIn": "In {{m}} Min. erinnern",
+    "pendingCount_one": "{{count}} Spieler hat noch nicht geantwortet",
+    "pendingCount_other": "{{count}} Spieler haben noch nicht geantwortet",
+    "remindAllSent_one": "{{count}} Erinnerung gesendet",
+    "remindAllSent_other": "{{count}} Erinnerungen gesendet"
   },
   "stats": {
     "title": "Statistiken",

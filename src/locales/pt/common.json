@@ -935,12 +935,20 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "pendingCount": "{{count}} Jogador ainda não respondeu",
-    "pendingCount_plural": "{{count}} Jogadores ainda não responderam",
-    "remindAllSent": "{{count}} lembrete enviado",
-    "remindAllSent_plural": "{{count}} lembretes enviados",
-    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
-    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
+    "reasonsAbsent": [
+      "Trabalho",
+      "Família",
+      "Lesão",
+      "Doença",
+      "Estudos",
+      "Outro compromisso"
+    ],
+    "reasonsUncertain": [
+      "A confirmar",
+      "Trabalho",
+      "Família",
+      "Problema de saúde ligeiro"
+    ],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
@@ -950,7 +958,11 @@
     "reviewBeforeSend": "Rever antes de enviar",
     "reviewBeforeSendHint": "Verifique os destinatários e os detalhes — o envio é definitivo.",
     "cooldownHint": "Faltam {{m}} min. para poder lembrar novamente",
-    "remindIn": "Lembrar em {{m}} min."
+    "remindIn": "Lembrar em {{m}} min.",
+    "pendingCount_one": "{{count}} Jogador ainda não respondeu",
+    "pendingCount_other": "{{count}} Jogadores ainda não responderam",
+    "remindAllSent_one": "{{count}} lembrete enviado",
+    "remindAllSent_other": "{{count}} lembretes enviados"
   },
   "stats": {
     "title": "Estatísticas",
