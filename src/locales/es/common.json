@@ -2195,6 +2195,10 @@
       "checkFailed": "No se pueden verificar las alertas"
     },
     "partialError": "Algunas fuentes no están disponibles, la lista puede estar incompleta.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Responder",
       "open": "Abrir"
