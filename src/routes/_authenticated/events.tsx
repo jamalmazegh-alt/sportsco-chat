@@ -76,6 +76,7 @@ function EventsPage() {
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: club } = useQuery({
@@ -150,6 +151,7 @@ function EventsPage() {
     const q = searchQuery.trim().toLowerCase();
     return events.filter((e) => {
       if (!showCancelled && e.status === "cancelled") return false;
+      if (hideTrainings && e.type === "training") return false;
       if (!showPast) {
         const d = new Date(e.starts_at);
         if (isPast(d) && !isToday(d)) return false;
@@ -163,7 +165,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, searchQuery]);
+  }, [events, showPast, showCancelled, hideTrainings, searchQuery]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
@@ -595,6 +597,24 @@ function EventsPage() {
               {showCancelled
                 ? t("events.hideCancelled", { defaultValue: "Masquer annulés" })
                 : t("events.showCancelled", { defaultValue: "Voir annulés" })}
+            </button>
+          )}
+          {view === "list" && (
+            <button
+              type="button"
+              onClick={() => setHideTrainings((s) => !s)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+                hideTrainings
+                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+              )}
+              title={t("events.trainingsToggle", { defaultValue: "Entraînements" })}
+            >
+              <Dumbbell className="h-3.5 w-3.5" />
+              {hideTrainings
+                ? t("events.showTrainings", { defaultValue: "Voir entraînements" })
+                : t("events.hideTrainings", { defaultValue: "Masquer entraînements" })}
             </button>
           )}
         </div>
