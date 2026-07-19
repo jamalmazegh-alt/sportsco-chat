@@ -67,6 +67,7 @@ import {
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+import { PersonRow } from "@/components/shared/person-row";
 
 
 
