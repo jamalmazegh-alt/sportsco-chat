@@ -218,6 +218,7 @@ export function AudiencePickerBody({
   ctx,
   state,
   controls,
+  preview,
 }: {
   ctx: AudienceCtx | null | undefined;
   state: AudienceState;
@@ -227,10 +228,12 @@ export function AudiencePickerBody({
     toggleTeam: (id: string, kind: TeamKind) => void;
     setCategory: (v: string) => void;
   };
+  preview?: { count: number | null; loading: boolean };
 }) {
   const { t } = useTranslation();
   const [kind, setKind] = useState<KindKey | "">("");
   const [param, setParam] = useState<string>("");
+
 
   const teamNameById = useMemo(
     () => new Map((ctx?.teams ?? []).map((tm) => [tm.id, tm])),
