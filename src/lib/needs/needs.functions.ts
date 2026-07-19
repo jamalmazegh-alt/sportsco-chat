@@ -1310,6 +1310,58 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------------ */
+/* 9c. staffUnassignSignup — staff retire une candidature confirmée         */
+/* ------------------------------------------------------------------------ */
+
+export const staffUnassignSignup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ signup_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signup, error: sErr } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("id, need_id, status, event_needs:need_id(club_id, event_id)")
+      .eq("id", data.signup_id)
+      .maybeSingle();
+    if (sErr) throw new Error(sErr.message);
+    if (!signup) throw new Error("signup_not_found");
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clubId = ((signup as any).event_needs?.club_id as string | undefined) ?? null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const eventId = ((signup as any).event_needs?.event_id as string | undefined) ?? null;
+    if (!clubId) throw new Error("club_not_found");
+
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: clubId,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    if (signup.status !== "confirmed") return { ok: true, already: true };
+
+    const { error: upErr } = await supabaseAdmin
+      .from("event_need_signups")
+      .update({
+        status: "withdrawn",
+        withdrawn_at: new Date().toISOString(),
+        confirmed_at: null,
+        decided_by: userId,
+      })
+      .eq("id", data.signup_id);
+    if (upErr) throw new Error(upErr.message);
+
+    if (eventId) await recomputeCoverageServiceRole(eventId);
+    return { ok: true, already: false };
+  });
+
+
+
+/* ------------------------------------------------------------------------ */
 /* 10. listMyOpenNeeds — feed membre "Coups de main" (toutes évènements)    */
 /* ------------------------------------------------------------------------ */
 

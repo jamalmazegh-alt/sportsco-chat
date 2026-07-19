@@ -95,6 +95,7 @@ import {
   previewEventAudience,
   searchClubMembersForNeed,
   staffAddManualSignup,
+  staffUnassignSignup,
 } from "@/lib/needs/needs.functions";
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
@@ -659,6 +660,7 @@ function NeedRow({
           open={staffOpen}
           onOpenChange={setStaffOpen}
           needId={need.id}
+          capacity={need.capacity}
           onChanged={onChange}
         />
       )}
@@ -1354,12 +1356,14 @@ function StaffSignupsDialog({
   open,
   onOpenChange,
   needId,
+  capacity,
   onChanged,
   defaultAddOpen = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
+  capacity: number;
   onChanged: () => void;
   defaultAddOpen?: boolean;
 }) {
@@ -1369,6 +1373,7 @@ function StaffSignupsDialog({
   const decide = useServerFn(decideSignup);
   const searchFn = useServerFn(searchClubMembersForNeed);
   const addManual = useServerFn(staffAddManualSignup);
+  const unassignFn = useServerFn(staffUnassignSignup);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -1419,8 +1424,22 @@ function StaffSignupsDialog({
       toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
+  const unassignM = useMutation({
+    mutationFn: (signup_id: string) => unassignFn({ data: { signup_id } }),
+    onSuccess: () => {
+      toast.success(t("needs:staff.unassigned", { defaultValue: "Assignation annulée" }));
+      refetch();
+      onChanged();
+      qc.invalidateQueries({ queryKey: ["need-signups", needId] });
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
+
   const signups = (data?.signups ?? []) as StaffSignup[];
   const pending = signups.filter((s) => s.status === "applied");
+  const confirmedCount = signups.filter((s) => s.status === "confirmed").length;
+  const isFull = confirmedCount >= capacity;
   const pendingIds = pending.map((s) => s.id);
   const allPendingSelected =
     pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
@@ -1588,7 +1607,8 @@ function StaffSignupsDialog({
                             onClick={() =>
                               decideM.mutate({ signup_id: s.id, decision: "confirm" })
                             }
-                            disabled={decideM.isPending || bulkPending}
+                            disabled={decideM.isPending || bulkPending || isFull}
+                            title={isFull ? t("needs:staff.fullTitle", { defaultValue: "Capacité atteinte" }) : undefined}
                           >
                             <Check className="h-3.5 w-3.5" />
                           </Button>
@@ -1603,6 +1623,20 @@ function StaffSignupsDialog({
                             <X className="h-3.5 w-3.5" />
                           </Button>
                         </div>
+                      ) : s.status === "confirmed" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => unassignM.mutate(s.id)}
+                          disabled={unassignM.isPending}
+                          title={t("needs:staff.unassignCta", { defaultValue: "Retirer" })}
+                        >
+                          {unassignM.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <X className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
                       ) : null
                     }
                   />
@@ -1635,9 +1669,18 @@ function StaffSignupsDialog({
           </button>
           {addOpen && (
             <>
-              <p className="text-[11px] text-muted-foreground">
-                {t("needs:applications.assignHelp")}
-              </p>
+              {isFull ? (
+                <p className="text-[11px] rounded border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 text-amber-800 dark:text-amber-200 px-2 py-1.5">
+                  {t("needs:staff.fullBlock", {
+                    defaultValue:
+                      "Capacité atteinte. Retirez d'abord une personne confirmée pour en assigner une autre.",
+                  })}
+                </p>
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  {t("needs:applications.assignHelp")}
+                </p>
+              )}
               <div className="space-y-2">
                 <div className="relative">
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -1674,7 +1717,7 @@ function StaffSignupsDialog({
                           variant="outline"
                           className="h-7 text-[11px]"
                           onClick={() => addManualM.mutate(m.user_id)}
-                          disabled={addPendingUser === m.user_id}
+                          disabled={addPendingUser === m.user_id || isFull}
                         >
                           {addPendingUser === m.user_id ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
