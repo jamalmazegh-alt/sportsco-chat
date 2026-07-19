@@ -405,54 +405,98 @@ export function AudiencePickerBody({
     }));
   }, [state.scalar, controls, t]);
 
+  // Also remove club_staff/etc. keys from the club audiences box so that
+  // convocation scalars only appear in the "event-relevant" box.
+  const hasConvocationScalar =
+    state.scalar.has("convoked_players") || state.scalar.has("convoked_parents");
+  const showEmptyConvocation =
+    hasConvocationScalar &&
+    !!preview &&
+    !preview.loading &&
+    (preview.count ?? 0) === 0 &&
+    // Only convocation scalars picked → convocation-not-done wording
+    state.groupIds.size === 0 &&
+    state.teamPicks.length === 0 &&
+    !state.category &&
+    [...state.scalar].every(
+      (k) => k === "convoked_players" || k === "convoked_parents",
+    );
+
   return (
     <div className="space-y-3">
-      {/* Selected audiences — prominent block */}
-      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 shadow-sm">
-        <Label className="text-[11px] uppercase tracking-wide text-primary flex items-center gap-1.5 font-semibold">
-          <UserCheck className="h-3.5 w-3.5" />
-          {t("needs:audiences.selectedTitle", {
-            defaultValue: "Audience sélectionnée",
-          })}
-          {chips.length > 0 && (
-            <span className="ml-1 rounded-full bg-primary/15 text-primary px-1.5 py-0.5 text-[10px] font-bold">
-              {chips.length}
-            </span>
-          )}
-        </Label>
+      {/* Selected audiences — sticky, high-visibility */}
+      <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
         {chips.length === 0 ? (
-          <p className="mt-2 text-xs text-muted-foreground italic">
-            {t("needs:audiences.emptyHint", {
-              defaultValue:
-                "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
-            })}
-          </p>
+          <div
+            className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center"
+            role="status"
+          >
+            {t("needs:audiences.selected.empty")}
+          </div>
         ) : (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {chips.map((c) => {
-              const { Icon, cls } = KIND_META[c.kind];
-              return (
-                <Badge
-                  key={c.id}
-                  variant="outline"
-                  className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span className="text-xs">{c.label}</span>
-                  <button
-                    type="button"
-                    className="ml-0.5 rounded hover:bg-muted p-0.5"
-                    onClick={c.onRemove}
-                    aria-label={t("common.remove", { defaultValue: "Retirer" })}
+          <div
+            className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)] motion-safe:transition-shadow"
+          >
+            <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold">
+              <UserCheck className="h-3.5 w-3.5" />
+              {t("needs:audiences.selected.title")}
+              <span className="ml-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 text-[10px] font-bold">
+                {chips.length}
+              </span>
+            </Label>
+            <div className="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
+              {chips.map((c) => {
+                const { Icon } = KIND_META[c.kind];
+                return (
+                  <span
+                    key={c.id}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white pl-2.5 pr-1 py-1 text-xs font-medium shadow-sm"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              );
-            })}
+                    <Icon className="h-3 w-3" />
+                    <span>{c.label}</span>
+                    <button
+                      type="button"
+                      className="ml-0.5 rounded-full hover:bg-emerald-700/60 p-0.5 motion-safe:transition-colors"
+                      onClick={c.onRemove}
+                      aria-label={t("needs:audiences.selected.removeAria", {
+                        label: c.label,
+                      })}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+            {/* Counter pill inside selected block */}
+            {preview && (
+              <div className="mt-2.5">
+                {preview.loading ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground px-2.5 py-1 text-[11px]">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    {t("needs:audiences.selected.loading")}
+                  </span>
+                ) : showEmptyConvocation ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px] font-medium">
+                    {t("needs:audiences.selected.emptyConvocation")}
+                  </span>
+                ) : (preview.count ?? 0) === 0 ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px] font-medium">
+                    {t("needs:publish.previewNone")}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+                    {t("needs:audiences.selected.count", {
+                      count: preview.count ?? 0,
+                    })}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
+
 
 
       {/* Custom groups — highlighted */}
