@@ -964,7 +964,8 @@
     "pendingCount_one": "{{count}} Speler heeft nog niet geantwoord",
     "pendingCount_other": "{{count}} Spelers hebben nog niet geantwoord",
     "remindAllSent_one": "{{count}} herinnering verzonden",
-    "remindAllSent_other": "{{count}} herinneringen verzonden"
+    "remindAllSent_other": "{{count}} herinneringen verzonden",
+    "errorPastEventLocked": "Dit evenement is voorbij — antwoorden kunnen niet meer worden gewijzigd."
   },
   "stats": {
     "title": "Statistieken",

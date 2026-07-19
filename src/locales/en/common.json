@@ -964,7 +964,8 @@
     "pendingCount_one": "{{count}} player hasn't replied yet",
     "pendingCount_other": "{{count}} players haven't replied yet",
     "remindAllSent_one": "{{count}} reminder sent",
-    "remindAllSent_other": "{{count}} reminders sent"
+    "remindAllSent_other": "{{count}} reminders sent",
+    "errorPastEventLocked": "This event is in the past — responses can no longer be changed."
   },
   "stats": {
     "title": "Stats",
