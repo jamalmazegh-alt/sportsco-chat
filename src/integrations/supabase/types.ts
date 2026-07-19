@@ -1271,6 +1271,425 @@ export type Database = {
           },
         ]
       }
+      club_poll_options: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          publication_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          publication_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          publication_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_poll_options_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_poll_votes: {
+        Row: {
+          cast_by_user_id: string
+          created_at: string
+          id: string
+          member_id: string
+          option_id: string
+          publication_id: string
+          updated_at: string
+        }
+        Insert: {
+          cast_by_user_id: string
+          created_at?: string
+          id?: string
+          member_id: string
+          option_id: string
+          publication_id: string
+          updated_at?: string
+        }
+        Update: {
+          cast_by_user_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+          option_id?: string
+          publication_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_poll_votes_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "club_poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_poll_votes_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_audiences: {
+        Row: {
+          audience_type: Database["public"]["Enums"]["publication_audience_type"]
+          category_label: string | null
+          created_at: string
+          event_id: string | null
+          group_id: string | null
+          id: string
+          publication_id: string
+          season_id: string | null
+          team_id: string | null
+        }
+        Insert: {
+          audience_type: Database["public"]["Enums"]["publication_audience_type"]
+          category_label?: string | null
+          created_at?: string
+          event_id?: string | null
+          group_id?: string | null
+          id?: string
+          publication_id: string
+          season_id?: string | null
+          team_id?: string | null
+        }
+        Update: {
+          audience_type?: Database["public"]["Enums"]["publication_audience_type"]
+          category_label?: string | null
+          created_at?: string
+          event_id?: string | null
+          group_id?: string | null
+          id?: string
+          publication_id?: string
+          season_id?: string | null
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_audiences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_dispatches: {
+        Row: {
+          created_at: string
+          created_by: string
+          dispatch_id: string
+          id: string
+          kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id: string
+          recipients_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          dispatch_id: string
+          id?: string
+          kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id: string
+          recipients_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          dispatch_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id?: string
+          recipients_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_dispatches_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_documents: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          publication_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          publication_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          publication_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_documents_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_manual_members: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          publication_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          publication_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          publication_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_manual_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_manual_members_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_media: {
+        Row: {
+          created_at: string
+          id: string
+          publication_id: string
+          sort_order: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          publication_id: string
+          sort_order?: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          publication_id?: string
+          sort_order?: number
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_media_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_recipients: {
+        Row: {
+          created_at: string
+          first_dispatch_id: string | null
+          id: string
+          member_id: string
+          publication_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_dispatch_id?: string | null
+          id?: string
+          member_id: string
+          publication_id: string
+        }
+        Update: {
+          created_at?: string
+          first_dispatch_id?: string | null
+          id?: string
+          member_id?: string
+          publication_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_recipients_first_dispatch_id_fkey"
+            columns: ["first_dispatch_id"]
+            isOneToOne: false
+            referencedRelation: "club_publication_dispatches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_recipients_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_recipients_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publications: {
+        Row: {
+          author_id: string
+          closed_at: string | null
+          closes_at: string | null
+          club_id: string
+          content: string
+          created_at: string
+          deleted_at: string | null
+          email_body: string | null
+          event_id: string | null
+          id: string
+          poll_visibility: Database["public"]["Enums"]["poll_visibility"] | null
+          publication_type: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall: boolean
+          published_at: string
+          send_email: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          closed_at?: string | null
+          closes_at?: string | null
+          club_id: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          email_body?: string | null
+          event_id?: string | null
+          id?: string
+          poll_visibility?:
+            | Database["public"]["Enums"]["poll_visibility"]
+            | null
+          publication_type: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall?: boolean
+          published_at?: string
+          send_email?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          closed_at?: string | null
+          closes_at?: string | null
+          club_id?: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          email_body?: string | null
+          event_id?: string | null
+          id?: string
+          poll_visibility?:
+            | Database["public"]["Enums"]["poll_visibility"]
+            | null
+          publication_type?: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall?: boolean
+          published_at?: string
+          send_email?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publications_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_receipt_counters: {
         Row: {
           club_id: string
@@ -6947,6 +7366,18 @@ export type Database = {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
+      cast_poll_vote: {
+        Args: {
+          _member_id: string
+          _option_id: string
+          _publication_id: string
+        }
+        Returns: string
+      }
+      close_publication: {
+        Args: { _publication_id: string }
+        Returns: undefined
+      }
       club_camp_is_published: { Args: { _camp_id: string }; Returns: boolean }
       club_has_active_subscription: {
         Args: { _club_id: string }
@@ -7186,6 +7617,19 @@ export type Database = {
           id: string
         }[]
       }
+      get_poll_results: {
+        Args: { _publication_id: string }
+        Returns: {
+          below_threshold: boolean
+          is_anonymous: boolean
+          is_closed: boolean
+          label: string
+          option_id: string
+          sort_order: number
+          total_voters: number
+          vote_count: number
+        }[]
+      }
       get_public_camp_by_slug: {
         Args: { _camp_slug: string; _club_slug: string }
         Returns: Json
@@ -7370,6 +7814,18 @@ export type Database = {
           was_idempotent_skip: boolean
         }[]
       }
+      publish_publication_atomic: {
+        Args: {
+          _dispatch_id?: string
+          _kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          _publication_id: string
+        }
+        Returns: {
+          dispatch_row_id: string
+          new_recipient_count: number
+          recipients_count: number
+        }[]
+      }
       purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -7411,6 +7867,12 @@ export type Database = {
       resolve_camp_registration_for_upload: {
         Args: { _required_document_id: string; _token: string }
         Returns: Json
+      }
+      resolve_publication_audience: {
+        Args: { _publication_id: string }
+        Returns: {
+          member_id: string
+        }[]
       }
       respond_via_token: {
         Args: {
@@ -7508,6 +7970,10 @@ export type Database = {
       slugify: { Args: { _input: string }; Returns: string }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }
+        Returns: undefined
+      }
+      soft_delete_publication: {
+        Args: { _publication_id: string }
         Returns: undefined
       }
       staff_owns_need_signup: {
@@ -7737,12 +8203,30 @@ export type Database = {
         | "manual"
       payment_target_kind: "player" | "team" | "club"
       payment_tx_status: "pending" | "succeeded" | "failed" | "refunded"
+      poll_visibility: "staff_visible" | "anonymous"
+      poll_vote_action: "vote" | "change" | "retrait"
       privacy_request_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "cancelled"
+      publication_audience_type:
+        | "joueurs_convoques"
+        | "parents_convoques"
+        | "joueurs_equipe"
+        | "parents_equipe"
+        | "joueurs_categorie"
+        | "parents_categorie"
+        | "educateurs"
+        | "dirigeants"
+        | "groupe_personnalise"
+        | "selection_manuelle"
+      publication_dispatch_kind:
+        | "publish"
+        | "audience_refresh"
+        | "manual_resend"
+      publication_type: "message" | "poll"
       receipt_kind: "official" | "confirmation"
       reminder_channel: "in_app" | "email" | "push"
       subscription_plan: "monthly" | "yearly"
@@ -8022,6 +8506,8 @@ export const Constants = {
       ],
       payment_target_kind: ["player", "team", "club"],
       payment_tx_status: ["pending", "succeeded", "failed", "refunded"],
+      poll_visibility: ["staff_visible", "anonymous"],
+      poll_vote_action: ["vote", "change", "retrait"],
       privacy_request_status: [
         "pending",
         "processing",
@@ -8029,6 +8515,24 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      publication_audience_type: [
+        "joueurs_convoques",
+        "parents_convoques",
+        "joueurs_equipe",
+        "parents_equipe",
+        "joueurs_categorie",
+        "parents_categorie",
+        "educateurs",
+        "dirigeants",
+        "groupe_personnalise",
+        "selection_manuelle",
+      ],
+      publication_dispatch_kind: [
+        "publish",
+        "audience_refresh",
+        "manual_resend",
+      ],
+      publication_type: ["message", "poll"],
       receipt_kind: ["official", "confirmation"],
       reminder_channel: ["in_app", "email", "push"],
       subscription_plan: ["monthly", "yearly"],
