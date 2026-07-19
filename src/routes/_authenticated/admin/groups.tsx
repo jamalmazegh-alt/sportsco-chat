@@ -398,7 +398,7 @@ function GroupsPage() {
       ) : (
         <div className="space-y-2">
           {allGroups.map((g) => {
-            const count = groupsQ.data?.counts[g.id] ?? 0;
+            const resolvedCount = groupsQ.data?.resolved_counts?.[g.id] ?? 0;
             const expanded = expandedId === g.id;
             return (
               <div
@@ -426,7 +426,7 @@ function GroupsPage() {
                         </Badge>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        · {t("groups.membersCount", { count })}
+                        {t("groups.personsToday", { count: resolvedCount })}
                       </span>
                     </div>
                     {g.description && (
@@ -435,26 +435,46 @@ function GroupsPage() {
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditing(g)}
-                    aria-label={t("groups.edit")}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      if (window.confirm(t("groups.deleteConfirm"))) {
-                        deleteMut.mutate(g.id);
-                      }
-                    }}
-                    aria-label={t("groups.delete")}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t("common.actions", { defaultValue: "Actions" })}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => setEditing(g)}>
+                        {t("groups.actions.rename")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (
+                            window.confirm(
+                              g.is_active
+                                ? t("groups.confirmDeactivate")
+                                : t("groups.confirmActivate"),
+                            )
+                          ) {
+                            updateMut.mutate({ id: g.id, is_active: !g.is_active });
+                          }
+                        }}
+                      >
+                        {g.is_active
+                          ? t("groups.actions.deactivate")
+                          : t("groups.actions.activate")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onSelect={() => setConfirmDelete(g)}
+                      >
+                        {t("groups.actions.delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 {expanded && (
                   <GroupMembersPanel
@@ -470,6 +490,34 @@ function GroupsPage() {
           })}
         </div>
       )}
+
+      <AlertDialog
+        open={!!confirmDelete}
+        onOpenChange={(o) => !o && setConfirmDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("groups.delete")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("groups.deleteConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (confirmDelete) deleteMut.mutate(confirmDelete.id);
+                setConfirmDelete(null);
+              }}
+            >
+              {t("groups.actions.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+
 
       <GroupFormDialog
         open={creating}
