@@ -324,7 +324,12 @@
     "fallbackTitle": "Coup de main"
   },
   "myFeed": {
-    "title": "Mes coups de main"
+    "title": "Mes coups de main",
+    "engagementsCount_one": "{{count}} engagement",
+    "engagementsCount_other": "{{count}} engagements",
+    "nextLabel": "Prochain",
+    "plusOthers_one": "+ {{count}} autre engagement",
+    "plusOthers_other": "+ {{count}} autres engagements"
   },
   "resend": {
     "title": "Relancer le besoin",
@@ -345,5 +350,11 @@
     "empty": "Aucune notification n'a encore été envoyée pour ce besoin.",
     "count_one": "{{count}} personne prévenue",
     "count_other": "{{count}} personnes prévenues"
+  },
+  "withdrawDialog": {
+    "title": "Vous désister ?",
+    "description": "Vous désister de {{need}} pour {{event}} ? Le staff en sera informé.",
+    "confirm": "Me désister",
+    "abort": "Annuler"
   }
 }

@@ -324,7 +324,12 @@
     "fallbackTitle": "Un cable"
   },
   "myFeed": {
-    "title": "Mis manos amigas"
+    "title": "Mis manos amigas",
+    "engagementsCount_one": "{{count}} commitment",
+    "engagementsCount_other": "{{count}} commitments",
+    "nextLabel": "Next",
+    "plusOthers_one": "+ {{count}} other commitment",
+    "plusOthers_other": "+ {{count}} other commitments"
   },
   "resend": {
     "title": "Re-notify recipients",
@@ -345,5 +350,11 @@
     "empty": "No notification has been sent for this need yet.",
     "count_one": "{{count}} person notified",
     "count_other": "{{count}} people notified"
+  },
+  "withdrawDialog": {
+    "title": "Withdraw?",
+    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
+    "confirm": "Withdraw",
+    "abort": "Cancel"
   }
 }
