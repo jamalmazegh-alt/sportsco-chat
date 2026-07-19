@@ -269,7 +269,8 @@
     "stop": "Ferma",
     "errorOccurred": "Si è verificato un errore",
     "unknown": "Senza nome",
-    "deselectAll": "Deseleziona tutto"
+    "deselectAll": "Deseleziona tutto",
+    "actions": "Azioni"
   },
   "notFound": {
     "code": "404",
@@ -2391,9 +2392,6 @@
       "team_educators": "Allenatori di una squadra",
       "category_educators": "Allenatori di una categoria"
     },
-    "dynamicRules": "Sottogruppi dinamici",
-    "noRules": "Nessun sottogruppo. Aggiungine uno per includere automaticamente i membri.",
-    "resolvedTotal": "Totale risolto: {{count}}",
     "bulkPickKind": "Scegli un tipo…",
     "bulkPickParam": "Scegli…"
   }
