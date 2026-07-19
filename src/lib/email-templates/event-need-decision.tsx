@@ -43,11 +43,14 @@ const T = {
   en: {
     previewConfirm: (label: string) => `Application confirmed: ${label}`,
     previewDecline: (label: string) => `Application declined: ${label}`,
+    previewUnassign: (label: string) => `No longer needed: ${label}`,
     hello: (n?: string | null) => (n ? `Hi ${n},` : "Hi,"),
     introConfirm: (club: string | null | undefined, event: string) =>
       `${club ?? "The club"} confirmed your application for ${event}. Thanks for helping out!`,
     introDecline: (club: string | null | undefined, event: string) =>
       `${club ?? "The club"} did not select your application for ${event}. Thanks for volunteering anyway.`,
+    introUnassign: (club: string | null | undefined, event: string) =>
+      `${club ?? "The club"} no longer needs you for ${event}. Thanks for making yourself available!`,
     role: "Role",
     when: "When",
     cta: "View event",
