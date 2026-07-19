@@ -139,3 +139,9 @@ sous `audiences.*` :
 
 FR et EN sont finaux. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par
 des traductions natives.
+
+## `needs.json` — Voir les destinataires d'un besoin (DE/ES/IT/NL/PT)
+
+Nouvelles clés `menu.viewRecipients` et bloc `recipients.*` (title, desc,
+empty, count_one/other). FR et EN sont finaux. DE/ES/IT/NL/PT sont des
+**clones EN** — à remplacer par des traductions natives.

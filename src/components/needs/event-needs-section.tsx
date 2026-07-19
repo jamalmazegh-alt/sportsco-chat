@@ -78,6 +78,7 @@ import { cn } from "@/lib/utils";
 import {
   listEventNeeds,
   listStaffSignupsForNeed,
+  listNeedRecipients,
   createEventNeed,
   updateEventNeed,
   publishEventNeed,
@@ -257,6 +258,7 @@ function NeedRow({
   const [publishOpen, setPublishOpen] = useState(false);
   const [resendOpen, setResendOpen] = useState(false);
   const [editAudienceOpen, setEditAudienceOpen] = useState(false);
+  const [viewRecipientsOpen, setViewRecipientsOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   
   const [editOpen, setEditOpen] = useState(false);
@@ -497,6 +499,10 @@ function NeedRow({
                     <Users className="h-3.5 w-3.5 mr-2" />
                     {t("needs:menu.editAudience")}
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setViewRecipientsOpen(true)}>
+                    <Users className="h-3.5 w-3.5 mr-2" />
+                    {t("needs:menu.viewRecipients")}
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setCloseConfirmOpen(true)}>
                     <CheckCircle2 className="h-3.5 w-3.5 mr-2" />
@@ -670,6 +676,14 @@ function NeedRow({
           eventId={eventId}
           onPublished={onChange}
           mode="edit_audience"
+        />
+      )}
+      {viewRecipientsOpen && (
+        <NeedRecipientsDialog
+          open={viewRecipientsOpen}
+          onOpenChange={setViewRecipientsOpen}
+          needId={need.id}
+          needLabel={resolveNeedLabel(need, t)}
         />
       )}
       {staffOpen && (
@@ -1763,3 +1777,81 @@ function StaffSignupsDialog({
     </Dialog>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* NeedRecipientsDialog — staff: liste des destinataires notifiés             */
+/* -------------------------------------------------------------------------- */
+
+function NeedRecipientsDialog({
+  open,
+  onOpenChange,
+  needId,
+  needLabel,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  needId: string;
+  needLabel: string;
+}) {
+  const { t } = useTranslation();
+  const listFn = useServerFn(listNeedRecipients);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["need-recipients", needId],
+    queryFn: () => listFn({ data: { need_id: needId } }),
+    enabled: open,
+  });
+
+  const recipients = data?.recipients ?? [];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t("needs:recipients.title")}</DialogTitle>
+          <DialogDescription>
+            {t("needs:recipients.desc", { need: needLabel })}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1">
+          {isLoading && (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+              {t("common.loading")}
+            </p>
+          )}
+          {!isLoading && recipients.length === 0 && (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              {t("needs:recipients.empty")}
+            </p>
+          )}
+          {!isLoading && recipients.length > 0 && (
+            <>
+              <p className="text-xs text-muted-foreground mb-2">
+                {t("needs:recipients.count", { count: recipients.length })}
+              </p>
+              <div className="divide-y divide-border/60">
+                {recipients.map((r) => (
+                  <PersonRow
+                    key={r.user_id}
+                    name={r.full_name ?? t("common.unknown")}
+                    roles={r.roles}
+                    compact
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t("common.close")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+

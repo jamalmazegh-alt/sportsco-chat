@@ -1515,3 +1515,74 @@ export const listMyOpenNeeds = createServerFn({ method: "POST" })
       })),
     };
   });
+
+/* ------------------------------------------------------------------------ */
+/* 14. listNeedRecipients — staff: everyone notified for a given need       */
+/* ------------------------------------------------------------------------ */
+
+export const listNeedRecipients = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ need_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Union of every user_id ever notified across all publications of this need.
+    const { data: pubRows } = await supabaseAdmin
+      .from("event_need_publication_recipients")
+      .select("user_id, publication_id, event_need_publications!inner(need_id, published_at)")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq("event_need_publications.need_id" as any, data.need_id);
+
+    const uniqUserIds = Array.from(
+      new Set(
+        (pubRows ?? [])
+          .map((r: { user_id: string | null }) => r.user_id)
+          .filter(Boolean) as string[],
+      ),
+    );
+
+    if (uniqUserIds.length === 0) {
+      return { recipients: [] as Array<{ user_id: string; full_name: string | null; roles: string[] }> };
+    }
+
+    const [{ data: profs }, { data: members }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id, full_name").in("id", uniqUserIds),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id, roles")
+        .eq("club_id", need.club_id)
+        .in("user_id", uniqUserIds),
+    ]);
+
+    const nameByUser: Record<string, string | null> = {};
+    for (const p of profs ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+    }
+    const rolesByUser: Record<string, string[]> = {};
+    for (const m of members ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mm = m as any;
+      if (mm.user_id) rolesByUser[mm.user_id as string] = (mm.roles as string[]) ?? [];
+    }
+
+    const recipients = uniqUserIds
+      .map((uid) => ({
+        user_id: uid,
+        full_name: nameByUser[uid] ?? null,
+        roles: rolesByUser[uid] ?? [],
+      }))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
+
+    return { recipients };
+  });

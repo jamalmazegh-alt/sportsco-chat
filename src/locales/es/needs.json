@@ -301,7 +301,8 @@
     "closeNeed": "Cerrar la necesidad",
     "cancelNeed": "Anular la necesidad",
     "delete": "Eliminar",
-    "editAudience": "Edit recipients"
+    "editAudience": "Edit recipients",
+    "viewRecipients": "View recipients"
   },
   "assignNotification": {
     "assignedAs": "Te han inscrito como {{role}}"
@@ -337,5 +338,12 @@
     "success_one": "{{count}} new recipient notified",
     "success_other": "{{count}} new recipients notified",
     "successNoDelta": "Selection updated — nobody new to notify."
+  },
+  "recipients": {
+    "title": "Notified recipients",
+    "desc": "People who received a notification for \"{{need}}\".",
+    "empty": "No notification has been sent for this need yet.",
+    "count_one": "{{count}} person notified",
+    "count_other": "{{count}} people notified"
   }
 }
