@@ -55,9 +55,19 @@ interface Props {
   isCoach: boolean;
   convocations: Convocation[];
   childrenLinks: string[]; // player_ids the current user is parent of
+  carpoolEnabled: boolean;
+  onToggleEnabled?: () => void | Promise<void>;
 }
 
-export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }: Props) {
+export function CarpoolSection({
+  eventId,
+  isCoach,
+  convocations,
+  childrenLinks,
+  carpoolEnabled,
+  onToggleEnabled,
+}: Props) {
+
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -199,11 +209,42 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
   return (
     <>
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-          <Car className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold text-sm">{t("carpool.tab")}</h3>
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <Car className="h-4 w-4 text-primary shrink-0" />
+            <div className="min-w-0">
+              <h3 className="font-semibold text-sm leading-tight">{t("carpool.tab")}</h3>
+              {isCoach && (
+                <p className="text-[11px] text-muted-foreground leading-tight">
+                  {carpoolEnabled
+                    ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
+                    : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
+                </p>
+              )}
+            </div>
+          </div>
+          {isCoach && onToggleEnabled && (
+            <Button
+              size="sm"
+              variant={carpoolEnabled ? "outline" : "default"}
+              onClick={() => onToggleEnabled()}
+              className="shrink-0"
+            >
+              {carpoolEnabled
+                ? t("carpool.disable" as any) || "Désactiver"
+                : t("carpool.enable" as any) || "Activer"}
+            </Button>
+          )}
         </div>
 
+        {!carpoolEnabled ? (
+          <div className="p-4">
+            <p className="text-xs text-muted-foreground italic">
+              {t("carpool.disabledHint" as any) ||
+                "Activez le covoiturage pour permettre aux parents de proposer et réserver des places."}
+            </p>
+          </div>
+        ) : (
         <div className="p-4 space-y-3">
           <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
             {t("carpool.disclaimer")}
@@ -217,6 +258,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
                 </span>
                 <span className="font-semibold tabular-nums">{pct}%</span>
               </div>
+
               <div className="h-2 rounded-full bg-muted overflow-hidden">
                 <div
                   className={cn("h-full transition-all", coverageColor)}
@@ -367,7 +409,9 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
             )}
           </div>
         </div>
+        )}
       </div>
+
 
       {offerOpen && (
         <OfferDialog eventId={eventId} open={offerOpen} onClose={() => setOfferOpen(false)} />

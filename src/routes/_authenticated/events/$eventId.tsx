@@ -4457,51 +4457,34 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {isCoach && eventSupportsCarpool(event.type) && event.status !== "cancelled" && (
-        <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">
-              {t("carpool.toggleTitle" as any) || "Covoiturage"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {event.carpool_enabled
-                ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
-                : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
-            </p>
-          </div>
-          <Button
-            variant={event.carpool_enabled ? "outline" : "default"}
-            size="sm"
-            onClick={async () => {
-              const { error } = await supabase
-                .from("events")
-                .update({ carpool_enabled: !event.carpool_enabled })
-                .eq("id", eventId);
-              if (error) {
-                toast.error(error.message);
-                return;
-              }
-              qc.invalidateQueries({ queryKey: ["event", eventId] });
-            }}
-          >
-            {event.carpool_enabled
-              ? t("carpool.disable" as any) || "Désactiver"
-              : t("carpool.enable" as any) || "Activer"}
-          </Button>
-        </div>
-      )}
-
       {eventSupportsCarpool(event.type) &&
-        event.carpool_enabled &&
-        event.status !== "cancelled" && (
+        event.status !== "cancelled" &&
+        (isCoach || event.carpool_enabled) && (
           <CarpoolSection
             eventId={eventId}
             teamId={event.team_id}
             isCoach={isCoach}
             convocations={(convocations ?? []) as any}
             childrenLinks={(childrenLinks ?? []) as string[]}
+            carpoolEnabled={!!event.carpool_enabled}
+            onToggleEnabled={
+              isCoach
+                ? async () => {
+                    const { error } = await supabase
+                      .from("events")
+                      .update({ carpool_enabled: !event.carpool_enabled })
+                      .eq("id", eventId);
+                    if (error) {
+                      toast.error(error.message);
+                      return;
+                    }
+                    qc.invalidateQueries({ queryKey: ["event", eventId] });
+                  }
+                : undefined
+            }
           />
         )}
+
 
       <EventNeedsSection
         eventId={eventId}
