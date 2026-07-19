@@ -1126,7 +1126,7 @@ function StaffSignupsDialog({
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(defaultAddOpen);
   const [searchText, setSearchText] = useState("");
   const [addPendingUser, setAddPendingUser] = useState<string | null>(null);
 
