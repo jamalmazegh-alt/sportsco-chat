@@ -1441,6 +1441,15 @@ function StaffSignupsDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("needs:staff.title")}</DialogTitle>
+          <p className="text-xs text-muted-foreground">
+            {t("needs:applications.summary", {
+              count: pending.length + signups.filter((s) => s.status === "confirmed").length,
+              pending: pending.length,
+              confirmed: signups.filter((s) => s.status === "confirmed").length,
+              seats: signups.filter((s) => s.status === "confirmed").length,
+              defaultValue: "{{pending}} en attente · {{confirmed}} confirmé(s)",
+            })}
+          </p>
         </DialogHeader>
 
         {pending.length > 0 && (
