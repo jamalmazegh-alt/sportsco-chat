@@ -302,5 +302,8 @@
     "seatsRemaining_one": "{{count}} posto",
     "seatsRemaining_other": "{{count}} posti",
     "fallbackTitle": "Aiuto"
+  },
+  "myFeed": {
+    "title": "Le mie disponibilità"
   }
 }

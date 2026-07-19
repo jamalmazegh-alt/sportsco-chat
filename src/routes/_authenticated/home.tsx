@@ -329,11 +329,12 @@ function HomePage() {
         />
       )}
 
-      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit.
+      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit
+          + besoins ouverts non répondus (déplacés depuis HomeNeedsCard).
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
 
-      {activeClubId && <HomeNeedsCard />}
+
 
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
@@ -431,6 +432,10 @@ function HomePage() {
           )}
         </section>
       )}
+
+      {/* Mes coups de main : engagements en cours (applied/confirmed) + "Récemment complétés".
+          Les besoins non répondus sont dans l'UrgencyCenter au-dessus — pas de doublon. */}
+      {activeClubId && <HomeNeedsCard />}
 
       {/* KPIs (admins/coaches) — insights are now unified in UrgencyCenter deck above */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}

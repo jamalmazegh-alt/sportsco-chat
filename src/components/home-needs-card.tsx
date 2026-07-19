@@ -100,12 +100,11 @@ export function HomeNeedsCard() {
     n.my_signup.status !== "withdrawn" &&
     n.my_signup.status !== "declined";
 
-  // Section principale : actionnable OU engagement en cours (applied/confirmed).
-  // On garde les engagements ici pour que l'utilisateur suive son statut ; les
-  // besoins "declined" restent dans le fil /needs (sous-section refusée).
-  const primary = relevant.filter(
-    (n) => (n.remaining_seats > 0 && !hasActiveSignup(n)) || hasActiveSignup(n),
-  );
+  // Section principale : UNIQUEMENT les engagements en cours (applied/confirmed).
+  // Les besoins ouverts non répondus vont désormais dans l'UrgencyCenter — pas
+  // de doublon. Un besoin non répondu = action en attente → urgence.
+  // Un besoin engagé = statut à suivre → cette carte.
+  const primary = relevant.filter((n) => hasActiveSignup(n));
 
   // Sous-section "Récemment complétés" : plus de place, l'utilisateur n'est pas
   // engagé, complété il y a moins de 48h et avant le début de l'événement.
@@ -113,14 +112,10 @@ export function HomeNeedsCard() {
     (n) => !hasActiveSignup(n) && isRecentlyFilledVisible(n),
   );
 
-  const primarySorted = [...primary].sort((a, b) => {
-    const aPending = !a.my_signup || a.my_signup.status === "withdrawn" ? 0 : 1;
-    const bPending = !b.my_signup || b.my_signup.status === "withdrawn" ? 0 : 1;
-    return aPending - bPending;
-  });
-  const primaryVisible = primarySorted.slice(0, 3);
+  const primaryVisible = primary.slice(0, 3);
   const filledVisible = recentlyFilled.slice(0, 2);
 
+  // Le bloc disparaît entièrement s'il n'a rien à afficher (pas d'état vide décoratif).
   if (primaryVisible.length === 0 && filledVisible.length === 0) return null;
 
   return (
@@ -128,7 +123,7 @@ export function HomeNeedsCard() {
       <div className="flex items-center justify-between mb-2.5 px-0.5">
         <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em] inline-flex items-center gap-1.5">
           <HandHelping className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
-          {t("needs:feed.title")}
+          {t("needs:myFeed.title", { defaultValue: "Mes coups de main" })}
           {primaryVisible.length > 0 && (
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
               {primary.length}
@@ -143,6 +138,7 @@ export function HomeNeedsCard() {
           <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
+
 
       {primaryVisible.length > 0 && (
         <div className="space-y-2">
