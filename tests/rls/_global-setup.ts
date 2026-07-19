@@ -12,8 +12,101 @@ import { writeFileSync, existsSync, unlinkSync } from "fs";
 import { admin } from "./_admin";
 import { fixturesPath, PASSWORD, type Fixtures, type Role, type UserFixture } from "./_setup";
 
+/**
+ * ============================================================================
+ *  HARD TARGET GUARD — RLS suite MUST NEVER run outside `bughunt`.
+ * ============================================================================
+ * The suite runs only via the GitHub workflow `rls-tests.yml`, which sets
+ * RLS_TARGET_PROJECT_REF to the bughunt project ref. If the ref extracted
+ * from SUPABASE_URL does not match, we abort BEFORE touching any table.
+ *
+ * No fallback, no default — either both vars are present and equal, or the
+ * process exits. This is what prevents another accidental prod run.
+ */
+const RLS_TARGET_PROJECT_REF = process.env.RLS_TARGET_PROJECT_REF;
+const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+const urlRefMatch = SUPABASE_URL.match(/^https?:\/\/([a-z0-9]+)\.supabase\.co/i);
+const actualRef = urlRefMatch?.[1] ?? null;
+
+console.log(
+  `[rls] Target guard — expected ref: ${RLS_TARGET_PROJECT_REF ?? "<unset>"}, ` +
+    `actual ref from SUPABASE_URL: ${actualRef ?? "<unparsable>"}`,
+);
+
+if (!RLS_TARGET_PROJECT_REF) {
+  throw new Error(
+    "[rls] ABORT: RLS_TARGET_PROJECT_REF is not set. The RLS suite must only run " +
+      "via the GitHub workflow rls-tests.yml against the bughunt project. Refusing to start.",
+  );
+}
+if (!actualRef) {
+  throw new Error(
+    `[rls] ABORT: could not extract project ref from SUPABASE_URL (${SUPABASE_URL || "<empty>"}). Refusing to start.`,
+  );
+}
+if (actualRef !== RLS_TARGET_PROJECT_REF) {
+  throw new Error(
+    `[rls] ABORT: SUPABASE_URL points at project "${actualRef}" but RLS_TARGET_PROJECT_REF is "${RLS_TARGET_PROJECT_REF}". ` +
+      "The RLS suite is only allowed to run against bughunt. Refusing to start.",
+  );
+}
+
 const RUN_ID = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 const PREFIX = `__rls_${RUN_ID}`;
+
+/**
+ * Sweep leftover fixtures from previous failed runs (any row/user whose name
+ * or email starts with `__rls_`). Best-effort — errors are logged, not thrown,
+ * because a fresh bughunt DB will have nothing to delete and some tables may
+ * not exist in every environment.
+ */
+async function sweepStaleRlsRows(): Promise<void> {
+  console.log(`[rls] Sweeping stale __rls_% rows from previous runs...`);
+
+  const safeDelete = async (label: string, fn: () => Promise<{ error: unknown }>) => {
+    try {
+      const { error } = await fn();
+      if (error) console.warn(`[rls] sweep ${label}: ${(error as { message?: string }).message ?? error}`);
+    } catch (e) {
+      console.warn(`[rls] sweep ${label} threw:`, e);
+    }
+  };
+
+  // Domain tables — ordered child → parent to respect FKs.
+  await safeDelete("support_messages", () =>
+    admin.from("support_messages").delete().like("body", "__rls_%"),
+  );
+  await safeDelete("support_tickets", () =>
+    admin.from("support_tickets").delete().like("subject", "__rls_%"),
+  );
+  await safeDelete("clubs", () => admin.from("clubs").delete().like("name", "__rls_%"));
+
+  // Auth users — sweep every account whose email starts with `__rls_`.
+  try {
+    let page = 1;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+      if (error) {
+        console.warn(`[rls] sweep auth.users listUsers page ${page}: ${error.message}`);
+        break;
+      }
+      const stale = (data?.users ?? []).filter((u) => (u.email ?? "").startsWith("__rls_"));
+      for (const u of stale) {
+        await admin.auth.admin.deleteUser(u.id).catch((e) => {
+          console.warn(`[rls] sweep auth.users deleteUser(${u.id}):`, e);
+        });
+      }
+      if (!data || (data.users ?? []).length < 200) break;
+      page += 1;
+    }
+  } catch (e) {
+    console.warn("[rls] sweep auth.users threw:", e);
+  }
+
+  console.log(`[rls] Sweep complete.`);
+}
+
 
 const ROLES: Role[] = [
   "adminA",
