@@ -721,6 +721,10 @@ function HomePage() {
             </section>
           );
         })()}
+
+      {/* Mes coups de main : engagements en cours + récemment complétés.
+          Placé en bas pour rester sous les prochains events. */}
+      {activeClubId && <HomeNeedsCard />}
     </div>
   );
 }
