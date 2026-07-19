@@ -371,6 +371,23 @@ export function AudiencePickerBody({
     return list;
   }, [ctx, state.teamPicks, state.category, controls, t]);
 
+  const clubAudienceSuggestions: Suggestion[] = useMemo(() => {
+    const clubKeys: ScalarAudienceKey[] = [
+      "club_staff",
+      "club_educators",
+      "club_admins",
+      "club_tournament_managers",
+      "club_members",
+    ];
+    return clubKeys.map((k) => ({
+      id: `sg-s-${k}`,
+      kind: k as KindKey,
+      label: t(`needs:audiences.${k}`),
+      active: state.scalar.has(k),
+      onToggle: () => controls.toggleScalar(k),
+    }));
+  }, [state.scalar, controls, t]);
+
   return (
     <div className="space-y-3">
       {/* Selected audiences — prominent block */}
