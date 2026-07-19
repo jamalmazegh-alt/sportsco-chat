@@ -2337,6 +2337,53 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Ya existe un grupo con este nombre."
+    },
+    "personsToday_one": "{{count}} persona hoy",
+    "personsToday_other": "{{count}} personas hoy",
+    "dynamicSubgroups": "Subgrupos",
+    "dynamicBadge": "DINÁMICO",
+    "noSubgroups": "Sin subgrupo. La composición se actualiza automáticamente.",
+    "addSubgroup": "Añadir",
+    "subgroupAdded": "Subgrupo añadido",
+    "subgroupRemoved": "Subgrupo eliminado",
+    "subgroupRemove": "Quitar",
+    "subgroupPreview": "Ver miembros",
+    "subgroupPreviewDescription": "Lista resuelta al momento. La composición se actualiza automáticamente.",
+    "subgroupPreviewEmpty": "Ningún miembro resuelto.",
+    "subgroupPreviewCount_one": "{{count}} miembro",
+    "subgroupPreviewCount_other": "{{count}} miembros",
+    "pickAudienceKind": "Elegir una audiencia…",
+    "pickAudienceParam": "Elegir…",
+    "selectedAudiencesTitle": "Audiencias seleccionadas",
+    "selectedAudiencesEmpty": "Ninguna audiencia. Añade una abajo.",
+    "otherAudiences": "Otras audiencias",
+    "parentOf": "Padre/madre de {{names}}",
+    "emailOnly": "solo email",
+    "individualMembers": "Miembros individuales",
+    "addIndividual": "Añadir individualmente",
+    "confirmDeactivate": "¿Desactivar este grupo?",
+    "confirmActivate": "¿Reactivar este grupo?",
+    "activated": "Grupo reactivado",
+    "deactivated": "Grupo desactivado",
+    "actions": {
+      "rename": "Renombrar",
+      "deactivate": "Desactivar",
+      "activate": "Reactivar",
+      "delete": "Eliminar"
+    },
+    "bulk": {
+      "club_members": "Todos los miembros",
+      "club_staff": "Todo el staff",
+      "club_admins": "Administradores",
+      "club_educators": "Todos los entrenadores",
+      "club_tournament_managers": "Responsables de torneos",
+      "team_players": "Jugadores de un equipo",
+      "team_parents": "Padres de un equipo",
+      "team_educators": "Entrenadores de un equipo",
+      "category_educators": "Entrenadores de una categoría"
+    }
   }
 }

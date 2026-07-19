@@ -2360,6 +2360,40 @@
       "team_parents": "Parents d'une équipe",
       "team_educators": "Éducateurs d'une équipe",
       "category_educators": "Éducateurs d'une catégorie"
-    }
+    },
+    "errors": {
+      "nameTaken": "Un groupe avec ce nom existe déjà."
+    },
+    "personsToday_one": "{{count}} personne aujourd'hui",
+    "personsToday_other": "{{count}} personnes aujourd'hui",
+    "actions": {
+      "rename": "Renommer",
+      "deactivate": "Désactiver",
+      "activate": "Réactiver",
+      "delete": "Supprimer"
+    },
+    "dynamicSubgroups": "Sous-groupes",
+    "dynamicBadge": "DYNAMIQUE",
+    "noSubgroups": "Aucun sous-groupe. La composition se met à jour automatiquement.",
+    "addSubgroup": "Ajouter",
+    "subgroupAdded": "Sous-groupe ajouté",
+    "subgroupRemoved": "Sous-groupe retiré",
+    "subgroupRemove": "Retirer",
+    "subgroupPreview": "Voir les membres",
+    "subgroupPreviewDescription": "Liste résolue à l'instant. La composition se met à jour automatiquement.",
+    "subgroupPreviewEmpty": "Aucun membre résolu.",
+    "subgroupPreviewCount_one": "{{count}} membre",
+    "subgroupPreviewCount_other": "{{count}} membres",
+    "pickAudienceKind": "Choisir une audience…",
+    "pickAudienceParam": "Choisir…",
+    "selectedAudiencesTitle": "Audiences sélectionnées",
+    "selectedAudiencesEmpty": "Aucune audience sélectionnée. Ajoute une audience ci-dessous.",
+    "otherAudiences": "Autres audiences",
+    "parentOf": "Parent de {{names}}",
+    "emailOnly": "email uniquement",
+    "confirmDeactivate": "Désactiver ce groupe ?",
+    "confirmActivate": "Réactiver ce groupe ?",
+    "activated": "Groupe réactivé",
+    "deactivated": "Groupe désactivé"
   }
 }

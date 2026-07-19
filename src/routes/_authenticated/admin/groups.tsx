@@ -8,8 +8,7 @@ import { toast } from "sonner";
 import {
   Loader2,
   Plus,
-  Pencil,
-  Trash2,
+  MoreHorizontal,
   UsersRound,
   UserPlus,
   X,
@@ -27,6 +26,23 @@ import {
   Tag,
   type LucideIcon,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -213,6 +229,7 @@ function GroupsPage() {
   const [editing, setEditing] = useState<GroupRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<GroupRow | null>(null);
 
   const groupsQ = useQuery({
     queryKey: ["club-groups", activeClubId],
@@ -382,7 +399,7 @@ function GroupsPage() {
       ) : (
         <div className="space-y-2">
           {allGroups.map((g) => {
-            const count = groupsQ.data?.counts[g.id] ?? 0;
+            const resolvedCount = groupsQ.data?.resolved_counts?.[g.id] ?? 0;
             const expanded = expandedId === g.id;
             return (
               <div
@@ -410,7 +427,7 @@ function GroupsPage() {
                         </Badge>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        · {t("groups.membersCount", { count })}
+                        {t("groups.personsToday", { count: resolvedCount })}
                       </span>
                     </div>
                     {g.description && (
@@ -419,26 +436,46 @@ function GroupsPage() {
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditing(g)}
-                    aria-label={t("groups.edit")}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      if (window.confirm(t("groups.deleteConfirm"))) {
-                        deleteMut.mutate(g.id);
-                      }
-                    }}
-                    aria-label={t("groups.delete")}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t("common.actions", { defaultValue: "Actions" })}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => setEditing(g)}>
+                        {t("groups.actions.rename")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (
+                            window.confirm(
+                              g.is_active
+                                ? t("groups.confirmDeactivate")
+                                : t("groups.confirmActivate"),
+                            )
+                          ) {
+                            updateMut.mutate({ id: g.id, is_active: !g.is_active });
+                          }
+                        }}
+                      >
+                        {g.is_active
+                          ? t("groups.actions.deactivate")
+                          : t("groups.actions.activate")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onSelect={() => setConfirmDelete(g)}
+                      >
+                        {t("groups.actions.delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 {expanded && (
                   <GroupMembersPanel
@@ -454,6 +491,34 @@ function GroupsPage() {
           })}
         </div>
       )}
+
+      <AlertDialog
+        open={!!confirmDelete}
+        onOpenChange={(o) => !o && setConfirmDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("groups.delete")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("groups.deleteConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (confirmDelete) deleteMut.mutate(confirmDelete.id);
+                setConfirmDelete(null);
+              }}
+            >
+              {t("groups.actions.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+
 
       <GroupFormDialog
         open={creating}
@@ -685,7 +750,7 @@ function GroupMembersPanel({
       category: string | null;
     }) => addRuleFn({ data: { group_id: groupId, ...input } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleAdded", { defaultValue: "Règle ajoutée" }));
+      toast.success(t("groups.subgroupAdded"));
       setRuleType("");
       setRuleParam("");
       invalidateAll();
@@ -696,7 +761,7 @@ function GroupMembersPanel({
   const removeRuleMut = useMutation({
     mutationFn: (id: string) => removeRuleFn({ data: { id } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleRemoved", { defaultValue: "Règle retirée" }));
+      toast.success(t("groups.subgroupRemoved"));
       invalidateAll();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -779,27 +844,17 @@ function GroupMembersPanel({
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {t("groups.manageMembers")}
         </Label>
-        {resolvedQ.data && (
-          <span className="text-xs text-muted-foreground">
-            {t("groups.resolvedTotal", {
-              defaultValue: "Total résolu : {{count}}",
-              count: resolvedQ.data.count,
-            })}
-          </span>
-        )}
       </div>
 
-      {/* Dynamic rules (chips) */}
+      {/* Dynamic sub-groups (chips) */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
           <Layers className="h-3.5 w-3.5" />
-          {t("groups.dynamicRules", { defaultValue: "Sous-groupes dynamiques" })}
+          {t("groups.dynamicSubgroups")}
         </Label>
         {rules.length === 0 ? (
           <p className="text-xs text-muted-foreground italic">
-            {t("groups.noRules", {
-              defaultValue: "Aucune règle. La composition se met à jour automatiquement.",
-            })}
+            {t("groups.noSubgroups")}
           </p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
@@ -816,17 +871,18 @@ function GroupMembersPanel({
                   type="button"
                   className="text-xs hover:underline"
                   onClick={() => setPreviewRule(r)}
-                  aria-label={t("groups.rulePreview", {
-                    defaultValue: "Voir les membres",
-                  })}
+                  aria-label={t("groups.subgroupPreview")}
                 >
                   {ruleLabel(r)}
                 </button>
+                <span className="text-[9px] font-semibold tracking-wider opacity-70 px-1 rounded bg-background/40">
+                  {t("groups.dynamicBadge")}
+                </span>
                 <button
                   type="button"
                   className="ml-0.5 rounded hover:bg-muted p-0.5"
                   onClick={() => removeRuleMut.mutate(r.id)}
-                  aria-label={t("groups.ruleRemove", { defaultValue: "Retirer la règle" })}
+                  aria-label={t("groups.subgroupRemove")}
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -845,11 +901,7 @@ function GroupMembersPanel({
             }}
           >
             <SelectTrigger>
-              <SelectValue
-                placeholder={t("groups.bulkPickKind", {
-                  defaultValue: "Choisir un type…",
-                })}
-              />
+              <SelectValue placeholder={t("groups.pickAudienceKind")} />
             </SelectTrigger>
             <SelectContent>
               {RULE_TYPES.map((rt) => (
@@ -863,9 +915,7 @@ function GroupMembersPanel({
           {ruleType && (needsTeam(ruleType) || needsCategory(ruleType)) ? (
             <Select value={ruleParam} onValueChange={setRuleParam}>
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("groups.bulkPickParam", { defaultValue: "Choisir…" })}
-                />
+                <SelectValue placeholder={t("groups.pickAudienceParam")} />
               </SelectTrigger>
               <SelectContent>
                 {needsTeam(ruleType) &&
@@ -894,10 +944,11 @@ function GroupMembersPanel({
           >
             {addRuleMut.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
             <Plus className="h-4 w-4 mr-1" />
-            {t("groups.addRule", { defaultValue: "Ajouter la règle" })}
+            {t("groups.addSubgroup")}
           </Button>
         </div>
       </div>
+
 
       {/* Individual members */}
       <div className="space-y-2">
@@ -1092,10 +1143,7 @@ function RulePreviewDialog({
             {ruleLabel}
           </DialogTitle>
           <DialogDescription>
-            {t("groups.rulePreviewDescription", {
-              defaultValue:
-                "Liste résolue à l'instant. La composition se met à jour automatiquement.",
-            })}
+            {t("groups.subgroupPreviewDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -1105,7 +1153,7 @@ function RulePreviewDialog({
           </div>
         ) : rows.length === 0 ? (
           <p className="text-sm text-muted-foreground italic py-4">
-            {t("groups.rulePreviewEmpty", { defaultValue: "Aucun membre résolu." })}
+            {t("groups.subgroupPreviewEmpty")}
           </p>
         ) : (
           <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
@@ -1144,8 +1192,7 @@ function RulePreviewDialog({
         )}
 
         <DialogFooter className="text-xs text-muted-foreground">
-          {t("groups.rulePreviewCount", {
-            defaultValue: "{{count}} membre(s)",
+          {t("groups.subgroupPreviewCount", {
             count: rows.length,
           })}
         </DialogFooter>

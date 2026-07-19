@@ -2337,6 +2337,53 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "A group with this name already exists."
+    },
+    "personsToday_one": "{{count}} person today",
+    "personsToday_other": "{{count}} people today",
+    "dynamicSubgroups": "Sub-groups",
+    "dynamicBadge": "DYNAMIC",
+    "noSubgroups": "No sub-group. Composition updates automatically.",
+    "addSubgroup": "Add",
+    "subgroupAdded": "Sub-group added",
+    "subgroupRemoved": "Sub-group removed",
+    "subgroupRemove": "Remove",
+    "subgroupPreview": "View members",
+    "subgroupPreviewDescription": "Resolved list at this moment. Composition updates automatically.",
+    "subgroupPreviewEmpty": "No resolved member.",
+    "subgroupPreviewCount_one": "{{count}} member",
+    "subgroupPreviewCount_other": "{{count}} members",
+    "pickAudienceKind": "Choose an audience…",
+    "pickAudienceParam": "Choose…",
+    "selectedAudiencesTitle": "Selected audiences",
+    "selectedAudiencesEmpty": "No audience selected. Add one below.",
+    "otherAudiences": "Other audiences",
+    "parentOf": "Parent of {{names}}",
+    "emailOnly": "email only",
+    "individualMembers": "Individual members",
+    "addIndividual": "Add individually",
+    "confirmDeactivate": "Deactivate this group?",
+    "confirmActivate": "Reactivate this group?",
+    "activated": "Group reactivated",
+    "deactivated": "Group deactivated",
+    "actions": {
+      "rename": "Rename",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "delete": "Delete"
+    },
+    "bulk": {
+      "club_members": "All club members",
+      "club_staff": "All staff",
+      "club_admins": "Administrators",
+      "club_educators": "All coaches",
+      "club_tournament_managers": "Tournament managers",
+      "team_players": "Players of a team",
+      "team_parents": "Parents of a team",
+      "team_educators": "Coaches of a team",
+      "category_educators": "Coaches of a category"
+    }
   }
 }

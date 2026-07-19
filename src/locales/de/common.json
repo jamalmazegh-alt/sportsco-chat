@@ -2337,6 +2337,53 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Es existiert bereits eine Gruppe mit diesem Namen."
+    },
+    "personsToday_one": "{{count}} Person heute",
+    "personsToday_other": "{{count}} Personen heute",
+    "dynamicSubgroups": "Untergruppen",
+    "dynamicBadge": "DYNAMISCH",
+    "noSubgroups": "Keine Untergruppe. Die Zusammensetzung wird automatisch aktualisiert.",
+    "addSubgroup": "Hinzufügen",
+    "subgroupAdded": "Untergruppe hinzugefügt",
+    "subgroupRemoved": "Untergruppe entfernt",
+    "subgroupRemove": "Entfernen",
+    "subgroupPreview": "Mitglieder anzeigen",
+    "subgroupPreviewDescription": "Aktuell aufgelöste Liste. Die Zusammensetzung wird automatisch aktualisiert.",
+    "subgroupPreviewEmpty": "Kein aufgelöstes Mitglied.",
+    "subgroupPreviewCount_one": "{{count}} Mitglied",
+    "subgroupPreviewCount_other": "{{count}} Mitglieder",
+    "pickAudienceKind": "Zielgruppe wählen…",
+    "pickAudienceParam": "Wählen…",
+    "selectedAudiencesTitle": "Ausgewählte Zielgruppen",
+    "selectedAudiencesEmpty": "Keine Zielgruppe ausgewählt. Füge unten eine hinzu.",
+    "otherAudiences": "Weitere Zielgruppen",
+    "parentOf": "Elternteil von {{names}}",
+    "emailOnly": "nur E-Mail",
+    "individualMembers": "Einzelne Mitglieder",
+    "addIndividual": "Einzeln hinzufügen",
+    "confirmDeactivate": "Diese Gruppe deaktivieren?",
+    "confirmActivate": "Diese Gruppe reaktivieren?",
+    "activated": "Gruppe reaktiviert",
+    "deactivated": "Gruppe deaktiviert",
+    "actions": {
+      "rename": "Umbenennen",
+      "deactivate": "Deaktivieren",
+      "activate": "Aktivieren",
+      "delete": "Löschen"
+    },
+    "bulk": {
+      "club_members": "Alle Vereinsmitglieder",
+      "club_staff": "Gesamtes Team",
+      "club_admins": "Administratoren",
+      "club_educators": "Alle Trainer",
+      "club_tournament_managers": "Turnierverantwortliche",
+      "team_players": "Spieler einer Mannschaft",
+      "team_parents": "Eltern einer Mannschaft",
+      "team_educators": "Trainer einer Mannschaft",
+      "category_educators": "Trainer einer Kategorie"
+    }
   }
 }

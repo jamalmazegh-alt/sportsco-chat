@@ -2337,6 +2337,53 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Er bestaat al een groep met deze naam."
+    },
+    "personsToday_one": "{{count}} persoon vandaag",
+    "personsToday_other": "{{count}} personen vandaag",
+    "dynamicSubgroups": "Subgroepen",
+    "dynamicBadge": "DYNAMISCH",
+    "noSubgroups": "Geen subgroep. De samenstelling wordt automatisch bijgewerkt.",
+    "addSubgroup": "Toevoegen",
+    "subgroupAdded": "Subgroep toegevoegd",
+    "subgroupRemoved": "Subgroep verwijderd",
+    "subgroupRemove": "Verwijderen",
+    "subgroupPreview": "Leden bekijken",
+    "subgroupPreviewDescription": "Nu opgeloste lijst. De samenstelling wordt automatisch bijgewerkt.",
+    "subgroupPreviewEmpty": "Geen opgelost lid.",
+    "subgroupPreviewCount_one": "{{count}} lid",
+    "subgroupPreviewCount_other": "{{count}} leden",
+    "pickAudienceKind": "Kies een doelgroep…",
+    "pickAudienceParam": "Kies…",
+    "selectedAudiencesTitle": "Geselecteerde doelgroepen",
+    "selectedAudiencesEmpty": "Geen doelgroep geselecteerd. Voeg er hieronder een toe.",
+    "otherAudiences": "Andere doelgroepen",
+    "parentOf": "Ouder van {{names}}",
+    "emailOnly": "alleen e-mail",
+    "individualMembers": "Individuele leden",
+    "addIndividual": "Individueel toevoegen",
+    "confirmDeactivate": "Deze groep deactiveren?",
+    "confirmActivate": "Deze groep reactiveren?",
+    "activated": "Groep gereactiveerd",
+    "deactivated": "Groep gedeactiveerd",
+    "actions": {
+      "rename": "Hernoemen",
+      "deactivate": "Deactiveren",
+      "activate": "Reactiveren",
+      "delete": "Verwijderen"
+    },
+    "bulk": {
+      "club_members": "Alle clubleden",
+      "club_staff": "Alle staf",
+      "club_admins": "Beheerders",
+      "club_educators": "Alle trainers",
+      "club_tournament_managers": "Toernooiverantwoordelijken",
+      "team_players": "Spelers van een team",
+      "team_parents": "Ouders van een team",
+      "team_educators": "Trainers van een team",
+      "category_educators": "Trainers van een categorie"
+    }
   }
 }
