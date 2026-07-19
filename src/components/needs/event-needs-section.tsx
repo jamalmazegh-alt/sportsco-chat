@@ -1355,12 +1355,14 @@ function StaffSignupsDialog({
   open,
   onOpenChange,
   needId,
+  capacity,
   onChanged,
   defaultAddOpen = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
+  capacity: number;
   onChanged: () => void;
   defaultAddOpen?: boolean;
 }) {
@@ -1370,6 +1372,7 @@ function StaffSignupsDialog({
   const decide = useServerFn(decideSignup);
   const searchFn = useServerFn(searchClubMembersForNeed);
   const addManual = useServerFn(staffAddManualSignup);
+  const unassignFn = useServerFn(staffUnassignSignup);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
