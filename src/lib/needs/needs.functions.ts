@@ -506,14 +506,56 @@ export const closeEventNeed = createServerFn({ method: "POST" })
     });
     if (!isStaff) throw new Error("forbidden");
 
-    const { error } = await supabase
+    // 1) Récupère les 'applied' encore en attente avant transition, pour
+    //    les décliner et les notifier ("le poste est pourvu").
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: pendingApplied } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("id, user_id")
+      .eq("need_id", data.need_id)
+      .eq("status", "applied");
+
+    // 2) Fermeture + decline en cascade en un seul batch.
+    const nowIso = new Date().toISOString();
+    const { error: closeErr } = await supabaseAdmin
       .from("event_needs")
       .update({ status: "closed" })
       .eq("id", data.need_id);
-    if (error) throw new Error(error.message);
+    if (closeErr) throw new Error(closeErr.message);
+
+    if ((pendingApplied?.length ?? 0) > 0) {
+      const ids = pendingApplied!.map((r) => r.id);
+      await supabaseAdmin
+        .from("event_need_signups")
+        .update({ status: "declined", declined_at: nowIso, decided_by: userId })
+        .in("id", ids);
+    }
 
     await recomputeCoverageServiceRole(need.event_id);
-    return { ok: true };
+
+    // 3) Notification aux applied → declined (poste pourvu). Les confirmed
+    //    ne reçoivent RIEN (mission tenue, rappel conservé).
+    if ((pendingApplied?.length ?? 0) > 0) {
+      try {
+        const { notifyApplicantOfDecision } = await import("./dispatch.server");
+        await Promise.allSettled(
+          pendingApplied!
+            .filter((r) => r.user_id)
+            .map((r) =>
+              notifyApplicantOfDecision({
+                needId: data.need_id,
+                signupId: r.id,
+                decision: "decline",
+                applicantUserId: r.user_id as string,
+              }),
+            ),
+        );
+      } catch (e) {
+        console.error("[closeEventNeed] notify applied failed", e);
+      }
+    }
+
+    return { ok: true, declined_count: pendingApplied?.length ?? 0 };
   });
 
 export const cancelEventNeed = createServerFn({ method: "POST" })
@@ -536,8 +578,7 @@ export const cancelEventNeed = createServerFn({ method: "POST" })
 
     await recomputeCoverageServiceRole(need.event_id);
 
-    // Notifier les signups actifs de l'annulation — awaité (Cloudflare Workers
-    // peut tuer une promesse orpheline après la réponse).
+    // Notif dédiée aux confirmés + candidats (push + email dédupliqué).
     try {
       const { notifyNeedCancelled } = await import("./dispatch.server");
       await notifyNeedCancelled({ needId: data.need_id });
