@@ -127,3 +127,15 @@ natively (Aktionen/Acciones/Azioni/Acties/Ações) — no clone tracking needed.
 Removed dead keys from every locale (FR + EN + DE/ES/IT/NL/PT):
 `groups.dynamicRules`, `groups.noRules`, `groups.resolvedTotal` (leftover
 from the rules → subgroups rename).
+
+## `needs.json` — Audience picker v4 (DE/ES/IT/NL/PT)
+
+Sélection d'audience mise en avant (dialog « Qui prévenir ? »). Nouvelles clés
+sous `audiences.*` :
+- `customGroups`, `eventRelevant`, `otherAudiences`, `pickKind`, `pickParam`, `noGroups`
+- `selected.title`, `selected.empty`, `selected.emptyConvocation`,
+  `selected.loading`, `selected.count_one`, `selected.count_other`,
+  `selected.removeAria`, `selected.takenAria`
+
+FR et EN sont finaux. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par
+des traductions natives.
