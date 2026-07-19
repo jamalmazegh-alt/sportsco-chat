@@ -648,16 +648,27 @@ function NeedRow({
           needId={need.id}
           eventId={eventId}
           onPublished={onChange}
+          mode="publish"
         />
       )}
-      {republishOpen && (
+      {resendOpen && (
         <PublishDialog
-          open={republishOpen}
-          onOpenChange={setRepublishOpen}
+          open={resendOpen}
+          onOpenChange={setResendOpen}
           needId={need.id}
           eventId={eventId}
           onPublished={onChange}
-          republish
+          mode="resend"
+        />
+      )}
+      {editAudienceOpen && (
+        <PublishDialog
+          open={editAudienceOpen}
+          onOpenChange={setEditAudienceOpen}
+          needId={need.id}
+          eventId={eventId}
+          onPublished={onChange}
+          mode="edit_audience"
         />
       )}
       {staffOpen && (
