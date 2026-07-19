@@ -1842,8 +1842,8 @@
     "toggleTitle": "Passaggio in auto",
     "toggleOn": "Abilitato per questo evento",
     "toggleOff": "Disabilitato per questo evento",
-    "enable": "Abilita",
-    "disable": "Disabilita",
+    "enable": "Attiva",
+    "disable": "Disattiva",
     "seats": "Posti disponibili",
     "note": "Nota (luogo di partenza, orario…)",
     "edit": "Modifica",
@@ -1855,7 +1855,8 @@
     "confirm": "Conferma",
     "noDriversYet": "Ancora nessun autista.",
     "iNeedRide": "Richiedi un passaggio",
-    "needRideRegistered": "Richiesta inviata all'Allenatore"
+    "needRideRegistered": "Richiesta inviata all'Allenatore",
+    "disabledHint": "Attiva i passaggi in auto per permettere ai genitori di offrire e prenotare posti."
   },
   "journey": {
     "tab": {

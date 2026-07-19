@@ -1855,7 +1855,8 @@
     "confirm": "Bestätigen",
     "noDriversYet": "Noch kein Fahrer.",
     "iNeedRide": "Transport anfragen",
-    "needRideRegistered": "Anfrage an den Trainer gesendet"
+    "needRideRegistered": "Anfrage an den Trainer gesendet",
+    "disabledHint": "Aktiviere Mitfahrgelegenheiten, damit Eltern Plätze anbieten und buchen können."
   },
   "journey": {
     "tab": {
