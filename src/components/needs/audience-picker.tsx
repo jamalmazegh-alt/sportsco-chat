@@ -422,8 +422,39 @@ export function AudiencePickerBody({
       (k) => k === "convoked_players" || k === "convoked_parents",
     );
 
-  return (
-    <div className="space-y-3">
+  type SuggestionT = {
+    id: string;
+    kind: KindKey;
+    label: string;
+    active: boolean;
+    onToggle: () => void;
+  };
+  const SuggestionChip = ({ s, takenLabel }: { s: SuggestionT; takenLabel: string }) => {
+    const { Icon } = KIND_META[s.kind];
+    return (
+      <button
+        type="button"
+        onClick={s.onToggle}
+        aria-pressed={s.active}
+        aria-label={s.active ? `${takenLabel} — ${s.label}` : s.label}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs motion-safe:transition-colors ${
+          s.active
+            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200 opacity-75 hover:opacity-100"
+            : "border-border bg-background hover:bg-muted text-foreground"
+        }`}
+      >
+        <Icon className="h-3 w-3" />
+        <span>{s.label}</span>
+        {s.active ? (
+          <Check className="h-3 w-3 opacity-80" />
+        ) : (
+          <Plus className="h-3 w-3 opacity-70" />
+        )}
+      </button>
+    );
+  };
+
+
       {/* Selected audiences — sticky, high-visibility */}
       <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
         {chips.length === 0 ? (
