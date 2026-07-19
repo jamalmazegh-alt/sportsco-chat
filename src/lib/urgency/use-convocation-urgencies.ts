@@ -52,7 +52,6 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         .in("team_id", teamIds)
         .eq("status", "published")
         .gte("starts_at", nowIso)
-        .lte("starts_at", horizonIso)
         .order("starts_at", { ascending: true });
       if (eventsErr) throw eventsErr;
       if (!events || events.length === 0) return [];
