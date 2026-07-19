@@ -229,6 +229,7 @@ function GroupsPage() {
   const [editing, setEditing] = useState<GroupRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<GroupRow | null>(null);
 
   const groupsQ = useQuery({
     queryKey: ["club-groups", activeClubId],
