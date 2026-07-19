@@ -28,6 +28,7 @@ export type ActivityActionType =
   | "event.cancelled"
   // convocations
   | "convocation.sent"
+  | "convocation.email_backfill"
   | "convocation.responded"
   // teams
   | "team.created"

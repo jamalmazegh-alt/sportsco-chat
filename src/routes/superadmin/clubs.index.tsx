@@ -17,6 +17,7 @@ const ACTION_LABELS: Record<string, string> = {
   "event.updated": "Événement modifié",
   "event.cancelled": "Événement annulé",
   "convocation.sent": "Convocation envoyée",
+  "convocation.email_backfill": "Convoc. — rattrapage email superadmin",
   "convocation.responded": "Réponse convocation",
   "team.created": "Équipe créée",
   "team.updated": "Équipe modifiée",
