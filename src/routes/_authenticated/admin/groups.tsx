@@ -844,27 +844,17 @@ function GroupMembersPanel({
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {t("groups.manageMembers")}
         </Label>
-        {resolvedQ.data && (
-          <span className="text-xs text-muted-foreground">
-            {t("groups.resolvedTotal", {
-              defaultValue: "Total résolu : {{count}}",
-              count: resolvedQ.data.count,
-            })}
-          </span>
-        )}
       </div>
 
-      {/* Dynamic rules (chips) */}
+      {/* Dynamic sub-groups (chips) */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
           <Layers className="h-3.5 w-3.5" />
-          {t("groups.dynamicRules", { defaultValue: "Sous-groupes dynamiques" })}
+          {t("groups.dynamicSubgroups")}
         </Label>
         {rules.length === 0 ? (
           <p className="text-xs text-muted-foreground italic">
-            {t("groups.noRules", {
-              defaultValue: "Aucune règle. La composition se met à jour automatiquement.",
-            })}
+            {t("groups.noSubgroups")}
           </p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
@@ -881,17 +871,18 @@ function GroupMembersPanel({
                   type="button"
                   className="text-xs hover:underline"
                   onClick={() => setPreviewRule(r)}
-                  aria-label={t("groups.rulePreview", {
-                    defaultValue: "Voir les membres",
-                  })}
+                  aria-label={t("groups.subgroupPreview")}
                 >
                   {ruleLabel(r)}
                 </button>
+                <span className="text-[9px] font-semibold tracking-wider opacity-70 px-1 rounded bg-background/40">
+                  {t("groups.dynamicBadge")}
+                </span>
                 <button
                   type="button"
                   className="ml-0.5 rounded hover:bg-muted p-0.5"
                   onClick={() => removeRuleMut.mutate(r.id)}
-                  aria-label={t("groups.ruleRemove", { defaultValue: "Retirer la règle" })}
+                  aria-label={t("groups.subgroupRemove")}
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -910,11 +901,7 @@ function GroupMembersPanel({
             }}
           >
             <SelectTrigger>
-              <SelectValue
-                placeholder={t("groups.bulkPickKind", {
-                  defaultValue: "Choisir un type…",
-                })}
-              />
+              <SelectValue placeholder={t("groups.pickAudienceKind")} />
             </SelectTrigger>
             <SelectContent>
               {RULE_TYPES.map((rt) => (
@@ -928,9 +915,7 @@ function GroupMembersPanel({
           {ruleType && (needsTeam(ruleType) || needsCategory(ruleType)) ? (
             <Select value={ruleParam} onValueChange={setRuleParam}>
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("groups.bulkPickParam", { defaultValue: "Choisir…" })}
-                />
+                <SelectValue placeholder={t("groups.pickAudienceParam")} />
               </SelectTrigger>
               <SelectContent>
                 {needsTeam(ruleType) &&
@@ -959,10 +944,11 @@ function GroupMembersPanel({
           >
             {addRuleMut.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
             <Plus className="h-4 w-4 mr-1" />
-            {t("groups.addRule", { defaultValue: "Ajouter la règle" })}
+            {t("groups.addSubgroup")}
           </Button>
         </div>
       </div>
+
 
       {/* Individual members */}
       <div className="space-y-2">
