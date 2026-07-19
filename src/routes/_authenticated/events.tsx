@@ -600,6 +600,19 @@ function EventsPage() {
         </div>
       </div>
 
+      {view === "list" && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("events.searchPlaceholder", { defaultValue: "Rechercher un événement…" })}
+            className="pl-9"
+          />
+        </div>
+      )}
+
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
           <Link
