@@ -91,16 +91,8 @@ export const Route = createFileRoute("/_authenticated/admin/groups")({
   component: GroupsPage,
   head: () => ({
     meta: [
-      {
-        title: i18nInstance.t("groups.title", { defaultValue: "Groupes du club" }),
-      },
-      {
-        name: "description",
-        content: i18nInstance.t("groups.subtitle", {
-          defaultValue:
-            "Créez des groupes personnalisés pour cibler vos communications.",
-        }),
-      },
+      { title: i18nInstance.t("groups.title") },
+      { name: "description", content: i18nInstance.t("groups.subtitle") },
     ],
   }),
 });
@@ -150,7 +142,7 @@ function useRoleLabel() {
   const { t } = useTranslation();
   return (role: string | null) => {
     if (!role) return null;
-    return t(`roles.${role}`, { defaultValue: role });
+    return t(`roles.${role}`, { defaultValue: role as string });
   };
 }
 
@@ -195,7 +187,7 @@ function RoleBadges({
           variant="outline"
           className={`text-[10px] border ${ROLE_COLORS[r] ?? "bg-muted text-muted-foreground border-border"}`}
         >
-          {t(`roles.${r}`, { defaultValue: r })}
+          {t(`roles.${r}`, { defaultValue: r as string })}
         </Badge>
       ))}
     </div>
@@ -207,10 +199,7 @@ function ParentSubtitle({ children_names }: { children_names?: string[] | null }
   if (!children_names || children_names.length === 0) return null;
   return (
     <span className="text-xs text-muted-foreground truncate">
-      {t("groups.parentOf", {
-        defaultValue: "Parent de {{names}}",
-        names: children_names.join(", "),
-      })}
+      {t("groups.parentOf", { names: children_names.join(", ") })}
     </span>
   );
 }
@@ -333,7 +322,7 @@ function GroupsPage() {
     onError: (e: Error) =>
       toast.error(
         e.message === "group_name_taken"
-          ? t("groups.errors.nameTaken", { defaultValue: "Un groupe avec ce nom existe déjà." })
+          ? t("groups.errors.nameTaken")
           : e.message,
       ),
   });
@@ -353,7 +342,7 @@ function GroupsPage() {
     onError: (e: Error) =>
       toast.error(
         e.message === "group_name_taken"
-          ? t("groups.errors.nameTaken", { defaultValue: "Un groupe avec ce nom existe déjà." })
+          ? t("groups.errors.nameTaken")
           : e.message,
       ),
   });
@@ -441,7 +430,7 @@ function GroupsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={t("common.actions", { defaultValue: "Actions" })}
+                        aria-label={t("common.actions")}
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
@@ -503,7 +492,7 @@ function GroupsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -609,7 +598,7 @@ function GroupFormDialog(props: {
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={props.onClose}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button
             disabled={!name.trim() || props.submitting}
@@ -622,7 +611,7 @@ function GroupFormDialog(props: {
             }
           >
             {props.submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {t("common.save", { defaultValue: "Enregistrer" })}
+            {t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -787,7 +776,7 @@ function GroupMembersPanel({
   );
 
   function ruleLabel(r: RuleRow) {
-    const base = t(`groups.bulk.${r.rule_type}`, { defaultValue: r.rule_type });
+    const base = t(`groups.bulk.${r.rule_type}`, { defaultValue: r.rule_type as string });
     if (needsTeam(r.rule_type) && r.team_id) {
       const tm = teamNameById.get(r.team_id);
       return `${base} · ${tm?.name ?? r.team_id}`;
@@ -906,7 +895,7 @@ function GroupMembersPanel({
             <SelectContent>
               {RULE_TYPES.map((rt) => (
                 <SelectItem key={rt} value={rt}>
-                  {t(`groups.bulk.${rt}`, { defaultValue: rt })}
+                  {t(`groups.bulk.${rt}`, { defaultValue: rt as string })}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -953,7 +942,7 @@ function GroupMembersPanel({
       {/* Individual members */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {t("groups.individualMembers", { defaultValue: "Membres individuels" })}
+          {t("groups.individualMembers")}
         </Label>
         {membersQ.isLoading ? (
           <div className="flex justify-center py-4">
@@ -981,10 +970,7 @@ function GroupMembersPanel({
                     roles={roleList}
                     subline={
                       childNames && childNames.length > 0
-                        ? t("groups.parentOf", {
-                            defaultValue: "Parent de {{names}}",
-                            names: childNames.join(", "),
-                          })
+                        ? t("groups.parentOf", { names: childNames.join(", ") })
                         : undefined
                     }
                     action={
@@ -1008,7 +994,7 @@ function GroupMembersPanel({
       {/* Individual add */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {t("groups.addIndividual", { defaultValue: "Ajouter individuellement" })}
+          {t("groups.addIndividual")}
         </Label>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
