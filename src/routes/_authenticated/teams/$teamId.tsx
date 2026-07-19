@@ -1486,9 +1486,35 @@ function TeamDetail() {
             const coveredByParent = isMinorP && !p.child_platform_access && anyParentLinked;
             const linked = !!p.user_id || coveredByParent;
             const canInvite = !linked;
-            const hasPendingInvite = !linked && !!pendingInvitesByPlayer?.get(p.id);
-            const failures = inviteFailuresByPlayer?.[p.id] ?? [];
+            // Minor without direct platform access: only parent invites matter.
+            // Failures on the player's own (possibly bogus) email are hidden in
+            // favor of the parent-account activation status.
+            const minorParentMode = isMinorP && !p.child_platform_access;
+            const parentEmailsSet = new Set(
+              parentsForP
+                .map((pp: any) => (pp.email ?? "").toLowerCase().trim())
+                .filter((e: string) => !!e),
+            );
+            const pendingForP = pendingInvitesByPlayer?.get(p.id);
+            const hasParentPendingInvite = !!pendingForP
+              && [...pendingForP.emails].some((e) => parentEmailsSet.has(e));
+            const hasPendingInvite =
+              !linked &&
+              (minorParentMode ? hasParentPendingInvite : !!pendingForP);
+            const allFailures = inviteFailuresByPlayer?.[p.id] ?? [];
+            const failures = minorParentMode
+              ? allFailures.filter((f: any) =>
+                  parentEmailsSet.has((f.email ?? "").toLowerCase().trim()),
+                )
+              : allFailures;
             const hasFailedInvite = !linked && failures.length > 0;
+            const showParentActivationPending =
+              minorParentMode &&
+              !linked &&
+              parentsForP.length > 0 &&
+              !hasFailedInvite &&
+              !hasPendingInvite;
+
 
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
