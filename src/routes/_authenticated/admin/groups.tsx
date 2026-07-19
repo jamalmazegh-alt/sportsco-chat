@@ -961,31 +961,35 @@ function GroupMembersPanel({
         {search.trim() && candidates.length > 0 && (
           <ul className="rounded-md border border-border bg-background divide-y divide-border max-h-64 overflow-auto">
             {candidates.map((m) => {
+              const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
+                .filter((r, i, arr) => r && arr.indexOf(r) === i);
               return (
-                <li
-                  key={m.id}
-                  className="flex items-center justify-between gap-2 px-3 py-2"
-                >
-                  <div className="flex flex-col gap-1 min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">{displayName(m)}</span>
-                    <ParentSubtitle children_names={m.children_names} />
-                    <div className="flex flex-wrap gap-1">
-                      <RoleBadges roles={m.roles} fallback={m.role} />
-                    </div>
-                  </div>
-
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      addMut.mutate(m.id);
-                      setSearch("");
-                    }}
-                  >
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    {t("groups.addMember")}
-                  </Button>
+                <li key={m.id} className="px-3">
+                  <PersonRow
+                    name={displayName(m)}
+                    roles={roleList}
+                    subline={
+                      m.children_names && m.children_names.length > 0
+                        ? t("groups.parentOf", {
+                            defaultValue: "Parent de {{names}}",
+                            names: m.children_names.join(", "),
+                          })
+                        : undefined
+                    }
+                    action={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          addMut.mutate(m.id);
+                          setSearch("");
+                        }}
+                      >
+                        <UserPlus className="h-4 w-4 mr-1" />
+                        {t("groups.addMember")}
+                      </Button>
+                    }
+                  />
                 </li>
               );
             })}
