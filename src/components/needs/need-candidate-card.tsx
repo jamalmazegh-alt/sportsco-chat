@@ -216,6 +216,14 @@ export function NeedCandidateCard({
             )}
           </>
         )}
+        {isFullNoSignup && (
+          <Badge
+            variant="outline"
+            className="text-[10px] font-bold border-muted-foreground/40 text-muted-foreground"
+          >
+            {t("needs:seats.full")}
+          </Badge>
+        )}
       </div>
     </div>
   );
