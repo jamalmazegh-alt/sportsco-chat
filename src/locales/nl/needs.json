@@ -48,7 +48,8 @@
     "close": "Behoefte sluiten",
     "cancel": "Behoefte annuleren",
     "publish": "Publiceren",
-    "republish": "Opnieuw publiceren"
+    "republish": "Opnieuw publiceren",
+    "assign": "Asignar"
   },
   "errors": {
     "forbidden": "Actie niet toegestaan.",

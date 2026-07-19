@@ -48,7 +48,8 @@
     "close": "Bedarf schließen",
     "cancel": "Bedarf absagen",
     "publish": "Veröffentlichen",
-    "republish": "Erneut veröffentlichen"
+    "republish": "Erneut veröffentlichen",
+    "assign": "Asignar"
   },
   "errors": {
     "forbidden": "Aktion nicht erlaubt.",

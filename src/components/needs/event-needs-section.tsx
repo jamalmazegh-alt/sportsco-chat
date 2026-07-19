@@ -236,8 +236,10 @@ function NeedRow({
   const cancel = useServerFn(cancelEventNeed);
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+
 
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
@@ -402,6 +404,13 @@ function NeedRow({
             )}
           </Button>
         )}
+        {isStaff && (status === "open" || status === "draft") && remaining > 0 && (
+          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
+            <UserPlus className="h-3.5 w-3.5 mr-1" />
+            {t("needs:actions.assign", { defaultValue: "Assigner" })}
+          </Button>
+        )}
+
         {!isStaff && status === "open" && (
           <>
             {mySignup ? (
@@ -501,6 +510,16 @@ function NeedRow({
           onChanged={onChange}
         />
       )}
+      {assignOpen && (
+        <StaffSignupsDialog
+          open={assignOpen}
+          onOpenChange={setAssignOpen}
+          needId={need.id}
+          onChanged={onChange}
+          defaultAddOpen
+        />
+      )}
+
       {editOpen && (
         <NeedFormDialog
           open={editOpen}
@@ -651,7 +670,10 @@ function NeedFormDialog({
     NEED_TEMPLATES.find((x) => x.key === "other")!;
 
   const defaultLabel = t(`needs:templates.${currentTpl.key}`);
-  const [label, setLabel] = useState(initial?.label ?? defaultLabel);
+  const [label, setLabel] = useState(
+    initial?.label && !/^needs[.:]templates\./.test(initial.label) ? initial.label : "",
+  );
+
   const [description, setDescription] = useState(initial?.description ?? "");
   const [capacity, setCapacity] = useState(
     initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
@@ -663,10 +685,11 @@ function NeedFormDialog({
   const [lastKey, setLastKey] = useState(templateKey);
   if (lastKey !== templateKey && !isEdit) {
     setLastKey(templateKey);
-    setLabel(t(`needs:templates.${currentTpl.key}`));
+    setLabel("");
     setCapacity(currentTpl.suggestedCapacity ?? 1);
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
+
 
   const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
 
@@ -1068,12 +1091,15 @@ function StaffSignupsDialog({
   onOpenChange,
   needId,
   onChanged,
+  defaultAddOpen = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
   onChanged: () => void;
+  defaultAddOpen?: boolean;
 }) {
+
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
@@ -1100,7 +1126,7 @@ function StaffSignupsDialog({
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(defaultAddOpen);
   const [searchText, setSearchText] = useState("");
   const [addPendingUser, setAddPendingUser] = useState<string | null>(null);
 

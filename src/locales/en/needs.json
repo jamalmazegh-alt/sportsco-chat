@@ -48,7 +48,8 @@
     "close": "Close need",
     "cancel": "Cancel need",
     "publish": "Publish",
-    "republish": "Republish"
+    "republish": "Republish",
+    "assign": "Assign"
   },
   "errors": {
     "forbidden": "Action not allowed.",

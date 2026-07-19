@@ -48,7 +48,8 @@
     "close": "Chiudere la necessità",
     "cancel": "Annullare la necessità",
     "publish": "Pubblicare",
-    "republish": "Ripubblicare"
+    "republish": "Ripubblicare",
+    "assign": "Asignar"
   },
   "errors": {
     "forbidden": "Azione non autorizzata.",
