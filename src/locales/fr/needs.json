@@ -129,8 +129,10 @@
     "club_group": "Groupe personnalisé",
     "team_players": "Joueurs d'une équipe",
     "team_parents": "Parents d'une équipe",
-    "team_educators": "Éducateurs d'une catégorie"
+    "team_educators": "Éducateurs d'une équipe",
+    "category_educators": "Éducateurs d'une catégorie"
   },
+
 
   "staff": {
     "title": "Candidatures",
