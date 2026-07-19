@@ -160,47 +160,138 @@ export const updateEventNeed = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const need = await loadNeedCore(data.need_id);
-    if (need.status === "cancelled" || need.status === "closed") {
-      throw new Error("need_not_editable");
-    }
+    // RPC atomique : verrou event_needs, garde is_club_staff, garde capacité
+    // (refus si nouvelle capacité < confirmed_count actuels). role_key ignoré
+    // sur un besoin publié (nature immuable après notifications).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error } = await supabase.rpc("update_event_need_atomic" as any, {
+      _need_id: data.need_id,
+      _actor: userId,
+      _label: data.label ?? null,
+      _description: data.description === undefined ? null : (data.description ?? null),
+      _capacity: data.capacity ?? null,
+      _validation_mode: data.validation_mode ?? null,
+      _has_description: data.description !== undefined,
+    });
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      id: string;
+      event_id: string;
+      club_id: string;
+      status: string;
+      capacity: number;
+      validation_mode: string;
+      label: string;
+      role_key: string;
+      description: string | null;
+      capacity_changed: boolean;
+    } | null;
+    if (!row) throw new Error("need_update_failed");
 
-    // Seul le staff du club peut éditer.
+    if (row.status === "open" && row.capacity_changed) {
+      await recomputeCoverageServiceRole(row.event_id);
+    }
+    return row;
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 1ter. declareUnavailable — membre se déclare indisponible                */
+/* ------------------------------------------------------------------------ */
+
+export const declareUnavailable = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => NeedIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error } = await supabase.rpc("declare_unavailable_atomic" as any, {
+      _need_id: data.need_id,
+      _user_id: userId,
+    });
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      signup_id: string;
+      status: "unavailable";
+    } | null;
+    if (!row) throw new Error("declare_unavailable_failed");
+    return row;
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 1quater. deleteEventNeed — suppression stricte d'un brouillon             */
+/* ------------------------------------------------------------------------ */
+
+export const deleteEventNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => NeedIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await supabase.rpc("delete_event_need_draft" as any, {
+      _need_id: data.need_id,
+      _actor: userId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 1quinquies. republishEventNeed — relance avec sélection rééditable        */
+/* ------------------------------------------------------------------------ */
+
+export const republishEventNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => PublishInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const need = await loadNeedCore(data.need_id);
+    if (need.status !== "open") throw new Error("need_not_open");
     const { data: isStaff } = await supabase.rpc("is_club_staff", {
       _user_id: userId,
       _club_id: need.club_id,
     });
     if (!isStaff) throw new Error("forbidden");
 
-    const patch: Record<string, unknown> = {};
-    if (data.label !== undefined) patch.label = data.label;
-    if (data.description !== undefined) patch.description = data.description ?? null;
-    if (data.capacity !== undefined) patch.capacity = data.capacity;
-    if (data.validation_mode !== undefined) patch.validation_mode = data.validation_mode;
-
-    // Un besoin publié (open) garde son role_key : changer la nature du besoin
-    // après l'envoi des notifications créerait de la confusion pour les candidats.
-    if (data.role_key !== undefined && need.status === "draft") {
-      patch.role_key = data.role_key;
-    }
-
-    if (Object.keys(patch).length === 0) return need;
-
-    const { data: row, error } = await supabase
-      .from("event_needs")
+    // Réutilise publish_event_need_atomic — remplace la sélection d'audiences,
+    // recalcule la photographie et exclut les 'unavailable' (garde en SQL).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error } = await supabase.rpc("publish_event_need_atomic" as any, {
+      _need_id: data.need_id,
+      _actor: userId,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update(patch as any)
-      .eq("id", data.need_id)
-      .select("id, event_id, club_id, status, capacity, validation_mode, label, role_key, description")
-      .single();
+      _audiences: data.audiences as any,
+    });
     if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      publication_id: string;
+      recipients_count: number;
+      recipient_user_ids: string[] | null;
+      was_idempotent_skip: boolean;
+      status: string;
+    } | null;
+    if (!row) throw new Error("republish_failed");
 
-    // Recalcule la couverture si la capacité a changé sur un besoin publié.
-    if (need.status === "open" && data.capacity !== undefined) {
-      await recomputeCoverageServiceRole(need.event_id);
+    if (!row.was_idempotent_skip && (row.recipient_user_ids?.length ?? 0) > 0) {
+      const { dispatchEventNeedPublication } = await import("./dispatch.server");
+      try {
+        await dispatchEventNeedPublication({
+          needId: data.need_id,
+          publicationId: row.publication_id,
+          recipientUserIds: row.recipient_user_ids ?? [],
+        });
+      } catch (e) {
+        console.error("[republishEventNeed] dispatch failed", e);
+      }
     }
 
-    return row;
+    await recomputeCoverageServiceRole(need.event_id);
+    return {
+      publication_id: row.publication_id,
+      recipients_count: row.recipients_count,
+      status: row.status,
+      was_idempotent_skip: row.was_idempotent_skip,
+    };
   });
 
 /* ------------------------------------------------------------------------ */
@@ -415,14 +506,56 @@ export const closeEventNeed = createServerFn({ method: "POST" })
     });
     if (!isStaff) throw new Error("forbidden");
 
-    const { error } = await supabase
+    // 1) Récupère les 'applied' encore en attente avant transition, pour
+    //    les décliner et les notifier ("le poste est pourvu").
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: pendingApplied } = await supabaseAdmin
+      .from("event_need_signups")
+      .select("id, user_id")
+      .eq("need_id", data.need_id)
+      .eq("status", "applied");
+
+    // 2) Fermeture + decline en cascade en un seul batch.
+    const nowIso = new Date().toISOString();
+    const { error: closeErr } = await supabaseAdmin
       .from("event_needs")
       .update({ status: "closed" })
       .eq("id", data.need_id);
-    if (error) throw new Error(error.message);
+    if (closeErr) throw new Error(closeErr.message);
+
+    if ((pendingApplied?.length ?? 0) > 0) {
+      const ids = pendingApplied!.map((r) => r.id);
+      await supabaseAdmin
+        .from("event_need_signups")
+        .update({ status: "declined", declined_at: nowIso, decided_by: userId })
+        .in("id", ids);
+    }
 
     await recomputeCoverageServiceRole(need.event_id);
-    return { ok: true };
+
+    // 3) Notification aux applied → declined (poste pourvu). Les confirmed
+    //    ne reçoivent RIEN (mission tenue, rappel conservé).
+    if ((pendingApplied?.length ?? 0) > 0) {
+      try {
+        const { notifyApplicantOfDecision } = await import("./dispatch.server");
+        await Promise.allSettled(
+          pendingApplied!
+            .filter((r) => r.user_id)
+            .map((r) =>
+              notifyApplicantOfDecision({
+                needId: data.need_id,
+                signupId: r.id,
+                decision: "decline",
+                applicantUserId: r.user_id as string,
+              }),
+            ),
+        );
+      } catch (e) {
+        console.error("[closeEventNeed] notify applied failed", e);
+      }
+    }
+
+    return { ok: true, declined_count: pendingApplied?.length ?? 0 };
   });
 
 export const cancelEventNeed = createServerFn({ method: "POST" })
@@ -445,8 +578,7 @@ export const cancelEventNeed = createServerFn({ method: "POST" })
 
     await recomputeCoverageServiceRole(need.event_id);
 
-    // Notifier les signups actifs de l'annulation — awaité (Cloudflare Workers
-    // peut tuer une promesse orpheline après la réponse).
+    // Notif dédiée aux confirmés + candidats (push + email dédupliqué).
     try {
       const { notifyNeedCancelled } = await import("./dispatch.server");
       await notifyNeedCancelled({ needId: data.need_id });

@@ -254,10 +254,12 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
 export async function notifyNeedCancelled(params: { needId: string }) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
-    .select("id, label, event_id")
+    .select(
+      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name)))",
+    )
     .eq("id", params.needId)
     .maybeSingle();
-  if (!need) return;
+  if (!need) return { dispatched: 0 };
 
   const { data: signups } = await supabaseAdmin
     .from("event_need_signups")
@@ -265,20 +267,79 @@ export async function notifyNeedCancelled(params: { needId: string }) {
     .eq("need_id", params.needId)
     .in("status", ["applied", "confirmed"]);
 
-  const uids = (signups ?? [])
-    .map((s) => s.user_id as string | null)
-    .filter((v): v is string => Boolean(v));
-  if (uids.length === 0) return;
-
-  const { sendPushToUser } = await import("@/lib/push-send.server");
-  await Promise.allSettled(
-    uids.map((uid) =>
-      sendPushToUser(uid, {
-        title: `Besoin annulé`,
-        body: need.label,
-        url: `/events/${need.event_id}`,
-        tag: `event-need-cancelled-${need.id}`,
-      }),
+  // Dédupliqué : un seul dispatch par personne (confirmed ET applied).
+  const uids = Array.from(
+    new Set(
+      (signups ?? [])
+        .map((s) => s.user_id as string | null)
+        .filter((v): v is string => Boolean(v)),
     ),
   );
+  if (uids.length === 0) return { dispatched: 0 };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ev = (need as any).events;
+  const eventTitle = (ev?.title as string) ?? "Événement";
+  const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+
+  // Push
+  try {
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+    await Promise.allSettled(
+      uids.map((uid) =>
+        sendPushToUser(uid, {
+          title: `Besoin annulé`,
+          body: `${need.label} · ${eventTitle} est annulé, vous n'êtes plus attendu·e`,
+          url: `/events/${need.event_id}`,
+          tag: `event-need-cancelled-${need.id}`,
+        }),
+      ),
+    );
+  } catch (e) {
+    console.error("[notifyNeedCancelled] push failed", e);
+  }
+
+  // Email
+  const { data: profiles } = await supabaseAdmin
+    .from("profiles")
+    .select("id, first_name, preferred_language")
+    .in("id", uids);
+  const profileById = new Map(
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p as { first_name: string | null; preferred_language: string | null },
+    ]),
+  );
+
+  let dispatched = 0;
+  for (const uid of uids) {
+    try {
+      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(uid);
+      const email = userData?.user?.email;
+      if (!email) continue;
+      const p = profileById.get(uid);
+      await enqueueTransactionalEmailServer({
+        templateName: "event-need-cancelled",
+        recipientEmail: email,
+        idempotencyKey: `need-cancelled-${need.id}-${uid}`,
+        dispatchId: need.id,
+        eventId: need.event_id,
+        recipientId: uid,
+        notificationType: "event_need_cancelled",
+        fromName: clubName ? `${clubName} via Clubero` : undefined,
+        templateData: {
+          recipientFirstName: p?.first_name ?? null,
+          locale: (p?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr",
+          needLabel: need.label,
+          eventTitle,
+          clubName,
+          eventUrl: `/events/${need.event_id}`,
+        },
+      });
+      dispatched++;
+    } catch (e) {
+      console.error("[notifyNeedCancelled] email failed", { uid, error: (e as Error).message });
+    }
+  }
+  return { dispatched };
 }

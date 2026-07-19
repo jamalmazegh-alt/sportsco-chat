@@ -7034,9 +7034,20 @@ export type Database = {
           signup_id: string
         }[]
       }
+      declare_unavailable_atomic: {
+        Args: { _need_id: string; _user_id: string }
+        Returns: {
+          signup_id: string
+          status: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
+      }
+      delete_event_need_draft: {
+        Args: { _actor: string; _need_id: string }
+        Returns: undefined
       }
       delete_player_smart: { Args: { _id: string }; Returns: string }
       delete_team_if_empty: { Args: { _id: string }; Returns: undefined }
@@ -7595,6 +7606,29 @@ export type Database = {
       team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
       unarchive_team: { Args: { _id: string }; Returns: undefined }
+      update_event_need_atomic: {
+        Args: {
+          _actor: string
+          _capacity: number
+          _description: string
+          _has_description: boolean
+          _label: string
+          _need_id: string
+          _validation_mode: string
+        }
+        Returns: {
+          capacity: number
+          capacity_changed: boolean
+          club_id: string
+          description: string
+          event_id: string
+          id: string
+          label: string
+          role_key: string
+          status: string
+          validation_mode: string
+        }[]
+      }
       update_player_review_content: {
         Args: { _content: string; _id: string; _model: string }
         Returns: {
