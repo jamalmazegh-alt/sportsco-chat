@@ -108,6 +108,7 @@ export function UrgencyCenter({ className }: Props) {
   const { items: rawItems, status } = useUrgencies();
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [dismissed, setDismissed] = useState<DismissMap>(() => readDismissed());
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     // Re-prune at mount in case TTL expired since last write.
