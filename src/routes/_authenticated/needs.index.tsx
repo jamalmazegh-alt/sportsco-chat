@@ -14,6 +14,7 @@ import {
 } from "@/lib/needs/needs.functions";
 import { NeedCandidateCard } from "@/components/needs/need-candidate-card";
 import { isRecentlyFilledVisible } from "@/lib/needs/recently-filled";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/needs/")({
