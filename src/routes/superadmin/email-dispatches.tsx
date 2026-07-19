@@ -184,3 +184,86 @@ function EmailDispatchesPage() {
     </div>
   );
 }
+
+function BackfillPanel({ onDone }: { onDone: () => void }) {
+  const backfill = useServerFn(backfillConvocationEmails);
+  const [raw, setRaw] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [results, setResults] = useState<BackfillEventResult[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run() {
+    setError(null);
+    setResults(null);
+    const ids = Array.from(
+      new Set(
+        raw
+          .split(/[\s,;]+/)
+          .map((s) => s.trim())
+          .filter((s) => /^[0-9a-f-]{36}$/i.test(s)),
+      ),
+    );
+    if (ids.length === 0) {
+      setError("Aucun UUID d'événement valide détecté.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const r = await backfill({ data: { eventIds: ids } });
+      setResults(r.results);
+      onDone();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <details className="mb-4 rounded-md border border-border bg-card p-3">
+      <summary className="text-sm font-medium cursor-pointer flex items-center gap-2">
+        <Send className="h-3.5 w-3.5" />
+        Rattraper les emails de convocation (superadmin)
+      </summary>
+      <div className="mt-3 space-y-2">
+        <p className="text-xs text-muted-foreground">
+          Colle les <strong>event IDs</strong> (UUID, un par ligne ou séparés par des virgules).
+          Un dispatch <em>Renvoi (manual_resend)</em> sera créé par événement, avec metadata{" "}
+          <code>reason=backfill_missing_initial</code>. Une entrée{" "}
+          <code>convocation.email_backfill</code> apparaîtra dans les logs superadmin.
+        </p>
+        <Textarea
+          value={raw}
+          onChange={(e) => setRaw(e.target.value)}
+          placeholder="dab68c6a-…, b8a60c8b-…, d8821604-…, 42885868-…"
+          className="font-mono text-xs min-h-[80px]"
+        />
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={run} disabled={busy}>
+            {busy ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : null}
+            Lancer le rattrapage
+          </Button>
+          {error && <span className="text-xs text-destructive">{error}</span>}
+        </div>
+        {results && (
+          <ul className="mt-2 space-y-1">
+            {results.map((r) => (
+              <li key={r.eventId} className="text-xs font-mono">
+                <span className="text-muted-foreground">{r.eventId.slice(0, 8)}…</span>{" "}
+                {r.error ? (
+                  <span className="text-destructive">{r.error}</span>
+                ) : (
+                  <>
+                    {r.eventTitle && <span className="mr-1">{r.eventTitle} —</span>}
+                    conv={r.convocations} destinataires={r.recipients} enfilés={r.enqueued}
+                    {r.failed > 0 && <span className="text-destructive"> échec={r.failed}</span>}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </details>
+  );
+}
