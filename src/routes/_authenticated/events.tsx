@@ -7,6 +7,7 @@ import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -24,6 +25,7 @@ import {
   Eye,
   EyeOff,
   Clock,
+  Search,
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
