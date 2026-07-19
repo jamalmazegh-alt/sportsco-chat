@@ -1424,8 +1424,22 @@ function StaffSignupsDialog({
       toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
+  const unassignM = useMutation({
+    mutationFn: (signup_id: string) => unassignFn({ data: { signup_id } }),
+    onSuccess: () => {
+      toast.success(t("needs:staff.unassigned", { defaultValue: "Assignation annulée" }));
+      refetch();
+      onChanged();
+      qc.invalidateQueries({ queryKey: ["need-signups", needId] });
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
+
   const signups = (data?.signups ?? []) as StaffSignup[];
   const pending = signups.filter((s) => s.status === "applied");
+  const confirmedCount = signups.filter((s) => s.status === "confirmed").length;
+  const isFull = confirmedCount >= capacity;
   const pendingIds = pending.map((s) => s.id);
   const allPendingSelected =
     pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
