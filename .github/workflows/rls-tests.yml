@@ -63,6 +63,9 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Hard target guard — _global-setup.ts refuses to start unless the
+          # ref extracted from SUPABASE_URL matches this value (bughunt).
+          RLS_TARGET_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: bun run test:rls
 
       - name: Notify on failure (cron only)
