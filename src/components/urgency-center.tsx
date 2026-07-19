@@ -96,6 +96,7 @@ function ActionIcon({ kind }: { kind: UrgencyAction["kind"] }) {
   if (kind === "remind-all" || kind === "remind-one")
     return <BellRing className="h-3.5 w-3.5" strokeWidth={2.4} />;
   if (kind === "respond") return <Bell className="h-3.5 w-3.5" strokeWidth={2.4} />;
+  if (kind === "open-need") return <HandHelping className="h-3.5 w-3.5" strokeWidth={2.4} />;
   return <ChevronRight className="h-3.5 w-3.5" strokeWidth={2.4} />;
 }
 
