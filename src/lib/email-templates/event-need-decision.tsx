@@ -85,8 +85,17 @@ const Email = ({
 }: Props) => {
   const t = T[locale] ?? T.fr;
   const isConfirm = decision === "confirm";
-  const preview = isConfirm ? t.previewConfirm(needLabel) : t.previewDecline(needLabel);
-  const intro = isConfirm ? t.introConfirm(clubName, eventTitle) : t.introDecline(clubName, eventTitle);
+  const isUnassign = decision === "unassign";
+  const preview = isUnassign
+    ? t.previewUnassign(needLabel)
+    : isConfirm
+      ? t.previewConfirm(needLabel)
+      : t.previewDecline(needLabel);
+  const intro = isUnassign
+    ? t.introUnassign(clubName, eventTitle)
+    : isConfirm
+      ? t.introConfirm(clubName, eventTitle)
+      : t.introDecline(clubName, eventTitle);
   const whenStr = fmtDate(eventStartsAt, locale);
   return (
     <Html lang={locale} dir="ltr">
