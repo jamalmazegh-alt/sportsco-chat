@@ -546,9 +546,13 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Publier (draft) / Relancer (open) */}
+        {/* Staff — Publier (draft) / Relancer (open, notifie tout le monde) */}
         {isStaff && (isDraft || isOpen) && (
-          <Button size="sm" variant={isDraft ? "default" : "outline"} onClick={() => setPublishOpen(true)}>
+          <Button
+            size="sm"
+            variant={isDraft ? "default" : "outline"}
+            onClick={() => (isDraft ? setPublishOpen(true) : setResendOpen(true))}
+          >
             <Send className="h-3.5 w-3.5 mr-1" />
             {isDraft ? t("needs:actions.publish") : t("needs:card.republish")}
           </Button>
