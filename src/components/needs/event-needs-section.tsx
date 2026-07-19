@@ -1091,12 +1091,15 @@ function StaffSignupsDialog({
   onOpenChange,
   needId,
   onChanged,
+  defaultAddOpen = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
   onChanged: () => void;
+  defaultAddOpen?: boolean;
 }) {
+
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
