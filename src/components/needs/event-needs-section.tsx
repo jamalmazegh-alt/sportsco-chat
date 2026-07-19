@@ -82,6 +82,7 @@ import {
   publishEventNeed,
   applyToEventNeed,
   withdrawSignup,
+  declareUnavailable,
   decideSignup,
   closeEventNeed,
   cancelEventNeed,
