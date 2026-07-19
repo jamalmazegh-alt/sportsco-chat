@@ -964,7 +964,8 @@
     "pendingCount_one": "{{count}} Jogador ainda não respondeu",
     "pendingCount_other": "{{count}} Jogadores ainda não responderam",
     "remindAllSent_one": "{{count}} lembrete enviado",
-    "remindAllSent_other": "{{count}} lembretes enviados"
+    "remindAllSent_other": "{{count}} lembretes enviados",
+    "errorPastEventLocked": "Este evento já passou — as respostas já não podem ser alteradas."
   },
   "stats": {
     "title": "Estatísticas",
