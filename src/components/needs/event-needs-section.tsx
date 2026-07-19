@@ -82,6 +82,7 @@ import {
   publishEventNeed,
   applyToEventNeed,
   withdrawSignup,
+  declareUnavailable,
   decideSignup,
   closeEventNeed,
   cancelEventNeed,
@@ -244,6 +245,7 @@ function NeedRow({
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
   const withdraw = useServerFn(withdrawSignup);
+  const declareUnavail = useServerFn(declareUnavailable);
   const close = useServerFn(closeEventNeed);
   const cancel = useServerFn(cancelEventNeed);
   const deleteFn = useServerFn(deleteEventNeed);
@@ -283,6 +285,15 @@ function NeedRow({
     mutationFn: () => withdraw({ data: { signup_id: mySignup!.id } }),
     onSuccess: () => {
       toast.success(t("needs:signup.withdrawn"));
+      onChange();
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
+  const declareUnavailM = useMutation({
+    mutationFn: () => declareUnavail({ data: { need_id: need.id } }),
+    onSuccess: () => {
+      toast.success(t("needs:unavailable.confirmed"));
       onChange();
     },
     onError: (e: Error) =>
@@ -537,46 +548,85 @@ function NeedRow({
         {/* S1-5 : « Assigner » vit DANS le dialog Candidatures (StaffSignupsDialog), pas sur la carte. */}
 
 
-        {/* Membre — J'apply / Retirer */}
+        {/* Membre — S5 : 3 états normalisés + « Je me propose » / « Pas dispo » permanent */}
         {!isStaff && isOpen && (
           <>
-            {mySignup ? (
+            {mySignup?.status === "confirmed" && (
               <>
-                <Badge
-                  className={cn(
-                    "text-[11px] px-2 py-1",
-                    mySignup.status === "confirmed" && "bg-emerald-600",
-                    mySignup.status === "applied" && "bg-amber-500",
-                    mySignup.status === "declined" && "bg-slate-500",
-                  )}
-                >
-                  {t(`needs:signup.${mySignup.status}`)}
+                <Badge className="text-[11px] px-2 py-1 bg-emerald-600">
+                  {t("needs:memberCard.confirmed")}
                 </Badge>
-                {(mySignup.status === "applied" || mySignup.status === "confirmed") && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => withdrawM.mutate()}
-                    disabled={withdrawM.isPending}
-                  >
-                    {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                    {t("needs:actions.withdraw")}
-                  </Button>
-                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => withdrawM.mutate()}
+                  disabled={withdrawM.isPending}
+                >
+                  {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:actions.withdraw")}
+                </Button>
               </>
-            ) : (
-              <Button
-                size="sm"
-                onClick={() => applyM.mutate()}
-                disabled={applyM.isPending || remaining === 0}
-              >
-                {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                {t("needs:memberCard.applyCta")}
-              </Button>
+            )}
+            {mySignup?.status === "applied" && (
+              <>
+                <Badge className="text-[11px] px-2 py-1 bg-amber-500">
+                  {t("needs:memberCard.pending")}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => withdrawM.mutate()}
+                  disabled={withdrawM.isPending}
+                >
+                  {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:actions.withdraw")}
+                </Button>
+              </>
+            )}
+            {mySignup?.status === "unavailable" && (
+              <>
+                <Badge variant="outline" className="text-[11px] px-2 py-1">
+                  {t("needs:memberCard.unavailableCta")}
+                </Badge>
+                <Button
+                  size="sm"
+                  onClick={() => applyM.mutate()}
+                  disabled={applyM.isPending || remaining === 0}
+                >
+                  {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:unavailable.backToApply")}
+                </Button>
+              </>
+            )}
+            {(!mySignup ||
+              (mySignup.status !== "confirmed" &&
+                mySignup.status !== "applied" &&
+                mySignup.status !== "unavailable")) && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => applyM.mutate()}
+                  disabled={applyM.isPending || remaining === 0}
+                >
+                  {applyM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:memberCard.applyCta")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => declareUnavailM.mutate()}
+                  disabled={declareUnavailM.isPending}
+                >
+                  {declareUnavailM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                  {t("needs:memberCard.unavailableCta")}
+                </Button>
+              </>
             )}
           </>
         )}
       </div>
+
+
 
       {publishOpen && (
         <PublishDialog
@@ -1391,6 +1441,15 @@ function StaffSignupsDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("needs:staff.title")}</DialogTitle>
+          <p className="text-xs text-muted-foreground">
+            {t("needs:applications.summary", {
+              count: pending.length + signups.filter((s) => s.status === "confirmed").length,
+              pending: pending.length,
+              confirmed: signups.filter((s) => s.status === "confirmed").length,
+              seats: signups.filter((s) => s.status === "confirmed").length,
+              defaultValue: "{{pending}} en attente · {{confirmed}} confirmé(s)",
+            })}
+          </p>
         </DialogHeader>
 
         {pending.length > 0 && (
@@ -1436,77 +1495,8 @@ function StaffSignupsDialog({
           </div>
         )}
 
-        <div className="rounded-md border bg-muted/20 p-2 space-y-2">
-          <button
-            type="button"
-            onClick={() => setAddOpen((v) => !v)}
-            className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
-          >
-            <UserPlus className="h-3.5 w-3.5" />
-            {t("needs:staff.addManual", { defaultValue: "Ajouter manuellement" })}
-          </button>
-          {addOpen && (
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                <Input
-                  className="pl-7 h-8 text-sm"
-                  placeholder={t("needs:staff.searchPlaceholder", {
-                    defaultValue: "Rechercher un membre…",
-                  })}
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <div className="max-h-40 overflow-y-auto space-y-1">
-                {memberSearchLoading && (
-                  <p className="text-[11px] text-muted-foreground px-1">
-                    <Loader2 className="h-3 w-3 inline animate-spin mr-1" />
-                    {t("common.loading", { defaultValue: "Chargement…" })}
-                  </p>
-                )}
-                {!memberSearchLoading && (memberResults?.members ?? []).length === 0 && (
-                  <p className="text-[11px] text-muted-foreground px-1 py-2">
-                    {t("needs:staff.noMembers", { defaultValue: "Aucun membre trouvé" })}
-                  </p>
-                )}
-                {(memberResults?.members ?? []).map((m) => (
-                  <div
-                    key={m.member_id}
-                    className="flex items-center justify-between gap-2 rounded border bg-background px-2 py-1.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium truncate">
-                        {m.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
-                      </p>
-                      {m.roles.length > 0 && (
-                        <p className="text-[10px] text-muted-foreground truncate">
-                          {m.roles
-                            .map((r) => t(`common.roles.${r}`, { defaultValue: r }))
-                            .join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-[11px]"
-                      onClick={() => addManualM.mutate(m.user_id)}
-                      disabled={addPendingUser === m.user_id}
-                    >
-                      {addPendingUser === m.user_id ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Plus className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* S4-4 : Assigner section moved below signups list */}
+
 
 
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -1592,6 +1582,95 @@ function StaffSignupsDialog({
             </p>
           )}
         </div>
+
+        {/* S4-4 : Assigner replié en bas — notification automatique à l'assigné */}
+        <div className="rounded-md border bg-muted/20 p-2 space-y-2 mt-2">
+          <button
+            type="button"
+            onClick={() => setAddOpen((v) => !v)}
+            className="flex items-center justify-between w-full text-xs font-medium text-primary hover:underline"
+          >
+            <span className="inline-flex items-center gap-2">
+              <UserPlus className="h-3.5 w-3.5" />
+              {t("needs:applications.assignSection", {
+                defaultValue: "Assigner directement",
+              })}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {addOpen ? "−" : "+"}
+            </span>
+          </button>
+          {addOpen && (
+            <>
+              <p className="text-[11px] text-muted-foreground">
+                {t("needs:applications.assignHelp")}
+              </p>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input
+                    className="pl-7 h-8 text-sm"
+                    placeholder={t("needs:applications.searchPlaceholder", {
+                      defaultValue: "Rechercher un membre…",
+                    })}
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-40 overflow-y-auto space-y-1">
+                  {memberSearchLoading && (
+                    <p className="text-[11px] text-muted-foreground px-1">
+                      <Loader2 className="h-3 w-3 inline animate-spin mr-1" />
+                      {t("common.loading", { defaultValue: "Chargement…" })}
+                    </p>
+                  )}
+                  {!memberSearchLoading && (memberResults?.members ?? []).length === 0 && (
+                    <p className="text-[11px] text-muted-foreground px-1 py-2">
+                      {t("needs:staff.noMembers", { defaultValue: "Aucun membre trouvé" })}
+                    </p>
+                  )}
+                  {(memberResults?.members ?? []).map((m) => (
+                    <div
+                      key={m.member_id}
+                      className="flex items-center justify-between gap-2 rounded border bg-background px-2 py-1.5"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium truncate">
+                          {m.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
+                        </p>
+                        {m.roles.length > 0 && (
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {m.roles
+                              .map((r) => t(`common.roles.${r}`, { defaultValue: r }))
+                              .join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-[11px]"
+                        onClick={() => addManualM.mutate(m.user_id)}
+                        disabled={addPendingUser === m.user_id}
+                      >
+                        {addPendingUser === m.user_id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <>
+                            <Plus className="h-3 w-3 mr-1" />
+                            {t("needs:applications.assignCta", { defaultValue: "Assigner" })}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.close", { defaultValue: "Fermer" })}
