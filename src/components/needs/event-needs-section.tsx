@@ -26,7 +26,9 @@ import {
   Pencil,
   UserPlus,
   Search,
+  MoreHorizontal,
 } from "lucide-react";
+
 import { formatDistanceToNow } from "date-fns";
 import { fr as frLocale, enUS as enLocale } from "date-fns/locale";
 
