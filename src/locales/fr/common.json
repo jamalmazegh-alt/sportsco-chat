@@ -638,6 +638,7 @@
     "accountInactive": "Pas de compte",
     "inviteNotSent": "Invitation non envoyée",
     "inviteSentLabel": "Invitation envoyée",
+    "parentActivationPending": "En attente d'activation du compte parent",
     "inviteSentAction": "Inviter",
     "resendAction": "Renvoyer",
     "noPlayers": "Aucun joueur.",
