@@ -509,6 +509,7 @@ function UrgencyDeck({
           {position}/{total} · {t("urgency.deck.hint", { defaultValue: "Swipe pour passer" })}
         </p>
       )}
+      {footer}
     </section>
   );
 }
