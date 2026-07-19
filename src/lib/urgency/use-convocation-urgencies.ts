@@ -10,17 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
+import { severityForStart } from "./pure";
 import type { UrgencyCollectorResult, UrgencyItem, UrgencyRole } from "./types";
-
-const DAY_MS = 86_400_000;
-
-function severityForStart(startsAt: string): "critical" | "high" | null {
-  const delta = new Date(startsAt).getTime() - Date.now();
-  if (delta <= 0) return null;
-  if (delta <= 1 * DAY_MS) return "critical"; // J-1
-  if (delta <= 3 * DAY_MS) return "high"; // J-2 / J-3
-  return null;
-}
 
 export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending: boolean } {
   const { t } = useTranslation();
