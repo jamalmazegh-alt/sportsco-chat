@@ -14,6 +14,7 @@ import {
 } from "@/lib/needs/needs.functions";
 import { NeedCandidateCard } from "@/components/needs/need-candidate-card";
 import { isRecentlyFilledVisible } from "@/lib/needs/recently-filled";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/needs/")({
@@ -97,6 +98,7 @@ function NeedsFeedPage() {
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-4">
       <div className="flex items-center gap-2">
+        <BackLink to="/home" className="mr-1" />
         <HandHelping className="h-5 w-5 text-primary" />
         <h1 className="text-xl font-extrabold tracking-tight">
           {t("needs:feed.title")}
