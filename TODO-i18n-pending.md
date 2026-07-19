@@ -102,3 +102,16 @@ Clones EN → DE/ES/IT/NL/PT pour :
 `urgency.deck.showMore_one`, `urgency.deck.showMore_other`.
 
 → Traductions natives DE/ES/IT/NL/PT à fournir.
+
+## `needs.json` — Modifier destinataires vs Relancer (DE/ES/IT/NL/PT)
+
+Added the following keys to distinguish two staff intents on a published need:
+- `actions.resend`, `actions.notifyNew`
+- `menu.editAudience`
+- `resend.title`, `resend.success_one`, `resend.success_other`
+- `editAudience.title`, `editAudience.desc`, `editAudience.deltaHint`,
+  `editAudience.success_one`, `editAudience.success_other`,
+  `editAudience.successNoDelta`
+
+FR and EN are final. DE/ES/IT/NL/PT are **clones of EN** and need native
+translations.
