@@ -2337,6 +2337,53 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Esiste già un gruppo con questo nome."
+    },
+    "personsToday_one": "{{count}} persona oggi",
+    "personsToday_other": "{{count}} persone oggi",
+    "dynamicSubgroups": "Sottogruppi",
+    "dynamicBadge": "DINAMICO",
+    "noSubgroups": "Nessun sottogruppo. La composizione si aggiorna automaticamente.",
+    "addSubgroup": "Aggiungi",
+    "subgroupAdded": "Sottogruppo aggiunto",
+    "subgroupRemoved": "Sottogruppo rimosso",
+    "subgroupRemove": "Rimuovi",
+    "subgroupPreview": "Vedi membri",
+    "subgroupPreviewDescription": "Lista risolta al momento. La composizione si aggiorna automaticamente.",
+    "subgroupPreviewEmpty": "Nessun membro risolto.",
+    "subgroupPreviewCount_one": "{{count}} membro",
+    "subgroupPreviewCount_other": "{{count}} membri",
+    "pickAudienceKind": "Scegli un pubblico…",
+    "pickAudienceParam": "Scegli…",
+    "selectedAudiencesTitle": "Pubblici selezionati",
+    "selectedAudiencesEmpty": "Nessun pubblico selezionato. Aggiungine uno sotto.",
+    "otherAudiences": "Altri pubblici",
+    "parentOf": "Genitore di {{names}}",
+    "emailOnly": "solo email",
+    "individualMembers": "Membri individuali",
+    "addIndividual": "Aggiungi singolarmente",
+    "confirmDeactivate": "Disattivare questo gruppo?",
+    "confirmActivate": "Riattivare questo gruppo?",
+    "activated": "Gruppo riattivato",
+    "deactivated": "Gruppo disattivato",
+    "actions": {
+      "rename": "Rinomina",
+      "deactivate": "Disattiva",
+      "activate": "Riattiva",
+      "delete": "Elimina"
+    },
+    "bulk": {
+      "club_members": "Tutti i membri",
+      "club_staff": "Tutto lo staff",
+      "club_admins": "Amministratori",
+      "club_educators": "Tutti gli allenatori",
+      "club_tournament_managers": "Responsabili tornei",
+      "team_players": "Giocatori di una squadra",
+      "team_parents": "Genitori di una squadra",
+      "team_educators": "Allenatori di una squadra",
+      "category_educators": "Allenatori di una categoria"
+    }
   }
 }
