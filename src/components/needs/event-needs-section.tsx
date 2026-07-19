@@ -651,7 +651,10 @@ function NeedFormDialog({
     NEED_TEMPLATES.find((x) => x.key === "other")!;
 
   const defaultLabel = t(`needs:templates.${currentTpl.key}`);
-  const [label, setLabel] = useState(initial?.label ?? "");
+  const [label, setLabel] = useState(
+    initial?.label && !/^needs[.:]templates\./.test(initial.label) ? initial.label : "",
+  );
+
   const [description, setDescription] = useState(initial?.description ?? "");
   const [capacity, setCapacity] = useState(
     initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
