@@ -111,7 +111,7 @@ export function computeOpenNeedUrgencies(args: ComputeOpenNeedUrgenciesArgs): Ur
 }
 
 export function useNeedUrgencies(): UrgencyCollectorResult & { isPending: boolean } {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, activeClubId } = useAuth();
   const roles = useMyRoles();
   const isCoach =
