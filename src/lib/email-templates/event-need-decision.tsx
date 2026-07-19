@@ -133,9 +133,11 @@ export const template = {
   subject: (data: Record<string, any>) => {
     const loc = (data.locale as string) === "en" ? "en" : "fr";
     const t = T[loc];
+    const label = (data.needLabel as string) ?? "";
+    if (data.decision === "unassign") return t.previewUnassign(label);
     return data.decision === "confirm"
-      ? t.previewConfirm((data.needLabel as string) ?? "")
-      : t.previewDecline((data.needLabel as string) ?? "");
+      ? t.previewConfirm(label)
+      : t.previewDecline(label);
   },
   displayName: "Event need — decision",
   previewData: {
