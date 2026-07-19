@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 import { useUrgencies } from "@/lib/urgency/use-urgencies";
 import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
 import { selectSurfaceState } from "@/lib/urgency/pure";
