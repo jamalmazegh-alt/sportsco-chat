@@ -250,7 +250,7 @@ function NeedRow({
 
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
-  const [assignOpen, setAssignOpen] = useState(false);
+  
   const [editOpen, setEditOpen] = useState(false);
   const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
