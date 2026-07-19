@@ -88,3 +88,10 @@ newly-added staff-rated template.
 Once the value-system extension lands, register the template in
 `src/lib/challenges/templates.ts` with the correct `sport` scope and remove
 the corresponding row from this file.
+
+## needs.json — Phase 2 UI (Coups de main v2)
+
+Clones EN → DE/ES/IT/NL/PT pour les namespaces ajoutés :
+`card`, `badge`, `wizard`, `audiencePicker`, `publishStep`, `applications`, `memberCard`, `unavailable`, `editDialog`, `deleteDraft`, `closeDialog2`, `cancelDialog2`, `menu`, `assignNotification`.
+
+→ Traductions natives DE/ES/IT/NL/PT à fournir.
