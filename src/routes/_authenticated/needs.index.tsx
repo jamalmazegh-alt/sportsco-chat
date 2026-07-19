@@ -74,10 +74,14 @@ function NeedsFeedPage() {
 
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [unavailOpen, setUnavailOpen] = useState(false);
+  const [declinedOpen, setDeclinedOpen] = useState(false);
 
   const allNeeds = (data?.needs ?? []) as any[];
-  const activeNeeds = allNeeds.filter((n) => n.my_signup?.status !== "unavailable");
+  const activeNeeds = allNeeds.filter(
+    (n) => n.my_signup?.status !== "unavailable" && n.my_signup?.status !== "declined",
+  );
   const unavailNeeds = allNeeds.filter((n) => n.my_signup?.status === "unavailable");
+  const declinedNeeds = allNeeds.filter((n) => n.my_signup?.status === "declined");
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-4">
@@ -155,6 +159,32 @@ function NeedsFeedPage() {
                   }}
                   applyPending={pendingId === n.id && applyM.isPending}
                 />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {declinedNeeds.length > 0 && (
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setDeclinedOpen((v) => !v)}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground h-7 px-2"
+          >
+            {declinedOpen ? (
+              <ChevronDown className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5" />
+            )}
+            {t("needs:declined.sectionTitleCount", { count: declinedNeeds.length })}
+          </Button>
+          {declinedOpen && (
+            <div className="space-y-2.5 mt-2">
+              {declinedNeeds.map((n) => (
+                <NeedCandidateCard key={n.id} need={n} showDescription />
               ))}
             </div>
           )}

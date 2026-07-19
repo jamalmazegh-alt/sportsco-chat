@@ -64,7 +64,11 @@ export function NeedCandidateCard({
   const applied = status === "applied";
   const confirmed = status === "confirmed";
   const unavailable = status === "unavailable";
-  const canApply = !need.my_signup && need.remaining_seats > 0;
+  const declined = status === "declined";
+  const withdrawn = status === "withdrawn";
+  // withdrawn = user retracted; treat as "no signup" so he can re-apply.
+  const noActiveSignup = !need.my_signup || withdrawn;
+  const canApply = noActiveSignup && need.remaining_seats > 0;
 
   return (
     <div
@@ -170,6 +174,14 @@ export function NeedCandidateCard({
               </Button>
             )}
           </>
+        )}
+        {declined && (
+          <Badge
+            variant="outline"
+            className="text-[10px] font-bold border-red-300 text-red-700 dark:text-red-300 dark:border-red-800/60"
+          >
+            {t("needs:signup.declined")}
+          </Badge>
         )}
         {canApply && (
           <>

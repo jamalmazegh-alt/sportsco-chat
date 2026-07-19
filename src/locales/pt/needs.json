@@ -32,7 +32,7 @@
   "signup": {
     "applied": "Candidatura enviada",
     "confirmed": "Confirmado",
-    "declined": "Recusado",
+    "declined": "Candidatura recusada",
     "withdrawn": "Retirado"
   },
   "seats": {
@@ -289,5 +289,9 @@
   "feed": {
     "title": "Pedidos de ajuda",
     "empty": "Nenhuma solicitação aberta para ti no momento."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} recusada",
+    "sectionTitleCount_other": "{{count}} recusadas"
   }
 }

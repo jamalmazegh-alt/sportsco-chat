@@ -32,7 +32,7 @@
   "signup": {
     "applied": "Anfrage gesendet",
     "confirmed": "Bestätigt",
-    "declined": "Abgelehnt",
+    "declined": "Bewerbung abgelehnt",
     "withdrawn": "Zurückgezogen"
   },
   "seats": {
@@ -289,5 +289,9 @@
   "feed": {
     "title": "Helferbedarf",
     "empty": "Aktuell keine offenen Anfragen für dich."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} abgelehnt",
+    "sectionTitleCount_other": "{{count}} abgelehnt"
   }
 }

@@ -32,7 +32,7 @@
   "signup": {
     "applied": "Application sent",
     "confirmed": "Confirmed",
-    "declined": "Declined",
+    "declined": "Application declined",
     "withdrawn": "Withdrawn"
   },
   "seats": {
@@ -289,5 +289,9 @@
   "feed": {
     "title": "Volunteer needs",
     "empty": "No open needs for you right now."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} declined",
+    "sectionTitleCount_other": "{{count}} declined"
   }
 }
