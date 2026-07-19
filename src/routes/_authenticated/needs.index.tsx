@@ -13,6 +13,7 @@ import {
   declareUnavailable,
 } from "@/lib/needs/needs.functions";
 import { NeedCandidateCard } from "@/components/needs/need-candidate-card";
+import { isRecentlyFilledVisible } from "@/lib/needs/recently-filled";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/needs/")({
@@ -80,6 +81,16 @@ function NeedsFeedPage() {
   const activeNeeds = allNeeds.filter(
     (n) => n.my_signup?.status !== "unavailable" && n.my_signup?.status !== "declined",
   );
+  const hasActiveSignup = (n: any) =>
+    n.my_signup &&
+    n.my_signup.status !== "withdrawn" &&
+    n.my_signup.status !== "declined";
+  const recentlyFilled = activeNeeds.filter(
+    (n) => !hasActiveSignup(n) && isRecentlyFilledVisible(n),
+  );
+  const primaryActive = activeNeeds.filter(
+    (n) => !recentlyFilled.some((rf) => rf.id === n.id),
+  );
   const unavailNeeds = allNeeds.filter((n) => n.my_signup?.status === "unavailable");
   const declinedNeeds = allNeeds.filter((n) => n.my_signup?.status === "declined");
 
@@ -102,9 +113,9 @@ function NeedsFeedPage() {
         </Card>
       )}
 
-      {activeNeeds.length > 0 && (
+      {primaryActive.length > 0 && (
         <div className="space-y-2.5">
-          {activeNeeds.map((n) => (
+          {primaryActive.map((n) => (
             <NeedCandidateCard
               key={n.id}
               need={n}
@@ -127,6 +138,19 @@ function NeedsFeedPage() {
               unavailablePending={pendingId === n.id && unavailM.isPending}
             />
           ))}
+        </div>
+      )}
+
+      {recentlyFilled.length > 0 && (
+        <div className="pt-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] px-0.5 mb-1.5">
+            {t("needs:recentlyFilled.title")}
+          </p>
+          <div className="space-y-2.5">
+            {recentlyFilled.map((n) => (
+              <NeedCandidateCard key={n.id} need={n} showDescription />
+            ))}
+          </div>
         </div>
       )}
 

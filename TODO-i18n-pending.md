@@ -145,3 +145,10 @@ des traductions natives.
 Nouvelles clés `menu.viewRecipients` et bloc `recipients.*` (title, desc,
 empty, count_one/other). FR et EN sont finaux. DE/ES/IT/NL/PT sont des
 **clones EN** — à remplacer par des traductions natives.
+
+## needs.myFeed.* + needs.withdrawDialog.* (2026-07-19)
+Clones EN → DE/ES/IT/NL/PT pour :
+- needs.myFeed.engagementsCount_one/other
+- needs.myFeed.nextLabel
+- needs.myFeed.plusOthers_one/other
+- needs.withdrawDialog.title/description/confirm/abort
