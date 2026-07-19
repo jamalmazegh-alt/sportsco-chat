@@ -1374,11 +1374,12 @@ export async function _staffUnassignSignupImpl(deps: {
   signupId: string;
   actorUserId: string;
   supabase: {
-    rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rpc: (name: any, args: Record<string, unknown>) => Promise<{ data: unknown }>;
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseAdmin: any;
-  recomputeCoverage: (eventId: string) => Promise<void>;
+  recomputeCoverage: (eventId: string) => Promise<unknown>;
   notify: (params: {
     needId: string;
     signupId: string;
