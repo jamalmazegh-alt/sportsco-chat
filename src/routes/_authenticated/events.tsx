@@ -634,20 +634,32 @@ function EventsPage() {
       ) : !visibleEvents || visibleEvents.length === 0 ? (
         <EmptyState
           icon={<Calendar className="h-6 w-6" />}
-          title={t("events.noEvents")}
+          title={
+            searchQuery.trim()
+              ? t("events.noSearchResults", { defaultValue: "Aucun résultat" })
+              : t("events.noEvents")
+          }
           description={
-            isCoach
-              ? t("events.emptyHintCoach", {
-                  defaultValue:
-                    "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+            searchQuery.trim()
+              ? t("events.noSearchResultsHint", {
+                  defaultValue: "Aucun événement ne correspond à ta recherche.",
                 })
-              : t("events.emptyHintPlayer", {
-                  defaultValue:
-                    "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
-                })
+              : isCoach
+                ? t("events.emptyHintCoach", {
+                    defaultValue:
+                      "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+                  })
+                : t("events.emptyHintPlayer", {
+                    defaultValue:
+                      "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
+                  })
           }
           action={
-            isCoach && user ? (
+            searchQuery.trim() ? (
+              <Button size="sm" variant="outline" className="h-9" onClick={() => setSearchQuery("")}>
+                {t("events.clearSearch", { defaultValue: "Effacer la recherche" })}
+              </Button>
+            ) : isCoach && user ? (
               <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
                 <Plus className="h-4 w-4" />
                 {t("events.create")}
