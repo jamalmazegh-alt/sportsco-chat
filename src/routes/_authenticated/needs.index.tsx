@@ -113,9 +113,9 @@ function NeedsFeedPage() {
         </Card>
       )}
 
-      {activeNeeds.length > 0 && (
+      {primaryActive.length > 0 && (
         <div className="space-y-2.5">
-          {activeNeeds.map((n) => (
+          {primaryActive.map((n) => (
             <NeedCandidateCard
               key={n.id}
               need={n}
@@ -138,6 +138,19 @@ function NeedsFeedPage() {
               unavailablePending={pendingId === n.id && unavailM.isPending}
             />
           ))}
+        </div>
+      )}
+
+      {recentlyFilled.length > 0 && (
+        <div className="pt-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] px-0.5 mb-1.5">
+            {t("needs:recentlyFilled.title")}
+          </p>
+          <div className="space-y-2.5">
+            {recentlyFilled.map((n) => (
+              <NeedCandidateCard key={n.id} need={n} showDescription />
+            ))}
+          </div>
         </div>
       )}
 
