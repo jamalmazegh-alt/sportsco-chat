@@ -102,6 +102,7 @@
   "audiences": {
     "convoked_players": "Called-up players",
     "convoked_parents": "Parents of called-up players",
+    "clubAudiences": "Pubblici del club",
     "club_members": "All club members",
     "club_educators": "Club educators",
     "club_staff": "Club staff / volunteers",
