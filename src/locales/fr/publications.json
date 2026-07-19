@@ -1,0 +1,125 @@
+{
+  "type": {
+    "message": "Communication",
+    "poll": "Sondage"
+  },
+  "delivery": {
+    "wallPush": "Publier (mur + push)",
+    "emailOnly": "E-mail uniquement",
+    "alsoSendEmail": "Envoyer aussi un e-mail",
+    "emailBodyLabel": "Corps de l'e-mail (facultatif)",
+    "emailBodyHelp": "Laisser vide pour reprendre le contenu de la publication."
+  },
+  "actions": {
+    "publish": "Publier",
+    "publishing": "Publication…",
+    "notifyNew": "Notifier les nouveaux membres",
+    "resendAll": "Renvoyer à tous",
+    "seeResults": "Voir les résultats",
+    "seeVoters": "Voir les votants",
+    "closePoll": "Fermer le sondage",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "reply": "Répondre",
+    "seeRecipients": "Voir les destinataires"
+  },
+  "poll": {
+    "visibilityLabel": "Visibilité des votes",
+    "staffVisible": "Vote nominatif",
+    "anonymous": "Vote anonyme",
+    "isAnonymous": "Ce sondage est anonyme",
+    "isStaffVisible": "Ce sondage est nominatif",
+    "youVoted": "Vous avez voté « {{option}} »",
+    "closed": "Sondage fermé",
+    "closedAt": "Fermé le {{date}}",
+    "closesAt": "Se ferme le {{date}}",
+    "belowThreshold": "Pas assez de réponses pour afficher les résultats",
+    "votesCount_one": "{{count}} vote",
+    "votesCount_other": "{{count}} votes",
+    "optionLabel": "Option {{n}}",
+    "optionsHint": "2 options minimum",
+    "addOption": "Ajouter une option",
+    "removeOption": "Retirer",
+    "minTwoOptions": "Ajoutez au moins deux options."
+  },
+  "state": {
+    "deleted": "Publication supprimée",
+    "sent": "Envoyée à {{count}} membres.",
+    "sentDelta": "{{new}} nouveaux membres notifiés.",
+    "sentAll": "Envoyée à tous ({{count}})."
+  },
+  "confirm": {
+    "close": {
+      "title": "Fermer le sondage ?",
+      "body": "Les membres ne pourront plus voter."
+    },
+    "delete": {
+      "title": "Supprimer la publication ?",
+      "body": "Les votes sont conservés mais la publication disparaît du mur. Les liens d'e-mail afficheront « Publication supprimée »."
+    },
+    "resend": {
+      "title": "Renvoyer à tous ?",
+      "body": "Tous les destinataires actuels recevront un rappel."
+    },
+    "refresh": {
+      "title": "Notifier les nouveaux membres ?",
+      "body": "Seuls les membres ajoutés à l'audience depuis la dernière publication seront notifiés."
+    },
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  },
+  "audience": {
+    "picker": "Qui prévenir ?",
+    "recipientsCount_one": "{{count}} personne sera prévenue",
+    "recipientsCount_other": "{{count}} personnes seront prévenues",
+    "empty": "Aucune audience sélectionnée — ajoutez au moins un critère ci-dessous.",
+    "convocationsMissing": "La convocation n'est pas faite pour cet événement — audience vide.",
+    "categoryLabel": "Catégorie",
+    "seasonLabel": "Saison",
+    "types": {
+      "joueurs_convoques": "Joueurs convoqués",
+      "parents_convoques": "Parents des convoqués",
+      "joueurs_equipe": "Joueurs de l'équipe",
+      "parents_equipe": "Parents de l'équipe",
+      "joueurs_categorie": "Joueurs de la catégorie",
+      "parents_categorie": "Parents de la catégorie",
+      "educateurs": "Éducateurs",
+      "dirigeants": "Dirigeants",
+      "groupe_personnalise": "Groupe personnalisé",
+      "selection_manuelle": "Sélection manuelle"
+    }
+  },
+  "form": {
+    "titleLabel": "Titre",
+    "titlePlaceholder": "Réunion CODIR, stage d'été, changement d'horaire…",
+    "contentLabel": "Message",
+    "contentPlaceholder": "Écris ton message. Les images et documents peuvent être ajoutés ci-dessous.",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Disponible samedi ? Créneau A ou B ?",
+    "descriptionLabel": "Description (facultative)",
+    "closesAtLabel": "Date de fin (facultative)",
+    "typeLabel": "Type de publication"
+  },
+  "email": {
+    "pollSubject": "{{title}}",
+    "pollIntro": "Bonjour, merci de répondre à ce sondage.",
+    "pollClosedNotice": "Ce sondage est fermé.",
+    "messageSubject": "{{title}}",
+    "openInApp": "Ouvrir dans Clubero",
+    "deletedFallback": "Cette publication a été supprimée."
+  },
+  "push": {
+    "messageTitle": "{{club}} — {{title}}",
+    "pollTitle": "Sondage : {{title}}",
+    "voteChanged": "Merci, votre vote a été mis à jour."
+  },
+  "errors": {
+    "pollClosed": "Ce sondage est fermé.",
+    "forbidden": "Vous n'avez pas les droits pour cette action.",
+    "deliveryRequired": "Choisis au moins un mode de diffusion.",
+    "audienceEmpty": "Ajoute au moins une audience.",
+    "optionsMin": "Un sondage requiert au moins 2 options.",
+    "optionHasVotes": "Impossible de modifier une option ayant déjà reçu des votes.",
+    "visibilityLocked": "La visibilité ne peut plus changer après le premier vote."
+  }
+}
