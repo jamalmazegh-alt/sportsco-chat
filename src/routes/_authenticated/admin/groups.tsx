@@ -142,7 +142,7 @@ function useRoleLabel() {
   const { t } = useTranslation();
   return (role: string | null) => {
     if (!role) return null;
-    return t(`roles.${role}`, { defaultValue: role as string });
+    return t(`roles.${role}`);
   };
 }
 
@@ -187,7 +187,7 @@ function RoleBadges({
           variant="outline"
           className={`text-[10px] border ${ROLE_COLORS[r] ?? "bg-muted text-muted-foreground border-border"}`}
         >
-          {t(`roles.${r}`, { defaultValue: r as string })}
+          {t(`roles.${r}`)}
         </Badge>
       ))}
     </div>
@@ -776,7 +776,7 @@ function GroupMembersPanel({
   );
 
   function ruleLabel(r: RuleRow) {
-    const base = t(`groups.bulk.${r.rule_type}`, { defaultValue: r.rule_type as string });
+    const base = t(`groups.bulk.${r.rule_type}`);
     if (needsTeam(r.rule_type) && r.team_id) {
       const tm = teamNameById.get(r.team_id);
       return `${base} · ${tm?.name ?? r.team_id}`;
@@ -895,7 +895,7 @@ function GroupMembersPanel({
             <SelectContent>
               {RULE_TYPES.map((rt) => (
                 <SelectItem key={rt} value={rt}>
-                  {t(`groups.bulk.${rt}`, { defaultValue: rt as string })}
+                  {t(`groups.bulk.${rt}`)}
                 </SelectItem>
               ))}
             </SelectContent>
