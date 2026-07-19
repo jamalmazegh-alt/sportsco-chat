@@ -290,6 +290,15 @@ function NeedRow({
     onError: (e: Error) =>
       toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
+  const declareUnavailM = useMutation({
+    mutationFn: () => declareUnavail({ data: { need_id: need.id } }),
+    onSuccess: () => {
+      toast.success(t("needs:unavailable.confirmed"));
+      onChange();
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
   const closeM = useMutation({
     mutationFn: () => close({ data: { need_id: need.id } }),
     onSuccess: () => {
