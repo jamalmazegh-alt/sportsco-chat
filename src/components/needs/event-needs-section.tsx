@@ -659,6 +659,7 @@ function NeedRow({
           open={staffOpen}
           onOpenChange={setStaffOpen}
           needId={need.id}
+          capacity={need.capacity}
           onChanged={onChange}
         />
       )}
