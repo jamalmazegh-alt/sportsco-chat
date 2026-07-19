@@ -228,7 +228,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
 export interface NotifyApplicantOfDecisionParams {
   needId: string;
   signupId: string;
-  decision: "confirm" | "decline";
+  decision: "confirm" | "decline" | "unassign";
   applicantUserId: string;
 }
 
@@ -248,11 +248,16 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
   const eventStartsAt = (ev?.starts_at as string | null) ?? null;
   const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
   const isConfirm = params.decision === "confirm";
+  const isUnassign = params.decision === "unassign";
 
   // Push
   try {
     const { sendPushToUser } = await import("@/lib/push-send.server");
-    const title = isConfirm ? `Candidature confirmée 🎉` : `Candidature déclinée`;
+    const title = isUnassign
+      ? `Ce n'est plus nécessaire · ${need.label}`
+      : isConfirm
+        ? `Candidature confirmée 🎉`
+        : `Candidature déclinée`;
     const dateStr = eventStartsAt
       ? new Date(eventStartsAt).toLocaleString("fr-FR", {
           weekday: "short",
@@ -262,7 +267,9 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
           minute: "2-digit",
         })
       : null;
-    const body = [need.label, eventTitle, dateStr].filter(Boolean).join(" · ");
+    const body = isUnassign
+      ? `${eventTitle}${dateStr ? ` · ${dateStr}` : ""} — finalement nous n'avons plus besoin de toi. Merci quand même !`
+      : [need.label, eventTitle, dateStr].filter(Boolean).join(" · ");
     await sendPushToUser(params.applicantUserId, {
       title,
       body,
