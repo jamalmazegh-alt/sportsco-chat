@@ -3580,7 +3580,7 @@ function EventDetail() {
             const respondedP = totalP - counts.pending;
             const rate = totalP === 0 ? 0 : Math.round((respondedP / totalP) * 100);
             const pct = (n: number) => (totalP === 0 ? 0 : (n / totalP) * 100);
-            const teamName = teams?.[0]?.name ?? null;
+            const teamName = eventTeam?.name ?? null;
 
             // === A. HEADER ===
             if (event.convocations_sent) {
