@@ -31,6 +31,7 @@ export type NeedCandidateCardNeed = {
     title?: string | null;
     starts_at?: string | null;
   } | null;
+  updated_at?: string | null;
   my_signup?: { id: string; status: string } | null;
 };
 
@@ -69,6 +70,7 @@ export function NeedCandidateCard({
   // withdrawn = user retracted; treat as "no signup" so he can re-apply.
   const noActiveSignup = !need.my_signup || withdrawn;
   const canApply = noActiveSignup && need.remaining_seats > 0;
+  const isFullNoSignup = noActiveSignup && need.remaining_seats === 0;
 
   return (
     <div
@@ -213,6 +215,14 @@ export function NeedCandidateCard({
               </Button>
             )}
           </>
+        )}
+        {isFullNoSignup && (
+          <Badge
+            variant="outline"
+            className="text-[10px] font-bold border-muted-foreground/40 text-muted-foreground"
+          >
+            {t("needs:seats.full")}
+          </Badge>
         )}
       </div>
     </div>

@@ -1324,7 +1324,7 @@ export const listMyOpenNeeds = createServerFn({ method: "POST" })
     const { data: needs, error } = await supabase
       .from("event_needs")
       .select(
-        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, events:event_id(id, title, starts_at, location, type)",
+        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, updated_at, events:event_id(id, title, starts_at, location, type)",
       )
       .eq("status", "open")
       .order("last_published_at", { ascending: false })

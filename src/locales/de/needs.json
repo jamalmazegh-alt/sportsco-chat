@@ -294,5 +294,8 @@
   "declined": {
     "sectionTitleCount_one": "{{count}} abgelehnt",
     "sectionTitleCount_other": "{{count}} abgelehnt"
+  },
+  "recentlyFilled": {
+    "title": "Kürzlich abgeschlossen"
   }
 }
