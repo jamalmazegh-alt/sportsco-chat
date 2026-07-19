@@ -191,7 +191,20 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
 
   const { sendPushToUser } = await import("@/lib/push-send.server");
   const title = params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
-  const body = `${matchLine} — ${applicantFirstName}`;
+  const startsAt = ev?.starts_at as string | null;
+  const dateStr = startsAt
+    ? new Date(startsAt).toLocaleDateString("fr-FR", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      })
+    : "";
+  const timeStr = startsAt
+    ? new Date(startsAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+    : "";
+  const body = startsAt
+    ? `${matchLine} — ${dateStr} à ${timeStr} — ${applicantFirstName}`
+    : `${matchLine} — ${applicantFirstName}`;
   await Promise.allSettled(
     staffUserIds.map((uid) =>
       sendPushToUser(uid, {
