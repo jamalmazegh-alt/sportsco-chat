@@ -151,25 +151,39 @@ export const createEventNeed = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------------ */
-/* 1bis. updateEventNeed — édition d'un brouillon                           */
+/* 1bis. updateEventNeed — édition d'un brouillon ou besoin publié          */
 /* ------------------------------------------------------------------------ */
 
 export const updateEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => UpdateNeedInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
 
-    // Charge et vérifie: seul un brouillon peut être édité.
     const need = await loadNeedCore(data.need_id);
-    if (need.status !== "draft") throw new Error("need_not_editable");
+    if (need.status === "cancelled" || need.status === "closed") {
+      throw new Error("need_not_editable");
+    }
+
+    // Seul le staff du club peut éditer.
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
 
     const patch: Record<string, unknown> = {};
-    if (data.role_key !== undefined) patch.role_key = data.role_key;
     if (data.label !== undefined) patch.label = data.label;
     if (data.description !== undefined) patch.description = data.description ?? null;
     if (data.capacity !== undefined) patch.capacity = data.capacity;
     if (data.validation_mode !== undefined) patch.validation_mode = data.validation_mode;
+
+    // Un besoin publié (open) garde son role_key : changer la nature du besoin
+    // après l'envoi des notifications créerait de la confusion pour les candidats.
+    if (data.role_key !== undefined && need.status === "draft") {
+      patch.role_key = data.role_key;
+    }
+
     if (Object.keys(patch).length === 0) return need;
 
     const { data: row, error } = await supabase
@@ -180,6 +194,12 @@ export const updateEventNeed = createServerFn({ method: "POST" })
       .select("id, event_id, club_id, status, capacity, validation_mode, label, role_key, description")
       .single();
     if (error) throw new Error(error.message);
+
+    // Recalcule la couverture si la capacité a changé sur un besoin publié.
+    if (need.status === "open" && data.capacity !== undefined) {
+      await recomputeCoverageServiceRole(need.event_id);
+    }
+
     return row;
   });
 

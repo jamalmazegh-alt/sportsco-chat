@@ -206,6 +206,7 @@ type NeedRowType = {
   remaining_seats: number;
   validation_mode: string;
   applied_count: number;
+  confirmed_count: number;
   last_published_at: string | null;
   last_recipients_count: number | null;
   my_signup: { id: string; status: string } | null;
@@ -461,7 +462,7 @@ function NeedRow({
                   : t("needs:actions.republish")}
               </Button>
             )}
-            {status === "draft" && (
+            {(status === "draft" || status === "open") && (
               <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
                 <Pencil className="h-3.5 w-3.5 mr-1" />
                 {t("common.edit", { defaultValue: "Modifier" })}
@@ -535,6 +536,8 @@ function NeedRow({
             description: need.description,
             capacity: need.capacity,
             validation_mode: need.validation_mode as "auto" | "manual",
+            status: need.status,
+            confirmed_count: need.confirmed_count,
           }}
           onSaved={onChange}
         />
@@ -593,6 +596,8 @@ function NeedFormDialog({
     description: string | null;
     capacity: number;
     validation_mode: "auto" | "manual";
+    status: string;
+    confirmed_count: number;
   };
   onSaved: () => void;
 }) {
@@ -604,6 +609,7 @@ function NeedFormDialog({
   const ctxFn = useServerFn(getEventAudienceContext);
   const previewFn = useServerFn(previewEventAudience);
   const isEdit = !!initial;
+  const templateLocked = isEdit && initial?.status === "open";
 
   // Audience picker is only shown at CREATION (before publication).
   // For existing drafts, the user re-opens the Publish dialog.
@@ -770,12 +776,14 @@ function NeedFormDialog({
                   <button
                     key={tpl.key}
                     type="button"
+                    disabled={templateLocked}
                     onClick={() => setTemplateKey(tpl.key)}
                     className={cn(
                       "inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-2.5 py-1.5 transition-colors",
                       active
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background hover:bg-muted border-border text-foreground",
+                      templateLocked && "opacity-60 cursor-not-allowed",
                     )}
                   >
                     <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
@@ -786,6 +794,11 @@ function NeedFormDialog({
                 );
               })}
             </div>
+            {templateLocked && (
+              <p className="text-xs text-muted-foreground">
+                {t("needs:edit.templateLocked", { defaultValue: "Le type de besoin ne peut pas être modifié après publication." })}
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">

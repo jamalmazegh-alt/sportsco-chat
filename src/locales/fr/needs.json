@@ -91,6 +91,9 @@
     "success": "Besoin publié · {{count}} destinataire(s)",
     "successIdempotent": "Publication déjà effectuée (aucun nouvel envoi)."
   },
+  "edit": {
+    "templateLocked": "Le type de besoin ne peut pas être modifié après publication."
+  },
   "publishedBadge": {
     "at_one": "Publié {{time}} · {{count}} destinataire",
     "at_other": "Publié {{time}} · {{count}} destinataires",
