@@ -20,6 +20,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { AudienceSpecSchema } from "@/modules/groups/groups.functions";
 import { findNeedTemplate } from "./templates";
+import { projectConfirmedSignups } from "./confirmed-signups-visibility";
 
 /* ------------------------------------------------------------------------ */
 /* Schemas                                                                  */
