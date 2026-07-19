@@ -91,6 +91,9 @@
     "success": "Need published · {{count}} recipient(s)",
     "successIdempotent": "Already published (no new notifications sent)."
   },
+  "edit": {
+    "templateLocked": "The need type cannot be changed after publication."
+  },
   "publishedBadge": {
     "at_one": "Published {{time}} · {{count}} recipient",
     "at_other": "Published {{time}} · {{count}} recipients",
