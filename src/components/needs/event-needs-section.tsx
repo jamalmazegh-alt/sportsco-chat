@@ -1717,7 +1717,7 @@ function StaffSignupsDialog({
                           variant="outline"
                           className="h-7 text-[11px]"
                           onClick={() => addManualM.mutate(m.user_id)}
-                          disabled={addPendingUser === m.user_id}
+                          disabled={addPendingUser === m.user_id || isFull}
                         >
                           {addPendingUser === m.user_id ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
