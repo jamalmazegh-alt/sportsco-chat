@@ -1855,7 +1855,8 @@
     "confirm": "Confirm",
     "noDriversYet": "No drivers yet.",
     "iNeedRide": "Request a ride",
-    "needRideRegistered": "Request sent to coach"
+    "needRideRegistered": "Request sent to coach",
+    "disabledHint": "Enable carpooling to let parents offer and book seats."
   },
   "journey": {
     "tab": {

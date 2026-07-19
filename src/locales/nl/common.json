@@ -1842,8 +1842,8 @@
     "toggleTitle": "Meerijden",
     "toggleOn": "Geactiveerd voor dit evenement",
     "toggleOff": "Gedeactiveerd voor dit evenement",
-    "enable": "Activeren",
-    "disable": "Deactiveren",
+    "enable": "Inschakelen",
+    "disable": "Uitschakelen",
     "seats": "Beschikbare plaatsen",
     "note": "Notitie (vertreklocatie, tijd...)",
     "edit": "Bewerken",
@@ -1855,7 +1855,8 @@
     "confirm": "Bevestigen",
     "noDriversYet": "Nog geen chauffeur.",
     "iNeedRide": "Vervoer aanvragen",
-    "needRideRegistered": "Aanvraag naar de Coach gestuurd"
+    "needRideRegistered": "Aanvraag naar de Coach gestuurd",
+    "disabledHint": "Schakel meerijden in zodat ouders plaatsen kunnen aanbieden en reserveren."
   },
   "journey": {
     "tab": {

@@ -1855,7 +1855,8 @@
     "confirm": "Confirmer",
     "noDriversYet": "Aucun conducteur pour le moment.",
     "iNeedRide": "Demander un transport",
-    "needRideRegistered": "Demande envoyée au coach"
+    "needRideRegistered": "Demande envoyée au coach",
+    "disabledHint": "Activez le covoiturage pour permettre aux parents de proposer et réserver des places."
   },
   "journey": {
     "tab": {

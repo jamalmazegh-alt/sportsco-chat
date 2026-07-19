@@ -1855,7 +1855,8 @@
     "confirm": "Confirmar",
     "noDriversYet": "Ainda sem condutores.",
     "iNeedRide": "Pedir boleia",
-    "needRideRegistered": "Pedido enviado ao treinador"
+    "needRideRegistered": "Pedido enviado ao treinador",
+    "disabledHint": "Ative as boleias para que os encarregados possam oferecer e reservar lugares."
   },
   "journey": {
     "tab": {

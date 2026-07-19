@@ -1855,7 +1855,8 @@
     "confirm": "Confirmar",
     "noDriversYet": "Todavía no hay conductores.",
     "iNeedRide": "Solicitar transporte",
-    "needRideRegistered": "Solicitud enviada al entrenador"
+    "needRideRegistered": "Solicitud enviada al entrenador",
+    "disabledHint": "Activa el coche compartido para que los padres puedan ofrecer y reservar plazas."
   },
   "journey": {
     "tab": {
