@@ -132,8 +132,6 @@
     "team_educators": "Éducateurs d'une équipe",
     "category_educators": "Éducateurs d'une catégorie"
   },
-
-
   "staff": {
     "title": "Candidatures",
     "empty": "Aucune candidature pour le moment.",
@@ -303,7 +301,8 @@
     "closeNeed": "Fermer le besoin",
     "cancelNeed": "Annuler le besoin",
     "delete": "Supprimer",
-    "editAudience": "Modifier les destinataires"
+    "editAudience": "Modifier les destinataires",
+    "viewRecipients": "Voir les destinataires"
   },
   "assignNotification": {
     "assignedAs": "Vous avez été inscrit comme {{role}}"
@@ -339,5 +338,12 @@
     "success_one": "{{count}} nouveau destinataire notifié",
     "success_other": "{{count}} nouveaux destinataires notifiés",
     "successNoDelta": "Sélection mise à jour — personne à notifier en plus."
+  },
+  "recipients": {
+    "title": "Destinataires prévenus",
+    "desc": "Personnes qui ont reçu une notification pour « {{need}} ».",
+    "empty": "Aucune notification n'a encore été envoyée pour ce besoin.",
+    "count_one": "{{count}} personne prévenue",
+    "count_other": "{{count}} personnes prévenues"
   }
 }
