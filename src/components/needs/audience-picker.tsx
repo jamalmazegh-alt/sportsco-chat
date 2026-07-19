@@ -509,29 +509,9 @@ export function AudiencePickerBody({
             })}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {customGroupSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {customGroupSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
@@ -541,34 +521,12 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
             <Tag className="h-3.5 w-3.5" />
-            {t("needs:audiences.eventRelevant", {
-              defaultValue: "Suggéré pour cet événement",
-            })}
+            {t("needs:audiences.eventRelevant")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {eventSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {eventSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
@@ -578,37 +536,16 @@ export function AudiencePickerBody({
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
           <Label className="text-[11px] uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5" />
-            {t("needs:audiences.clubAudiences", {
-              defaultValue: "Audiences du club",
-            })}
+            {t("needs:audiences.clubAudiences")}
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {clubAudienceSuggestions.map((s) => {
-              const { Icon, cls } = KIND_META[s.kind];
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={s.onToggle}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
-                  }`}
-                >
-                  <Icon className="h-3 w-3" />
-                  <span>{s.label}</span>
-                  {s.active ? (
-                    <X className="h-3 w-3 opacity-70" />
-                  ) : (
-                    <Plus className="h-3 w-3 opacity-70" />
-                  )}
-                </button>
-              );
-            })}
+            {clubAudienceSuggestions.map((s) => (
+              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+            ))}
           </div>
         </div>
       )}
+
 
       {/* Other audiences — generic add row */}
       <div>
