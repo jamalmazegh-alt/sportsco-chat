@@ -147,15 +147,23 @@ function EventsPage() {
 
   const visibleEvents = useMemo(() => {
     if (!events) return [];
+    const q = searchQuery.trim().toLowerCase();
     return events.filter((e) => {
       if (!showCancelled && e.status === "cancelled") return false;
       if (!showPast) {
         const d = new Date(e.starts_at);
         if (isPast(d) && !isToday(d)) return false;
       }
+      if (q) {
+        const haystack = [e.title, e.opponent, e.team_name, e.competition_name, e.location]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
-  }, [events, showPast, showCancelled]);
+  }, [events, showPast, showCancelled, searchQuery]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
