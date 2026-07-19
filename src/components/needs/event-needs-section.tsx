@@ -254,7 +254,8 @@ function NeedRow({
   const deleteFn = useServerFn(deleteEventNeed);
 
   const [publishOpen, setPublishOpen] = useState(false);
-  const [republishOpen, setRepublishOpen] = useState(false);
+  const [resendOpen, setResendOpen] = useState(false);
+  const [editAudienceOpen, setEditAudienceOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   
   const [editOpen, setEditOpen] = useState(false);
@@ -491,9 +492,9 @@ function NeedRow({
               </DropdownMenuItem>
               {isOpen && (
                 <>
-                  <DropdownMenuItem onClick={() => setRepublishOpen(true)}>
+                  <DropdownMenuItem onClick={() => setEditAudienceOpen(true)}>
                     <Users className="h-3.5 w-3.5 mr-2" />
-                    {t("needs:menu.editAudience", { defaultValue: "Modifier les destinataires" })}
+                    {t("needs:menu.editAudience")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setCloseConfirmOpen(true)}>
@@ -545,9 +546,13 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Publier (draft) / Relancer (open) */}
+        {/* Staff — Publier (draft) / Relancer (open, notifie tout le monde) */}
         {isStaff && (isDraft || isOpen) && (
-          <Button size="sm" variant={isDraft ? "default" : "outline"} onClick={() => setPublishOpen(true)}>
+          <Button
+            size="sm"
+            variant={isDraft ? "default" : "outline"}
+            onClick={() => (isDraft ? setPublishOpen(true) : setResendOpen(true))}
+          >
             <Send className="h-3.5 w-3.5 mr-1" />
             {isDraft ? t("needs:actions.publish") : t("needs:card.republish")}
           </Button>
@@ -643,16 +648,27 @@ function NeedRow({
           needId={need.id}
           eventId={eventId}
           onPublished={onChange}
+          mode="publish"
         />
       )}
-      {republishOpen && (
+      {resendOpen && (
         <PublishDialog
-          open={republishOpen}
-          onOpenChange={setRepublishOpen}
+          open={resendOpen}
+          onOpenChange={setResendOpen}
           needId={need.id}
           eventId={eventId}
           onPublished={onChange}
-          republish
+          mode="resend"
+        />
+      )}
+      {editAudienceOpen && (
+        <PublishDialog
+          open={editAudienceOpen}
+          onOpenChange={setEditAudienceOpen}
+          needId={need.id}
+          eventId={eventId}
+          onPublished={onChange}
+          mode="edit_audience"
         />
       )}
       {staffOpen && (
@@ -1182,26 +1198,32 @@ function NeedFormDialog({
 
 import { AudiencePickerBody, useAudienceState } from "./audience-picker";
 
+type PublishDialogMode = "publish" | "resend" | "edit_audience";
+
 function PublishDialog({
   open,
   onOpenChange,
   needId,
   eventId,
   onPublished,
-  republish = false,
+  mode = "publish",
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   needId: string;
   eventId: string;
   onPublished: () => void;
-  republish?: boolean;
+  mode?: PublishDialogMode;
 }) {
   const { t } = useTranslation();
   const publish = useServerFn(publishEventNeed);
   const republishFn = useServerFn(republishEventNeed);
   const preview = useServerFn(previewEventNeedAudience);
   const ctxFn = useServerFn(getNeedAudienceContext);
+
+  const isPublish = mode === "publish";
+  const isResend = mode === "resend";
+  const isEditAudience = mode === "edit_audience";
 
   const { data: ctx } = useQuery({
     queryKey: ["need-audience-ctx", needId],
@@ -1243,22 +1265,44 @@ function PublishDialog({
   }, [audiences, needId, preview]);
 
   const publishM = useMutation({
-    mutationFn: () =>
-      republish
-        ? republishFn({ data: { need_id: needId, audiences } })
-        : publish({ data: { need_id: needId, audiences } }),
-    onSuccess: (r: { recipients_count: number; was_idempotent_skip: boolean } | null | undefined) => {
+    mutationFn: () => {
+      if (isPublish) return publish({ data: { need_id: needId, audiences } });
+      return republishFn({
+        data: {
+          need_id: needId,
+          audiences,
+          mode: isEditAudience ? "delta" : "resend",
+        },
+      });
+    },
+    onSuccess: (
+      r:
+        | {
+            recipients_count: number;
+            notified_count?: number;
+            was_idempotent_skip: boolean;
+          }
+        | null
+        | undefined,
+    ) => {
       if (r?.was_idempotent_skip) {
         toast.success(t("needs:publish.successIdempotent"));
-      } else {
+      } else if (isPublish) {
         toast.success(
-          t(republish ? "needs:republish.success" : "needs:publish.success", {
-            count: r?.recipients_count ?? 0,
-            defaultValue: republish
-              ? "{{count}} nouveaux destinataires notifiés"
-              : undefined,
-          }),
+          t("needs:publish.success", { count: r?.recipients_count ?? 0 }),
         );
+      } else if (isResend) {
+        toast.success(
+          t("needs:resend.success", { count: r?.notified_count ?? r?.recipients_count ?? 0 }),
+        );
+      } else {
+        // edit_audience — delta
+        const delta = r?.notified_count ?? 0;
+        if (delta === 0) {
+          toast.success(t("needs:editAudience.successNoDelta"));
+        } else {
+          toast.success(t("needs:editAudience.success", { count: delta }));
+        }
       }
       onPublished();
       onOpenChange(false);
@@ -1266,16 +1310,24 @@ function PublishDialog({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const titleKey = isPublish
+    ? "needs:publish.title"
+    : isResend
+      ? "needs:resend.title"
+      : "needs:editAudience.title";
+  const descKey = isEditAudience ? "needs:editAudience.desc" : "needs:publish.desc";
+  const ctaKey = isPublish
+    ? "needs:actions.publish"
+    : isResend
+      ? "needs:actions.resend"
+      : "needs:actions.notifyNew";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {t(republish ? "needs:republish.title" : "needs:publish.title", {
-              defaultValue: republish ? "Modifier les destinataires" : undefined,
-            })}
-          </DialogTitle>
-          <DialogDescription>{t("needs:publish.desc")}</DialogDescription>
+          <DialogTitle>{t(titleKey)}</DialogTitle>
+          <DialogDescription>{t(descKey)}</DialogDescription>
         </DialogHeader>
 
         <AudiencePickerBody ctx={ctx ?? null} state={state} controls={controls} />
@@ -1305,6 +1357,12 @@ function PublishDialog({
           )}
         </div>
 
+        {isEditAudience && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {t("needs:editAudience.deltaHint")}
+          </p>
+        )}
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
@@ -1318,9 +1376,7 @@ function PublishDialog({
             }
           >
             {publishM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {t(republish ? "needs:actions.saveAudience" : "needs:actions.publish", {
-              defaultValue: republish ? "Enregistrer" : undefined,
-            })}
+            {t(ctaKey)}
           </Button>
         </DialogFooter>
       </DialogContent>
