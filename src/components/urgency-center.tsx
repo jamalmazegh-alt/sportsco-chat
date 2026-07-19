@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
+  HandHelping,
   Loader2,
   RefreshCw,
   Sparkles,
