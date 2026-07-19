@@ -302,5 +302,8 @@
     "seatsRemaining_one": "{{count}} plaza",
     "seatsRemaining_other": "{{count}} plazas",
     "fallbackTitle": "Un cable"
+  },
+  "myFeed": {
+    "title": "Mis manos amigas"
   }
 }

@@ -302,5 +302,8 @@
     "seatsRemaining_one": "{{count}} place",
     "seatsRemaining_other": "{{count}} places",
     "fallbackTitle": "Coup de main"
+  },
+  "myFeed": {
+    "title": "Mes coups de main"
   }
 }

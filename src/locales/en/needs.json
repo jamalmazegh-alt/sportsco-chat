@@ -302,5 +302,8 @@
     "seatsRemaining_one": "{{count}} seat",
     "seatsRemaining_other": "{{count}} seats",
     "fallbackTitle": "Helping hand"
+  },
+  "myFeed": {
+    "title": "My helping hands"
   }
 }

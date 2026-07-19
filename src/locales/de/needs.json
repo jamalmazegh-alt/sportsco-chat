@@ -302,5 +302,8 @@
     "seatsRemaining_one": "{{count}} Platz",
     "seatsRemaining_other": "{{count}} Plätze",
     "fallbackTitle": "Aushilfe"
+  },
+  "myFeed": {
+    "title": "Meine Aushilfen"
   }
 }
