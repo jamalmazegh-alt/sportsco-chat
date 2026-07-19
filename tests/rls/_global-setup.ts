@@ -721,6 +721,7 @@ async function teardownAll(fx: Fixtures) {
 
 export default async function () {
   console.log(`[rls] Seeding fixtures (run ${RUN_ID})...`);
+  await sweepStaleRlsRows();
   const fx = await seedAll();
   writeFileSync(fixturesPath(), JSON.stringify(fx, null, 2));
 
