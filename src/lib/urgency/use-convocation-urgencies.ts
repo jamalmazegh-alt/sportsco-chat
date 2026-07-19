@@ -122,8 +122,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
           const role: UrgencyRole = isPlayer ? "player" : "parent";
           for (const eventId of eventsForMe) {
             const ev = eventById.get(eventId)!;
-            const sev = severityForStart(ev.starts_at);
-            if (!sev) continue;
+            const sev = severityForStart(ev.starts_at) ?? "medium";
             items.push({
               id: `convocation-silence:${eventId}:${role}`,
               source: "convocation-silence",
