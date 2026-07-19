@@ -151,6 +151,7 @@ function EventsPage() {
     const q = searchQuery.trim().toLowerCase();
     return events.filter((e) => {
       if (!showCancelled && e.status === "cancelled") return false;
+      if (hideTrainings && e.type === "training") return false;
       if (!showPast) {
         const d = new Date(e.starts_at);
         if (isPast(d) && !isToday(d)) return false;
@@ -164,7 +165,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, searchQuery]);
+  }, [events, showPast, showCancelled, hideTrainings, searchQuery]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
