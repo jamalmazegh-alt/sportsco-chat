@@ -60,15 +60,26 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         .lte("starts_at", next7);
       const upcomingIds = (upcomingEvents ?? []).map((e) => e.id);
 
+      // Pending responses: count across ALL upcoming published events
+      // (aligned with the /follow-ups page), not limited to 7 days.
+      const { data: allUpcomingEvents } = await supabase
+        .from("events")
+        .select("id")
+        .in("team_id", teamIds)
+        .eq("status", "published")
+        .gte("starts_at", nowIso);
+      const allUpcomingIds = (allUpcomingEvents ?? []).map((e) => e.id);
+
       let pendingResponses = 0;
-      if (upcomingIds.length > 0) {
+      if (allUpcomingIds.length > 0) {
         const { count } = await supabase
           .from("convocations")
           .select("id", { count: "exact", head: true })
-          .in("event_id", upcomingIds)
+          .in("event_id", allUpcomingIds)
           .eq("status", "pending");
         pendingResponses = count ?? 0;
       }
+
 
       return {
         attendancePct,
