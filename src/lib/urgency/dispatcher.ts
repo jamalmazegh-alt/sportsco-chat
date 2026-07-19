@@ -30,6 +30,10 @@ export async function dispatchUrgencyAction(
     case "open-team-availability":
       ctx.navigate(`/teams/${action.teamId}/availability`);
       return;
+    case "open-need":
+      // Navigue vers l'événement, ancré sur le bloc "Coups de main".
+      ctx.navigate(`/events/${action.eventId}#needs`);
+      return;
     case "open-player":
       throw new Error("open-player dispatched without handler (no live source emits it yet)");
     case "remind-one":
