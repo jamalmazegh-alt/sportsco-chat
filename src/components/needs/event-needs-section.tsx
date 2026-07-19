@@ -678,6 +678,14 @@ function NeedRow({
           mode="edit_audience"
         />
       )}
+      {viewRecipientsOpen && (
+        <NeedRecipientsDialog
+          open={viewRecipientsOpen}
+          onOpenChange={setViewRecipientsOpen}
+          needId={need.id}
+          needLabel={resolveNeedLabel(need, t)}
+        />
+      )}
       {staffOpen && (
         <StaffSignupsDialog
           open={staffOpen}
