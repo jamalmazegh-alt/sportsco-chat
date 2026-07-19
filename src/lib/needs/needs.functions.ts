@@ -1379,7 +1379,7 @@ export const staffUnassignSignup = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signup, error: sErr } = await supabaseAdmin
       .from("event_need_signups")
-      .select("id, need_id, status, event_needs:need_id(club_id, event_id)")
+      .select("id, need_id, user_id, status, event_needs:need_id(club_id, event_id)")
       .eq("id", data.signup_id)
       .maybeSingle();
     if (sErr) throw new Error(sErr.message);
@@ -1399,18 +1399,42 @@ export const staffUnassignSignup = createServerFn({ method: "POST" })
 
     if (signup.status !== "confirmed") return { ok: true, already: true };
 
+    // Le retrait par le staff = decline serveur (maquette S4-2), pas un withdraw.
+    // withdrawn = « s'est désisté soi-même » ; ici c'est le staff qui retire.
+    // decided_by porte l'ID du staff pour tracer qui a fait quoi.
     const { error: upErr } = await supabaseAdmin
       .from("event_need_signups")
       .update({
-        status: "withdrawn",
-        withdrawn_at: new Date().toISOString(),
+        status: "declined",
+        declined_at: new Date().toISOString(),
         confirmed_at: null,
+        withdrawn_at: null,
         decided_by: userId,
       })
       .eq("id", data.signup_id);
     if (upErr) throw new Error(upErr.message);
 
     if (eventId) await recomputeCoverageServiceRole(eventId);
+
+    // Notification obligatoire au retiré (push + email). Sans ça la personne
+    // se présente au match. Routage mineur → parent pris en charge par le
+    // pipeline habituel.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const applicantUserId = (signup as any).user_id as string | null;
+    if (applicantUserId) {
+      try {
+        const { notifyApplicantOfDecision } = await import("./dispatch.server");
+        await notifyApplicantOfDecision({
+          needId: signup.need_id,
+          signupId: signup.id,
+          decision: "unassign",
+          applicantUserId,
+        });
+      } catch (e) {
+        console.error("[staffUnassignSignup] notify failed", e);
+      }
+    }
+
     return { ok: true, already: false };
   });
 
