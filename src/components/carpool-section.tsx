@@ -55,9 +55,19 @@ interface Props {
   isCoach: boolean;
   convocations: Convocation[];
   childrenLinks: string[]; // player_ids the current user is parent of
+  carpoolEnabled: boolean;
+  onToggleEnabled?: () => void | Promise<void>;
 }
 
-export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }: Props) {
+export function CarpoolSection({
+  eventId,
+  isCoach,
+  convocations,
+  childrenLinks,
+  carpoolEnabled,
+  onToggleEnabled,
+}: Props) {
+
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
