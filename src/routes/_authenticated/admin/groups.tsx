@@ -903,38 +903,40 @@ function GroupMembersPanel({
             {t("groups.noMembers")}
           </div>
         ) : (
-          <ul className="space-y-1">
+          <ul className="divide-y divide-border/60 rounded-md border border-border bg-background">
             {(membersQ.data?.members ?? []).map((m) => {
+              const name = displayName({
+                full_name: m.profile?.full_name,
+                first_name: m.profile?.first_name,
+                last_name: m.profile?.last_name,
+              });
+              const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
+                .filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const childNames = m.user_id ? childrenByUserId.get(m.user_id) : undefined;
               return (
-                <li
-                  key={m.id}
-                  className="flex items-center justify-between gap-2 rounded-md bg-background border border-border px-3 py-2"
-                >
-                  <div className="flex flex-col gap-1 min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">
-                      {displayName({
-                        full_name: m.profile?.full_name,
-                        first_name: m.profile?.first_name,
-                        last_name: m.profile?.last_name,
-                      })}
-                    </span>
-                    <ParentSubtitle
-                      children_names={m.user_id ? childrenByUserId.get(m.user_id) : undefined}
-                    />
-                    <div className="flex flex-wrap gap-1">
-                      <RoleBadges roles={m.roles} fallback={m.role} />
-                    </div>
-                  </div>
-
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeMut.mutate(m.member_id)}
-                    aria-label={t("groups.remove")}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                <li key={m.id} className="px-3">
+                  <PersonRow
+                    name={name}
+                    roles={roleList}
+                    subline={
+                      childNames && childNames.length > 0
+                        ? t("groups.parentOf", {
+                            defaultValue: "Parent de {{names}}",
+                            names: childNames.join(", "),
+                          })
+                        : undefined
+                    }
+                    action={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeMut.mutate(m.member_id)}
+                        aria-label={t("groups.remove")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
                 </li>
               );
             })}
