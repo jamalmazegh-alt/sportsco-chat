@@ -750,7 +750,7 @@ function GroupMembersPanel({
       category: string | null;
     }) => addRuleFn({ data: { group_id: groupId, ...input } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleAdded", { defaultValue: "Règle ajoutée" }));
+      toast.success(t("groups.subgroupAdded"));
       setRuleType("");
       setRuleParam("");
       invalidateAll();
@@ -761,7 +761,7 @@ function GroupMembersPanel({
   const removeRuleMut = useMutation({
     mutationFn: (id: string) => removeRuleFn({ data: { id } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleRemoved", { defaultValue: "Règle retirée" }));
+      toast.success(t("groups.subgroupRemoved"));
       invalidateAll();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -1156,7 +1156,7 @@ function RulePreviewDialog({
           </div>
         ) : rows.length === 0 ? (
           <p className="text-sm text-muted-foreground italic py-4">
-            {t("groups.rulePreviewEmpty", { defaultValue: "Aucun membre résolu." })}
+            {t("groups.subgroupPreviewEmpty")}
           </p>
         ) : (
           <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
