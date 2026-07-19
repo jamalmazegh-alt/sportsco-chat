@@ -20,6 +20,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { AudienceSpecSchema } from "@/modules/groups/groups.functions";
 import { findNeedTemplate } from "./templates";
+import { projectConfirmedSignups } from "./confirmed-signups-visibility";
 
 /* ------------------------------------------------------------------------ */
 /* Schemas                                                                  */
@@ -732,10 +733,17 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       }
     }
 
-    // Résoudre les noms des confirmés (pour afficher qui a été accepté).
-    const allConfirmedUserIds = Array.from(
-      new Set(Object.values(confirmedUserIdsByNeed).flat()),
-    );
+    // Staff view ? (déterminé tôt : gate la résolution des noms de confirmés)
+    const clubId = rows[0]?.club_id;
+    const { data: isStaff } = clubId
+      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
+      : { data: false };
+
+    // Résoudre les noms des confirmés — STAFF UNIQUEMENT (invariant 2 : les
+    // membres ne doivent pas voir les noms des autres volontaires).
+    const allConfirmedUserIds = isStaff
+      ? Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()))
+      : [];
     const nameByUser: Record<string, string | null> = {};
     if (allConfirmedUserIds.length > 0) {
       const { data: profs } = await supabaseAdmin
@@ -778,11 +786,6 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const mySignupByNeed: Record<string, MySignup> = {};
     for (const s of (mySignups ?? []) as MySignup[]) mySignupByNeed[s.need_id] = s;
 
-    // Staff view ?
-    const clubId = rows[0]?.club_id;
-    const { data: isStaff } = clubId
-      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
-      : { data: false };
 
     // Dernière publication par besoin (recipients_count + published_at).
     const { data: pubs } = await supabaseAdmin
@@ -805,10 +808,11 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       needs: rows.map((n) => ({
         ...n,
         confirmed_count: confirmedByNeed[n.id] ?? 0,
-        confirmed_signups: (confirmedUserIdsByNeed[n.id] ?? []).map((uid) => ({
-          user_id: uid,
-          full_name: nameByUser[uid] ?? null,
-        })),
+        confirmed_signups: projectConfirmedSignups(
+          Boolean(isStaff),
+          confirmedUserIdsByNeed[n.id] ?? [],
+          nameByUser,
+        ),
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
         my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,

@@ -250,7 +250,7 @@ function NeedRow({
 
   const [publishOpen, setPublishOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
-  const [assignOpen, setAssignOpen] = useState(false);
+  
   const [editOpen, setEditOpen] = useState(false);
   const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
@@ -440,7 +440,7 @@ function NeedRow({
           {/* Pill places + confirmés visibles (S1 · pastille 4 + 5) */}
           <div className="mt-2.5 flex items-center gap-2 flex-wrap">
             {seatsPill}
-            {(need.confirmed_signups?.length ?? 0) > 0 && (
+            {isStaff && (need.confirmed_signups?.length ?? 0) > 0 && (
               <div className="flex items-center gap-1 flex-wrap">
                 {need.confirmed_signups!.map((s) => (
                   <Badge
@@ -534,13 +534,8 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Assigner directement (quand il reste de la place) */}
-        {isStaff && (isDraft || isOpen) && remaining > 0 && (
-          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
-            <UserPlus className="h-3.5 w-3.5 mr-1" />
-            {t("needs:actions.assign")}
-          </Button>
-        )}
+        {/* S1-5 : « Assigner » vit DANS le dialog Candidatures (StaffSignupsDialog), pas sur la carte. */}
+
 
         {/* Membre — J'apply / Retirer */}
         {!isStaff && isOpen && (
@@ -598,15 +593,6 @@ function NeedRow({
           onOpenChange={setStaffOpen}
           needId={need.id}
           onChanged={onChange}
-        />
-      )}
-      {assignOpen && (
-        <StaffSignupsDialog
-          open={assignOpen}
-          onOpenChange={setAssignOpen}
-          needId={need.id}
-          onChanged={onChange}
-          defaultAddOpen
         />
       )}
 
