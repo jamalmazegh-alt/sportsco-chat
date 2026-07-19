@@ -433,9 +433,7 @@ function HomePage() {
         </section>
       )}
 
-      {/* Mes coups de main : engagements en cours (applied/confirmed) + "Récemment complétés".
-          Les besoins non répondus sont dans l'UrgencyCenter au-dessus — pas de doublon. */}
-      {activeClubId && <HomeNeedsCard />}
+      {/* Mes coups de main : rendu en bas de page (sous les prochains events). */}
 
       {/* KPIs (admins/coaches) — insights are now unified in UrgencyCenter deck above */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
