@@ -329,11 +329,12 @@ function HomePage() {
         />
       )}
 
-      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit.
+      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit
+          + besoins ouverts non répondus (déplacés depuis HomeNeedsCard).
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
 
-      {activeClubId && <HomeNeedsCard />}
+
 
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
