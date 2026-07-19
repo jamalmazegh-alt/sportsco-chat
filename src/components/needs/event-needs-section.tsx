@@ -651,7 +651,7 @@ function NeedFormDialog({
     NEED_TEMPLATES.find((x) => x.key === "other")!;
 
   const defaultLabel = t(`needs:templates.${currentTpl.key}`);
-  const [label, setLabel] = useState(initial?.label ?? defaultLabel);
+  const [label, setLabel] = useState(initial?.label ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [capacity, setCapacity] = useState(
     initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
@@ -663,10 +663,11 @@ function NeedFormDialog({
   const [lastKey, setLastKey] = useState(templateKey);
   if (lastKey !== templateKey && !isEdit) {
     setLastKey(templateKey);
-    setLabel(t(`needs:templates.${currentTpl.key}`));
+    setLabel("");
     setCapacity(currentTpl.suggestedCapacity ?? 1);
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
+
 
   const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
 
