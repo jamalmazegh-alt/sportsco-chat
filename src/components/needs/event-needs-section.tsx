@@ -404,6 +404,13 @@ function NeedRow({
             )}
           </Button>
         )}
+        {isStaff && (status === "open" || status === "draft") && remaining > 0 && (
+          <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
+            <UserPlus className="h-3.5 w-3.5 mr-1" />
+            {t("needs:actions.assign", { defaultValue: "Assigner" })}
+          </Button>
+        )}
+
         {!isStaff && status === "open" && (
           <>
             {mySignup ? (
