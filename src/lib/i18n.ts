@@ -65,6 +65,14 @@ import ptNeeds from "@/locales/pt/needs.json";
 import itNeeds from "@/locales/it/needs.json";
 import nlNeeds from "@/locales/nl/needs.json";
 
+import enPublications from "@/locales/en/publications.json";
+import frPublications from "@/locales/fr/publications.json";
+import dePublications from "@/locales/de/publications.json";
+import esPublications from "@/locales/es/publications.json";
+import ptPublications from "@/locales/pt/publications.json";
+import itPublications from "@/locales/it/publications.json";
+import nlPublications from "@/locales/nl/publications.json";
+
 export const SUPPORTED_LANGS = ["en", "fr", "de", "es", "pt", "it", "nl"] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
