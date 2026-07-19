@@ -258,6 +258,7 @@ function NeedRow({
   const [publishOpen, setPublishOpen] = useState(false);
   const [resendOpen, setResendOpen] = useState(false);
   const [editAudienceOpen, setEditAudienceOpen] = useState(false);
+  const [viewRecipientsOpen, setViewRecipientsOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   
   const [editOpen, setEditOpen] = useState(false);
