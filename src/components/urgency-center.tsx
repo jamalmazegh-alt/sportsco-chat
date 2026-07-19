@@ -500,34 +500,89 @@ function UrgencyDeck({
                           </p>
                         )}
                         <div className="mt-2.5">
-                          <Button
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAction(item);
-                            }}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            disabled={busy || !isTop}
-                            className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
-                            style={{
-                              background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
-                            }}
-                          >
-                            {busy ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <ActionIcon kind={item.primaryAction.kind} />
-                            )}
-                            {item.primaryAction.kind === "remind-all"
-                              ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
-                              : item.primaryAction.kind === "respond"
-                                ? t("urgency.cta.respond", { defaultValue: "Répondre" })
-                                : item.primaryAction.kind === "open-team-availability"
-                                  ? t("urgency.cta.openCalendar", {
-                                      defaultValue: "Voir le calendrier",
-                                    })
-                                  : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
-                          </Button>
+                          {item.quickRespondConvocationId ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Button
+                                size="sm"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onQuickRespond(item, "present");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
+                                style={{
+                                  background:
+                                    "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                }}
+                              >
+                                {busy ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <Check className="h-3.5 w-3.5" strokeWidth={2.6} />
+                                )}
+                                {t("attendance.present", { defaultValue: "Présent" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onQuickRespond(item, "uncertain");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 border-[1.5px]"
+                              >
+                                <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                {t("attendance.uncertain", { defaultValue: "Incertain" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onQuickRespond(item, "absent");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 border-[1.5px] text-[#b91c1c] hover:text-[#b91c1c]"
+                              >
+                                <XCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                {t("attendance.absent", { defaultValue: "Absent" })}
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAction(item);
+                              }}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              disabled={busy || !isTop}
+                              className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
+                              style={{
+                                background:
+                                  "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                              }}
+                            >
+                              {busy ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <ActionIcon kind={item.primaryAction.kind} />
+                              )}
+                              {item.primaryAction.kind === "remind-all"
+                                ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
+                                : item.primaryAction.kind === "respond"
+                                  ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                                  : item.primaryAction.kind === "open-team-availability"
+                                    ? t("urgency.cta.openCalendar", {
+                                        defaultValue: "Voir le calendrier",
+                                      })
+                                    : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                            </Button>
+                          )}
                         </div>
                       </div>
                       <button
