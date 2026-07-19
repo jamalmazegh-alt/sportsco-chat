@@ -409,7 +409,9 @@ export function CarpoolSection({
             )}
           </div>
         </div>
+        )}
       </div>
+
 
       {offerOpen && (
         <OfferDialog eventId={eventId} open={offerOpen} onClose={() => setOfferOpen(false)} />
