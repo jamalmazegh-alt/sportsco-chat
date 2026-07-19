@@ -70,6 +70,7 @@ export function NeedCandidateCard({
   // withdrawn = user retracted; treat as "no signup" so he can re-apply.
   const noActiveSignup = !need.my_signup || withdrawn;
   const canApply = noActiveSignup && need.remaining_seats > 0;
+  const isFullNoSignup = noActiveSignup && need.remaining_seats === 0;
 
   return (
     <div
