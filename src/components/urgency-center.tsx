@@ -262,6 +262,7 @@ interface DeckProps {
   onDismiss: (id: string) => void;
   onRefresh: () => void;
   className?: string;
+  footer?: React.ReactNode;
 }
 
 const SWIPE_THRESHOLD = 90; // px
@@ -274,6 +275,7 @@ function UrgencyDeck({
   onDismiss,
   onRefresh,
   className,
+  footer,
 }: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
