@@ -130,6 +130,15 @@
       "count_other": "{{count}} people will be notified",
       "removeAria": "Remove {{label}}",
       "takenAria": "Already selected"
+    },
+    "preassign": {
+      "title": "Personen vorab zuweisen",
+      "hint": "Suche ein Vereinsmitglied, das direkt bestätigt wird (es wird als bestätigt benachrichtigt).",
+      "searchPlaceholder": "Mitglied suchen…",
+      "noResults": "Kein Ergebnis",
+      "capacityReached": "Kapazität erreicht.",
+      "confirmed_one": "{{count}} Person vorab zugewiesen und bestätigt.",
+      "confirmed_other": "{{count}} Personen vorab zugewiesen und bestätigt."
     }
   },
   "staff": {

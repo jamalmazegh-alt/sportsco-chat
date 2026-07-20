@@ -130,7 +130,16 @@
     "team_players": "Joueurs d'une équipe",
     "team_parents": "Parents d'une équipe",
     "team_educators": "Éducateurs d'une équipe",
-    "category_educators": "Éducateurs d'une catégorie"
+    "category_educators": "Éducateurs d'une catégorie",
+    "preassign": {
+      "title": "Pré-assigner des personnes",
+      "hint": "Recherche un membre du club à confirmer immédiatement (il sera notifié comme confirmé).",
+      "searchPlaceholder": "Rechercher un membre…",
+      "noResults": "Aucun résultat",
+      "capacityReached": "Capacité atteinte.",
+      "confirmed_one": "{{count}} personne pré-assignée et confirmée.",
+      "confirmed_other": "{{count}} personnes pré-assignées et confirmées."
+    }
   },
   "staff": {
     "title": "Candidatures",

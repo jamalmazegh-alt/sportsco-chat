@@ -130,6 +130,15 @@
       "count_other": "{{count}} people will be notified",
       "removeAria": "Remove {{label}}",
       "takenAria": "Already selected"
+    },
+    "preassign": {
+      "title": "Pré-atribuir pessoas",
+      "hint": "Procura um membro do clube para confirmar diretamente (será notificado como confirmado).",
+      "searchPlaceholder": "Procurar um membro…",
+      "noResults": "Sem resultados",
+      "capacityReached": "Capacidade atingida.",
+      "confirmed_one": "{{count}} pessoa pré-atribuída e confirmada.",
+      "confirmed_other": "{{count}} pessoas pré-atribuídas e confirmadas."
     }
   },
   "staff": {
