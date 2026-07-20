@@ -1211,6 +1211,7 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
     if (!isStaff) throw new Error("forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { buildMemberContextByUser } = await import("./member-context.server");
 
     // Exclude members already signed up (any active status).
     const { data: existing } = await supabaseAdmin
@@ -1225,12 +1226,13 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
 
     const { data: members, error } = await supabaseAdmin
       .from("club_members")
-      .select("id, user_id, roles")
+      .select("id, user_id, roles, role")
       .eq("club_id", need.club_id)
       .limit(500);
     if (error) throw new Error(error.message);
 
-    const userIds = (members ?? []).map((m) => m.user_id).filter(Boolean);
+    const rawMembers = (members ?? []).filter((m) => !excludedMemberIds.has(m.id));
+    const userIds = rawMembers.map((m) => m.user_id).filter(Boolean);
     const { data: profs } = userIds.length
       ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
       : { data: [] as { id: string; full_name: string | null }[] };
@@ -1240,15 +1242,34 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
       nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
     }
 
+    const ctxMap = await buildMemberContextByUser(
+      supabaseAdmin,
+      need.club_id,
+      rawMembers.map((m) => ({
+        user_id: (m.user_id as string) ?? null,
+        roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+        role: (m as unknown as { role: string | null }).role ?? null,
+      })),
+    );
+
     const q = (data.search ?? "").toLowerCase().trim();
-    const rows = (members ?? [])
-      .filter((m) => !excludedMemberIds.has(m.id))
-      .map((m) => ({
-        member_id: m.id as string,
-        user_id: m.user_id as string,
-        full_name: nameByUser[m.user_id] ?? null,
-        roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
-      }))
+    const rows = rawMembers
+      .map((m) => {
+        const uid = m.user_id as string;
+        const ctx = ctxMap.get(uid) ?? null;
+        return {
+          member_id: m.id as string,
+          user_id: uid,
+          full_name: nameByUser[uid] ?? null,
+          roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
+          primary_role: ctx?.primary_role ?? null,
+          player_category: ctx?.player_category ?? null,
+          player_categories: ctx?.player_categories ?? [],
+          children: ctx?.children ?? [],
+          coached_teams: ctx?.coached_teams ?? [],
+          context: ctx,
+        };
+      })
       .filter((r) => (q ? (r.full_name ?? "").toLowerCase().includes(q) : true))
       .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""))
       .slice(0, 30);
