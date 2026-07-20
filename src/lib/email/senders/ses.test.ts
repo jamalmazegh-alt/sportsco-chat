@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { SesSender, rewriteFromDomain } from "./ses";
+import { SesSender, rewriteFromDomain, formatFromHeader } from "./ses";
 import type { SendPayload } from "./types";
 
 const payload: SendPayload = {
@@ -48,11 +48,13 @@ describe("SesSender", () => {
     expect(req.headers.get("authorization")).toMatch(/AWS4-HMAC-SHA256/);
 
     const body = JSON.parse(await req.text());
-    // From is rewritten onto the SES-verified domain, display name preserved.
-    expect(body.FromEmailAddress).toBe("Clubero <noreply@send.clubero.app>");
+    // FromEmailAddress must NOT be set — it makes SES drop the display name with
+    // Raw content. The raw MIME From is authoritative instead.
+    expect(body.FromEmailAddress).toBeUndefined();
 
     const mime = Buffer.from(body.Content.Raw.Data, "base64").toString("utf8");
-    expect(mime).toContain("From: Clubero <noreply@send.clubero.app>");
+    // From rewritten onto the SES-verified domain, display name quoted & preserved.
+    expect(mime).toContain('From: "Clubero" <noreply@send.clubero.app>');
     // List-Unsubscribe header preserved from the token
     expect(mime).toContain(
       "List-Unsubscribe: <https://app.clubero.app/email/unsubscribe?token=tok-123>",
