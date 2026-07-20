@@ -553,8 +553,9 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Publier (draft) / Relancer (open, notifie tout le monde) */}
-        {isStaff && (isDraft || isOpen) && (
+        {/* Staff — Publier (draft) / Relancer (open avec places restantes).
+            Un besoin complet (open, 0 place) ne propose plus de re-solliciter. */}
+        {isStaff && (isDraft || (isOpen && remaining > 0)) && (
           <Button
             size="sm"
             variant={isDraft ? "default" : "outline"}
