@@ -37,6 +37,7 @@ function AdminTicketsPage() {
   const [priority, setPriority] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
   const [clubId, setClubId] = useState<string>("all");
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-support-tickets", { search, status, priority, category, clubId }],
