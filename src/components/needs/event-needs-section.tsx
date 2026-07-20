@@ -843,8 +843,10 @@ function NeedFormDialog({
   const create = useServerFn(createEventNeed);
   const update = useServerFn(updateEventNeed);
   const publish = useServerFn(publishEventNeed);
+  const addManualFn = useServerFn(staffAddManualSignup);
   const ctxFn = useServerFn(getEventAudienceContext);
   const previewFn = useServerFn(previewEventAudience);
+
   const isEdit = !!initial;
   const templateLocked = isEdit && initial?.status === "open";
 
@@ -965,13 +967,27 @@ function NeedFormDialog({
           validation_mode: mode,
         },
       });
+      // Pre-assign selected people (before publish so they are already confirmed).
+      let preassignedCount = 0;
+      if (created?.id && audState.preassigned.length > 0) {
+        for (const p of audState.preassigned) {
+          try {
+            await addManualFn({ data: { need_id: created.id, user_id: p.user_id } });
+            preassignedCount++;
+          } catch (e) {
+            console.error("[preassign] failed", p.user_id, e);
+          }
+        }
+      }
       if (wantsPublish && created?.id) {
         const r = await publish({ data: { need_id: created.id, audiences } });
-        return { ...created, __published: r };
+        return { ...created, __published: r, __preassignedCount: preassignedCount };
       }
-      return created;
+      return { ...created, __preassignedCount: preassignedCount };
+
     },
     onSuccess: (r) => {
+      const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
       if (isEdit) {
         toast.success(t("common.saved"));
       } else if ((r as { __published?: { recipients_count: number } })?.__published) {
@@ -980,6 +996,10 @@ function NeedFormDialog({
       } else {
         toast.success(t("needs:section.created"));
       }
+      if (pre > 0) {
+        toast.success(t("needs:audiences.preassign.confirmed", { count: pre }));
+      }
+
       onSaved();
       onOpenChange(false);
     },
@@ -1144,9 +1164,12 @@ function NeedFormDialog({
                 state={audState}
                 controls={audControls}
                 preview={{ count: previewCount, loading: previewLoading }}
+                capacity={capacity}
+                enablePreassign
               />
             </div>
           )}
+
 
         </div>
 

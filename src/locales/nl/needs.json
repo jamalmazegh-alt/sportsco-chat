@@ -130,6 +130,15 @@
       "count_other": "{{count}} people will be notified",
       "removeAria": "Remove {{label}}",
       "takenAria": "Already selected"
+    },
+    "preassign": {
+      "title": "Personen vooraf toewijzen",
+      "hint": "Zoek een clublid om direct te bevestigen (het lid wordt als bevestigd genotificeerd).",
+      "searchPlaceholder": "Zoek een lid…",
+      "noResults": "Geen resultaat",
+      "capacityReached": "Capaciteit bereikt.",
+      "confirmed_one": "{{count}} persoon vooraf toegewezen en bevestigd.",
+      "confirmed_other": "{{count}} personen vooraf toegewezen en bevestigd."
     }
   },
   "staff": {

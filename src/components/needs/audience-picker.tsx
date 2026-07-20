@@ -9,6 +9,8 @@
  */
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Users,
   UserRound,
@@ -20,6 +22,7 @@ import {
   Tag,
   UsersRound,
   UserCheck,
+  UserPlus,
   Plus,
   X,
   Check,
@@ -27,6 +30,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import {
@@ -37,6 +41,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
+import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
+
 
 export type ScalarAudienceKey =
   | "convoked_players"
@@ -60,6 +66,7 @@ export const SCALAR_AUDIENCES: { key: ScalarAudienceKey; needsEvent: boolean }[]
 export type TeamKind = "team_players" | "team_parents" | "team_educators";
 
 export type AudienceCtx = {
+  club_id?: string;
   teams: { id: string; name: string; age_group?: string | null }[];
   groups: { id: string; name: string }[];
   categories: string[];
@@ -67,12 +74,19 @@ export type AudienceCtx = {
   event_category?: string | null;
 };
 
+export type PreassignedPerson = {
+  user_id: string;
+  full_name: string | null;
+};
+
+
 
 export type AudienceState = {
   scalar: Set<ScalarAudienceKey>;
   groupIds: Set<string>;
   teamPicks: Array<{ team_id: string; kind: TeamKind }>;
   category: string;
+  preassigned: PreassignedPerson[];
 };
 
 export function useAudienceState(defaults: Partial<AudienceState> = {}) {
@@ -84,10 +98,13 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
     defaults.teamPicks ?? [],
   );
   const [category, setCategory] = useState<string>(defaults.category ?? "");
+  const [preassigned, setPreassigned] = useState<PreassignedPerson[]>(
+    defaults.preassigned ?? [],
+  );
 
   const state = useMemo<AudienceState>(
-    () => ({ scalar, groupIds, teamPicks, category }),
-    [scalar, groupIds, teamPicks, category],
+    () => ({ scalar, groupIds, teamPicks, category, preassigned }),
+    [scalar, groupIds, teamPicks, category, preassigned],
   );
 
   const toggleScalar = (k: ScalarAudienceKey) => {
@@ -109,6 +126,14 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
       return [...prev, { team_id, kind }];
     });
   };
+  const addPreassigned = (p: PreassignedPerson) => {
+    setPreassigned((prev) =>
+      prev.some((x) => x.user_id === p.user_id) ? prev : [...prev, p],
+    );
+  };
+  const removePreassigned = (user_id: string) => {
+    setPreassigned((prev) => prev.filter((p) => p.user_id !== user_id));
+  };
 
   const buildAudiences = (eventId: string): AudienceSelector[] => {
     const list: AudienceSelector[] = [];
@@ -125,10 +150,11 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
 
   return {
     state,
-    controls: { toggleScalar, toggleGroup, toggleTeam, setCategory },
+    controls: { toggleScalar, toggleGroup, toggleTeam, setCategory, addPreassigned, removePreassigned },
     buildAudiences,
   };
 }
+
 
 export function useHydratedAudiences(
   eventId: string,
@@ -219,6 +245,8 @@ export function AudiencePickerBody({
   state,
   controls,
   preview,
+  capacity,
+  enablePreassign = false,
 }: {
   ctx: AudienceCtx | null | undefined;
   state: AudienceState;
@@ -227,9 +255,14 @@ export function AudiencePickerBody({
     toggleGroup: (id: string) => void;
     toggleTeam: (id: string, kind: TeamKind) => void;
     setCategory: (v: string) => void;
+    addPreassigned?: (p: PreassignedPerson) => void;
+    removePreassigned?: (user_id: string) => void;
   };
   preview?: { count: number | null; loading: boolean };
+  capacity?: number;
+  enablePreassign?: boolean;
 }) {
+
   const { t } = useTranslation();
   const [kind, setKind] = useState<KindKey | "">("");
   const [param, setParam] = useState<string>("");
@@ -675,7 +708,146 @@ export function AudiencePickerBody({
           </p>
         )}
       </div>
+
+      {enablePreassign && ctx?.club_id && controls.addPreassigned && controls.removePreassigned && (
+        <PreassignPanel
+          clubId={ctx.club_id}
+          selected={state.preassigned}
+          capacity={capacity}
+          onAdd={controls.addPreassigned}
+          onRemove={controls.removePreassigned}
+        />
+      )}
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* PreassignPanel — search club members and directly pre-confirm them */
+/* ------------------------------------------------------------------ */
+
+function PreassignPanel({
+  clubId,
+  selected,
+  capacity,
+  onAdd,
+  onRemove,
+}: {
+  clubId: string;
+  selected: PreassignedPerson[];
+  capacity?: number;
+  onAdd: (p: PreassignedPerson) => void;
+  onRemove: (user_id: string) => void;
+}) {
+  const { t } = useTranslation();
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const searchFn = useServerFn(searchClubMembersForAssignment);
+  const excludeIds = useMemo(() => selected.map((s) => s.user_id), [selected]);
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["preassign-search", clubId, q, excludeIds.length],
+    queryFn: () =>
+      searchFn({
+        data: { club_id: clubId, search: q, exclude_user_ids: excludeIds },
+      }),
+    enabled: open,
+    staleTime: 15_000,
+  });
+
+  const atCapacity =
+    typeof capacity === "number" && capacity > 0 && selected.length >= capacity;
+
+  return (
+    <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2.5">
+      <Label className="text-[11px] uppercase tracking-wide text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+        <UserPlus className="h-3.5 w-3.5" />
+        {t("needs:audiences.preassign.title")}
+        {typeof capacity === "number" && (
+          <span className="ml-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-200 px-1.5 py-0.5 text-[10px] font-semibold">
+            {selected.length}/{capacity}
+          </span>
+        )}
+      </Label>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        {t("needs:audiences.preassign.hint")}
+      </p>
+
+      {selected.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {selected.map((p) => (
+            <span
+              key={p.user_id}
+              className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 text-white pl-2.5 pr-1 py-1 text-xs font-medium shadow-sm"
+            >
+              <UserRound className="h-3 w-3" />
+              <span>{p.full_name ?? p.user_id.slice(0, 8)}</span>
+              <button
+                type="button"
+                className="ml-0.5 rounded-full hover:bg-indigo-700/60 p-0.5"
+                onClick={() => onRemove(p.user_id)}
+                aria-label={t("common.remove")}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-2">
+        <Input
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          placeholder={t("needs:audiences.preassign.searchPlaceholder")}
+          disabled={atCapacity}
+        />
+        {atCapacity && (
+          <p className="mt-1 text-[11px] text-amber-700 dark:text-amber-300">
+            {t("needs:audiences.preassign.capacityReached")}
+          </p>
+        )}
+        {open && !atCapacity && (
+          <div className="mt-1.5 max-h-48 overflow-y-auto rounded-md border bg-background">
+            {isFetching ? (
+              <div className="flex items-center gap-2 p-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {t("common.loading")}
+              </div>
+            ) : (data?.members ?? []).length === 0 ? (
+              <div className="p-2 text-xs text-muted-foreground">
+                {t("needs:audiences.preassign.noResults")}
+              </div>
+            ) : (
+              <ul className="divide-y">
+                {(data?.members ?? []).map((m) => (
+                  <li key={m.user_id}>
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left text-xs hover:bg-muted"
+                      onClick={() => {
+                        onAdd({ user_id: m.user_id, full_name: m.full_name });
+                        setQ("");
+                      }}
+                    >
+                      <span className="truncate">
+                        {m.full_name ?? m.user_id.slice(0, 8)}
+                      </span>
+                      <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 

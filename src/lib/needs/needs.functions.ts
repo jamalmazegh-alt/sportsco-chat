@@ -1257,6 +1257,69 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
   });
 
 /* ------------------------------------------------------------------------ */
+/* 12quater-bis. searchClubMembersForAssignment — pré-assignation (avant   */
+/* création du need). Basé sur club_id, exclut des user_ids si demandé.    */
+/* ------------------------------------------------------------------------ */
+
+export const searchClubMembersForAssignment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        search: z.string().trim().max(80).optional(),
+        exclude_user_ids: z.array(z.string().uuid()).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: data.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: members, error } = await supabaseAdmin
+      .from("club_members")
+      .select("id, user_id, roles")
+      .eq("club_id", data.club_id)
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const excluded = new Set(data.exclude_user_ids ?? []);
+    const userIds = (members ?? [])
+      .map((m) => m.user_id as string)
+      .filter((uid) => uid && !excluded.has(uid));
+    const { data: profs } = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+    const nameByUser: Record<string, string | null> = {};
+    for (const p of profs ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+    }
+
+    const q = (data.search ?? "").toLowerCase().trim();
+    const rows = (members ?? [])
+      .filter((m) => !excluded.has(m.user_id as string))
+      .map((m) => ({
+        member_id: m.id as string,
+        user_id: m.user_id as string,
+        full_name: nameByUser[m.user_id as string] ?? null,
+        roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
+      }))
+      .filter((r) => (q ? (r.full_name ?? "").toLowerCase().includes(q) : true))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""))
+      .slice(0, 30);
+
+    return { members: rows };
+  });
+
+
+
+/* ------------------------------------------------------------------------ */
 /* 12quinquies. staffAddManualSignup — staff adds a confirmed participant  */
 /* ------------------------------------------------------------------------ */
 

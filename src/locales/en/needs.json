@@ -130,7 +130,16 @@
     "team_players": "Players of a team",
     "team_parents": "Parents of a team",
     "team_educators": "Educators of a team",
-    "category_educators": "Educators of a category"
+    "category_educators": "Educators of a category",
+    "preassign": {
+      "title": "Pre-assign people",
+      "hint": "Find a club member to confirm directly (they will be notified as confirmed).",
+      "searchPlaceholder": "Search a member…",
+      "noResults": "No result",
+      "capacityReached": "Capacity reached.",
+      "confirmed_one": "{{count}} person pre-assigned and confirmed.",
+      "confirmed_other": "{{count}} people pre-assigned and confirmed."
+    }
   },
   "staff": {
     "title": "Applications",
