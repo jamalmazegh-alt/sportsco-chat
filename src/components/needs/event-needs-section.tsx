@@ -1169,7 +1169,7 @@ function NeedFormDialog({
             </>
           )}
 
-          {!isEdit && step === 2 && (
+          {showAudienceStep && step === 2 && (
             <div className="space-y-3">
               <AudiencePickerBody
                 ctx={audienceCtx ?? null}
@@ -1186,7 +1186,7 @@ function NeedFormDialog({
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
-          {!isEdit && step === 2 ? (
+          {showAudienceStep && step === 2 ? (
             <>
               <Button variant="outline" onClick={() => setStep(1)}>
                 {t("needs:wizard.back")}
@@ -1195,7 +1195,9 @@ function NeedFormDialog({
                 {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                 {wantsPublish
                   ? t("needs:actions.publish")
-                  : t("common.create")}
+                  : isEdit
+                    ? t("common.save")
+                    : t("common.create")}
               </Button>
             </>
           ) : (
@@ -1203,7 +1205,7 @@ function NeedFormDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 {t("common.cancel")}
               </Button>
-              {isEdit ? (
+              {!showAudienceStep ? (
                 <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
                   {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                   {t("common.save")}
