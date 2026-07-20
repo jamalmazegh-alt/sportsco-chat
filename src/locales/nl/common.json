@@ -270,7 +270,8 @@
     "errorOccurred": "Er is een fout opgetreden",
     "unknown": "Geen naam",
     "deselectAll": "Alles deselecteren",
-    "actions": "Acties"
+    "actions": "Acties",
+    "add": "Toevoegen"
   },
   "notFound": {
     "code": "404",

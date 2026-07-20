@@ -270,7 +270,8 @@
     "errorOccurred": "Ocorreu um erro",
     "unknown": "Sem nome",
     "deselectAll": "Desmarcar tudo",
-    "actions": "Ações"
+    "actions": "Ações",
+    "add": "Adicionar"
   },
   "notFound": {
     "code": "404",

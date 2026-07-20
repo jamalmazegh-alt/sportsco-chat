@@ -270,7 +270,8 @@
     "errorOccurred": "An error occurred",
     "unknown": "No name",
     "deselectAll": "Deselect all",
-    "actions": "Actions"
+    "actions": "Actions",
+    "add": "Add"
   },
   "notFound": {
     "code": "404",
