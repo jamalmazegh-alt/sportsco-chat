@@ -2414,6 +2414,19 @@
     "platformsTitle": "iPhone e Android",
     "platformsDesc": "Compatibile con Safari (iOS 16.4+) e Chrome / Edge / Samsung Internet su Android.",
     "alreadyInstalledTitle": "Già installata?",
-    "alreadyInstalledDesc": "Apri Clubero dall'icona sulla schermata Home per attivare le notifiche."
+    "alreadyInstalledDesc": "Apri Clubero dall'icona sulla schermata Home per attivare le notifiche.",
+    "iosStepsTitle": "Su iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 passaggi per aggiungere Clubero alla schermata Home",
+    "iosStep1Before": "Tocca i",
+    "iosStep1Icon": "3 puntini",
+    "iosStep1After": "in fondo a Safari",
+    "iosStep2Before": "Scegli",
+    "iosStep2Icon": "Condividi",
+    "iosStep3Before": "Tocca la freccia",
+    "iosStep3Icon": "Mostra altro",
+    "iosStep3After": "per espandere l'elenco",
+    "iosStep4Before": "Scegli",
+    "iosStep4Icon": "Aggiungi a Home",
+    "iosStep4After": "e tocca «Aggiungi»"
   }
 }
