@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
+  BarChart3,
   Eye,
   ExternalLink,
   Loader2,
+  Lock,
   MegaphoneIcon,
   MessageSquare,
   Pin,
   PinOff,
+  Plus,
   Send,
   Trash2,
 } from "lucide-react";
@@ -25,7 +29,9 @@ import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
+import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
+
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
