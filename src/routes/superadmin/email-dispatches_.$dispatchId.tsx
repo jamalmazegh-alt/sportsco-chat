@@ -179,8 +179,21 @@ function DispatchDetailPage() {
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
             Rafraîchir
           </Button>
-        </div>
-      </header>
+          {templateSupportsRetry && failuresCount > 0 && (
+            <Button
+              size="sm"
+              onClick={retryAll}
+              disabled={busyKey !== null}
+              title="Renfiler les envois failed/DLQ sans dupliquer les envois déjà délivrés"
+            >
+              {busyKey === "batch" ? (
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <RotateCw className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Relancer les échecs ({failuresCount})
+            </Button>
+          )}
 
       {isLoading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
