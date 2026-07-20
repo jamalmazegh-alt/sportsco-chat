@@ -24,6 +24,7 @@ import { MentionInput, RenderWithMentions, parseMentions } from "@/components/me
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
+import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
@@ -36,8 +37,9 @@ type Comment = {
   author?: Profile | null;
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
-type AudienceType = "club" | "team" | "multi_team";
+type AudienceType = "club" | "team" | "multi_team" | "group";
 type Team = { id: string; name: string };
+type Group = { id: string; name: string };
 type Post = {
   id: string;
   club_id: string;
@@ -51,7 +53,9 @@ type Post = {
   external_url: string | null;
   external_media_url: string | null;
   audience_team_ids: string[] | null;
+  audience_group_ids: string[] | null;
   audience_type: AudienceType;
+  send_email: boolean;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
@@ -81,6 +85,7 @@ const SOURCE_META: Record<
 export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
+  const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -94,6 +99,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
   // Targetable teams for the audience picker; computed from club teams + user rights.
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
+  // Groups the current user can target from the composer (staff-visible via RLS).
+  const [targetableGroups, setTargetableGroups] = useState<Group[]>([]);
+  // Group selection is disjoint from team selection: non-empty ⇒ audience_type='group'.
+  const [audienceGroups, setAudienceGroups] = useState<string[]>([]);
+  // "Aussi par e-mail" checkbox — triggers a best-effort outbox after the insert.
+  const [sendEmail, setSendEmail] = useState(false);
   // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
   const [audience, setAudience] = useState<string[] | null>(null);
 

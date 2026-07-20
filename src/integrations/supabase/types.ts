@@ -7374,6 +7374,7 @@ export type Database = {
       wall_posts: {
         Row: {
           attachments: Json
+          audience_group_ids: string[] | null
           audience_team_ids: string[] | null
           audience_type: string
           author_user_id: string | null
@@ -7386,10 +7387,12 @@ export type Database = {
           external_url: string | null
           id: string
           is_pinned: boolean
+          send_email: boolean
           source: string
         }
         Insert: {
           attachments?: Json
+          audience_group_ids?: string[] | null
           audience_team_ids?: string[] | null
           audience_type?: string
           author_user_id?: string | null
@@ -7402,10 +7405,12 @@ export type Database = {
           external_url?: string | null
           id?: string
           is_pinned?: boolean
+          send_email?: boolean
           source?: string
         }
         Update: {
           attachments?: Json
+          audience_group_ids?: string[] | null
           audience_team_ids?: string[] | null
           audience_type?: string
           author_user_id?: string | null
@@ -7418,6 +7423,7 @@ export type Database = {
           external_url?: string | null
           id?: string
           is_pinned?: boolean
+          send_email?: boolean
           source?: string
         }
         Relationships: []
