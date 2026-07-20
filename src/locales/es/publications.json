@@ -29,7 +29,13 @@
     "email": "Email",
     "emailDesc": "Sends an email to each recipient.",
     "publish": "Publish",
-    "published": "Publication sent"
+    "published": "Publication sent",
+    "pickCategory": "Elegir una categoría…",
+    "pickEvent": "Elegir un evento…",
+    "pickMembers": "Selección manual (jugadores)",
+    "searchPlaceholder": "Buscar un jugador…",
+    "addPlayersBtn": "+ Jugadores",
+    "addParentsBtn": "+ Padres"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -122,8 +128,8 @@
   },
   "audience": {
     "picker": "Who to notify?",
-    "recipientsCount_one": "{{count}} person will be notified",
-    "recipientsCount_other": "{{count}} people will be notified",
+    "recipientsCount_one": "{{count}} destinatario",
+    "recipientsCount_other": "{{count}} destinatarios",
     "empty": "No audience selected — add at least one criterion below.",
     "convocationsMissing": "No line-up yet for this event — audience empty.",
     "categoryLabel": "Category",
@@ -139,7 +145,10 @@
       "dirigeants": "Board members",
       "groupe_personnalise": "Custom group",
       "selection_manuelle": "Manual selection"
-    }
+    },
+    "recipientsBreakdown": "({{players}} jugadores · {{users}} usuarios)",
+    "none": "0 destinatarios",
+    "previewError": "Vista previa no disponible"
   },
   "form": {
     "titleLabel": "Title",

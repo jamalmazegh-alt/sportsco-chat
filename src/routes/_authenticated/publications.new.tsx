@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, Send, Plus, X, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Send, Plus, X, Loader2, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,11 @@ import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { createPublication } from "@/lib/publications/publications.functions";
+import {
+  createPublication,
+  previewPublicationAudience,
+} from "@/lib/publications/publications.functions";
+import { listSeasons } from "@/lib/seasons.functions";
 
 export const Route = createFileRoute("/_authenticated/publications/new")({
   head: () => ({
@@ -34,13 +38,21 @@ type Audience =
   | { audience_type: "dirigeants" }
   | { audience_type: "joueurs_equipe"; team_id: string }
   | { audience_type: "parents_equipe"; team_id: string }
+  | { audience_type: "joueurs_categorie"; category_label: string; season_id: string }
+  | { audience_type: "parents_categorie"; category_label: string; season_id: string }
+  | { audience_type: "joueurs_convoques"; event_id: string }
+  | { audience_type: "parents_convoques"; event_id: string }
   | { audience_type: "groupe_personnalise"; group_id: string };
+
+type ManualPlayer = { id: string; first_name: string | null; last_name: string | null };
 
 function NewPublicationPage() {
   const { t } = useTranslation();
   const nav = useNavigate();
   const { activeClubId } = useAuth();
   const createFn = useServerFn(createPublication);
+  const previewFn = useServerFn(previewPublicationAudience);
+  const listSeasonsFn = useServerFn(listSeasons);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [type, setType] = useState<"message" | "poll">("message");
@@ -51,7 +63,11 @@ function NewPublicationPage() {
   const [publishToWall, setPublishToWall] = useState(true);
   const [sendEmail, setSendEmail] = useState(false);
   const [audiences, setAudiences] = useState<Audience[]>([]);
+  const [manualPlayers, setManualPlayers] = useState<ManualPlayer[]>([]);
+  const [manualQuery, setManualQuery] = useState("");
+  const manualMemberIds = useMemo(() => manualPlayers.map((p) => p.id), [manualPlayers]);
 
+  // Teams
   const { data: teams = [] } = useQuery({
     queryKey: ["pub-teams", activeClubId],
     queryFn: async () => {
@@ -65,6 +81,7 @@ function NewPublicationPage() {
     enabled: !!activeClubId,
   });
 
+  // Groups
   const { data: groups = [] } = useQuery({
     queryKey: ["pub-groups", activeClubId],
     queryFn: async () => {
@@ -77,6 +94,83 @@ function NewPublicationPage() {
       return data ?? [];
     },
     enabled: !!activeClubId,
+  });
+
+  // Seasons — pick current, or most recent by start_date.
+  const { data: seasonsData } = useQuery({
+    queryKey: ["pub-seasons", activeClubId],
+    queryFn: () => listSeasonsFn({ data: { clubId: activeClubId! } }),
+    enabled: !!activeClubId,
+  });
+  const activeSeason = useMemo(() => {
+    const list = seasonsData?.seasons ?? [];
+    if (list.length === 0) return null;
+    const current = list.find((s: any) => s.is_current);
+    return (current ?? list[0]) as { id: string; label: string };
+  }, [seasonsData]);
+
+  // Categories for active season
+  const { data: categories = [] } = useQuery({
+    queryKey: ["pub-cats", activeClubId, activeSeason?.label],
+    queryFn: async () => {
+      if (!activeSeason) return [];
+      const { data } = await supabase
+        .from("player_seasons")
+        .select("category")
+        .eq("club_id", activeClubId!)
+        .eq("season_label", activeSeason.label)
+        .not("category", "is", null);
+      const set = new Set<string>();
+      (data ?? []).forEach((r: any) => r.category && set.add(r.category));
+      return Array.from(set).sort();
+    },
+    enabled: !!activeClubId && !!activeSeason,
+  });
+
+  // Events with convocations (team-scoped)
+  const { data: events = [] } = useQuery({
+    queryKey: ["pub-events", activeClubId],
+    queryFn: async () => {
+      const teamIds = teams.map((t) => t.id);
+      if (teamIds.length === 0) return [];
+      const { data: evs } = await supabase
+        .from("events")
+        .select("id, title, starts_at")
+        .in("team_id", teamIds)
+        .is("deleted_at", null)
+        .order("starts_at", { ascending: false })
+        .limit(200);
+      const list = evs ?? [];
+      if (list.length === 0) return [];
+      const { data: convos } = await supabase
+        .from("convocations")
+        .select("event_id")
+        .in("event_id", list.map((e: any) => e.id));
+      const withConv = new Set((convos ?? []).map((c: any) => c.event_id));
+      return list.filter((e: any) => withConv.has(e.id));
+    },
+    enabled: !!activeClubId && teams.length > 0,
+  });
+
+  // Player search (manual selection)
+  const { data: playerResults = [] } = useQuery({
+    queryKey: ["pub-players", activeClubId, manualQuery],
+    queryFn: async () => {
+      const q = manualQuery.trim();
+      let sel = supabase
+        .from("players")
+        .select("id, first_name, last_name")
+        .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
+        .order("last_name")
+        .limit(20);
+      if (q.length >= 2) {
+        sel = sel.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`);
+      }
+      const { data } = await sel;
+      return (data ?? []) as ManualPlayer[];
+    },
+    enabled: !!activeClubId && step === 2,
   });
 
   const create = useMutation({
@@ -94,7 +188,7 @@ function NewPublicationPage() {
           closesAt: null,
           eventId: null,
           audiences: audiences as any,
-          manualMemberIds: [],
+          manualMemberIds,
           pollOptions: type === "poll" ? pollOptions.map((s) => s.trim()).filter(Boolean) : [],
           documentIds: [],
           mediaPaths: [],
@@ -110,9 +204,68 @@ function NewPublicationPage() {
     },
   });
 
-  const canStep1 = title.trim().length > 0 && (type === "message" || pollOptions.filter((s) => s.trim()).length >= 2);
+  // -------- Preview (debounced) --------
+  const [preview, setPreview] = useState<{
+    count: number;
+    playerCount: number;
+    userCount: number;
+    loading: boolean;
+    error: boolean;
+  }>({ count: 0, playerCount: 0, userCount: 0, loading: false, error: false });
+
+  // Build a stable key to trigger the debounced fetch
+  const previewKey = useMemo(
+    () => JSON.stringify({ audiences, manualMemberIds }),
+    [audiences, manualMemberIds],
+  );
+
+  useEffect(() => {
+    if (!activeClubId) return;
+    if (audiences.length === 0 && manualMemberIds.length === 0) {
+      setPreview({ count: 0, playerCount: 0, userCount: 0, loading: false, error: false });
+      return;
+    }
+    setPreview((p) => ({ ...p, loading: true, error: false }));
+    const timer = setTimeout(async () => {
+      // Filter out manual audience (dedicated field) if it accidentally landed in the list
+      const cleanAudiences = audiences.filter(
+        (a) => a.audience_type !== ("selection_manuelle" as unknown as string),
+      );
+      // If manual players are set, add the selection_manuelle audience marker for the resolver
+      const withManual =
+        manualMemberIds.length > 0
+          ? [...cleanAudiences, { audience_type: "selection_manuelle" as const }]
+          : cleanAudiences;
+      try {
+        const r = await previewFn({
+          data: {
+            clubId: activeClubId,
+            eventId: null,
+            audiences: withManual as any,
+            manualMemberIds,
+          },
+        });
+        setPreview({
+          count: r.count,
+          playerCount: r.playerCount,
+          userCount: r.userCount,
+          loading: false,
+          error: false,
+        });
+      } catch {
+        setPreview({ count: 0, playerCount: 0, userCount: 0, loading: false, error: true });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewKey, activeClubId]);
+
+  const canStep1 =
+    title.trim().length > 0 && (type === "message" || pollOptions.filter((s) => s.trim()).length >= 2);
   const canSubmit =
-    audiences.length > 0 && (publishToWall || sendEmail) && !create.isPending;
+    (audiences.length > 0 || manualMemberIds.length > 0) &&
+    (publishToWall || sendEmail) &&
+    !create.isPending;
 
   function toggleScalar(k: ScalarKey) {
     setAudiences((a) => {
@@ -130,15 +283,53 @@ function NewPublicationPage() {
     if (audiences.some((x: any) => x.audience_type === "groupe_personnalise" && x.group_id === group_id)) return;
     setAudiences((a) => [...a, { audience_type: "groupe_personnalise", group_id }]);
   }
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  function addCategory(kind: "joueurs_categorie" | "parents_categorie") {
+    if (!selectedCategory || !activeSeason) return;
+    if (
+      audiences.some(
+        (x: any) =>
+          x.audience_type === kind &&
+          x.category_label === selectedCategory &&
+          x.season_id === activeSeason.id,
+      )
+    )
+      return;
+    setAudiences((a) => [
+      ...a,
+      { audience_type: kind, category_label: selectedCategory, season_id: activeSeason.id } as Audience,
+    ]);
+  }
+  const [selectedEvent, setSelectedEvent] = useState<string>("");
+  function addEvent(kind: "joueurs_convoques" | "parents_convoques") {
+    if (!selectedEvent) return;
+    if (audiences.some((x: any) => x.audience_type === kind && x.event_id === selectedEvent)) return;
+    setAudiences((a) => [...a, { audience_type: kind, event_id: selectedEvent } as Audience]);
+  }
+  function addManualPlayer(p: ManualPlayer) {
+    if (manualPlayers.some((x) => x.id === p.id)) return;
+    setManualPlayers((list) => [...list, p]);
+  }
+  function removeManualPlayer(id: string) {
+    setManualPlayers((list) => list.filter((x) => x.id !== id));
+  }
   function removeAudience(idx: number) {
     setAudiences((a) => a.filter((_, i) => i !== idx));
   }
+
   function labelFor(a: Audience): string {
     if (a.audience_type === "educateurs") return t("publications.audiences.types.educateurs");
     if (a.audience_type === "dirigeants") return t("publications.audiences.types.dirigeants");
     if (a.audience_type === "groupe_personnalise") {
       const g = groups.find((x) => x.id === (a as any).group_id);
       return `${t("publications.audiences.types.groupe_personnalise")} — ${g?.name ?? ""}`;
+    }
+    if (a.audience_type === "joueurs_categorie" || a.audience_type === "parents_categorie") {
+      return `${t(`publications.audiences.types.${a.audience_type}`)} — ${a.category_label}`;
+    }
+    if (a.audience_type === "joueurs_convoques" || a.audience_type === "parents_convoques") {
+      const ev = events.find((x: any) => x.id === (a as any).event_id);
+      return `${t(`publications.audiences.types.${a.audience_type}`)} — ${ev?.title ?? ""}`;
     }
     const team = teams.find((x) => x.id === (a as any).team_id);
     return `${t(`publications.audiences.types.${a.audience_type}`)} — ${team?.name ?? ""}`;
@@ -291,9 +482,10 @@ function NewPublicationPage() {
       {step === 2 && (
         <Card>
           <CardContent className="py-5 space-y-5">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>{t("publications.new.audienceLabel", "Destinataires")}</Label>
 
+              {/* Scalar (staff) */}
               <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
@@ -311,8 +503,9 @@ function NewPublicationPage() {
                 </Button>
               </div>
 
+              {/* Team */}
               {teams.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <div>
                     <Label className="text-xs">
                       {t("publications.audiences.types.joueurs_equipe")}
@@ -360,8 +553,96 @@ function NewPublicationPage() {
                 </div>
               )}
 
+              {/* Category (season-scoped) */}
+              {activeSeason && categories.length > 0 && (
+                <div className="pt-1 space-y-1">
+                  <Label className="text-xs">
+                    {t("publications.audience.categoryLabel", "Catégorie")}
+                    {" · "}
+                    <span className="text-muted-foreground">{activeSeason.label}</span>
+                  </Label>
+                  <div className="flex gap-2 flex-wrap">
+                    <select
+                      className="flex-1 min-w-[10rem] rounded-md border bg-background px-2 py-1.5 text-sm"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        {t("publications.new.pickCategory", "Choisir une catégorie…")}
+                      </option>
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!selectedCategory}
+                      onClick={() => addCategory("joueurs_categorie")}
+                    >
+                      {t("publications.new.addPlayersBtn", "+ Joueurs")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!selectedCategory}
+                      onClick={() => addCategory("parents_categorie")}
+                    >
+                      {t("publications.new.addParentsBtn", "+ Parents")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Convoqués */}
+              {events.length > 0 && (
+                <div className="pt-1 space-y-1">
+                  <Label className="text-xs">
+                    {t("publications.new.pickEvent", "Convoqués d'un événement")}
+                  </Label>
+                  <div className="flex gap-2 flex-wrap">
+                    <select
+                      className="flex-1 min-w-[12rem] rounded-md border bg-background px-2 py-1.5 text-sm"
+                      value={selectedEvent}
+                      onChange={(e) => setSelectedEvent(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        {t("publications.new.pickEvent", "Choisir un événement…")}
+                      </option>
+                      {events.map((ev: any) => (
+                        <option key={ev.id} value={ev.id}>
+                          {ev.title}
+                          {ev.starts_at
+                            ? ` — ${new Date(ev.starts_at).toLocaleDateString()}`
+                            : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!selectedEvent}
+                      onClick={() => addEvent("joueurs_convoques")}
+                    >
+                      {t("publications.new.addPlayersBtn", "+ Joueurs")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!selectedEvent}
+                      onClick={() => addEvent("parents_convoques")}
+                    >
+                      {t("publications.new.addParentsBtn", "+ Parents")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Groups */}
               {groups.length > 0 && (
-                <div className="pt-2">
+                <div className="pt-1">
                   <Label className="text-xs">
                     {t("publications.audiences.types.groupe_personnalise")}
                   </Label>
@@ -385,20 +666,124 @@ function NewPublicationPage() {
                 </div>
               )}
 
-              <div className="pt-3 min-h-[2.5rem] rounded-md border-2 border-dashed border-emerald-500/40 bg-emerald-500/5 p-2 flex flex-wrap gap-1.5">
-                {audiences.length === 0 ? (
+              {/* Manual player selection */}
+              <div className="pt-1 space-y-1.5">
+                <Label className="text-xs">
+                  {t("publications.new.pickMembers", "Sélection manuelle (joueurs)")}
+                </Label>
+                <div className="relative">
+                  <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={manualQuery}
+                    onChange={(e) => setManualQuery(e.target.value)}
+                    placeholder={t("publications.new.searchPlaceholder", "Rechercher un joueur…")}
+                    className="pl-7"
+                  />
+                </div>
+                {manualQuery.trim().length >= 2 && (
+                  <div className="max-h-40 overflow-y-auto rounded-md border bg-background text-sm">
+                    {playerResults.length === 0 ? (
+                      <div className="p-2 text-xs text-muted-foreground">
+                        {t("common.noResults", "Aucun résultat")}
+                      </div>
+                    ) : (
+                      playerResults.map((p) => {
+                        const already = manualPlayers.some((x) => x.id === p.id);
+                        return (
+                          <button
+                            key={p.id}
+                            type="button"
+                            className="w-full text-left px-2 py-1.5 hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
+                            disabled={already}
+                            onClick={() => addManualPlayer(p)}
+                          >
+                            {p.first_name} {p.last_name}
+                            {already ? (
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                {t("common.added", "ajouté")}
+                              </span>
+                            ) : null}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+                {manualPlayers.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {manualPlayers.map((p) => (
+                      <Badge key={p.id} variant="secondary" className="gap-1.5">
+                        {p.first_name} {p.last_name}
+                        <button onClick={() => removeManualPlayer(p.id)}>
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Recap zone */}
+              <div className="pt-2 min-h-[2.5rem] rounded-md border-2 border-dashed border-emerald-500/40 bg-emerald-500/5 p-2 flex flex-wrap gap-1.5">
+                {audiences.length === 0 && manualPlayers.length === 0 ? (
                   <div className="text-xs text-muted-foreground w-full text-center py-2">
                     {t("publications.new.audienceEmpty", "Aucun destinataire sélectionné")}
                   </div>
                 ) : (
-                  audiences.map((a, i) => (
-                    <Badge key={i} variant="secondary" className="gap-1.5">
-                      {labelFor(a)}
-                      <button onClick={() => removeAudience(i)}>
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))
+                  <>
+                    {audiences.map((a, i) => (
+                      <Badge key={`a-${i}`} variant="secondary" className="gap-1.5">
+                        {labelFor(a)}
+                        <button onClick={() => removeAudience(i)}>
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                    {manualPlayers.length > 0 && (
+                      <Badge variant="secondary" className="gap-1.5">
+                        {t("publications.audiences.types.selection_manuelle")} · {manualPlayers.length}
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Live recipients counter */}
+              <div
+                className="rounded-md border bg-muted/40 px-3 py-2 text-sm flex items-center gap-2"
+                aria-live="polite"
+              >
+                {preview.loading ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      {t("common.loading", "Chargement…")}
+                    </span>
+                  </>
+                ) : preview.error ? (
+                  <span className="text-xs text-muted-foreground">
+                    {t("publications.audiences.previewError", "Aperçu indisponible")}
+                  </span>
+                ) : audiences.length === 0 && manualMemberIds.length === 0 ? (
+                  <span className="text-muted-foreground">
+                    {t("publications.audiences.none", "0 destinataire")}
+                  </span>
+                ) : (
+                  <>
+                    <span className="font-medium">
+                      {t("publications.audiences.recipientsCount", {
+                        count: preview.count,
+                        defaultValue: "{{count}} destinataires",
+                      })}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("publications.audiences.recipientsBreakdown", {
+                        players: preview.playerCount,
+                        users: preview.userCount,
+                        defaultValue: "({{players}} joueurs · {{users}} utilisateurs)",
+                      })}
+                    </span>
+                  </>
                 )}
               </div>
             </div>

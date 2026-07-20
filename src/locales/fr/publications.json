@@ -29,7 +29,13 @@
     "email": "E-mail",
     "emailDesc": "Envoie un e-mail à chaque destinataire.",
     "publish": "Publier",
-    "published": "Publication publiée"
+    "published": "Publication publiée",
+    "pickCategory": "Choisir une catégorie…",
+    "pickEvent": "Choisir un événement…",
+    "pickMembers": "Sélection manuelle (joueurs)",
+    "searchPlaceholder": "Rechercher un joueur…",
+    "addPlayersBtn": "+ Joueurs",
+    "addParentsBtn": "+ Parents"
   },
   "detail": {
     "notFound": "Publication introuvable",
@@ -122,8 +128,8 @@
   },
   "audience": {
     "picker": "Qui prévenir ?",
-    "recipientsCount_one": "{{count}} personne sera prévenue",
-    "recipientsCount_other": "{{count}} personnes seront prévenues",
+    "recipientsCount_one": "{{count}} destinataire",
+    "recipientsCount_other": "{{count}} destinataires",
     "empty": "Aucune audience sélectionnée — ajoutez au moins un critère ci-dessous.",
     "convocationsMissing": "La convocation n'est pas faite pour cet événement — audience vide.",
     "categoryLabel": "Catégorie",
@@ -139,7 +145,10 @@
       "dirigeants": "Dirigeants",
       "groupe_personnalise": "Groupe personnalisé",
       "selection_manuelle": "Sélection manuelle"
-    }
+    },
+    "recipientsBreakdown": "({{players}} joueurs · {{users}} utilisateurs)",
+    "none": "0 destinataire",
+    "previewError": "Aperçu indisponible"
   },
   "form": {
     "titleLabel": "Titre",
