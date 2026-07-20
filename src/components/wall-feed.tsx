@@ -682,28 +682,44 @@ function AudiencePicker({
   teams,
   value,
   onChange,
+  groups,
+  groupValue,
+  onGroupChange,
   canPickClubWide,
 }: {
   teams: Team[];
   value: string[] | null;
   onChange: (next: string[] | null) => void;
+  groups: Group[];
+  groupValue: string[];
+  onGroupChange: (next: string[]) => void;
   canPickClubWide: boolean;
 }) {
   const { t } = useTranslation();
-  const isClubWide = value === null;
+  const groupsActive = groupValue.length > 0;
+  const isClubWide = !groupsActive && value === null;
   function toggleTeam(id: string) {
+    // Picking a team switches out of "group" mode.
+    if (groupsActive) onGroupChange([]);
     if (value === null) {
       onChange([id]);
       return;
     }
     if (value.includes(id)) {
-      const next = value.filter((x) => x !== id);
-      onChange(next);
+      onChange(value.filter((x) => x !== id));
     } else {
       onChange([...value, id]);
     }
   }
-  if (teams.length === 0 && !canPickClubWide) return null;
+  function toggleGroup(id: string) {
+    if (groupValue.includes(id)) {
+      onGroupChange(groupValue.filter((x) => x !== id));
+    } else {
+      // Switching to group mode clears any team selection.
+      onGroupChange([...groupValue, id]);
+    }
+  }
+  if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       <span className="text-xs font-medium text-muted-foreground mr-1">
@@ -712,7 +728,10 @@ function AudiencePicker({
       {canPickClubWide && (
         <button
           type="button"
-          onClick={() => onChange(null)}
+          onClick={() => {
+            onGroupChange([]);
+            onChange(null);
+          }}
           className={cn(
             "text-xs px-2.5 py-1 rounded-full border transition-colors",
             isClubWide
@@ -724,7 +743,7 @@ function AudiencePicker({
         </button>
       )}
       {teams.map((tt) => {
-        const active = !isClubWide && (value ?? []).includes(tt.id);
+        const active = !groupsActive && !isClubWide && (value ?? []).includes(tt.id);
         return (
           <button
             key={tt.id}
@@ -738,6 +757,29 @@ function AudiencePicker({
             )}
           >
             {tt.name}
+          </button>
+        );
+      })}
+      {groups.length > 0 && (
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-1">
+          {t("wall.compose.targetGroup", { defaultValue: "Groupe(s)" })}
+        </span>
+      )}
+      {groups.map((g) => {
+        const active = groupValue.includes(g.id);
+        return (
+          <button
+            key={g.id}
+            type="button"
+            onClick={() => toggleGroup(g.id)}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              active
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-accent",
+            )}
+          >
+            {g.name}
           </button>
         );
       })}
