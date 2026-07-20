@@ -34,7 +34,7 @@ import {
   deletePublication,
   listPublicationRecipients,
 } from "@/lib/publications/publications.functions";
-import { useAuth } from "@/lib/auth-context";
+
 
 export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
   head: () => ({
