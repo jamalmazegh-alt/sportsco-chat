@@ -293,3 +293,101 @@ export const listPublicationRecipients = createServerFn({ method: "POST" })
     if (error) throw new Response(`list_failed: ${error.message}`, { status: 500 });
     return { recipients: rows ?? [] };
   });
+
+// ---------------------------------------------------------------------------
+// previewPublicationAudience — dry-run the resolver, returns distinct user count
+// ---------------------------------------------------------------------------
+const PreviewInput = z.object({
+  clubId: z.string().uuid(),
+  eventId: z.string().uuid().nullable(),
+  audiences: z.array(AudienceInput).default([]),
+  manualMemberIds: z.array(z.string().uuid()).default([]),
+});
+
+export const previewPublicationAudience = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => PreviewInput.parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: staff } = await supabase.rpc("is_club_staff" as any, {
+      _user_id: userId,
+      _club_id: data.clubId,
+    });
+    if (!staff) throw new Response("Forbidden", { status: 403 });
+
+    const { data: res, error } = await supabase.rpc("preview_publication_audience" as any, {
+      _club_id: data.clubId,
+      _event_id: data.eventId,
+      _audiences: data.audiences as any,
+      _manual_member_ids: data.manualMemberIds,
+    });
+    if (error) {
+      // Fallback: 0 if the RPC doesn't exist yet.
+      console.warn("[previewPublicationAudience] rpc unavailable", error.message);
+      return { count: 0 };
+    }
+    const row = Array.isArray(res) ? res[0] : res;
+    return { count: (row?.count as number) ?? (typeof res === "number" ? (res as number) : 0) };
+  });
+
+// ---------------------------------------------------------------------------
+// listPublications — feed for the current user in a club
+// ---------------------------------------------------------------------------
+export const listPublications = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ clubId: z.string().uuid(), limit: z.number().min(1).max(100).default(50) }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("club_publications")
+      .select(
+        "id, club_id, author_id, publication_type, title, content, poll_visibility, publish_to_wall, send_email, published_at, closes_at, closed_at, event_id, deleted_at",
+      )
+      .eq("club_id", data.clubId)
+      .is("deleted_at", null)
+      .order("published_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw new Response(`list_failed: ${error.message}`, { status: 500 });
+    return { publications: rows ?? [] };
+  });
+
+// ---------------------------------------------------------------------------
+// getPublication — single publication with options + own vote
+// ---------------------------------------------------------------------------
+export const getPublication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ publicationId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: pub, error: pubErr } = await supabase
+      .from("club_publications")
+      .select(
+        "id, club_id, author_id, publication_type, title, content, poll_visibility, publish_to_wall, send_email, email_body, published_at, closes_at, closed_at, event_id, deleted_at",
+      )
+      .eq("id", data.publicationId)
+      .maybeSingle();
+    if (pubErr) throw new Response(`get_failed: ${pubErr.message}`, { status: 500 });
+    if (!pub) throw new Response("not_found", { status: 404 });
+
+    const [{ data: opts }, { data: myVotes }, { data: staff }] = await Promise.all([
+      supabase
+        .from("club_poll_options")
+        .select("id, label, sort_order")
+        .eq("publication_id", data.publicationId)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("club_poll_votes")
+        .select("option_id, subject_kind, subject_user_id, member_id")
+        .eq("publication_id", data.publicationId)
+        .eq("cast_by_user_id", userId),
+      supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
+    ]);
+
+    return {
+      publication: pub,
+      options: opts ?? [],
+      myVotes: myVotes ?? [],
+      isStaff: !!staff,
+    };
+  });
+

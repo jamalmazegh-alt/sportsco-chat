@@ -1,4 +1,52 @@
 {
+  "list": {
+    "title": "Publications",
+    "new": "New publication",
+    "empty": "No publications yet.",
+    "anonymous": "Anonymous",
+    "closed": "Closed"
+  },
+  "new": {
+    "title": "New publication",
+    "step": "Step",
+    "typeMessage": "Message",
+    "typePoll": "Poll",
+    "pollOptions": "Options",
+    "option": "Option",
+    "addOption": "Add an option",
+    "visibility": "Result visibility",
+    "visibilityAnon": "Anonymous",
+    "visibilityAnonDesc": "Nobody, including staff, sees who voted what. Results hidden while < 3 votes per option.",
+    "visibilityStaff": "Visible to staff",
+    "visibilityStaffDesc": "Staff sees who voted what. Voters see only totals.",
+    "audienceLabel": "Recipients",
+    "audienceEmpty": "No recipient selected",
+    "chooseTeam": "Choose a team…",
+    "chooseGroup": "Choose a group…",
+    "deliveryLabel": "Delivery mode",
+    "wall": "Wall + push notification",
+    "wallDesc": "Appears on the club feed and sends a push to recipients.",
+    "email": "Email",
+    "emailDesc": "Sends an email to each recipient.",
+    "publish": "Publish",
+    "published": "Publication sent"
+  },
+  "detail": {
+    "notFound": "Publication not found",
+    "vote": "Vote",
+    "voted": "Vote recorded",
+    "masked": "—",
+    "thresholdNotice": "Results hidden to preserve anonymity (< 3 votes per option).",
+    "recipients": "See recipients",
+    "recipientsTitle": "Recipients",
+    "userSubject": "User",
+    "unknown": "Unknown",
+    "close": "Close poll",
+    "closed": "Publication closed",
+    "delete": "Delete",
+    "deleted": "Publication deleted",
+    "confirmDelete": "Delete this publication?"
+  },
   "type": {
     "message": "Message",
     "poll": "Poll"

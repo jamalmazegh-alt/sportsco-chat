@@ -77,6 +77,7 @@ import { Route as SupportViewSessionIdIndexRouteImport } from './routes/support-
 import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
+import { Route as AuthenticatedPublicationsIndexRouteImport } from './routes/_authenticated/publications.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedNeedsIndexRouteImport } from './routes/_authenticated/needs.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -108,6 +109,8 @@ import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './route
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
+import { Route as AuthenticatedPublicationsNewRouteImport } from './routes/_authenticated/publications.new'
+import { Route as AuthenticatedPublicationsPublicationIdRouteImport } from './routes/_authenticated/publications.$publicationId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
@@ -519,6 +522,12 @@ const AuthenticatedSupportIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSupportRoute,
   } as any)
+const AuthenticatedPublicationsIndexRoute =
+  AuthenticatedPublicationsIndexRouteImport.update({
+    id: '/publications/',
+    path: '/publications/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProfileIndexRoute =
   AuthenticatedProfileIndexRouteImport.update({
     id: '/',
@@ -689,6 +698,18 @@ const AuthenticatedSupportTicketIdRoute =
     id: '/$ticketId',
     path: '/$ticketId',
     getParentRoute: () => AuthenticatedSupportRoute,
+  } as any)
+const AuthenticatedPublicationsNewRoute =
+  AuthenticatedPublicationsNewRouteImport.update({
+    id: '/publications/new',
+    path: '/publications/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPublicationsPublicationIdRoute =
+  AuthenticatedPublicationsPublicationIdRouteImport.update({
+    id: '/publications/$publicationId',
+    path: '/publications/$publicationId',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
@@ -1144,6 +1165,8 @@ export interface FileRoutesByFullPath {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1175,6 +1198,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/needs/': typeof AuthenticatedNeedsIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/publications/': typeof AuthenticatedPublicationsIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
@@ -1303,6 +1327,8 @@ export interface FileRoutesByTo {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1334,6 +1360,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/needs': typeof AuthenticatedNeedsIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
+  '/publications': typeof AuthenticatedPublicationsIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
@@ -1469,6 +1496,8 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/_authenticated/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/_authenticated/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1500,6 +1529,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/needs/': typeof AuthenticatedNeedsIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/_authenticated/publications/': typeof AuthenticatedPublicationsIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
@@ -1635,6 +1665,8 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
+    | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
@@ -1666,6 +1698,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/needs/'
     | '/profile/'
+    | '/publications/'
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
@@ -1794,6 +1827,8 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
+    | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
@@ -1825,6 +1860,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/needs'
     | '/profile'
+    | '/publications'
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
@@ -1959,6 +1995,8 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
+    | '/_authenticated/publications/$publicationId'
+    | '/_authenticated/publications/new'
     | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/tournaments/$tournamentId'
@@ -1990,6 +2028,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/needs/'
     | '/_authenticated/profile/'
+    | '/_authenticated/publications/'
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
@@ -2615,6 +2654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportIndexRouteImport
       parentRoute: typeof AuthenticatedSupportRoute
     }
+    '/_authenticated/publications/': {
+      id: '/_authenticated/publications/'
+      path: '/publications'
+      fullPath: '/publications/'
+      preLoaderRoute: typeof AuthenticatedPublicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile/': {
       id: '/_authenticated/profile/'
       path: '/'
@@ -2831,6 +2877,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/support/$ticketId'
       preLoaderRoute: typeof AuthenticatedSupportTicketIdRouteImport
       parentRoute: typeof AuthenticatedSupportRoute
+    }
+    '/_authenticated/publications/new': {
+      id: '/_authenticated/publications/new'
+      path: '/publications/new'
+      fullPath: '/publications/new'
+      preLoaderRoute: typeof AuthenticatedPublicationsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/publications/$publicationId': {
+      id: '/_authenticated/publications/$publicationId'
+      path: '/publications/$publicationId'
+      fullPath: '/publications/$publicationId'
+      preLoaderRoute: typeof AuthenticatedPublicationsPublicationIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
@@ -3521,7 +3581,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
   AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  AuthenticatedPublicationsPublicationIdRoute: typeof AuthenticatedPublicationsPublicationIdRoute
+  AuthenticatedPublicationsNewRoute: typeof AuthenticatedPublicationsNewRoute
   AuthenticatedNeedsIndexRoute: typeof AuthenticatedNeedsIndexRoute
+  AuthenticatedPublicationsIndexRoute: typeof AuthenticatedPublicationsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -3541,7 +3604,11 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
+  AuthenticatedPublicationsPublicationIdRoute:
+    AuthenticatedPublicationsPublicationIdRoute,
+  AuthenticatedPublicationsNewRoute: AuthenticatedPublicationsNewRoute,
   AuthenticatedNeedsIndexRoute: AuthenticatedNeedsIndexRoute,
+  AuthenticatedPublicationsIndexRoute: AuthenticatedPublicationsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

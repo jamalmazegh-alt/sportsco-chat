@@ -1,0 +1,327 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import {
+  BarChart3,
+  MessageSquare,
+  Lock,
+  Users,
+  CheckCircle2,
+  MoreHorizontal,
+  Trash2,
+  Loader2,
+  Info,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { BackLink } from "@/components/back-link";
+import { toast } from "sonner";
+import {
+  getPublication,
+  getPollResults,
+  castPollVote,
+  closePublication,
+  deletePublication,
+  listPublicationRecipients,
+} from "@/lib/publications/publications.functions";
+import { useAuth } from "@/lib/auth-context";
+
+export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
+  head: () => ({
+    meta: [
+      { title: "Publication · Clubero" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: PublicationDetailPage,
+});
+
+function PublicationDetailPage() {
+  const { t } = useTranslation();
+  const { publicationId } = Route.useParams();
+  const { user } = useAuth();
+  const nav = useNavigate();
+  const qc = useQueryClient();
+
+  const getFn = useServerFn(getPublication);
+  const resultsFn = useServerFn(getPollResults);
+  const voteFn = useServerFn(castPollVote);
+  const closeFn = useServerFn(closePublication);
+  const deleteFn = useServerFn(deletePublication);
+  const recipientsFn = useServerFn(listPublicationRecipients);
+
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showRecipients, setShowRecipients] = useState(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["publication", publicationId],
+    queryFn: () => getFn({ data: { publicationId } }),
+  });
+
+  const isPoll = data?.publication?.publication_type === "poll";
+  const isClosed = !!data?.publication?.closed_at;
+  const isStaff = !!data?.isStaff;
+  const myVote = data?.myVotes?.[0];
+
+  const { data: results } = useQuery({
+    queryKey: ["publication-results", publicationId],
+    queryFn: () => resultsFn({ data: { publicationId } }),
+    enabled: !!data && isPoll,
+  });
+
+  const { data: recipients } = useQuery({
+    queryKey: ["publication-recipients", publicationId],
+    queryFn: () => recipientsFn({ data: { publicationId } }),
+    enabled: showRecipients && isStaff,
+  });
+
+  const vote = useMutation({
+    mutationFn: async (optionId: string) => {
+      if (!user?.id) throw new Error("no_user");
+      return voteFn({
+        data: {
+          publicationId,
+          optionId,
+          subjectKind: "user",
+          subjectId: user.id,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("publications.detail.voted", "Vote enregistré"));
+      qc.invalidateQueries({ queryKey: ["publication", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
+    },
+    onError: (e: any) => {
+      const msg = e?.message || "";
+      if (msg.includes("poll_closed")) {
+        toast.error(t("publications.errors.pollClosed"));
+      } else if (msg.includes("Forbidden") || msg.includes("forbidden")) {
+        toast.error(t("publications.errors.forbidden"));
+      } else {
+        toast.error(t("common.error", "Erreur"));
+      }
+    },
+  });
+
+  const closeMut = useMutation({
+    mutationFn: async () => closeFn({ data: { publicationId } }),
+    onSuccess: () => {
+      toast.success(t("publications.detail.closed", "Publication fermée"));
+      qc.invalidateQueries({ queryKey: ["publication", publicationId] });
+    },
+    onError: () => toast.error(t("common.error", "Erreur")),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: async () => deleteFn({ data: { publicationId } }),
+    onSuccess: () => {
+      toast.success(t("publications.detail.deleted", "Publication supprimée"));
+      nav({ to: "/publications" });
+    },
+    onError: () => toast.error(t("common.error", "Erreur")),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="p-6 text-sm text-muted-foreground">{t("common.loading", "Chargement…")}</div>
+    );
+  }
+  if (!data?.publication) {
+    return <div className="p-6">{t("publications.detail.notFound", "Publication introuvable")}</div>;
+  }
+
+  const pub = data.publication;
+  const totalVotes = results?.rows?.[0]?.total_voters ?? 0;
+  const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
+
+  return (
+    <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
+      <BackLink to="/publications" label={t("publications.list.title", "Publications")} />
+
+      <Card>
+        <CardContent className="py-5 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2 min-w-0">
+              {isPoll ? (
+                <BarChart3 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              ) : (
+                <MessageSquare className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+              )}
+              <div className="min-w-0">
+                <h1 className="text-lg font-semibold">{pub.title}</h1>
+                <div className="flex items-center gap-2 flex-wrap mt-1">
+                  {isPoll && pub.poll_visibility === "anonymous" && (
+                    <Badge variant="outline" className="gap-1">
+                      <Lock className="h-3 w-3" />
+                      {t("publications.list.anonymous", "Anonyme")}
+                    </Badge>
+                  )}
+                  {isClosed && (
+                    <Badge variant="secondary" className="gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      {t("publications.list.closed", "Fermé")}
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(pub.published_at).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {isStaff && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setShowRecipients((s) => !s)}>
+                    <Users className="h-4 w-4 mr-2" />
+                    {t("publications.detail.recipients", "Voir les destinataires")}
+                  </DropdownMenuItem>
+                  {!isClosed && isPoll && (
+                    <DropdownMenuItem onClick={() => closeMut.mutate()}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      {t("publications.detail.close", "Fermer le sondage")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => {
+                      if (confirm(t("publications.detail.confirmDelete", "Supprimer cette publication ?"))) {
+                        deleteMut.mutate();
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {t("publications.detail.delete", "Supprimer")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+
+          {pub.content && (
+            <div className="text-sm whitespace-pre-wrap">{pub.content}</div>
+          )}
+
+          {isPoll && data.options.length > 0 && (
+            <div className="space-y-2 pt-2">
+              {!myVote && !isClosed ? (
+                <>
+                  <RadioGroup
+                    value={selectedOption ?? ""}
+                    onValueChange={setSelectedOption}
+                    className="space-y-2"
+                  >
+                    {data.options.map((opt) => (
+                      <label
+                        key={opt.id}
+                        className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent"
+                      >
+                        <RadioGroupItem value={opt.id} />
+                        <span className="text-sm">{opt.label}</span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                  <Button
+                    disabled={!selectedOption || vote.isPending}
+                    onClick={() => selectedOption && vote.mutate(selectedOption)}
+                  >
+                    {vote.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                    {t("publications.detail.vote", "Voter")}
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  {(results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))).map(
+                    (r: any) => {
+                      const isMine = myVote?.option_id === r.option_id;
+                      const count = r.vote_count;
+                      const pct =
+                        count == null
+                          ? null
+                          : totalVotes > 0
+                            ? Math.round((count / totalVotes) * 100)
+                            : 0;
+                      return (
+                        <div key={r.option_id} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className={isMine ? "font-medium" : ""}>
+                              {r.label} {isMine && "✓"}
+                            </span>
+                            <span className="text-muted-foreground text-xs">
+                              {count == null
+                                ? t("publications.detail.masked", "—")
+                                : `${count} · ${pct}%`}
+                            </span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${isMine ? "bg-primary" : "bg-primary/40"}`}
+                              style={{
+                                width:
+                                  count == null
+                                    ? "0%"
+                                    : `${Math.round((count / maxCount) * 100)}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    },
+                  )}
+                  {results?.rows?.some((r) => r.below_threshold) && (
+                    <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
+                      <Info className="h-3.5 w-3.5 mt-0.5" />
+                      <span>
+                        {t(
+                          "publications.detail.thresholdNotice",
+                          "Résultats masqués pour préserver l'anonymat (< 3 votes par option).",
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {isStaff && showRecipients && (
+        <Card>
+          <CardContent className="py-4 space-y-2">
+            <div className="font-medium text-sm flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              {t("publications.detail.recipientsTitle", "Destinataires")} ({recipients?.recipients?.length ?? 0})
+            </div>
+            <div className="space-y-1 max-h-64 overflow-y-auto">
+              {(recipients?.recipients ?? []).map((r: any, i: number) => (
+                <div key={i} className="text-sm text-muted-foreground">
+                  {r.players
+                    ? `${r.players.first_name} ${r.players.last_name}`
+                    : r.subject_kind === "user"
+                      ? t("publications.detail.userSubject", "Utilisateur")
+                      : t("publications.detail.unknown", "Inconnu")}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
