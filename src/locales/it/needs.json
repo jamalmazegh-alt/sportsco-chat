@@ -156,7 +156,11 @@
     "confirmSelection": "Conferma",
     "noMembers": "Nessun membro trovato",
     "editNeed": "Modifica la necessità",
-    "createDraft": "Crea come bozza"
+    "createDraft": "Crea come bozza",
+    "unassigned": "Assegnazione annullata",
+    "fullTitle": "Capacità raggiunta",
+    "unassignCta": "Rimuovi",
+    "fullBlock": "Capacità raggiunta. Rimuovi prima una persona confermata per assegnarne un'altra."
   },
   "pendingApplications_one": "{{count}} in attesa",
   "pendingApplications_other": "{{count}} in attesa",
