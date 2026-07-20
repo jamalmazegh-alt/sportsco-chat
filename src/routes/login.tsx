@@ -201,6 +201,10 @@ function LoginPage() {
         <p className="signup">
           {t("auth.noAccount")} <Link to="/register">{t("auth.register")}</Link>
         </p>
+
+        <div className="install-cta">
+          <InstallAppButton label="Installer l'app sur mon téléphone" />
+        </div>
       </main>
     </div>
   );
