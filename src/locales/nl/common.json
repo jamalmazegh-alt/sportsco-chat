@@ -1285,7 +1285,15 @@
       "plusOthers": "{{first}} + {{n}} andere"
     },
     "audienceTo": "Aan:",
-    "audienceRequired": "Kies minstens één team."
+    "audienceRequired": "Kies minstens één team.",
+    "compose": {
+      "targetGroup": "Groep(en)",
+      "alsoEmail": "Ook per e-mail"
+    },
+    "email": {
+      "subject": "Nieuw bericht van {{club}}",
+      "viewOnWall": "Bekijk op het prikbord"
+    }
   },
   "chat": {
     "title": "Evenementchat",
