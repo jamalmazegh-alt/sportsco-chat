@@ -987,6 +987,7 @@ function NeedFormDialog({
 
     },
     onSuccess: (r) => {
+      const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
       if (isEdit) {
         toast.success(t("common.saved"));
       } else if ((r as { __published?: { recipients_count: number } })?.__published) {
@@ -995,6 +996,10 @@ function NeedFormDialog({
       } else {
         toast.success(t("needs:section.created"));
       }
+      if (pre > 0) {
+        toast.success(t("needs:audiences.preassign.confirmed", { count: pre }));
+      }
+
       onSaved();
       onOpenChange(false);
     },
