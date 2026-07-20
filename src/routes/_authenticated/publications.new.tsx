@@ -55,7 +55,8 @@ function NewPublicationPage() {
   const listSeasonsFn = useServerFn(listSeasons);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [type, setType] = useState<"message" | "poll">("message");
+  // Wizard is polls-only — messages live on the wall. Any ?type=message is ignored.
+  const type: "message" | "poll" = "poll";
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [pollVisibility, setPollVisibility] = useState<"anonymous" | "staff_visible">("anonymous");
