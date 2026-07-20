@@ -82,6 +82,8 @@ function DispatchDetailPage() {
 
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  const retryFn = useServerFn(superadminRetryDispatch);
 
   const recipients: DispatchRecipientRow[] = data?.recipients ?? [];
   const filtered = useMemo(() => {
@@ -95,6 +97,51 @@ function DispatchDetailPage() {
       );
     });
   }, [recipients, q, statusFilter]);
+
+  const failuresCount = data ? data.counts.failed + data.counts.dlq : 0;
+  const templateSupportsRetry = data?.dispatch.template_name === "convocation-invite";
+
+  function summarize(r: SuperadminRetryReport, label: string) {
+    if (!r.ok) {
+      toast.error(`${label} : ${r.reason ?? "erreur"}`);
+      return;
+    }
+    const parts = [
+      `${r.replayed} renfilé(s)`,
+      r.skippedAlreadyDelivered > 0 && `${r.skippedAlreadyDelivered} déjà délivré(s)`,
+      r.skippedInFlight > 0 && `${r.skippedInFlight} en cours`,
+      r.skippedNotRetryable > 0 && `${r.skippedNotRetryable} non-relançable(s)`,
+      r.errors > 0 && `${r.errors} erreur(s)`,
+    ].filter(Boolean);
+    toast.success(`${label} — ${parts.join(" · ")}`);
+  }
+
+  async function retryAll() {
+    if (!data) return;
+    setBusyKey("batch");
+    try {
+      const r = await retryFn({ data: { dispatchId } });
+      summarize(r, "Batch");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusyKey(null);
+    }
+  }
+
+  async function retryOne(rowId: string) {
+    setBusyKey(rowId);
+    try {
+      const r = await retryFn({ data: { dispatchId, logRowIds: [rowId] } });
+      summarize(r, "Envoi");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusyKey(null);
+    }
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
