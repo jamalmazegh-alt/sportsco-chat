@@ -110,6 +110,7 @@ import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './rout
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
 import { Route as AuthenticatedPublicationsNewRouteImport } from './routes/_authenticated/publications.new'
+import { Route as AuthenticatedPublicationsPublicationIdRouteImport } from './routes/_authenticated/publications.$publicationId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
@@ -704,6 +705,12 @@ const AuthenticatedPublicationsNewRoute =
     path: '/publications/new',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPublicationsPublicationIdRoute =
+  AuthenticatedPublicationsPublicationIdRouteImport.update({
+    id: '/publications/$publicationId',
+    path: '/publications/$publicationId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
     id: '/privacy',
@@ -1158,6 +1165,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
   '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
@@ -1319,6 +1327,7 @@ export interface FileRoutesByTo {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
   '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
@@ -1487,6 +1496,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/_authenticated/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
   '/_authenticated/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
@@ -1655,6 +1665,7 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
     | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
@@ -1816,6 +1827,7 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
     | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
@@ -1983,6 +1995,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
+    | '/_authenticated/publications/$publicationId'
     | '/_authenticated/publications/new'
     | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
@@ -2872,6 +2885,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPublicationsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/publications/$publicationId': {
+      id: '/_authenticated/publications/$publicationId'
+      path: '/publications/$publicationId'
+      fullPath: '/publications/$publicationId'
+      preLoaderRoute: typeof AuthenticatedPublicationsPublicationIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
       path: '/privacy'
@@ -3561,6 +3581,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
   AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  AuthenticatedPublicationsPublicationIdRoute: typeof AuthenticatedPublicationsPublicationIdRoute
   AuthenticatedPublicationsNewRoute: typeof AuthenticatedPublicationsNewRoute
   AuthenticatedNeedsIndexRoute: typeof AuthenticatedNeedsIndexRoute
   AuthenticatedPublicationsIndexRoute: typeof AuthenticatedPublicationsIndexRoute
@@ -3583,6 +3604,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
+  AuthenticatedPublicationsPublicationIdRoute:
+    AuthenticatedPublicationsPublicationIdRoute,
   AuthenticatedPublicationsNewRoute: AuthenticatedPublicationsNewRoute,
   AuthenticatedNeedsIndexRoute: AuthenticatedNeedsIndexRoute,
   AuthenticatedPublicationsIndexRoute: AuthenticatedPublicationsIndexRoute,
@@ -3766,3 +3789,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
