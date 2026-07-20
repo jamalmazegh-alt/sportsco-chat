@@ -1048,7 +1048,7 @@ function NeedFormDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-1">
-          {(isEdit || step === 1) && (
+          {(!showAudienceStep || step === 1) && (
             <>
               {/* Permanent minor reminder */}
               <div className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
