@@ -468,16 +468,29 @@ function NeedRow({
           <div className="mt-2.5 flex items-center gap-2 flex-wrap">
             {seatsPill}
             {isStaff && (need.confirmed_signups?.length ?? 0) > 0 && (
-              <div className="flex items-center gap-1 flex-wrap">
-                {need.confirmed_signups!.map((s) => (
-                  <Badge
-                    key={s.user_id}
-                    variant="outline"
-                    className="text-[11px] border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
-                  >
-                    {s.full_name ?? t("common.unknown")}
-                  </Badge>
-                ))}
+              <div className="w-full mt-1 rounded-md border border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/60 dark:bg-emerald-950/20 px-2 py-1 divide-y divide-emerald-100 dark:divide-emerald-900/60">
+                {need.confirmed_signups!.map((s) => {
+                  const ctx = s.context;
+                  const roles =
+                    ctx?.primary_role ? [ctx.primary_role] : [];
+                  const subline = formatMemberContextSubline(ctx, {
+                    playerSubline: (c) =>
+                      t("common:person.playerSubline", { category: c }),
+                    playerSublineMulti: (c) =>
+                      t("common:person.playerSublineMulti", { categories: c }),
+                    parentSubline: (c) =>
+                      t("common:person.parentSubline", { children: c }),
+                  });
+                  return (
+                    <PersonRow
+                      key={s.user_id}
+                      compact
+                      name={s.full_name ?? t("common.unknown")}
+                      roles={roles}
+                      subline={subline}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
