@@ -862,6 +862,7 @@ export const listEventNeeds = createServerFn({ method: "POST" })
           Boolean(isStaff),
           confirmedUserIdsByNeed[n.id] ?? [],
           nameByUser,
+          contextByUser,
         ),
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
