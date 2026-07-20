@@ -51,6 +51,20 @@ const b64utf8 = (s: string): string => base64(new TextEncoder().encode(s));
 // RFC 2047 encoded-word so accented subjects survive.
 const encodeSubject = (s: string): string => `=?UTF-8?B?${b64utf8(s)}?=`;
 
+// Format a `Display Name <addr>` string for the MIME From header so the display
+// name (e.g. "USAG Uckange via Clubero") is preserved: quote it (ASCII) or
+// RFC-2047 encode it (accented club names). A bare address is returned as-is.
+export function formatFromHeader(from: string): string {
+  const m = from.match(/^\s*(.*?)\s*<\s*([^<>@\s]+@[^<>@\s]+)\s*>\s*$/);
+  if (!m || !m[1]) return from;
+  const name = m[1];
+  const addr = m[2];
+  const display = /[^\x00-\x7F]/.test(name)
+    ? `=?UTF-8?B?${b64utf8(name)}?=`
+    : `"${name.replace(/([\\"])/g, "\\$1")}"`;
+  return `${display} <${addr}>`;
+}
+
 // Wrap base64 body at 76 chars per RFC 2045.
 const wrap76 = (s: string): string => s.replace(/(.{76})/g, "$1\r\n");
 
@@ -75,7 +89,7 @@ function buildMime(p: SendPayload, from: string): string {
   const boundary =
     "clubero_" + (p.messageId ?? "m").replace(/[^A-Za-z0-9]/g, "").slice(0, 40) + "_alt";
   const headers: string[] = [
-    `From: ${from}`,
+    `From: ${formatFromHeader(from)}`,
     `To: ${p.to}`,
     `Subject: ${encodeSubject(p.subject)}`,
     "MIME-Version: 1.0",
@@ -127,8 +141,10 @@ export class SesSender implements EmailSender {
     // rewrites, so Lovable stays a working fallback under EMAIL_PROVIDER=lovable.
     const from = rewriteFromDomain(payload.from, process.env.AWS_SES_FROM_DOMAIN);
 
+    // Do NOT set FromEmailAddress: when combined with Raw content, SES normalizes
+    // the From and drops the display name (club name). Leaving it out makes the
+    // raw MIME From header authoritative, so "USAG Uckange via Clubero" survives.
     const requestBody: Record<string, unknown> = {
-      FromEmailAddress: from,
       Destination: { ToAddresses: [payload.to] },
       Content: { Raw: { Data: b64utf8(buildMime(payload, from)) } },
     };
