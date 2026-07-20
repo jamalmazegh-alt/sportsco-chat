@@ -245,6 +245,8 @@ export function AudiencePickerBody({
   state,
   controls,
   preview,
+  capacity,
+  enablePreassign = false,
 }: {
   ctx: AudienceCtx | null | undefined;
   state: AudienceState;
@@ -253,9 +255,14 @@ export function AudiencePickerBody({
     toggleGroup: (id: string) => void;
     toggleTeam: (id: string, kind: TeamKind) => void;
     setCategory: (v: string) => void;
+    addPreassigned?: (p: PreassignedPerson) => void;
+    removePreassigned?: (user_id: string) => void;
   };
   preview?: { count: number | null; loading: boolean };
+  capacity?: number;
+  enablePreassign?: boolean;
 }) {
+
   const { t } = useTranslation();
   const [kind, setKind] = useState<KindKey | "">("");
   const [param, setParam] = useState<string>("");
