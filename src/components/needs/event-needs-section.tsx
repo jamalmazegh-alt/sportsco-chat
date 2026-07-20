@@ -978,9 +978,23 @@ function NeedFormDialog({
         });
         needId = created!.id;
       }
+      // Publish FIRST so the need is open, THEN materialize pre-assignments.
+      // A draft must never notify anyone: pre-assignments are only sent when
+      // the need actually transitions to "open".
+      let published: { recipients_count?: number } | null = null;
+      const hasPreassign = showAudienceStep && audState.preassigned.length > 0;
+      const shouldPublish =
+        showAudienceStep &&
+        (audiences.length > 0 ||
+          (hasPreassign && (!isEdit || initial?.status !== "open")));
+      if (shouldPublish) {
+        published = await publish({ data: { need_id: needId, audiences } });
+      }
       // Pre-assign selected people (confirmed immediately, notified).
+      // Skipped entirely if the need stays a draft.
       let preassignedCount = 0;
-      if (showAudienceStep && audState.preassigned.length > 0) {
+      const needIsOpen = shouldPublish || (isEdit && initial?.status === "open");
+      if (hasPreassign && needIsOpen) {
         for (const p of audState.preassigned) {
           try {
             await addManualFn({ data: { need_id: needId, user_id: p.user_id } });
@@ -990,12 +1004,8 @@ function NeedFormDialog({
           }
         }
       }
-      // Publish (broadcast audience or draft with pre-assignments).
-      let published: { recipients_count?: number } | null = null;
-      if (showAudienceStep && audiences.length > 0) {
-        published = await publish({ data: { need_id: needId, audiences } });
-      }
       return { id: needId, __published: published, __preassignedCount: preassignedCount, __wasEdit: isEdit };
+
     },
     onSuccess: (r) => {
       const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
