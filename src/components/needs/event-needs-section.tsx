@@ -1708,7 +1708,7 @@ function StaffSignupsDialog({
                           variant="outline"
                           onClick={() => unassignM.mutate(s.id)}
                           disabled={unassignM.isPending}
-                          title={t("needs:staff.unassignCta", { defaultValue: "Retirer" })}
+                          title={t("needs:staff.unassignCta")}
                         >
                           {unassignM.isPending ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
