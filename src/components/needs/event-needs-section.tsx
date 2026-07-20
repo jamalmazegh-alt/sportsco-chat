@@ -1506,7 +1506,7 @@ function StaffSignupsDialog({
   const unassignM = useMutation({
     mutationFn: (signup_id: string) => unassignFn({ data: { signup_id } }),
     onSuccess: () => {
-      toast.success(t("needs:staff.unassigned", { defaultValue: "Assignation annulée" }));
+      toast.success(t("needs:staff.unassigned"));
       refetch();
       onChanged();
       qc.invalidateQueries({ queryKey: ["need-signups", needId] });
