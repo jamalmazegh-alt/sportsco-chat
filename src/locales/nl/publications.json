@@ -29,7 +29,13 @@
     "email": "Email",
     "emailDesc": "Sends an email to each recipient.",
     "publish": "Publish",
-    "published": "Publication sent"
+    "published": "Publication sent",
+    "pickCategory": "Kies een categorie…",
+    "pickEvent": "Kies een evenement…",
+    "pickMembers": "Handmatige selectie (spelers)",
+    "searchPlaceholder": "Zoek een speler…",
+    "addPlayersBtn": "+ Spelers",
+    "addParentsBtn": "+ Ouders"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -122,8 +128,8 @@
   },
   "audience": {
     "picker": "Who to notify?",
-    "recipientsCount_one": "{{count}} person will be notified",
-    "recipientsCount_other": "{{count}} people will be notified",
+    "recipientsCount_one": "{{count}} ontvanger",
+    "recipientsCount_other": "{{count}} ontvangers",
     "empty": "No audience selected — add at least one criterion below.",
     "convocationsMissing": "No line-up yet for this event — audience empty.",
     "categoryLabel": "Category",
@@ -139,7 +145,10 @@
       "dirigeants": "Board members",
       "groupe_personnalise": "Custom group",
       "selection_manuelle": "Manual selection"
-    }
+    },
+    "recipientsBreakdown": "({{players}} spelers · {{users}} gebruikers)",
+    "none": "0 ontvangers",
+    "previewError": "Voorbeeld niet beschikbaar"
   },
   "form": {
     "titleLabel": "Title",
