@@ -1288,7 +1288,8 @@
     "audienceRequired": "Scegli almeno una squadra.",
     "compose": {
       "targetGroup": "Gruppo/i",
-      "alsoEmail": "Anche via email"
+      "alsoEmail": "Invia una copia via email",
+      "newPoll": "Nuovo sondaggio"
     },
     "email": {
       "subject": "Nuovo messaggio da {{club}}",

@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
+  BarChart3,
   Eye,
   ExternalLink,
   Loader2,
+  Lock,
   MegaphoneIcon,
   MessageSquare,
   Pin,
@@ -25,7 +28,9 @@ import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
+import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
+
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
@@ -60,6 +65,16 @@ type Post = {
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
 };
+type PollItem = {
+  id: string;
+  publication_type: string;
+  title: string;
+  content: string | null;
+  poll_visibility: string | null;
+  published_at: string | null;
+  closed_at: string | null;
+  voter_count?: number;
+};
 
 const SOURCE_META: Record<
   Exclude<PostSource, "clubero">,
@@ -86,10 +101,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
+  const listPublicationsFn = useServerFn(listPublications);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [posting, setPosting] = useState(false);
@@ -203,6 +220,44 @@ export function WallFeed({ clubId }: { clubId: string }) {
   useEffect(() => {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
+
+  // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
+  // Filter to publication_type='poll' as a safety net; messages now live on the wall.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await listPublicationsFn({ data: { clubId, limit: 50 } });
+        const list = ((r?.publications ?? []) as any[]).filter(
+          (p) => p.publication_type === "poll",
+        ) as PollItem[];
+        if (list.length === 0) {
+          if (!cancelled) setPolls([]);
+          return;
+        }
+        // Best-effort voter count (RLS on club_poll_votes: voters are visible per policy).
+        const ids = list.map((p) => p.id);
+        const { data: votes } = await supabase
+          .from("club_poll_votes")
+          .select("publication_id")
+          .in("publication_id", ids);
+        const counts = new Map<string, number>();
+        for (const v of (votes ?? []) as { publication_id: string }[]) {
+          counts.set(v.publication_id, (counts.get(v.publication_id) ?? 0) + 1);
+        }
+        if (!cancelled) {
+          setPolls(list.map((p) => ({ ...p, voter_count: counts.get(p.id) ?? 0 })));
+        }
+      } catch {
+        if (!cancelled) setPolls([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line
+  }, [clubId]);
+
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
@@ -635,8 +690,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
               checked={sendEmail}
               onChange={(e) => setSendEmail(e.target.checked)}
             />
-            {t("wall.compose.alsoEmail", { defaultValue: "Aussi par e-mail" })}
+            {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
           </label>
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+            <Button asChild size="sm" variant="outline">
+              <Link to="/publications/new">
+                <BarChart3 className="h-4 w-4 mr-1.5" />
+                {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+              </Link>
+            </Button>
+          </div>
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
@@ -664,6 +727,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
       <WallGrouped
         posts={posts}
+        polls={polls}
         currentUserId={user?.id ?? null}
         role={role}
         commentsEnabled={commentsEnabled}
@@ -835,8 +899,13 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
   );
 }
 
+type TimelineEntry =
+  | { kind: "post"; date: Date; post: Post }
+  | { kind: "poll"; date: Date; poll: PollItem };
+
 function WallGrouped({
   posts,
+  polls,
   currentUserId,
   role,
   commentsEnabled,
@@ -847,6 +916,7 @@ function WallGrouped({
   onTogglePin,
 }: {
   posts: Post[];
+  polls: PollItem[];
   currentUserId: string | null;
   role: string | null;
   commentsEnabled: boolean;
@@ -861,18 +931,26 @@ function WallGrouped({
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { label: string; items: Post[] }>();
-    for (const p of rest) {
-      const d = new Date(p.created_at);
-      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      const label = format(d, "MMMM yyyy", { locale: dateLocale() });
+    const entries: TimelineEntry[] = [
+      ...rest.map((p) => ({ kind: "post" as const, date: new Date(p.created_at), post: p })),
+      ...polls.map((pl) => ({
+        kind: "poll" as const,
+        date: new Date(pl.published_at ?? new Date().toISOString()),
+        poll: pl,
+      })),
+    ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    const map = new Map<string, { label: string; items: TimelineEntry[] }>();
+    for (const e of entries) {
+      const key = `${e.date.getFullYear()}-${String(e.date.getMonth()).padStart(2, "0")}`;
+      const label = format(e.date, "MMMM yyyy", { locale: dateLocale() });
       if (!map.has(key)) map.set(key, { label, items: [] });
-      map.get(key)!.items.push(p);
+      map.get(key)!.items.push(e);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [rest]);
+  }, [rest, polls]);
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && polls.length === 0) {
     return (
       <EmptyState
         icon={<MegaphoneIcon className="h-6 w-6" />}
@@ -884,6 +962,7 @@ function WallGrouped({
       />
     );
   }
+
 
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
@@ -1048,12 +1127,86 @@ function WallGrouped({
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
             {group.label}
           </h2>
-          <ul className="space-y-2.5">{group.items.map(renderItem)}</ul>
+          <ul className="space-y-2.5">
+            {group.items.map((entry) =>
+              entry.kind === "post" ? renderItem(entry.post) : <PollCard key={entry.poll.id} poll={entry.poll} />,
+            )}
+          </ul>
         </section>
       ))}
+      {polls.length > 0 && (
+        <div className="pt-2 text-center">
+          <Link to="/publications" className="text-xs text-primary hover:underline">
+            {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
+
+function PollCard({ poll }: { poll: PollItem }) {
+  const { t } = useTranslation();
+  const d = new Date(poll.published_at ?? Date.now());
+  const isClosed = !!poll.closed_at;
+  const isAnonymous = poll.poll_visibility === "anonymous";
+  return (
+    <li
+      className={cn(
+        "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
+        "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
+        "animate-in fade-in-0 slide-in-from-bottom-1 duration-300",
+        "border-primary/30 bg-primary/[0.02]",
+      )}
+    >
+      <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/12">
+        <BarChart3 className="h-5 w-5 text-primary" />
+        <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">
+          {format(d, "d MMM")}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0 py-3 pr-3">
+        <header className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30 inline-flex items-center gap-1">
+            <BarChart3 className="h-3 w-3" />
+            {t("publications:card.tagPoll", { defaultValue: "Sondage" })}
+          </span>
+          {isAnonymous && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
+              {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
+            </span>
+          )}
+          {isClosed && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("publications:card.closed", { defaultValue: "Fermé" })}
+            </span>
+          )}
+        </header>
+        <p className="text-sm font-semibold">{poll.title}</p>
+        {poll.content && (
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
+        )}
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {t("publications:card.voters", {
+              defaultValue: "{{count}} votants",
+              count: poll.voter_count ?? 0,
+            })}
+          </span>
+          <Button asChild size="sm" variant={isClosed ? "outline" : "default"}>
+            <Link to="/publications/$publicationId" params={{ publicationId: poll.id }}>
+              {isClosed
+                ? t("publications:card.viewResults", { defaultValue: "Voir les résultats" })
+                : t("publications:card.vote", { defaultValue: "Voter" })}
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
 
 function CommentBlock({
   post,

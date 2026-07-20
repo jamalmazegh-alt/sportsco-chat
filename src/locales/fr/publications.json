@@ -35,7 +35,8 @@
     "pickMembers": "Sélection manuelle (joueurs)",
     "searchPlaceholder": "Rechercher un joueur…",
     "addPlayersBtn": "+ Joueurs",
-    "addParentsBtn": "+ Parents"
+    "addParentsBtn": "+ Parents",
+    "pollTitle": "Nouveau sondage"
   },
   "detail": {
     "notFound": "Publication introuvable",
@@ -182,5 +183,14 @@
     "optionsMin": "Un sondage requiert au moins 2 options.",
     "optionHasVotes": "Impossible de modifier une option ayant déjà reçu des votes.",
     "visibilityLocked": "La visibilité ne peut plus changer après le premier vote."
-  }
+  },
+  "card": {
+    "tagPoll": "Sondage",
+    "voters": "{{count}} votants",
+    "vote": "Voter",
+    "viewResults": "Voir les résultats",
+    "anonymous": "Anonyme",
+    "closed": "Fermé"
+  },
+  "seeAllPolls": "Voir tous les sondages"
 }

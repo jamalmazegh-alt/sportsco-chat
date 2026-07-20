@@ -55,7 +55,8 @@ function NewPublicationPage() {
   const listSeasonsFn = useServerFn(listSeasons);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [type, setType] = useState<"message" | "poll">("message");
+  // Wizard is polls-only — messages live on the wall. Any ?type=message is ignored.
+  const type: "message" | "poll" = "poll";
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [pollVisibility, setPollVisibility] = useState<"anonymous" | "staff_visible">("anonymous");
@@ -261,7 +262,7 @@ function NewPublicationPage() {
   }, [previewKey, activeClubId]);
 
   const canStep1 =
-    title.trim().length > 0 && (type === "message" || pollOptions.filter((s) => s.trim()).length >= 2);
+    title.trim().length > 0 && pollOptions.filter((s) => s.trim()).length >= 2;
   const canSubmit =
     (audiences.length > 0 || manualMemberIds.length > 0) &&
     (publishToWall || sendEmail) &&
@@ -339,7 +340,7 @@ function NewPublicationPage() {
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
       <BackLink to="/publications" label={t("publications:list.title", "Publications")} />
       <h1 className="text-xl font-semibold">
-        {t("publications:new.title", "Nouvelle publication")}
+        {t("publications:new.pollTitle", "Nouveau sondage")}
       </h1>
       <div className="text-xs text-muted-foreground">
         {t("publications:new.step", "Étape")} {step} / 2
@@ -348,23 +349,7 @@ function NewPublicationPage() {
       {step === 1 && (
         <Card>
           <CardContent className="py-5 space-y-4">
-            <div className="space-y-2">
-              <Label>{t("publications:form.typeLabel")}</Label>
-              <RadioGroup
-                value={type}
-                onValueChange={(v) => setType(v as any)}
-                className="flex gap-4"
-              >
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <RadioGroupItem value="message" id="pt-msg" />
-                  <span>{t("publications:new.typeMessage", "Message")}</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <RadioGroupItem value="poll" id="pt-poll" />
-                  <span>{t("publications:new.typePoll", "Sondage")}</span>
-                </label>
-              </RadioGroup>
-            </div>
+
 
             <div className="space-y-1.5">
               <Label htmlFor="pub-title">
