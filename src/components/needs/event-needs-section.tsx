@@ -967,11 +967,24 @@ function NeedFormDialog({
           validation_mode: mode,
         },
       });
+      // Pre-assign selected people (before publish so they are already confirmed).
+      let preassignedCount = 0;
+      if (created?.id && audState.preassigned.length > 0) {
+        for (const p of audState.preassigned) {
+          try {
+            await addManualFn({ data: { need_id: created.id, user_id: p.user_id } });
+            preassignedCount++;
+          } catch (e) {
+            console.error("[preassign] failed", p.user_id, e);
+          }
+        }
+      }
       if (wantsPublish && created?.id) {
         const r = await publish({ data: { need_id: created.id, audiences } });
-        return { ...created, __published: r };
+        return { ...created, __published: r, __preassignedCount: preassignedCount };
       }
-      return created;
+      return { ...created, __preassignedCount: preassignedCount };
+
     },
     onSuccess: (r) => {
       if (isEdit) {
