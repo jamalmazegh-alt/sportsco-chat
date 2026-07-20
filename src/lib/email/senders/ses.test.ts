@@ -81,6 +81,16 @@ describe("SesSender", () => {
     );
   });
 
+  it("formats the From header so the club display name is preserved", () => {
+    expect(formatFromHeader("USAG Uckange via Clubero <noreply@send.clubero.app>")).toBe(
+      '"USAG Uckange via Clubero" <noreply@send.clubero.app>',
+    );
+    expect(formatFromHeader("Étoile FC via Clubero <noreply@send.clubero.app>")).toBe(
+      "=?UTF-8?B?w4l0b2lsZSBGQyB2aWEgQ2x1YmVybw==?= <noreply@send.clubero.app>",
+    );
+    expect(formatFromHeader("noreply@send.clubero.app")).toBe("noreply@send.clubero.app");
+  });
+
   it("maps SES throttling (400 Throttling) to a 429 so the caller backs off", async () => {
     vi.stubGlobal(
       "fetch",
