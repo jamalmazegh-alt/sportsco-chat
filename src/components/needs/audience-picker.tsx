@@ -825,23 +825,57 @@ function PreassignPanel({
               </div>
             ) : (
               <ul className="divide-y">
-                {(data?.members ?? []).map((m) => (
-                  <li key={m.user_id}>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left text-xs hover:bg-muted"
-                      onClick={() => {
-                        onAdd({ user_id: m.user_id, full_name: m.full_name });
-                        setQ("");
-                      }}
-                    >
-                      <span className="truncate">
-                        {m.full_name ?? m.user_id.slice(0, 8)}
-                      </span>
-                      <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                    </button>
-                  </li>
-                ))}
+                {(data?.members ?? []).map((m) => {
+                  const primary = m.primary_role ?? null;
+                  const roleForChip = primary ?? m.roles?.[0] ?? null;
+                  // Build subline based on role.
+                  let subline: string | null = null;
+                  if (primary === "player") {
+                    subline = m.player_category
+                      ? t("needs:audiences.preassign.playerSubline", {
+                          category: m.player_category,
+                          defaultValue: "Joueur · {{category}}",
+                        })
+                      : null;
+                  } else if (primary === "parent" && m.children && m.children.length > 0) {
+                    subline = m.children
+                      .map((c) => (c.category ? `${c.name} (${c.category})` : c.name))
+                      .join(", ");
+                    subline = t("needs:audiences.preassign.parentSubline", {
+                      children: subline,
+                      defaultValue: "Parent de {{children}}",
+                    });
+                  } else if (
+                    (primary === "coach" || primary === "assistant_coach") &&
+                    m.coached_teams &&
+                    m.coached_teams.length > 0
+                  ) {
+                    subline = m.coached_teams
+                      .map((tm) => tm.age_group || tm.name)
+                      .filter(Boolean)
+                      .join(", ");
+                  }
+                  return (
+                    <li key={m.user_id}>
+                      <button
+                        type="button"
+                        className="w-full text-left hover:bg-muted px-2"
+                        onClick={() => {
+                          onAdd({ user_id: m.user_id, full_name: m.full_name });
+                          setQ("");
+                        }}
+                      >
+                        <PersonRow
+                          compact
+                          name={m.full_name ?? m.user_id.slice(0, 8)}
+                          roles={roleForChip ? [roleForChip] : []}
+                          subline={subline}
+                          action={<Plus className="h-3.5 w-3.5 text-muted-foreground" />}
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
