@@ -941,7 +941,9 @@ function NeedFormDialog({
     if (open) setStep(1);
   }, [open]);
 
-  const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
+  const wantsPublish =
+    !isEdit &&
+    (audiences.length > 0 || audState.preassigned.length > 0);
 
   const saveM = useMutation({
     mutationFn: async () => {
