@@ -95,3 +95,35 @@ describe("publications — poll anonymity threshold logic", () => {
   it("anonymous with 3 votes → visible", () => expect(belowThreshold("anonymous", 3)).toBe(false));
   it("staff_visible with 0 votes → visible", () => expect(belowThreshold("staff_visible", 0)).toBe(false));
 });
+
+describe("publications — create input requires at least one target", () => {
+  // Mirror of CreateInput refine: audiences OR manualMemberIds must be non-empty.
+  const CreateInput = z
+    .object({
+      audiences: z.array(AudienceInput).default([]),
+      manualMemberIds: z.array(z.string().uuid()).default([]),
+    })
+    .refine((d) => d.audiences.length > 0 || d.manualMemberIds.length > 0, {
+      message: "audience_required",
+      path: ["audiences"],
+    });
+
+  it("accepts manual-only publication", () => {
+    expect(
+      CreateInput.safeParse({ audiences: [], manualMemberIds: [UUID] }).success,
+    ).toBe(true);
+  });
+  it("accepts audience-only publication", () => {
+    expect(
+      CreateInput.safeParse({
+        audiences: [{ audience_type: "educateurs" }],
+        manualMemberIds: [],
+      }).success,
+    ).toBe(true);
+  });
+  it("rejects empty audience AND empty manual list", () => {
+    const r = CreateInput.safeParse({ audiences: [], manualMemberIds: [] });
+    expect(r.success).toBe(false);
+  });
+});
+
