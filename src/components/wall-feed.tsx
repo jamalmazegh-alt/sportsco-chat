@@ -15,7 +15,6 @@ import {
   MessageSquare,
   Pin,
   PinOff,
-  Plus,
   Send,
   Trash2,
 } from "lucide-react";
