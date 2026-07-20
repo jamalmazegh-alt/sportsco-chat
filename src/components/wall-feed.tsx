@@ -120,7 +120,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     const { data: rawPosts } = await supabase
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type",
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
       )
       .eq("club_id", clubId)
       .is("deleted_at", null)
