@@ -9,6 +9,8 @@
  */
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Users,
   UserRound,
@@ -20,6 +22,7 @@ import {
   Tag,
   UsersRound,
   UserCheck,
+  UserPlus,
   Plus,
   X,
   Check,
@@ -27,6 +30,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import {
@@ -37,6 +41,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
+import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
+
 
 export type ScalarAudienceKey =
   | "convoked_players"
