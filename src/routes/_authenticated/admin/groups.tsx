@@ -83,6 +83,11 @@ import {
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+import { listClubMembersWithContext } from "@/lib/needs/needs.functions";
+import {
+  formatMemberContextSubline,
+  type MemberContext,
+} from "@/lib/needs/member-context";
 import { PersonRow } from "@/components/shared/person-row";
 
 
