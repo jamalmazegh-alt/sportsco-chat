@@ -1,14 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   getEmailDispatchDetail,
   type DispatchRecipientRow,
 } from "@/lib/superadmin/email-dispatches.functions";
+import {
+  superadminRetryDispatch,
+  type SuperadminRetryReport,
+} from "@/lib/superadmin/email-retry.functions";
 import { StatusBadge } from "@/lib/superadmin/ui";
-import { ArrowLeft, Loader2, Mail, RefreshCw } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, RefreshCw, RotateCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/superadmin/email-dispatches_/$dispatchId")({
   component: DispatchDetailPage,
