@@ -776,6 +776,7 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       ? Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()))
       : [];
     const nameByUser: Record<string, string | null> = {};
+    let contextByUser: Map<string, import("./member-context").MemberContext> | undefined;
     if (allConfirmedUserIds.length > 0) {
       const { data: profs } = await supabaseAdmin
         .from("profiles")
@@ -784,6 +785,24 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       for (const p of profs ?? []) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+      }
+      // Enrichissement rôle + catégorie (staff-only).
+      if (clubId) {
+        const { data: cm } = await supabaseAdmin
+          .from("club_members")
+          .select("user_id, roles, role")
+          .eq("club_id", clubId)
+          .in("user_id", allConfirmedUserIds);
+        const { buildMemberContextByUser } = await import("./member-context.server");
+        contextByUser = await buildMemberContextByUser(
+          supabaseAdmin,
+          clubId,
+          (cm ?? []).map((m) => ({
+            user_id: (m as { user_id: string | null }).user_id ?? null,
+            roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+            role: (m as unknown as { role: string | null }).role ?? null,
+          })),
+        );
       }
     }
 
