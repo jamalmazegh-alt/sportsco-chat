@@ -156,7 +156,11 @@
     "confirmSelection": "Bestätigen",
     "noMembers": "Kein Mitglied gefunden",
     "editNeed": "Bedarf bearbeiten",
-    "createDraft": "Als Entwurf anlegen"
+    "createDraft": "Als Entwurf anlegen",
+    "unassigned": "Zuweisung storniert",
+    "fullTitle": "Kapazität erreicht",
+    "unassignCta": "Entfernen",
+    "fullBlock": "Kapazität erreicht. Entfernen Sie zuerst eine bestätigte Person, um eine andere zuzuweisen."
   },
   "pendingApplications_one": "{{count}} offen",
   "pendingApplications_other": "{{count}} offen",
