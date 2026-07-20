@@ -281,37 +281,67 @@ function DispatchDetailPage() {
                     <th className="text-left px-3 py-2 font-medium">Tentatives</th>
                     <th className="text-left px-3 py-2 font-medium">Dernier événement</th>
                     <th className="text-left px-3 py-2 font-medium">Erreur</th>
+                    <th className="text-right px-3 py-2 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((r) => (
-                    <tr key={r.id} className="border-t border-border">
-                      <td className="px-3 py-2 font-mono text-xs break-all">{r.recipient_email}</td>
-                      <td className="px-3 py-2">
-                        <StatusBadge tone={statusTone(r.status)}>
-                          {statusLabel(r.status)}
-                        </StatusBadge>
-                      </td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground">
-                        {r.notification_type ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-xs">
-                        {r.attempt_count}
-                        {r.mismatch_count > 0 && (
-                          <span className="text-destructive"> · mismatch {r.mismatch_count}</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
-                        {fmtDate(r.created_at)}
-                      </td>
-                      <td
-                        className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate"
-                        title={r.error_message ?? undefined}
-                      >
-                        {r.error_message ?? ""}
-                      </td>
-                    </tr>
-                  ))}
+                  {filtered.map((r) => {
+                    const canRetry =
+                      templateSupportsRetry &&
+                      (r.status === "failed" || r.status === "dlq") &&
+                      !!r.message_id;
+                    return (
+                      <tr key={r.id} className="border-t border-border">
+                        <td className="px-3 py-2 font-mono text-xs break-all">
+                          {r.recipient_email}
+                        </td>
+                        <td className="px-3 py-2">
+                          <StatusBadge tone={statusTone(r.status)}>
+                            {statusLabel(r.status)}
+                          </StatusBadge>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          {r.notification_type ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-xs">
+                          {r.attempt_count}
+                          {r.mismatch_count > 0 && (
+                            <span className="text-destructive">
+                              {" "}
+                              · mismatch {r.mismatch_count}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                          {fmtDate(r.created_at)}
+                        </td>
+                        <td
+                          className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate"
+                          title={r.error_message ?? undefined}
+                        >
+                          {r.error_message ?? ""}
+                        </td>
+                        <td className="px-3 py-2 text-right">
+                          {canRetry ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs"
+                              onClick={() => retryOne(r.id)}
+                              disabled={busyKey !== null}
+                            >
+                              {busyKey === r.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RotateCw className="h-3 w-3 mr-1" />
+                              )}
+                              Relancer
+                            </Button>
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
