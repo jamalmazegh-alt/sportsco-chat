@@ -848,27 +848,28 @@ function NeedFormDialog({
   const previewFn = useServerFn(previewEventAudience);
 
   const isEdit = !!initial;
+  const isDraftEdit = isEdit && initial?.status === "draft";
+  const showAudienceStep = !isEdit || isDraftEdit;
   const templateLocked = isEdit && initial?.status === "open";
 
-  // Audience picker is only shown at CREATION (before publication).
-  // For existing drafts, the user re-opens the Publish dialog.
+  // Audience picker is shown at CREATION and when editing a DRAFT.
   const { data: audienceCtx } = useQuery({
     queryKey: ["event-audience-ctx", eventId],
     queryFn: () => ctxFn({ data: { event_id: eventId } }),
-    enabled: open && !isEdit,
+    enabled: open && showAudienceStep,
   });
 
   const { state: audState, controls: audControls, buildAudiences } = useAudienceState();
   const audiences = useMemo<AudienceSelector[]>(
-    () => (isEdit ? [] : buildAudiences(eventId)),
+    () => (showAudienceStep ? buildAudiences(eventId) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [audState, eventId, isEdit],
+    [audState, eventId, showAudienceStep],
   );
 
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   useEffect(() => {
-    if (isEdit || audiences.length === 0) {
+    if (!showAudienceStep || audiences.length === 0) {
       setPreviewCount(0);
       return;
     }
@@ -888,7 +889,7 @@ function NeedFormDialog({
       cancelled = true;
       clearTimeout(to);
     };
-  }, [audiences, eventId, previewFn, isEdit]);
+  }, [audiences, eventId, previewFn, showAudienceStep]);
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
     const s = (sport ?? "").toLowerCase().trim();
@@ -935,15 +936,18 @@ function NeedFormDialog({
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
-  // 2-step wizard state (creation only). Edit stays single-step.
+  // 2-step wizard: step 1 = fields, step 2 = audience.
+  // Draft edits jump straight to step 2 (fields still editable via "back").
   const [step, setStep] = useState<1 | 2>(1);
   useEffect(() => {
-    if (open) setStep(1);
-  }, [open]);
+    if (open) setStep(isDraftEdit ? 2 : 1);
+  }, [open, isDraftEdit]);
 
-  // Creation flow: always save first as draft (with optional pre-assignments).
-  // Publishing to a broadcast audience is done afterwards from the need card.
-  const wantsPublish = !isEdit && audiences.length > 0;
+  // Saves as draft only when neither broadcast audience nor pre-assignments are set.
+  // Any audience selection (broadcast OR pre-assignments) triggers publication.
+  const wantsPublish =
+    showAudienceStep &&
+    (audiences.length > 0 || audState.preassigned.length > 0);
 
   const saveM = useMutation({
     mutationFn: async () => {
