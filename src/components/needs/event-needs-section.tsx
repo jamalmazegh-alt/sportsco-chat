@@ -843,8 +843,10 @@ function NeedFormDialog({
   const create = useServerFn(createEventNeed);
   const update = useServerFn(updateEventNeed);
   const publish = useServerFn(publishEventNeed);
+  const addManualFn = useServerFn(staffAddManualSignup);
   const ctxFn = useServerFn(getEventAudienceContext);
   const previewFn = useServerFn(previewEventAudience);
+
   const isEdit = !!initial;
   const templateLocked = isEdit && initial?.status === "open";
 
