@@ -553,8 +553,9 @@ function NeedRow({
           </Button>
         )}
 
-        {/* Staff — Publier (draft) / Relancer (open, notifie tout le monde) */}
-        {isStaff && (isDraft || isOpen) && (
+        {/* Staff — Publier (draft) / Relancer (open avec places restantes).
+            Un besoin complet (open, 0 place) ne propose plus de re-solliciter. */}
+        {isStaff && (isDraft || (isOpen && remaining > 0)) && (
           <Button
             size="sm"
             variant={isDraft ? "default" : "outline"}
@@ -1505,7 +1506,7 @@ function StaffSignupsDialog({
   const unassignM = useMutation({
     mutationFn: (signup_id: string) => unassignFn({ data: { signup_id } }),
     onSuccess: () => {
-      toast.success(t("needs:staff.unassigned", { defaultValue: "Assignation annulée" }));
+      toast.success(t("needs:staff.unassigned"));
       refetch();
       onChanged();
       qc.invalidateQueries({ queryKey: ["need-signups", needId] });
@@ -1686,7 +1687,7 @@ function StaffSignupsDialog({
                               decideM.mutate({ signup_id: s.id, decision: "confirm" })
                             }
                             disabled={decideM.isPending || bulkPending || isFull}
-                            title={isFull ? t("needs:staff.fullTitle", { defaultValue: "Capacité atteinte" }) : undefined}
+                            title={isFull ? t("needs:staff.fullTitle") : undefined}
                           >
                             <Check className="h-3.5 w-3.5" />
                           </Button>
@@ -1707,7 +1708,7 @@ function StaffSignupsDialog({
                           variant="outline"
                           onClick={() => unassignM.mutate(s.id)}
                           disabled={unassignM.isPending}
-                          title={t("needs:staff.unassignCta", { defaultValue: "Retirer" })}
+                          title={t("needs:staff.unassignCta")}
                         >
                           {unassignM.isPending ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1749,10 +1750,7 @@ function StaffSignupsDialog({
             <>
               {isFull ? (
                 <p className="text-[11px] rounded border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 text-amber-800 dark:text-amber-200 px-2 py-1.5">
-                  {t("needs:staff.fullBlock", {
-                    defaultValue:
-                      "Capacité atteinte. Retirez d'abord une personne confirmée pour en assigner une autre.",
-                  })}
+                  {t("needs:staff.fullBlock")}
                 </p>
               ) : (
                 <p className="text-[11px] text-muted-foreground">

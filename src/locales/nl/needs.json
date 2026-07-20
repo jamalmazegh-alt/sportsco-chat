@@ -156,7 +156,11 @@
     "confirmSelection": "Bevestigen",
     "noMembers": "Geen lid gevonden",
     "editNeed": "Behoefte bewerken",
-    "createDraft": "Als concept aanmaken"
+    "createDraft": "Als concept aanmaken",
+    "unassigned": "Toewijzing geannuleerd",
+    "fullTitle": "Capaciteit bereikt",
+    "unassignCta": "Verwijderen",
+    "fullBlock": "Capaciteit bereikt. Verwijder eerst een bevestigde persoon om iemand anders toe te wijzen."
   },
   "pendingApplications_one": "{{count}} in afwachting",
   "pendingApplications_other": "{{count}} in afwachting",

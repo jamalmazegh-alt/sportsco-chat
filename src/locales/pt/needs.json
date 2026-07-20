@@ -156,7 +156,11 @@
     "confirmSelection": "Confirmar",
     "noMembers": "Nenhum membro encontrado",
     "editNeed": "Editar a necessidade",
-    "createDraft": "Criar como rascunho"
+    "createDraft": "Criar como rascunho",
+    "unassigned": "Atribuição cancelada",
+    "fullTitle": "Capacidade atingida",
+    "unassignCta": "Remover",
+    "fullBlock": "Capacidade atingida. Remova primeiro uma pessoa confirmada para atribuir outra."
   },
   "pendingApplications_one": "{{count}} pendente",
   "pendingApplications_other": "{{count}} pendentes",

@@ -156,7 +156,11 @@
     "confirmSelection": "Confirmer",
     "noMembers": "Aucun membre trouvé",
     "editNeed": "Modifier le besoin",
-    "createDraft": "Créer en brouillon"
+    "createDraft": "Créer en brouillon",
+    "unassigned": "Assignation annulée",
+    "fullTitle": "Capacité atteinte",
+    "unassignCta": "Retirer",
+    "fullBlock": "Capacité atteinte. Retirez d'abord une personne confirmée pour en assigner une autre."
   },
   "pendingApplications_one": "{{count}} en attente",
   "pendingApplications_other": "{{count}} en attente",
