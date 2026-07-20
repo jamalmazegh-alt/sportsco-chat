@@ -196,7 +196,7 @@ function NewPublicationPage() {
       });
     },
     onSuccess: (res: any) => {
-      toast.success(t("publications.new.published", "Publication publiée"));
+      toast.success(t("publications:new.published", "Publication publiée"));
       nav({ to: "/publications/$publicationId", params: { publicationId: res.publicationId } });
     },
     onError: (e: any) => {
@@ -318,38 +318,38 @@ function NewPublicationPage() {
   }
 
   function labelFor(a: Audience): string {
-    if (a.audience_type === "educateurs") return t("publications.audiences.types.educateurs");
-    if (a.audience_type === "dirigeants") return t("publications.audiences.types.dirigeants");
+    if (a.audience_type === "educateurs") return t("publications:audience.types.educateurs");
+    if (a.audience_type === "dirigeants") return t("publications:audience.types.dirigeants");
     if (a.audience_type === "groupe_personnalise") {
       const g = groups.find((x) => x.id === (a as any).group_id);
-      return `${t("publications.audiences.types.groupe_personnalise")} — ${g?.name ?? ""}`;
+      return `${t("publications:audience.types.groupe_personnalise")} — ${g?.name ?? ""}`;
     }
     if (a.audience_type === "joueurs_categorie" || a.audience_type === "parents_categorie") {
-      return `${t(`publications.audiences.types.${a.audience_type}`)} — ${a.category_label}`;
+      return `${t(`publications:audience.types.${a.audience_type}`)} — ${a.category_label}`;
     }
     if (a.audience_type === "joueurs_convoques" || a.audience_type === "parents_convoques") {
       const ev = events.find((x: any) => x.id === (a as any).event_id);
-      return `${t(`publications.audiences.types.${a.audience_type}`)} — ${ev?.title ?? ""}`;
+      return `${t(`publications:audience.types.${a.audience_type}`)} — ${ev?.title ?? ""}`;
     }
     const team = teams.find((x) => x.id === (a as any).team_id);
-    return `${t(`publications.audiences.types.${a.audience_type}`)} — ${team?.name ?? ""}`;
+    return `${t(`publications:audience.types.${a.audience_type}`)} — ${team?.name ?? ""}`;
   }
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
-      <BackLink to="/publications" label={t("publications.list.title", "Publications")} />
+      <BackLink to="/publications" label={t("publications:list.title", "Publications")} />
       <h1 className="text-xl font-semibold">
-        {t("publications.new.title", "Nouvelle publication")}
+        {t("publications:new.title", "Nouvelle publication")}
       </h1>
       <div className="text-xs text-muted-foreground">
-        {t("publications.new.step", "Étape")} {step} / 2
+        {t("publications:new.step", "Étape")} {step} / 2
       </div>
 
       {step === 1 && (
         <Card>
           <CardContent className="py-5 space-y-4">
             <div className="space-y-2">
-              <Label>{t("publications.form.typeLabel")}</Label>
+              <Label>{t("publications:form.typeLabel")}</Label>
               <RadioGroup
                 value={type}
                 onValueChange={(v) => setType(v as any)}
@@ -357,18 +357,18 @@ function NewPublicationPage() {
               >
                 <label className="flex items-center gap-2 cursor-pointer">
                   <RadioGroupItem value="message" id="pt-msg" />
-                  <span>{t("publications.new.typeMessage", "Message")}</span>
+                  <span>{t("publications:new.typeMessage", "Message")}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <RadioGroupItem value="poll" id="pt-poll" />
-                  <span>{t("publications.new.typePoll", "Sondage")}</span>
+                  <span>{t("publications:new.typePoll", "Sondage")}</span>
                 </label>
               </RadioGroup>
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="pub-title">
-                {type === "poll" ? t("publications.form.questionLabel") : t("publications.form.titleLabel")}
+                {type === "poll" ? t("publications:form.questionLabel") : t("publications:form.titleLabel")}
               </Label>
               <Input
                 id="pub-title"
@@ -376,8 +376,8 @@ function NewPublicationPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={
                   type === "poll"
-                    ? t("publications.form.questionPlaceholder")
-                    : t("publications.form.titlePlaceholder")
+                    ? t("publications:form.questionPlaceholder")
+                    : t("publications:form.titlePlaceholder")
                 }
               />
             </div>
@@ -385,22 +385,22 @@ function NewPublicationPage() {
             <div className="space-y-1.5">
               <Label htmlFor="pub-content">
                 {type === "poll"
-                  ? t("publications.form.descriptionLabel")
-                  : t("publications.form.contentLabel")}
+                  ? t("publications:form.descriptionLabel")
+                  : t("publications:form.contentLabel")}
               </Label>
               <Textarea
                 id="pub-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={type === "poll" ? 3 : 6}
-                placeholder={type === "poll" ? "" : t("publications.form.contentPlaceholder")}
+                placeholder={type === "poll" ? "" : t("publications:form.contentPlaceholder")}
               />
             </div>
 
             {type === "poll" && (
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <Label>{t("publications.new.pollOptions", "Options")}</Label>
+                  <Label>{t("publications:new.pollOptions", "Options")}</Label>
                   {pollOptions.map((opt, i) => (
                     <div key={i} className="flex gap-2">
                       <Input
@@ -410,7 +410,7 @@ function NewPublicationPage() {
                           next[i] = e.target.value;
                           setPollOptions(next);
                         }}
-                        placeholder={`${t("publications.new.option", "Option")} ${i + 1}`}
+                        placeholder={`${t("publications:new.option", "Option")} ${i + 1}`}
                       />
                       {pollOptions.length > 2 && (
                         <Button
@@ -429,12 +429,12 @@ function NewPublicationPage() {
                     onClick={() => setPollOptions([...pollOptions, ""])}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    {t("publications.new.addOption", "Ajouter une option")}
+                    {t("publications:new.addOption", "Ajouter une option")}
                   </Button>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{t("publications.new.visibility", "Visibilité des résultats")}</Label>
+                  <Label>{t("publications:new.visibility", "Visibilité des résultats")}</Label>
                   <RadioGroup
                     value={pollVisibility}
                     onValueChange={(v) => setPollVisibility(v as any)}
@@ -443,7 +443,7 @@ function NewPublicationPage() {
                     <label className="flex items-start gap-2 cursor-pointer">
                       <RadioGroupItem value="anonymous" id="v-anon" className="mt-0.5" />
                       <div>
-                        <div>{t("publications.new.visibilityAnon", "Anonyme")}</div>
+                        <div>{t("publications:new.visibilityAnon", "Anonyme")}</div>
                         <div className="text-xs text-muted-foreground">
                           {t(
                             "publications.new.visibilityAnonDesc",
@@ -455,7 +455,7 @@ function NewPublicationPage() {
                     <label className="flex items-start gap-2 cursor-pointer">
                       <RadioGroupItem value="staff_visible" id="v-staff" className="mt-0.5" />
                       <div>
-                        <div>{t("publications.new.visibilityStaff", "Visible par le staff")}</div>
+                        <div>{t("publications:new.visibilityStaff", "Visible par le staff")}</div>
                         <div className="text-xs text-muted-foreground">
                           {t(
                             "publications.new.visibilityStaffDesc",
@@ -483,7 +483,7 @@ function NewPublicationPage() {
         <Card>
           <CardContent className="py-5 space-y-5">
             <div className="space-y-3">
-              <Label>{t("publications.new.audienceLabel", "Destinataires")}</Label>
+              <Label>{t("publications:new.audienceLabel", "Destinataires")}</Label>
 
               {/* Scalar (staff) */}
               <div className="flex flex-wrap gap-2">
@@ -492,14 +492,14 @@ function NewPublicationPage() {
                   variant={audiences.some((a) => a.audience_type === "educateurs") ? "default" : "outline"}
                   onClick={() => toggleScalar("educateurs")}
                 >
-                  {t("publications.audiences.types.educateurs")}
+                  {t("publications:audience.types.educateurs")}
                 </Button>
                 <Button
                   size="sm"
                   variant={audiences.some((a) => a.audience_type === "dirigeants") ? "default" : "outline"}
                   onClick={() => toggleScalar("dirigeants")}
                 >
-                  {t("publications.audiences.types.dirigeants")}
+                  {t("publications:audience.types.dirigeants")}
                 </Button>
               </div>
 
@@ -508,7 +508,7 @@ function NewPublicationPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <div>
                     <Label className="text-xs">
-                      {t("publications.audiences.types.joueurs_equipe")}
+                      {t("publications:audience.types.joueurs_equipe")}
                     </Label>
                     <select
                       className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
@@ -519,7 +519,7 @@ function NewPublicationPage() {
                       }}
                     >
                       <option value="" disabled>
-                        {t("publications.new.chooseTeam", "Choisir une équipe…")}
+                        {t("publications:new.chooseTeam", "Choisir une équipe…")}
                       </option>
                       {teams.map((tm) => (
                         <option key={tm.id} value={tm.id}>
@@ -530,7 +530,7 @@ function NewPublicationPage() {
                   </div>
                   <div>
                     <Label className="text-xs">
-                      {t("publications.audiences.types.parents_equipe")}
+                      {t("publications:audience.types.parents_equipe")}
                     </Label>
                     <select
                       className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
@@ -541,7 +541,7 @@ function NewPublicationPage() {
                       }}
                     >
                       <option value="" disabled>
-                        {t("publications.new.chooseTeam", "Choisir une équipe…")}
+                        {t("publications:new.chooseTeam", "Choisir une équipe…")}
                       </option>
                       {teams.map((tm) => (
                         <option key={tm.id} value={tm.id}>
@@ -557,7 +557,7 @@ function NewPublicationPage() {
               {activeSeason && categories.length > 0 && (
                 <div className="pt-1 space-y-1">
                   <Label className="text-xs">
-                    {t("publications.audience.categoryLabel", "Catégorie")}
+                    {t("publications:audience.categoryLabel", "Catégorie")}
                     {" · "}
                     <span className="text-muted-foreground">{activeSeason.label}</span>
                   </Label>
@@ -568,7 +568,7 @@ function NewPublicationPage() {
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                       <option value="" disabled>
-                        {t("publications.new.pickCategory", "Choisir une catégorie…")}
+                        {t("publications:new.pickCategory", "Choisir une catégorie…")}
                       </option>
                       {categories.map((c) => (
                         <option key={c} value={c}>
@@ -582,7 +582,7 @@ function NewPublicationPage() {
                       disabled={!selectedCategory}
                       onClick={() => addCategory("joueurs_categorie")}
                     >
-                      {t("publications.new.addPlayersBtn", "+ Joueurs")}
+                      {t("publications:new.addPlayersBtn", "+ Joueurs")}
                     </Button>
                     <Button
                       size="sm"
@@ -590,7 +590,7 @@ function NewPublicationPage() {
                       disabled={!selectedCategory}
                       onClick={() => addCategory("parents_categorie")}
                     >
-                      {t("publications.new.addParentsBtn", "+ Parents")}
+                      {t("publications:new.addParentsBtn", "+ Parents")}
                     </Button>
                   </div>
                 </div>
@@ -600,7 +600,7 @@ function NewPublicationPage() {
               {events.length > 0 && (
                 <div className="pt-1 space-y-1">
                   <Label className="text-xs">
-                    {t("publications.new.pickEvent", "Convoqués d'un événement")}
+                    {t("publications:new.pickEvent", "Convoqués d'un événement")}
                   </Label>
                   <div className="flex gap-2 flex-wrap">
                     <select
@@ -609,7 +609,7 @@ function NewPublicationPage() {
                       onChange={(e) => setSelectedEvent(e.target.value)}
                     >
                       <option value="" disabled>
-                        {t("publications.new.pickEvent", "Choisir un événement…")}
+                        {t("publications:new.pickEvent", "Choisir un événement…")}
                       </option>
                       {events.map((ev: any) => (
                         <option key={ev.id} value={ev.id}>
@@ -626,7 +626,7 @@ function NewPublicationPage() {
                       disabled={!selectedEvent}
                       onClick={() => addEvent("joueurs_convoques")}
                     >
-                      {t("publications.new.addPlayersBtn", "+ Joueurs")}
+                      {t("publications:new.addPlayersBtn", "+ Joueurs")}
                     </Button>
                     <Button
                       size="sm"
@@ -634,7 +634,7 @@ function NewPublicationPage() {
                       disabled={!selectedEvent}
                       onClick={() => addEvent("parents_convoques")}
                     >
-                      {t("publications.new.addParentsBtn", "+ Parents")}
+                      {t("publications:new.addParentsBtn", "+ Parents")}
                     </Button>
                   </div>
                 </div>
@@ -644,7 +644,7 @@ function NewPublicationPage() {
               {groups.length > 0 && (
                 <div className="pt-1">
                   <Label className="text-xs">
-                    {t("publications.audiences.types.groupe_personnalise")}
+                    {t("publications:audience.types.groupe_personnalise")}
                   </Label>
                   <select
                     className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
@@ -655,7 +655,7 @@ function NewPublicationPage() {
                     }}
                   >
                     <option value="" disabled>
-                      {t("publications.new.chooseGroup", "Choisir un groupe…")}
+                      {t("publications:new.chooseGroup", "Choisir un groupe…")}
                     </option>
                     {groups.map((g) => (
                       <option key={g.id} value={g.id}>
@@ -669,14 +669,14 @@ function NewPublicationPage() {
               {/* Manual player selection */}
               <div className="pt-1 space-y-1.5">
                 <Label className="text-xs">
-                  {t("publications.new.pickMembers", "Sélection manuelle (joueurs)")}
+                  {t("publications:new.pickMembers", "Sélection manuelle (joueurs)")}
                 </Label>
                 <div className="relative">
                   <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={manualQuery}
                     onChange={(e) => setManualQuery(e.target.value)}
-                    placeholder={t("publications.new.searchPlaceholder", "Rechercher un joueur…")}
+                    placeholder={t("publications:new.searchPlaceholder", "Rechercher un joueur…")}
                     className="pl-7"
                   />
                 </div>
@@ -727,7 +727,7 @@ function NewPublicationPage() {
               <div className="pt-2 min-h-[2.5rem] rounded-md border-2 border-dashed border-emerald-500/40 bg-emerald-500/5 p-2 flex flex-wrap gap-1.5">
                 {audiences.length === 0 && manualPlayers.length === 0 ? (
                   <div className="text-xs text-muted-foreground w-full text-center py-2">
-                    {t("publications.new.audienceEmpty", "Aucun destinataire sélectionné")}
+                    {t("publications:new.audienceEmpty", "Aucun destinataire sélectionné")}
                   </div>
                 ) : (
                   <>
@@ -741,7 +741,7 @@ function NewPublicationPage() {
                     ))}
                     {manualPlayers.length > 0 && (
                       <Badge variant="secondary" className="gap-1.5">
-                        {t("publications.audiences.types.selection_manuelle")} · {manualPlayers.length}
+                        {t("publications:audience.types.selection_manuelle")} · {manualPlayers.length}
                       </Badge>
                     )}
                   </>
@@ -762,22 +762,22 @@ function NewPublicationPage() {
                   </>
                 ) : preview.error ? (
                   <span className="text-xs text-muted-foreground">
-                    {t("publications.audiences.previewError", "Aperçu indisponible")}
+                    {t("publications:audience.previewError", "Aperçu indisponible")}
                   </span>
                 ) : audiences.length === 0 && manualMemberIds.length === 0 ? (
                   <span className="text-muted-foreground">
-                    {t("publications.audiences.none", "0 destinataire")}
+                    {t("publications:audience.none", "0 destinataire")}
                   </span>
                 ) : (
                   <>
                     <span className="font-medium">
-                      {t("publications.audiences.recipientsCount", {
+                      {t("publications:audience.recipientsCount", {
                         count: preview.count,
                         defaultValue: "{{count}} destinataires",
                       })}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {t("publications.audiences.recipientsBreakdown", {
+                      {t("publications:audience.recipientsBreakdown", {
                         players: preview.playerCount,
                         users: preview.userCount,
                         defaultValue: "({{players}} joueurs · {{users}} utilisateurs)",
@@ -789,7 +789,7 @@ function NewPublicationPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t("publications.new.deliveryLabel", "Mode de diffusion")}</Label>
+              <Label>{t("publications:new.deliveryLabel", "Mode de diffusion")}</Label>
               <label className="flex items-start gap-2 cursor-pointer">
                 <Checkbox
                   checked={publishToWall}
@@ -797,9 +797,9 @@ function NewPublicationPage() {
                   className="mt-0.5"
                 />
                 <div>
-                  <div className="text-sm">{t("publications.new.wall", "Mur + notification push")}</div>
+                  <div className="text-sm">{t("publications:new.wall", "Mur + notification push")}</div>
                   <div className="text-xs text-muted-foreground">
-                    {t("publications.new.wallDesc", "Apparaît sur le fil du club et envoie une push aux destinataires.")}
+                    {t("publications:new.wallDesc", "Apparaît sur le fil du club et envoie une push aux destinataires.")}
                   </div>
                 </div>
               </label>
@@ -810,9 +810,9 @@ function NewPublicationPage() {
                   className="mt-0.5"
                 />
                 <div>
-                  <div className="text-sm">{t("publications.new.email", "E-mail")}</div>
+                  <div className="text-sm">{t("publications:new.email", "E-mail")}</div>
                   <div className="text-xs text-muted-foreground">
-                    {t("publications.new.emailDesc", "Envoie un e-mail à chaque destinataire.")}
+                    {t("publications:new.emailDesc", "Envoie un e-mail à chaque destinataire.")}
                   </div>
                 </div>
               </label>
@@ -829,7 +829,7 @@ function NewPublicationPage() {
                 ) : (
                   <Send className="h-4 w-4 mr-1.5" />
                 )}
-                {t("publications.new.publish", "Publier")}
+                {t("publications:new.publish", "Publier")}
               </Button>
             </div>
           </CardContent>

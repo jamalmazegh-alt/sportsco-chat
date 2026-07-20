@@ -38,12 +38,12 @@ function PublicationsListPage() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <Megaphone className="h-5 w-5 text-primary" />
-          <h1 className="text-xl font-semibold">{t("publications.list.title", "Publications")}</h1>
+          <h1 className="text-xl font-semibold">{t("publications:list.title", "Publications")}</h1>
         </div>
         <Button asChild size="sm">
           <Link to="/publications/new">
             <Plus className="h-4 w-4 mr-1.5" />
-            {t("publications.list.new", "Nouvelle publication")}
+            {t("publications:list.new", "Nouvelle publication")}
           </Link>
         </Button>
       </div>
@@ -53,7 +53,7 @@ function PublicationsListPage() {
       ) : !data?.publications?.length ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-muted-foreground">
-            {t("publications.list.empty", "Aucune publication pour le moment.")}
+            {t("publications:list.empty", "Aucune publication pour le moment.")}
           </CardContent>
         </Card>
       ) : (
@@ -80,13 +80,13 @@ function PublicationsListPage() {
                       {p.publication_type === "poll" && p.poll_visibility === "anonymous" && (
                         <Badge variant="outline" className="gap-1">
                           <Lock className="h-3 w-3" />
-                          {t("publications.list.anonymous", "Anonyme")}
+                          {t("publications:list.anonymous", "Anonyme")}
                         </Badge>
                       )}
                       {p.closed_at && (
                         <Badge variant="secondary" className="gap-1">
                           <CheckCircle2 className="h-3 w-3" />
-                          {t("publications.list.closed", "Fermé")}
+                          {t("publications:list.closed", "Fermé")}
                         </Badge>
                       )}
                     </div>

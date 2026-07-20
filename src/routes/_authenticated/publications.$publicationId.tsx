@@ -108,16 +108,16 @@ function PublicationDetailPage() {
       });
     },
     onSuccess: () => {
-      toast.success(t("publications.detail.voted", "Vote enregistré"));
+      toast.success(t("publications:detail.voted", "Vote enregistré"));
       qc.invalidateQueries({ queryKey: ["publication", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
     },
     onError: (e: any) => {
       const msg = e?.message || "";
       if (msg.includes("poll_closed")) {
-        toast.error(t("publications.errors.pollClosed"));
+        toast.error(t("publications:errors.pollClosed"));
       } else if (msg.includes("Forbidden") || msg.includes("forbidden")) {
-        toast.error(t("publications.errors.forbidden"));
+        toast.error(t("publications:errors.forbidden"));
       } else {
         toast.error(t("common.error", "Erreur"));
       }
@@ -127,7 +127,7 @@ function PublicationDetailPage() {
   const closeMut = useMutation({
     mutationFn: async () => closeFn({ data: { publicationId } }),
     onSuccess: () => {
-      toast.success(t("publications.detail.closed", "Publication fermée"));
+      toast.success(t("publications:detail.closed", "Publication fermée"));
       qc.invalidateQueries({ queryKey: ["publication", publicationId] });
     },
     onError: () => toast.error(t("common.error", "Erreur")),
@@ -136,7 +136,7 @@ function PublicationDetailPage() {
   const deleteMut = useMutation({
     mutationFn: async () => deleteFn({ data: { publicationId } }),
     onSuccess: () => {
-      toast.success(t("publications.detail.deleted", "Publication supprimée"));
+      toast.success(t("publications:detail.deleted", "Publication supprimée"));
       nav({ to: "/publications" });
     },
     onError: () => toast.error(t("common.error", "Erreur")),
@@ -148,7 +148,7 @@ function PublicationDetailPage() {
     );
   }
   if (!data?.publication) {
-    return <div className="p-6">{t("publications.detail.notFound", "Publication introuvable")}</div>;
+    return <div className="p-6">{t("publications:detail.notFound", "Publication introuvable")}</div>;
   }
 
   const pub = data.publication;
@@ -157,7 +157,7 @@ function PublicationDetailPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
-      <BackLink to="/publications" label={t("publications.list.title", "Publications")} />
+      <BackLink to="/publications" label={t("publications:list.title", "Publications")} />
 
       <Card>
         <CardContent className="py-5 space-y-4">
@@ -174,13 +174,13 @@ function PublicationDetailPage() {
                   {isPoll && pub.poll_visibility === "anonymous" && (
                     <Badge variant="outline" className="gap-1">
                       <Lock className="h-3 w-3" />
-                      {t("publications.list.anonymous", "Anonyme")}
+                      {t("publications:list.anonymous", "Anonyme")}
                     </Badge>
                   )}
                   {isClosed && (
                     <Badge variant="secondary" className="gap-1">
                       <CheckCircle2 className="h-3 w-3" />
-                      {t("publications.list.closed", "Fermé")}
+                      {t("publications:list.closed", "Fermé")}
                     </Badge>
                   )}
                   <span className="text-xs text-muted-foreground">
@@ -199,24 +199,24 @@ function PublicationDetailPage() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setShowRecipients((s) => !s)}>
                     <Users className="h-4 w-4 mr-2" />
-                    {t("publications.detail.recipients", "Voir les destinataires")}
+                    {t("publications:detail.recipients", "Voir les destinataires")}
                   </DropdownMenuItem>
                   {!isClosed && isPoll && (
                     <DropdownMenuItem onClick={() => closeMut.mutate()}>
                       <CheckCircle2 className="h-4 w-4 mr-2" />
-                      {t("publications.detail.close", "Fermer le sondage")}
+                      {t("publications:detail.close", "Fermer le sondage")}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
                     className="text-destructive"
                     onClick={() => {
-                      if (confirm(t("publications.detail.confirmDelete", "Supprimer cette publication ?"))) {
+                      if (confirm(t("publications:detail.confirmDelete", "Supprimer cette publication ?"))) {
                         deleteMut.mutate();
                       }
                     }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    {t("publications.detail.delete", "Supprimer")}
+                    {t("publications:detail.delete", "Supprimer")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -233,7 +233,7 @@ function PublicationDetailPage() {
               {canVote && eligibleSubjects.length > 1 && (
                 <div className="space-y-1.5">
                   <div className="text-xs text-muted-foreground">
-                    {t("publications.detail.votingAs", "Je vote en tant que :")}
+                    {t("publications:detail.votingAs", "Je vote en tant que :")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {eligibleSubjects.map((s) => {
@@ -241,8 +241,8 @@ function PublicationDetailPage() {
                       const isActive = key === (selectedSubjectKey ?? subjectKey(eligibleSubjects[0]));
                       const label =
                         s.subjectKind === "user"
-                          ? t("publications.detail.votingAsSelf", "Moi")
-                          : s.label ?? t("publications.detail.player", "Joueur");
+                          ? t("publications:detail.votingAsSelf", "Moi")
+                          : s.label ?? t("publications:detail.player", "Joueur");
                       return (
                         <Button
                           key={key}
@@ -262,7 +262,7 @@ function PublicationDetailPage() {
               )}
               {canVote && eligibleSubjects.length === 1 && activeSubject?.relation === "guardian" && activeSubject.label && (
                 <div className="text-xs text-muted-foreground">
-                  {t("publications.detail.votingForChild", "Vous votez pour {{name}}", {
+                  {t("publications:detail.votingForChild", "Vous votez pour {{name}}", {
                     name: activeSubject.label,
                   })}
                 </div>
@@ -290,7 +290,7 @@ function PublicationDetailPage() {
                     onClick={() => selectedOption && vote.mutate(selectedOption)}
                   >
                     {vote.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                    {t("publications.detail.vote", "Voter")}
+                    {t("publications:detail.vote", "Voter")}
                   </Button>
                 </>
               ) : (
@@ -313,7 +313,7 @@ function PublicationDetailPage() {
                             </span>
                             <span className="text-muted-foreground text-xs">
                               {count == null
-                                ? t("publications.detail.masked", "—")
+                                ? t("publications:detail.masked", "—")
                                 : `${count} · ${pct}%`}
                             </span>
                           </div>
@@ -355,7 +355,7 @@ function PublicationDetailPage() {
           <CardContent className="py-4 space-y-2">
             <div className="font-medium text-sm flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t("publications.detail.recipientsTitle", "Destinataires")} ({recipients?.recipients?.length ?? 0})
+              {t("publications:detail.recipientsTitle", "Destinataires")} ({recipients?.recipients?.length ?? 0})
             </div>
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {(recipients?.recipients ?? []).map((r: any, i: number) => (
@@ -363,8 +363,8 @@ function PublicationDetailPage() {
                   {r.players
                     ? `${r.players.first_name} ${r.players.last_name}`
                     : r.subject_kind === "user"
-                      ? t("publications.detail.userSubject", "Utilisateur")
-                      : t("publications.detail.unknown", "Inconnu")}
+                      ? t("publications:detail.userSubject", "Utilisateur")
+                      : t("publications:detail.unknown", "Inconnu")}
                 </div>
               ))}
             </div>
