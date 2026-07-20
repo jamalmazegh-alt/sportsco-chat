@@ -174,3 +174,7 @@ FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
 - FR: traduit
 - EN: traduit
 - DE/ES/IT/NL/PT: clone EN, à traduire
+
+## publications.new.pickCategory/pickEvent/pickMembers/searchPlaceholder/addPlayersBtn/addParentsBtn + publications.audience.recipientsCount/recipientsBreakdown/none/previewError (2026-07-20 wizard audiences)
+- FR/EN: traduit
+- DE/ES/IT/NL/PT: traductions natives fournies pour ces clés (bloc wizard categories/convocations/manual + compteur preview)
