@@ -934,17 +934,14 @@ function GroupMembersPanel({
               });
               const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
                 .filter((r, i, arr) => r && arr.indexOf(r) === i);
-              const childNames = m.user_id ? childrenByUserId.get(m.user_id) : undefined;
+              const ctx = m.user_id ? contextByUserId.get(m.user_id) ?? null : null;
+              const subline = formatMemberContextSubline(ctx, sublineLabels);
               return (
                 <li key={m.id} className="px-3">
                   <PersonRow
                     name={name}
                     roles={roleList}
-                    subline={
-                      childNames && childNames.length > 0
-                        ? t("groups.parentOf", { names: childNames.join(", ") })
-                        : undefined
-                    }
+                    subline={subline}
                     action={
                       <Button
                         variant="ghost"
