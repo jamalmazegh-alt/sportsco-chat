@@ -106,17 +106,31 @@ export const createPublication = createServerFn({ method: "POST" })
     }
     const publicationId = pub.id as string;
 
-    // Audiences
-    if (data.audiences.length) {
-      const audRows = data.audiences.map((a) => ({
+    // Audiences — always insert the selection_manuelle marker when manual members
+    // are present, so _resolve_audience_subjects picks them up (parity with preview).
+    const audRows = data.audiences.map((a) => ({
+      publication_id: publicationId,
+      audience_type: a.audience_type,
+      team_id: (a as any).team_id ?? null,
+      group_id: (a as any).group_id ?? null,
+      category_label: (a as any).category_label ?? null,
+      season_id: (a as any).season_id ?? null,
+      event_id: (a as any).event_id ?? null,
+    }));
+    const hasManualMarker = audRows.some((r) => r.audience_type === "selection_manuelle");
+    if (data.manualMemberIds.length > 0 && !hasManualMarker) {
+      audRows.push({
         publication_id: publicationId,
-        audience_type: a.audience_type,
-        team_id: (a as any).team_id ?? null,
-        group_id: (a as any).group_id ?? null,
-        category_label: (a as any).category_label ?? null,
-        season_id: (a as any).season_id ?? null,
-        event_id: (a as any).event_id ?? null,
-      }));
+        audience_type: "selection_manuelle",
+        team_id: null,
+        group_id: null,
+        category_label: null,
+        season_id: null,
+        event_id: null,
+      });
+    }
+    if (audRows.length) {
+
       const { error } = await supabase.from("club_publication_audiences").insert(audRows);
       if (error) throw new Response(`audience_insert_failed: ${error.message}`, { status: 500 });
     }
