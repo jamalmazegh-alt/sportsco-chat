@@ -1687,7 +1687,7 @@ function StaffSignupsDialog({
                               decideM.mutate({ signup_id: s.id, decision: "confirm" })
                             }
                             disabled={decideM.isPending || bulkPending || isFull}
-                            title={isFull ? t("needs:staff.fullTitle", { defaultValue: "Capacité atteinte" }) : undefined}
+                            title={isFull ? t("needs:staff.fullTitle") : undefined}
                           >
                             <Check className="h-3.5 w-3.5" />
                           </Button>
