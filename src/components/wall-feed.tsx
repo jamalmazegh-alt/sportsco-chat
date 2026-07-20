@@ -66,6 +66,16 @@ type Post = {
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
 };
+type PollItem = {
+  id: string;
+  publication_type: string;
+  title: string;
+  content: string | null;
+  poll_visibility: string | null;
+  published_at: string | null;
+  closed_at: string | null;
+  voter_count?: number;
+};
 
 const SOURCE_META: Record<
   Exclude<PostSource, "clubero">,
