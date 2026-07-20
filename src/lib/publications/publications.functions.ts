@@ -321,17 +321,17 @@ export const previewPublicationAudience = createServerFn({ method: "POST" })
       _audiences: data.audiences as any,
       _manual_member_ids: data.manualMemberIds,
     });
-    if (error) {
-      // Fallback: 0 if the RPC doesn't exist yet.
-      console.warn("[previewPublicationAudience] rpc unavailable", error.message);
-      return { count: 0 };
-    }
+    if (error) throw new Response(`preview_failed: ${error.message}`, { status: 500 });
     const row = Array.isArray(res) ? res[0] : res;
-    return { count: (row?.count as number) ?? (typeof res === "number" ? (res as number) : 0) };
+    return {
+      count: (row?.count as number) ?? 0,
+      playerCount: (row?.player_count as number) ?? 0,
+      userCount: (row?.user_count as number) ?? 0,
+    };
   });
 
 // ---------------------------------------------------------------------------
-// listPublications — feed for the current user in a club
+// listPublications — feed for the current user in a club (wall only)
 // ---------------------------------------------------------------------------
 export const listPublications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -343,6 +343,7 @@ export const listPublications = createServerFn({ method: "POST" })
         "id, club_id, author_id, publication_type, title, content, poll_visibility, publish_to_wall, send_email, published_at, closes_at, closed_at, event_id, deleted_at",
       )
       .eq("club_id", data.clubId)
+      .eq("publish_to_wall", true)
       .is("deleted_at", null)
       .order("published_at", { ascending: false })
       .limit(data.limit);
@@ -369,24 +370,35 @@ export const getPublication = createServerFn({ method: "POST" })
     if (pubErr) throw new Response(`get_failed: ${pubErr.message}`, { status: 500 });
     if (!pub) throw new Response("not_found", { status: 404 });
 
-    const [{ data: opts }, { data: myVotes }, { data: staff }] = await Promise.all([
+    const [{ data: opts }, { data: eligible, error: eligibleErr }, { data: staff }] = await Promise.all([
       supabase
         .from("club_poll_options")
         .select("id, label, sort_order")
         .eq("publication_id", data.publicationId)
         .order("sort_order", { ascending: true }),
-      supabase
-        .from("club_poll_votes")
-        .select("option_id, subject_kind, subject_user_id, member_id")
-        .eq("publication_id", data.publicationId)
-        .eq("cast_by_user_id", userId),
+      supabase.rpc("get_eligible_vote_subjects" as any, { _publication_id: data.publicationId }),
       supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
     ]);
+    if (eligibleErr) throw new Response(`eligible_failed: ${eligibleErr.message}`, { status: 500 });
+
+    const eligibleSubjects = ((eligible ?? []) as Array<{
+      subject_kind: string;
+      subject_id: string;
+      relation: string;
+      label: string | null;
+      current_option_id: string | null;
+    }>).map((r) => ({
+      subjectKind: r.subject_kind as "user" | "player",
+      subjectId: r.subject_id,
+      relation: r.relation as "self" | "guardian",
+      label: r.label,
+      currentOptionId: r.current_option_id,
+    }));
 
     return {
       publication: pub,
       options: opts ?? [],
-      myVotes: myVotes ?? [],
+      eligibleSubjects,
       isStaff: !!staff,
     };
   });
