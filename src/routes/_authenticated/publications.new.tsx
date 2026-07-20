@@ -262,7 +262,7 @@ function NewPublicationPage() {
   }, [previewKey, activeClubId]);
 
   const canStep1 =
-    title.trim().length > 0 && (type === "message" || pollOptions.filter((s) => s.trim()).length >= 2);
+    title.trim().length > 0 && pollOptions.filter((s) => s.trim()).length >= 2;
   const canSubmit =
     (audiences.length > 0 || manualMemberIds.length > 0) &&
     (publishToWall || sendEmail) &&
