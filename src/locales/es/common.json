@@ -2414,6 +2414,19 @@
     "platformsTitle": "iPhone y Android",
     "platformsDesc": "Compatible con Safari (iOS 16.4+) y Chrome / Edge / Samsung Internet en Android.",
     "alreadyInstalledTitle": "¿Ya está instalada?",
-    "alreadyInstalledDesc": "Abre Clubero desde el icono en tu pantalla de inicio para activar las notificaciones."
+    "alreadyInstalledDesc": "Abre Clubero desde el icono en tu pantalla de inicio para activar las notificaciones.",
+    "iosStepsTitle": "En iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 pasos para añadir Clubero a tu pantalla de inicio",
+    "iosStep1Before": "Toca los",
+    "iosStep1Icon": "3 puntos",
+    "iosStep1After": "en la parte inferior de Safari",
+    "iosStep2Before": "Elige",
+    "iosStep2Icon": "Compartir",
+    "iosStep3Before": "Toca la flecha",
+    "iosStep3Icon": "Ver más",
+    "iosStep3After": "para desplegar la lista",
+    "iosStep4Before": "Elige",
+    "iosStep4Icon": "Añadir a pantalla de inicio",
+    "iosStep4After": "y toca «Añadir»"
   }
 }

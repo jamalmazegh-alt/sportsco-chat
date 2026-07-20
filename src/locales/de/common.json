@@ -2414,6 +2414,19 @@
     "platformsTitle": "iPhone & Android",
     "platformsDesc": "Kompatibel mit Safari (iOS 16.4+) und Chrome / Edge / Samsung Internet auf Android.",
     "alreadyInstalledTitle": "Bereits installiert?",
-    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf Ihrem Startbildschirm, um Benachrichtigungen zu aktivieren."
+    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf Ihrem Startbildschirm, um Benachrichtigungen zu aktivieren.",
+    "iosStepsTitle": "Auf iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 Schritte, um Clubero zum Home-Bildschirm hinzuzufügen",
+    "iosStep1Before": "Tippen Sie auf die",
+    "iosStep1Icon": "drei Punkte",
+    "iosStep1After": "unten in Safari",
+    "iosStep2Before": "Wählen Sie",
+    "iosStep2Icon": "Teilen",
+    "iosStep3Before": "Tippen Sie auf den Pfeil",
+    "iosStep3Icon": "Mehr anzeigen",
+    "iosStep3After": "um die Liste zu erweitern",
+    "iosStep4Before": "Wählen Sie",
+    "iosStep4Icon": "Zum Home-Bildschirm",
+    "iosStep4After": "und tippen Sie auf „Hinzufügen“"
   }
 }

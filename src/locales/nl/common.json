@@ -2414,6 +2414,19 @@
     "platformsTitle": "iPhone & Android",
     "platformsDesc": "Werkt op Safari (iOS 16.4+) en Chrome / Edge / Samsung Internet op Android.",
     "alreadyInstalledTitle": "Al geïnstalleerd?",
-    "alreadyInstalledDesc": "Open Clubero via het pictogram op je startscherm om meldingen in te schakelen."
+    "alreadyInstalledDesc": "Open Clubero via het pictogram op je startscherm om meldingen in te schakelen.",
+    "iosStepsTitle": "Op iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 stappen om Clubero aan je beginscherm toe te voegen",
+    "iosStep1Before": "Tik op de",
+    "iosStep1Icon": "3 puntjes",
+    "iosStep1After": "onderin Safari",
+    "iosStep2Before": "Kies",
+    "iosStep2Icon": "Deel",
+    "iosStep3Before": "Tik op de pijl",
+    "iosStep3Icon": "Meer weergeven",
+    "iosStep3After": "om de lijst uit te klappen",
+    "iosStep4Before": "Kies",
+    "iosStep4Icon": "Zet op beginscherm",
+    "iosStep4After": "en tik op „Voeg toe“"
   }
 }
