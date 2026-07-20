@@ -110,6 +110,7 @@ type ClubMemberRow = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  context: MemberContext | null;
   children_names?: string[];
 };
 
