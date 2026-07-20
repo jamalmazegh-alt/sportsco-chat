@@ -92,10 +92,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
+  const listPublicationsFn = useServerFn(listPublications);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [posting, setPosting] = useState(false);
