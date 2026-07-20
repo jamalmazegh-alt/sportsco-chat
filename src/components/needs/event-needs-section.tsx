@@ -951,8 +951,10 @@ function NeedFormDialog({
 
   const saveM = useMutation({
     mutationFn: async () => {
+      let needId: string;
+      let created: { id: string } | null = null;
       if (isEdit) {
-        return update({
+        await update({
           data: {
             need_id: initial!.id,
             role_key: currentTpl.key,
@@ -962,43 +964,47 @@ function NeedFormDialog({
             validation_mode: mode,
           },
         });
+        needId = initial!.id;
+      } else {
+        created = await create({
+          data: {
+            event_id: eventId,
+            role_key: currentTpl.key,
+            label: label.trim() || defaultLabel,
+            description: description.trim() || null,
+            capacity,
+            validation_mode: mode,
+          },
+        });
+        needId = created!.id;
       }
-      const created = await create({
-        data: {
-          event_id: eventId,
-          role_key: currentTpl.key,
-          label: label.trim() || defaultLabel,
-          description: description.trim() || null,
-          capacity,
-          validation_mode: mode,
-        },
-      });
       // Pre-assign selected people (confirmed immediately, notified).
       let preassignedCount = 0;
-      if (created?.id && audState.preassigned.length > 0) {
+      if (showAudienceStep && audState.preassigned.length > 0) {
         for (const p of audState.preassigned) {
           try {
-            await addManualFn({ data: { need_id: created.id, user_id: p.user_id } });
+            await addManualFn({ data: { need_id: needId, user_id: p.user_id } });
             preassignedCount++;
           } catch (e) {
             console.error("[preassign] failed", p.user_id, e);
           }
         }
       }
-      if (wantsPublish && created?.id) {
-        const r = await publish({ data: { need_id: created.id, audiences } });
-        return { ...created, __published: r, __preassignedCount: preassignedCount };
+      // Publish (broadcast audience or draft with pre-assignments).
+      let published: { recipients_count?: number } | null = null;
+      if (showAudienceStep && audiences.length > 0) {
+        published = await publish({ data: { need_id: needId, audiences } });
       }
-      return { ...created, __preassignedCount: preassignedCount };
-
+      return { id: needId, __published: published, __preassignedCount: preassignedCount, __wasEdit: isEdit };
     },
     onSuccess: (r) => {
       const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
-      if (isEdit) {
+      const pub = (r as { __published?: { recipients_count?: number } | null }).__published;
+      const wasEdit = (r as { __wasEdit?: boolean }).__wasEdit;
+      if (pub) {
+        toast.success(t("needs:publish.success", { count: pub.recipients_count ?? 0 }));
+      } else if (wasEdit) {
         toast.success(t("common.saved"));
-      } else if ((r as { __published?: { recipients_count: number } })?.__published) {
-        const rc = (r as { __published: { recipients_count: number } }).__published.recipients_count;
-        toast.success(t("needs:publish.success", { count: rc ?? 0 }));
       } else {
         toast.success(t("needs:section.created"));
       }
@@ -1012,8 +1018,8 @@ function NeedFormDialog({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const totalSteps = isEdit ? 1 : 2;
-  const currentStep = isEdit ? 1 : step;
+  const totalSteps = showAudienceStep ? 2 : 1;
+  const currentStep = showAudienceStep ? step : 1;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
