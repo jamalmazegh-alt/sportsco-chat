@@ -728,6 +728,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
       <WallGrouped
         posts={posts}
+        polls={polls}
         currentUserId={user?.id ?? null}
         role={role}
         commentsEnabled={commentsEnabled}
