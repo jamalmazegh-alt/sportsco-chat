@@ -611,7 +611,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
           <AudiencePicker
             teams={targetableTeams}
             value={audience}
-            onChange={setAudience}
+            onChange={(next) => {
+              setAudience(next);
+              if (next !== null) setAudienceGroups([]);
+            }}
+            groups={targetableGroups}
+            groupValue={audienceGroups}
+            onGroupChange={(next) => {
+              setAudienceGroups(next);
+              if (next.length > 0) setAudience([]);
+            }}
             canPickClubWide={
               roles.includes("admin") ||
               roles.includes("dirigeant") ||
@@ -619,6 +628,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
             }
           />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
+          <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-3.5 w-3.5 rounded border-border"
+              checked={sendEmail}
+              onChange={(e) => setSendEmail(e.target.checked)}
+            />
+            {t("wall.compose.alsoEmail", { defaultValue: "Aussi par e-mail" })}
+          </label>
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
