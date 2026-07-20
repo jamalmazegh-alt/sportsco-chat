@@ -45,7 +45,11 @@
     "closed": "Publication fermée",
     "delete": "Supprimer",
     "deleted": "Publication supprimée",
-    "confirmDelete": "Supprimer cette publication ?"
+    "confirmDelete": "Supprimer cette publication ?",
+    "votingAs": "Je vote en tant que :",
+    "votingAsSelf": "Moi",
+    "votingForChild": "Vous votez pour {{name}}",
+    "player": "Joueur"
   },
   "type": {
     "message": "Communication",

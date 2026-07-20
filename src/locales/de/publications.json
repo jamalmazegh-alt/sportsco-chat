@@ -45,7 +45,11 @@
     "closed": "Publication closed",
     "delete": "Delete",
     "deleted": "Publication deleted",
-    "confirmDelete": "Delete this publication?"
+    "confirmDelete": "Delete this publication?",
+    "votingAs": "I am voting as:",
+    "votingAsSelf": "Me",
+    "votingForChild": "You are voting for {{name}}",
+    "player": "Player"
   },
   "type": {
     "message": "Message",
