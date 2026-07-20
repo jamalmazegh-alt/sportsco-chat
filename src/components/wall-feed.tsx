@@ -261,6 +261,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
       if (cancelled) return;
       setTargetableTeams(targetable);
 
+      // Groups targetable from the composer — visibility is enforced by RLS on
+      // club_groups (staff-only). We do not fetch group members here; sending
+      // the email is done server-side after the insert.
+      let groups: Group[] = [];
+      if (isPriv || roles.includes("coach") || roles.includes("assistant_coach")) {
+        const { data: gRows } = await supabase
+          .from("club_groups")
+          .select("id, name")
+          .eq("club_id", clubId)
+          .order("name", { ascending: true });
+        if (!cancelled) groups = (gRows ?? []) as Group[];
+      }
+      if (cancelled) return;
+      setTargetableGroups(groups);
+
       // Preselection rules (nuancées) :
       // - admin / dirigeant → club-wide (null).
       // - coach with exactly one targetable team → preselect that team.
@@ -272,6 +287,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
       } else {
         setAudience([]);
       }
+      setAudienceGroups([]);
     })();
     return () => {
       cancelled = true;
