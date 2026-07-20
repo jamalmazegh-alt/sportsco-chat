@@ -60,12 +60,19 @@ export const SCALAR_AUDIENCES: { key: ScalarAudienceKey; needsEvent: boolean }[]
 export type TeamKind = "team_players" | "team_parents" | "team_educators";
 
 export type AudienceCtx = {
+  club_id?: string;
   teams: { id: string; name: string; age_group?: string | null }[];
   groups: { id: string; name: string }[];
   categories: string[];
   event_team_id?: string | null;
   event_category?: string | null;
 };
+
+export type PreassignedPerson = {
+  user_id: string;
+  full_name: string | null;
+};
+
 
 
 export type AudienceState = {
