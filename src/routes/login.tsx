@@ -332,6 +332,7 @@ const LOGIN_CSS = `
   animation:cl-fadeUp .6s 1s ease both}
 .clubero-login .signup a{color:var(--green);font-weight:600;text-decoration:none}
 .clubero-login .signup a:hover{text-decoration:underline}
+.clubero-login .install-cta{display:flex;justify-content:center;margin-top:18px;position:relative;z-index:2}
 
 @keyframes cl-fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes cl-fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
