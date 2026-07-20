@@ -2395,5 +2395,25 @@
     },
     "bulkPickKind": "Typ wählen…",
     "bulkPickParam": "Wählen…"
+  },
+  "install": {
+    "meta": {
+      "title": "Clubero auf Ihrem Telefon installieren",
+      "description": "Installieren Sie Clubero mit einem Tipp auf iPhone oder Android und erhalten Sie Einberufungen, Erinnerungen und Echtzeit-Benachrichtigungen.",
+      "ogTitle": "Clubero auf Ihrem Telefon installieren",
+      "ogDescription": "Einberufungen, Anwesenheit und Erinnerungen in Echtzeit — installieren Sie Clubero auf Ihrem Startbildschirm."
+    },
+    "back": "Zurück",
+    "title": "Clubero installieren",
+    "subtitle": "Die App wird mit 1 Tipp aus Ihrem Browser installiert — kein App Store oder Google Play nötig.",
+    "cta": "Auf meinem Telefon installieren",
+    "notifTitle": "Echtzeit-Benachrichtigungen",
+    "notifDesc": "Einberufungen, Erinnerungen und Trainer-Nachrichten, sobald sie gesendet werden.",
+    "launchTitle": "Sofortiger Start",
+    "launchDesc": "Ein Symbol auf dem Startbildschirm, wie eine echte App.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Kompatibel mit Safari (iOS 16.4+) und Chrome / Edge / Samsung Internet auf Android.",
+    "alreadyInstalledTitle": "Bereits installiert?",
+    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf Ihrem Startbildschirm, um Benachrichtigungen zu aktivieren."
   }
 }

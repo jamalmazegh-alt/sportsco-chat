@@ -2395,5 +2395,25 @@
     },
     "bulkPickKind": "Kies een type…",
     "bulkPickParam": "Kies…"
+  },
+  "install": {
+    "meta": {
+      "title": "Installeer Clubero op je telefoon",
+      "description": "Installeer Clubero met één tik op iPhone of Android voor oproepen, herinneringen en realtime meldingen.",
+      "ogTitle": "Installeer Clubero op je telefoon",
+      "ogDescription": "Oproepen, aanwezigheid en herinneringen in realtime — installeer Clubero op je startscherm."
+    },
+    "back": "Terug",
+    "title": "Clubero installeren",
+    "subtitle": "De app installeert met 1 tik vanuit je browser — geen App Store of Google Play nodig.",
+    "cta": "Installeren op mijn telefoon",
+    "notifTitle": "Realtime meldingen",
+    "notifDesc": "Oproepen, herinneringen en coach-berichten zodra ze verzonden zijn.",
+    "launchTitle": "Direct openen",
+    "launchDesc": "Een pictogram op je startscherm, net als een echte app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Werkt op Safari (iOS 16.4+) en Chrome / Edge / Samsung Internet op Android.",
+    "alreadyInstalledTitle": "Al geïnstalleerd?",
+    "alreadyInstalledDesc": "Open Clubero via het pictogram op je startscherm om meldingen in te schakelen."
   }
 }

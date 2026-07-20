@@ -1,28 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Bell, Smartphone, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/install")({
-  head: () => ({
-    meta: [
-      { title: "Installer Clubero sur votre téléphone" },
-      {
-        name: "description",
-        content:
-          "Installez Clubero en un tap sur iPhone ou Android pour recevoir vos convocations, rappels et notifications en temps réel.",
-      },
-      { property: "og:title", content: "Installer Clubero sur votre téléphone" },
-      {
-        property: "og:description",
-        content:
-          "Convocations, présences et rappels en temps réel — installez Clubero sur votre écran d'accueil.",
-      },
-    ],
-  }),
+  head: () => {
+    const t = i18n.getFixedT(i18n.language || "fr", "translation");
+    return {
+      meta: [
+        { title: t("install.meta.title") },
+        { name: "description", content: t("install.meta.description") },
+        { property: "og:title", content: t("install.meta.ogTitle") },
+        { property: "og:description", content: t("install.meta.ogDescription") },
+      ],
+    };
+  },
   component: InstallPage,
 });
 
 function InstallPage() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-dvh bg-gradient-to-b from-[#070D1B] to-[#0B1730] text-white">
       <div className="mx-auto max-w-lg px-5 pt-6 pb-16">
@@ -30,22 +28,19 @@ function InstallPage() {
           to="/"
           className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition"
         >
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> {t("install.back")}
         </Link>
 
         <div className="mt-8 text-center">
           <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] flex items-center justify-center shadow-lg">
             <Smartphone className="h-8 w-8 text-white" />
           </div>
-          <h1 className="mt-5 text-2xl font-bold">Installer Clubero</h1>
-          <p className="mt-2 text-sm text-white/70">
-            L'app s'installe en 1 tap depuis votre navigateur — pas besoin de passer par l'App Store
-            ou Google Play.
-          </p>
+          <h1 className="mt-5 text-2xl font-bold">{t("install.title")}</h1>
+          <p className="mt-2 text-sm text-white/70">{t("install.subtitle")}</p>
         </div>
 
         <div className="mt-8 flex justify-center">
-          <InstallAppButton alwaysShow label="Installer sur mon téléphone" className="px-6 py-3" />
+          <InstallAppButton alwaysShow label={t("install.cta")} className="px-6 py-3" />
         </div>
 
         <ul className="mt-10 space-y-4">
@@ -54,10 +49,8 @@ function InstallPage() {
               <Bell className="h-4 w-4 text-emerald-300" />
             </span>
             <div>
-              <p className="text-sm font-semibold">Notifications en temps réel</p>
-              <p className="text-xs text-white/60 mt-0.5">
-                Convocations, rappels et messages coach dès qu'ils sont envoyés.
-              </p>
+              <p className="text-sm font-semibold">{t("install.notifTitle")}</p>
+              <p className="text-xs text-white/60 mt-0.5">{t("install.notifDesc")}</p>
             </div>
           </li>
           <li className="flex gap-3">
@@ -65,10 +58,8 @@ function InstallPage() {
               <Zap className="h-4 w-4 text-emerald-300" />
             </span>
             <div>
-              <p className="text-sm font-semibold">Ouverture instantanée</p>
-              <p className="text-xs text-white/60 mt-0.5">
-                Une icône sur l'écran d'accueil, comme une vraie app.
-              </p>
+              <p className="text-sm font-semibold">{t("install.launchTitle")}</p>
+              <p className="text-xs text-white/60 mt-0.5">{t("install.launchDesc")}</p>
             </div>
           </li>
           <li className="flex gap-3">
@@ -76,19 +67,15 @@ function InstallPage() {
               <Smartphone className="h-4 w-4 text-emerald-300" />
             </span>
             <div>
-              <p className="text-sm font-semibold">iPhone &amp; Android</p>
-              <p className="text-xs text-white/60 mt-0.5">
-                Compatible Safari (iOS 16.4+) et Chrome / Edge / Samsung Internet sur Android.
-              </p>
+              <p className="text-sm font-semibold">{t("install.platformsTitle")}</p>
+              <p className="text-xs text-white/60 mt-0.5">{t("install.platformsDesc")}</p>
             </div>
           </li>
         </ul>
 
         <div className="mt-10 rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/70">
-          <p className="font-semibold text-white mb-1">Déjà installée ?</p>
-          <p>
-            Ouvrez Clubero depuis l'icône sur votre écran d'accueil pour activer les notifications.
-          </p>
+          <p className="font-semibold text-white mb-1">{t("install.alreadyInstalledTitle")}</p>
+          <p>{t("install.alreadyInstalledDesc")}</p>
         </div>
       </div>
     </div>

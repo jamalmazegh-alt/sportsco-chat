@@ -2395,5 +2395,25 @@
     },
     "bulkPickKind": "Choose a type…",
     "bulkPickParam": "Choose…"
+  },
+  "install": {
+    "meta": {
+      "title": "Install Clubero on your phone",
+      "description": "Install Clubero in one tap on iPhone or Android to get your call-ups, reminders and real-time notifications.",
+      "ogTitle": "Install Clubero on your phone",
+      "ogDescription": "Call-ups, attendance and reminders in real time — install Clubero on your home screen."
+    },
+    "back": "Back",
+    "title": "Install Clubero",
+    "subtitle": "The app installs in 1 tap from your browser — no App Store or Google Play needed.",
+    "cta": "Install on my phone",
+    "notifTitle": "Real-time notifications",
+    "notifDesc": "Call-ups, reminders and coach messages as soon as they're sent.",
+    "launchTitle": "Instant launch",
+    "launchDesc": "An icon on your home screen, just like a real app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Works on Safari (iOS 16.4+) and Chrome / Edge / Samsung Internet on Android.",
+    "alreadyInstalledTitle": "Already installed?",
+    "alreadyInstalledDesc": "Open Clubero from the icon on your home screen to enable notifications."
   }
 }
