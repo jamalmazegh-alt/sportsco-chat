@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Bell, Smartphone, Zap } from "lucide-react";
+import { Apple } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import i18n from "@/lib/i18n";
