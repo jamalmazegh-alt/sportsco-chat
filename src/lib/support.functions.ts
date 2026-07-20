@@ -602,6 +602,120 @@ export const listAllSupportTickets = createServerFn({ method: "POST" })
     }));
   });
 
+// ---------- Create ticket on behalf of a user (superadmin) ----------
+
+const CreateOnBehalfInput = z.object({
+  user_id: z.string().uuid(),
+  subject: z.string().trim().min(1).max(200),
+  description: z.string().trim().min(1).max(10000),
+  category: z.enum(CATEGORIES).default("other"),
+  priority: z.enum(PRIORITIES).default("normal"),
+  club_id: z.string().uuid().nullable().optional(),
+  channel: z.enum(["phone", "email", "in_person", "other"]).default("phone"),
+  notify_user: z.boolean().default(false),
+});
+
+export const createSupportTicketOnBehalf = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => CreateOnBehalfInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isAdmin) throw new Error("forbidden");
+
+    const contextData = {
+      created_on_behalf: true,
+      created_by_admin_id: context.userId,
+      channel: data.channel,
+      submitted_at: new Date().toISOString(),
+    };
+
+    const { data: ticket, error } = await supabaseAdmin
+      .from("support_tickets")
+      .insert({
+        user_id: data.user_id,
+        club_id: data.club_id ?? null,
+        subject: data.subject,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        context_data: contextData,
+      })
+      .select("id, subject, category, created_at")
+      .single();
+    if (error) throw new Error(error.message);
+
+    // First message: staff message logging what the user reported.
+    await supabaseAdmin.from("support_messages").insert({
+      ticket_id: ticket.id,
+      sender_id: context.userId,
+      sender_role: "staff",
+      body: data.description,
+      is_internal_note: false,
+    });
+
+    await logSupportAudit({
+      ticket_id: ticket.id,
+      actor_user_id: context.userId,
+      actor_role: "staff",
+      action: "created",
+      to_value: ticket.subject,
+      meta: { on_behalf_of: data.user_id, channel: data.channel },
+    });
+
+    // Superadmin audit log
+    try {
+      await supabaseAdmin.from("superadmin_audit_logs").insert({
+        actor_user_id: context.userId,
+        action: "support_ticket_created_on_behalf",
+        target_type: "support_ticket",
+        target_id: ticket.id,
+        club_id: data.club_id ?? null,
+        metadata: {
+          on_behalf_of: data.user_id,
+          channel: data.channel,
+          subject: ticket.subject,
+        } as never,
+      });
+    } catch (e) {
+      console.error("[support] superadmin audit failed", e);
+    }
+
+    // Optional user notification (in-app + email)
+    if (data.notify_user) {
+      await supabaseAdmin.from("notifications").insert({
+        user_id: data.user_id,
+        type: "support_ticket",
+        title: `Ticket #${shortId(ticket.id)} ouvert`,
+        body: ticket.subject,
+        link: `/support/${ticket.id}`,
+      });
+
+      const profile = await getUserProfile(data.user_id);
+      const email = await getUserEmail(data.user_id);
+      if (email) {
+        const locale = pickLocale(profile?.preferred_language);
+        await enqueueTransactionalEmailServer({
+          templateName: "support-ticket-created",
+          recipientEmail: email,
+          fromName: SUPPORT_FROM_NAME,
+          templateData: {
+            name: profile?.first_name ?? profile?.full_name ?? null,
+            subject: ticket.subject,
+            ticketShortId: shortId(ticket.id),
+            category: ticket.category,
+            ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
+            locale,
+          },
+          idempotencyKey: `support-created-user-${ticket.id}`,
+        }).catch((e) => console.error("[support] user confirmation email failed", e));
+      }
+    }
+
+    return { id: ticket.id };
+  });
+
 const UpdateInput = z.object({
   ticket_id: z.string().uuid(),
   status: z.enum(STATUSES).optional(),
