@@ -156,7 +156,11 @@
     "confirmSelection": "Confirm",
     "noMembers": "No members found",
     "editNeed": "Edit need",
-    "createDraft": "Save as draft"
+    "createDraft": "Save as draft",
+    "unassigned": "Assignment cancelled",
+    "fullTitle": "Capacity reached",
+    "unassignCta": "Remove",
+    "fullBlock": "Capacity reached. Remove a confirmed person first to assign someone else."
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
