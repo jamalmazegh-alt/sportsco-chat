@@ -533,8 +533,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       })();
     }
+    // "Aussi par e-mail" — outbox best-effort ; les erreurs n'impactent pas le post.
+    if (data?.id && sendEmail) {
+      void (async () => {
+        try {
+          await sendWallPostEmailsFn({ data: { postId: data.id } });
+        } catch (e) {
+          console.warn("[email] wall dispatch failed", e);
+        }
+      })();
+    }
     setBody("");
     setAtts([]);
+    setAudienceGroups([]);
+    setSendEmail(false);
     // Reset audience to the per-role default for the next post.
     if (isPriv) setAudience(null);
     else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
