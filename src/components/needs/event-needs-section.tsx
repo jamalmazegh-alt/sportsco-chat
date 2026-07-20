@@ -941,9 +941,9 @@ function NeedFormDialog({
     if (open) setStep(1);
   }, [open]);
 
-  const wantsPublish =
-    !isEdit &&
-    (audiences.length > 0 || audState.preassigned.length > 0);
+  // Creation flow: always save first as draft (with optional pre-assignments).
+  // Publishing to a broadcast audience is done afterwards from the need card.
+  const wantsPublish = !isEdit && audiences.length > 0;
 
   const saveM = useMutation({
     mutationFn: async () => {
@@ -969,7 +969,7 @@ function NeedFormDialog({
           validation_mode: mode,
         },
       });
-      // Pre-assign selected people (before publish so they are already confirmed).
+      // Pre-assign selected people (confirmed immediately, notified).
       let preassignedCount = 0;
       if (created?.id && audState.preassigned.length > 0) {
         for (const p of audState.preassigned) {

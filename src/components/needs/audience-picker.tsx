@@ -699,7 +699,7 @@ export function AudiencePickerBody({
             onClick={submit}
           >
             <Plus className="h-4 w-4 mr-1" />
-            {t("add")}
+            {t("common.add")}
           </Button>
         </div>
         {ctx && ctx.groups.length === 0 && (
