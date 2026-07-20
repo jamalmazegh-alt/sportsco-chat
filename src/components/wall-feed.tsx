@@ -1128,12 +1128,86 @@ function WallGrouped({
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
             {group.label}
           </h2>
-          <ul className="space-y-2.5">{group.items.map(renderItem)}</ul>
+          <ul className="space-y-2.5">
+            {group.items.map((entry) =>
+              entry.kind === "post" ? renderItem(entry.post) : <PollCard key={entry.poll.id} poll={entry.poll} />,
+            )}
+          </ul>
         </section>
       ))}
+      {polls.length > 0 && (
+        <div className="pt-2 text-center">
+          <Link to="/publications" className="text-xs text-primary hover:underline">
+            {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
+
+function PollCard({ poll }: { poll: PollItem }) {
+  const { t } = useTranslation();
+  const d = new Date(poll.published_at ?? Date.now());
+  const isClosed = !!poll.closed_at;
+  const isAnonymous = poll.poll_visibility === "anonymous";
+  return (
+    <li
+      className={cn(
+        "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
+        "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
+        "animate-in fade-in-0 slide-in-from-bottom-1 duration-300",
+        "border-primary/30 bg-primary/[0.02]",
+      )}
+    >
+      <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/12">
+        <BarChart3 className="h-5 w-5 text-primary" />
+        <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">
+          {format(d, "d MMM")}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0 py-3 pr-3">
+        <header className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30 inline-flex items-center gap-1">
+            <BarChart3 className="h-3 w-3" />
+            {t("publications:card.tagPoll", { defaultValue: "Sondage" })}
+          </span>
+          {isAnonymous && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
+              {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
+            </span>
+          )}
+          {isClosed && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("publications:card.closed", { defaultValue: "Fermé" })}
+            </span>
+          )}
+        </header>
+        <p className="text-sm font-semibold">{poll.title}</p>
+        {poll.content && (
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
+        )}
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {t("publications:card.voters", {
+              defaultValue: "{{count}} votants",
+              count: poll.voter_count ?? 0,
+            })}
+          </span>
+          <Button asChild size="sm" variant={isClosed ? "outline" : "default"}>
+            <Link to="/publications/$publicationId" params={{ publicationId: poll.id }}>
+              {isClosed
+                ? t("publications:card.viewResults", { defaultValue: "Voir les résultats" })
+                : t("publications:card.vote", { defaultValue: "Voter" })}
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
 
 function CommentBlock({
   post,
