@@ -169,3 +169,8 @@ Blocs concernés :
 
 Phase B added `list.*`, `new.*`, and `detail.*` sections to publications.json.
 FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
+
+## publications.detail.votingAs*, votingForChild, player (2026-07-20)
+- FR: traduit
+- EN: traduit
+- DE/ES/IT/NL/PT: clone EN, à traduire

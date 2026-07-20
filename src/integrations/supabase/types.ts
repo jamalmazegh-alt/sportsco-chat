@@ -7552,6 +7552,18 @@ export type Database = {
       }
     }
     Functions: {
+      _resolve_audience_subjects: {
+        Args: {
+          _audiences: Json
+          _club_id: string
+          _manual_member_ids: string[]
+        }
+        Returns: {
+          member_id: string
+          subject_kind: string
+          subject_user_id: string
+        }[]
+      }
       accept_tournament_invite: { Args: { _token: string }; Returns: Json }
       accept_tournament_member_invite: {
         Args: { _token: string; _user_id: string }
@@ -7866,6 +7878,16 @@ export type Database = {
           team_name: string
         }[]
       }
+      get_eligible_vote_subjects: {
+        Args: { _publication_id: string }
+        Returns: {
+          current_option_id: string
+          label: string
+          relation: string
+          subject_id: string
+          subject_kind: string
+        }[]
+      }
       get_member_invite_info: {
         Args: { _token: string }
         Returns: {
@@ -8075,6 +8097,19 @@ export type Database = {
           roles: string[]
           subtitle: string
           user_id: string
+        }[]
+      }
+      preview_publication_audience: {
+        Args: {
+          _audiences: Json
+          _club_id: string
+          _event_id: string
+          _manual_member_ids: string[]
+        }
+        Returns: {
+          count: number
+          player_count: number
+          user_count: number
         }[]
       }
       privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }

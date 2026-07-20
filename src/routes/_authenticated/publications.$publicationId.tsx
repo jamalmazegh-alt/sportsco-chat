@@ -34,7 +34,7 @@ import {
   deletePublication,
   listPublicationRecipients,
 } from "@/lib/publications/publications.functions";
-import { useAuth } from "@/lib/auth-context";
+
 
 export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
   head: () => ({
@@ -49,7 +49,6 @@ export const Route = createFileRoute("/_authenticated/publications/$publicationI
 function PublicationDetailPage() {
   const { t } = useTranslation();
   const { publicationId } = Route.useParams();
-  const { user } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
 
@@ -61,6 +60,7 @@ function PublicationDetailPage() {
   const recipientsFn = useServerFn(listPublicationRecipients);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState<string | null>(null);
   const [showRecipients, setShowRecipients] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -71,7 +71,17 @@ function PublicationDetailPage() {
   const isPoll = data?.publication?.publication_type === "poll";
   const isClosed = !!data?.publication?.closed_at;
   const isStaff = !!data?.isStaff;
-  const myVote = data?.myVotes?.[0];
+  const eligibleSubjects = data?.eligibleSubjects ?? [];
+  const canVote = eligibleSubjects.length > 0 && !isClosed;
+
+  // Pick the active subject: first by default, or the one selected via chip.
+  const subjectKey = (s: { subjectKind: string; subjectId: string }) =>
+    `${s.subjectKind}:${s.subjectId}`;
+  const activeSubject =
+    eligibleSubjects.find((s) => subjectKey(s) === selectedSubjectKey) ??
+    eligibleSubjects[0] ??
+    null;
+  const myCurrentOption = activeSubject?.currentOptionId ?? null;
 
   const { data: results } = useQuery({
     queryKey: ["publication-results", publicationId],
@@ -87,13 +97,13 @@ function PublicationDetailPage() {
 
   const vote = useMutation({
     mutationFn: async (optionId: string) => {
-      if (!user?.id) throw new Error("no_user");
+      if (!activeSubject) throw new Error("no_subject");
       return voteFn({
         data: {
           publicationId,
           optionId,
-          subjectKind: "user",
-          subjectId: user.id,
+          subjectKind: activeSubject.subjectKind,
+          subjectId: activeSubject.subjectId,
         },
       });
     },
@@ -218,8 +228,47 @@ function PublicationDetailPage() {
           )}
 
           {isPoll && data.options.length > 0 && (
-            <div className="space-y-2 pt-2">
-              {!myVote && !isClosed ? (
+            <div className="space-y-3 pt-2">
+              {/* Subject selector — only when multiple votable subjects */}
+              {canVote && eligibleSubjects.length > 1 && (
+                <div className="space-y-1.5">
+                  <div className="text-xs text-muted-foreground">
+                    {t("publications.detail.votingAs", "Je vote en tant que :")}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {eligibleSubjects.map((s) => {
+                      const key = subjectKey(s);
+                      const isActive = key === (selectedSubjectKey ?? subjectKey(eligibleSubjects[0]));
+                      const label =
+                        s.subjectKind === "user"
+                          ? t("publications.detail.votingAsSelf", "Moi")
+                          : s.label ?? t("publications.detail.player", "Joueur");
+                      return (
+                        <Button
+                          key={key}
+                          size="sm"
+                          variant={isActive ? "default" : "outline"}
+                          onClick={() => {
+                            setSelectedSubjectKey(key);
+                            setSelectedOption(null);
+                          }}
+                        >
+                          {label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {canVote && eligibleSubjects.length === 1 && activeSubject?.relation === "guardian" && activeSubject.label && (
+                <div className="text-xs text-muted-foreground">
+                  {t("publications.detail.votingForChild", "Vous votez pour {{name}}", {
+                    name: activeSubject.label,
+                  })}
+                </div>
+              )}
+
+              {canVote && !myCurrentOption ? (
                 <>
                   <RadioGroup
                     value={selectedOption ?? ""}
@@ -248,7 +297,7 @@ function PublicationDetailPage() {
                 <div className="space-y-2">
                   {(results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))).map(
                     (r: any) => {
-                      const isMine = myVote?.option_id === r.option_id;
+                      const isMine = myCurrentOption === r.option_id;
                       const count = r.vote_count;
                       const pct =
                         count == null
