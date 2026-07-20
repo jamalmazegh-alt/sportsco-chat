@@ -164,3 +164,8 @@ Blocs concernés :
 - `confirm.close/delete/resend/refresh.*`, `confirm.confirm/cancel`
 - `audience.*` (dont `audience.types.*` pour les 10 audiences)
 - `form.*`, `email.*`, `push.*`, `errors.*`
+
+## `publications.json` — Phase B UI (DE/ES/IT/NL/PT)
+
+Phase B added `list.*`, `new.*`, and `detail.*` sections to publications.json.
+FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
