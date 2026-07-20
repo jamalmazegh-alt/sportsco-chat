@@ -1,4 +1,52 @@
 {
+  "list": {
+    "title": "Publications",
+    "new": "Nouvelle publication",
+    "empty": "Aucune publication pour le moment.",
+    "anonymous": "Anonyme",
+    "closed": "Fermé"
+  },
+  "new": {
+    "title": "Nouvelle publication",
+    "step": "Étape",
+    "typeMessage": "Message",
+    "typePoll": "Sondage",
+    "pollOptions": "Options",
+    "option": "Option",
+    "addOption": "Ajouter une option",
+    "visibility": "Visibilité des résultats",
+    "visibilityAnon": "Anonyme",
+    "visibilityAnonDesc": "Personne, y compris le staff, ne voit qui a voté quoi. Résultats masqués tant que < 3 votes par option.",
+    "visibilityStaff": "Visible par le staff",
+    "visibilityStaffDesc": "Le staff voit qui a voté quoi. Les votants voient uniquement les totaux.",
+    "audienceLabel": "Destinataires",
+    "audienceEmpty": "Aucun destinataire sélectionné",
+    "chooseTeam": "Choisir une équipe…",
+    "chooseGroup": "Choisir un groupe…",
+    "deliveryLabel": "Mode de diffusion",
+    "wall": "Mur + notification push",
+    "wallDesc": "Apparaît sur le fil du club et envoie une push aux destinataires.",
+    "email": "E-mail",
+    "emailDesc": "Envoie un e-mail à chaque destinataire.",
+    "publish": "Publier",
+    "published": "Publication publiée"
+  },
+  "detail": {
+    "notFound": "Publication introuvable",
+    "vote": "Voter",
+    "voted": "Vote enregistré",
+    "masked": "—",
+    "thresholdNotice": "Résultats masqués pour préserver l'anonymat (< 3 votes par option).",
+    "recipients": "Voir les destinataires",
+    "recipientsTitle": "Destinataires",
+    "userSubject": "Utilisateur",
+    "unknown": "Inconnu",
+    "close": "Fermer le sondage",
+    "closed": "Publication fermée",
+    "delete": "Supprimer",
+    "deleted": "Publication supprimée",
+    "confirmDelete": "Supprimer cette publication ?"
+  },
   "type": {
     "message": "Communication",
     "poll": "Sondage"
