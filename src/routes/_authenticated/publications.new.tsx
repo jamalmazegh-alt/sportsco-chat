@@ -446,7 +446,7 @@ function NewPublicationPage() {
                         <div>{t("publications:new.visibilityAnon", "Anonyme")}</div>
                         <div className="text-xs text-muted-foreground">
                           {t(
-                            "publications.new.visibilityAnonDesc",
+                            "publications:new.visibilityAnonDesc",
                             "Personne, y compris le staff, ne voit qui a voté quoi. Résultats masqués tant que < 3 votes par option.",
                           )}
                         </div>
@@ -458,7 +458,7 @@ function NewPublicationPage() {
                         <div>{t("publications:new.visibilityStaff", "Visible par le staff")}</div>
                         <div className="text-xs text-muted-foreground">
                           {t(
-                            "publications.new.visibilityStaffDesc",
+                            "publications:new.visibilityStaffDesc",
                             "Le staff voit qui a voté quoi. Les votants voient uniquement les totaux.",
                           )}
                         </div>

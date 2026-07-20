@@ -337,7 +337,7 @@ function PublicationDetailPage() {
                       <Info className="h-3.5 w-3.5 mt-0.5" />
                       <span>
                         {t(
-                          "publications.detail.thresholdNotice",
+                          "publications:detail.thresholdNotice",
                           "Résultats masqués pour préserver l'anonymat (< 3 votes par option).",
                         )}
                       </span>
