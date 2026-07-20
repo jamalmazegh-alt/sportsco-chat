@@ -21,6 +21,7 @@ import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InstallRouteImport } from './routes/install'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -234,6 +235,11 @@ const McpRoute = McpRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstallRoute = InstallRouteImport.update({
+  id: '/install',
+  path: '/install',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -1100,6 +1106,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/install': typeof InstallRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
@@ -1267,6 +1274,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/install': typeof InstallRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
@@ -1431,6 +1439,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/install': typeof InstallRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/notifications': typeof NotificationsRoute
@@ -1600,6 +1609,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/forgot-password'
+    | '/install'
     | '/login'
     | '/mcp'
     | '/notifications'
@@ -1767,6 +1777,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/forgot-password'
+    | '/install'
     | '/login'
     | '/mcp'
     | '/notifications'
@@ -1930,6 +1941,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/forgot-password'
+    | '/install'
     | '/login'
     | '/mcp'
     | '/notifications'
@@ -2099,6 +2111,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InstallRoute: typeof InstallRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -2260,6 +2273,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/install': {
+      id: '/install'
+      path: '/install'
+      fullPath: '/install'
+      preLoaderRoute: typeof InstallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -3707,6 +3727,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  InstallRoute: InstallRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   NotificationsRoute: NotificationsRoute,
