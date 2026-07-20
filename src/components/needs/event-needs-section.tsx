@@ -58,6 +58,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PersonRow } from "@/components/shared/person-row";
 import {
+  formatMemberContextSubline,
+  type MemberContext,
+} from "@/lib/needs/member-context";
+import {
   Select,
   SelectContent,
   SelectItem,
