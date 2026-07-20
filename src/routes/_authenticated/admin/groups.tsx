@@ -659,15 +659,24 @@ function GroupMembersPanel({
     [membersQ.data],
   );
 
-  const childrenByUserId = useMemo(() => {
-    const m = new Map<string, string[]>();
+  const contextByUserId = useMemo(() => {
+    const m = new Map<string, MemberContext>();
     for (const cm of allMembers) {
-      if (cm.user_id && cm.children_names && cm.children_names.length > 0) {
-        m.set(cm.user_id, cm.children_names);
-      }
+      if (cm.user_id && cm.context) m.set(cm.user_id, cm.context);
     }
     return m;
   }, [allMembers]);
+
+  const sublineLabels = useMemo(
+    () => ({
+      playerSubline: (c: string) => t("common:person.playerSubline", { category: c }),
+      playerSublineMulti: (c: string) =>
+        t("common:person.playerSublineMulti", { categories: c }),
+      parentSubline: (c: string) => t("common:person.parentSubline", { children: c }),
+    }),
+    [t],
+  );
+
 
 
   const invalidateAll = () => {
