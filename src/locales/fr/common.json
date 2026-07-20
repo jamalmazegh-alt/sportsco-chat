@@ -2395,5 +2395,25 @@
     "confirmActivate": "Réactiver ce groupe ?",
     "activated": "Groupe réactivé",
     "deactivated": "Groupe désactivé"
+  },
+  "install": {
+    "meta": {
+      "title": "Installer Clubero sur votre téléphone",
+      "description": "Installez Clubero en un tap sur iPhone ou Android pour recevoir vos convocations, rappels et notifications en temps réel.",
+      "ogTitle": "Installer Clubero sur votre téléphone",
+      "ogDescription": "Convocations, présences et rappels en temps réel — installez Clubero sur votre écran d'accueil."
+    },
+    "back": "Retour",
+    "title": "Installer Clubero",
+    "subtitle": "L'app s'installe en 1 tap depuis votre navigateur — pas besoin de passer par l'App Store ou Google Play.",
+    "cta": "Installer sur mon téléphone",
+    "notifTitle": "Notifications en temps réel",
+    "notifDesc": "Convocations, rappels et messages coach dès qu'ils sont envoyés.",
+    "launchTitle": "Ouverture instantanée",
+    "launchDesc": "Une icône sur l'écran d'accueil, comme une vraie app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Compatible Safari (iOS 16.4+) et Chrome / Edge / Samsung Internet sur Android.",
+    "alreadyInstalledTitle": "Déjà installée ?",
+    "alreadyInstalledDesc": "Ouvrez Clubero depuis l'icône sur votre écran d'accueil pour activer les notifications."
   }
 }

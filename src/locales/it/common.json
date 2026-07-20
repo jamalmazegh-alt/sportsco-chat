@@ -2395,5 +2395,25 @@
     },
     "bulkPickKind": "Scegli un tipo…",
     "bulkPickParam": "Scegli…"
+  },
+  "install": {
+    "meta": {
+      "title": "Installa Clubero sul tuo telefono",
+      "description": "Installa Clubero con un tocco su iPhone o Android per ricevere convocazioni, promemoria e notifiche in tempo reale.",
+      "ogTitle": "Installa Clubero sul tuo telefono",
+      "ogDescription": "Convocazioni, presenze e promemoria in tempo reale — installa Clubero sulla tua schermata Home."
+    },
+    "back": "Indietro",
+    "title": "Installa Clubero",
+    "subtitle": "L'app si installa con 1 tocco dal browser — senza App Store o Google Play.",
+    "cta": "Installa sul mio telefono",
+    "notifTitle": "Notifiche in tempo reale",
+    "notifDesc": "Convocazioni, promemoria e messaggi dell'allenatore appena inviati.",
+    "launchTitle": "Apertura istantanea",
+    "launchDesc": "Un'icona sulla schermata Home, come una vera app.",
+    "platformsTitle": "iPhone e Android",
+    "platformsDesc": "Compatibile con Safari (iOS 16.4+) e Chrome / Edge / Samsung Internet su Android.",
+    "alreadyInstalledTitle": "Già installata?",
+    "alreadyInstalledDesc": "Apri Clubero dall'icona sulla schermata Home per attivare le notifiche."
   }
 }
