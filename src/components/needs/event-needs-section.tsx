@@ -558,7 +558,7 @@ function NeedRow({
           <Button
             size="sm"
             variant={isDraft ? "default" : "outline"}
-            onClick={() => (isDraft ? setPublishOpen(true) : setResendOpen(true))}
+            onClick={() => (isDraft ? setEditOpen(true) : setResendOpen(true))}
           >
             <Send className="h-3.5 w-3.5 mr-1" />
             {isDraft ? t("needs:actions.publish") : t("needs:card.republish")}
@@ -848,27 +848,28 @@ function NeedFormDialog({
   const previewFn = useServerFn(previewEventAudience);
 
   const isEdit = !!initial;
+  const isDraftEdit = isEdit && initial?.status === "draft";
+  const showAudienceStep = !isEdit || isDraftEdit;
   const templateLocked = isEdit && initial?.status === "open";
 
-  // Audience picker is only shown at CREATION (before publication).
-  // For existing drafts, the user re-opens the Publish dialog.
+  // Audience picker is shown at CREATION and when editing a DRAFT.
   const { data: audienceCtx } = useQuery({
     queryKey: ["event-audience-ctx", eventId],
     queryFn: () => ctxFn({ data: { event_id: eventId } }),
-    enabled: open && !isEdit,
+    enabled: open && showAudienceStep,
   });
 
   const { state: audState, controls: audControls, buildAudiences } = useAudienceState();
   const audiences = useMemo<AudienceSelector[]>(
-    () => (isEdit ? [] : buildAudiences(eventId)),
+    () => (showAudienceStep ? buildAudiences(eventId) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [audState, eventId, isEdit],
+    [audState, eventId, showAudienceStep],
   );
 
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   useEffect(() => {
-    if (isEdit || audiences.length === 0) {
+    if (!showAudienceStep || audiences.length === 0) {
       setPreviewCount(0);
       return;
     }
@@ -888,7 +889,7 @@ function NeedFormDialog({
       cancelled = true;
       clearTimeout(to);
     };
-  }, [audiences, eventId, previewFn, isEdit]);
+  }, [audiences, eventId, previewFn, showAudienceStep]);
 
   const availableTemplates = useMemo<NeedTemplate[]>(() => {
     const s = (sport ?? "").toLowerCase().trim();
@@ -935,20 +936,25 @@ function NeedFormDialog({
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
 
-  // 2-step wizard state (creation only). Edit stays single-step.
+  // 2-step wizard: step 1 = fields, step 2 = audience.
+  // Draft edits jump straight to step 2 (fields still editable via "back").
   const [step, setStep] = useState<1 | 2>(1);
   useEffect(() => {
-    if (open) setStep(1);
-  }, [open]);
+    if (open) setStep(isDraftEdit ? 2 : 1);
+  }, [open, isDraftEdit]);
 
-  // Creation flow: always save first as draft (with optional pre-assignments).
-  // Publishing to a broadcast audience is done afterwards from the need card.
-  const wantsPublish = !isEdit && audiences.length > 0;
+  // Saves as draft only when neither broadcast audience nor pre-assignments are set.
+  // Any audience selection (broadcast OR pre-assignments) triggers publication.
+  const wantsPublish =
+    showAudienceStep &&
+    (audiences.length > 0 || audState.preassigned.length > 0);
 
   const saveM = useMutation({
     mutationFn: async () => {
+      let needId: string;
+      let created: { id: string } | null = null;
       if (isEdit) {
-        return update({
+        await update({
           data: {
             need_id: initial!.id,
             role_key: currentTpl.key,
@@ -958,43 +964,47 @@ function NeedFormDialog({
             validation_mode: mode,
           },
         });
+        needId = initial!.id;
+      } else {
+        created = await create({
+          data: {
+            event_id: eventId,
+            role_key: currentTpl.key,
+            label: label.trim() || defaultLabel,
+            description: description.trim() || null,
+            capacity,
+            validation_mode: mode,
+          },
+        });
+        needId = created!.id;
       }
-      const created = await create({
-        data: {
-          event_id: eventId,
-          role_key: currentTpl.key,
-          label: label.trim() || defaultLabel,
-          description: description.trim() || null,
-          capacity,
-          validation_mode: mode,
-        },
-      });
       // Pre-assign selected people (confirmed immediately, notified).
       let preassignedCount = 0;
-      if (created?.id && audState.preassigned.length > 0) {
+      if (showAudienceStep && audState.preassigned.length > 0) {
         for (const p of audState.preassigned) {
           try {
-            await addManualFn({ data: { need_id: created.id, user_id: p.user_id } });
+            await addManualFn({ data: { need_id: needId, user_id: p.user_id } });
             preassignedCount++;
           } catch (e) {
             console.error("[preassign] failed", p.user_id, e);
           }
         }
       }
-      if (wantsPublish && created?.id) {
-        const r = await publish({ data: { need_id: created.id, audiences } });
-        return { ...created, __published: r, __preassignedCount: preassignedCount };
+      // Publish (broadcast audience or draft with pre-assignments).
+      let published: { recipients_count?: number } | null = null;
+      if (showAudienceStep && audiences.length > 0) {
+        published = await publish({ data: { need_id: needId, audiences } });
       }
-      return { ...created, __preassignedCount: preassignedCount };
-
+      return { id: needId, __published: published, __preassignedCount: preassignedCount, __wasEdit: isEdit };
     },
     onSuccess: (r) => {
       const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
-      if (isEdit) {
+      const pub = (r as { __published?: { recipients_count?: number } | null }).__published;
+      const wasEdit = (r as { __wasEdit?: boolean }).__wasEdit;
+      if (pub) {
+        toast.success(t("needs:publish.success", { count: pub.recipients_count ?? 0 }));
+      } else if (wasEdit) {
         toast.success(t("common.saved"));
-      } else if ((r as { __published?: { recipients_count: number } })?.__published) {
-        const rc = (r as { __published: { recipients_count: number } }).__published.recipients_count;
-        toast.success(t("needs:publish.success", { count: rc ?? 0 }));
       } else {
         toast.success(t("needs:section.created"));
       }
@@ -1008,28 +1018,28 @@ function NeedFormDialog({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const totalSteps = isEdit ? 1 : 2;
-  const currentStep = isEdit ? 1 : step;
+  const totalSteps = showAudienceStep ? 2 : 1;
+  const currentStep = showAudienceStep ? step : 1;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          {!isEdit && (
+          {showAudienceStep && (
             <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {t("needs:wizard.step", { current: currentStep, total: totalSteps })}
             </div>
           )}
           <DialogTitle className="flex items-center gap-2">
             <HandHelping className="h-4 w-4 text-primary" />
-            {isEdit
+            {!showAudienceStep
               ? t("common.edit")
               : step === 1
                 ? t("needs:wizard.step1Title")
                 : t("needs:wizard.step2Title")}
           </DialogTitle>
           <DialogDescription>
-            {isEdit
+            {!showAudienceStep
               ? t("needs:section.createDesc")
               : step === 1
                 ? t("needs:section.createDesc")
@@ -1038,7 +1048,7 @@ function NeedFormDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-1">
-          {(isEdit || step === 1) && (
+          {(!showAudienceStep || step === 1) && (
             <>
               {/* Permanent minor reminder */}
               <div className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
@@ -1159,7 +1169,7 @@ function NeedFormDialog({
             </>
           )}
 
-          {!isEdit && step === 2 && (
+          {showAudienceStep && step === 2 && (
             <div className="space-y-3">
               <AudiencePickerBody
                 ctx={audienceCtx ?? null}
@@ -1176,7 +1186,7 @@ function NeedFormDialog({
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
-          {!isEdit && step === 2 ? (
+          {showAudienceStep && step === 2 ? (
             <>
               <Button variant="outline" onClick={() => setStep(1)}>
                 {t("needs:wizard.back")}
@@ -1185,7 +1195,9 @@ function NeedFormDialog({
                 {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                 {wantsPublish
                   ? t("needs:actions.publish")
-                  : t("common.create")}
+                  : isEdit
+                    ? t("common.save")
+                    : t("common.create")}
               </Button>
             </>
           ) : (
@@ -1193,7 +1205,7 @@ function NeedFormDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 {t("common.cancel")}
               </Button>
-              {isEdit ? (
+              {!showAudienceStep ? (
                 <Button onClick={() => saveM.mutate()} disabled={saveM.isPending}>
                   {saveM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                   {t("common.save")}
