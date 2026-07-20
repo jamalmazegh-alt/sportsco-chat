@@ -1159,9 +1159,12 @@ function NeedFormDialog({
                 state={audState}
                 controls={audControls}
                 preview={{ count: previewCount, loading: previewLoading }}
+                capacity={capacity}
+                enablePreassign
               />
             </div>
           )}
+
 
         </div>
 
