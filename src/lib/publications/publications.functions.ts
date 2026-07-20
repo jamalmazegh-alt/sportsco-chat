@@ -286,7 +286,9 @@ export const listPublicationRecipients = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("club_publication_recipients")
-      .select("member_id, created_at, players!inner(id, first_name, last_name)")
+      .select(
+        "subject_kind, member_id, subject_user_id, created_at, players(id, first_name, last_name)",
+      )
       .eq("publication_id", data.publicationId);
     if (error) throw new Response(`list_failed: ${error.message}`, { status: 500 });
     return { recipients: rows ?? [] };
