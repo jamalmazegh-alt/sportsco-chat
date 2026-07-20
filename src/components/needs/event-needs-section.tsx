@@ -558,7 +558,7 @@ function NeedRow({
           <Button
             size="sm"
             variant={isDraft ? "default" : "outline"}
-            onClick={() => (isDraft ? setPublishOpen(true) : setResendOpen(true))}
+            onClick={() => (isDraft ? setEditOpen(true) : setResendOpen(true))}
           >
             <Send className="h-3.5 w-3.5 mr-1" />
             {isDraft ? t("needs:actions.publish") : t("needs:card.republish")}
