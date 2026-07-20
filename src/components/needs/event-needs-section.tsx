@@ -1025,21 +1025,21 @@ function NeedFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          {!isEdit && (
+          {showAudienceStep && (
             <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {t("needs:wizard.step", { current: currentStep, total: totalSteps })}
             </div>
           )}
           <DialogTitle className="flex items-center gap-2">
             <HandHelping className="h-4 w-4 text-primary" />
-            {isEdit
+            {!showAudienceStep
               ? t("common.edit")
               : step === 1
                 ? t("needs:wizard.step1Title")
                 : t("needs:wizard.step2Title")}
           </DialogTitle>
           <DialogDescription>
-            {isEdit
+            {!showAudienceStep
               ? t("needs:section.createDesc")
               : step === 1
                 ? t("needs:section.createDesc")
