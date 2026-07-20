@@ -691,8 +691,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
               checked={sendEmail}
               onChange={(e) => setSendEmail(e.target.checked)}
             />
-            {t("wall.compose.alsoEmail", { defaultValue: "Aussi par e-mail" })}
+            {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
           </label>
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+            <Button asChild size="sm" variant="outline">
+              <Link to="/publications/new">
+                <BarChart3 className="h-4 w-4 mr-1.5" />
+                {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+              </Link>
+            </Button>
+          </div>
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
