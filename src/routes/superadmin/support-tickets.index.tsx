@@ -10,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Search, LifeBuoy, ChevronRight } from "lucide-react";
+import { Loader2, Search, LifeBuoy, ChevronRight, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CreateTicketOnBehalfDialog } from "@/components/superadmin/CreateTicketOnBehalfDialog";
 import {
   SUPPORT_STATUSES,
   SUPPORT_PRIORITIES,
