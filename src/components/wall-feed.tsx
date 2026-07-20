@@ -320,13 +320,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if ((!body.trim() && atts.length === 0) || !user) return;
 
     // Resolve final audience for the insert.
-    //   null         → "Tout le club"
-    //   [] (forced)  → coach must pick at least one team
-    //   [ids]        → team-scoped (1 or many)
+    //   groups non-empty → audience_type='group', audience_group_ids=[…], team_ids=null
+    //   null             → "Tout le club"
+    //   [] (forced)      → coach must pick at least one team
+    //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const audienceForInsert: string[] | null =
-      audience === null ? null : audience.length === 0 ? null : audience;
-    if (!isPriv && audienceForInsert === null && audience !== null) {
+    const hasGroups = audienceGroups.length > 0;
+    const audienceForInsert: string[] | null = hasGroups
+      ? null
+      : audience === null
+        ? null
+        : audience.length === 0
+          ? null
+          : audience;
+    if (!isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -335,13 +342,24 @@ export function WallFeed({ clubId }: { clubId: string }) {
       return;
     }
 
+    const audienceTypeForInsert: AudienceType = hasGroups
+      ? "group"
+      : audienceForInsert === null
+        ? "club"
+        : audienceForInsert.length === 1
+          ? "team"
+          : "multi_team";
+
     setPosting(true);
     const insertPayload = {
       club_id: clubId,
       author_user_id: user.id,
       body: body.trim(),
       attachments: atts as unknown as never,
+      audience_type: audienceTypeForInsert as unknown as never,
       audience_team_ids: audienceForInsert as unknown as never,
+      audience_group_ids: (hasGroups ? audienceGroups : null) as unknown as never,
+      send_email: sendEmail as unknown as never,
     };
 
     // Pre-flight: confirm the JWT subject matches user.id and that the active
