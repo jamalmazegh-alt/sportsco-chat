@@ -1288,7 +1288,8 @@
     "audienceRequired": "Kies minstens één team.",
     "compose": {
       "targetGroup": "Groep(en)",
-      "alsoEmail": "Ook per e-mail"
+      "alsoEmail": "Stuur ook een kopie per e-mail",
+      "newPoll": "Nieuwe peiling"
     },
     "email": {
       "subject": "Nieuw bericht van {{club}}",
