@@ -33,23 +33,29 @@ const AudienceInput = z.discriminatedUnion("audience_type", [
   z.object({ audience_type: z.literal("selection_manuelle") }),
 ]);
 
-const CreateInput = z.object({
-  clubId: z.string().uuid(),
-  publicationType: z.enum(["message", "poll"]),
-  title: z.string().min(1).max(200),
-  content: z.string().max(20000).default(""),
-  pollVisibility: z.enum(["staff_visible", "anonymous"]).nullable(),
-  publishToWall: z.boolean(),
-  sendEmail: z.boolean(),
-  emailBody: z.string().max(20000).nullable(),
-  closesAt: z.string().datetime().nullable(),
-  eventId: z.string().uuid().nullable(),
-  audiences: z.array(AudienceInput).min(1),
-  manualMemberIds: z.array(z.string().uuid()).default([]),
-  pollOptions: z.array(z.string().min(1).max(120)).default([]),
-  documentIds: z.array(z.string().uuid()).default([]),
-  mediaPaths: z.array(z.string().min(1)).default([]),
-});
+const CreateInput = z
+  .object({
+    clubId: z.string().uuid(),
+    publicationType: z.enum(["message", "poll"]),
+    title: z.string().min(1).max(200),
+    content: z.string().max(20000).default(""),
+    pollVisibility: z.enum(["staff_visible", "anonymous"]).nullable(),
+    publishToWall: z.boolean(),
+    sendEmail: z.boolean(),
+    emailBody: z.string().max(20000).nullable(),
+    closesAt: z.string().datetime().nullable(),
+    eventId: z.string().uuid().nullable(),
+    audiences: z.array(AudienceInput).default([]),
+    manualMemberIds: z.array(z.string().uuid()).default([]),
+    pollOptions: z.array(z.string().min(1).max(120)).default([]),
+    documentIds: z.array(z.string().uuid()).default([]),
+    mediaPaths: z.array(z.string().min(1)).default([]),
+  })
+  .refine((d) => d.audiences.length > 0 || d.manualMemberIds.length > 0, {
+    message: "audience_required",
+    path: ["audiences"],
+  });
+
 
 // ---------------------------------------------------------------------------
 // createPublication — persists all rows then calls publish_publication_atomic
@@ -74,9 +80,7 @@ export const createPublication = createServerFn({ method: "POST" })
     if (!data.publishToWall && !data.sendEmail) {
       throw new Response("delivery_required", { status: 400 });
     }
-    if (!data.publishToWall && !data.sendEmail) {
-      throw new Response("delivery_required", { status: 400 });
-    }
+
 
     // Insert publication
     const { data: pub, error: pubErr } = await supabase
