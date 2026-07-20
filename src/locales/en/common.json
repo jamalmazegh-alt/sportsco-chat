@@ -2445,5 +2445,10 @@
     "iosStep4Before": "Choose",
     "iosStep4Icon": "Add to Home Screen",
     "iosStep4After": "then tap “Add”"
+  },
+  "person": {
+    "playerSubline": "Player · {{category}}",
+    "playerSublineMulti": "Player · {{categories}}",
+    "parentSubline": "Parent of {{children}}"
   }
 }

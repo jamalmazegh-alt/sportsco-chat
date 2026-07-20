@@ -2445,5 +2445,10 @@
     "iosStep4Before": "Elige",
     "iosStep4Icon": "Añadir a pantalla de inicio",
     "iosStep4After": "y toca «Añadir»"
+  },
+  "person": {
+    "playerSubline": "Jugador · {{category}}",
+    "playerSublineMulti": "Jugador · {{categories}}",
+    "parentSubline": "Padre/Madre de {{children}}"
   }
 }
