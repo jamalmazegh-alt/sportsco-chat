@@ -49,7 +49,6 @@ export const Route = createFileRoute("/_authenticated/publications/$publicationI
 function PublicationDetailPage() {
   const { t } = useTranslation();
   const { publicationId } = Route.useParams();
-  const { user } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
 
@@ -61,6 +60,7 @@ function PublicationDetailPage() {
   const recipientsFn = useServerFn(listPublicationRecipients);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState<string | null>(null);
   const [showRecipients, setShowRecipients] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -71,7 +71,17 @@ function PublicationDetailPage() {
   const isPoll = data?.publication?.publication_type === "poll";
   const isClosed = !!data?.publication?.closed_at;
   const isStaff = !!data?.isStaff;
-  const myVote = data?.myVotes?.[0];
+  const eligibleSubjects = data?.eligibleSubjects ?? [];
+  const canVote = eligibleSubjects.length > 0 && !isClosed;
+
+  // Pick the active subject: first by default, or the one selected via chip.
+  const subjectKey = (s: { subjectKind: string; subjectId: string }) =>
+    `${s.subjectKind}:${s.subjectId}`;
+  const activeSubject =
+    eligibleSubjects.find((s) => subjectKey(s) === selectedSubjectKey) ??
+    eligibleSubjects[0] ??
+    null;
+  const myCurrentOption = activeSubject?.currentOptionId ?? null;
 
   const { data: results } = useQuery({
     queryKey: ["publication-results", publicationId],
@@ -87,13 +97,13 @@ function PublicationDetailPage() {
 
   const vote = useMutation({
     mutationFn: async (optionId: string) => {
-      if (!user?.id) throw new Error("no_user");
+      if (!activeSubject) throw new Error("no_subject");
       return voteFn({
         data: {
           publicationId,
           optionId,
-          subjectKind: "user",
-          subjectId: user.id,
+          subjectKind: activeSubject.subjectKind,
+          subjectId: activeSubject.subjectId,
         },
       });
     },
