@@ -35,18 +35,24 @@ describe("getEmailSender", () => {
 });
 
 describe("SesSender", () => {
-  it("throws explicitly instead of silently accepting", async () => {
-    const ses = new SesSender();
-    await expect(
-      ses.send({
-        to: "a@b.test",
-        from: "c@d.test",
-        senderDomain: "d.test",
-        subject: "x",
-        html: "<p>x</p>",
-        text: "x",
-      }),
-    ).rejects.toThrow(/SES sender not yet configured/);
+  it("fails fast when AWS credentials are missing (no silent accept)", async () => {
+    const original = process.env.AWS_SES_ACCESS_KEY_ID;
+    delete process.env.AWS_SES_ACCESS_KEY_ID;
+    try {
+      const ses = new SesSender();
+      await expect(
+        ses.send({
+          to: "a@b.test",
+          from: "c@d.test",
+          senderDomain: "d.test",
+          subject: "x",
+          html: "<p>x</p>",
+          text: "x",
+        }),
+      ).rejects.toThrow(/not configured/);
+    } finally {
+      if (original !== undefined) process.env.AWS_SES_ACCESS_KEY_ID = original;
+    }
   });
 });
 
