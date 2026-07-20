@@ -1569,27 +1569,33 @@ export type Database = {
           cast_by_user_id: string
           created_at: string
           id: string
-          member_id: string
+          member_id: string | null
           option_id: string
           publication_id: string
+          subject_kind: string
+          subject_user_id: string | null
           updated_at: string
         }
         Insert: {
           cast_by_user_id: string
           created_at?: string
           id?: string
-          member_id: string
+          member_id?: string | null
           option_id: string
           publication_id: string
+          subject_kind?: string
+          subject_user_id?: string | null
           updated_at?: string
         }
         Update: {
           cast_by_user_id?: string
           created_at?: string
           id?: string
-          member_id?: string
+          member_id?: string | null
           option_id?: string
           publication_id?: string
+          subject_kind?: string
+          subject_user_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1831,22 +1837,28 @@ export type Database = {
           created_at: string
           first_dispatch_id: string | null
           id: string
-          member_id: string
+          member_id: string | null
           publication_id: string
+          subject_kind: string
+          subject_user_id: string | null
         }
         Insert: {
           created_at?: string
           first_dispatch_id?: string | null
           id?: string
-          member_id: string
+          member_id?: string | null
           publication_id: string
+          subject_kind?: string
+          subject_user_id?: string | null
         }
         Update: {
           created_at?: string
           first_dispatch_id?: string | null
           id?: string
-          member_id?: string
+          member_id?: string | null
           publication_id?: string
+          subject_kind?: string
+          subject_user_id?: string | null
         }
         Relationships: [
           {
@@ -7629,9 +7641,10 @@ export type Database = {
       }
       cast_poll_vote: {
         Args: {
-          _member_id: string
           _option_id: string
           _publication_id: string
+          _subject_id: string
+          _subject_kind: string
         }
         Returns: string
       }
@@ -8133,6 +8146,8 @@ export type Database = {
         Args: { _publication_id: string }
         Returns: {
           member_id: string
+          subject_kind: string
+          subject_user_id: string
         }[]
       }
       respond_via_token: {
