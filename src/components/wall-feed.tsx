@@ -222,6 +222,44 @@ export function WallFeed({ clubId }: { clubId: string }) {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
 
+  // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
+  // Filter to publication_type='poll' as a safety net; messages now live on the wall.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await listPublicationsFn({ data: { clubId, limit: 50 } });
+        const list = ((r?.publications ?? []) as any[]).filter(
+          (p) => p.publication_type === "poll",
+        ) as PollItem[];
+        if (list.length === 0) {
+          if (!cancelled) setPolls([]);
+          return;
+        }
+        // Best-effort voter count (RLS on club_poll_votes: voters are visible per policy).
+        const ids = list.map((p) => p.id);
+        const { data: votes } = await supabase
+          .from("club_poll_votes")
+          .select("publication_id")
+          .in("publication_id", ids);
+        const counts = new Map<string, number>();
+        for (const v of (votes ?? []) as { publication_id: string }[]) {
+          counts.set(v.publication_id, (counts.get(v.publication_id) ?? 0) + 1);
+        }
+        if (!cancelled) {
+          setPolls(list.map((p) => ({ ...p, voter_count: counts.get(p.id) ?? 0 })));
+        }
+      } catch {
+        if (!cancelled) setPolls([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line
+  }, [clubId]);
+
+
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
     const channelName = `wall:${clubId}:${Math.random().toString(36).slice(2)}`;
