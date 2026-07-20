@@ -80,6 +80,7 @@ export type AudienceState = {
   groupIds: Set<string>;
   teamPicks: Array<{ team_id: string; kind: TeamKind }>;
   category: string;
+  preassigned: PreassignedPerson[];
 };
 
 export function useAudienceState(defaults: Partial<AudienceState> = {}) {
@@ -91,10 +92,13 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
     defaults.teamPicks ?? [],
   );
   const [category, setCategory] = useState<string>(defaults.category ?? "");
+  const [preassigned, setPreassigned] = useState<PreassignedPerson[]>(
+    defaults.preassigned ?? [],
+  );
 
   const state = useMemo<AudienceState>(
-    () => ({ scalar, groupIds, teamPicks, category }),
-    [scalar, groupIds, teamPicks, category],
+    () => ({ scalar, groupIds, teamPicks, category, preassigned }),
+    [scalar, groupIds, teamPicks, category, preassigned],
   );
 
   const toggleScalar = (k: ScalarAudienceKey) => {
@@ -116,6 +120,14 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
       return [...prev, { team_id, kind }];
     });
   };
+  const addPreassigned = (p: PreassignedPerson) => {
+    setPreassigned((prev) =>
+      prev.some((x) => x.user_id === p.user_id) ? prev : [...prev, p],
+    );
+  };
+  const removePreassigned = (user_id: string) => {
+    setPreassigned((prev) => prev.filter((p) => p.user_id !== user_id));
+  };
 
   const buildAudiences = (eventId: string): AudienceSelector[] => {
     const list: AudienceSelector[] = [];
@@ -132,10 +144,11 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
 
   return {
     state,
-    controls: { toggleScalar, toggleGroup, toggleTeam, setCategory },
+    controls: { toggleScalar, toggleGroup, toggleTeam, setCategory, addPreassigned, removePreassigned },
     buildAudiences,
   };
 }
+
 
 export function useHydratedAudiences(
   eventId: string,
