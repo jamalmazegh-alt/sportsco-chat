@@ -1750,10 +1750,7 @@ function StaffSignupsDialog({
             <>
               {isFull ? (
                 <p className="text-[11px] rounded border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 text-amber-800 dark:text-amber-200 px-2 py-1.5">
-                  {t("needs:staff.fullBlock", {
-                    defaultValue:
-                      "Capacité atteinte. Retirez d'abord une personne confirmée pour en assigner une autre.",
-                  })}
+                  {t("needs:staff.fullBlock")}
                 </p>
               ) : (
                 <p className="text-[11px] text-muted-foreground">
