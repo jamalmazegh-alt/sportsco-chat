@@ -204,7 +204,8 @@ export const republishPublication = createServerFn({ method: "POST" })
 const VoteInput = z.object({
   publicationId: z.string().uuid(),
   optionId: z.string().uuid(),
-  memberId: z.string().uuid(),
+  subjectKind: z.enum(["player", "user"]),
+  subjectId: z.string().uuid(),
 });
 
 export const castPollVote = createServerFn({ method: "POST" })
@@ -214,13 +215,15 @@ export const castPollVote = createServerFn({ method: "POST" })
     const { data: voteId, error } = await context.supabase.rpc("cast_poll_vote" as any, {
       _publication_id: data.publicationId,
       _option_id: data.optionId,
-      _member_id: data.memberId,
+      _subject_kind: data.subjectKind,
+      _subject_id: data.subjectId,
     });
     if (error) {
-      // Expose known business errors clearly
       const msg = error.message || "";
       if (msg.includes("poll_closed")) throw new Response("poll_closed", { status: 409 });
       if (msg.includes("forbidden")) throw new Response("Forbidden", { status: 403 });
+      if (msg.includes("invalid_subject_kind"))
+        throw new Response("invalid_subject_kind", { status: 400 });
       throw new Response(`vote_failed: ${msg}`, { status: 500 });
     }
     return { voteId: voteId as string };
@@ -283,7 +286,9 @@ export const listPublicationRecipients = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("club_publication_recipients")
-      .select("member_id, created_at, players!inner(id, first_name, last_name)")
+      .select(
+        "subject_kind, member_id, subject_user_id, created_at, players(id, first_name, last_name)",
+      )
       .eq("publication_id", data.publicationId);
     if (error) throw new Response(`list_failed: ${error.message}`, { status: 500 });
     return { recipients: rows ?? [] };
