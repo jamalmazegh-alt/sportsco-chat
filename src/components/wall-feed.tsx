@@ -900,8 +900,13 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
   );
 }
 
+type TimelineEntry =
+  | { kind: "post"; date: Date; post: Post }
+  | { kind: "poll"; date: Date; poll: PollItem };
+
 function WallGrouped({
   posts,
+  polls,
   currentUserId,
   role,
   commentsEnabled,
@@ -912,6 +917,7 @@ function WallGrouped({
   onTogglePin,
 }: {
   posts: Post[];
+  polls: PollItem[];
   currentUserId: string | null;
   role: string | null;
   commentsEnabled: boolean;
@@ -926,18 +932,26 @@ function WallGrouped({
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { label: string; items: Post[] }>();
-    for (const p of rest) {
-      const d = new Date(p.created_at);
-      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      const label = format(d, "MMMM yyyy", { locale: dateLocale() });
+    const entries: TimelineEntry[] = [
+      ...rest.map((p) => ({ kind: "post" as const, date: new Date(p.created_at), post: p })),
+      ...polls.map((pl) => ({
+        kind: "poll" as const,
+        date: new Date(pl.published_at ?? new Date().toISOString()),
+        poll: pl,
+      })),
+    ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    const map = new Map<string, { label: string; items: TimelineEntry[] }>();
+    for (const e of entries) {
+      const key = `${e.date.getFullYear()}-${String(e.date.getMonth()).padStart(2, "0")}`;
+      const label = format(e.date, "MMMM yyyy", { locale: dateLocale() });
       if (!map.has(key)) map.set(key, { label, items: [] });
-      map.get(key)!.items.push(p);
+      map.get(key)!.items.push(e);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [rest]);
+  }, [rest, polls]);
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && polls.length === 0) {
     return (
       <EmptyState
         icon={<MegaphoneIcon className="h-6 w-6" />}
@@ -949,6 +963,7 @@ function WallGrouped({
       />
     );
   }
+
 
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
