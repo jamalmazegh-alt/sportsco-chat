@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>): { invite?: string; next?: string } => {
