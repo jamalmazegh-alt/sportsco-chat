@@ -2445,5 +2445,10 @@
     "iosStep4Before": "Wählen Sie",
     "iosStep4Icon": "Zum Home-Bildschirm",
     "iosStep4After": "und tippen Sie auf „Hinzufügen“"
+  },
+  "person": {
+    "playerSubline": "Spieler · {{category}}",
+    "playerSublineMulti": "Spieler · {{categories}}",
+    "parentSubline": "Elternteil von {{children}}"
   }
 }

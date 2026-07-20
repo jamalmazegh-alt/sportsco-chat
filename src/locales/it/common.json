@@ -2445,5 +2445,10 @@
     "iosStep4Before": "Scegli",
     "iosStep4Icon": "Aggiungi a Home",
     "iosStep4After": "e tocca «Aggiungi»"
+  },
+  "person": {
+    "playerSubline": "Giocatore · {{category}}",
+    "playerSublineMulti": "Giocatore · {{categories}}",
+    "parentSubline": "Genitore di {{children}}"
   }
 }

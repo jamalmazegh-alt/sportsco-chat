@@ -2445,5 +2445,10 @@
     "iosStep4Before": "Kies",
     "iosStep4Icon": "Zet op beginscherm",
     "iosStep4After": "en tik op „Voeg toe“"
+  },
+  "person": {
+    "playerSubline": "Speler · {{category}}",
+    "playerSublineMulti": "Speler · {{categories}}",
+    "parentSubline": "Ouder van {{children}}"
   }
 }

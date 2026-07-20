@@ -83,6 +83,11 @@ import {
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+import { listClubMembersWithContext } from "@/lib/needs/needs.functions";
+import {
+  formatMemberContextSubline,
+  type MemberContext,
+} from "@/lib/needs/member-context";
 import { PersonRow } from "@/components/shared/person-row";
 
 
@@ -105,6 +110,7 @@ type ClubMemberRow = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  context: MemberContext | null;
   children_names?: string[];
 };
 
@@ -226,71 +232,28 @@ function GroupsPage() {
     enabled: !!activeClubId,
   });
 
-  // Load all club members for the picker (RLS: staff can read).
+  // Load all club members for the picker via server fn (staff-gated, enriched
+  // avec le contexte rôle : catégorie joueur, enfants+catégorie, équipes coachées).
+  const listMembersWithCtx = useServerFn(listClubMembersWithContext);
   const membersQ = useQuery({
     queryKey: ["club-members-for-groups", activeClubId],
     enabled: !!activeClubId,
     queryFn: async (): Promise<ClubMemberRow[]> => {
-      const { data: members, error } = await supabase
-        .from("club_members")
-        .select("id, user_id, role, roles")
-        .eq("club_id", activeClubId!);
-      if (error) throw error;
-      const userIds = Array.from(
-        new Set((members ?? []).map((m) => m.user_id).filter(Boolean)),
-      );
-      const { data: profiles } = userIds.length
-        ? await supabase
-            .from("profiles")
-            .select("id, full_name, first_name, last_name")
-            .in("id", userIds)
-        : { data: [] as {
-            id: string;
-            full_name: string | null;
-            first_name: string | null;
-            last_name: string | null;
-          }[] };
-      const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
-      // For parents, fetch the children names
-      const { data: pp } = userIds.length
-        ? await supabase
-            .from("player_parents")
-            .select("parent_user_id, players:player_id(first_name, last_name)")
-            .in("parent_user_id", userIds)
-        : { data: [] as Array<{
-            parent_user_id: string;
-            players: { first_name: string | null; last_name: string | null } | null;
-          }> };
-      const childrenByParent = new Map<string, string[]>();
-      for (const row of (pp ?? []) as Array<{
-        parent_user_id: string;
-        players: { first_name: string | null; last_name: string | null } | null;
-      }>) {
-        const name = [row.players?.first_name, row.players?.last_name]
-          .filter(Boolean)
-          .join(" ")
-          .trim();
-        if (!name) continue;
-        const arr = childrenByParent.get(row.parent_user_id) ?? [];
-        arr.push(name);
-        childrenByParent.set(row.parent_user_id, arr);
-      }
-      return (members ?? []).map((m) => {
-        const p = byId.get(m.user_id);
-        return {
-          id: m.id,
-          user_id: m.user_id,
-          role: m.role ?? null,
-          roles: (m.roles ?? []) as string[],
-          full_name: p?.full_name ?? null,
-          first_name: p?.first_name ?? null,
-          last_name: p?.last_name ?? null,
-          children_names: childrenByParent.get(m.user_id) ?? [],
-        };
-      });
-
+      const res = await listMembersWithCtx({ data: { club_id: activeClubId! } });
+      return res.members.map((m) => ({
+        id: m.id,
+        user_id: m.user_id,
+        role: m.role ?? null,
+        roles: m.roles ?? [],
+        full_name: m.full_name ?? null,
+        first_name: m.first_name ?? null,
+        last_name: m.last_name ?? null,
+        context: m.context ?? null,
+        children_names: (m.context?.children ?? []).map((c) => c.name),
+      }));
     },
   });
+
 
   // Load teams for the "bulk add from team/category" picker.
   const teamsQ = useQuery({
@@ -696,15 +659,24 @@ function GroupMembersPanel({
     [membersQ.data],
   );
 
-  const childrenByUserId = useMemo(() => {
-    const m = new Map<string, string[]>();
+  const contextByUserId = useMemo(() => {
+    const m = new Map<string, MemberContext>();
     for (const cm of allMembers) {
-      if (cm.user_id && cm.children_names && cm.children_names.length > 0) {
-        m.set(cm.user_id, cm.children_names);
-      }
+      if (cm.user_id && cm.context) m.set(cm.user_id, cm.context);
     }
     return m;
   }, [allMembers]);
+
+  const sublineLabels = useMemo(
+    () => ({
+      playerSubline: (c: string) => t("common:person.playerSubline", { category: c }),
+      playerSublineMulti: (c: string) =>
+        t("common:person.playerSublineMulti", { categories: c }),
+      parentSubline: (c: string) => t("common:person.parentSubline", { children: c }),
+    }),
+    [t],
+  );
+
 
 
   const invalidateAll = () => {
@@ -962,17 +934,14 @@ function GroupMembersPanel({
               });
               const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
                 .filter((r, i, arr) => r && arr.indexOf(r) === i);
-              const childNames = m.user_id ? childrenByUserId.get(m.user_id) : undefined;
+              const ctx = m.user_id ? contextByUserId.get(m.user_id) ?? null : null;
+              const subline = formatMemberContextSubline(ctx, sublineLabels);
               return (
                 <li key={m.id} className="px-3">
                   <PersonRow
                     name={name}
                     roles={roleList}
-                    subline={
-                      childNames && childNames.length > 0
-                        ? t("groups.parentOf", { names: childNames.join(", ") })
-                        : undefined
-                    }
+                    subline={subline}
                     action={
                       <Button
                         variant="ghost"
@@ -1010,16 +979,13 @@ function GroupMembersPanel({
             {candidates.map((m) => {
               const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
                 .filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const subline = formatMemberContextSubline(m.context, sublineLabels);
               return (
                 <li key={m.id} className="px-3">
                   <PersonRow
                     name={displayName(m)}
                     roles={roleList}
-                    subline={
-                      m.children_names && m.children_names.length > 0
-                        ? t("groups.parentOf", { names: m.children_names.join(", ") })
-                        : undefined
-                    }
+                    subline={subline}
                     action={
                       <Button
                         variant="ghost"

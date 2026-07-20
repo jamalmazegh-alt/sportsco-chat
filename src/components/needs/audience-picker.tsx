@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatMemberContextSubline } from "@/lib/needs/member-context";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
 import { PersonRow } from "@/components/shared/person-row";
@@ -828,33 +829,25 @@ function PreassignPanel({
                 {(data?.members ?? []).map((m) => {
                   const primary = m.primary_role ?? null;
                   const roleForChip = primary ?? m.roles?.[0] ?? null;
-                  // Build subline based on role.
-                  let subline: string | null = null;
-                  if (primary === "player") {
-                    subline = m.player_category
-                      ? t("needs:audiences.preassign.playerSubline", {
-                          category: m.player_category,
-                          defaultValue: "Joueur · {{category}}",
-                        })
-                      : null;
-                  } else if (primary === "parent" && m.children && m.children.length > 0) {
-                    subline = m.children
-                      .map((c) => (c.category ? `${c.name} (${c.category})` : c.name))
-                      .join(", ");
-                    subline = t("needs:audiences.preassign.parentSubline", {
-                      children: subline,
-                      defaultValue: "Parent de {{children}}",
-                    });
-                  } else if (
-                    (primary === "coach" || primary === "assistant_coach") &&
-                    m.coached_teams &&
-                    m.coached_teams.length > 0
-                  ) {
-                    subline = m.coached_teams
-                      .map((tm) => tm.age_group || tm.name)
-                      .filter(Boolean)
-                      .join(", ");
-                  }
+                  const subline = formatMemberContextSubline(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (m as any).context ?? {
+                      primary_role: primary,
+                      player_category: m.player_category ?? null,
+                      player_categories: (m as unknown as { player_categories?: string[] })
+                        .player_categories ?? (m.player_category ? [m.player_category] : []),
+                      children: m.children ?? [],
+                      coached_teams: m.coached_teams ?? [],
+                    },
+                    {
+                      playerSubline: (c) =>
+                        t("common:person.playerSubline", { category: c }),
+                      playerSublineMulti: (c) =>
+                        t("common:person.playerSublineMulti", { categories: c }),
+                      parentSubline: (c) =>
+                        t("common:person.parentSubline", { children: c }),
+                    },
+                  );
                   return (
                     <li key={m.user_id}>
                       <button
