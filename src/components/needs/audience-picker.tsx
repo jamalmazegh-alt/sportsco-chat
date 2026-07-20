@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
+import { PersonRow } from "@/components/shared/person-row";
 
 
 export type ScalarAudienceKey =
