@@ -24,6 +24,7 @@ import { MentionInput, RenderWithMentions, parseMentions } from "@/components/me
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
+import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
@@ -36,8 +37,9 @@ type Comment = {
   author?: Profile | null;
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
-type AudienceType = "club" | "team" | "multi_team";
+type AudienceType = "club" | "team" | "multi_team" | "group";
 type Team = { id: string; name: string };
+type Group = { id: string; name: string };
 type Post = {
   id: string;
   club_id: string;
@@ -51,7 +53,9 @@ type Post = {
   external_url: string | null;
   external_media_url: string | null;
   audience_team_ids: string[] | null;
+  audience_group_ids: string[] | null;
   audience_type: AudienceType;
+  send_email: boolean;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
@@ -81,6 +85,7 @@ const SOURCE_META: Record<
 export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
+  const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -94,6 +99,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
   // Targetable teams for the audience picker; computed from club teams + user rights.
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
+  // Groups the current user can target from the composer (staff-visible via RLS).
+  const [targetableGroups, setTargetableGroups] = useState<Group[]>([]);
+  // Group selection is disjoint from team selection: non-empty ⇒ audience_type='group'.
+  const [audienceGroups, setAudienceGroups] = useState<string[]>([]);
+  // "Aussi par e-mail" checkbox — triggers a best-effort outbox after the insert.
+  const [sendEmail, setSendEmail] = useState(false);
   // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
   const [audience, setAudience] = useState<string[] | null>(null);
 
@@ -109,7 +120,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     const { data: rawPosts } = await supabase
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type",
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
       )
       .eq("club_id", clubId)
       .is("deleted_at", null)
@@ -250,6 +261,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
       if (cancelled) return;
       setTargetableTeams(targetable);
 
+      // Groups targetable from the composer — visibility is enforced by RLS on
+      // club_groups (staff-only). We do not fetch group members here; sending
+      // the email is done server-side after the insert.
+      let groups: Group[] = [];
+      if (isPriv || roles.includes("coach") || roles.includes("assistant_coach")) {
+        const { data: gRows } = await supabase
+          .from("club_groups")
+          .select("id, name")
+          .eq("club_id", clubId)
+          .order("name", { ascending: true });
+        if (!cancelled) groups = (gRows ?? []) as Group[];
+      }
+      if (cancelled) return;
+      setTargetableGroups(groups);
+
       // Preselection rules (nuancées) :
       // - admin / dirigeant → club-wide (null).
       // - coach with exactly one targetable team → preselect that team.
@@ -261,6 +287,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
       } else {
         setAudience([]);
       }
+      setAudienceGroups([]);
     })();
     return () => {
       cancelled = true;
@@ -293,13 +320,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if ((!body.trim() && atts.length === 0) || !user) return;
 
     // Resolve final audience for the insert.
-    //   null         → "Tout le club"
-    //   [] (forced)  → coach must pick at least one team
-    //   [ids]        → team-scoped (1 or many)
+    //   groups non-empty → audience_type='group', audience_group_ids=[…], team_ids=null
+    //   null             → "Tout le club"
+    //   [] (forced)      → coach must pick at least one team
+    //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const audienceForInsert: string[] | null =
-      audience === null ? null : audience.length === 0 ? null : audience;
-    if (!isPriv && audienceForInsert === null && audience !== null) {
+    const hasGroups = audienceGroups.length > 0;
+    const audienceForInsert: string[] | null = hasGroups
+      ? null
+      : audience === null
+        ? null
+        : audience.length === 0
+          ? null
+          : audience;
+    if (!isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -308,13 +342,24 @@ export function WallFeed({ clubId }: { clubId: string }) {
       return;
     }
 
+    const audienceTypeForInsert: AudienceType = hasGroups
+      ? "group"
+      : audienceForInsert === null
+        ? "club"
+        : audienceForInsert.length === 1
+          ? "team"
+          : "multi_team";
+
     setPosting(true);
     const insertPayload = {
       club_id: clubId,
       author_user_id: user.id,
       body: body.trim(),
       attachments: atts as unknown as never,
+      audience_type: audienceTypeForInsert as unknown as never,
       audience_team_ids: audienceForInsert as unknown as never,
+      audience_group_ids: (hasGroups ? audienceGroups : null) as unknown as never,
+      send_email: sendEmail as unknown as never,
     };
 
     // Pre-flight: confirm the JWT subject matches user.id and that the active
@@ -387,7 +432,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
       // Recipient set for in-app notifications must mirror the post audience
       // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
       const recipientSet = new Set<string>();
-      if (audienceForInsert === null) {
+      if (hasGroups) {
+        // Admins/dirigeants always see every post.
+        const { data: priv } = await supabase
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        // Members of the targeted group(s).
+        const { data: gm } = await supabase
+          .from("club_group_members")
+          .select("club_members:member_id(user_id)")
+          .in("group_id", audienceGroups);
+        for (const row of gm ?? []) {
+          const uid = ((row as any).club_members?.user_id as string | null) ?? null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else if (audienceForInsert === null) {
         const { data: members } = await supabase
           .from("club_members")
           .select("user_id")
@@ -468,8 +533,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       })();
     }
+    // "Aussi par e-mail" — outbox best-effort ; les erreurs n'impactent pas le post.
+    if (data?.id && sendEmail) {
+      void (async () => {
+        try {
+          await sendWallPostEmailsFn({ data: { postId: data.id } });
+        } catch (e) {
+          console.warn("[email] wall dispatch failed", e);
+        }
+      })();
+    }
     setBody("");
     setAtts([]);
+    setAudienceGroups([]);
+    setSendEmail(false);
     // Reset audience to the per-role default for the next post.
     if (isPriv) setAudience(null);
     else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
@@ -534,7 +611,16 @@ export function WallFeed({ clubId }: { clubId: string }) {
           <AudiencePicker
             teams={targetableTeams}
             value={audience}
-            onChange={setAudience}
+            onChange={(next) => {
+              setAudience(next);
+              if (next !== null) setAudienceGroups([]);
+            }}
+            groups={targetableGroups}
+            groupValue={audienceGroups}
+            onGroupChange={(next) => {
+              setAudienceGroups(next);
+              if (next.length > 0) setAudience([]);
+            }}
             canPickClubWide={
               roles.includes("admin") ||
               roles.includes("dirigeant") ||
@@ -542,6 +628,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
             }
           />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
+          <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-3.5 w-3.5 rounded border-border"
+              checked={sendEmail}
+              onChange={(e) => setSendEmail(e.target.checked)}
+            />
+            {t("wall.compose.alsoEmail", { defaultValue: "Aussi par e-mail" })}
+          </label>
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
@@ -587,28 +682,44 @@ function AudiencePicker({
   teams,
   value,
   onChange,
+  groups,
+  groupValue,
+  onGroupChange,
   canPickClubWide,
 }: {
   teams: Team[];
   value: string[] | null;
   onChange: (next: string[] | null) => void;
+  groups: Group[];
+  groupValue: string[];
+  onGroupChange: (next: string[]) => void;
   canPickClubWide: boolean;
 }) {
   const { t } = useTranslation();
-  const isClubWide = value === null;
+  const groupsActive = groupValue.length > 0;
+  const isClubWide = !groupsActive && value === null;
   function toggleTeam(id: string) {
+    // Picking a team switches out of "group" mode.
+    if (groupsActive) onGroupChange([]);
     if (value === null) {
       onChange([id]);
       return;
     }
     if (value.includes(id)) {
-      const next = value.filter((x) => x !== id);
-      onChange(next);
+      onChange(value.filter((x) => x !== id));
     } else {
       onChange([...value, id]);
     }
   }
-  if (teams.length === 0 && !canPickClubWide) return null;
+  function toggleGroup(id: string) {
+    if (groupValue.includes(id)) {
+      onGroupChange(groupValue.filter((x) => x !== id));
+    } else {
+      // Switching to group mode clears any team selection.
+      onGroupChange([...groupValue, id]);
+    }
+  }
+  if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       <span className="text-xs font-medium text-muted-foreground mr-1">
@@ -617,7 +728,10 @@ function AudiencePicker({
       {canPickClubWide && (
         <button
           type="button"
-          onClick={() => onChange(null)}
+          onClick={() => {
+            onGroupChange([]);
+            onChange(null);
+          }}
           className={cn(
             "text-xs px-2.5 py-1 rounded-full border transition-colors",
             isClubWide
@@ -629,7 +743,7 @@ function AudiencePicker({
         </button>
       )}
       {teams.map((tt) => {
-        const active = !isClubWide && (value ?? []).includes(tt.id);
+        const active = !groupsActive && !isClubWide && (value ?? []).includes(tt.id);
         return (
           <button
             key={tt.id}
@@ -643,6 +757,29 @@ function AudiencePicker({
             )}
           >
             {tt.name}
+          </button>
+        );
+      })}
+      {groups.length > 0 && (
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-1">
+          {t("wall.compose.targetGroup", { defaultValue: "Groupe(s)" })}
+        </span>
+      )}
+      {groups.map((g) => {
+        const active = groupValue.includes(g.id);
+        return (
+          <button
+            key={g.id}
+            type="button"
+            onClick={() => toggleGroup(g.id)}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              active
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-accent",
+            )}
+          >
+            {g.name}
           </button>
         );
       })}

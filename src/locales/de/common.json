@@ -1285,7 +1285,15 @@
       "plusOthers": "{{first}} + {{n}} weitere"
     },
     "audienceTo": "An:",
-    "audienceRequired": "Wähle mindestens ein Team."
+    "audienceRequired": "Wähle mindestens ein Team.",
+    "compose": {
+      "targetGroup": "Gruppe(n)",
+      "alsoEmail": "Auch per E-Mail"
+    },
+    "email": {
+      "subject": "Neue Nachricht von {{club}}",
+      "viewOnWall": "Zur Pinnwand"
+    }
   },
   "chat": {
     "title": "Event-Chat",
