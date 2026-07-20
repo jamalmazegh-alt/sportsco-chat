@@ -38,10 +38,9 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from "@/components/ui/select";
-import { formatMemberContextSubline } from "@/lib/needs/member-context";
   SelectValue,
 } from "@/components/ui/select";
+import { formatMemberContextSubline } from "@/lib/needs/member-context";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
 import { PersonRow } from "@/components/shared/person-row";
