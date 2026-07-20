@@ -35,7 +35,8 @@
     "pickMembers": "Manual selection (players)",
     "searchPlaceholder": "Search a player…",
     "addPlayersBtn": "+ Players",
-    "addParentsBtn": "+ Parents"
+    "addParentsBtn": "+ Parents",
+    "pollTitle": "New poll"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -182,5 +183,14 @@
     "optionsMin": "A poll requires at least 2 options.",
     "optionHasVotes": "You cannot edit an option that has already received votes.",
     "visibilityLocked": "Vote visibility can no longer change once a vote has been cast."
-  }
+  },
+  "card": {
+    "tagPoll": "Poll",
+    "voters": "{{count}} voters",
+    "vote": "Vote",
+    "viewResults": "View results",
+    "anonymous": "Anonymous",
+    "closed": "Closed"
+  },
+  "seeAllPolls": "See all polls"
 }

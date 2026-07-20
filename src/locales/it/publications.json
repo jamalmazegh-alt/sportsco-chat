@@ -35,7 +35,8 @@
     "pickMembers": "Selezione manuale (giocatori)",
     "searchPlaceholder": "Cerca un giocatore…",
     "addPlayersBtn": "+ Giocatori",
-    "addParentsBtn": "+ Genitori"
+    "addParentsBtn": "+ Genitori",
+    "pollTitle": "Nuovo sondaggio"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -182,5 +183,14 @@
     "optionsMin": "A poll requires at least 2 options.",
     "optionHasVotes": "You cannot edit an option that has already received votes.",
     "visibilityLocked": "Vote visibility can no longer change once a vote has been cast."
-  }
+  },
+  "card": {
+    "tagPoll": "Sondaggio",
+    "voters": "{{count}} votanti",
+    "vote": "Vota",
+    "viewResults": "Vedi risultati",
+    "anonymous": "Anonimo",
+    "closed": "Chiuso"
+  },
+  "seeAllPolls": "Vedi tutti i sondaggi"
 }

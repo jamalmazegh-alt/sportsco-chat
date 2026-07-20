@@ -35,7 +35,8 @@
     "pickMembers": "Seleção manual (jogadores)",
     "searchPlaceholder": "Pesquisar um jogador…",
     "addPlayersBtn": "+ Jogadores",
-    "addParentsBtn": "+ Pais"
+    "addParentsBtn": "+ Pais",
+    "pollTitle": "Nova sondagem"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -182,5 +183,14 @@
     "optionsMin": "A poll requires at least 2 options.",
     "optionHasVotes": "You cannot edit an option that has already received votes.",
     "visibilityLocked": "Vote visibility can no longer change once a vote has been cast."
-  }
+  },
+  "card": {
+    "tagPoll": "Sondagem",
+    "voters": "{{count}} votantes",
+    "vote": "Votar",
+    "viewResults": "Ver resultados",
+    "anonymous": "Anónimo",
+    "closed": "Fechada"
+  },
+  "seeAllPolls": "Ver todas as sondagens"
 }

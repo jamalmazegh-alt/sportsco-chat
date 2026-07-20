@@ -35,7 +35,8 @@
     "pickMembers": "Handmatige selectie (spelers)",
     "searchPlaceholder": "Zoek een speler…",
     "addPlayersBtn": "+ Spelers",
-    "addParentsBtn": "+ Ouders"
+    "addParentsBtn": "+ Ouders",
+    "pollTitle": "Nieuwe peiling"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -182,5 +183,14 @@
     "optionsMin": "A poll requires at least 2 options.",
     "optionHasVotes": "You cannot edit an option that has already received votes.",
     "visibilityLocked": "Vote visibility can no longer change once a vote has been cast."
-  }
+  },
+  "card": {
+    "tagPoll": "Peiling",
+    "voters": "{{count}} stemmers",
+    "vote": "Stemmen",
+    "viewResults": "Bekijk resultaten",
+    "anonymous": "Anoniem",
+    "closed": "Gesloten"
+  },
+  "seeAllPolls": "Bekijk alle peilingen"
 }
