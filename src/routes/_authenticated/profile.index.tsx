@@ -35,6 +35,7 @@ import {
   Mail,
   LifeBuoy,
   Users,
+  CalendarOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -74,6 +75,8 @@ function ProfilePage() {
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
   const canManageLogo = isAdmin || roles.includes("dirigeant");
+  const isCoachLike =
+    isAdmin || roles.includes("coach") || roles.includes("assistant_coach");
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
@@ -477,6 +480,28 @@ function ProfilePage() {
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </Link>
+
+      {isCoachLike && (
+        <Link
+          to="/profile/availabilities"
+          className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+        >
+          <div className="flex items-center gap-3">
+            <CalendarOff className="h-5 w-5 text-primary" />
+            <div>
+              <div className="text-sm font-medium">
+                {t("staffAvailability.title", { defaultValue: "Mes indisponibilités" })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("staffAvailability.menuSubtitle", {
+                  defaultValue: "Déclare tes absences pour toutes tes équipes",
+                })}
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+      )}
 
       <Link
         to="/profile/privacy"
