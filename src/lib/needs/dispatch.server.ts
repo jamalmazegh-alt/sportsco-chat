@@ -133,7 +133,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, club_id, event_id, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name))",
+      "id, label, club_id, event_id, created_by, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name, clubs:club_id(name)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -219,6 +219,48 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
       }),
     ),
   );
+
+  // Email au créateur du besoin (le staff qui a publié) — garantit un canal
+  // sortant même sans PWA/push installée. Un seul email : le créateur, pas
+  // toute la liste staff (évite le spam).
+  try {
+    const creatorId = (need as { created_by: string | null }).created_by;
+    if (!creatorId) return;
+    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(creatorId);
+    const email = userData?.user?.email;
+    if (!email) return;
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("first_name, preferred_language")
+      .eq("id", creatorId)
+      .maybeSingle();
+    const locale = (profile?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr";
+    const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+    await enqueueTransactionalEmailServer({
+      templateName: "event-need-signup",
+      recipientEmail: email,
+      idempotencyKey: `need-signup-${params.signupId}-${params.status}`,
+      dispatchId: need.id,
+      eventId: need.event_id,
+      recipientId: creatorId,
+      notificationType: "event_need_signup",
+      fromName: clubName ? `${clubName} via Clubero` : undefined,
+      templateData: {
+        recipientFirstName: profile?.first_name ?? null,
+        locale,
+        status: params.status,
+        needLabel: need.label,
+        eventTitle,
+        eventStartsAt: startsAt,
+        clubName,
+        applicantFirstName,
+        applicantLastName: null,
+        eventUrl: `/events/${need.event_id}`,
+      },
+    });
+  } catch (e) {
+    console.error("[notifyStaffOfSignup] email failed", e);
+  }
 }
 
 /* ------------------------------------------------------------------------ */

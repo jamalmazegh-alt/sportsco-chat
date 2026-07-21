@@ -425,13 +425,23 @@ export const applyToEventNeed = createServerFn({ method: "POST" })
     // terminaison prématurée du Worker (les promesses orphelines peuvent être
     // tuées quand la réponse part). Erreur non bloquante pour l'apply.
     try {
-      const { notifyStaffOfSignup } = await import("./dispatch.server");
+      const { notifyStaffOfSignup, notifyApplicantOfDecision } = await import("./dispatch.server");
       await notifyStaffOfSignup({
         needId: data.need_id,
         signupId: row.signup_id,
         status: row.status,
         applicantUserId: userId,
       });
+      // Auto-confirmed apply → confirm the applicant too (push + email).
+      // Sans ça, l'utilisateur ne reçoit aucun accusé de son inscription.
+      if (row.auto_confirmed) {
+        await notifyApplicantOfDecision({
+          needId: data.need_id,
+          signupId: row.signup_id,
+          decision: "confirm",
+          applicantUserId: userId,
+        });
+      }
     } catch (e) {
       console.error("[applyToEventNeed] notify failed", e);
     }
