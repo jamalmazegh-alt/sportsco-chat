@@ -96,12 +96,14 @@ function TeamAvailabilityCalendar() {
   const monthStartStr = ymd(monthStart);
   const monthEndStr = ymd(monthEnd);
 
+  const isCoach = useIsCoach();
+
   const { data: team } = useQuery({
     queryKey: ["team-basic", teamId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teams")
-        .select("id, name")
+        .select("id, name, club_id")
         .eq("id", teamId)
         .single();
       if (error) throw error;
