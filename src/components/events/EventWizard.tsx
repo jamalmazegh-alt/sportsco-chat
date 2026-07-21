@@ -458,7 +458,19 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         );
         onCreated();
       } else {
-        toast.success(t("events.published", { defaultValue: "Publié" }));
+        toast.success(t("events.published", { defaultValue: "Publié" }), {
+          action: {
+            label: t("staffAssignment.assignNow", {
+              defaultValue: "Assigner un coach",
+            }),
+            onClick: () => {
+              navigate({
+                to: "/events/$eventId",
+                params: { eventId: res.eventId },
+              });
+            },
+          },
+        });
         onCreated(res.eventId);
       }
     },
