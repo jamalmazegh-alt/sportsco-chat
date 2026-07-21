@@ -94,4 +94,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "event-need-invite": eventNeedInviteTemplate,
   "event-need-decision": eventNeedDecisionTemplate,
   "wall-message": wallMessageTemplate,
+  "publication-poll": publicationPollTemplate,
 };
