@@ -26,16 +26,9 @@ function resolveLocale(...candidates: Array<string | null | undefined>): Locale 
   return "fr";
 }
 
-function isMinorFromBirthDate(dob: string | null | undefined): boolean {
-  if (!dob) return false;
-  const d = new Date(dob);
-  if (Number.isNaN(d.getTime())) return false;
-  const now = new Date();
-  let age = now.getFullYear() - d.getFullYear();
-  const m = now.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age -= 1;
-  return age < 18;
-}
+// Le seuil "mineur" n'est plus codé en dur : on délègue à la fonction SQL
+// public.player_is_minor(_player_id) qui applique le seuil configuré (club/locale).
+
 
 export const sendWallPostEmails = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
