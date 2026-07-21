@@ -320,7 +320,9 @@ export function UrgencyCenter({ className }: Props) {
             /* best-effort */
           }
         })();
-        void notifyCoachesEmailFn({ data: { convocationId } }).catch(() => {});
+        void notifyCoachesEmailFn({ data: { convocationId } }).catch((e) => {
+          console.error("[urgency] notifyCoachesEmail failed", e);
+        });
       }
       dismissItem(item.id);
       qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
