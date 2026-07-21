@@ -75,7 +75,9 @@ export function DeclareAbsenceDrawer({
   teamId,
   onCreated,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
+
   const { user } = useAuth();
   const qc = useQueryClient();
 
