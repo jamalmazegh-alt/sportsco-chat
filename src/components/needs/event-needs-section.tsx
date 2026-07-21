@@ -27,6 +27,7 @@ import {
   UserPlus,
   Search,
   MoreHorizontal,
+  RotateCcw,
 } from "lucide-react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -92,6 +93,7 @@ import {
   declareUnavailable,
   decideSignup,
   closeEventNeed,
+  reopenEventNeed,
   cancelEventNeed,
   deleteEventNeed,
   previewEventNeedAudience,
@@ -260,6 +262,7 @@ function NeedRow({
   const withdraw = useServerFn(withdrawSignup);
   const declareUnavail = useServerFn(declareUnavailable);
   const close = useServerFn(closeEventNeed);
+  const reopen = useServerFn(reopenEventNeed);
   const cancel = useServerFn(cancelEventNeed);
   const deleteFn = useServerFn(deleteEventNeed);
 
@@ -320,6 +323,15 @@ function NeedRow({
     onSuccess: () => {
       toast.success(t("needs:status.closed"));
       setCloseConfirmOpen(false);
+      onChange();
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
+  const reopenM = useMutation({
+    mutationFn: () => reopen({ data: { need_id: need.id } }),
+    onSuccess: () => {
+      toast.success(t("needs:status.reopened", { defaultValue: "Besoin rouvert" }));
       onChange();
     },
     onError: (e: Error) =>
@@ -427,8 +439,10 @@ function NeedRow({
   /* -------------------- contextual ⋯ menu (S7 · pastille 1) -------------------- */
   // Draft:              Modifier · Supprimer
   // Published (open):   Modifier · Fermer · Annuler
-  // Closed / Cancelled: no menu (read-only)
-  const showMenu = isStaff && !isReadOnly;
+  // Closed:             Rouvrir
+  // Cancelled:          no menu (read-only)
+  const isClosed = status === "closed";
+  const showMenu = isStaff && (!isReadOnly || isClosed);
 
   return (
     <div
@@ -510,10 +524,21 @@ function NeedRow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                <Pencil className="h-3.5 w-3.5 mr-2" />
-                {t("needs:menu.edit")}
-              </DropdownMenuItem>
+              {!isClosed && (
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5 mr-2" />
+                  {t("needs:menu.edit")}
+                </DropdownMenuItem>
+              )}
+              {isClosed && (
+                <DropdownMenuItem
+                  onClick={() => reopenM.mutate()}
+                  disabled={reopenM.isPending}
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-2" />
+                  {t("needs:menu.reopenNeed", { defaultValue: "Rouvrir" })}
+                </DropdownMenuItem>
+              )}
               {isOpen && (
                 <>
                   <DropdownMenuItem onClick={() => setEditAudienceOpen(true)}>
@@ -1450,6 +1475,7 @@ type StaffSignup = {
   license_number: string | null;
   is_minor: boolean;
   profile?: { full_name: string | null } | null;
+  context: MemberContext | null;
 };
 
 function StaffSignupsDialog({
@@ -1652,6 +1678,13 @@ function StaffSignupsDialog({
             const checked = selected.has(s.id);
             const name = s.profile?.full_name ?? t("common.unknown");
             const sublineParts: React.ReactNode[] = [];
+            const ctxSubline = formatMemberContextSubline(s.context, {
+              playerSubline: (c) => t("common:person.playerSubline", { category: c }),
+              playerSublineMulti: (c) =>
+                t("common:person.playerSublineMulti", { categories: c }),
+              parentSubline: (c) => t("common:person.parentSubline", { children: c }),
+            });
+            if (ctxSubline) sublineParts.push(<span key="ctx">{ctxSubline}</span>);
             sublineParts.push(t(`needs:signup.${s.status}`));
             if (s.license_number) {
               sublineParts.push(

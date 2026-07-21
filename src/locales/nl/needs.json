@@ -23,7 +23,8 @@
     "draft": "Concept",
     "open": "Open",
     "closed": "Gesloten",
-    "cancelled": "Geannuleerd"
+    "cancelled": "Geannuleerd",
+    "reopened": "Behoefte heropend"
   },
   "validationMode": {
     "auto": "Automatische bevestiging",
@@ -315,7 +316,8 @@
     "cancelNeed": "Behoefte annuleren",
     "delete": "Verwijderen",
     "editAudience": "Edit recipients",
-    "viewRecipients": "View recipients"
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Behoefte heropenen"
   },
   "assignNotification": {
     "assignedAs": "Je bent ingeschreven als {{role}}"
@@ -369,5 +371,11 @@
     "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
     "confirm": "Withdraw",
     "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Beschikbaar",
+    "unavailable": "Niet beschikbaar",
+    "appliedToast": "Aanmelding verstuurd",
+    "unavailableToast": "Als niet-beschikbaar gemarkeerd"
   }
 }

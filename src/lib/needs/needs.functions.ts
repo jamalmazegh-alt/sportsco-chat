@@ -600,6 +600,35 @@ export const closeEventNeed = createServerFn({ method: "POST" })
     return { ok: true, declined_count: pendingApplied?.length ?? 0 };
   });
 
+/* ------------------------------------------------------------------------ */
+/* 6bis. reopenEventNeed — rouvre un besoin fermé (sans cascade decline)     */
+/* ------------------------------------------------------------------------ */
+
+export const reopenEventNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => NeedIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+    if (need.status !== "closed") throw new Error("need_not_closed");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("event_needs")
+      .update({ status: "open" })
+      .eq("id", data.need_id);
+    if (error) throw new Error(error.message);
+
+    await recomputeCoverageServiceRole(need.event_id);
+    return { ok: true };
+  });
+
+
 export const cancelEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => NeedIdInput.parse(input))
@@ -928,17 +957,35 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
 
     // Rôles club pour chaque candidat.
     const rolesByUser: Record<string, string[]> = {};
+    const memberRowsForCtx: Array<{
+      user_id: string | null;
+      roles: string[] | null;
+      role: string | null;
+    }> = [];
     if (userIds.length > 0) {
       const { data: memberRows } = await supabaseAdmin
         .from("club_members")
-        .select("user_id, roles")
+        .select("user_id, roles, role")
         .eq("club_id", need.club_id)
         .in("user_id", userIds);
       for (const m of memberRows ?? []) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         rolesByUser[m.user_id] = ((m as any).roles as string[] | null) ?? [];
+        memberRowsForCtx.push({
+          user_id: (m as { user_id: string | null }).user_id ?? null,
+          roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+          role: (m as unknown as { role: string | null }).role ?? null,
+        });
       }
     }
+
+    // Contexte joueur (catégorie) / parent (enfants) — pour subline.
+    const { buildMemberContextByUser } = await import("./member-context.server");
+    const contextByUser = await buildMemberContextByUser(
+      supabaseAdmin,
+      need.club_id,
+      memberRowsForCtx,
+    );
 
     // Licence + date de naissance (via players.user_id).
     const licenseByUser: Record<string, string | null> = {};
@@ -984,6 +1031,7 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
           roles: (s.user_id && rolesByUser[s.user_id]) || [],
           license_number: (s.user_id && licenseByUser[s.user_id]) || null,
           is_minor: isMinor(dob),
+          context: (s.user_id && contextByUser.get(s.user_id)) || null,
         };
       }),
     };

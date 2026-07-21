@@ -23,7 +23,8 @@
     "draft": "Brouillon",
     "open": "Ouvert",
     "closed": "Fermé",
-    "cancelled": "Annulé"
+    "cancelled": "Annulé",
+    "reopened": "Besoin rouvert"
   },
   "validationMode": {
     "auto": "Confirmation automatique",
@@ -315,7 +316,8 @@
     "cancelNeed": "Annuler le besoin",
     "delete": "Supprimer",
     "editAudience": "Modifier les destinataires",
-    "viewRecipients": "Voir les destinataires"
+    "viewRecipients": "Voir les destinataires",
+    "reopenNeed": "Rouvrir le besoin"
   },
   "assignNotification": {
     "assignedAs": "Vous avez été inscrit comme {{role}}"
@@ -369,5 +371,11 @@
     "description": "Vous désister de {{need}} pour {{event}} ? Le staff en sera informé.",
     "confirm": "Me désister",
     "abort": "Annuler"
+  },
+  "insight": {
+    "available": "Dispo",
+    "unavailable": "Pas dispo",
+    "appliedToast": "Candidature envoyée",
+    "unavailableToast": "Indisponibilité enregistrée"
   }
 }

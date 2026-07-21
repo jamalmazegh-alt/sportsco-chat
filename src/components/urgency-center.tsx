@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -16,6 +17,8 @@ import {
   Loader2,
   RefreshCw,
   Sparkles,
+  ThumbsDown,
+  ThumbsUp,
   X,
   XCircle,
 } from "lucide-react";
@@ -29,6 +32,9 @@ import { useUrgencies } from "@/lib/urgency/use-urgencies";
 import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
 import { selectSurfaceState } from "@/lib/urgency/pure";
 import { remindAllForEvent } from "@/lib/urgency/remind";
+import { dispatchConvocationResponsePush } from "@/lib/push-dispatch.functions";
+import { notifyCoachesEmail } from "@/lib/convocation-notify.functions";
+import { applyToEventNeed, declareUnavailable } from "@/lib/needs/needs.functions";
 import type { UrgencyAction, UrgencyItem, UrgencySeverity } from "@/lib/urgency/types";
 
 const DISMISS_STORAGE_KEY = "clubero:urgency:dismissed";
@@ -113,6 +119,10 @@ export function UrgencyCenter({ className }: Props) {
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [dismissed, setDismissed] = useState<DismissMap>(() => readDismissed());
   const [expanded, setExpanded] = useState(false);
+  const dispatchResponsePushFn = useServerFn(dispatchConvocationResponsePush);
+  const notifyCoachesEmailFn = useServerFn(notifyCoachesEmail);
+  const applyNeedFn = useServerFn(applyToEventNeed);
+  const declareUnavailableFn = useServerFn(declareUnavailable);
 
   useEffect(() => {
     // Re-prune at mount in case TTL expired since last write.
@@ -251,11 +261,54 @@ export function UrgencyCenter({ className }: Props) {
         return;
       }
       toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
+      // Fire-and-forget push + email — same as events/$eventId.tsx flow.
+      void dispatchResponsePushFn({ data: { convocationId } }).catch(() => {});
+      if (status === "absent" || status === "uncertain") {
+        void notifyCoachesEmailFn({ data: { convocationId } }).catch(() => {});
+      }
       dismissItem(item.id);
       qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
-      qc.invalidateQueries({ queryKey: ["myConvocs"], exact: false });
+      qc.invalidateQueries({ queryKey: ["my-convocs-home"], exact: false });
+      qc.invalidateQueries({ queryKey: ["upcoming"], exact: false });
     } catch (e) {
       toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+    } finally {
+      setBusyIds((s) => {
+        const n = new Set(s);
+        n.delete(item.id);
+        return n;
+      });
+    }
+  }
+
+  async function handleNeedRespond(
+    item: UrgencyItem,
+    choice: "available" | "unavailable",
+  ) {
+    if (item.primaryAction.kind !== "open-need") return;
+    const needId = item.primaryAction.needId;
+    setBusyIds((s) => new Set(s).add(item.id));
+    try {
+      if (choice === "available") {
+        await applyNeedFn({ data: { need_id: needId } });
+        toast.success(
+          t("needs:insight.appliedToast", { defaultValue: "Candidature envoyée" }),
+        );
+      } else {
+        await declareUnavailableFn({ data: { need_id: needId } });
+        toast.success(
+          t("needs:insight.unavailableToast", { defaultValue: "Indisponibilité enregistrée" }),
+        );
+      }
+      dismissItem(item.id);
+      qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      toast.error(
+        t(`needs:errors.${msg}`, {
+          defaultValue: t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }),
+        }),
+      );
     } finally {
       setBusyIds((s) => {
         const n = new Set(s);
@@ -276,6 +329,7 @@ export function UrgencyCenter({ className }: Props) {
       busyIds={busyIds}
       onAction={handleAction}
       onQuickRespond={handleQuickRespond}
+      onNeedRespond={handleNeedRespond}
       onDismiss={(id) => {
         dismissItem(id);
       }}
@@ -308,6 +362,10 @@ interface DeckProps {
     item: UrgencyItem,
     status: "present" | "uncertain" | "absent",
   ) => void | Promise<void>;
+  onNeedRespond: (
+    item: UrgencyItem,
+    choice: "available" | "unavailable",
+  ) => void | Promise<void>;
   onDismiss: (id: string) => void;
   onRefresh: () => void;
   className?: string;
@@ -322,6 +380,7 @@ function UrgencyDeck({
   busyIds,
   onAction,
   onQuickRespond,
+  onNeedRespond,
   onDismiss,
   onRefresh,
   className,
@@ -550,6 +609,57 @@ function UrgencyDeck({
                               >
                                 <XCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
                                 {t("attendance.absent", { defaultValue: "Absent" })}
+                              </Button>
+                            </div>
+                          ) : item.primaryAction.kind === "open-need" ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Button
+                                size="sm"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNeedRespond(item, "available");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
+                                style={{
+                                  background:
+                                    "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                }}
+                              >
+                                {busy ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <ThumbsUp className="h-3.5 w-3.5" strokeWidth={2.6} />
+                                )}
+                                {t("needs:insight.available", { defaultValue: "Dispo" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNeedRespond(item, "unavailable");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 border-[1.5px] text-[#b91c1c] hover:text-[#b91c1c]"
+                              >
+                                <ThumbsDown className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                {t("needs:insight.unavailable", { defaultValue: "Pas dispo" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onAction(item);
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2 text-[11px]"
+                              >
+                                {t("urgency.cta.open", { defaultValue: "Ouvrir" })}
                               </Button>
                             </div>
                           ) : (

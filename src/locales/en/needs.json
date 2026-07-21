@@ -23,7 +23,8 @@
     "draft": "Draft",
     "open": "Open",
     "closed": "Closed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "reopened": "Need reopened"
   },
   "validationMode": {
     "auto": "Auto-confirmation",
@@ -315,7 +316,8 @@
     "cancelNeed": "Cancel need",
     "delete": "Delete",
     "editAudience": "Edit recipients",
-    "viewRecipients": "View recipients"
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Reopen need"
   },
   "assignNotification": {
     "assignedAs": "You've been assigned as {{role}}"
@@ -369,5 +371,11 @@
     "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
     "confirm": "Withdraw",
     "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "appliedToast": "Application sent",
+    "unavailableToast": "Marked unavailable"
   }
 }
