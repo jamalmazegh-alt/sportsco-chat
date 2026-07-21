@@ -275,7 +275,9 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
           templateName: "wall-message",
           recipientEmail: email,
           idempotencyKey: `wall-msg-${postId}-${uid}`,
-          dispatchId: postId,
+          // NB: on ne renseigne pas dispatchId (postId n'est pas dans
+          // email_dispatches → FK violation). recipient_id + notification_type
+          // suffisent pour tracer, l'idempotency_key protège des doublons.
           recipientId: uid,
           notificationType: "wall_message",
           fromName: clubName ? `${clubName} via Clubero` : undefined,
