@@ -91,6 +91,27 @@ function PublicationDetailPage() {
     null;
   const myCurrentOption = activeSubject?.currentOptionId ?? null;
 
+  // Deep-link intent (?vote=<optionId>) : pré-sélection uniquement.
+  // Ne jamais auto-cast au chargement — l'utilisateur confirme explicitement.
+  const options = data?.options ?? [];
+  const voteIntentIsValid =
+    !!voteIntent && options.some((o) => o.id === voteIntent);
+  useEffect(() => {
+    if (!data || !isPoll || isClosed) return;
+    if (!voteIntent) return;
+    if (!voteIntentIsValid) {
+      toast.error(
+        t("publications:errors.voteIntentInvalid", "Cette option n'existe pas ou plus."),
+      );
+      return;
+    }
+    if (!canVote) return;
+    if (myCurrentOption) return;
+    if (selectedOption == null) setSelectedOption(voteIntent);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.publication?.id, voteIntent, voteIntentIsValid]);
+
+
   const { data: results } = useQuery({
     queryKey: ["publication-results", publicationId],
     queryFn: () => resultsFn({ data: { publicationId } }),
