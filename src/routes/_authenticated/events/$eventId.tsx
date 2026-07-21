@@ -73,6 +73,7 @@ import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { StaffAvailabilityForEvent } from "@/components/staff-availability";
 import { StaffAssignmentSection } from "@/components/staff-assignment-section";
+import { StaffCoverageBadge } from "@/components/staff-coverage-badge";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -4248,11 +4249,21 @@ function EventDetail() {
       )}
 
       {isCoach && event?.team_id && eventTeam?.club_id && eventDateStr && (
-        <StaffAvailabilityForEvent
-          teamId={event.team_id}
-          clubId={eventTeam.club_id}
-          date={eventDateStr}
-        />
+        <>
+          <div className="flex items-center gap-2">
+            <StaffCoverageBadge
+              eventId={event.id}
+              teamId={event.team_id}
+              clubId={eventTeam.club_id}
+              startsAt={event.starts_at}
+            />
+          </div>
+          <StaffAvailabilityForEvent
+            teamId={event.team_id}
+            clubId={eventTeam.club_id}
+            date={eventDateStr}
+          />
+        </>
       )}
 
       {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
