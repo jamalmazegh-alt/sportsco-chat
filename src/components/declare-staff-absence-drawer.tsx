@@ -69,7 +69,9 @@ interface Props {
  * autorise l'insert par owner (auth.uid() = user_id = created_by).
  */
 export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
+
   const { user, activeClubId } = useAuth();
   const qc = useQueryClient();
 
