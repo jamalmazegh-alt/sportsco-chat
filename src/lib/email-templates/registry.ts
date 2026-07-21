@@ -54,6 +54,7 @@ import { template as campDocumentResubmittedTemplate } from "./camp-document-res
 import { template as eventNeedInviteTemplate } from "./event-need-invite";
 import { template as eventNeedDecisionTemplate } from "./event-need-decision";
 import { template as wallMessageTemplate } from "./wall-message";
+import { template as publicationPollTemplate } from "./publication-poll";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
