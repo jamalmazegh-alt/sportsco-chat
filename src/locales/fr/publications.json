@@ -56,7 +56,9 @@
     "votingAs": "Je vote en tant que :",
     "votingAsSelf": "Moi",
     "votingForChild": "Vous votez pour {{name}}",
-    "player": "Joueur"
+    "player": "Joueur",
+    "confirmVote": "Confirmer : {{option}}",
+    "pollClosed": "Sondage fermé"
   },
   "type": {
     "message": "Communication",
@@ -168,7 +170,12 @@
     "pollClosedNotice": "Ce sondage est fermé.",
     "messageSubject": "{{title}}",
     "openInApp": "Ouvrir dans Clubero",
-    "deletedFallback": "Cette publication a été supprimée."
+    "deletedFallback": "Cette publication a été supprimée.",
+    "poll": {
+      "subject": "{{title}}",
+      "intro": "Merci de répondre à ce sondage — un clic suffit.",
+      "viewResults": "Voir les résultats"
+    }
   },
   "push": {
     "messageTitle": "{{club}} — {{title}}",
@@ -182,7 +189,8 @@
     "audienceEmpty": "Ajoute au moins une audience.",
     "optionsMin": "Un sondage requiert au moins 2 options.",
     "optionHasVotes": "Impossible de modifier une option ayant déjà reçu des votes.",
-    "visibilityLocked": "La visibilité ne peut plus changer après le premier vote."
+    "visibilityLocked": "La visibilité ne peut plus changer après le premier vote.",
+    "voteIntentInvalid": "Cette option n'existe pas ou plus."
   },
   "card": {
     "tagPoll": "Sondage",

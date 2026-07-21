@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import {
   BarChart3,
   MessageSquare,
@@ -36,7 +37,12 @@ import {
 } from "@/lib/publications/publications.functions";
 
 
+const SearchSchema = z.object({
+  vote: z.string().uuid().optional(),
+});
+
 export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
+  validateSearch: (search) => SearchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Publication · Clubero" },
@@ -49,6 +55,8 @@ export const Route = createFileRoute("/_authenticated/publications/$publicationI
 function PublicationDetailPage() {
   const { t } = useTranslation();
   const { publicationId } = Route.useParams();
+  const search = Route.useSearch();
+  const voteIntent = search.vote ?? null;
   const nav = useNavigate();
   const qc = useQueryClient();
 
@@ -82,6 +90,27 @@ function PublicationDetailPage() {
     eligibleSubjects[0] ??
     null;
   const myCurrentOption = activeSubject?.currentOptionId ?? null;
+
+  // Deep-link intent (?vote=<optionId>) : pré-sélection uniquement.
+  // Ne jamais auto-cast au chargement — l'utilisateur confirme explicitement.
+  const options = data?.options ?? [];
+  const voteIntentIsValid =
+    !!voteIntent && options.some((o) => o.id === voteIntent);
+  useEffect(() => {
+    if (!data || !isPoll || isClosed) return;
+    if (!voteIntent) return;
+    if (!voteIntentIsValid) {
+      toast.error(
+        t("publications:errors.voteIntentInvalid", "Cette option n'existe pas ou plus."),
+      );
+      return;
+    }
+    if (!canVote) return;
+    if (myCurrentOption) return;
+    if (selectedOption == null) setSelectedOption(voteIntent);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.publication?.id, voteIntent, voteIntentIsValid]);
+
 
   const { data: results } = useQuery({
     queryKey: ["publication-results", publicationId],
@@ -290,7 +319,15 @@ function PublicationDetailPage() {
                     onClick={() => selectedOption && vote.mutate(selectedOption)}
                   >
                     {vote.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                    {t("publications:detail.vote", "Voter")}
+                    {(() => {
+                      const selectedLabel = options.find((o) => o.id === selectedOption)?.label;
+                      if (voteIntentIsValid && selectedOption === voteIntent && selectedLabel) {
+                        return t("publications:detail.confirmVote", "Confirmer : {{option}}", {
+                          option: selectedLabel,
+                        });
+                      }
+                      return t("publications:detail.vote", "Voter");
+                    })()}
                   </Button>
                 </>
               ) : (
