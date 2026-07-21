@@ -72,6 +72,7 @@ import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { StaffAvailabilityForEvent } from "@/components/staff-availability";
+import { StaffAssignmentSection } from "@/components/staff-assignment-section";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -4251,6 +4252,15 @@ function EventDetail() {
           teamId={event.team_id}
           clubId={eventTeam.club_id}
           date={eventDateStr}
+        />
+      )}
+
+      {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
+        <StaffAssignmentSection
+          eventId={event.id}
+          teamId={event.team_id}
+          clubId={eventTeam.club_id}
+          eventDate={eventDateStr}
         />
       )}
 
