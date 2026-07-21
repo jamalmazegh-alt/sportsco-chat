@@ -5419,6 +5419,62 @@ export type Database = {
           },
         ]
       }
+      staff_availabilities: {
+        Row: {
+          certainty: string
+          club_id: string
+          comment: string | null
+          created_at: string
+          created_by_user_id: string
+          end_date: string
+          id: string
+          reason: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          certainty?: string
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          created_by_user_id: string
+          end_date: string
+          id?: string
+          reason: string
+          start_date: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          certainty?: string
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          end_date?: string
+          id?: string
+          reason?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_availabilities_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_webhook_events: {
         Row: {
           event_id: string
@@ -7942,6 +7998,28 @@ export type Database = {
         Args: { _token: string }
         Returns: Json
       }
+      get_staff_availabilities: {
+        Args: {
+          p_club_id?: string
+          p_end?: string
+          p_start?: string
+          p_team_id?: string
+          p_user_id?: string
+        }
+        Returns: {
+          can_view_reason: boolean
+          certainty: string
+          club_id: string
+          comment: string
+          end_date: string
+          id: string
+          reason: string
+          start_date: string
+          status: string
+          user_id: string
+          visibility: string
+        }[]
+      }
       get_tournament_invite_by_token: {
         Args: { _token: string }
         Returns: Json
@@ -8074,6 +8152,10 @@ export type Database = {
         Returns: undefined
       }
       mark_expired_availabilities_completed: { Args: never; Returns: number }
+      mark_expired_staff_availabilities_completed: {
+        Args: never
+        Returns: number
+      }
       mark_support_ticket_read: {
         Args: { _ticket_id: string }
         Returns: undefined
