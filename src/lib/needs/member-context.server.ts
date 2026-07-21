@@ -107,6 +107,51 @@ export async function buildMemberContextByUser(
     }
   }
 
+  // Union additionnelle : joueurs présents dans `players` (user_id) mais
+  // éventuellement absents de `team_members` avec role='player'. On aligne
+  // ainsi la résolution de la catégorie d'un joueur sur la même source que
+  // celle utilisée pour les enfants (players → team_members via player_id).
+  const { data: playerRows } = await supabaseAdmin
+    .from("players")
+    .select("id, user_id")
+    .eq("club_id", clubId)
+    .in("user_id", userIds)
+    .is("deleted_at", null);
+  const playerIdByUser = new Map<string, string>();
+  const playerUserIds: string[] = [];
+  for (const p of (playerRows ?? []) as Array<{
+    id: string | null;
+    user_id: string | null;
+  }>) {
+    if (p.id && p.user_id && !playerIdByUser.has(p.user_id)) {
+      playerIdByUser.set(p.user_id, p.id);
+      playerUserIds.push(p.id);
+    }
+  }
+  if (playerUserIds.length > 0) {
+    const { data: playerTm } = await supabaseAdmin
+      .from("team_members")
+      .select("player_id, team_id")
+      .in("player_id", playerUserIds);
+    const teamsByPlayerId = new Map<string, Set<string>>();
+    for (const r of (playerTm ?? []) as Array<{
+      player_id: string | null;
+      team_id: string | null;
+    }>) {
+      if (!r.player_id || !r.team_id) continue;
+      if (!teamsByPlayerId.has(r.player_id))
+        teamsByPlayerId.set(r.player_id, new Set());
+      teamsByPlayerId.get(r.player_id)!.add(r.team_id);
+    }
+    for (const [uid, pid] of playerIdByUser.entries()) {
+      const tset = teamsByPlayerId.get(pid);
+      if (!tset) continue;
+      if (!playerTeamsByUser.has(uid)) playerTeamsByUser.set(uid, new Set());
+      const target = playerTeamsByUser.get(uid)!;
+      for (const t of tset) target.add(t);
+    }
+  }
+
   // Parents → enfants.
   const { data: parentLinks } = await supabaseAdmin
     .from("player_parents")
