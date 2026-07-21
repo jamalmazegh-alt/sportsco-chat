@@ -23,7 +23,8 @@
     "draft": "Entwurf",
     "open": "Offen",
     "closed": "Geschlossen",
-    "cancelled": "Abgesagt"
+    "cancelled": "Abgesagt",
+    "reopened": "Bedarf wieder geöffnet"
   },
   "validationMode": {
     "auto": "Automatische Bestätigung",
@@ -315,7 +316,8 @@
     "cancelNeed": "Bedarf absagen",
     "delete": "Löschen",
     "editAudience": "Edit recipients",
-    "viewRecipients": "View recipients"
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Bedarf wieder öffnen"
   },
   "assignNotification": {
     "assignedAs": "Du wurdest als {{role}} eingetragen"
@@ -369,5 +371,11 @@
     "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
     "confirm": "Withdraw",
     "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Verfügbar",
+    "unavailable": "Nicht verfügbar",
+    "appliedToast": "Bewerbung gesendet",
+    "unavailableToast": "Als nicht verfügbar markiert"
   }
 }
