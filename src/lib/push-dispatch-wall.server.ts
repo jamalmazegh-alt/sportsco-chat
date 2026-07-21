@@ -13,32 +13,17 @@ import { getClubNotifSettings } from "@/lib/club-notif-settings.server";
 
 const MINOR_PUSH_THRESHOLD_YEARS = 16;
 
-const ALL_CLUB: Record<string, string> = {
-  fr: "tout le club",
-  en: "the whole club",
-  de: "den ganzen Verein",
-  es: "todo el club",
-  it: "tutto il club",
-  nl: "de hele club",
-  pt: "todo o clube",
-};
-const OTHERS: Record<string, (n: number) => string> = {
-  fr: (n) => `+ ${n} autres`,
-  en: (n) => `+ ${n} others`,
-  de: (n) => `+ ${n} weitere`,
-  es: (n) => `+ ${n} más`,
-  it: (n) => `+ ${n} altre`,
-  nl: (n) => `+ ${n} andere`,
-  pt: (n) => `+ ${n} outras`,
-};
-const I18N: Record<string, { title: string; body: (a: string, s: string) => string }> = {
-  fr: { title: "Nouveau message sur le mur", body: (a, s) => `${a} a publié dans ${s}` },
-  en: { title: "New post on the wall", body: (a, s) => `${a} posted in ${s}` },
-  de: { title: "Neuer Beitrag an der Pinnwand", body: (a, s) => `${a} hat in ${s} gepostet` },
-  es: { title: "Nuevo mensaje en el muro", body: (a, s) => `${a} publicó en ${s}` },
-  it: { title: "Nuovo messaggio sulla bacheca", body: (a, s) => `${a} ha pubblicato in ${s}` },
-  nl: { title: "Nieuw bericht op de muur", body: (a, s) => `${a} heeft in ${s} gepost` },
-  pt: { title: "Nova mensagem no mural", body: (a, s) => `${a} publicou em ${s}` },
+// Corps de notification générique : on ne nomme pas l'audience (club, équipe,
+// groupe) pour éviter d'exposer la portée à des destinataires qui ne devraient
+// pas la deviner. Titre inchangé.
+const I18N: Record<string, { title: string; body: (a: string) => string }> = {
+  fr: { title: "Nouveau message sur le mur", body: (a) => `${a} a publié un nouveau message` },
+  en: { title: "New post on the wall", body: (a) => `${a} posted a new message` },
+  de: { title: "Neuer Beitrag an der Pinnwand", body: (a) => `${a} hat einen neuen Beitrag veröffentlicht` },
+  es: { title: "Nuevo mensaje en el muro", body: (a) => `${a} publicó un nuevo mensaje` },
+  it: { title: "Nuovo messaggio sulla bacheca", body: (a) => `${a} ha pubblicato un nuovo messaggio` },
+  nl: { title: "Nieuw bericht op de muur", body: (a) => `${a} heeft een nieuw bericht geplaatst` },
+  pt: { title: "Nova mensagem no mural", body: (a) => `${a} publicou uma nova mensagem` },
 };
 
 // Label per social source, localized where obvious.
@@ -223,15 +208,6 @@ export async function dispatchWallPostPushInternal(
     targets.push(uid);
   }
 
-  function scopeLabel(lang: string): string {
-    if (audienceTeamIds === null) return ALL_CLUB[lang] || ALL_CLUB.fr;
-    if (liveTeams.length === 0) return ALL_CLUB[lang] || ALL_CLUB.fr;
-    if (liveTeams.length === 1) return liveTeams[0].name;
-    if (liveTeams.length === 2) return `${liveTeams[0].name} + ${liveTeams[1].name}`;
-    const others = (OTHERS[lang] || OTHERS.fr)(liveTeams.length - 1);
-    return `${liveTeams[0].name} ${others}`;
-  }
-
   const collapseTag =
     audienceType === "team" && liveTeams.length === 1
       ? `wall-team-${liveTeams[0].id}`
@@ -242,7 +218,7 @@ export async function dispatchWallPostPushInternal(
     const t = I18N[lang] || I18N.fr;
     return sendPushToUser(uid, {
       title: t.title,
-      body: t.body(authorName, scopeLabel(lang)),
+      body: t.body(authorName),
       url: `/inbox?post=${postId}&from=push`,
       tag: collapseTag,
     }).catch((e: unknown) => {
