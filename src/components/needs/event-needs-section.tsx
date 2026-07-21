@@ -524,10 +524,21 @@ function NeedRow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                <Pencil className="h-3.5 w-3.5 mr-2" />
-                {t("needs:menu.edit")}
-              </DropdownMenuItem>
+              {!isClosed && (
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5 mr-2" />
+                  {t("needs:menu.edit")}
+                </DropdownMenuItem>
+              )}
+              {isClosed && (
+                <DropdownMenuItem
+                  onClick={() => reopenM.mutate()}
+                  disabled={reopenM.isPending}
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-2" />
+                  {t("needs:menu.reopenNeed", { defaultValue: "Rouvrir" })}
+                </DropdownMenuItem>
+              )}
               {isOpen && (
                 <>
                   <DropdownMenuItem onClick={() => setEditAudienceOpen(true)}>
