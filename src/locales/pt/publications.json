@@ -56,7 +56,9 @@
     "votingAs": "I am voting as:",
     "votingAsSelf": "Me",
     "votingForChild": "You are voting for {{name}}",
-    "player": "Player"
+    "player": "Player",
+    "confirmVote": "Confirmar: {{option}}",
+    "pollClosed": "Sondagem fechada"
   },
   "type": {
     "message": "Message",
@@ -168,7 +170,12 @@
     "pollClosedNotice": "This poll is closed.",
     "messageSubject": "{{title}}",
     "openInApp": "Open in Clubero",
-    "deletedFallback": "This publication has been deleted."
+    "deletedFallback": "This publication has been deleted.",
+    "poll": {
+      "subject": "{{title}}",
+      "intro": "Responde a esta sondagem — basta um toque.",
+      "viewResults": "Ver resultados"
+    }
   },
   "push": {
     "messageTitle": "{{club}} — {{title}}",
@@ -182,7 +189,8 @@
     "audienceEmpty": "Add at least one audience.",
     "optionsMin": "A poll requires at least 2 options.",
     "optionHasVotes": "You cannot edit an option that has already received votes.",
-    "visibilityLocked": "Vote visibility can no longer change once a vote has been cast."
+    "visibilityLocked": "Vote visibility can no longer change once a vote has been cast.",
+    "voteIntentInvalid": "Esta opção já não existe."
   },
   "card": {
     "tagPoll": "Sondagem",
