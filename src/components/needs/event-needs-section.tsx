@@ -262,6 +262,7 @@ function NeedRow({
   const withdraw = useServerFn(withdrawSignup);
   const declareUnavail = useServerFn(declareUnavailable);
   const close = useServerFn(closeEventNeed);
+  const reopen = useServerFn(reopenEventNeed);
   const cancel = useServerFn(cancelEventNeed);
   const deleteFn = useServerFn(deleteEventNeed);
 
