@@ -119,6 +119,8 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
   // Groups the current user can target from the composer (staff-visible via RLS).
   const [targetableGroups, setTargetableGroups] = useState<Group[]>([]);
+  // Names of groups referenced by loaded posts (may include groups not in targetableGroups).
+  const [postGroups, setPostGroups] = useState<Group[]>([]);
   // Group selection is disjoint from team selection: non-empty ⇒ audience_type='group'.
   const [audienceGroups, setAudienceGroups] = useState<string[]>([]);
   // "Aussi par e-mail" checkbox — triggers a best-effort outbox after the insert.
