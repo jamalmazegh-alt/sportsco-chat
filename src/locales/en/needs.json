@@ -34,7 +34,8 @@
     "applied": "Application sent",
     "confirmed": "Confirmed",
     "declined": "Application declined",
-    "withdrawn": "Withdrawn"
+    "withdrawn": "Withdrawn",
+    "unavailable": "Unavailable"
   },
   "seats": {
     "remaining_one": "{{count}} seat left",

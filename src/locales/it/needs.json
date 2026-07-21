@@ -34,7 +34,8 @@
     "applied": "Candidatura inviata",
     "confirmed": "Confermato",
     "declined": "Candidatura rifiutata",
-    "withdrawn": "Ritirato"
+    "withdrawn": "Ritirato",
+    "unavailable": "Non disponibile"
   },
   "seats": {
     "full": "Al completo",
