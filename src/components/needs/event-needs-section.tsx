@@ -1475,6 +1475,7 @@ type StaffSignup = {
   license_number: string | null;
   is_minor: boolean;
   profile?: { full_name: string | null } | null;
+  context: MemberContext | null;
 };
 
 function StaffSignupsDialog({
