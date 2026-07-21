@@ -396,6 +396,15 @@ function TeamAvailabilityCalendar() {
         </CardContent>
       </Card>
 
+      {isCoach && team?.club_id && (
+        <StaffAvailabilityForTeamMonth
+          teamId={teamId}
+          clubId={team.club_id}
+          cursor={cursor}
+          days={days}
+        />
+      )}
+
       {/* Legend */}
       <div className="flex flex-wrap gap-2 items-center text-xs">
         <span className="text-muted-foreground mr-2">
