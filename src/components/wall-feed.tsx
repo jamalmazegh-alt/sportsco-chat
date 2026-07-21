@@ -850,9 +850,16 @@ function AudiencePicker({
         );
       })}
       {groups.length > 0 && (
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-1">
-          {t("wall.compose.targetGroup", { defaultValue: "Groupe(s)" })}
-        </span>
+        <>
+          <span
+            aria-hidden
+            className="h-4 w-px bg-border mx-1 self-center"
+          />
+          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <Users className="h-3 w-3" />
+            {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
+          </span>
+        </>
       )}
       {groups.map((g) => {
         const active = groupValue.includes(g.id);
@@ -862,12 +869,13 @@ function AudiencePicker({
             type="button"
             onClick={() => toggleGroup(g.id)}
             className={cn(
-              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-dashed transition-colors",
               active
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-border hover:bg-accent",
+                ? "bg-amber-500 text-white border-amber-500"
+                : "bg-amber-500/5 text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10",
             )}
           >
+            <Users className="h-3 w-3" />
             {g.name}
           </button>
         );
