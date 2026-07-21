@@ -881,8 +881,49 @@ function AudiencePicker({
 // team names are data (not translated). Deleted/unknown teams are filtered out;
 // if none survive, we surface a discreet "Audience restreinte" hint so admins
 // understand why the post is now narrower than originally targeted.
-function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string, Team> }) {
+function AudienceBadge({
+  post,
+  teamsById,
+  groupsById,
+}: {
+  post: Post;
+  teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
+}) {
   const { t } = useTranslation();
+  // Group audience — visually distinct (amber palette + Users icon, dashed border)
+  // to make groups instantly recognizable next to team badges.
+  if (post.audience_group_ids && post.audience_group_ids.length > 0) {
+    const liveG = post.audience_group_ids
+      .map((id) => groupsById.get(id))
+      .filter((x): x is Group => !!x);
+    let gLabel: string;
+    if (liveG.length === 0) {
+      gLabel = t("wall.scope.group", { defaultValue: "Groupe" });
+    } else if (liveG.length === 1) {
+      gLabel = liveG[0].name;
+    } else if (liveG.length === 2) {
+      gLabel = `${liveG[0].name} + ${liveG[1].name}`;
+    } else {
+      gLabel = t("wall.scope.plusOthers", {
+        defaultValue: "{{first}} + {{n}} autres",
+        first: liveG[0].name,
+        n: liveG.length - 1,
+      });
+    }
+    const gTooltip = liveG.length
+      ? liveG.map((g) => g.name).join(" · ")
+      : t("wall.scope.groupTooltip", { defaultValue: "Audience : groupe personnalisé" });
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-dashed shrink-0 bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40"
+        title={gTooltip}
+      >
+        <Users className="h-2.5 w-2.5" />
+        {gLabel}
+      </span>
+    );
+  }
   if (post.audience_team_ids === null) {
     return (
       <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
