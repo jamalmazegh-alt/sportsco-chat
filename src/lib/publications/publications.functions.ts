@@ -221,8 +221,28 @@ export const republishPublication = createServerFn({ method: "POST" })
     });
     if (error) throw new Response(`republish_failed: ${error.message}`, { status: 500 });
     const row = Array.isArray(res) ? res[0] : res;
+    const dispatchRowId = row?.dispatch_row_id as string;
+
+    // Best-effort : e-mail interactif de sondage (delta si audience_refresh,
+    // tous les destinataires si manual_resend).
+    if (dispatchRowId) {
+      try {
+        const { data: pubMeta } = await context.supabase
+          .from("club_publications")
+          .select("publication_type, send_email")
+          .eq("id", data.publicationId)
+          .maybeSingle();
+        if (pubMeta?.publication_type === "poll" && pubMeta?.send_email) {
+          const { dispatchPollEmails } = await import("./publications.notify.server");
+          await dispatchPollEmails(data.publicationId, dispatchRowId, data.mode);
+        }
+      } catch (e) {
+        console.error("[republishPublication] dispatchPollEmails failed", e);
+      }
+    }
+
     return {
-      dispatchRowId: row?.dispatch_row_id as string,
+      dispatchRowId,
       totalRecipients: (row?.recipients_count as number) ?? 0,
       newRecipients: (row?.new_recipient_count as number) ?? 0,
     };
