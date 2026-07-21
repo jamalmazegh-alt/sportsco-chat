@@ -17,6 +17,7 @@ import {
   PinOff,
   Send,
   Trash2,
+  Users,
 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
