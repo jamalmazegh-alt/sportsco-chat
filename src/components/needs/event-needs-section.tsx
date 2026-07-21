@@ -1834,13 +1834,24 @@ function StaffSignupsDialog({
                       {t("needs:staff.noMembers")}
                     </p>
                   )}
-                  {(memberResults?.members ?? []).map((m) => (
+                  {(memberResults?.members ?? []).map((m) => {
+                    const ctxSubline = formatMemberContextSubline(
+                      (m as { context?: import("@/lib/needs/member-context").MemberContext | null }).context ?? null,
+                      {
+                        playerSubline: (c) => t("common:person.playerSubline", { category: c }),
+                        playerSublineMulti: (c) =>
+                          t("common:person.playerSublineMulti", { categories: c }),
+                        parentSubline: (c) => t("common:person.parentSubline", { children: c }),
+                      },
+                    );
+                    return (
                     <PersonRow
                       key={m.member_id}
                       className="rounded border bg-background px-2"
                       compact
                       name={m.full_name ?? t("common.unknown")}
                       roles={m.roles}
+                      subline={ctxSubline ?? undefined}
                       action={
                         <Button
                           size="sm"
@@ -1860,7 +1871,8 @@ function StaffSignupsDialog({
                         </Button>
                       }
                     />
-                  ))}
+                  );
+                  })}
                 </div>
               </div>
             </>
