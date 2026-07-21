@@ -41,6 +41,7 @@
   "detail": {
     "notFound": "Publication not found",
     "vote": "Vote",
+    "changeVote": "Cambiar mi voto",
     "voted": "Vote recorded",
     "masked": "—",
     "thresholdNotice": "Results hidden to preserve anonymity (< 3 votes per option).",
