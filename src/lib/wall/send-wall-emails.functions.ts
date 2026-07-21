@@ -156,25 +156,36 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
     }
 
     // 3) Routage mineur → parents.
-    //    - Un joueur mineur est déterminé via players.birth_date < 18 ans.
+    //    - Un joueur mineur est déterminé via la fonction SQL public.player_is_minor
+    //      (seuil configuré côté club/locale ; ex. FR = 15 ans).
     //    - Le user_id du joueur mineur est retiré du set et on ajoute ses parents (parent_user_id).
     if (playerIds.size > 0) {
+      const idsArr = Array.from(playerIds);
       const { data: players } = await supabaseAdmin
         .from("players")
-        .select("id, user_id, birth_date")
-        .in("id", Array.from(playerIds));
+        .select("id, user_id")
+        .in("id", idsArr);
+      const playerRows = (players ?? []) as Array<{ id: string; user_id: string | null }>;
+
+      // Interroger la fonction SQL par joueur (volume faible dans un post du mur).
+      const minorFlags = await Promise.all(
+        idsArr.map(async (pid) => {
+          const { data } = await supabaseAdmin.rpc("player_is_minor", {
+            _player_id: pid,
+          } as any);
+          return [pid, data === true] as const;
+        }),
+      );
+      const isMinor = new Map(minorFlags);
+
       const minorPlayerIds: string[] = [];
-      for (const p of players ?? []) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dob = ((p as any).birth_date as string | null) ?? null;
-        if (isMinorFromBirthDate(dob)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const uid = ((p as any).user_id as string | null) ?? null;
-          if (uid) recipientUserSet.delete(uid);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          minorPlayerIds.push((p as any).id as string);
+      for (const p of playerRows) {
+        if (isMinor.get(p.id) === true) {
+          if (p.user_id) recipientUserSet.delete(p.user_id);
+          minorPlayerIds.push(p.id);
         }
       }
+
       if (minorPlayerIds.length) {
         const { data: parents } = await supabaseAdmin
           .from("player_parents")
