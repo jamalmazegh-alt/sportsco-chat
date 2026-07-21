@@ -636,3 +636,72 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
     const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
     return { dispatched: targets.size, sent };
   });
+
+/* ------------------------------------------------------------------ */
+/* Staff assignment / unassignment push                                */
+/* ------------------------------------------------------------------ */
+const StaffAssignmentInput = z.object({
+  eventId: z.string().uuid(),
+  userId: z.string().uuid(),
+  action: z.enum(["assigned", "unassigned"]),
+});
+
+export const dispatchStaffAssignmentPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => StaffAssignmentInput.parse(input))
+  .handler(async ({ data, context }) => {
+    if (data.userId === context.userId) return { sent: 0 };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+
+    const { data: ev } = await supabaseAdmin
+      .from("events")
+      .select(
+        "id, title, starts_at, type, team_id, opponent, is_home, location, teams:team_id(name, club_id)",
+      )
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (!ev) return { sent: 0 };
+
+    const dt = new Date((ev as any).starts_at);
+    const dateStr = dt.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const isMatch = (ev as any).type === "match";
+    const teamName = ((ev as any).teams?.name as string | null) ?? null;
+    const opponent = ((ev as any).opponent as string | null) ?? null;
+
+    let headline: string;
+    if (isMatch && opponent) {
+      headline = teamName ? `${teamName} vs ${opponent}` : `Match vs ${opponent}`;
+    } else if (isMatch) {
+      headline = teamName ? `Match — ${teamName}` : "Match";
+    } else {
+      headline = (ev as any).title || "Événement";
+    }
+
+    const title =
+      data.action === "assigned"
+        ? "👤 Assigné à un événement"
+        : "👤 Assignation retirée";
+    const body =
+      data.action === "assigned"
+        ? `${headline} — ${dateStr} à ${timeStr}`
+        : `${headline} — ${dateStr}`;
+
+    const result = await sendPushToUser(data.userId, {
+      title,
+      body,
+      url: `/events/${data.eventId}`,
+      tag: `staff-${data.action}-${data.eventId}-${data.userId}`,
+    }).catch((e) => {
+      console.warn("[push] staff assignment send failed", data.userId, (e as Error).message);
+      return { sent: 0, pruned: 0 };
+    });
+    return { sent: result.sent };
+  });
+
