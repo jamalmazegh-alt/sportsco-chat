@@ -27,22 +27,24 @@ function makeAdmin(data: {
       const state: {
         rows: unknown[];
         filters: Array<(r: Record<string, unknown>) => boolean>;
-      } = { rows: [], filters: [] };
+        cols: string[];
+      } = { rows: [], filters: [], cols: [] };
       if (table === "teams") state.rows = data.teams;
       else if (table === "player_parents") state.rows = data.parentLinks;
       else if (table === "players") state.rows = data.players;
-      // team_members: choix par filtres
       const api = {
         select() {
           return api;
         },
         eq(col: string, val: unknown) {
+          state.cols.push(col);
           state.filters.push(
             (r) => (r as Record<string, unknown>)[col] === val,
           );
           return api;
         },
         in(col: string, vals: unknown[]) {
+          state.cols.push(col);
           const set = new Set(vals);
           state.filters.push((r) =>
             set.has((r as Record<string, unknown>)[col]),
@@ -50,6 +52,7 @@ function makeAdmin(data: {
           return api;
         },
         is(col: string, val: unknown) {
+          state.cols.push(col);
           state.filters.push(
             (r) => (r as Record<string, unknown>)[col] === val,
           );
@@ -58,10 +61,7 @@ function makeAdmin(data: {
         then(resolve: (v: { data: unknown[] }) => unknown) {
           let rows: unknown[] = state.rows;
           if (table === "team_members") {
-            // On applique les filtres sur l'union des deux sources ; les
-            // filtres user_id/player_id sélectionnent la bonne source.
-            const filtersStr = state.filters.toString();
-            const usesPlayerId = filtersStr.includes("player_id");
+            const usesPlayerId = state.cols.includes("player_id");
             rows = usesPlayerId
               ? data.teamMembersByPlayer
               : data.teamMembersByUser;
