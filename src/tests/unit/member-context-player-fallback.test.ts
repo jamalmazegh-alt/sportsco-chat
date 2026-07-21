@@ -105,7 +105,3 @@ describe("buildMemberContextByUser — fallback players.team_id", () => {
     expect(adam?.player_categories).toEqual(["U15"]);
   });
 });
-
-// debug
-import { buildMemberContextByUser as bmc } from "@/lib/needs/member-context.server";
-describe("debug", () => {
