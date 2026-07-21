@@ -217,7 +217,7 @@ export async function buildMemberContextByUser(
     let children: Array<{ name: string; category: string | null }> = [];
     let coached: Array<{ name: string; age_group: string | null }> = [];
 
-    if (primary === "player") {
+    console.log("DBG member",uid,"primary",primary,"playerTeamsByUser",Array.from(playerTeamsByUser.entries()).map(([k,v])=>[k,Array.from(v)]),"teamById",Array.from(teamById.entries()));if (primary === "player") {
       const tids = playerTeamsByUser.get(uid);
       if (tids) {
         const cats = Array.from(tids)
