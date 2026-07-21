@@ -183,9 +183,21 @@ export const createPublication = createServerFn({ method: "POST" })
     }
 
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
+    const dispatchRowId = row?.dispatch_row_id as string;
+
+    // Best-effort : e-mail interactif de sondage
+    if (data.publicationType === "poll" && data.sendEmail && dispatchRowId) {
+      try {
+        const { dispatchPollEmails } = await import("./publications.notify.server");
+        await dispatchPollEmails(publicationId, dispatchRowId, "publish");
+      } catch (e) {
+        console.error("[createPublication] dispatchPollEmails failed", e);
+      }
+    }
+
     return {
       publicationId,
-      dispatchRowId: row?.dispatch_row_id as string,
+      dispatchRowId,
       recipientsCount: (row?.recipients_count as number) ?? 0,
     };
   });
