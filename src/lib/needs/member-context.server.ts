@@ -128,7 +128,7 @@ export async function buildMemberContextByUser(
       playerUserIds.push(p.id);
     }
   }
-  if (playerUserIds.length > 0) {
+  console.log("DBG playerUserIds", playerUserIds, "playerIdByUser", Array.from(playerIdByUser.entries()));if (playerUserIds.length > 0) {
     const { data: playerTm } = await supabaseAdmin
       .from("team_members")
       .select("player_id, team_id")
@@ -143,7 +143,7 @@ export async function buildMemberContextByUser(
         teamsByPlayerId.set(r.player_id, new Set());
       teamsByPlayerId.get(r.player_id)!.add(r.team_id);
     }
-    for (const [uid, pid] of playerIdByUser.entries()) {
+    console.log("DBG teamsByPlayerId", Array.from(teamsByPlayerId.entries()).map(([k,v])=>[k,Array.from(v)]));for (const [uid, pid] of playerIdByUser.entries()) {
       const tset = teamsByPlayerId.get(pid);
       if (!tset) continue;
       if (!playerTeamsByUser.has(uid)) playerTeamsByUser.set(uid, new Set());
