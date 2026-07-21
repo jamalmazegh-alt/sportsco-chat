@@ -40,6 +40,9 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Défis et tests physiques : gamification et suivi de la condition physique.
 - Statistiques (présence, résultats) : pilotage de la saison.
 - Covoiturage par événement : logistique simplifiée pour les parents.
+- Coups de main (besoins bénévoles par événement) : le coach publie un besoin (transport, goûter, arbitrage, matériel...) ciblé sur une audience (équipe, parents, groupe), les membres se portent volontaires en un clic, suivi des candidatures et des places restantes, réouverture possible d'un besoin clôturé.
+- Disponibilités & encadrement du staff : les coachs et adjoints déclarent leurs indisponibilités (période + motif optionnel masqué aux non-gestionnaires) ; vue équipe des dispos ; assignation d'un coach à un événement (staff équipe ou renfort du club) avec badge de couverture (🟢 encadrement OK / 🔴 aucun coach dispo), alertes automatiques en cas de conflit et remontée dans le centre d'urgences.
+- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe ou tout le club, un seul vote par utilisateur, résultats en direct.
 
 ### Effectif & joueurs
 - Fiche joueur (avatar, historique, feedback, sanctions) : carnet de vie sportif.
