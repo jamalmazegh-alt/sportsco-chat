@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
+import { StaffAvailabilityForTeamMonth } from "@/components/staff-availability";
+import { useIsCoach } from "@/lib/auth-context";
 import {
   Select,
   SelectContent,
