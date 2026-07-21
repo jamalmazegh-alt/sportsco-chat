@@ -53,6 +53,7 @@ import { template as campDocumentRejectedTemplate } from "./camp-document-reject
 import { template as campDocumentResubmittedTemplate } from "./camp-document-resubmitted";
 import { template as eventNeedInviteTemplate } from "./event-need-invite";
 import { template as eventNeedDecisionTemplate } from "./event-need-decision";
+import { template as eventNeedSignupTemplate } from "./event-need-signup";
 import { template as wallMessageTemplate } from "./wall-message";
 import { template as publicationPollTemplate } from "./publication-poll";
 
