@@ -439,8 +439,10 @@ function NeedRow({
   /* -------------------- contextual ⋯ menu (S7 · pastille 1) -------------------- */
   // Draft:              Modifier · Supprimer
   // Published (open):   Modifier · Fermer · Annuler
-  // Closed / Cancelled: no menu (read-only)
-  const showMenu = isStaff && !isReadOnly;
+  // Closed:             Rouvrir
+  // Cancelled:          no menu (read-only)
+  const isClosed = status === "closed";
+  const showMenu = isStaff && (!isReadOnly || isClosed);
 
   return (
     <div
