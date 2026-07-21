@@ -109,15 +109,3 @@ describe("buildMemberContextByUser — fallback players.team_id", () => {
 // debug
 import { buildMemberContextByUser as bmc } from "@/lib/needs/member-context.server";
 describe("debug", () => {
-  it("logs", async () => {
-    const admin = makeAdmin({
-      teams: [{ id: "t-u15", name: "U15 A", age_group: "U15", club_id: "club-1" } as any],
-      teamMembersByUser: [],
-      parentLinks: [],
-      players: [{ id: "p1", user_id: "u-adam", first_name:"A", last_name:"M", club_id: "club-1", deleted_at: null }],
-      teamMembersByPlayer: [{ player_id: "p1", team_id: "t-u15" }],
-    });
-    const ctx = await bmc(admin, "club-1", [{ user_id: "u-adam", roles: ["player"], role: null }]);
-    console.log("CTX:", JSON.stringify(Array.from(ctx.entries())));
-  });
-});
