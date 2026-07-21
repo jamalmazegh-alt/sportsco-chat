@@ -259,14 +259,50 @@ export function WallFeed({ clubId }: { clubId: string }) {
         const ids = list.map((p) => p.id);
         const { data: votes } = await supabase
           .from("club_poll_votes")
-          .select("publication_id")
+          .select("publication_id, option_id")
           .in("publication_id", ids);
         const counts = new Map<string, number>();
-        for (const v of (votes ?? []) as { publication_id: string }[]) {
+        const perOption = new Map<string, Map<string, number>>();
+        for (const v of (votes ?? []) as { publication_id: string; option_id: string }[]) {
           counts.set(v.publication_id, (counts.get(v.publication_id) ?? 0) + 1);
+          let m = perOption.get(v.publication_id);
+          if (!m) {
+            m = new Map();
+            perOption.set(v.publication_id, m);
+          }
+          m.set(v.option_id, (m.get(v.option_id) ?? 0) + 1);
+        }
+        // Fetch options for closed polls so we can render inline results.
+        const closedIds = list.filter((p) => !!p.closed_at).map((p) => p.id);
+        const optionsByPoll = new Map<string, PollOptionResult[]>();
+        if (closedIds.length > 0) {
+          const { data: opts } = await supabase
+            .from("club_poll_options")
+            .select("id, publication_id, label, sort_order")
+            .in("publication_id", closedIds)
+            .order("sort_order", { ascending: true });
+          for (const o of (opts ?? []) as {
+            id: string;
+            publication_id: string;
+            label: string;
+          }[]) {
+            const arr = optionsByPoll.get(o.publication_id) ?? [];
+            arr.push({
+              id: o.id,
+              label: o.label,
+              votes: perOption.get(o.publication_id)?.get(o.id) ?? 0,
+            });
+            optionsByPoll.set(o.publication_id, arr);
+          }
         }
         if (!cancelled) {
-          setPolls(list.map((p) => ({ ...p, voter_count: counts.get(p.id) ?? 0 })));
+          setPolls(
+            list.map((p) => ({
+              ...p,
+              voter_count: counts.get(p.id) ?? 0,
+              options: optionsByPoll.get(p.id),
+            })),
+          );
         }
       } catch {
         if (!cancelled) setPolls([]);
