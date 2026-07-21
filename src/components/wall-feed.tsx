@@ -17,6 +17,7 @@ import {
   PinOff,
   Send,
   Trash2,
+  Users,
 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
@@ -118,6 +119,8 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
   // Groups the current user can target from the composer (staff-visible via RLS).
   const [targetableGroups, setTargetableGroups] = useState<Group[]>([]);
+  // Names of groups referenced by loaded posts (may include groups not in targetableGroups).
+  const [postGroups, setPostGroups] = useState<Group[]>([]);
   // Group selection is disjoint from team selection: non-empty ⇒ audience_type='group'.
   const [audienceGroups, setAudienceGroups] = useState<string[]>([]);
   // "Aussi par e-mail" checkbox — triggers a best-effort outbox after the insert.
@@ -207,6 +210,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       }
     }
+    // Fetch names for groups referenced by these posts (RLS-scoped).
+    const groupIdSet = new Set<string>();
+    for (const p of ps) {
+      if (p.audience_group_ids) for (const gid of p.audience_group_ids) groupIdSet.add(gid);
+    }
+    if (groupIdSet.size > 0) {
+      const { data: gRows } = await supabase
+        .from("club_groups")
+        .select("id, name")
+        .in("id", Array.from(groupIdSet));
+      setPostGroups((gRows ?? []) as Group[]);
+    } else {
+      setPostGroups([]);
+    }
     // Total club members (denominator for "Lu par X/Y")
     const { count } = await supabase
       .from("club_members")
@@ -216,6 +233,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     setPosts(ps);
     setLoading(false);
   }
+
 
   useEffect(() => {
     load(); /* eslint-disable-next-line */
@@ -639,6 +657,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     for (const tt of allTeams) m.set(tt.id, tt);
     return m;
   }, [allTeams]);
+  const groupsById = useMemo(() => {
+    const m = new Map<string, Group>();
+    for (const g of targetableGroups) m.set(g.id, g);
+    for (const g of postGroups) if (!m.has(g.id)) m.set(g.id, g);
+    return m;
+  }, [targetableGroups, postGroups]);
 
   if (loading) {
     return <WallFeedSkeleton />;
@@ -734,6 +758,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         canPin={canPost}
         memberCount={memberCount}
         teamsById={teamsById}
+        groupsById={groupsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
@@ -825,9 +850,16 @@ function AudiencePicker({
         );
       })}
       {groups.length > 0 && (
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-1">
-          {t("wall.compose.targetGroup", { defaultValue: "Groupe(s)" })}
-        </span>
+        <>
+          <span
+            aria-hidden
+            className="h-4 w-px bg-border mx-1 self-center"
+          />
+          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <Users className="h-3 w-3" />
+            {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
+          </span>
+        </>
       )}
       {groups.map((g) => {
         const active = groupValue.includes(g.id);
@@ -837,12 +869,13 @@ function AudiencePicker({
             type="button"
             onClick={() => toggleGroup(g.id)}
             className={cn(
-              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-dashed transition-colors",
               active
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-border hover:bg-accent",
+                ? "bg-amber-500 text-white border-amber-500"
+                : "bg-amber-500/5 text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10",
             )}
           >
+            <Users className="h-3 w-3" />
             {g.name}
           </button>
         );
@@ -856,8 +889,49 @@ function AudiencePicker({
 // team names are data (not translated). Deleted/unknown teams are filtered out;
 // if none survive, we surface a discreet "Audience restreinte" hint so admins
 // understand why the post is now narrower than originally targeted.
-function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string, Team> }) {
+function AudienceBadge({
+  post,
+  teamsById,
+  groupsById,
+}: {
+  post: Post;
+  teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
+}) {
   const { t } = useTranslation();
+  // Group audience — visually distinct (amber palette + Users icon, dashed border)
+  // to make groups instantly recognizable next to team badges.
+  if (post.audience_group_ids && post.audience_group_ids.length > 0) {
+    const liveG = post.audience_group_ids
+      .map((id) => groupsById.get(id))
+      .filter((x): x is Group => !!x);
+    let gLabel: string;
+    if (liveG.length === 0) {
+      gLabel = t("wall.scope.group", { defaultValue: "Groupe" });
+    } else if (liveG.length === 1) {
+      gLabel = liveG[0].name;
+    } else if (liveG.length === 2) {
+      gLabel = `${liveG[0].name} + ${liveG[1].name}`;
+    } else {
+      gLabel = t("wall.scope.plusOthers", {
+        defaultValue: "{{first}} + {{n}} autres",
+        first: liveG[0].name,
+        n: liveG.length - 1,
+      });
+    }
+    const gTooltip = liveG.length
+      ? liveG.map((g) => g.name).join(" · ")
+      : t("wall.scope.groupTooltip", { defaultValue: "Audience : groupe personnalisé" });
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-dashed shrink-0 bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40"
+        title={gTooltip}
+      >
+        <Users className="h-2.5 w-2.5" />
+        {gLabel}
+      </span>
+    );
+  }
   if (post.audience_team_ids === null) {
     return (
       <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
@@ -912,6 +986,7 @@ function WallGrouped({
   canPin,
   memberCount,
   teamsById,
+  groupsById,
   onDelete,
   onTogglePin,
 }: {
@@ -923,6 +998,7 @@ function WallGrouped({
   canPin: boolean;
   memberCount: number;
   teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
@@ -1019,7 +1095,7 @@ function WallGrouped({
                   {fmt(d, "d MMM yyyy, HH:mm")}
                 </span>
               )}
-              <AudienceBadge post={p} teamsById={teamsById} />
+              <AudienceBadge post={p} teamsById={teamsById} groupsById={groupsById} />
             </div>
 
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
