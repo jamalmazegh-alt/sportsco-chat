@@ -937,6 +937,7 @@ function WallGrouped({
   canPin,
   memberCount,
   teamsById,
+  groupsById,
   onDelete,
   onTogglePin,
 }: {
@@ -948,6 +949,7 @@ function WallGrouped({
   canPin: boolean;
   memberCount: number;
   teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
