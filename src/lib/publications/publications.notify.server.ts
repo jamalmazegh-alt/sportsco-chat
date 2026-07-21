@@ -150,13 +150,12 @@ export async function dispatchPollEmails(
 
     if (deliveries.length === 0) return { sent: 0, skipped: "no_targets" };
 
-    // 5) Dédup (par recipient row + target user) — plusieurs recipients peuvent
-    //    tomber sur le même parent, on garde un envoi par cible.
+    // 5) Dédup par targetUserId — un utilisateur destinataire via plusieurs
+    //    sujets (ex. subject player + subject user) ne reçoit qu'un e-mail.
     const seen = new Set<string>();
     const unique = deliveries.filter((d) => {
-      const k = `${d.recipientRowId}:${d.targetUserId}`;
-      if (seen.has(k)) return false;
-      seen.add(k);
+      if (seen.has(d.targetUserId)) return false;
+      seen.add(d.targetUserId);
       return true;
     });
 
