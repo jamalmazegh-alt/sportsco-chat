@@ -34,7 +34,8 @@
     "applied": "Anfrage gesendet",
     "confirmed": "Bestätigt",
     "declined": "Bewerbung abgelehnt",
-    "withdrawn": "Zurückgezogen"
+    "withdrawn": "Zurückgezogen",
+    "unavailable": "Nicht verfügbar"
   },
   "seats": {
     "full": "Vollständig besetzt",

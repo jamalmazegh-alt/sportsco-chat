@@ -34,7 +34,8 @@
     "applied": "Aanmelding verzonden",
     "confirmed": "Bevestigd",
     "declined": "Aanmelding geweigerd",
-    "withdrawn": "Ingetrokken"
+    "withdrawn": "Ingetrokken",
+    "unavailable": "Niet beschikbaar"
   },
   "seats": {
     "full": "Volzet",
