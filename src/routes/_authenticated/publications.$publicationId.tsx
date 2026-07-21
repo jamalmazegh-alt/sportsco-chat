@@ -69,6 +69,7 @@ function PublicationDetailPage() {
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState<string | null>(null);
+  const [isChangingVote, setIsChangingVote] = useState(false);
   const [showRecipients, setShowRecipients] = useState(false);
 
   const { data, isLoading } = useQuery({
