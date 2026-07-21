@@ -139,6 +139,8 @@ function PublicationDetailPage() {
     },
     onSuccess: () => {
       toast.success(t("publications:detail.voted", "Vote enregistré"));
+      setIsChangingVote(false);
+      setSelectedOption(null);
       qc.invalidateQueries({ queryKey: ["publication", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
     },
