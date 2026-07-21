@@ -1301,6 +1301,51 @@ function PollCard({ poll }: { poll: PollItem }) {
         {poll.content && (
           <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
         )}
+        {isClosed && poll.options && poll.options.length > 0 && (() => {
+          const total = poll.options.reduce((s, o) => s + o.votes, 0);
+          const belowThreshold =
+            isAnonymous && poll.options.some((o) => o.votes > 0 && o.votes < 3);
+          if (belowThreshold) {
+            return (
+              <p className="text-[11px] text-muted-foreground mt-2 italic">
+                {t("publications:poll.belowThreshold", {
+                  defaultValue: "Pas assez de réponses pour afficher les résultats",
+                })}
+              </p>
+            );
+          }
+          const max = Math.max(1, ...poll.options.map((o) => o.votes));
+          const winner = poll.options.reduce((a, b) => (b.votes > a.votes ? b : a));
+          return (
+            <ul className="mt-2 space-y-1.5">
+              {poll.options.map((o) => {
+                const pct = total === 0 ? 0 : Math.round((o.votes / total) * 100);
+                const isWinner = total > 0 && o.id === winner.id && o.votes > 0;
+                return (
+                  <li key={o.id} className="text-xs">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span className={cn("truncate", isWinner && "font-semibold")}>
+                        {o.label}
+                      </span>
+                      <span className="tabular-nums text-muted-foreground shrink-0">
+                        {o.votes} · {pct}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all",
+                          isWinner ? "bg-primary" : "bg-primary/40",
+                        )}
+                        style={{ width: `${total === 0 ? 0 : (o.votes / max) * 100}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <span className="text-[11px] text-muted-foreground tabular-nums">
             {t("publications:card.voters", {
