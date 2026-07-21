@@ -328,6 +328,15 @@ function NeedRow({
     onError: (e: Error) =>
       toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
+  const reopenM = useMutation({
+    mutationFn: () => reopen({ data: { need_id: need.id } }),
+    onSuccess: () => {
+      toast.success(t("needs:status.reopened", { defaultValue: "Besoin rouvert" }));
+      onChange();
+    },
+    onError: (e: Error) =>
+      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+  });
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
     onSuccess: () => {
