@@ -3,7 +3,24 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Send, Plus, X, Loader2, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Send,
+  Plus,
+  X,
+  Loader2,
+  Search,
+  Users,
+  UserRound,
+  GraduationCap,
+  Shield,
+  Trophy,
+  Tag,
+  UsersRound,
+  UserCheck,
+  type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +28,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +55,8 @@ export const Route = createFileRoute("/_authenticated/publications/new")({
   component: NewPublicationPage,
 });
 
-type ScalarKey = "educateurs" | "dirigeants";
+// Convocation-based audiences are supported in DB/RPC but no longer exposed
+// via this wizard — the wall covers those flows.
 type Audience =
   | { audience_type: "educateurs" }
   | { audience_type: "dirigeants" }
@@ -40,11 +64,31 @@ type Audience =
   | { audience_type: "parents_equipe"; team_id: string }
   | { audience_type: "joueurs_categorie"; category_label: string; season_id: string }
   | { audience_type: "parents_categorie"; category_label: string; season_id: string }
-  | { audience_type: "joueurs_convoques"; event_id: string }
-  | { audience_type: "parents_convoques"; event_id: string }
   | { audience_type: "groupe_personnalise"; group_id: string };
 
+type KindKey = Audience["audience_type"];
+
 type ManualPlayer = { id: string; first_name: string | null; last_name: string | null };
+
+const KIND_META: Record<KindKey, { Icon: LucideIcon }> = {
+  educateurs: { Icon: GraduationCap },
+  dirigeants: { Icon: Shield },
+  joueurs_equipe: { Icon: Trophy },
+  parents_equipe: { Icon: UserRound },
+  joueurs_categorie: { Icon: Tag },
+  parents_categorie: { Icon: UserRound },
+  groupe_personnalise: { Icon: UsersRound },
+};
+
+function needsTeam(k: KindKey) {
+  return k === "joueurs_equipe" || k === "parents_equipe";
+}
+function needsCategory(k: KindKey) {
+  return k === "joueurs_categorie" || k === "parents_categorie";
+}
+function needsGroup(k: KindKey) {
+  return k === "groupe_personnalise";
+}
 
 function NewPublicationPage() {
   const { t } = useTranslation();
@@ -67,6 +111,10 @@ function NewPublicationPage() {
   const [manualPlayers, setManualPlayers] = useState<ManualPlayer[]>([]);
   const [manualQuery, setManualQuery] = useState("");
   const manualMemberIds = useMemo(() => manualPlayers.map((p) => p.id), [manualPlayers]);
+
+  // Add-row state (kind + parameter)
+  const [addKind, setAddKind] = useState<KindKey | "">("");
+  const [addParam, setAddParam] = useState<string>("");
 
   // Teams
   const { data: teams = [] } = useQuery({
@@ -126,31 +174,6 @@ function NewPublicationPage() {
       return Array.from(set).sort();
     },
     enabled: !!activeClubId && !!activeSeason,
-  });
-
-  // Events with convocations (team-scoped)
-  const { data: events = [] } = useQuery({
-    queryKey: ["pub-events", activeClubId],
-    queryFn: async () => {
-      const teamIds = teams.map((t) => t.id);
-      if (teamIds.length === 0) return [];
-      const { data: evs } = await supabase
-        .from("events")
-        .select("id, title, starts_at")
-        .in("team_id", teamIds)
-        .is("deleted_at", null)
-        .order("starts_at", { ascending: false })
-        .limit(200);
-      const list = evs ?? [];
-      if (list.length === 0) return [];
-      const { data: convos } = await supabase
-        .from("convocations")
-        .select("event_id")
-        .in("event_id", list.map((e: any) => e.id));
-      const withConv = new Set((convos ?? []).map((c: any) => c.event_id));
-      return list.filter((e: any) => withConv.has(e.id));
-    },
-    enabled: !!activeClubId && teams.length > 0,
   });
 
   // Player search (manual selection)
@@ -214,7 +237,6 @@ function NewPublicationPage() {
     error: boolean;
   }>({ count: 0, playerCount: 0, userCount: 0, loading: false, error: false });
 
-  // Build a stable key to trigger the debounced fetch
   const previewKey = useMemo(
     () => JSON.stringify({ audiences, manualMemberIds }),
     [audiences, manualMemberIds],
@@ -228,11 +250,9 @@ function NewPublicationPage() {
     }
     setPreview((p) => ({ ...p, loading: true, error: false }));
     const timer = setTimeout(async () => {
-      // Filter out manual audience (dedicated field) if it accidentally landed in the list
       const cleanAudiences = audiences.filter(
         (a) => a.audience_type !== ("selection_manuelle" as unknown as string),
       );
-      // If manual players are set, add the selection_manuelle audience marker for the resolver
       const withManual =
         manualMemberIds.length > 0
           ? [...cleanAudiences, { audience_type: "selection_manuelle" as const }]
@@ -268,44 +288,37 @@ function NewPublicationPage() {
     (publishToWall || sendEmail) &&
     !create.isPending;
 
-  function toggleScalar(k: ScalarKey) {
-    setAudiences((a) => {
-      const has = a.some((x) => x.audience_type === k);
-      return has ? a.filter((x) => x.audience_type !== k) : [...a, { audience_type: k } as Audience];
+  // ---- Audience helpers ----
+  function hasAudience(next: Audience): boolean {
+    return audiences.some((a) => {
+      if (a.audience_type !== next.audience_type) return false;
+      if ("team_id" in next && "team_id" in a) return a.team_id === next.team_id;
+      if ("group_id" in next && "group_id" in a) return a.group_id === next.group_id;
+      if ("category_label" in next && "category_label" in a)
+        return a.category_label === next.category_label && a.season_id === next.season_id;
+      return true;
     });
   }
-  function addTeam(kind: "joueurs_equipe" | "parents_equipe", team_id: string) {
-    if (!team_id) return;
-    if (audiences.some((x: any) => x.audience_type === kind && x.team_id === team_id)) return;
-    setAudiences((a) => [...a, { audience_type: kind, team_id } as Audience]);
+  function addAudience(a: Audience) {
+    if (hasAudience(a)) return;
+    setAudiences((prev) => [...prev, a]);
   }
-  function addGroup(group_id: string) {
-    if (!group_id) return;
-    if (audiences.some((x: any) => x.audience_type === "groupe_personnalise" && x.group_id === group_id)) return;
-    setAudiences((a) => [...a, { audience_type: "groupe_personnalise", group_id }]);
+  function removeAudienceAt(idx: number) {
+    setAudiences((prev) => prev.filter((_, i) => i !== idx));
   }
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  function addCategory(kind: "joueurs_categorie" | "parents_categorie") {
-    if (!selectedCategory || !activeSeason) return;
-    if (
-      audiences.some(
-        (x: any) =>
-          x.audience_type === kind &&
-          x.category_label === selectedCategory &&
-          x.season_id === activeSeason.id,
-      )
-    )
-      return;
-    setAudiences((a) => [
-      ...a,
-      { audience_type: kind, category_label: selectedCategory, season_id: activeSeason.id } as Audience,
-    ]);
+  function toggleScalar(k: "educateurs" | "dirigeants") {
+    if (hasAudience({ audience_type: k })) {
+      setAudiences((prev) => prev.filter((a) => a.audience_type !== k));
+    } else {
+      addAudience({ audience_type: k });
+    }
   }
-  const [selectedEvent, setSelectedEvent] = useState<string>("");
-  function addEvent(kind: "joueurs_convoques" | "parents_convoques") {
-    if (!selectedEvent) return;
-    if (audiences.some((x: any) => x.audience_type === kind && x.event_id === selectedEvent)) return;
-    setAudiences((a) => [...a, { audience_type: kind, event_id: selectedEvent } as Audience]);
+  function toggleGroup(id: string) {
+    const existing = audiences.findIndex(
+      (a) => a.audience_type === "groupe_personnalise" && a.group_id === id,
+    );
+    if (existing >= 0) removeAudienceAt(existing);
+    else addAudience({ audience_type: "groupe_personnalise", group_id: id });
   }
   function addManualPlayer(p: ManualPlayer) {
     if (manualPlayers.some((x) => x.id === p.id)) return;
@@ -314,26 +327,87 @@ function NewPublicationPage() {
   function removeManualPlayer(id: string) {
     setManualPlayers((list) => list.filter((x) => x.id !== id));
   }
-  function removeAudience(idx: number) {
-    setAudiences((a) => a.filter((_, i) => i !== idx));
-  }
 
-  function labelFor(a: Audience): string {
-    if (a.audience_type === "educateurs") return t("publications:audience.types.educateurs");
-    if (a.audience_type === "dirigeants") return t("publications:audience.types.dirigeants");
-    if (a.audience_type === "groupe_personnalise") {
-      const g = groups.find((x) => x.id === (a as any).group_id);
-      return `${t("publications:audience.types.groupe_personnalise")} — ${g?.name ?? ""}`;
+  function submitAdd() {
+    if (!addKind) return;
+    if (needsTeam(addKind)) {
+      if (!addParam) return;
+      addAudience({ audience_type: addKind, team_id: addParam } as Audience);
+    } else if (needsCategory(addKind)) {
+      if (!addParam || !activeSeason) return;
+      addAudience({
+        audience_type: addKind,
+        category_label: addParam,
+        season_id: activeSeason.id,
+      } as Audience);
+    } else if (needsGroup(addKind)) {
+      if (!addParam) return;
+      addAudience({ audience_type: "groupe_personnalise", group_id: addParam });
+    } else {
+      addAudience({ audience_type: addKind } as Audience);
     }
-    if (a.audience_type === "joueurs_categorie" || a.audience_type === "parents_categorie") {
-      return `${t(`publications:audience.types.${a.audience_type}`)} — ${a.category_label}`;
-    }
-    if (a.audience_type === "joueurs_convoques" || a.audience_type === "parents_convoques") {
-      const ev = events.find((x: any) => x.id === (a as any).event_id);
-      return `${t(`publications:audience.types.${a.audience_type}`)} — ${ev?.title ?? ""}`;
-    }
-    const team = teams.find((x) => x.id === (a as any).team_id);
-    return `${t(`publications:audience.types.${a.audience_type}`)} — ${team?.name ?? ""}`;
+    setAddKind("");
+    setAddParam("");
+  }
+  const canAdd =
+    !!addKind &&
+    ((needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind))
+      ? !!addParam
+      : true);
+
+  // Available kinds in the "add" select — filter out already-picked scalars.
+  const availableKinds: KindKey[] = useMemo(() => {
+    const list: KindKey[] = [];
+    if (!hasAudience({ audience_type: "educateurs" })) list.push("educateurs");
+    if (!hasAudience({ audience_type: "dirigeants" })) list.push("dirigeants");
+    if (teams.length > 0) list.push("joueurs_equipe", "parents_equipe");
+    if (activeSeason && categories.length > 0)
+      list.push("joueurs_categorie", "parents_categorie");
+    if (groups.length > 0) list.push("groupe_personnalise");
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audiences, teams, categories, groups, activeSeason]);
+
+  // Recap chips
+  type Chip = { id: string; kind: KindKey; label: string; onRemove: () => void };
+  const chips: Chip[] = useMemo(() => {
+    return audiences.map((a, i) => {
+      const base = t(`publications:audience.types.${a.audience_type}`);
+      let label = base;
+      if ("team_id" in a) {
+        const tm = teams.find((x) => x.id === a.team_id);
+        label = `${base} · ${tm?.name ?? ""}`;
+      } else if ("group_id" in a) {
+        const g = groups.find((x) => x.id === a.group_id);
+        label = `${base} · ${g?.name ?? ""}`;
+      } else if ("category_label" in a) {
+        label = `${base} · ${a.category_label}`;
+      }
+      return {
+        id: `a-${i}-${a.audience_type}`,
+        kind: a.audience_type,
+        label,
+        onRemove: () => removeAudienceAt(i),
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audiences, teams, groups, t]);
+
+  const scalarSuggestions = [
+    {
+      key: "educateurs" as const,
+      Icon: GraduationCap,
+      label: t("publications:audience.types.educateurs"),
+    },
+    {
+      key: "dirigeants" as const,
+      Icon: Shield,
+      label: t("publications:audience.types.dirigeants"),
+    },
+  ];
+
+  function kindLabel(k: KindKey) {
+    return t(`publications:audience.types.${k}`);
   }
 
   return (
@@ -349,110 +423,99 @@ function NewPublicationPage() {
       {step === 1 && (
         <Card>
           <CardContent className="py-5 space-y-4">
-
-
             <div className="space-y-1.5">
               <Label htmlFor="pub-title">
-                {type === "poll" ? t("publications:form.questionLabel") : t("publications:form.titleLabel")}
+                {t("publications:form.questionLabel")}
               </Label>
               <Input
                 id="pub-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={
-                  type === "poll"
-                    ? t("publications:form.questionPlaceholder")
-                    : t("publications:form.titlePlaceholder")
-                }
+                placeholder={t("publications:form.questionPlaceholder")}
               />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="pub-content">
-                {type === "poll"
-                  ? t("publications:form.descriptionLabel")
-                  : t("publications:form.contentLabel")}
+                {t("publications:form.descriptionLabel")}
               </Label>
               <Textarea
                 id="pub-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                rows={type === "poll" ? 3 : 6}
-                placeholder={type === "poll" ? "" : t("publications:form.contentPlaceholder")}
+                rows={3}
               />
             </div>
 
-            {type === "poll" && (
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label>{t("publications:new.pollOptions", "Options")}</Label>
-                  {pollOptions.map((opt, i) => (
-                    <div key={i} className="flex gap-2">
-                      <Input
-                        value={opt}
-                        onChange={(e) => {
-                          const next = [...pollOptions];
-                          next[i] = e.target.value;
-                          setPollOptions(next);
-                        }}
-                        placeholder={`${t("publications:new.option", "Option")} ${i + 1}`}
-                      />
-                      {pollOptions.length > 2 && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setPollOptions(pollOptions.filter((_, k) => k !== i))}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPollOptions([...pollOptions, ""])}
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    {t("publications:new.addOption", "Ajouter une option")}
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{t("publications:new.visibility", "Visibilité des résultats")}</Label>
-                  <RadioGroup
-                    value={pollVisibility}
-                    onValueChange={(v) => setPollVisibility(v as any)}
-                    className="space-y-1.5"
-                  >
-                    <label className="flex items-start gap-2 cursor-pointer">
-                      <RadioGroupItem value="anonymous" id="v-anon" className="mt-0.5" />
-                      <div>
-                        <div>{t("publications:new.visibilityAnon", "Anonyme")}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t(
-                            "publications:new.visibilityAnonDesc",
-                            "Personne, y compris le staff, ne voit qui a voté quoi. Résultats masqués tant que < 3 votes par option.",
-                          )}
-                        </div>
-                      </div>
-                    </label>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                      <RadioGroupItem value="staff_visible" id="v-staff" className="mt-0.5" />
-                      <div>
-                        <div>{t("publications:new.visibilityStaff", "Visible par le staff")}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t(
-                            "publications:new.visibilityStaffDesc",
-                            "Le staff voit qui a voté quoi. Les votants voient uniquement les totaux.",
-                          )}
-                        </div>
-                      </div>
-                    </label>
-                  </RadioGroup>
-                </div>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>{t("publications:new.pollOptions", "Options")}</Label>
+                {pollOptions.map((opt, i) => (
+                  <div key={i} className="flex gap-2">
+                    <Input
+                      value={opt}
+                      onChange={(e) => {
+                        const next = [...pollOptions];
+                        next[i] = e.target.value;
+                        setPollOptions(next);
+                      }}
+                      placeholder={`${t("publications:new.option", "Option")} ${i + 1}`}
+                    />
+                    {pollOptions.length > 2 && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setPollOptions(pollOptions.filter((_, k) => k !== i))}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPollOptions([...pollOptions, ""])}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t("publications:new.addOption", "Ajouter une option")}
+                </Button>
               </div>
-            )}
+
+              <div className="space-y-2">
+                <Label>{t("publications:new.visibility", "Visibilité des résultats")}</Label>
+                <RadioGroup
+                  value={pollVisibility}
+                  onValueChange={(v) => setPollVisibility(v as any)}
+                  className="space-y-1.5"
+                >
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <RadioGroupItem value="anonymous" id="v-anon" className="mt-0.5" />
+                    <div>
+                      <div>{t("publications:new.visibilityAnon", "Anonyme")}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {t(
+                          "publications:new.visibilityAnonDesc",
+                          "Personne, y compris le staff, ne voit qui a voté quoi. Résultats masqués tant que < 3 votes par option.",
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <RadioGroupItem value="staff_visible" id="v-staff" className="mt-0.5" />
+                    <div>
+                      <div>{t("publications:new.visibilityStaff", "Visible par le staff")}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {t(
+                          "publications:new.visibilityStaffDesc",
+                          "Le staff voit qui a voté quoi. Les votants voient uniquement les totaux.",
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+            </div>
 
             <div className="flex justify-end">
               <Button disabled={!canStep1} onClick={() => setStep(2)}>
@@ -466,194 +529,244 @@ function NewPublicationPage() {
 
       {step === 2 && (
         <Card>
-          <CardContent className="py-5 space-y-5">
+          <CardContent className="py-5 space-y-4">
             <div className="space-y-3">
               <Label>{t("publications:new.audienceLabel", "Destinataires")}</Label>
 
-              {/* Scalar (staff) */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant={audiences.some((a) => a.audience_type === "educateurs") ? "default" : "outline"}
-                  onClick={() => toggleScalar("educateurs")}
-                >
-                  {t("publications:audience.types.educateurs")}
-                </Button>
-                <Button
-                  size="sm"
-                  variant={audiences.some((a) => a.audience_type === "dirigeants") ? "default" : "outline"}
-                  onClick={() => toggleScalar("dirigeants")}
-                >
-                  {t("publications:audience.types.dirigeants")}
-                </Button>
+              {/* Sticky recap of picked audiences */}
+              <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
+                {chips.length === 0 && manualPlayers.length === 0 ? (
+                  <div
+                    className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center"
+                    role="status"
+                  >
+                    {t("publications:new.audienceEmpty", "Aucun destinataire sélectionné")}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)]">
+                    <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold">
+                      <UserCheck className="h-3.5 w-3.5" />
+                      {t("publications:audience.selectedTitle", {
+                        defaultValue: "Destinataires sélectionnés",
+                      })}
+                      <span className="ml-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 text-[10px] font-bold">
+                        {chips.length + (manualPlayers.length > 0 ? 1 : 0)}
+                      </span>
+                    </Label>
+                    <div className="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
+                      {chips.map((c) => {
+                        const { Icon } = KIND_META[c.kind];
+                        return (
+                          <span
+                            key={c.id}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white pl-2.5 pr-1 py-1 text-xs font-medium shadow-sm"
+                          >
+                            <Icon className="h-3 w-3" />
+                            <span>{c.label}</span>
+                            <button
+                              type="button"
+                              className="ml-0.5 rounded-full hover:bg-emerald-700/60 p-0.5"
+                              onClick={c.onRemove}
+                              aria-label={t("common.remove", "Retirer")}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        );
+                      })}
+                      {manualPlayers.length > 0 && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white pl-2.5 pr-2.5 py-1 text-xs font-medium shadow-sm">
+                          <Users className="h-3 w-3" />
+                          {t("publications:audience.types.selection_manuelle")} · {manualPlayers.length}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Live counter */}
+                    <div className="mt-2.5" aria-live="polite">
+                      {preview.loading ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground px-2.5 py-1 text-[11px]">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          {t("common.loading", "Chargement…")}
+                        </span>
+                      ) : preview.error ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px]">
+                          {t("publications:audience.previewError", "Aperçu indisponible")}
+                        </span>
+                      ) : preview.count === 0 ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-2.5 py-1 text-[11px] font-medium">
+                          {t("publications:audience.none", "0 destinataire")}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+                          {t("publications:audience.recipientsCount", {
+                            count: preview.count,
+                            defaultValue: "{{count}} destinataires",
+                          })}
+                          <span className="opacity-80 font-normal">
+                            {" · "}
+                            {t("publications:audience.recipientsBreakdown", {
+                              players: preview.playerCount,
+                              users: preview.userCount,
+                              defaultValue: "{{players}} joueurs · {{users}} utilisateurs",
+                            })}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Team */}
-              {teams.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <Label className="text-xs">
-                      {t("publications:audience.types.joueurs_equipe")}
-                    </Label>
-                    <select
-                      className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
-                      defaultValue=""
-                      onChange={(e) => {
-                        addTeam("joueurs_equipe", e.target.value);
-                        e.target.value = "";
-                      }}
-                    >
-                      <option value="" disabled>
-                        {t("publications:new.chooseTeam", "Choisir une équipe…")}
-                      </option>
-                      {teams.map((tm) => (
-                        <option key={tm.id} value={tm.id}>
-                          {tm.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">
-                      {t("publications:audience.types.parents_equipe")}
-                    </Label>
-                    <select
-                      className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
-                      defaultValue=""
-                      onChange={(e) => {
-                        addTeam("parents_equipe", e.target.value);
-                        e.target.value = "";
-                      }}
-                    >
-                      <option value="" disabled>
-                        {t("publications:new.chooseTeam", "Choisir une équipe…")}
-                      </option>
-                      {teams.map((tm) => (
-                        <option key={tm.id} value={tm.id}>
-                          {tm.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Category (season-scoped) */}
-              {activeSeason && categories.length > 0 && (
-                <div className="pt-1 space-y-1">
-                  <Label className="text-xs">
-                    {t("publications:audience.categoryLabel", "Catégorie")}
-                    {" · "}
-                    <span className="text-muted-foreground">{activeSeason.label}</span>
-                  </Label>
-                  <div className="flex gap-2 flex-wrap">
-                    <select
-                      className="flex-1 min-w-[10rem] rounded-md border bg-background px-2 py-1.5 text-sm"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        {t("publications:new.pickCategory", "Choisir une catégorie…")}
-                      </option>
-                      {categories.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!selectedCategory}
-                      onClick={() => addCategory("joueurs_categorie")}
-                    >
-                      {t("publications:new.addPlayersBtn", "+ Joueurs")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!selectedCategory}
-                      onClick={() => addCategory("parents_categorie")}
-                    >
-                      {t("publications:new.addParentsBtn", "+ Parents")}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Convoqués */}
-              {events.length > 0 && (
-                <div className="pt-1 space-y-1">
-                  <Label className="text-xs">
-                    {t("publications:new.pickEvent", "Convoqués d'un événement")}
-                  </Label>
-                  <div className="flex gap-2 flex-wrap">
-                    <select
-                      className="flex-1 min-w-[12rem] rounded-md border bg-background px-2 py-1.5 text-sm"
-                      value={selectedEvent}
-                      onChange={(e) => setSelectedEvent(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        {t("publications:new.pickEvent", "Choisir un événement…")}
-                      </option>
-                      {events.map((ev: any) => (
-                        <option key={ev.id} value={ev.id}>
-                          {ev.title}
-                          {ev.starts_at
-                            ? ` — ${new Date(ev.starts_at).toLocaleDateString()}`
-                            : ""}
-                        </option>
-                      ))}
-                    </select>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!selectedEvent}
-                      onClick={() => addEvent("joueurs_convoques")}
-                    >
-                      {t("publications:new.addPlayersBtn", "+ Joueurs")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!selectedEvent}
-                      onClick={() => addEvent("parents_convoques")}
-                    >
-                      {t("publications:new.addParentsBtn", "+ Parents")}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Groups */}
+              {/* Custom groups quick chips */}
               {groups.length > 0 && (
-                <div className="pt-1">
-                  <Label className="text-xs">
+                <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
+                  <Label className="text-[11px] uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
+                    <UsersRound className="h-3.5 w-3.5" />
                     {t("publications:audience.types.groupe_personnalise")}
                   </Label>
-                  <select
-                    className="w-full mt-1 rounded-md border bg-background px-2 py-1.5 text-sm"
-                    defaultValue=""
-                    onChange={(e) => {
-                      addGroup(e.target.value);
-                      e.target.value = "";
-                    }}
-                  >
-                    <option value="" disabled>
-                      {t("publications:new.chooseGroup", "Choisir un groupe…")}
-                    </option>
-                    {groups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {groups.map((g) => {
+                      const active = audiences.some(
+                        (a) => a.audience_type === "groupe_personnalise" && a.group_id === g.id,
+                      );
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => toggleGroup(g.id)}
+                          aria-pressed={active}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs motion-safe:transition-colors ${
+                            active
+                              ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200"
+                              : "border-border bg-background hover:bg-muted text-foreground"
+                          }`}
+                        >
+                          <UsersRound className="h-3 w-3" />
+                          <span>{g.name}</span>
+                          <Plus className="h-3 w-3 opacity-70" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
+              {/* Staff quick chips */}
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
+                <Label className="text-[11px] uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5" />
+                  {t("publications:audience.staff", { defaultValue: "Staff" })}
+                </Label>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {scalarSuggestions.map((s) => {
+                    const active = hasAudience({ audience_type: s.key });
+                    return (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => toggleScalar(s.key)}
+                        aria-pressed={active}
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs motion-safe:transition-colors ${
+                          active
+                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200"
+                            : "border-border bg-background hover:bg-muted text-foreground"
+                        }`}
+                      >
+                        <s.Icon className="h-3 w-3" />
+                        <span>{s.label}</span>
+                        <Plus className="h-3 w-3 opacity-70" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Generic add row — team / category / group */}
+              <div>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t("publications:audience.addAnother", {
+                    defaultValue: "Ajouter une audience",
+                  })}
+                </Label>
+                <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+                  <Select
+                    value={addKind}
+                    onValueChange={(v) => {
+                      setAddKind(v as KindKey);
+                      setAddParam("");
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("publications:audience.pickKind", {
+                          defaultValue: "Type d'audience",
+                        })}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableKinds
+                        .filter((k) => k !== "educateurs" && k !== "dirigeants")
+                        .map((k) => {
+                          const { Icon } = KIND_META[k];
+                          return (
+                            <SelectItem key={k} value={k}>
+                              <span className="inline-flex items-center gap-2">
+                                <Icon className="h-3.5 w-3.5" />
+                                {kindLabel(k)}
+                              </span>
+                            </SelectItem>
+                          );
+                        })}
+                    </SelectContent>
+                  </Select>
+
+                  {addKind && (needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind)) ? (
+                    <Select value={addParam} onValueChange={setAddParam}>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t("publications:audience.pickParam", {
+                            defaultValue: "Choisir…",
+                          })}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {needsTeam(addKind) &&
+                          teams.map((tm) => (
+                            <SelectItem key={tm.id} value={tm.id}>
+                              {tm.name}
+                            </SelectItem>
+                          ))}
+                        {needsCategory(addKind) &&
+                          categories.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c}
+                              {activeSeason ? ` · ${activeSeason.label}` : ""}
+                            </SelectItem>
+                          ))}
+                        {needsGroup(addKind) &&
+                          groups.map((g) => (
+                            <SelectItem key={g.id} value={g.id}>
+                              {g.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div />
+                  )}
+
+                  <Button type="button" size="sm" disabled={!canAdd} onClick={submitAdd}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    {t("common:add", "Ajouter")}
+                  </Button>
+                </div>
+              </div>
+
               {/* Manual player selection */}
-              <div className="pt-1 space-y-1.5">
-                <Label className="text-xs">
+              <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2.5 space-y-1.5">
+                <Label className="text-[11px] uppercase tracking-wide text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5" />
                   {t("publications:new.pickMembers", "Sélection manuelle (joueurs)")}
                 </Label>
                 <div className="relative">
@@ -697,78 +810,23 @@ function NewPublicationPage() {
                 {manualPlayers.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {manualPlayers.map((p) => (
-                      <Badge key={p.id} variant="secondary" className="gap-1.5">
+                      <span
+                        key={p.id}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 text-white pl-2.5 pr-1 py-1 text-xs font-medium shadow-sm"
+                      >
+                        <UserRound className="h-3 w-3" />
                         {p.first_name} {p.last_name}
-                        <button onClick={() => removeManualPlayer(p.id)}>
+                        <button
+                          type="button"
+                          className="ml-0.5 rounded-full hover:bg-indigo-700/60 p-0.5"
+                          onClick={() => removeManualPlayer(p.id)}
+                          aria-label={t("common.remove", "Retirer")}
+                        >
                           <X className="h-3 w-3" />
                         </button>
-                      </Badge>
+                      </span>
                     ))}
                   </div>
-                )}
-              </div>
-
-              {/* Recap zone */}
-              <div className="pt-2 min-h-[2.5rem] rounded-md border-2 border-dashed border-emerald-500/40 bg-emerald-500/5 p-2 flex flex-wrap gap-1.5">
-                {audiences.length === 0 && manualPlayers.length === 0 ? (
-                  <div className="text-xs text-muted-foreground w-full text-center py-2">
-                    {t("publications:new.audienceEmpty", "Aucun destinataire sélectionné")}
-                  </div>
-                ) : (
-                  <>
-                    {audiences.map((a, i) => (
-                      <Badge key={`a-${i}`} variant="secondary" className="gap-1.5">
-                        {labelFor(a)}
-                        <button onClick={() => removeAudience(i)}>
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                    {manualPlayers.length > 0 && (
-                      <Badge variant="secondary" className="gap-1.5">
-                        {t("publications:audience.types.selection_manuelle")} · {manualPlayers.length}
-                      </Badge>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Live recipients counter */}
-              <div
-                className="rounded-md border bg-muted/40 px-3 py-2 text-sm flex items-center gap-2"
-                aria-live="polite"
-              >
-                {preview.loading ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      {t("common.loading", "Chargement…")}
-                    </span>
-                  </>
-                ) : preview.error ? (
-                  <span className="text-xs text-muted-foreground">
-                    {t("publications:audience.previewError", "Aperçu indisponible")}
-                  </span>
-                ) : audiences.length === 0 && manualMemberIds.length === 0 ? (
-                  <span className="text-muted-foreground">
-                    {t("publications:audience.none", "0 destinataire")}
-                  </span>
-                ) : (
-                  <>
-                    <span className="font-medium">
-                      {t("publications:audience.recipientsCount", {
-                        count: preview.count,
-                        defaultValue: "{{count}} destinataires",
-                      })}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {t("publications:audience.recipientsBreakdown", {
-                        players: preview.playerCount,
-                        users: preview.userCount,
-                        defaultValue: "({{players}} joueurs · {{users}} utilisateurs)",
-                      })}
-                    </span>
-                  </>
                 )}
               </div>
             </div>
