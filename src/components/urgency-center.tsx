@@ -119,6 +119,10 @@ export function UrgencyCenter({ className }: Props) {
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [dismissed, setDismissed] = useState<DismissMap>(() => readDismissed());
   const [expanded, setExpanded] = useState(false);
+  const dispatchResponsePushFn = useServerFn(dispatchConvocationResponsePush);
+  const notifyCoachesEmailFn = useServerFn(notifyCoachesEmail);
+  const applyNeedFn = useServerFn(applyToEventNeed);
+  const declareUnavailableFn = useServerFn(declareUnavailable);
 
   useEffect(() => {
     // Re-prune at mount in case TTL expired since last write.
