@@ -761,6 +761,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
                 {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
               </Link>
             </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/publications">
+                {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+              </Link>
+            </Button>
           </div>
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
