@@ -1678,6 +1678,13 @@ function StaffSignupsDialog({
             const checked = selected.has(s.id);
             const name = s.profile?.full_name ?? t("common.unknown");
             const sublineParts: React.ReactNode[] = [];
+            const ctxSubline = formatMemberContextSubline(s.context, {
+              playerSubline: (c) => t("common:person.playerSubline", { category: c }),
+              playerSublineMulti: (c) =>
+                t("common:person.playerSublineMulti", { categories: c }),
+              parentSubline: (c) => t("common:person.parentSubline", { children: c }),
+            });
+            if (ctxSubline) sublineParts.push(<span key="ctx">{ctxSubline}</span>);
             sublineParts.push(t(`needs:signup.${s.status}`));
             if (s.license_number) {
               sublineParts.push(
