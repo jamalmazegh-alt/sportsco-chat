@@ -362,6 +362,10 @@ interface DeckProps {
     item: UrgencyItem,
     status: "present" | "uncertain" | "absent",
   ) => void | Promise<void>;
+  onNeedRespond: (
+    item: UrgencyItem,
+    choice: "available" | "unavailable",
+  ) => void | Promise<void>;
   onDismiss: (id: string) => void;
   onRefresh: () => void;
   className?: string;
@@ -376,6 +380,7 @@ function UrgencyDeck({
   busyIds,
   onAction,
   onQuickRespond,
+  onNeedRespond,
   onDismiss,
   onRefresh,
   className,
