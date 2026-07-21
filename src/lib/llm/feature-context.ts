@@ -40,6 +40,9 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Défis et tests physiques : gamification et suivi de la condition physique.
 - Statistiques (présence, résultats) : pilotage de la saison.
 - Covoiturage par événement : logistique simplifiée pour les parents.
+- Coups de main (besoins bénévoles par événement) : le coach publie un besoin (transport, goûter, arbitrage, matériel...) ciblé sur une audience (équipe, parents, groupe), les membres se portent volontaires en un clic, suivi des candidatures et des places restantes, réouverture possible d'un besoin clôturé.
+- Disponibilités & encadrement du staff : les coachs et adjoints déclarent leurs indisponibilités (période + motif optionnel masqué aux non-gestionnaires) ; vue équipe des dispos ; assignation d'un coach à un événement (staff équipe ou renfort du club) avec badge de couverture (🟢 encadrement OK / 🔴 aucun coach dispo), alertes automatiques en cas de conflit et remontée dans le centre d'urgences.
+- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe ou tout le club, un seul vote par utilisateur, résultats en direct.
 
 ### Effectif & joueurs
 - Fiche joueur (avatar, historique, feedback, sanctions) : carnet de vie sportif.
@@ -131,6 +134,9 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Physical challenges and tests: gamification and fitness tracking.
 - Statistics (attendance, results): season steering.
 - Event carpooling: simplified logistics for parents.
+- Team helpers (volunteer needs per event): the coach publishes a need (transport, snack, refereeing, equipment...) targeted to an audience (team, parents, group), members sign up in one click, applications and remaining slots are tracked, and a closed need can be reopened.
+- Staff availabilities & event coverage: coaches and assistant coaches declare unavailabilities (period + optional reason hidden from non-managers); team availability view; assign a coach to an event (team staff or club reinforcement) with a coverage badge (🟢 staff OK / 🔴 no coach available), automatic conflict alerts and surfacing in the urgency centre.
+- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group or the whole club, one vote per user, live results.
 
 ### Roster & players
 - Player profile (avatar, history, feedback, sanctions): a sporting life record.
