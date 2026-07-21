@@ -134,6 +134,9 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Physical challenges and tests: gamification and fitness tracking.
 - Statistics (attendance, results): season steering.
 - Event carpooling: simplified logistics for parents.
+- Team helpers (volunteer needs per event): the coach publishes a need (transport, snack, refereeing, equipment...) targeted to an audience (team, parents, group), members sign up in one click, applications and remaining slots are tracked, and a closed need can be reopened.
+- Staff availabilities & event coverage: coaches and assistant coaches declare unavailabilities (period + optional reason hidden from non-managers); team availability view; assign a coach to an event (team staff or club reinforcement) with a coverage badge (🟢 staff OK / 🔴 no coach available), automatic conflict alerts and surfacing in the urgency centre.
+- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group or the whole club, one vote per user, live results.
 
 ### Roster & players
 - Player profile (avatar, history, feedback, sanctions): a sporting life record.
