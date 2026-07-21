@@ -8455,6 +8455,10 @@ export type Database = {
         Returns: boolean
       }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
+      viewer_is_publication_recipient: {
+        Args: { _publication_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
