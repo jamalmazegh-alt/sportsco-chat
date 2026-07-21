@@ -37,7 +37,12 @@ import {
 } from "@/lib/publications/publications.functions";
 
 
+const SearchSchema = z.object({
+  vote: z.string().uuid().optional(),
+});
+
 export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
+  validateSearch: (search) => SearchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Publication · Clubero" },
