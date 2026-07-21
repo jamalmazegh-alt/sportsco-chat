@@ -142,15 +142,30 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
       if (groupIds.length) {
         const { data: gm } = await supabaseAdmin
           .from("club_group_members")
-          .select("member_id, club_members:member_id(user_id, player_id)")
+          .select("member_id, club_members:member_id(user_id)")
           .in("group_id", groupIds);
+        const groupUserIds = new Set<string>();
         for (const row of gm ?? []) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const cm = (row as any).club_members;
           const uid = cm?.user_id as string | null;
-          const pid = cm?.player_id as string | null;
-          if (uid) recipientUserSet.add(uid);
-          if (pid) playerIds.add(pid);
+          if (uid) {
+            recipientUserSet.add(uid);
+            groupUserIds.add(uid);
+          }
+        }
+        // Routage mineur des membres de groupe : mapper user_ids → players
+        // (players.user_id) pour permettre le check player_is_minor plus bas.
+        if (groupUserIds.size > 0) {
+          const { data: playersFromUsers } = await supabaseAdmin
+            .from("players")
+            .select("id, user_id")
+            .in("user_id", Array.from(groupUserIds));
+          for (const p of playersFromUsers ?? []) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const pid = (p as any).id as string | null;
+            if (pid) playerIds.add(pid);
+          }
         }
       }
     }
