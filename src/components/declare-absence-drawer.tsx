@@ -212,7 +212,7 @@ export function DeclareAbsenceDrawer({
       case "meeting":
         return Users;
       default:
-        return Calendar;
+        return CalendarIcon;
     }
   }
 
