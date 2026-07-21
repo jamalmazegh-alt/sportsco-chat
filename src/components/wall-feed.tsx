@@ -758,6 +758,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         canPin={canPost}
         memberCount={memberCount}
         teamsById={teamsById}
+        groupsById={groupsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
