@@ -270,8 +270,8 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
         null;
     }
 
-    const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
-    const wallUrl = `${baseUrl}/inbox#${postId}`;
+    const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
+    const wallUrl = `${baseUrl}/inbox?post=${postId}`;
 
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
 
