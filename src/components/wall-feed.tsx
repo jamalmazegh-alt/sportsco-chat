@@ -210,6 +210,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       }
     }
+    // Fetch names for groups referenced by these posts (RLS-scoped).
+    const groupIdSet = new Set<string>();
+    for (const p of ps) {
+      if (p.audience_group_ids) for (const gid of p.audience_group_ids) groupIdSet.add(gid);
+    }
+    if (groupIdSet.size > 0) {
+      const { data: gRows } = await supabase
+        .from("club_groups")
+        .select("id, name")
+        .in("id", Array.from(groupIdSet));
+      setPostGroups((gRows ?? []) as Group[]);
+    } else {
+      setPostGroups([]);
+    }
     // Total club members (denominator for "Lu par X/Y")
     const { count } = await supabase
       .from("club_members")
@@ -219,6 +233,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     setPosts(ps);
     setLoading(false);
   }
+
 
   useEffect(() => {
     load(); /* eslint-disable-next-line */
