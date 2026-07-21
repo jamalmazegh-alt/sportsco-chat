@@ -22,6 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
+import { format } from "date-fns";
+import { fr as frLocale, enUS } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -34,8 +39,9 @@ import {
   Swords,
   Dumbbell,
   Trophy,
-  Calendar,
+  Calendar as CalendarIcon,
 } from "lucide-react";
+
 
 type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
 
