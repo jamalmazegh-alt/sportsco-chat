@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
+import { StaffAvailabilityForTeamMonth } from "@/components/staff-availability";
+import { useIsCoach } from "@/lib/auth-context";
 import {
   Select,
   SelectContent,
@@ -94,12 +96,14 @@ function TeamAvailabilityCalendar() {
   const monthStartStr = ymd(monthStart);
   const monthEndStr = ymd(monthEnd);
 
+  const isCoach = useIsCoach();
+
   const { data: team } = useQuery({
     queryKey: ["team-basic", teamId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teams")
-        .select("id, name")
+        .select("id, name, club_id")
         .eq("id", teamId)
         .single();
       if (error) throw error;
@@ -391,6 +395,15 @@ function TeamAvailabilityCalendar() {
           )}
         </CardContent>
       </Card>
+
+      {isCoach && team?.club_id && (
+        <StaffAvailabilityForTeamMonth
+          teamId={teamId}
+          clubId={team.club_id}
+          cursor={cursor}
+          days={days}
+        />
+      )}
 
       {/* Legend */}
       <div className="flex flex-wrap gap-2 items-center text-xs">
