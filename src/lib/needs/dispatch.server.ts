@@ -133,7 +133,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, club_id, event_id, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name))",
+      "id, label, club_id, event_id, created_by, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name, clubs:club_id(name)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
