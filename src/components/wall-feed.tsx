@@ -1046,7 +1046,7 @@ function WallGrouped({
                   {fmt(d, "d MMM yyyy, HH:mm")}
                 </span>
               )}
-              <AudienceBadge post={p} teamsById={teamsById} />
+              <AudienceBadge post={p} teamsById={teamsById} groupsById={groupsById} />
             </div>
 
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
