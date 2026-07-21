@@ -71,6 +71,7 @@ import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
+import { StaffAvailabilityForEvent } from "@/components/staff-availability";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
