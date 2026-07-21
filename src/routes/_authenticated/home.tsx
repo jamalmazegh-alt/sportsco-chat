@@ -402,9 +402,10 @@ function HomePage() {
                               {e.title}
                             </p>
                           </div>
-                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
+                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                            {formatWhen(new Date(e.starts_at))}
+                            <span>{formatWhen(new Date(e.starts_at))}</span>
+                            {(e as any).team_name && <span>· {(e as any).team_name}</span>}
                             {e.location && (
                               <>
                                 <span>·</span>
