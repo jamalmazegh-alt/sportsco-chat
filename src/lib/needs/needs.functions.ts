@@ -600,6 +600,35 @@ export const closeEventNeed = createServerFn({ method: "POST" })
     return { ok: true, declined_count: pendingApplied?.length ?? 0 };
   });
 
+/* ------------------------------------------------------------------------ */
+/* 6bis. reopenEventNeed — rouvre un besoin fermé (sans cascade decline)     */
+/* ------------------------------------------------------------------------ */
+
+export const reopenEventNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => NeedIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+    if (need.status !== "closed") throw new Error("need_not_closed");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("event_needs")
+      .update({ status: "open" })
+      .eq("id", data.need_id);
+    if (error) throw new Error(error.message);
+
+    await recomputeCoverageServiceRole(need.event_id);
+    return { ok: true };
+  });
+
+
 export const cancelEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => NeedIdInput.parse(input))
