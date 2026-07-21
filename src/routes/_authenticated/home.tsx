@@ -48,6 +48,25 @@ function formatWhen(d: Date) {
   return `${label} · ${fmt(d, "HH:mm")}`;
 }
 
+function formatHomeEventTitle(event: {
+  type?: string | null;
+  title: string;
+  team_name?: string | null;
+  opponent?: string | null;
+  is_home?: boolean | null;
+}) {
+  const teamName = event.team_name?.trim();
+  if (event.type !== "match" || !teamName) return event.title;
+  if (event.title.toLowerCase().includes(teamName.toLowerCase())) return event.title;
+
+  const opponent = event.opponent?.trim();
+  if (opponent) return event.is_home === false ? `${opponent} vs ${teamName}` : `${teamName} vs ${opponent}`;
+
+  const title = event.title.trim();
+  if (/^(vs|contre)\b/i.test(title)) return `${teamName} ${title}`;
+  return `${teamName} · ${event.title}`;
+}
+
 function formatPaymentAmount(cents: number, currency: string | null | undefined, locale: string) {
   const code = (currency || "eur").toUpperCase();
   try {
@@ -102,7 +121,7 @@ function HomePage() {
       const teamIds = teams.map((t) => t.id);
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id")
+        .select("id, title, starts_at, location, type, status, team_id, opponent, is_home")
         .in("team_id", teamIds)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -143,7 +162,7 @@ function HomePage() {
       const { data } = await supabase
         .from("convocations")
         .select(
-          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id)",
+          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id, opponent, is_home)",
         )
         .in("player_id", playerIds)
         .order("created_at", { ascending: false });
@@ -399,7 +418,7 @@ function HomePage() {
                                 isFirst ? "text-[15px]" : "text-sm",
                               )}
                             >
-                              {e.title}
+                              {formatHomeEventTitle(e as any)}
                             </p>
                           </div>
                           <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
@@ -674,7 +693,7 @@ function HomePage() {
                                     isCancelled && "line-through text-red-700 dark:text-red-300",
                                   )}
                                 >
-                                  {e.title}
+                                  {formatHomeEventTitle(e as any)}
                                 </p>
                                 {isCancelled ? (
                                   <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
