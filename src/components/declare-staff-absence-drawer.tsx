@@ -11,7 +11,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -21,6 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
+import { format } from "date-fns";
+import { fr as frLocale, enUS } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -34,7 +38,9 @@ import {
   CircleDashed,
   Eye,
   EyeOff,
+  Calendar as CalendarIcon,
 } from "lucide-react";
+
 
 type Reason = "vacation" | "injury" | "school" | "family" | "work" | "other";
 type Certainty = "confirmed" | "tentative";
