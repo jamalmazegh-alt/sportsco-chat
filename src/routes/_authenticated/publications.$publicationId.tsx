@@ -55,6 +55,8 @@ export const Route = createFileRoute("/_authenticated/publications/$publicationI
 function PublicationDetailPage() {
   const { t } = useTranslation();
   const { publicationId } = Route.useParams();
+  const search = Route.useSearch();
+  const voteIntent = search.vote ?? null;
   const nav = useNavigate();
   const qc = useQueryClient();
 
