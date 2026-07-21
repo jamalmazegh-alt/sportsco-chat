@@ -329,6 +329,7 @@ export function UrgencyCenter({ className }: Props) {
       busyIds={busyIds}
       onAction={handleAction}
       onQuickRespond={handleQuickRespond}
+      onNeedRespond={handleNeedRespond}
       onDismiss={(id) => {
         dismissItem(id);
       }}
