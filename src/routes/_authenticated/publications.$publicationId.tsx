@@ -319,7 +319,15 @@ function PublicationDetailPage() {
                     onClick={() => selectedOption && vote.mutate(selectedOption)}
                   >
                     {vote.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                    {t("publications:detail.vote", "Voter")}
+                    {(() => {
+                      const selectedLabel = options.find((o) => o.id === selectedOption)?.label;
+                      if (voteIntentIsValid && selectedOption === voteIntent && selectedLabel) {
+                        return t("publications:detail.confirmVote", "Confirmer : {{option}}", {
+                          option: selectedLabel,
+                        });
+                      }
+                      return t("publications:detail.vote", "Voter");
+                    })()}
                   </Button>
                 </>
               ) : (
