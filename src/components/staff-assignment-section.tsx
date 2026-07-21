@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { dispatchStaffAssignmentPush } from "@/lib/push-dispatch.functions";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -195,12 +196,17 @@ export function StaffAssignmentSection({
         .from("event_staff_assignments")
         .insert({ event_id: eventId, user_id: userId, assigned_by: user?.id ?? null });
       if (error) throw error;
+      return userId;
     },
-    onSuccess: () => {
+    onSuccess: (userId) => {
       toast.success(
         t("staffAssignment.assigned", { defaultValue: "Coach assigné" }),
       );
       qc.invalidateQueries({ queryKey: ["event-staff-assignments", eventId] });
+      // Fire-and-forget push
+      dispatchStaffAssignmentPush({
+        data: { eventId, userId, action: "assigned" },
+      }).catch((e) => console.warn("[staff] assign push failed", (e as Error).message));
     },
     onError: (e: any) => {
       const msg = String(e?.message ?? "");
@@ -225,12 +231,16 @@ export function StaffAssignmentSection({
         .eq("event_id", eventId)
         .eq("user_id", userId);
       if (error) throw error;
+      return userId;
     },
-    onSuccess: () => {
+    onSuccess: (userId) => {
       toast.success(
         t("staffAssignment.removed", { defaultValue: "Coach retiré" }),
       );
       qc.invalidateQueries({ queryKey: ["event-staff-assignments", eventId] });
+      dispatchStaffAssignmentPush({
+        data: { eventId, userId, action: "unassigned" },
+      }).catch((e) => console.warn("[staff] unassign push failed", (e as Error).message));
     },
     onError: (e: any) => toast.error(String(e?.message ?? "Erreur")),
   });
