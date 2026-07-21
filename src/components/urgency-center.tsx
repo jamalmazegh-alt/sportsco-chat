@@ -611,6 +611,57 @@ function UrgencyDeck({
                                 {t("attendance.absent", { defaultValue: "Absent" })}
                               </Button>
                             </div>
+                          ) : item.primaryAction.kind === "open-need" ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Button
+                                size="sm"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNeedRespond(item, "available");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
+                                style={{
+                                  background:
+                                    "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                }}
+                              >
+                                {busy ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <ThumbsUp className="h-3.5 w-3.5" strokeWidth={2.6} />
+                                )}
+                                {t("needs:insight.available", { defaultValue: "Dispo" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNeedRespond(item, "unavailable");
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2.5 border-[1.5px] text-[#b91c1c] hover:text-[#b91c1c]"
+                              >
+                                <ThumbsDown className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                {t("needs:insight.unavailable", { defaultValue: "Pas dispo" })}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onAction(item);
+                                }}
+                                disabled={busy || !isTop}
+                                className="h-8 px-2 text-[11px]"
+                              >
+                                {t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                              </Button>
+                            </div>
                           ) : (
                             <Button
                               size="sm"
