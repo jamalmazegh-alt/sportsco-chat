@@ -1248,7 +1248,7 @@ function WallGrouped({
           </ul>
         </section>
       ))}
-      {polls.length > 0 && (
+      {(polls.length > 0 || posts.length > 0) && (
         <div className="pt-2 text-center">
           <Link to="/publications" className="text-xs text-primary hover:underline">
             {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
