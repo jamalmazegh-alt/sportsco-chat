@@ -114,6 +114,7 @@ import { Route as AuthenticatedPublicationsNewRouteImport } from './routes/_auth
 import { Route as AuthenticatedPublicationsPublicationIdRouteImport } from './routes/_authenticated/publications.$publicationId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
+import { Route as AuthenticatedProfileAvailabilitiesRouteImport } from './routes/_authenticated/profile/availabilities'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_authenticated/payments.receipts'
 import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
@@ -730,6 +731,12 @@ const AuthenticatedProfilePasswordRoute =
     path: '/password',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedProfileAvailabilitiesRoute =
+  AuthenticatedProfileAvailabilitiesRouteImport.update({
+    id: '/availabilities',
+    path: '/availabilities',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdRoute =
   AuthenticatedPlayersPlayerIdRouteImport.update({
     id: '/players/$playerId',
@@ -1177,6 +1184,7 @@ export interface FileRoutesByFullPath {
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
@@ -1341,6 +1349,7 @@ export interface FileRoutesByTo {
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
@@ -1512,6 +1521,7 @@ export interface FileRoutesById {
   '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/_authenticated/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/_authenticated/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
@@ -1683,6 +1693,7 @@ export interface FileRouteTypes {
     | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/availabilities'
     | '/profile/password'
     | '/profile/privacy'
     | '/publications/$publicationId'
@@ -1847,6 +1858,7 @@ export interface FileRouteTypes {
     | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/availabilities'
     | '/profile/password'
     | '/profile/privacy'
     | '/publications/$publicationId'
@@ -2017,6 +2029,7 @@ export interface FileRouteTypes {
     | '/_authenticated/payments/family'
     | '/_authenticated/payments/receipts'
     | '/_authenticated/players/$playerId'
+    | '/_authenticated/profile/availabilities'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/publications/$publicationId'
@@ -2940,6 +2953,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePasswordRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/profile/availabilities': {
+      id: '/_authenticated/profile/availabilities'
+      path: '/availabilities'
+      fullPath: '/profile/availabilities'
+      preLoaderRoute: typeof AuthenticatedProfileAvailabilitiesRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/players/$playerId': {
       id: '/_authenticated/players/$playerId'
       path: '/players/$playerId'
@@ -3485,12 +3505,15 @@ const AuthenticatedPaymentsRouteWithChildren =
   )
 
 interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfileAvailabilitiesRoute: typeof AuthenticatedProfileAvailabilitiesRoute
   AuthenticatedProfilePasswordRoute: typeof AuthenticatedProfilePasswordRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfileAvailabilitiesRoute:
+    AuthenticatedProfileAvailabilitiesRoute,
   AuthenticatedProfilePasswordRoute: AuthenticatedProfilePasswordRoute,
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
