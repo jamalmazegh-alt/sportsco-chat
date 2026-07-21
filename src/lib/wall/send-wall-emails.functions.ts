@@ -38,14 +38,25 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1) Charger le post + flag send_email
-    const { data: post } = await supabaseAdmin
+    // 1) Charger le post + flag send_email.
+    // Important: wall_posts.club_id n'a pas de FK DB vers clubs, donc pas de
+    // select imbriqué `clubs:club_id(...)` ici (sinon PostgREST renvoie une
+    // erreur et `data` reste null, ce qui masquait l'envoi en not_flagged).
+    const { data: post, error: postError } = await supabaseAdmin
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, audience_type, audience_team_ids, audience_group_ids, send_email, clubs:club_id(name, default_language)",
+        "id, club_id, author_user_id, body, audience_type, audience_team_ids, audience_group_ids, send_email",
       )
       .eq("id", postId)
       .maybeSingle();
+    if (postError) {
+      console.error("[wall-message] post load failed", {
+        postId,
+        code: postError.code,
+        message: postError.message,
+      });
+      return { sent: 0, skipped: "post_load_failed" as const };
+    }
     if (!post || !post.send_email) return { sent: 0, skipped: "not_flagged" as const };
 
     // Contrôle simple : l'appelant doit être l'auteur (la publication passe par RLS d'insert de toute façon).
@@ -61,10 +72,13 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clubName = ((post as any).clubs?.name as string | null) ?? null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clubDefaultLang = ((post as any).clubs?.default_language as string | null) ?? null;
+    const { data: club } = await supabaseAdmin
+      .from("clubs")
+      .select("name, default_language")
+      .eq("id", post.club_id)
+      .maybeSingle();
+    const clubName = ((club as any)?.name as string | null) ?? null;
+    const clubDefaultLang = ((club as any)?.default_language as string | null) ?? null;
 
     const audienceType = post.audience_type as
       | "club"
