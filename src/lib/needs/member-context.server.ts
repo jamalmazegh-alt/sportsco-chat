@@ -128,7 +128,7 @@ export async function buildMemberContextByUser(
       playerUserIds.push(p.id);
     }
   }
-  console.log("DBG playerUserIds", playerUserIds, "playerIdByUser", Array.from(playerIdByUser.entries()));if (playerUserIds.length > 0) {
+  if (playerUserIds.length > 0) {
     const { data: playerTm } = await supabaseAdmin
       .from("team_members")
       .select("player_id, team_id")
@@ -143,7 +143,7 @@ export async function buildMemberContextByUser(
         teamsByPlayerId.set(r.player_id, new Set());
       teamsByPlayerId.get(r.player_id)!.add(r.team_id);
     }
-    console.log("DBG teamsByPlayerId", Array.from(teamsByPlayerId.entries()).map(([k,v])=>[k,Array.from(v)]));for (const [uid, pid] of playerIdByUser.entries()) {
+    for (const [uid, pid] of playerIdByUser.entries()) {
       const tset = teamsByPlayerId.get(pid);
       if (!tset) continue;
       if (!playerTeamsByUser.has(uid)) playerTeamsByUser.set(uid, new Set());
@@ -217,7 +217,7 @@ export async function buildMemberContextByUser(
     let children: Array<{ name: string; category: string | null }> = [];
     let coached: Array<{ name: string; age_group: string | null }> = [];
 
-    console.log("DBG member",uid,"primary",primary,"playerTeamsByUser",Array.from(playerTeamsByUser.entries()).map(([k,v])=>[k,Array.from(v)]),"teamById",Array.from(teamById.entries()));if (primary === "player") {
+    if (primary === "player") {
       const tids = playerTeamsByUser.get(uid);
       if (tids) {
         const cats = Array.from(tids)

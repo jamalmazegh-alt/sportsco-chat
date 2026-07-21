@@ -80,7 +80,7 @@ function makeAdmin(data: {
 describe("buildMemberContextByUser — fallback players.team_id", () => {
   it("joueur avec user_id dans players + team_members(player_id) mais SANS team_members(user_id) : catégorie résolue", async () => {
     const admin = makeAdmin({
-      teams: [{ id: "t-u15", name: "U15 A", age_group: "U15" }],
+      teams: [{ id: "t-u15", name: "U15 A", age_group: "U15", club_id: "club-1" } as any],
       teamMembersByUser: [], // <— vide : joueur absent de cette source
       parentLinks: [],
       players: [
@@ -111,7 +111,7 @@ import { buildMemberContextByUser as bmc } from "@/lib/needs/member-context.serv
 describe("debug", () => {
   it("logs", async () => {
     const admin = makeAdmin({
-      teams: [{ id: "t-u15", name: "U15 A", age_group: "U15" }],
+      teams: [{ id: "t-u15", name: "U15 A", age_group: "U15", club_id: "club-1" } as any],
       teamMembersByUser: [],
       parentLinks: [],
       players: [{ id: "p1", user_id: "u-adam", first_name:"A", last_name:"M", club_id: "club-1", deleted_at: null }],
