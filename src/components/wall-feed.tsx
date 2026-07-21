@@ -66,6 +66,7 @@ type Post = {
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
 };
+type PollOptionResult = { id: string; label: string; votes: number };
 type PollItem = {
   id: string;
   publication_type: string;
@@ -75,6 +76,7 @@ type PollItem = {
   published_at: string | null;
   closed_at: string | null;
   voter_count?: number;
+  options?: PollOptionResult[];
 };
 
 const SOURCE_META: Record<
@@ -257,14 +259,50 @@ export function WallFeed({ clubId }: { clubId: string }) {
         const ids = list.map((p) => p.id);
         const { data: votes } = await supabase
           .from("club_poll_votes")
-          .select("publication_id")
+          .select("publication_id, option_id")
           .in("publication_id", ids);
         const counts = new Map<string, number>();
-        for (const v of (votes ?? []) as { publication_id: string }[]) {
+        const perOption = new Map<string, Map<string, number>>();
+        for (const v of (votes ?? []) as { publication_id: string; option_id: string }[]) {
           counts.set(v.publication_id, (counts.get(v.publication_id) ?? 0) + 1);
+          let m = perOption.get(v.publication_id);
+          if (!m) {
+            m = new Map();
+            perOption.set(v.publication_id, m);
+          }
+          m.set(v.option_id, (m.get(v.option_id) ?? 0) + 1);
+        }
+        // Fetch options for closed polls so we can render inline results.
+        const closedIds = list.filter((p) => !!p.closed_at).map((p) => p.id);
+        const optionsByPoll = new Map<string, PollOptionResult[]>();
+        if (closedIds.length > 0) {
+          const { data: opts } = await supabase
+            .from("club_poll_options")
+            .select("id, publication_id, label, sort_order")
+            .in("publication_id", closedIds)
+            .order("sort_order", { ascending: true });
+          for (const o of (opts ?? []) as {
+            id: string;
+            publication_id: string;
+            label: string;
+          }[]) {
+            const arr = optionsByPoll.get(o.publication_id) ?? [];
+            arr.push({
+              id: o.id,
+              label: o.label,
+              votes: perOption.get(o.publication_id)?.get(o.id) ?? 0,
+            });
+            optionsByPoll.set(o.publication_id, arr);
+          }
         }
         if (!cancelled) {
-          setPolls(list.map((p) => ({ ...p, voter_count: counts.get(p.id) ?? 0 })));
+          setPolls(
+            list.map((p) => ({
+              ...p,
+              voter_count: counts.get(p.id) ?? 0,
+              options: optionsByPoll.get(p.id),
+            })),
+          );
         }
       } catch {
         if (!cancelled) setPolls([]);
@@ -721,6 +759,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
               <Link to="/publications/new">
                 <BarChart3 className="h-4 w-4 mr-1.5" />
                 {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/publications">
+                {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
               </Link>
             </Button>
           </div>
@@ -1210,7 +1253,7 @@ function WallGrouped({
           </ul>
         </section>
       ))}
-      {polls.length > 0 && (
+      {(polls.length > 0 || posts.length > 0) && (
         <div className="pt-2 text-center">
           <Link to="/publications" className="text-xs text-primary hover:underline">
             {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
@@ -1263,6 +1306,51 @@ function PollCard({ poll }: { poll: PollItem }) {
         {poll.content && (
           <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
         )}
+        {isClosed && poll.options && poll.options.length > 0 && (() => {
+          const total = poll.options.reduce((s, o) => s + o.votes, 0);
+          const belowThreshold =
+            isAnonymous && poll.options.some((o) => o.votes > 0 && o.votes < 3);
+          if (belowThreshold) {
+            return (
+              <p className="text-[11px] text-muted-foreground mt-2 italic">
+                {t("publications:poll.belowThreshold", {
+                  defaultValue: "Pas assez de réponses pour afficher les résultats",
+                })}
+              </p>
+            );
+          }
+          const max = Math.max(1, ...poll.options.map((o) => o.votes));
+          const winner = poll.options.reduce((a, b) => (b.votes > a.votes ? b : a));
+          return (
+            <ul className="mt-2 space-y-1.5">
+              {poll.options.map((o) => {
+                const pct = total === 0 ? 0 : Math.round((o.votes / total) * 100);
+                const isWinner = total > 0 && o.id === winner.id && o.votes > 0;
+                return (
+                  <li key={o.id} className="text-xs">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span className={cn("truncate", isWinner && "font-semibold")}>
+                        {o.label}
+                      </span>
+                      <span className="tabular-nums text-muted-foreground shrink-0">
+                        {o.votes} · {pct}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all",
+                          isWinner ? "bg-primary" : "bg-primary/40",
+                        )}
+                        style={{ width: `${total === 0 ? 0 : (o.votes / max) * 100}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <span className="text-[11px] text-muted-foreground tabular-nums">
             {t("publications:card.voters", {
