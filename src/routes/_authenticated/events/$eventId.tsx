@@ -4246,6 +4246,16 @@ function EventDetail() {
         </section>
       )}
 
+      {isCoach && event?.team_id && eventTeam?.club_id && eventDateStr && (
+        <StaffAvailabilityForEvent
+          teamId={event.team_id}
+          clubId={eventTeam.club_id}
+          date={eventDateStr}
+        />
+      )}
+
+
+
       <ConvocationDetailDialog
         open={!!detailConvocId}
         onOpenChange={(o) => !o && setDetailConvocId(null)}
