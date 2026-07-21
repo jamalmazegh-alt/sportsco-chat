@@ -199,9 +199,9 @@ export async function dispatchPollEmails(
         await enqueueTransactionalEmailServer({
           templateName: "publication-poll",
           recipientEmail: email,
-          idempotencyKey: `poll-${dispatchRowId}-${d.recipientRowId}-${d.targetUserId}`,
+          idempotencyKey: `poll-${dispatchRowId}-${d.targetUserId}`,
           dispatchId: dispatchRowId,
-          recipientId: `${d.recipientRowId}:${d.targetUserId}`,
+          recipientId: d.targetUserId,
           notificationType: "publication_poll",
           fromName: clubName ? `${clubName} via Clubero` : undefined,
           templateData: {
