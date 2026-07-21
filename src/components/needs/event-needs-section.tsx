@@ -93,6 +93,7 @@ import {
   declareUnavailable,
   decideSignup,
   closeEventNeed,
+  reopenEventNeed,
   cancelEventNeed,
   deleteEventNeed,
   previewEventNeedAudience,
