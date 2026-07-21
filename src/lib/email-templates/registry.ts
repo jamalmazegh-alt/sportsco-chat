@@ -94,6 +94,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "camp-document-resubmitted": campDocumentResubmittedTemplate,
   "event-need-invite": eventNeedInviteTemplate,
   "event-need-decision": eventNeedDecisionTemplate,
+  "event-need-signup": eventNeedSignupTemplate,
   "wall-message": wallMessageTemplate,
   "publication-poll": publicationPollTemplate,
 };
