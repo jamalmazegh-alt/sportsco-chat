@@ -261,11 +261,54 @@ export function UrgencyCenter({ className }: Props) {
         return;
       }
       toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
+      // Fire-and-forget push + email — same as events/$eventId.tsx flow.
+      void dispatchResponsePushFn({ data: { convocationId } }).catch(() => {});
+      if (status === "absent" || status === "uncertain") {
+        void notifyCoachesEmailFn({ data: { convocationId } }).catch(() => {});
+      }
       dismissItem(item.id);
       qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
-      qc.invalidateQueries({ queryKey: ["myConvocs"], exact: false });
+      qc.invalidateQueries({ queryKey: ["my-convocs-home"], exact: false });
+      qc.invalidateQueries({ queryKey: ["upcoming"], exact: false });
     } catch (e) {
       toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+    } finally {
+      setBusyIds((s) => {
+        const n = new Set(s);
+        n.delete(item.id);
+        return n;
+      });
+    }
+  }
+
+  async function handleNeedRespond(
+    item: UrgencyItem,
+    choice: "available" | "unavailable",
+  ) {
+    if (item.primaryAction.kind !== "open-need") return;
+    const needId = item.primaryAction.needId;
+    setBusyIds((s) => new Set(s).add(item.id));
+    try {
+      if (choice === "available") {
+        await applyNeedFn({ data: { need_id: needId } });
+        toast.success(
+          t("needs:insight.appliedToast", { defaultValue: "Candidature envoyée" }),
+        );
+      } else {
+        await declareUnavailableFn({ data: { need_id: needId } });
+        toast.success(
+          t("needs:insight.unavailableToast", { defaultValue: "Indisponibilité enregistrée" }),
+        );
+      }
+      dismissItem(item.id);
+      qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      toast.error(
+        t(`needs:errors.${msg}`, {
+          defaultValue: t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }),
+        }),
+      );
     } finally {
       setBusyIds((s) => {
         const n = new Set(s);
