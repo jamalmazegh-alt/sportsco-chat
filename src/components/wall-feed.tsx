@@ -657,6 +657,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     for (const tt of allTeams) m.set(tt.id, tt);
     return m;
   }, [allTeams]);
+  const groupsById = useMemo(() => {
+    const m = new Map<string, Group>();
+    for (const g of targetableGroups) m.set(g.id, g);
+    for (const g of postGroups) if (!m.has(g.id)) m.set(g.id, g);
+    return m;
+  }, [targetableGroups, postGroups]);
 
   if (loading) {
     return <WallFeedSkeleton />;
