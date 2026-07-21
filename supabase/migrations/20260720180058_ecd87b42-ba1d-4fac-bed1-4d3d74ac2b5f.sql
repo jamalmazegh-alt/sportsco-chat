@@ -1,26 +1,27 @@
 
 -- 1) Lock down U15 merge backup tables: enable RLS with no policies (deny all via PostgREST; service_role still bypasses for admin ops).
-ALTER TABLE public._backup_u15_merge_20260719_convocations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_guardians    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_parents      ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_players      ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_team_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_timeline     ENABLE ROW LEVEL SECURITY;
-
--- Force RLS so even table owner is subject to policies via PostgREST; explicitly revoke any lingering grants from anon/authenticated.
-ALTER TABLE public._backup_u15_merge_20260719_convocations FORCE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_guardians    FORCE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_parents      FORCE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_players      FORCE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_team_members FORCE ROW LEVEL SECURITY;
-ALTER TABLE public._backup_u15_merge_20260719_timeline     FORCE ROW LEVEL SECURITY;
-
-REVOKE ALL ON public._backup_u15_merge_20260719_convocations FROM anon, authenticated;
-REVOKE ALL ON public._backup_u15_merge_20260719_guardians    FROM anon, authenticated;
-REVOKE ALL ON public._backup_u15_merge_20260719_parents      FROM anon, authenticated;
-REVOKE ALL ON public._backup_u15_merge_20260719_players      FROM anon, authenticated;
-REVOKE ALL ON public._backup_u15_merge_20260719_team_members FROM anon, authenticated;
-REVOKE ALL ON public._backup_u15_merge_20260719_timeline     FROM anon, authenticated;
+-- These backup tables are created ad-hoc on environments where the U15 merge ran (e.g. prod). They may not exist on other envs
+-- (bughunt, fresh clones, CI DBs), so every ALTER/REVOKE below is wrapped in a to_regclass existence guard to keep the migration idempotent.
+DO $$
+DECLARE
+  t text;
+  tables text[] := ARRAY[
+    'public._backup_u15_merge_20260719_convocations',
+    'public._backup_u15_merge_20260719_guardians',
+    'public._backup_u15_merge_20260719_parents',
+    'public._backup_u15_merge_20260719_players',
+    'public._backup_u15_merge_20260719_team_members',
+    'public._backup_u15_merge_20260719_timeline'
+  ];
+BEGIN
+  FOREACH t IN ARRAY tables LOOP
+    IF to_regclass(t) IS NOT NULL THEN
+      EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', t);
+      EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', t);
+      EXECUTE format('REVOKE ALL ON %s FROM anon, authenticated', t);
+    END IF;
+  END LOOP;
+END $$;
 
 -- 2) Drop broad SELECT policy on the public 'camp-covers' bucket. Bucket is public so files remain accessible via direct CDN URL, but clients can no longer LIST files.
 DROP POLICY IF EXISTS "camp-covers: public read" ON storage.objects;
