@@ -264,6 +264,62 @@ export function UrgencyCenter({ className }: Props) {
       // Fire-and-forget push + email — same as events/$eventId.tsx flow.
       void dispatchResponsePushFn({ data: { convocationId } }).catch(() => {});
       if (status === "absent" || status === "uncertain") {
+        // In-app notifications for coaches + email — mirrors events/$eventId flow.
+        void (async () => {
+          try {
+            const { data: conv } = await supabase
+              .from("convocations")
+              .select(
+                "id, comment, event_id, player_id, players:player_id(user_id, first_name, last_name), events:event_id(id, title, team_id)",
+              )
+              .eq("id", convocationId)
+              .maybeSingle();
+            const ev: any = (conv as any)?.events;
+            const pl: any = (conv as any)?.players;
+            if (ev?.team_id) {
+              const playerName =
+                `${pl?.first_name ?? ""} ${pl?.last_name ?? ""}`.trim() || "Un joueur";
+              const { data: coaches } = await supabase
+                .from("team_members")
+                .select("user_id")
+                .eq("team_id", ev.team_id)
+                .in("role", ["coach", "admin"]);
+              const coachIds = Array.from(
+                new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean)),
+              );
+              let declaredByName: string | null = null;
+              if (user && pl?.user_id && pl.user_id !== user.id) {
+                const { data: prof } = await supabase
+                  .from("profiles")
+                  .select("first_name, full_name")
+                  .eq("id", user.id)
+                  .maybeSingle();
+                declaredByName =
+                  (prof as any)?.first_name ||
+                  ((prof as any)?.full_name ?? "").split(" ")[0] ||
+                  null;
+              }
+              if (coachIds.length > 0) {
+                const reason = (conv as any)?.comment as string | null;
+                const baseBody = reason ? `${ev.title} — "${reason}"` : ev.title;
+                const body = declaredByName
+                  ? `${baseBody} — ${t("notification.declaredBy", { name: declaredByName, defaultValue: `déclaré par ${declaredByName}` })}`
+                  : baseBody;
+                await supabase.from("notifications").insert(
+                  coachIds.map((uid: string) => ({
+                    user_id: uid,
+                    type: "convocation_response",
+                    title: `${playerName} : ${t(`attendance.${status}`)}`,
+                    body,
+                    link: `/events/${ev.id}`,
+                  })),
+                );
+              }
+            }
+          } catch {
+            /* best-effort */
+          }
+        })();
         void notifyCoachesEmailFn({ data: { convocationId } }).catch(() => {});
       }
       dismissItem(item.id);
