@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -16,6 +17,8 @@ import {
   Loader2,
   RefreshCw,
   Sparkles,
+  ThumbsDown,
+  ThumbsUp,
   X,
   XCircle,
 } from "lucide-react";
@@ -29,6 +32,9 @@ import { useUrgencies } from "@/lib/urgency/use-urgencies";
 import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
 import { selectSurfaceState } from "@/lib/urgency/pure";
 import { remindAllForEvent } from "@/lib/urgency/remind";
+import { dispatchConvocationResponsePush } from "@/lib/push-dispatch.functions";
+import { notifyCoachesEmail } from "@/lib/convocation-notify.functions";
+import { applyToEventNeed, declareUnavailable } from "@/lib/needs/needs.functions";
 import type { UrgencyAction, UrgencyItem, UrgencySeverity } from "@/lib/urgency/types";
 
 const DISMISS_STORAGE_KEY = "clubero:urgency:dismissed";
