@@ -290,14 +290,14 @@ function ChallengesList({
           </CardContent>
         </Card>
       )}
-      {displayed.map((c) => {
+      {displayed.map((c: any) => {
         const hasEntries = (entryCounts[c.id] ?? 0) > 0;
         return (
           <Card key={c.id}>
             <CardContent className="flex items-center gap-3 p-4">
               <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{c.name}</div>
+                <div className="truncate font-medium">{challengeDisplayName(c, t)}</div>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <span>{t(`types.${c.kind}`)}</span>
                   <span>·</span>
