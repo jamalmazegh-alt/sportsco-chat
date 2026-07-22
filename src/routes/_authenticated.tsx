@@ -127,7 +127,8 @@ function AuthLayout() {
                 alt="Clubero"
                 className="h-10 w-auto object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5"
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                <HeaderActions />
                 <GlobalSearch />
               </div>
             </div>
@@ -138,9 +139,8 @@ function AuthLayout() {
           </div>
         </div>
         <OnboardingWizard />
-        <SupportFab />
-        <AssistantFab />
         <BottomNav />
+
       </div>
     </ConsentGate>
   );
