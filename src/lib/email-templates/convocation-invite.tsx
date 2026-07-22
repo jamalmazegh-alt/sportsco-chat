@@ -342,6 +342,7 @@ const ConvocationInviteEmail = ({
   meetingPointMapsUrl,
   competitionName,
   coachName,
+  coachNames,
   squadList,
   teamName,
   clubName,
