@@ -1267,7 +1267,7 @@ function EventDetail() {
               meetingPoint: (event as any).meeting_point ?? undefined,
               meetingPointMapsUrl,
               competitionName: competitionLabel,
-              coachName,
+              coachNames,
               squadList: emailSquadList,
               teamName,
               clubName,
