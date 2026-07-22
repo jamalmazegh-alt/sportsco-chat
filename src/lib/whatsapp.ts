@@ -25,6 +25,7 @@ type Dict = {
   meetingTime: string; // "Convocation :" label inside message body
   endTime: string;
   meetingPoint: string;
+  coachLabel: string;
   squad: (n: number) => string;
   lineup: (formation?: string) => string;
   startingXI: string;
@@ -45,6 +46,7 @@ type Dict = {
   timePattern: string;
 };
 
+
 const DICTS: Record<WaLocale, Dict> = {
   fr: {
     convocation: "Convocation",
@@ -57,6 +59,8 @@ const DICTS: Record<WaLocale, Dict> = {
     meetingTime: "Convocation",
     endTime: "Fin prévue",
     meetingPoint: "RDV",
+    coachLabel: "Coach",
+
     squad: (n) => `👥 *Convoqués (${n})*`,
     lineup: (f) => `⚽ *Composition prévue${f ? ` (${f})` : ""}*`,
     startingXI: "_XI de départ_",
@@ -87,6 +91,8 @@ const DICTS: Record<WaLocale, Dict> = {
     meetingTime: "Meeting time",
     endTime: "Ends at",
     meetingPoint: "Meeting point",
+    coachLabel: "Coach",
+
     squad: (n) => `👥 *Squad (${n})*`,
     lineup: (f) => `⚽ *Planned line-up${f ? ` (${f})` : ""}*`,
     startingXI: "_Starting XI_",
@@ -145,6 +151,8 @@ export type WhatsAppEventInput = {
   location?: string | null;
   locationUrl?: string | null;
   meetingPoint?: string | null;
+  coachNames?: string[] | null;
+
   description?: string | null;
   attachments?: Array<{ name?: string; url?: string }> | null;
   selectedPlayers?: string[]; // names
@@ -228,6 +236,10 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   if (input.meetingPoint) {
     lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
   }
+  if (input.coachNames && input.coachNames.length > 0) {
+    lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
+  }
+
 
   if (input.description) {
     lines.push("");

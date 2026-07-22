@@ -456,8 +456,9 @@ function EventDetail() {
       const { data, error } = await supabase
         .from("events")
         .select(
-          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id",
+          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id, event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name))",
         )
+
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -1158,35 +1159,26 @@ function EventDetail() {
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
         const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-        // Assigned coaches for this event (event_staff_assignments).
-        // Only staff explicitly assigned to this event are listed in the email.
-        let coachNames: string[] | undefined;
-        try {
-          const { data: assignRows } = await supabase
-            .from("event_staff_assignments")
-            .select("user_id")
-            .eq("event_id", event.id);
-          const ids = Array.from(
-            new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
-          );
-          if (ids.length > 0) {
-            const { data: profs } = await supabase
-              .from("profiles")
-              .select("id, full_name, first_name, last_name")
-              .in("id", ids);
-            coachNames = (profs ?? [])
-              .map(
-                (p: any) =>
-                  p.full_name ||
-                  [p.first_name, p.last_name].filter(Boolean).join(" ") ||
-                  "",
-              )
-              .filter(Boolean);
-            if (coachNames.length === 0) coachNames = undefined;
-          }
-        } catch {
-          // ignore
-        }
+        // Assigned coaches — sourced from the event embed (event_staff_assignments)
+        const coachNames: string[] | undefined = (() => {
+          const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+            profiles?: {
+              first_name?: string | null;
+              last_name?: string | null;
+              full_name?: string | null;
+            } | null;
+          }>;
+          const names = rows
+            .map((r) => {
+              const p = r.profiles ?? {};
+              return (
+                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+              );
+            })
+            .filter(Boolean);
+          return names.length > 0 ? names : undefined;
+        })();
+
 
         // Full squad list (names of ALL convoked players for this event:
         // already-existing convocations + newly inserted)
@@ -1995,32 +1987,26 @@ function EventDetail() {
         ? await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined)
         : undefined;
 
-      // Assigned coaches for this event.
-      let coachNamesUpd: string[] | undefined;
-      try {
-        const { data: assignRows } = await supabase
-          .from("event_staff_assignments")
-          .select("user_id")
-          .eq("event_id", event.id);
-        const ids = Array.from(
-          new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
-        );
-        if (ids.length > 0) {
-          const { data: profs } = await supabase
-            .from("profiles")
-            .select("id, full_name, first_name, last_name")
-            .in("id", ids);
-          coachNamesUpd = (profs ?? [])
-            .map(
-              (p: any) =>
-                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "",
-            )
-            .filter(Boolean);
-          if (coachNamesUpd.length === 0) coachNamesUpd = undefined;
-        }
-      } catch {
-        // ignore
-      }
+      // Assigned coaches — from event embed (single source).
+      const coachNamesUpd: string[] | undefined = (() => {
+        const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+          profiles?: {
+            first_name?: string | null;
+            last_name?: string | null;
+            full_name?: string | null;
+          } | null;
+        }>;
+        const names = rows
+          .map((r) => {
+            const p = r.profiles ?? {};
+            return (
+              p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+            );
+          })
+          .filter(Boolean);
+        return names.length > 0 ? names : undefined;
+      })();
+
 
       const idemBase = Date.now();
 
@@ -2824,6 +2810,24 @@ function EventDetail() {
           const selectedPlayers = (convocations ?? [])
             .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
             .filter(Boolean);
+          const waCoachNames: string[] | undefined = (() => {
+            const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+              profiles?: {
+                first_name?: string | null;
+                last_name?: string | null;
+                full_name?: string | null;
+              } | null;
+            }>;
+            const names = rows
+              .map((r) => {
+                const p = r.profiles ?? {};
+                return (
+                  p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+                );
+              })
+              .filter(Boolean);
+            return names.length > 0 ? names : undefined;
+          })();
           const base = {
             clubName,
             teamName,
@@ -2838,12 +2842,14 @@ function EventDetail() {
             location: event.location,
             locationUrl: (event as any).location_url,
             meetingPoint: (event as any).meeting_point,
+            coachNames: waCoachNames,
             description: event.description,
             attachments: (event.attachments as any) ?? [],
             selectedPlayers,
             cancellationReason: event.cancellation_reason,
             lineup: null,
           };
+
           const lineupBlock = lineupData
             ? {
                 formation: lineupData.formation,
