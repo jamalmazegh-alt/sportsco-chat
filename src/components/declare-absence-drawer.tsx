@@ -113,7 +113,17 @@ export function DeclareAbsenceDrawer({
   const [forceConfirm, setForceConfirm] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (availability) {
+      setPlayerId(availability.player_id);
+      setRange({
+        from: new Date(`${availability.start_date}T00:00:00`),
+        to: new Date(`${availability.end_date}T00:00:00`),
+      });
+      setReason((availability.reason as Reason) ?? "vacation");
+      setComment(availability.comment ?? "");
+      setForceConfirm(false);
+    } else {
       const t0 = new Date(`${today}T00:00:00`);
       setPlayerId(initialPlayerId ?? "");
       setRange({ from: t0, to: t0 });
@@ -122,7 +132,7 @@ export function DeclareAbsenceDrawer({
       setForceConfirm(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialPlayerId]);
+  }, [open, initialPlayerId, availability?.id]);
 
 
   // Candidates:
