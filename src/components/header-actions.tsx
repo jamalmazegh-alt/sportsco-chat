@@ -1,0 +1,57 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Bot, LifeBuoy } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+
+const ASSISTANT_HIDE = [
+  "/assistant",
+  "/login",
+  "/onboarding",
+  "/tournaments/",
+  "/tournament/",
+  "/t/",
+];
+const SUPPORT_HIDE = ["/support", "/login", "/onboarding"];
+
+function hidden(pathname: string, list: string[]): boolean {
+  return list.some((p) => (p.endsWith("/") ? pathname.startsWith(p) : pathname === p || pathname.startsWith(p + "/")));
+}
+
+export function HeaderActions() {
+  const { t } = useTranslation();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const showAssistant = !hidden(pathname, ASSISTANT_HIDE);
+  const showSupport = !hidden(pathname, SUPPORT_HIDE);
+
+  if (!showAssistant && !showSupport) return null;
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {showAssistant && (
+        <Link
+          to="/assistant"
+          aria-label={t("assistant.open", { defaultValue: "Open assistant" })}
+          className={cn(
+            "h-9 w-9 rounded-full bg-primary text-primary-foreground shadow-sm",
+            "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
+          )}
+        >
+          <Bot className="h-4 w-4" />
+        </Link>
+      )}
+      {showSupport && (
+        <Link
+          to="/support"
+          aria-label={t("support.fab", { defaultValue: "Support" })}
+          className={cn(
+            "h-9 w-9 rounded-full bg-secondary text-secondary-foreground shadow-sm",
+            "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
+          )}
+        >
+          <LifeBuoy className="h-4 w-4" />
+        </Link>
+      )}
+    </div>
+  );
+}

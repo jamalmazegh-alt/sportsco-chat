@@ -17,8 +17,7 @@ const CLUB_LOCKED_ALLOWED = ["/admin", "/profile", "/support"];
 function isPathAllowed(pathname: string, list: string[]): boolean {
   return list.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
-import { AssistantFab } from "@/components/assistant-fab";
-import { SupportFab } from "@/components/support-fab";
+import { HeaderActions } from "@/components/header-actions";
 import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
 import { TrialBanner } from "@/components/trial-banner";
@@ -96,9 +95,8 @@ function AuthLayout() {
               <Outlet />
             </div>
           </div>
-          <SupportFab />
-          <AssistantFab />
           <BottomNav />
+
         </div>
       );
     }
@@ -129,7 +127,8 @@ function AuthLayout() {
                 alt="Clubero"
                 className="h-10 w-auto object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5"
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                <HeaderActions />
                 <GlobalSearch />
               </div>
             </div>
@@ -140,9 +139,8 @@ function AuthLayout() {
           </div>
         </div>
         <OnboardingWizard />
-        <SupportFab />
-        <AssistantFab />
         <BottomNav />
+
       </div>
     </ConsentGate>
   );
@@ -153,9 +151,8 @@ function LockedClubShell({ children }: { children: ReactNode }) {
     <ConsentGate>
       <div className="min-h-screen bg-background pb-[164px]">
         <div className="mx-auto max-w-xl">{children}</div>
-        <SupportFab />
-        <AssistantFab />
         <BottomNav />
+
       </div>
     </ConsentGate>
   );
