@@ -252,7 +252,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
   });
   const ranking = data?.ranking ?? [];
   const top = useMemo(() => ranking.slice(0, 5), [ranking]);
-  const displayName = challengeDisplayName(challenge, (k, o) => i18n.t(`challenges:${k}`, o));
+  const displayName = challengeDisplayName(challenge, (k, o) => i18n.t(`challenges:${k}`, o) as string);
 
   const handleExport = () => {
     const rows = ranking.map((row: any, i: number) => ({
