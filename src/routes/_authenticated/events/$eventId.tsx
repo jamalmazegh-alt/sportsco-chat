@@ -1995,6 +1995,33 @@ function EventDetail() {
         ? await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined)
         : undefined;
 
+      // Assigned coaches for this event.
+      let coachNamesUpd: string[] | undefined;
+      try {
+        const { data: assignRows } = await supabase
+          .from("event_staff_assignments")
+          .select("user_id")
+          .eq("event_id", event.id);
+        const ids = Array.from(
+          new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
+        );
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", ids);
+          coachNamesUpd = (profs ?? [])
+            .map(
+              (p: any) =>
+                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "",
+            )
+            .filter(Boolean);
+          if (coachNamesUpd.length === 0) coachNamesUpd = undefined;
+        }
+      } catch {
+        // ignore
+      }
+
       const idemBase = Date.now();
 
       // Manual resend → NEW dispatch every time (never reuse the initial one).
