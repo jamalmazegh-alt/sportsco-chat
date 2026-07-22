@@ -57,6 +57,7 @@ function TeamsPage() {
           "id, name, season, sport, age_group, championship, competitions, image_url, archived_at",
         )
         .eq("club_id", activeClubId!)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name");
       if (!isAdmin || !showArchived) q = q.is("archived_at", null);

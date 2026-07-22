@@ -6153,6 +6153,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           image_url: string | null
+          is_internal: boolean
           name: string
           season: string | null
           show_called_up_players_override: boolean | null
@@ -6170,6 +6171,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           image_url?: string | null
+          is_internal?: boolean
           name: string
           season?: string | null
           show_called_up_players_override?: boolean | null
@@ -6187,6 +6189,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           image_url?: string | null
+          is_internal?: boolean
           name?: string
           season?: string | null
           show_called_up_players_override?: boolean | null
@@ -8080,6 +8083,10 @@ export type Database = {
           suggested_last_name: string
           used: boolean
         }[]
+      }
+      get_or_create_internal_team: {
+        Args: { _club_id: string }
+        Returns: string
       }
       get_or_create_personal_club: {
         Args: { _user_id: string }

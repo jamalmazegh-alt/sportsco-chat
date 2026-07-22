@@ -1103,6 +1103,7 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
         .from("teams")
         .select("id, name, age_group")
         .eq("club_id", need.club_id)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name", { ascending: true }),
       supabaseAdmin
@@ -1173,6 +1174,7 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
         .from("teams")
         .select("id, name, age_group")
         .eq("club_id", clubId)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name", { ascending: true }),
       supabaseAdmin

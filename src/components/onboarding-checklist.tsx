@@ -40,7 +40,7 @@ export function OnboardingChecklist({
     queryKey: ["onboarding-counts", clubId],
     queryFn: async () => {
       const [teamsRes, players, invites] = await Promise.all([
-        supabase.from("teams").select("id").eq("club_id", clubId),
+        supabase.from("teams").select("id").eq("club_id", clubId).eq("is_internal", false),
         supabase.from("players").select("id", { count: "exact", head: true }).eq("club_id", clubId),
         supabase
           .from("member_invites")

@@ -47,7 +47,7 @@ export function OnboardingWizard() {
     queryKey: ["wizard-counts", activeClubId],
     queryFn: async () => {
       const [teamsRes, playersRes, invitesRes] = await Promise.all([
-        supabase.from("teams").select("id").eq("club_id", activeClubId!),
+        supabase.from("teams").select("id").eq("club_id", activeClubId!).eq("is_internal", false),
         supabase
           .from("players")
           .select("id", { count: "exact", head: true })
