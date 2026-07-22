@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { listChallenges, getChallengeRanking } from "@/lib/challenges/challenges.functions";
+import { challengeDisplayName } from "@/lib/challenges/display";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import i18n from "@/lib/i18n";
 
