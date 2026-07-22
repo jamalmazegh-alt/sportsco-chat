@@ -146,22 +146,18 @@ export function StaffAssignmentSection({
     [assignments],
   );
 
-  // Fusion dédupliquée par user_id, staff équipe prioritaire.
+  // Tri : assignés en tête, puis staff équipe avant renforts, puis alpha.
   const people = useMemo<Candidate[]>(() => {
-    const map = new Map<string, Candidate>();
-    for (const c of teamStaff) map.set(c.user_id, c);
-    for (const c of reinforcements) if (!map.has(c.user_id)) map.set(c.user_id, c);
-    const list = Array.from(map.values());
+    const list = [...pool];
     list.sort((a, b) => {
       const aa = assignedIds.has(a.user_id) ? 0 : 1;
       const bb = assignedIds.has(b.user_id) ? 0 : 1;
       if (aa !== bb) return aa - bb;
-      // Puis staff équipe avant renforts
       if (a.isReinforcement !== b.isReinforcement) return a.isReinforcement ? 1 : -1;
       return a.full_name.localeCompare(b.full_name);
     });
     return list;
-  }, [teamStaff, reinforcements, assignedIds]);
+  }, [pool, assignedIds]);
 
   // ---- Mutations -----------------------------------------------------------
 
