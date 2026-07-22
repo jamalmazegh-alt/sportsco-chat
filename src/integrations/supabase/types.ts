@@ -8112,6 +8112,10 @@ export type Database = {
         Args: { _ip: string; _limit: number; _route: string; _window: string }
         Returns: boolean
       }
+      is_assignable_staff: {
+        Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_club_member: {
         Args: { _club_id: string; _user_id: string }
         Returns: boolean
