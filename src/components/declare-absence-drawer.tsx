@@ -361,78 +361,95 @@ export function DeclareAbsenceDrawer({
     }
     setBusy(true);
     try {
-      if (!forceConfirm) {
-        const overlap = await checkOverlap();
-        if (overlap) {
-          setBusy(false);
-          const ok = window.confirm(
-            t("availability.overlapWarning", {
-              defaultValue:
-                "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
-            }),
-          );
-          if (!ok) return;
-          setForceConfirm(true);
-          setBusy(true);
-        }
-      }
-      const { data: inserted, error } = await supabase
-        .from("player_availabilities")
-        .insert({
-          player_id: playerId,
-          created_by_user_id: user!.id,
-          start_date: startDate,
-          end_date: endDate,
-          reason,
-          comment: comment.trim() || null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-
-      // Notify coaches (best-effort): in-app + email (server fn handles per-coach locale)
-      try {
-        const [playerRes, declarerRes] = await Promise.all([
-          supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
-          supabase
-            .from("profiles")
-            .select("first_name, full_name")
-            .eq("id", user!.id)
-            .maybeSingle(),
-        ]);
-        const p = playerRes.data;
-        const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
-        const declaredByName =
-          (declarerRes.data as any)?.first_name ||
-          ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
-          null;
-        // Only attribute if declarer is NOT the player themselves
-        const isSelf =
-          !!p &&
-          (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
-            ?.user_id === user!.id;
-        const attribution = isSelf ? null : declaredByName;
-        const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
-        const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(
-          name,
-          fmt(startDate),
-          fmt(endDate),
-          reasonLabel,
-          impactedEvents,
-          attribution,
+      const overlap = await checkOverlap();
+      if (overlap) {
+        toast.error(
+          t("availability.errors.overlap", {
+            defaultValue:
+              "Une absence est déjà déclarée sur ces dates. Édite l'existante à la place.",
+          }),
         );
-
-        // Email coaches via server fn (per-coach language, excludes caller)
-        if (inserted?.id) {
-          const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
-          notifyCoachesOfAbsence({ data: { availabilityId: inserted.id } }).catch(() => undefined);
-        }
-      } catch {
-        /* ignore notify errors */
+        setBusy(false);
+        return;
       }
 
-      toast.success(t("availability.saved", { defaultValue: "Absence enregistrée" }));
+      let insertedId: string | null = null;
+      if (editing) {
+        const { error } = await supabase
+          .from("player_availabilities")
+          .update({
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .eq("id", availability!.id);
+        if (error) throw error;
+        insertedId = availability!.id;
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("player_availabilities")
+          .insert({
+            player_id: playerId,
+            created_by_user_id: user!.id,
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        insertedId = inserted?.id ?? null;
+      }
+
+      // Notify coaches on CREATE only (best-effort)
+      if (!editing) {
+        try {
+          const [playerRes, declarerRes] = await Promise.all([
+            supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
+            supabase
+              .from("profiles")
+              .select("first_name, full_name")
+              .eq("id", user!.id)
+              .maybeSingle(),
+          ]);
+          const p = playerRes.data;
+          const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
+          const declaredByName =
+            (declarerRes.data as any)?.first_name ||
+            ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
+            null;
+          const isSelf =
+            !!p &&
+            (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
+              ?.user_id === user!.id;
+          const attribution = isSelf ? null : declaredByName;
+          const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
+          const fmt = (d: string) => new Date(d).toLocaleDateString();
+          await notifyCoaches(
+            name,
+            fmt(startDate),
+            fmt(endDate),
+            reasonLabel,
+            impactedEvents,
+            attribution,
+          );
+
+          if (insertedId) {
+            const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
+            notifyCoachesOfAbsence({ data: { availabilityId: insertedId } }).catch(() => undefined);
+          }
+        } catch {
+          /* ignore notify errors */
+        }
+      }
+
+      toast.success(
+        editing
+          ? t("availability.updated", { defaultValue: "Absence mise à jour" })
+          : t("availability.saved", { defaultValue: "Absence enregistrée" }),
+      );
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
       qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
       qc.invalidateQueries({ queryKey: ["event-availabilities"] });
