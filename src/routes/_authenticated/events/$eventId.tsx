@@ -1159,35 +1159,26 @@ function EventDetail() {
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
         const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-        // Assigned coaches for this event (event_staff_assignments).
-        // Only staff explicitly assigned to this event are listed in the email.
-        let coachNames: string[] | undefined;
-        try {
-          const { data: assignRows } = await supabase
-            .from("event_staff_assignments")
-            .select("user_id")
-            .eq("event_id", event.id);
-          const ids = Array.from(
-            new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
-          );
-          if (ids.length > 0) {
-            const { data: profs } = await supabase
-              .from("profiles")
-              .select("id, full_name, first_name, last_name")
-              .in("id", ids);
-            coachNames = (profs ?? [])
-              .map(
-                (p: any) =>
-                  p.full_name ||
-                  [p.first_name, p.last_name].filter(Boolean).join(" ") ||
-                  "",
-              )
-              .filter(Boolean);
-            if (coachNames.length === 0) coachNames = undefined;
-          }
-        } catch {
-          // ignore
-        }
+        // Assigned coaches — sourced from the event embed (event_staff_assignments)
+        const coachNames: string[] | undefined = (() => {
+          const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+            profiles?: {
+              first_name?: string | null;
+              last_name?: string | null;
+              full_name?: string | null;
+            } | null;
+          }>;
+          const names = rows
+            .map((r) => {
+              const p = r.profiles ?? {};
+              return (
+                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+              );
+            })
+            .filter(Boolean);
+          return names.length > 0 ? names : undefined;
+        })();
+
 
         // Full squad list (names of ALL convoked players for this event:
         // already-existing convocations + newly inserted)
