@@ -198,8 +198,9 @@ export function StaffAssignmentSection({
       const msg = String(e?.message ?? "");
       if (msg.includes("row-level security") || msg.includes("check")) {
         toast.error(
-          t("staffAssignment.notClubCoach", {
-            defaultValue: "Ce coach n'appartient pas au club — assignation refusée.",
+          t("staffAssignment.notAssignableStaff", {
+            defaultValue:
+              "Assignation refusée : cette personne n'a pas de rôle d'encadrant (coach, adjoint, admin ou dirigeant) dans le club.",
           }),
         );
       } else {
