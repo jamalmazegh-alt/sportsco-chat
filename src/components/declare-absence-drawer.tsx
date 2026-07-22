@@ -56,6 +56,15 @@ const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
   { value: "other", Icon: HelpCircle },
 ];
 
+export interface PlayerAvailabilityEditPayload {
+  id: string;
+  player_id: string;
+  start_date: string;
+  end_date: string;
+  reason: string;
+  comment: string | null;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -64,6 +73,8 @@ interface Props {
   /** When provided, the candidate list = all players of this team (coach/admin flow). */
   teamId?: string;
   onCreated?: () => void;
+  /** When provided, drawer runs in EDIT mode. */
+  availability?: PlayerAvailabilityEditPayload | null;
 }
 
 type Candidate = { id: string; first_name: string; last_name: string };
