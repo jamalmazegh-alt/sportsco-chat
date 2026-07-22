@@ -1867,6 +1867,23 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
+        {current === "audience" && (
+          <MeetingAudienceStep
+            clubId={activeClubId ?? null}
+            teams={teams}
+            value={state.meetingAudience}
+            onChange={(v) => setState((s) => ({ ...s, meetingAudience: v }))}
+            onContinue={() => go(1)}
+            onSkip={() => {
+              setState((s) => ({ ...s, meetingAudience: undefined }));
+              go(1);
+            }}
+            t={t}
+          />
+        )}
+
+
+
         {current === "carpool" && (
           <StepQuestion
             title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}
