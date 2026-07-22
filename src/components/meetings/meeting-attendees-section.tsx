@@ -23,7 +23,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AttendancePill } from "@/components/attendance-pill";
-import { AudiencePickerBody, useAudienceState } from "@/components/needs/audience-picker";
+import {
+  AudiencePickerBody,
+  useAudienceState,
+  type AudienceState,
+} from "@/components/needs/audience-picker";
+import { sourcesToSelection } from "@/lib/meetings/sources-to-selection";
 import { getEventAudienceContext } from "@/lib/needs/needs.functions";
 import {
   listMeetingAttendees,
@@ -102,7 +107,13 @@ export function MeetingAttendeesSection({
             </Badge>
           )}
         </CardTitle>
-        {isStaff && <ManageAttendeesDialog eventId={eventId} onDone={refresh} />}
+        {isStaff && (
+          <ManageAttendeesDialog
+            eventId={eventId}
+            onDone={refresh}
+            initialSelection={sourcesToSelection(attendees)}
+          />
+        )}
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -245,23 +256,72 @@ function StatusButtons({
 function ManageAttendeesDialog({
   eventId,
   onDone,
+  initialSelection,
 }: {
   eventId: string;
+  onDone: () => void;
+  initialSelection: Partial<AudienceState>;
+}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <UserPlus className="mr-2 h-4 w-4" />
+          {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
+          </DialogTitle>
+          <DialogDescription>
+            {t("meetings:manage.desc", {
+              defaultValue:
+                "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
+            })}
+          </DialogDescription>
+        </DialogHeader>
+
+        {open && (
+          <AttendeesEditor
+            key={eventId}
+            eventId={eventId}
+            initialSelection={initialSelection}
+            onClose={() => setOpen(false)}
+            onDone={onDone}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AttendeesEditor({
+  eventId,
+  initialSelection,
+  onClose,
+  onDone,
+}: {
+  eventId: string;
+  initialSelection: Partial<AudienceState>;
+  onClose: () => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<RequiresConfirmationEntry[]>([]);
 
   const ctxFn = useServerFn(getEventAudienceContext);
   const ctxQuery = useQuery({
     queryKey: ["meeting-audience-ctx", eventId],
     queryFn: () => ctxFn({ data: { event_id: eventId } }),
-    enabled: open,
   });
 
-  const { state, controls, buildAudiences } = useAudienceState();
+  const { state, controls, buildAudiences } = useAudienceState(initialSelection);
 
   const audiences = useMemo(() => buildAudiences(eventId), [buildAudiences, eventId]);
   const manualUserIds = useMemo(
@@ -276,7 +336,7 @@ function ManageAttendeesDialog({
       previewFn({
         data: { event_id: eventId, audiences, manual_user_ids: manualUserIds },
       }),
-    enabled: open && (audiences.length > 0 || manualUserIds.length > 0),
+    enabled: audiences.length > 0 || manualUserIds.length > 0,
   });
 
   const syncFn = useServerFn(syncMeetingAttendees);
@@ -304,7 +364,7 @@ function ManageAttendeesDialog({
         setPendingConfirm(r.requires_confirmation);
       } else {
         setPendingConfirm([]);
-        setOpen(false);
+        onClose();
         onDone();
       }
     },
@@ -316,62 +376,36 @@ function ManageAttendeesDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="outline">
-            <UserPlus className="mr-2 h-4 w-4" />
-            {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
-            </DialogTitle>
-            <DialogDescription>
-              {t("meetings:manage.desc", {
-                defaultValue:
-                  "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
-              })}
-            </DialogDescription>
-          </DialogHeader>
+      {ctxQuery.isLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {t("common.loading", { defaultValue: "Chargement…" })}
+        </div>
+      ) : (
+        <AudiencePickerBody
+          ctx={ctxQuery.data ?? null}
+          state={state}
+          controls={controls}
+          preview={{
+            count: previewQuery.data?.count ?? null,
+            loading: previewQuery.isFetching,
+          }}
+          enablePreassign
+        />
+      )}
 
-          {ctxQuery.isLoading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("common.loading", { defaultValue: "Chargement…" })}
-            </div>
-          ) : (
-            <AudiencePickerBody
-              ctx={ctxQuery.data ?? null}
-              state={state}
-              controls={controls}
-              preview={{
-                count: previewQuery.data?.count ?? null,
-                loading: previewQuery.isFetching,
-              }}
-              enablePreassign
-            />
-          )}
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={sync.isPending}
-            >
-              {t("common.cancel", { defaultValue: "Annuler" })}
-            </Button>
-            <Button
-              onClick={() => sync.mutate([])}
-              disabled={!hasSelection || sync.isPending}
-            >
-              {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose} disabled={sync.isPending}>
+          {t("common.cancel", { defaultValue: "Annuler" })}
+        </Button>
+        <Button
+          onClick={() => sync.mutate([])}
+          disabled={!hasSelection || sync.isPending}
+        >
+          {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+        </Button>
+      </DialogFooter>
 
       <Dialog
         open={pendingConfirm.length > 0}
@@ -400,9 +434,7 @@ function ManageAttendeesDialog({
                 <span className="text-sm">
                   {p.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
                 </span>
-                {p.status && (
-                  <AttendancePill status={p.status as AttendanceStatus} />
-                )}
+                {p.status && <AttendancePill status={p.status as AttendanceStatus} />}
               </li>
             ))}
           </ul>
