@@ -109,6 +109,14 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
       );
       return;
     }
+    if (!range.from) {
+      toast.error(
+        t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
+      );
+      return;
+    }
+    const startDate = format(range.from, "yyyy-MM-dd");
+    const endDate = format(range.to ?? range.from, "yyyy-MM-dd");
     if (endDate < startDate) {
       toast.error(
         t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
@@ -128,6 +136,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
         visibility,
         comment: comment.trim() || null,
       });
+
       if (error) throw error;
       toast.success(
         t("staffAvailability.saved", { defaultValue: "Indisponibilité enregistrée" }),
