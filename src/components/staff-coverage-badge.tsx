@@ -1,90 +1,53 @@
-// Badge de couverture staff — lit la même logique que le collector Lot 4b.
-// Affiche 🟢 « Encadrement OK » ou 🔴 « Aucun coach dispo ».
-// Visible pour staff + admins uniquement (le call-site gate).
+// Badge de couverture staff — 3 états (assured / no assignment / no coach available).
+// Utilisé dans l'en-tête de la carte « Encadrement » ; l'état est calculé
+// côté parent à partir des données déjà chargées (assignments + pool + dispos).
 
-import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { computeCoverage } from "@/lib/urgency/use-staff-coverage-urgencies";
 import { cn } from "@/lib/utils";
 
+export type StaffCoverageState = "assured" | "unassigned" | "uncovered";
+
 export function StaffCoverageBadge({
-  eventId,
-  teamId,
-  clubId,
-  startsAt,
+  state,
   className,
 }: {
-  eventId: string;
-  teamId: string;
-  clubId: string;
-  /** ISO */
-  startsAt: string;
+  state: StaffCoverageState;
   className?: string;
 }) {
   const { t } = useTranslation();
-  const dateStr = startsAt.slice(0, 10);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["staff-coverage-badge", eventId, teamId, clubId, dateStr],
-    enabled: !!eventId && !!teamId && !!clubId,
-    staleTime: 30_000,
-    queryFn: async () => {
-      const [staffRes, avRes, asgRes] = await Promise.all([
-        supabase
-          .from("team_members")
-          .select("user_id")
-          .eq("team_id", teamId)
-          .in("role", ["coach", "assistant_coach"] as any),
-        supabase.rpc("get_staff_availabilities", {
-          p_team_id: teamId,
-          p_club_id: clubId,
-          p_start: dateStr,
-          p_end: dateStr,
-        }),
-        supabase
-          .from("event_staff_assignments")
-          .select("id", { count: "exact", head: true })
-          .eq("event_id", eventId),
-      ]);
-      const staff = (staffRes.data ?? [])
-        .map((r: any) => r.user_id)
-        .filter(Boolean) as string[];
-      const availabilities = (avRes.data ?? []).map((r: any) => ({
-        user_id: r.user_id,
-        start_date: r.start_date,
-        end_date: r.end_date,
-        certainty: r.certainty,
-        status: r.status,
-      }));
-      const assignmentsCount = asgRes.count ?? 0;
-      return computeCoverage({
-        eventId,
-        title: null,
-        startsAt,
-        teamId,
-        teamName: null,
-        teamStaffUserIds: Array.from(new Set(staff)),
-        availabilities,
-        assignmentsCount,
-      });
-    },
-  });
+  const config =
+    state === "assured"
+      ? {
+          Icon: CheckCircle2,
+          label: t("staffCoverage.badge.assured", {
+            defaultValue: "Encadrement assuré",
+          }),
+          cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+        }
+      : state === "unassigned"
+        ? {
+            Icon: AlertTriangle,
+            label: t("staffCoverage.badge.unassigned", {
+              defaultValue: "Pas de coach assigné",
+            }),
+            cls: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+          }
+        : {
+            Icon: AlertTriangle,
+            label: t("staffCoverage.badge.uncovered", {
+              defaultValue: "Aucun coach dispo",
+            }),
+            cls: "border-destructive/40 bg-destructive/10 text-destructive",
+          };
 
-  if (isLoading || !data) return null;
-  const covered = data.covered;
-  const Icon = covered ? CheckCircle2 : AlertTriangle;
-  const label = covered
-    ? t("staffCoverage.badge.covered", { defaultValue: "Encadrement OK" })
-    : t("staffCoverage.badge.uncovered", { defaultValue: "Aucun coach dispo" });
+  const { Icon, label, cls } = config;
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border",
-        covered
-          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          : "border-destructive/40 bg-destructive/10 text-destructive",
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border shrink-0",
+        cls,
         className,
       )}
       title={label}

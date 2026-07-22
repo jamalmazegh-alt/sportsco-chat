@@ -47,6 +47,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { StaffCoverageBadge } from "@/components/staff-coverage-badge";
 
 type Status = "available" | "tentative" | "unavailable";
 
@@ -312,13 +313,20 @@ export function StaffAssignmentSection({
     );
   };
 
+  const availableCount = useMemo(
+    () => people.filter((c) => (statusByUser.get(c.user_id) ?? "available") !== "unavailable").length,
+    [people, statusByUser],
+  );
+  const coverageState: "assured" | "unassigned" | "uncovered" =
+    assignedPeople.length > 0 ? "assured" : availableCount > 0 ? "unassigned" : "uncovered";
+
   return (
     <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+        <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
           <Users className="h-4 w-4" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold">
             {t("staffAssignment.title", { defaultValue: "Encadrement" })}
           </h3>
@@ -329,7 +337,7 @@ export function StaffAssignmentSection({
             })}
           </p>
         </div>
-        <span className="text-[10px] text-muted-foreground">{assignedPeople.length}</span>
+        <StaffCoverageBadge state={coverageState} />
       </div>
 
       {assignedPeople.length === 0 ? (

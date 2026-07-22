@@ -73,7 +73,7 @@ import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 // StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
 import { StaffAssignmentSection } from "@/components/staff-assignment-section";
-import { StaffCoverageBadge } from "@/components/staff-coverage-badge";
+
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -4285,19 +4285,6 @@ function EventDetail() {
         </section>
       )}
 
-      {isCoach && event?.team_id && eventTeam?.club_id && eventDateStr && (
-        <>
-          <div className="flex items-center gap-2">
-            <StaffCoverageBadge
-              eventId={event.id}
-              teamId={event.team_id}
-              clubId={eventTeam.club_id}
-              startsAt={event.starts_at}
-            />
-          </div>
-        </>
-
-      )}
 
       {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
         <StaffAssignmentSection
