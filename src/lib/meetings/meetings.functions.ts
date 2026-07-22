@@ -289,7 +289,7 @@ export type MeetingAttendeeRow = {
   member_id: string | null;
   status: "present" | "absent" | "uncertain" | "pending";
   comment: string | null;
-  sources: unknown[] | Record<string, unknown> | null;
+  sources: MeetingSources;
   added_manually: boolean;
   invited_at: string;
   responded_at: string | null;
