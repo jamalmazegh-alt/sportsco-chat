@@ -28,6 +28,7 @@ interface Props {
   meetingPointMapsUrl?: string;
   competitionName?: string;
   coachName?: string;
+  coachNames?: string[];
   squadList?: string[];
   teamName?: string;
   clubName?: string;
