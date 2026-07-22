@@ -155,6 +155,33 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       : undefined;
     const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
 
+    // Assigned coaches for this event (only those explicitly assigned).
+    let coachNames: string[] | undefined;
+    try {
+      const { data: assignRows } = await supabaseAdmin
+        .from("event_staff_assignments")
+        .select("user_id")
+        .eq("event_id", ev.id);
+      const ids = Array.from(
+        new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
+      );
+      if (ids.length > 0) {
+        const { data: profs } = await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, first_name, last_name")
+          .in("id", ids);
+        coachNames = (profs ?? [])
+          .map(
+            (p: any) =>
+              p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "",
+          )
+          .filter(Boolean);
+        if (coachNames.length === 0) coachNames = undefined;
+      }
+    } catch {
+      // ignore
+    }
+
     // 6. Build recipients + send emails (fire-and-forget per recipient).
     const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
     if ((player as any).email) {
@@ -198,6 +225,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             meetingPoint: ev.meeting_point ?? undefined,
             meetingPointMapsUrl,
             competitionName: ev.competition_name ?? ev.competition_type ?? undefined,
+            coachNames,
             teamName: ev.teams?.name ?? undefined,
             clubName: ev.teams?.clubs?.name ?? undefined,
             clubLogoUrl: ev.teams?.clubs?.logo_url ?? undefined,
