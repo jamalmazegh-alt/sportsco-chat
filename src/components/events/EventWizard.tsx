@@ -56,6 +56,15 @@ import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
 import { createEvent } from "@/lib/events/events.functions";
+import { setMeetingAttendees } from "@/lib/meetings/meetings.functions";
+import {
+  AudiencePickerBody,
+  useAudienceState,
+  type AudienceCtx,
+  type AudienceState,
+  type PreassignedPerson,
+  type TeamKind,
+} from "@/components/needs/audience-picker";
 import {
   defaultDuration,
   defaultStartTime,
