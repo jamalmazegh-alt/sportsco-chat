@@ -66,7 +66,6 @@ import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { EventNeedsSection } from "@/components/needs/event-needs-section";
-import { MeetingAttendeesSection } from "@/components/meetings/meeting-attendees-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
@@ -935,7 +934,9 @@ function EventDetail() {
         const clubName = (clubRow as any)?.clubs?.name as string | undefined;
         const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
         const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
-          string | null | undefined;
+          | string
+          | null
+          | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
         // ONE dispatch for this convocation-cancelled campaign (player + parents).
@@ -1153,7 +1154,9 @@ function EventDetail() {
         const clubName = (clubRow as any)?.clubs?.name as string | undefined;
         const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
         const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
-          string | null | undefined;
+          | string
+          | null
+          | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
         const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -1169,11 +1172,14 @@ function EventDetail() {
           const names = rows
             .map((r) => {
               const p = r.profiles ?? {};
-              return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+              return (
+                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+              );
             })
             .filter(Boolean);
           return names.length > 0 ? names : undefined;
         })();
+
 
         // Full squad list (names of ALL convoked players for this event:
         // already-existing convocations + newly inserted)
@@ -1563,7 +1569,9 @@ function EventDetail() {
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
       const clubDefaultLang = (teamRow as any)?.clubs?.default_language as
-        string | null | undefined;
+        | string
+        | null
+        | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
       // Player emails
@@ -1773,7 +1781,9 @@ function EventDetail() {
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
       const clubDefaultLang = (teamRow as any)?.clubs?.default_language as
-        string | null | undefined;
+        | string
+        | null
+        | undefined;
 
       const { data: playersInfo } =
         playerIds.length > 0
@@ -1945,7 +1955,9 @@ function EventDetail() {
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
       const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
-        string | null | undefined;
+        | string
+        | null
+        | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       void eventDateLabel;
       const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -1988,11 +2000,14 @@ function EventDetail() {
         const names = rows
           .map((r) => {
             const p = r.profiles ?? {};
-            return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+            return (
+              p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+            );
           })
           .filter(Boolean);
         return names.length > 0 ? names : undefined;
       })();
+
 
       const idemBase = Date.now();
 
@@ -2807,7 +2822,9 @@ function EventDetail() {
             const names = rows
               .map((r) => {
                 const p = r.profiles ?? {};
-                return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+                return (
+                  p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+                );
               })
               .filter(Boolean);
             return names.length > 0 ? names : undefined;
@@ -4269,6 +4286,7 @@ function EventDetail() {
         </section>
       )}
 
+
       {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
         <StaffAssignmentSection
           eventId={event.id}
@@ -4277,8 +4295,12 @@ function EventDetail() {
           eventDate={eventDateStr}
         />
       ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-        <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
+        <StaffAssignmentReadOnly
+          assignments={(event as any)?.event_staff_assignments}
+        />
       ) : null}
+
+
 
       <ConvocationDetailDialog
         open={!!detailConvocId}
@@ -4521,6 +4543,7 @@ function EventDetail() {
           />
         )}
 
+
       <EventNeedsSection
         eventId={eventId}
         eventType={event.type}
@@ -4528,10 +4551,8 @@ function EventDetail() {
         teamId={event.team_id ?? null}
       />
 
-      {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
-
       <EventChat eventId={eventId} />
+
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (

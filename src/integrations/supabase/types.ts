@@ -3731,76 +3731,6 @@ export type Database = {
         }
         Relationships: []
       }
-      meeting_attendees: {
-        Row: {
-          added_manually: boolean
-          club_id: string
-          comment: string | null
-          created_at: string
-          event_id: string
-          id: string
-          invited_at: string
-          member_id: string | null
-          responded_at: string | null
-          sources: Json
-          status: Database["public"]["Enums"]["attendance_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          added_manually?: boolean
-          club_id: string
-          comment?: string | null
-          created_at?: string
-          event_id: string
-          id?: string
-          invited_at?: string
-          member_id?: string | null
-          responded_at?: string | null
-          sources?: Json
-          status?: Database["public"]["Enums"]["attendance_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          added_manually?: boolean
-          club_id?: string
-          comment?: string | null
-          created_at?: string
-          event_id?: string
-          id?: string
-          invited_at?: string
-          member_id?: string | null
-          responded_at?: string | null
-          sources?: Json
-          status?: Database["public"]["Enums"]["attendance_status"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meeting_attendees_club_id_fkey"
-            columns: ["club_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "meeting_attendees_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "meeting_attendees_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "club_members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       member_invites: {
         Row: {
           club_id: string
@@ -8442,19 +8372,6 @@ export type Database = {
       set_call_up_visibility: {
         Args: { _choice: string; _id: string; _scope: string }
         Returns: undefined
-      }
-      set_meeting_attendees_atomic: {
-        Args: {
-          _actor: string
-          _audiences?: Json
-          _event_id: string
-          _manual_user_ids?: string[]
-        }
-        Returns: {
-          attendees_count: number
-          inserted_count: number
-          inserted_user_ids: string[]
-        }[]
       }
       set_player_public_profile: {
         Args: { _enabled: boolean; _player_id: string }
