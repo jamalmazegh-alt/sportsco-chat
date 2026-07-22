@@ -191,6 +191,24 @@ function halvesToMinutes(label: string): number | null {
   return parseInt(m[1], 10) * parseInt(m[2], 10);
 }
 
+/** Build audience selectors from the wizard's serialized meeting audience draft. */
+function buildMeetingAudiencesFromDraft(
+  aud: NonNullable<EventWizardState["meetingAudience"]>,
+  eventId: string,
+): Array<Record<string, unknown>> {
+  const scalarNeedsEvent = new Set(["convoked_players", "convoked_parents"]);
+  const list: Array<Record<string, unknown>> = [];
+  for (const key of aud.scalar) {
+    if (scalarNeedsEvent.has(key)) list.push({ type: key, event_id: eventId });
+    else list.push({ type: key });
+  }
+  for (const gid of aud.groupIds) list.push({ type: "club_group", group_id: gid });
+  for (const tp of aud.teamPicks) list.push({ type: tp.kind, team_id: tp.team_id });
+  if (aud.category.trim()) list.push({ type: "category_educators", category: aud.category.trim() });
+  return list;
+}
+
+
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
