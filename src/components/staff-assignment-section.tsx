@@ -128,18 +128,24 @@ export function StaffAssignmentSection({
     staleTime: 30_000,
   });
 
-  const statusByUser = useMemo(() => {
-    const map = new Map<string, Status>();
+  const absenceByUser = useMemo(() => {
+    const map = new Map<string, { status: Status; start: string; end: string }>();
     for (const r of availabilityRows as any[]) {
       if (r.status !== "active") continue;
       if (r.start_date > eventDate || r.end_date < eventDate) continue;
-      const prev = map.get(r.user_id);
       const next: Status = r.certainty === "confirmed" ? "unavailable" : "tentative";
-      if (prev === "unavailable") continue;
-      map.set(r.user_id, next);
+      const prev = map.get(r.user_id);
+      if (prev?.status === "unavailable") continue;
+      map.set(r.user_id, { status: next, start: r.start_date, end: r.end_date });
     }
     return map;
   }, [availabilityRows, eventDate]);
+
+  const statusByUser = useMemo(() => {
+    const m = new Map<string, Status>();
+    absenceByUser.forEach((v, k) => m.set(k, v.status));
+    return m;
+  }, [absenceByUser]);
 
   const assignedIds = useMemo(
     () => new Set(assignments.map((a) => a.user_id)),
