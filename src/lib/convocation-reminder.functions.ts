@@ -54,10 +54,11 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))",
+        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)), event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name)))",
       )
       .eq("id", data.convocationId)
       .maybeSingle();
+
 
     if (!conv) return { ok: false as const, reason: "not_found" };
     const ev: any = (conv as any).events;
