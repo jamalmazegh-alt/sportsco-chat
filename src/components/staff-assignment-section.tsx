@@ -141,17 +141,35 @@ export function StaffAssignmentSection({
       }
 
       // (b) club_members whose role/roles contain coach or assistant_coach.
+      //     club_members has no direct FK to profiles → fetch profiles in a
+      //     separate query keyed by user_id.
       const { data: cms, error: cmsErr } = await supabase
         .from("club_members")
-        .select("user_id, role, roles, profiles:user_id(first_name, last_name, full_name)")
+        .select("user_id, role, roles")
         .eq("club_id", clubId);
       if (cmsErr) throw cmsErr;
       const clubCoachRows = (cms ?? []).filter((m: any) => {
         const rs = new Set<string>();
-        if (m.role) rs.add(m.role);
-        if (Array.isArray(m.roles)) for (const r of m.roles) rs.add(r);
+        if (m.role) rs.add(String(m.role));
+        if (Array.isArray(m.roles)) for (const r of m.roles) rs.add(String(r));
         return rs.has("coach") || rs.has("assistant_coach");
       });
+
+      const missingIds = Array.from(
+        new Set(
+          clubCoachRows
+            .map((m: any) => m.user_id as string | null)
+            .filter((u): u is string => !!u && !teamStaffIds.has(u)),
+        ),
+      );
+      const profileById = new Map<string, any>();
+      if (missingIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, full_name")
+          .in("id", missingIds);
+        for (const p of (profs ?? []) as any[]) profileById.set(p.id, p);
+      }
 
       // Fuse by user_id — first occurrence wins. team_members has a real team name; use it.
       const byUser = new Map<string, Candidate>();
@@ -167,13 +185,15 @@ export function StaffAssignmentSection({
       }
       for (const m of clubCoachRows) {
         if (!m.user_id || teamStaffIds.has(m.user_id) || byUser.has(m.user_id)) continue;
+        const roles = Array.isArray(m.roles) ? m.roles.map(String) : [];
         const primary =
-          m.role === "assistant_coach" || (Array.isArray(m.roles) && m.roles.includes("assistant_coach") && !m.roles.includes("coach"))
+          String(m.role ?? "") === "assistant_coach" ||
+          (roles.includes("assistant_coach") && !roles.includes("coach"))
             ? "assistant_coach"
             : "coach";
         byUser.set(m.user_id, {
           user_id: m.user_id,
-          full_name: formatName(m.profiles),
+          full_name: formatName(profileById.get(m.user_id) ?? null),
           role: primary,
           teamName: null,
           isReinforcement: true,
@@ -182,6 +202,7 @@ export function StaffAssignmentSection({
       return Array.from(byUser.values());
     },
   });
+
 
 
   const { data: assignments = [] } = useQuery({
