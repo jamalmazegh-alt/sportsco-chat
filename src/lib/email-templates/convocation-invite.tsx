@@ -462,7 +462,12 @@ const ConvocationInviteEmail = ({
             </a>
           </Text>
         ) : null}
-        {coachName ? (
+        {coachNames && coachNames.length > 0 ? (
+          <Text style={cardMeta}>
+            👤 {t.coachLabel}
+            {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
+          </Text>
+        ) : coachName ? (
           <Text style={cardMeta}>
             👤 {t.coachLabel}: {coachName}
           </Text>
