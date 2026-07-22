@@ -105,6 +105,7 @@ type Step =
   | "official"
   | "location"
   | "convocation"
+  | "audience"
   | "carpool"
   | "comment"
   | "summary";
@@ -254,12 +255,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
     const s: Step[] = ["type"];
-    // Meetings are always attached to the club's internal team, so we don't
-    // ask the user to pick one. All other types keep the classic "team" step.
-    if (state.type !== "meeting") s.push("team");
+    // Meetings keep the team step, but with an extra "Internal meeting" tile
+    // that resolves to the club's internal transverse team.
+    s.push("team");
     // "Other" events: ask for a name up-front (e.g. camp/stage title).
     if (state.type === "other") s.push("name");
-    // Meetings need a title too (no team-derived default).
+    // Meetings need a title too (no team-derived default when internal).
     if (state.type === "meeting") s.push("name");
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
@@ -287,9 +288,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
       if (state.type !== "match") s.push("location");
-      // Meetings manage attendees on the event page, not through the
-      // convocation flow, so skip the "convocation" question.
-      if (state.type !== "meeting") s.push("convocation");
+      // Meetings: ask who to invite (optional) instead of the convocation flow.
+      if (state.type === "meeting") s.push("audience");
+      else s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
       s.push("comment");
@@ -297,6 +298,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     s.push("summary");
     return s;
   }, [state.type, state.isHome, state.recurrence]);
+
 
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
 
@@ -313,9 +315,17 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     screenRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [current]);
 
-  // Meetings: silently resolve the club's internal team (get_or_create).
+  // Internal meetings: resolve the club's internal transverse team on demand.
+  // Only when the user explicitly picked the "Réunion interne" option.
   useEffect(() => {
-    if (state.type !== "meeting" || state.teamId || !activeClubId) return;
+    if (
+      state.type !== "meeting" ||
+      state.meetingScope !== "internal" ||
+      state.teamId ||
+      !activeClubId
+    ) {
+      return;
+    }
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase.rpc("get_or_create_internal_team", {
@@ -327,7 +337,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     return () => {
       cancelled = true;
     };
-  }, [state.type, state.teamId, activeClubId]);
+  }, [state.type, state.meetingScope, state.teamId, activeClubId]);
+
 
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
@@ -554,6 +565,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
     convocation: t("eventWizard.hint.convocation", { defaultValue: "À qui on envoie ?" }),
+    audience: t("eventWizard.hint.audience", {
+      defaultValue: "Qui inviter à cette réunion ? (facultatif)",
+    }),
     carpool: t("eventWizard.hint.carpool", { defaultValue: "Activer le covoiturage ?" }),
     comment: t("eventWizard.hint.comment", {
       defaultValue: "Un commentaire à ajouter ? (facultatif)",
@@ -599,6 +613,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     location: { text: t("eventWizard.qShort.location", { defaultValue: "Où" }), mark: "?" },
     convocation: {
       text: t("eventWizard.qShort.convocation", { defaultValue: "Convoquer auto" }),
+      mark: "?",
+    },
+    audience: {
+      text: t("eventWizard.qShort.audience", { defaultValue: "Qui participe" }),
       mark: "?",
     },
     carpool: { text: t("eventWizard.qShort.carpool", { defaultValue: "Covoiturage" }), mark: "?" },
@@ -710,26 +728,57 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
         {current === "team" && (
           <StepQuestion title={t("eventWizard.q.team", { defaultValue: "Quelle équipe ?" })}>
-            {teams.length === 0 ? (
+            {teams.length === 0 && state.type !== "meeting" ? (
               <p className="text-sm text-muted-foreground">
                 {t("eventWizard.noTeams", { defaultValue: "Aucune équipe disponible." })}
               </p>
             ) : (
-              teams.map((tm, i) => {
-                const palette: DoorColor[] = ["green", "blue", "purple", "amber", "red", "pink"];
-                return (
+              <>
+                {teams.map((tm, i) => {
+                  const palette: DoorColor[] = ["green", "blue", "purple", "amber", "red", "pink"];
+                  return (
+                    <DoorButton
+                      key={tm.id}
+                      icon="👥"
+                      label={tm.name}
+                      subtitle={tm.sport ?? undefined}
+                      color={palette[i % palette.length]}
+                      active={state.teamId === tm.id && state.meetingScope !== "internal"}
+                      onClick={() => {
+                        setState((s) => ({
+                          ...s,
+                          teamId: tm.id,
+                          meetingScope: s.type === "meeting" ? "team" : s.meetingScope,
+                          step: s.step + 1,
+                        }));
+                      }}
+                    />
+                  );
+                })}
+                {state.type === "meeting" && (
                   <DoorButton
-                    key={tm.id}
-                    icon="👥"
-                    label={tm.name}
-                    subtitle={tm.sport ?? undefined}
-                    color={palette[i % palette.length]}
-                    active={state.teamId === tm.id}
-                    onClick={() => answer("teamId", tm.id)}
+                    icon="🏛️"
+                    label={t("eventWizard.meetingInternal.label", {
+                      defaultValue: "Réunion interne du club (sans équipe)",
+                    })}
+                    subtitle={t("eventWizard.meetingInternal.subtitle", {
+                      defaultValue: "CODIR, bureau, éducateurs… visible par admins et invités",
+                    })}
+                    color="purple"
+                    active={state.meetingScope === "internal"}
+                    onClick={() => {
+                      setState((s) => ({
+                        ...s,
+                        meetingScope: "internal",
+                        teamId: "",
+                        step: s.step + 1,
+                      }));
+                    }}
                   />
-                );
-              })
+                )}
+              </>
             )}
+
           </StepQuestion>
         )}
 
@@ -2022,6 +2071,7 @@ const STEP_ICONS: Record<Step, LucideIcon> = {
   official: Trophy,
   location: MapPin,
   convocation: Mail,
+  audience: Users,
   carpool: Car,
   comment: MessageSquare,
   summary: CheckCircle2,

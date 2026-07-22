@@ -45,6 +45,8 @@ export function summarizeSources(
     let chip: ProvenanceChip | null = null;
     if (type === "manual") {
       chip = { key: "manual", kind: "manual", label: "ajouté manuellement" };
+    } else if (type === "creator") {
+      chip = { key: "creator", kind: "manual", label: "organisateur" };
     } else if (TEAM_TYPES.has(type) && s.team_id) {
       chip = {
         key: `team:${s.team_id}`,
