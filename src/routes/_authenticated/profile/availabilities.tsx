@@ -10,10 +10,12 @@ import {
   ChevronLeft,
   Plus,
   Trash2,
+  Pencil,
   CalendarOff,
   Palmtree,
   HeartPulse,
   GraduationCap,
+  BookOpen,
   Users,
   Briefcase,
   HelpCircle,
@@ -22,7 +24,10 @@ import {
   EyeOff,
 } from "lucide-react";
 import i18n from "@/lib/i18n";
-import { DeclareStaffAbsenceDrawer } from "@/components/declare-staff-absence-drawer";
+import {
+  DeclareStaffAbsenceDrawer,
+  type StaffAvailabilityEditPayload,
+} from "@/components/declare-staff-absence-drawer";
 
 export const Route = createFileRoute("/_authenticated/profile/availabilities")({
   component: StaffAvailabilitiesPage,
