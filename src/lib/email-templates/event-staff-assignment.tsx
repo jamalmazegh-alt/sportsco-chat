@@ -42,22 +42,22 @@ const COPY: Record<
     titleUnassigned: "Assignation retirée",
     bodyAssigned: (e, t, d, tm) => (
       <>
-        Tu as été assigné à <strong>{e}</strong>
+        Tu as été assigné en tant qu'<strong>encadrant</strong> à <strong>{e}</strong>
         {tm ? <> de <strong>{tm}</strong></> : null}, le <strong>{d}</strong>
         {t ? <> à <strong>{t}</strong></> : null}.
       </>
     ),
     bodyUnassigned: (e, tm) => (
       <>
-        Tu n'es plus assigné à <strong>{e}</strong>
+        Tu n'es plus <strong>encadrant</strong> de <strong>{e}</strong>
         {tm ? <> de <strong>{tm}</strong></> : null}.
       </>
     ),
     ctaAssigned: "Voir l'événement",
     ctaUnassigned: "Voir l'événement",
     or: "Ou copie ce lien dans ton navigateur :",
-    subjectAssigned: (e) => `Tu as été assigné à ${e}`,
-    subjectUnassigned: (e) => `Assignation retirée : ${e}`,
+    subjectAssigned: (e) => `Tu as été assigné comme encadrant à ${e}`,
+    subjectUnassigned: (e) => `Encadrement retiré : ${e}`,
     at: "à",
   },
   en: {
@@ -67,22 +67,22 @@ const COPY: Record<
     titleUnassigned: "Assignment removed",
     bodyAssigned: (e, t, d, tm) => (
       <>
-        You have been assigned to <strong>{e}</strong>
+        You have been assigned as <strong>event staff</strong> to <strong>{e}</strong>
         {tm ? <> of <strong>{tm}</strong></> : null}, on <strong>{d}</strong>
         {t ? <> at <strong>{t}</strong></> : null}.
       </>
     ),
     bodyUnassigned: (e, tm) => (
       <>
-        You are no longer assigned to <strong>{e}</strong>
+        You are no longer <strong>event staff</strong> for <strong>{e}</strong>
         {tm ? <> of <strong>{tm}</strong></> : null}.
       </>
     ),
     ctaAssigned: "Open the event",
     ctaUnassigned: "Open the event",
     or: "Or copy this link in your browser:",
-    subjectAssigned: (e) => `You have been assigned to ${e}`,
-    subjectUnassigned: (e) => `Assignment removed: ${e}`,
+    subjectAssigned: (e) => `You have been assigned as event staff to ${e}`,
+    subjectUnassigned: (e) => `Event staff assignment removed: ${e}`,
     at: "at",
   },
   de: {
@@ -91,16 +91,16 @@ const COPY: Record<
     titleAssigned: "Du wurdest einem Ereignis zugewiesen",
     titleUnassigned: "Zuweisung entfernt",
     bodyAssigned: (e, t, d, tm) => (
-      <>Du wurdest <strong>{e}</strong>{tm ? <> von <strong>{tm}</strong></> : null} am <strong>{d}</strong>{t ? <> um <strong>{t}</strong></> : null} zugewiesen.</>
+      <>Du wurdest als <strong>Betreuer</strong> für <strong>{e}</strong>{tm ? <> von <strong>{tm}</strong></> : null} am <strong>{d}</strong>{t ? <> um <strong>{t}</strong></> : null} zugewiesen.</>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Du bist nicht mehr <strong>{e}</strong>{tm ? <> ({tm})</> : null} zugewiesen.</>
+      <>Du bist nicht mehr <strong>Betreuer</strong> von <strong>{e}</strong>{tm ? <> ({tm})</> : null}.</>
     ),
     ctaAssigned: "Ereignis öffnen",
     ctaUnassigned: "Ereignis öffnen",
     or: "Oder kopiere diesen Link in deinen Browser:",
-    subjectAssigned: (e) => `Du wurdest zugewiesen: ${e}`,
-    subjectUnassigned: (e) => `Zuweisung entfernt: ${e}`,
+    subjectAssigned: (e) => `Du wurdest als Betreuer zugewiesen: ${e}`,
+    subjectUnassigned: (e) => `Betreuung entfernt: ${e}`,
     at: "um",
   },
   es: {
@@ -109,16 +109,16 @@ const COPY: Record<
     titleAssigned: "Has sido asignado a un evento",
     titleUnassigned: "Asignación retirada",
     bodyAssigned: (e, t, d, tm) => (
-      <>Has sido asignado a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, el <strong>{d}</strong>{t ? <> a las <strong>{t}</strong></> : null}.</>
+      <>Has sido asignado como <strong>responsable</strong> a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, el <strong>{d}</strong>{t ? <> a las <strong>{t}</strong></> : null}.</>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Ya no estás asignado a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
+      <>Ya no eres <strong>responsable</strong> de <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
     ),
     ctaAssigned: "Abrir el evento",
     ctaUnassigned: "Abrir el evento",
     or: "O copia este enlace en tu navegador:",
-    subjectAssigned: (e) => `Has sido asignado a ${e}`,
-    subjectUnassigned: (e) => `Asignación retirada: ${e}`,
+    subjectAssigned: (e) => `Has sido asignado como responsable a ${e}`,
+    subjectUnassigned: (e) => `Responsabilidad retirada: ${e}`,
     at: "a las",
   },
   it: {
@@ -127,16 +127,16 @@ const COPY: Record<
     titleAssigned: "Sei stato assegnato a un evento",
     titleUnassigned: "Assegnazione rimossa",
     bodyAssigned: (e, t, d, tm) => (
-      <>Sei stato assegnato a <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}, il <strong>{d}</strong>{t ? <> alle <strong>{t}</strong></> : null}.</>
+      <>Sei stato assegnato come <strong>responsabile</strong> a <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}, il <strong>{d}</strong>{t ? <> alle <strong>{t}</strong></> : null}.</>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Non sei più assegnato a <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}.</>
+      <>Non sei più <strong>responsabile</strong> di <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}.</>
     ),
     ctaAssigned: "Apri l'evento",
     ctaUnassigned: "Apri l'evento",
     or: "Oppure copia questo link nel tuo browser:",
-    subjectAssigned: (e) => `Sei stato assegnato a ${e}`,
-    subjectUnassigned: (e) => `Assegnazione rimossa: ${e}`,
+    subjectAssigned: (e) => `Sei stato assegnato come responsabile a ${e}`,
+    subjectUnassigned: (e) => `Responsabilità rimossa: ${e}`,
     at: "alle",
   },
   nl: {
@@ -145,16 +145,16 @@ const COPY: Record<
     titleAssigned: "Je bent toegewezen aan een evenement",
     titleUnassigned: "Toewijzing verwijderd",
     bodyAssigned: (e, t, d, tm) => (
-      <>Je bent toegewezen aan <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}, op <strong>{d}</strong>{t ? <> om <strong>{t}</strong></> : null}.</>
+      <>Je bent toegewezen als <strong>begeleider</strong> aan <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}, op <strong>{d}</strong>{t ? <> om <strong>{t}</strong></> : null}.</>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Je bent niet meer toegewezen aan <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}.</>
+      <>Je bent niet meer <strong>begeleider</strong> van <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}.</>
     ),
     ctaAssigned: "Evenement openen",
     ctaUnassigned: "Evenement openen",
     or: "Of kopieer deze link in je browser:",
-    subjectAssigned: (e) => `Je bent toegewezen aan ${e}`,
-    subjectUnassigned: (e) => `Toewijzing verwijderd: ${e}`,
+    subjectAssigned: (e) => `Je bent toegewezen als begeleider aan ${e}`,
+    subjectUnassigned: (e) => `Begeleiding verwijderd: ${e}`,
     at: "om",
   },
   pt: {
@@ -163,19 +163,20 @@ const COPY: Record<
     titleAssigned: "Você foi designado a um evento",
     titleUnassigned: "Designação removida",
     bodyAssigned: (e, t, d, tm) => (
-      <>Você foi designado a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, em <strong>{d}</strong>{t ? <> às <strong>{t}</strong></> : null}.</>
+      <>Você foi designado como <strong>responsável</strong> em <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, em <strong>{d}</strong>{t ? <> às <strong>{t}</strong></> : null}.</>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Você não está mais designado a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
+      <>Você não é mais <strong>responsável</strong> por <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
     ),
     ctaAssigned: "Abrir o evento",
     ctaUnassigned: "Abrir o evento",
     or: "Ou copie este link no seu navegador:",
-    subjectAssigned: (e) => `Você foi designado a ${e}`,
-    subjectUnassigned: (e) => `Designação removida: ${e}`,
+    subjectAssigned: (e) => `Você foi designado como responsável em ${e}`,
+    subjectUnassigned: (e) => `Responsabilidade removida: ${e}`,
     at: "às",
   },
 };
+
 
 function pickLocale(l?: string): Locale {
   const v = (l ?? "fr").toLowerCase().slice(0, 2);
