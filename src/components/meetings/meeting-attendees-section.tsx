@@ -107,7 +107,13 @@ export function MeetingAttendeesSection({
             </Badge>
           )}
         </CardTitle>
-        {isStaff && <ManageAttendeesDialog eventId={eventId} onDone={refresh} />}
+        {isStaff && (
+          <ManageAttendeesDialog
+            eventId={eventId}
+            onDone={refresh}
+            initialSelection={sourcesToSelection(attendees)}
+          />
+        )}
       </CardHeader>
 
       <CardContent className="space-y-4">
