@@ -32,8 +32,20 @@
       "description": "Die Latte treffen — Saison gesamt."
     },
     "juggling": {
-      "name": "Jonglieren",
-      "description": "Höchste Anzahl an Ballkontakten in Folge — Rekord."
+      "name": "Freies Jonglieren",
+      "description": "Längste Serie an Ballkontakten — Rekord."
+    },
+    "jugglingLeftFoot": {
+      "name": "Jonglieren linker Fuß",
+      "description": "Meiste Ballkontakte in Folge mit dem linken Fuß — Rekord."
+    },
+    "jugglingRightFoot": {
+      "name": "Jonglieren rechter Fuß",
+      "description": "Meiste Ballkontakte in Folge mit dem rechten Fuß — Rekord."
+    },
+    "jugglingHead": {
+      "name": "Jonglieren Kopf",
+      "description": "Meiste Ballkontakte in Folge mit dem Kopf — Rekord."
     },
     "leger": {
       "name": "Luc Léger",

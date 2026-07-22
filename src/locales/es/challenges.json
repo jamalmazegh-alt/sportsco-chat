@@ -32,8 +32,20 @@
       "description": "Dar al larguero — total de la temporada."
     },
     "juggling": {
-      "name": "Toques",
-      "description": "Máximo de toques seguidos — récord."
+      "name": "Juegos malabares libres",
+      "description": "Mayor racha de toques seguidos — récord."
+    },
+    "jugglingLeftFoot": {
+      "name": "Malabares pie izquierdo",
+      "description": "Más toques seguidos con el pie izquierdo — récord."
+    },
+    "jugglingRightFoot": {
+      "name": "Malabares pie derecho",
+      "description": "Más toques seguidos con el pie derecho — récord."
+    },
+    "jugglingHead": {
+      "name": "Malabares cabeza",
+      "description": "Más toques seguidos de cabeza — récord."
     },
     "leger": {
       "name": "Luc Léger",
