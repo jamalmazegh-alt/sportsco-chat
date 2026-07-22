@@ -4287,12 +4287,16 @@ function EventDetail() {
       )}
 
 
-      {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
+      {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
         <StaffAssignmentSection
           eventId={event.id}
           teamId={event.team_id}
           clubId={eventTeam.club_id}
           eventDate={eventDateStr}
+        />
+      ) : (
+        <StaffAssignmentReadOnly
+          assignments={(event as any)?.event_staff_assignments}
         />
       )}
 
