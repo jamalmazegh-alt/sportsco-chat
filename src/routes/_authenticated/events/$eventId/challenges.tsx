@@ -197,7 +197,10 @@ function ChallengesList({
   const { t } = useTranslation("challenges");
 
   const sorted = useMemo(() => {
-    return [...challenges].sort((a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0));
+    const base = [...challenges].sort(
+      (a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0),
+    );
+    return groupJugglingVariants(base, (c) => c.template_key ?? null);
   }, [challenges, entryCounts]);
 
   const displayed = useMemo(() => {
