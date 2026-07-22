@@ -212,7 +212,7 @@ const EventStaffAssignmentEmail = ({
       <Text style={text}>
         {isAssigned
           ? c.bodyAssigned(eventLabel, timeStr ?? "", dateStr, teamName)
-          : c.bodyUnassigned(eventLabel, teamName)}
+          : c.bodyUnassigned(eventLabel, teamName ?? "")}
       </Text>
       <Button style={button} href={eventUrl}>
         {isAssigned ? c.ctaAssigned : c.ctaUnassigned}
