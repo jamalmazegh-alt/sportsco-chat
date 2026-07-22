@@ -37,7 +37,7 @@ export const listTeamCoachesForAvailability = createServerFn({ method: "POST" })
       .maybeSingle();
     if (teamError || !team) return [];
 
-    const [{ data: callerRows }, { data: hasClubStaffRole }] = await Promise.all([
+    const [{ data: callerRows }, { data: hasClubStaffRole }, { data: canViewTeam }] = await Promise.all([
       supabase
         .from("team_members")
         .select("role")
@@ -48,12 +48,16 @@ export const listTeamCoachesForAvailability = createServerFn({ method: "POST" })
         _club_id: team.club_id,
         _roles: ["admin", "dirigeant", "coach", "assistant_coach"],
       }),
+      (supabase as any).rpc("can_view_team", {
+        _user_id: userId,
+        _team_id: data.teamId,
+      }),
     ]);
 
     const isTeamStaff = (callerRows ?? []).some((row: { role: string }) =>
       STAFF_ROLES.has(String(row.role)),
     );
-    if (!isTeamStaff && !hasClubStaffRole) return [];
+    if (!isTeamStaff && !hasClubStaffRole && !canViewTeam) return [];
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
