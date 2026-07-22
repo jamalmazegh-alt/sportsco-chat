@@ -526,7 +526,7 @@ function EventsPage() {
         {isCoach && user && activeClubId && (
           <EventCreateChooser
             clubId={activeClubId}
-            teams={teams ?? []}
+            teams={visibleTeams}
             userId={user.id}
             open={open}
             onOpenChange={setOpen}
