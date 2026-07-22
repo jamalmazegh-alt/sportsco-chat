@@ -156,32 +156,24 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       : undefined;
     const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
 
-    // Assigned coaches for this event (only those explicitly assigned).
-    let coachNames: string[] | undefined;
-    try {
-      const { data: assignRows } = await supabaseAdmin
-        .from("event_staff_assignments")
-        .select("user_id")
-        .eq("event_id", ev.id);
-      const ids = Array.from(
-        new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
-      );
-      if (ids.length > 0) {
-        const { data: profs } = await supabaseAdmin
-          .from("profiles")
-          .select("id, full_name, first_name, last_name")
-          .in("id", ids);
-        coachNames = (profs ?? [])
-          .map(
-            (p: any) =>
-              p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "",
-          )
-          .filter(Boolean);
-        if (coachNames.length === 0) coachNames = undefined;
-      }
-    } catch {
-      // ignore
-    }
+    // Assigned coaches — sourced from the same event embed (single source of truth).
+    const coachNames: string[] | undefined = (() => {
+      const rows = ((ev as any).event_staff_assignments ?? []) as Array<{
+        profiles?: {
+          first_name?: string | null;
+          last_name?: string | null;
+          full_name?: string | null;
+        } | null;
+      }>;
+      const names = rows
+        .map((r) => {
+          const p = r.profiles ?? {};
+          return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+        })
+        .filter(Boolean);
+      return names.length > 0 ? names : undefined;
+    })();
+
 
     // 6. Build recipients + send emails (fire-and-forget per recipient).
     const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
