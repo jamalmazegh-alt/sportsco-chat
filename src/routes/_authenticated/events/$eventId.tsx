@@ -71,7 +71,7 @@ import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
-import { StaffAvailabilityForEvent } from "@/components/staff-availability";
+// StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
 import { StaffAssignmentSection } from "@/components/staff-assignment-section";
 import { StaffCoverageBadge } from "@/components/staff-coverage-badge";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
