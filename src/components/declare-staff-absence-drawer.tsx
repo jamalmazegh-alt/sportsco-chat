@@ -76,8 +76,11 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
   const qc = useQueryClient();
 
   const today = new Date().toISOString().slice(0, 10);
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  const todayDate = new Date(`${today}T00:00:00`);
+  const [range, setRange] = useState<{ from?: Date; to?: Date }>({
+    from: todayDate,
+    to: todayDate,
+  });
   const [reason, setReason] = useState<Reason>("vacation");
   const [certainty, setCertainty] = useState<Certainty>("confirmed");
   const [visibility, setVisibility] = useState<Visibility>("staff");
@@ -86,8 +89,8 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
 
   useEffect(() => {
     if (open) {
-      setStartDate(today);
-      setEndDate(today);
+      const t0 = new Date(`${today}T00:00:00`);
+      setRange({ from: t0, to: t0 });
       setReason("vacation");
       setCertainty("confirmed");
       setVisibility("staff");
@@ -95,6 +98,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
 
   async function onSubmit() {
     if (!user || !activeClubId) {
