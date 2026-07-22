@@ -76,8 +76,11 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
   const qc = useQueryClient();
 
   const today = new Date().toISOString().slice(0, 10);
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  const todayDate = new Date(`${today}T00:00:00`);
+  const [range, setRange] = useState<{ from?: Date; to?: Date }>({
+    from: todayDate,
+    to: todayDate,
+  });
   const [reason, setReason] = useState<Reason>("vacation");
   const [certainty, setCertainty] = useState<Certainty>("confirmed");
   const [visibility, setVisibility] = useState<Visibility>("staff");
@@ -86,8 +89,8 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
 
   useEffect(() => {
     if (open) {
-      setStartDate(today);
-      setEndDate(today);
+      const t0 = new Date(`${today}T00:00:00`);
+      setRange({ from: t0, to: t0 });
       setReason("vacation");
       setCertainty("confirmed");
       setVisibility("staff");
@@ -95,6 +98,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
 
   async function onSubmit() {
     if (!user || !activeClubId) {
@@ -105,6 +109,14 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
       );
       return;
     }
+    if (!range.from) {
+      toast.error(
+        t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
+      );
+      return;
+    }
+    const startDate = format(range.from, "yyyy-MM-dd");
+    const endDate = format(range.to ?? range.from, "yyyy-MM-dd");
     if (endDate < startDate) {
       toast.error(
         t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
@@ -124,6 +136,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
         visibility,
         comment: comment.trim() || null,
       });
+
       if (error) throw error;
       toast.success(
         t("staffAvailability.saved", { defaultValue: "Indisponibilité enregistrée" }),
@@ -164,22 +177,14 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
               <PopoverTrigger asChild>
                 <Button variant="outline" className="h-11 w-full justify-start font-normal">
                   <CalendarIcon className="h-4 w-4" />
-                  {startDate && endDate ? (
-                    startDate === endDate ? (
-                      <span>
-                        {format(new Date(`${startDate}T00:00:00`), "EEE d MMM", {
-                          locale: dateLocale,
-                        })}
-                      </span>
+                  {range.from ? (
+                    !range.to || range.from.getTime() === range.to.getTime() ? (
+                      <span>{format(range.from, "EEE d MMM", { locale: dateLocale })}</span>
                     ) : (
                       <span>
-                        {format(new Date(`${startDate}T00:00:00`), "EEE d MMM", {
-                          locale: dateLocale,
-                        })}
+                        {format(range.from, "EEE d MMM", { locale: dateLocale })}
                         {" → "}
-                        {format(new Date(`${endDate}T00:00:00`), "EEE d MMM", {
-                          locale: dateLocale,
-                        })}
+                        {format(range.to, "EEE d MMM", { locale: dateLocale })}
                       </span>
                     )
                   ) : (
@@ -191,17 +196,14 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
                 <Calendar
                   mode="range"
                   numberOfMonths={1}
-                  selected={{
-                    from: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
-                    to: endDate ? new Date(`${endDate}T00:00:00`) : undefined,
-                  }}
-                  onSelect={(range: { from?: Date; to?: Date } | undefined) => {
-                    if (!range) return;
-                    if (range.from) {
-                      const s = format(range.from, "yyyy-MM-dd");
-                      setStartDate(s);
-                      setEndDate(range.to ? format(range.to, "yyyy-MM-dd") : s);
+                  selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
+                  onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
+                    // 3rd click starts a new range at the clicked day instead of extending the end.
+                    if (range.from && range.to && clickedDay) {
+                      setRange({ from: clickedDay, to: undefined });
+                      return;
                     }
+                    setRange(next ?? {});
                   }}
                   initialFocus
                   className="p-3 pointer-events-auto"
@@ -209,6 +211,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
               </PopoverContent>
             </Popover>
           </div>
+
 
           <div className="space-y-1.5">
             <Label>{t("availability.reasonLabel", { defaultValue: "Motif" })}</Label>

@@ -82,9 +82,18 @@ export function DeclareAbsenceDrawer({
   const qc = useQueryClient();
 
   const today = new Date().toISOString().slice(0, 10);
+  const todayDate = new Date(`${today}T00:00:00`);
   const [playerId, setPlayerId] = useState<string>(initialPlayerId ?? "");
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  const [range, setRange] = useState<{ from?: Date; to?: Date }>({
+    from: todayDate,
+    to: todayDate,
+  });
+  const startDate = range.from ? format(range.from, "yyyy-MM-dd") : today;
+  const endDate = range.to
+    ? format(range.to, "yyyy-MM-dd")
+    : range.from
+      ? format(range.from, "yyyy-MM-dd")
+      : today;
   const [reason, setReason] = useState<Reason>("vacation");
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
@@ -92,15 +101,16 @@ export function DeclareAbsenceDrawer({
 
   useEffect(() => {
     if (open) {
+      const t0 = new Date(`${today}T00:00:00`);
       setPlayerId(initialPlayerId ?? "");
-      setStartDate(today);
-      setEndDate(today);
+      setRange({ from: t0, to: t0 });
       setReason("vacation");
       setComment("");
       setForceConfirm(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialPlayerId]);
+
 
   // Candidates:
   // - if teamId provided → all players of the team (coach flow)
@@ -488,21 +498,19 @@ export function DeclareAbsenceDrawer({
                 <Calendar
                   mode="range"
                   numberOfMonths={1}
-                  selected={{
-                    from: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
-                    to: endDate ? new Date(`${endDate}T00:00:00`) : undefined,
-                  }}
-                  onSelect={(range: { from?: Date; to?: Date } | undefined) => {
-                    if (!range) return;
-                    if (range.from) {
-                      const s = format(range.from, "yyyy-MM-dd");
-                      setStartDate(s);
-                      setEndDate(range.to ? format(range.to, "yyyy-MM-dd") : s);
+                  selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
+                  onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
+                    // 3rd click: start a fresh range at the clicked day instead of extending.
+                    if (range.from && range.to && clickedDay) {
+                      setRange({ from: clickedDay, to: undefined });
+                      return;
                     }
+                    setRange(next ?? {});
                   }}
                   initialFocus
                   className="p-3 pointer-events-auto"
                 />
+
               </PopoverContent>
             </Popover>
           </div>

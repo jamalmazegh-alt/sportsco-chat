@@ -113,43 +113,97 @@ export function StaffAssignmentSection({
   });
 
   const { data: reinforcements = [] } = useQuery({
-    queryKey: ["event-staff-candidates", "club-reinforcements", clubId, teamId],
+    queryKey: ["event-staff-candidates", "club-reinforcements", clubId, teamId, teamStaff.length],
     enabled: !!clubId && !!teamId,
     queryFn: async (): Promise<Candidate[]> => {
       const teamStaffIds = new Set(teamStaff.map((c) => c.user_id));
-      const { data, error } = await supabase
-        .from("club_members")
-        .select("user_id, role, roles, profiles:user_id(first_name, last_name, full_name)")
-        .eq("club_id", clubId);
-      if (error) throw error;
-      const coachIds = (data ?? []).filter(
-        (m: any) => m.role === "coach" || (Array.isArray(m.roles) && m.roles.includes("coach")),
+
+      // (a) All coaches / assistant_coaches across every non-deleted team of the club.
+      const { data: clubTeams } = await supabase
+        .from("teams")
+        .select("id, name")
+        .eq("club_id", clubId)
+        .is("deleted_at", null);
+      const clubTeamIds = (clubTeams ?? []).map((t: any) => t.id);
+      const teamNameById = new Map<string, string>(
+        (clubTeams ?? []).map((t: any) => [t.id, t.name]),
       );
-      const userIds = coachIds.map((m: any) => m.user_id).filter(Boolean);
-      let usualByUser = new Map<string, string>();
-      if (userIds.length > 0) {
-        const { data: tms } = await supabase
+
+      const teamMemberRows: any[] = [];
+      if (clubTeamIds.length > 0) {
+        const { data: tms, error: tmsErr } = await supabase
           .from("team_members")
-          .select("user_id, role, teams:team_id(id, name, club_id, deleted_at)")
-          .in("user_id", userIds)
+          .select("user_id, role, team_id, profiles:user_id(first_name, last_name, full_name)")
+          .in("team_id", clubTeamIds)
           .in("role", ["coach", "assistant_coach"] as any);
-        for (const r of (tms ?? []) as any[]) {
-          if (r.teams?.club_id === clubId && !r.teams?.deleted_at && !usualByUser.has(r.user_id)) {
-            usualByUser.set(r.user_id, r.teams.name);
-          }
-        }
+        if (tmsErr) throw tmsErr;
+        teamMemberRows.push(...(tms ?? []));
       }
-      return coachIds
-        .filter((m: any) => m.user_id && !teamStaffIds.has(m.user_id))
-        .map((m: any) => ({
-          user_id: m.user_id,
-          full_name: formatName(m.profiles),
-          role: "coach",
-          teamName: usualByUser.get(m.user_id) ?? null,
+
+      // (b) club_members whose role/roles contain coach or assistant_coach.
+      //     club_members has no direct FK to profiles → fetch profiles in a
+      //     separate query keyed by user_id.
+      const { data: cms, error: cmsErr } = await supabase
+        .from("club_members")
+        .select("user_id, role, roles")
+        .eq("club_id", clubId);
+      if (cmsErr) throw cmsErr;
+      const clubCoachRows = (cms ?? []).filter((m: any) => {
+        const rs = new Set<string>();
+        if (m.role) rs.add(String(m.role));
+        if (Array.isArray(m.roles)) for (const r of m.roles) rs.add(String(r));
+        return rs.has("coach") || rs.has("assistant_coach");
+      });
+
+      const missingIds = Array.from(
+        new Set(
+          clubCoachRows
+            .map((m: any) => m.user_id as string | null)
+            .filter((u): u is string => !!u && !teamStaffIds.has(u)),
+        ),
+      );
+      const profileById = new Map<string, any>();
+      if (missingIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, full_name")
+          .in("id", missingIds);
+        for (const p of (profs ?? []) as any[]) profileById.set(p.id, p);
+      }
+
+      // Fuse by user_id — first occurrence wins. team_members has a real team name; use it.
+      const byUser = new Map<string, Candidate>();
+      for (const r of teamMemberRows) {
+        if (!r.user_id || teamStaffIds.has(r.user_id) || byUser.has(r.user_id)) continue;
+        byUser.set(r.user_id, {
+          user_id: r.user_id,
+          full_name: formatName(r.profiles),
+          role: r.role,
+          teamName: teamNameById.get(r.team_id) ?? null,
           isReinforcement: true,
-        }));
+        });
+      }
+      for (const m of clubCoachRows) {
+        if (!m.user_id || teamStaffIds.has(m.user_id) || byUser.has(m.user_id)) continue;
+        const roles = Array.isArray(m.roles) ? m.roles.map(String) : [];
+        const primary =
+          String(m.role ?? "") === "assistant_coach" ||
+          (roles.includes("assistant_coach") && !roles.includes("coach"))
+            ? "assistant_coach"
+            : "coach";
+        byUser.set(m.user_id, {
+          user_id: m.user_id,
+          full_name: formatName(profileById.get(m.user_id) ?? null),
+          role: primary,
+          teamName: null,
+          isReinforcement: true,
+        });
+      }
+      return Array.from(byUser.values());
     },
   });
+
+
 
   const { data: assignments = [] } = useQuery({
     queryKey: ["event-staff-assignments", eventId],
@@ -351,10 +405,12 @@ export function StaffAssignmentSection({
 
       {people.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          {t("staffAssignment.noPeople", {
-            defaultValue: "Aucun coach disponible pour cet événement.",
+          {t("staffAssignment.noCoachInClub", {
+            defaultValue:
+              "Aucun coach dans ce club. Ajoute des coachs aux équipes pour pouvoir en assigner.",
           })}
         </p>
+
       ) : (
         <ul className="divide-y divide-border">{people.map(renderRow)}</ul>
       )}
