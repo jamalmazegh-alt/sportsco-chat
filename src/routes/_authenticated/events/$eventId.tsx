@@ -4258,12 +4258,8 @@ function EventDetail() {
               startsAt={event.starts_at}
             />
           </div>
-          <StaffAvailabilityForEvent
-            teamId={event.team_id}
-            clubId={eventTeam.club_id}
-            date={eventDateStr}
-          />
         </>
+
       )}
 
       {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
