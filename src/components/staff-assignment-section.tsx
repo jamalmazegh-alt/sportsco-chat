@@ -237,21 +237,32 @@ export function StaffAssignmentSection({
     assignMutation.mutate(c.user_id);
   };
 
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const assignedPeople = useMemo(
+    () => people.filter((c) => assignedIds.has(c.user_id)),
+    [people, assignedIds],
+  );
+  const unassignedPeople = useMemo(
+    () => people.filter((c) => !assignedIds.has(c.user_id)),
+    [people, assignedIds],
+  );
+
   // ---- Render --------------------------------------------------------------
 
-  const renderRow = (c: Candidate) => {
+  const fmt = (d: string) => {
+    const [, m, day] = d.split("-");
+    return `${day}/${m}`;
+  };
+
+  const renderAssignedRow = (c: Candidate) => {
     const status = statusByUser.get(c.user_id) ?? "available";
     const absence = absenceByUser.get(c.user_id);
-    const isAssigned = assignedIds.has(c.user_id);
     const roleLabel =
       c.role === "assistant_coach"
         ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
         : t("teams.role.coach", { defaultValue: "Coach" });
     const baseMeta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
-    const fmt = (d: string) => {
-      const [y, m, day] = d.split("-");
-      return `${day}/${m}`;
-    };
     const absenceLabel = absence
       ? absence.start === absence.end
         ? t("staffAssignment.absentOn", { defaultValue: "Absent le {{d}}", d: fmt(absence.start) })
@@ -286,28 +297,16 @@ export function StaffAssignmentSection({
           )}
         </div>
         <StatusDot status={status} />
-        {isAssigned ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 gap-1"
-            disabled={unassignMutation.isPending}
-            onClick={() => unassignMutation.mutate(c.user_id)}
-          >
-            <UserMinus className="h-3.5 w-3.5" />
-            {t("staffAssignment.remove", { defaultValue: "Retirer" })}
-          </Button>
-        ) : (
-          <Button
-            size="sm"
-            className="h-8 gap-1"
-            disabled={assignMutation.isPending}
-            onClick={() => requestAssign(c)}
-          >
-            <UserPlus className="h-3.5 w-3.5" />
-            {t("staffAssignment.assign", { defaultValue: "Assigner" })}
-          </Button>
-        )}
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 gap-1"
+          disabled={unassignMutation.isPending}
+          onClick={() => unassignMutation.mutate(c.user_id)}
+        >
+          <UserMinus className="h-3.5 w-3.5" />
+          {t("staffAssignment.remove", { defaultValue: "Retirer" })}
+        </Button>
       </li>
     );
   };
@@ -329,20 +328,123 @@ export function StaffAssignmentSection({
             })}
           </p>
         </div>
-        <span className="text-[10px] text-muted-foreground">{people.length}</span>
+        <span className="text-[10px] text-muted-foreground">{assignedPeople.length}</span>
       </div>
 
-      {people.length === 0 ? (
+      {assignedPeople.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          {t("staffAssignment.noCoachInClub", {
-            defaultValue:
-              "Aucun coach dans ce club. Ajoute des coachs aux équipes pour pouvoir en assigner.",
+          {t("staffAssignment.noneAssigned", {
+            defaultValue: "Aucun coach assigné pour cet événement.",
           })}
         </p>
-
       ) : (
-        <ul className="divide-y divide-border">{people.map(renderRow)}</ul>
+        <ul className="divide-y divide-border">{assignedPeople.map(renderAssignedRow)}</ul>
       )}
+
+      <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-between h-9"
+            disabled={people.length === 0 || unassignedPeople.length === 0}
+          >
+            <span className="inline-flex items-center gap-2">
+              <Plus className="h-3.5 w-3.5" />
+              {people.length === 0
+                ? t("staffAssignment.noCoachInClub", {
+                    defaultValue: "Aucun coach dans ce club",
+                  })
+                : unassignedPeople.length === 0
+                ? t("staffAssignment.allAssigned", {
+                    defaultValue: "Tous les coachs sont assignés",
+                  })
+                : t("staffAssignment.addCoach", { defaultValue: "Assigner un coach" })}
+            </span>
+            <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0 w-[--radix-popover-trigger-width] min-w-[280px]"
+          align="start"
+        >
+          <Command>
+            <CommandInput
+              placeholder={t("staffAssignment.searchPlaceholder", {
+                defaultValue: "Rechercher un coach…",
+              })}
+            />
+            <CommandList>
+              <CommandEmpty>
+                {t("staffAssignment.noResults", { defaultValue: "Aucun coach trouvé." })}
+              </CommandEmpty>
+              <CommandGroup>
+                {unassignedPeople.map((c) => {
+                  const status = statusByUser.get(c.user_id) ?? "available";
+                  const absence = absenceByUser.get(c.user_id);
+                  const roleLabel =
+                    c.role === "assistant_coach"
+                      ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
+                      : t("teams.role.coach", { defaultValue: "Coach" });
+                  const meta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
+                  const absenceLabel = absence
+                    ? absence.start === absence.end
+                      ? t("staffAssignment.absentOn", {
+                          defaultValue: "Absent le {{d}}",
+                          d: fmt(absence.start),
+                        })
+                      : t("staffAssignment.absentRange", {
+                          defaultValue: "Absent du {{s}} au {{e}}",
+                          s: fmt(absence.start),
+                          e: fmt(absence.end),
+                        })
+                    : null;
+                  return (
+                    <CommandItem
+                      key={c.user_id}
+                      value={`${c.full_name} ${meta}`}
+                      onSelect={() => {
+                        setPickerOpen(false);
+                        requestAssign(c);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="h-7 w-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
+                        {initials(c.full_name)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate flex items-center gap-1.5">
+                          <span className="truncate">{c.full_name}</span>
+                          {c.isReinforcement && (
+                            <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-1.5 py-0 text-[9px] font-medium uppercase text-primary shrink-0">
+                              {t("staffAssignment.reinforcement", { defaultValue: "Renfort" })}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground truncate">{meta}</div>
+                        {absenceLabel && (
+                          <div
+                            className={cn(
+                              "text-[11px] truncate",
+                              status === "unavailable"
+                                ? "text-destructive"
+                                : "text-amber-600 dark:text-amber-400",
+                            )}
+                          >
+                            {absenceLabel}
+                          </div>
+                        )}
+                      </div>
+                      <StatusDot status={status} />
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
 
       <AlertDialog
         open={!!pendingConflict}
