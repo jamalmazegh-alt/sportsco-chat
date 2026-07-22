@@ -228,13 +228,13 @@ function ChallengesList({
 
   const sorted = useMemo(() => {
     const base = [...challenges].sort(
-      (a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0),
+      (a: any, b: any) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0),
     );
-    return groupJugglingVariants(base, (c) => c.template_key ?? null);
+    return groupJugglingVariants(base, (c: any) => c.template_key ?? null);
   }, [challenges, entryCounts]);
 
   const displayed = useMemo(() => {
-    return showAll ? sorted : sorted.filter((c) => (entryCounts[c.id] ?? 0) > 0);
+    return showAll ? sorted : sorted.filter((c: any) => (entryCounts[c.id] ?? 0) > 0);
   }, [sorted, showAll, entryCounts]);
 
   const hasHidden = displayed.length < sorted.length;
