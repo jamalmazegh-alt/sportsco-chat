@@ -138,17 +138,8 @@ const CoachAssignedEmail = ({ displayName, teamName, clubName, teamUrl, locale }
   const team = teamName ?? "";
   const club = clubName ?? "";
   return (
-    <EmailShell preview={c.preview(team, club)} locale={"fr"}>
-      <Section style={header}>
-        <Img
-          src="https://www.clubero.app/clubero-logo.png"
-          alt="Clubero"
-          width="56"
-          height="56"
-          style={logo}
-        />
-        <Text style={brand}>{c.brand}</Text>
-      </Section>
+    <EmailShell preview={c.preview(team, club)} locale={locale}>
+
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(team, club)}</Text>
