@@ -253,9 +253,14 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
-    const s: Step[] = ["type", "team"];
+    const s: Step[] = ["type"];
+    // Meetings are always attached to the club's internal team, so we don't
+    // ask the user to pick one. All other types keep the classic "team" step.
+    if (state.type !== "meeting") s.push("team");
     // "Other" events: ask for a name up-front (e.g. camp/stage title).
     if (state.type === "other") s.push("name");
+    // Meetings need a title too (no team-derived default).
+    if (state.type === "meeting") s.push("name");
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
     const isRecurring =
@@ -282,7 +287,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
       if (state.type !== "match") s.push("location");
-      s.push("convocation");
+      // Meetings manage attendees on the event page, not through the
+      // convocation flow, so skip the "convocation" question.
+      if (state.type !== "meeting") s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
       s.push("comment");
