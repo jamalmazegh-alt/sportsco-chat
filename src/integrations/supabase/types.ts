@@ -8604,6 +8604,22 @@ export type Database = {
           since: string
         }[]
       }
+      sync_meeting_attendees_atomic: {
+        Args: {
+          _actor: string
+          _audiences?: Json
+          _confirm_remove?: string[]
+          _dry_run?: boolean
+          _event_id: string
+          _manual_user_ids?: string[]
+        }
+        Returns: {
+          added_user_ids: string[]
+          kept_count: number
+          removed_user_ids: string[]
+          requires_confirmation_user_ids: string[]
+        }[]
+      }
       team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
       unarchive_team: { Args: { _id: string }; Returns: undefined }
