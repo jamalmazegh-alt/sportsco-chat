@@ -119,10 +119,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
   const { i18n: i18nInstance } = useTranslation();
   const lang = (i18nInstance.language || i18n.language || "en").slice(0, 2);
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang} translate="no" className="notranslate" suppressHydrationWarning>
       <head>
+        <meta name="google" content="notranslate" />
         <HeadContent />
       </head>
+
       <body>
         {children}
         <Scripts />
