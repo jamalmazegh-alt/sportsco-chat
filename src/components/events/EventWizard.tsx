@@ -313,6 +313,22 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     screenRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [current]);
 
+  // Meetings: silently resolve the club's internal team (get_or_create).
+  useEffect(() => {
+    if (state.type !== "meeting" || state.teamId || !activeClubId) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.rpc("get_or_create_internal_team", {
+        _club_id: activeClubId,
+      });
+      if (cancelled || error || !data) return;
+      setState((s) => ({ ...s, teamId: data as string }));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [state.type, state.teamId, activeClubId]);
+
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
 
