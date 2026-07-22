@@ -2810,6 +2810,24 @@ function EventDetail() {
           const selectedPlayers = (convocations ?? [])
             .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
             .filter(Boolean);
+          const waCoachNames: string[] | undefined = (() => {
+            const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+              profiles?: {
+                first_name?: string | null;
+                last_name?: string | null;
+                full_name?: string | null;
+              } | null;
+            }>;
+            const names = rows
+              .map((r) => {
+                const p = r.profiles ?? {};
+                return (
+                  p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
+                );
+              })
+              .filter(Boolean);
+            return names.length > 0 ? names : undefined;
+          })();
           const base = {
             clubName,
             teamName,
@@ -2824,12 +2842,14 @@ function EventDetail() {
             location: event.location,
             locationUrl: (event as any).location_url,
             meetingPoint: (event as any).meeting_point,
+            coachNames: waCoachNames,
             description: event.description,
             attachments: (event.attachments as any) ?? [],
             selectedPlayers,
             cancellationReason: event.cancellation_reason,
             lineup: null,
           };
+
           const lineupBlock = lineupData
             ? {
                 formation: lineupData.formation,
