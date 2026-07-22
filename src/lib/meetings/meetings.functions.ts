@@ -283,13 +283,16 @@ export const updateMeetingAttendanceStatus = createServerFn({ method: "POST" })
     return { ok: true, status: data.status };
   });
 
+type JsonPrimitive = string | number | boolean | null;
+type Json = JsonPrimitive | { [k: string]: Json } | Json[];
+
 export type MeetingAttendeeRow = {
   id: string;
   user_id: string;
   member_id: string | null;
   status: "present" | "absent" | "uncertain" | "pending";
   comment: string | null;
-  sources: MeetingSources;
+  sources: Json;
   added_manually: boolean;
   invited_at: string;
   responded_at: string | null;
