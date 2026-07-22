@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { StaffAvailabilityForTeamMonth } from "@/components/staff-availability";
-import { useIsCoach } from "@/lib/auth-context";
 import {
   Select,
   SelectContent,
@@ -39,6 +38,22 @@ function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/availability")({
   component: TeamAvailabilityCalendar,
+  head: () => ({
+    meta: [
+      { title: "Calendrier des absences — Clubero" },
+      {
+        name: "description",
+        content: "Suivi mensuel des absences joueurs et staff d’une équipe dans Clubero.",
+      },
+      { property: "og:title", content: "Calendrier des absences — Clubero" },
+      {
+        property: "og:description",
+        content: "Suivi mensuel des absences joueurs et staff d’une équipe dans Clubero.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   errorComponent: ErrorBoundary,
 
   notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
@@ -95,8 +110,6 @@ function TeamAvailabilityCalendar() {
   );
   const monthStartStr = ymd(monthStart);
   const monthEndStr = ymd(monthEnd);
-
-  const isCoach = useIsCoach();
 
   const { data: team } = useQuery({
     queryKey: ["team-basic", teamId],
@@ -396,7 +409,7 @@ function TeamAvailabilityCalendar() {
         </CardContent>
       </Card>
 
-      {isCoach && team?.club_id && (
+      {team?.club_id && (
         <StaffAvailabilityForTeamMonth
           teamId={teamId}
           clubId={team.club_id}

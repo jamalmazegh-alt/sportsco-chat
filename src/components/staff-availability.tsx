@@ -13,9 +13,11 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, CircleDashed, MinusCircle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
+import { listTeamCoachesForAvailability } from "@/lib/staff-availability.functions";
 import { cn } from "@/lib/utils";
 
 type StaffAvailabilityRow = {
@@ -63,31 +65,12 @@ function statusForDate(rows: StaffAvailabilityRow[], dateStr: string): Status {
 
 /** Fetch coaches (head + assistant) of a team. */
 function useTeamCoaches(teamId: string | undefined) {
+  const listTeamCoaches = useServerFn(listTeamCoachesForAvailability);
   return useQuery({
     queryKey: ["team-coaches", teamId],
     enabled: !!teamId,
     queryFn: async (): Promise<Coach[]> => {
-      const { data, error } = await supabase
-        .from("team_members")
-        .select("user_id, role, profiles:user_id(id, first_name, last_name, full_name)")
-        .eq("team_id", teamId!)
-        .in("role", ["coach"] as any);
-      if (error) throw error;
-      const seen = new Set<string>();
-      return (data ?? [])
-        .filter((r: any) => {
-          if (!r.user_id || seen.has(r.user_id)) return false;
-          seen.add(r.user_id);
-          return true;
-        })
-        .map((r: any) => {
-          const p = r.profiles;
-          const name =
-            (p?.first_name || p?.last_name)
-              ? `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim()
-              : (p?.full_name ?? "—");
-          return { user_id: r.user_id, full_name: name, role: r.role };
-        });
+      return listTeamCoaches({ data: { teamId: teamId! } });
     },
   });
 }
