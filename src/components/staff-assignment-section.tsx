@@ -228,6 +228,7 @@ export function StaffAssignmentSection({
     onSuccess: (userId) => {
       toast.success(t("staffAssignment.removed", { defaultValue: "Coach retiré" }));
       qc.invalidateQueries({ queryKey: ["event-staff-assignments", eventId] });
+      qc.invalidateQueries({ queryKey: ["event", eventId] });
       dispatchStaffAssignmentPush({
         data: { eventId, userId, action: "unassigned" },
       }).catch((e) => console.warn("[staff] unassign push failed", (e as Error).message));
