@@ -64,7 +64,8 @@ type Row = {
 const REASON_ICONS: Record<string, typeof Palmtree> = {
   vacation: Palmtree,
   injury: HeartPulse,
-  school: GraduationCap,
+  school: BookOpen,
+  training: GraduationCap,
   family: Users,
   work: Briefcase,
   other: HelpCircle,
@@ -75,6 +76,7 @@ function StaffAvailabilitiesPage() {
   const { user, activeClubId, memberships } = useAuth();
   const qc = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editing, setEditing] = useState<StaffAvailabilityEditPayload | null>(null);
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
