@@ -151,9 +151,8 @@ function LockedClubShell({ children }: { children: ReactNode }) {
     <ConsentGate>
       <div className="min-h-screen bg-background pb-[164px]">
         <div className="mx-auto max-w-xl">{children}</div>
-        <SupportFab />
-        <AssistantFab />
         <BottomNav />
+
       </div>
     </ConsentGate>
   );
