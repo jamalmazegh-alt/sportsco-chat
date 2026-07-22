@@ -91,6 +91,8 @@ const DICTS: Record<WaLocale, Dict> = {
     meetingTime: "Meeting time",
     endTime: "Ends at",
     meetingPoint: "Meeting point",
+    coachLabel: "Coach",
+
     squad: (n) => `👥 *Squad (${n})*`,
     lineup: (f) => `⚽ *Planned line-up${f ? ` (${f})` : ""}*`,
     startingXI: "_Starting XI_",
