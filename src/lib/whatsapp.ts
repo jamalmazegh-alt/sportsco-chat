@@ -151,6 +151,8 @@ export type WhatsAppEventInput = {
   location?: string | null;
   locationUrl?: string | null;
   meetingPoint?: string | null;
+  coachNames?: string[] | null;
+
   description?: string | null;
   attachments?: Array<{ name?: string; url?: string }> | null;
   selectedPlayers?: string[]; // names
