@@ -73,6 +73,7 @@ import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 // StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
 import { StaffAssignmentSection } from "@/components/staff-assignment-section";
+import { StaffAssignmentReadOnly } from "@/components/staff-assignment-readonly";
 
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
