@@ -88,6 +88,27 @@ export const createEvent = createServerFn({ method: "POST" })
       throw new Error(translateEventDbError(error));
     }
 
+    // Meetings: auto-insert creator as attendee (idempotent).
+    if (payload.type === "meeting") {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("meeting_attendees")
+          .upsert(
+            {
+              event_id: row.id as string,
+              user_id: userId,
+              added_manually: true,
+              status: "pending",
+              sources: [{ type: "creator" }] as never,
+            } as never,
+            { onConflict: "event_id,user_id" },
+          );
+      } catch {
+        /* never block create */
+      }
+    }
+
     // Journal produit (fire-and-forget, superadmin observability).
     try {
       const [{ supabaseAdmin }, { logActivity }] = await Promise.all([
