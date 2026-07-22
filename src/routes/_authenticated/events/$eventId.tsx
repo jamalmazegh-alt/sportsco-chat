@@ -4285,19 +4285,6 @@ function EventDetail() {
         </section>
       )}
 
-      {isCoach && event?.team_id && eventTeam?.club_id && eventDateStr && (
-        <>
-          <div className="flex items-center gap-2">
-            <StaffCoverageBadge
-              eventId={event.id}
-              teamId={event.team_id}
-              clubId={eventTeam.club_id}
-              startsAt={event.starts_at}
-            />
-          </div>
-        </>
-
-      )}
 
       {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr && (
         <StaffAssignmentSection
