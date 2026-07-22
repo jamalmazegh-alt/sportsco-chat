@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { getPlayerChallengeStats } from "@/lib/challenges/challenges.functions";
+import { challengeDisplayName } from "@/lib/challenges/display";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId/challenges")({
@@ -80,7 +81,7 @@ function PlayerChallengesTab() {
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <span>{challenge.icon}</span>
-                  <span className="flex-1 truncate">{challenge.name}</span>
+                  <span className="flex-1 truncate">{challengeDisplayName(challenge, t)}</span>
                 </CardTitle>
                 <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                   <AggregateBadge
