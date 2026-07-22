@@ -23,7 +23,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AttendancePill } from "@/components/attendance-pill";
-import { AudiencePickerBody, useAudienceState } from "@/components/needs/audience-picker";
+import {
+  AudiencePickerBody,
+  useAudienceState,
+  type AudienceState,
+} from "@/components/needs/audience-picker";
+import { sourcesToSelection } from "@/lib/meetings/sources-to-selection";
 import { getEventAudienceContext } from "@/lib/needs/needs.functions";
 import {
   listMeetingAttendees,
