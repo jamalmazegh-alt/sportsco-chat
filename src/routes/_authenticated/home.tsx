@@ -105,6 +105,7 @@ function HomePage() {
         .from("teams")
         .select("id, name, sport, championship, competitions")
         .eq("club_id", activeClubId!)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .is("archived_at", null)
         .order("name");

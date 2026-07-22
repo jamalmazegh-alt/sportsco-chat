@@ -93,12 +93,12 @@ function EventsPage() {
   });
 
   const { data: teams } = useQuery({
-    queryKey: ["teams", activeClubId],
+    queryKey: ["teams", activeClubId, "with-internal"],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, sport, championship, competitions")
+        .select("id, name, sport, championship, competitions, is_internal")
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .is("archived_at", null)
@@ -106,6 +106,12 @@ function EventsPage() {
       return data ?? [];
     },
   });
+
+  // Teams shown in filter chips / new-event picker exclude the internal team.
+  const visibleTeams = useMemo(
+    () => (teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal),
+    [teams],
+  );
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["events", activeClubId, isCoach],
@@ -138,11 +144,15 @@ function EventsPage() {
           ]),
         );
       }
-      return list.map((e) => ({
-        ...e,
-        team_name: teams!.find((t) => t.id === e.team_id)?.name ?? "",
-        result: resultsById.get(e.id) ?? null,
-      }));
+      return list.map((e) => {
+        const team = teams!.find((t) => t.id === e.team_id);
+        const isInternal = Boolean((team as { is_internal?: boolean } | undefined)?.is_internal);
+        return {
+          ...e,
+          team_name: isInternal ? "" : (team?.name ?? ""),
+          result: resultsById.get(e.id) ?? null,
+        };
+      });
     },
   });
 
