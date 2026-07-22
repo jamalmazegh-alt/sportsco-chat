@@ -76,130 +76,24 @@ export function StaffAssignmentSection({
 
   // ---- Data ----------------------------------------------------------------
 
-  const { data: eventTeamName = null } = useQuery({
-    queryKey: ["event-team-name", teamId],
-    enabled: !!teamId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("teams")
-        .select("name")
-        .eq("id", teamId)
-        .maybeSingle();
-      return (data?.name as string | null) ?? null;
-    },
-  });
-
-  const { data: teamStaff = [] } = useQuery({
-    queryKey: ["event-staff-candidates", "team", teamId, eventTeamName],
-    enabled: !!teamId,
+  // Unified pool via SECURITY DEFINER RPC — bypasses can_view_team so admins /
+  // event staff can see reinforcements from other teams of the club. RPC
+  // enforces its own access guard (event team staff OR club admin/dirigeant).
+  const { data: pool = [] } = useQuery({
+    queryKey: ["event-assignable-staff", eventId],
+    enabled: !!eventId,
     queryFn: async (): Promise<Candidate[]> => {
-      const { data, error } = await supabase
-        .from("team_members")
-        .select("user_id, role, profiles:user_id(first_name, last_name, full_name)")
-        .eq("team_id", teamId)
-        .in("role", ["coach", "assistant_coach"] as any);
-      if (error) throw error;
-      const seen = new Set<string>();
-      return (data ?? [])
-        .filter((r: any) => r.user_id && !seen.has(r.user_id) && (seen.add(r.user_id), true))
-        .map((r: any) => ({
-          user_id: r.user_id,
-          full_name: formatName(r.profiles),
-          role: r.role,
-          teamName: eventTeamName,
-          isReinforcement: false,
-        }));
-    },
-  });
-
-  const { data: reinforcements = [] } = useQuery({
-    queryKey: ["event-staff-candidates", "club-reinforcements", clubId, teamId, teamStaff.length],
-    enabled: !!clubId && !!teamId,
-    queryFn: async (): Promise<Candidate[]> => {
-      const teamStaffIds = new Set(teamStaff.map((c) => c.user_id));
-
-      // (a) All coaches / assistant_coaches across every non-deleted team of the club.
-      const { data: clubTeams } = await supabase
-        .from("teams")
-        .select("id, name")
-        .eq("club_id", clubId)
-        .is("deleted_at", null);
-      const clubTeamIds = (clubTeams ?? []).map((t: any) => t.id);
-      const teamNameById = new Map<string, string>(
-        (clubTeams ?? []).map((t: any) => [t.id, t.name]),
-      );
-
-      const teamMemberRows: any[] = [];
-      if (clubTeamIds.length > 0) {
-        const { data: tms, error: tmsErr } = await supabase
-          .from("team_members")
-          .select("user_id, role, team_id, profiles:user_id(first_name, last_name, full_name)")
-          .in("team_id", clubTeamIds)
-          .in("role", ["coach", "assistant_coach"] as any);
-        if (tmsErr) throw tmsErr;
-        teamMemberRows.push(...(tms ?? []));
-      }
-
-      // (b) club_members whose role/roles contain coach or assistant_coach.
-      //     club_members has no direct FK to profiles → fetch profiles in a
-      //     separate query keyed by user_id.
-      const { data: cms, error: cmsErr } = await supabase
-        .from("club_members")
-        .select("user_id, role, roles")
-        .eq("club_id", clubId);
-      if (cmsErr) throw cmsErr;
-      const clubCoachRows = (cms ?? []).filter((m: any) => {
-        const rs = new Set<string>();
-        if (m.role) rs.add(String(m.role));
-        if (Array.isArray(m.roles)) for (const r of m.roles) rs.add(String(r));
-        return rs.has("coach") || rs.has("assistant_coach");
+      const { data, error } = await supabase.rpc("get_assignable_staff", {
+        p_event_id: eventId,
       });
-
-      const missingIds = Array.from(
-        new Set(
-          clubCoachRows
-            .map((m: any) => m.user_id as string | null)
-            .filter((u): u is string => !!u && !teamStaffIds.has(u)),
-        ),
-      );
-      const profileById = new Map<string, any>();
-      if (missingIds.length > 0) {
-        const { data: profs } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name, full_name")
-          .in("id", missingIds);
-        for (const p of (profs ?? []) as any[]) profileById.set(p.id, p);
-      }
-
-      // Fuse by user_id — first occurrence wins. team_members has a real team name; use it.
-      const byUser = new Map<string, Candidate>();
-      for (const r of teamMemberRows) {
-        if (!r.user_id || teamStaffIds.has(r.user_id) || byUser.has(r.user_id)) continue;
-        byUser.set(r.user_id, {
-          user_id: r.user_id,
-          full_name: formatName(r.profiles),
-          role: r.role,
-          teamName: teamNameById.get(r.team_id) ?? null,
-          isReinforcement: true,
-        });
-      }
-      for (const m of clubCoachRows) {
-        if (!m.user_id || teamStaffIds.has(m.user_id) || byUser.has(m.user_id)) continue;
-        const roles = Array.isArray(m.roles) ? m.roles.map(String) : [];
-        const primary =
-          String(m.role ?? "") === "assistant_coach" ||
-          (roles.includes("assistant_coach") && !roles.includes("coach"))
-            ? "assistant_coach"
-            : "coach";
-        byUser.set(m.user_id, {
-          user_id: m.user_id,
-          full_name: formatName(profileById.get(m.user_id) ?? null),
-          role: primary,
-          teamName: null,
-          isReinforcement: true,
-        });
-      }
-      return Array.from(byUser.values());
+      if (error) throw error;
+      return (data ?? []).map((r: any) => ({
+        user_id: r.user_id,
+        full_name: r.full_name ?? "—",
+        role: r.role,
+        teamName: r.usual_team_name ?? null,
+        isReinforcement: !r.is_event_team_staff,
+      }));
     },
   });
 
