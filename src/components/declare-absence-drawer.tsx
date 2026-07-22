@@ -252,13 +252,15 @@ export function DeclareAbsenceDrawer({
   }
 
   async function checkOverlap(): Promise<boolean> {
-    const { count } = await supabase
+    let q = supabase
       .from("player_availabilities")
       .select("id", { count: "exact", head: true })
       .eq("player_id", playerId)
       .eq("status", "active")
       .lte("start_date", endDate)
       .gte("end_date", startDate);
+    if (editing) q = q.neq("id", availability!.id);
+    const { count } = await q;
     return (count ?? 0) > 0;
   }
 
