@@ -10,10 +10,12 @@ import {
   ChevronLeft,
   Plus,
   Trash2,
+  Pencil,
   CalendarOff,
   Palmtree,
   HeartPulse,
   GraduationCap,
+  BookOpen,
   Users,
   Briefcase,
   HelpCircle,
@@ -22,7 +24,10 @@ import {
   EyeOff,
 } from "lucide-react";
 import i18n from "@/lib/i18n";
-import { DeclareStaffAbsenceDrawer } from "@/components/declare-staff-absence-drawer";
+import {
+  DeclareStaffAbsenceDrawer,
+  type StaffAvailabilityEditPayload,
+} from "@/components/declare-staff-absence-drawer";
 
 export const Route = createFileRoute("/_authenticated/profile/availabilities")({
   component: StaffAvailabilitiesPage,
@@ -59,7 +64,8 @@ type Row = {
 const REASON_ICONS: Record<string, typeof Palmtree> = {
   vacation: Palmtree,
   injury: HeartPulse,
-  school: GraduationCap,
+  school: BookOpen,
+  training: GraduationCap,
   family: Users,
   work: Briefcase,
   other: HelpCircle,
@@ -70,6 +76,7 @@ function StaffAvailabilitiesPage() {
   const { user, activeClubId, memberships } = useAuth();
   const qc = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editing, setEditing] = useState<StaffAvailabilityEditPayload | null>(null);
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
@@ -149,7 +156,13 @@ function StaffAvailabilitiesPage() {
         </p>
       </div>
 
-      <Button className="w-full h-11" onClick={() => setDrawerOpen(true)}>
+      <Button
+        className="w-full h-11"
+        onClick={() => {
+          setEditing(null);
+          setDrawerOpen(true);
+        }}
+      >
         <Plus className="h-4 w-4" />
         {t("staffAvailability.declareCta", { defaultValue: "Déclarer une indisponibilité" })}
       </Button>
@@ -219,21 +232,49 @@ function StaffAvailabilitiesPage() {
                     </div>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => cancel(r.id)}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                  aria-label={t("common.delete", { defaultValue: "Supprimer" })}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditing({
+                        id: r.id,
+                        start_date: r.start_date,
+                        end_date: r.end_date,
+                        reason: r.reason,
+                        certainty: r.certainty,
+                        visibility: r.visibility,
+                        comment: r.comment,
+                      });
+                      setDrawerOpen(true);
+                    }}
+                    className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    aria-label={t("common.edit", { defaultValue: "Modifier" })}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => cancel(r.id)}
+                    className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </li>
             );
           })}
         </ul>
       )}
 
-      <DeclareStaffAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+      <DeclareStaffAbsenceDrawer
+        open={drawerOpen}
+        onOpenChange={(v) => {
+          setDrawerOpen(v);
+          if (!v) setEditing(null);
+        }}
+        availability={editing}
+      />
     </div>
   );
 }

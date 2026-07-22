@@ -31,6 +31,7 @@ import {
   Palmtree,
   HeartPulse,
   GraduationCap,
+  BookOpen,
   Users,
   Briefcase,
   HelpCircle,
@@ -42,38 +43,46 @@ import {
 } from "lucide-react";
 
 
-type Reason = "vacation" | "injury" | "school" | "family" | "work" | "other";
+type Reason = "vacation" | "injury" | "school" | "training" | "family" | "work" | "other";
 type Certainty = "confirmed" | "tentative";
 type Visibility = "staff" | "admins_only";
 
 const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
   { value: "vacation", Icon: Palmtree },
   { value: "injury", Icon: HeartPulse },
-  { value: "school", Icon: GraduationCap },
+  { value: "school", Icon: BookOpen },
+  { value: "training", Icon: GraduationCap },
   { value: "family", Icon: Users },
   { value: "work", Icon: Briefcase },
   { value: "other", Icon: HelpCircle },
 ];
 
+export interface StaffAvailabilityEditPayload {
+  id: string;
+  start_date: string;
+  end_date: string;
+  reason: string;
+  certainty: string;
+  visibility: string;
+  comment: string | null;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onCreated?: () => void;
+  /** When provided, drawer runs in EDIT mode and updates this row. */
+  availability?: StaffAvailabilityEditPayload | null;
 }
 
-/**
- * Coach self-declaration of unavailability (Lot 2 — staff availabilities).
- *
- * L'indispo est globale au coach dans le club actif (activeClubId) et
- * couvre TOUTES les équipes qu'il/elle entraîne dans ce club. RLS
- * autorise l'insert par owner (auth.uid() = user_id = created_by).
- */
-export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Props) {
+export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, availability }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
 
   const { user, activeClubId } = useAuth();
   const qc = useQueryClient();
+
+  const editing = !!availability;
 
   const today = new Date().toISOString().slice(0, 10);
   const todayDate = new Date(`${today}T00:00:00`);
@@ -88,7 +97,17 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (availability) {
+      setRange({
+        from: new Date(`${availability.start_date}T00:00:00`),
+        to: new Date(`${availability.end_date}T00:00:00`),
+      });
+      setReason((availability.reason as Reason) ?? "vacation");
+      setCertainty((availability.certainty as Certainty) ?? "confirmed");
+      setVisibility((availability.visibility as Visibility) ?? "staff");
+      setComment(availability.comment ?? "");
+    } else {
       const t0 = new Date(`${today}T00:00:00`);
       setRange({ from: t0, to: t0 });
       setReason("vacation");
@@ -97,7 +116,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
       setComment("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, availability?.id]);
 
 
   async function onSubmit() {
@@ -125,22 +144,62 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
     }
     setBusy(true);
     try {
-      const { error } = await supabase.from("staff_availabilities").insert({
-        user_id: user.id,
-        created_by_user_id: user.id,
-        club_id: activeClubId,
-        start_date: startDate,
-        end_date: endDate,
-        reason,
-        certainty,
-        visibility,
-        comment: comment.trim() || null,
-      });
+      // Overlap check — block if another ACTIVE row overlaps [start,end].
+      let q = supabase
+        .from("staff_availabilities")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("club_id", activeClubId)
+        .eq("status", "active")
+        .lte("start_date", endDate)
+        .gte("end_date", startDate);
+      if (editing) q = q.neq("id", availability!.id);
+      const { count, error: overlapErr } = await q;
+      if (overlapErr) throw overlapErr;
+      if ((count ?? 0) > 0) {
+        toast.error(
+          t("availability.errors.overlap", {
+            defaultValue:
+              "Tu as déjà une indisponibilité sur ces dates. Édite l'existante à la place.",
+          }),
+        );
+        setBusy(false);
+        return;
+      }
 
-      if (error) throw error;
-      toast.success(
-        t("staffAvailability.saved", { defaultValue: "Indisponibilité enregistrée" }),
-      );
+      if (editing) {
+        const { error } = await supabase
+          .from("staff_availabilities")
+          .update({
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            certainty,
+            visibility,
+            comment: comment.trim() || null,
+          })
+          .eq("id", availability!.id);
+        if (error) throw error;
+        toast.success(
+          t("staffAvailability.updated", { defaultValue: "Indisponibilité mise à jour" }),
+        );
+      } else {
+        const { error } = await supabase.from("staff_availabilities").insert({
+          user_id: user.id,
+          created_by_user_id: user.id,
+          club_id: activeClubId,
+          start_date: startDate,
+          end_date: endDate,
+          reason,
+          certainty,
+          visibility,
+          comment: comment.trim() || null,
+        });
+        if (error) throw error;
+        toast.success(
+          t("staffAvailability.saved", { defaultValue: "Indisponibilité enregistrée" }),
+        );
+      }
       qc.invalidateQueries({ queryKey: ["my-staff-availabilities"] });
       qc.invalidateQueries({ queryKey: ["staff-availabilities"] });
       onCreated?.();
@@ -158,9 +217,11 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            {t("staffAvailability.declare", {
-              defaultValue: "Déclarer une indisponibilité",
-            })}
+            {editing
+              ? t("staffAvailability.edit", { defaultValue: "Modifier l'indisponibilité" })
+              : t("staffAvailability.declare", {
+                  defaultValue: "Déclarer une indisponibilité",
+                })}
           </SheetTitle>
           <SheetDescription>
             {t("staffAvailability.drawerHint", {
@@ -198,7 +259,6 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
                   numberOfMonths={1}
                   selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
                   onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
-                    // 3rd click starts a new range at the clicked day instead of extending the end.
                     if (range.from && range.to && clickedDay) {
                       setRange({ from: clickedDay, to: undefined });
                       return;
@@ -319,6 +379,8 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
           >
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
+            ) : editing ? (
+              t("common.saveChanges", { defaultValue: "Enregistrer les modifications" })
             ) : (
               t("common.save", { defaultValue: "Enregistrer" })
             )}

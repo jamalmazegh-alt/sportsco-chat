@@ -1,0 +1,2 @@
+ALTER TABLE public.staff_availabilities DROP CONSTRAINT IF EXISTS staff_availabilities_reason_check;
+ALTER TABLE public.staff_availabilities ADD CONSTRAINT staff_availabilities_reason_check CHECK (reason IN ('vacation','injury','school','training','family','work','other'));

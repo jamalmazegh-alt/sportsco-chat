@@ -56,6 +56,15 @@ const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
   { value: "other", Icon: HelpCircle },
 ];
 
+export interface PlayerAvailabilityEditPayload {
+  id: string;
+  player_id: string;
+  start_date: string;
+  end_date: string;
+  reason: string;
+  comment: string | null;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -64,6 +73,8 @@ interface Props {
   /** When provided, the candidate list = all players of this team (coach/admin flow). */
   teamId?: string;
   onCreated?: () => void;
+  /** When provided, drawer runs in EDIT mode. */
+  availability?: PlayerAvailabilityEditPayload | null;
 }
 
 type Candidate = { id: string; first_name: string; last_name: string };
@@ -74,7 +85,9 @@ export function DeclareAbsenceDrawer({
   playerId: initialPlayerId,
   teamId,
   onCreated,
+  availability,
 }: Props) {
+  const editing = !!availability;
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
 
@@ -100,7 +113,17 @@ export function DeclareAbsenceDrawer({
   const [forceConfirm, setForceConfirm] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (availability) {
+      setPlayerId(availability.player_id);
+      setRange({
+        from: new Date(`${availability.start_date}T00:00:00`),
+        to: new Date(`${availability.end_date}T00:00:00`),
+      });
+      setReason((availability.reason as Reason) ?? "vacation");
+      setComment(availability.comment ?? "");
+      setForceConfirm(false);
+    } else {
       const t0 = new Date(`${today}T00:00:00`);
       setPlayerId(initialPlayerId ?? "");
       setRange({ from: t0, to: t0 });
@@ -109,7 +132,7 @@ export function DeclareAbsenceDrawer({
       setForceConfirm(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialPlayerId]);
+  }, [open, initialPlayerId, availability?.id]);
 
 
   // Candidates:
@@ -229,13 +252,15 @@ export function DeclareAbsenceDrawer({
   }
 
   async function checkOverlap(): Promise<boolean> {
-    const { count } = await supabase
+    let q = supabase
       .from("player_availabilities")
       .select("id", { count: "exact", head: true })
       .eq("player_id", playerId)
       .eq("status", "active")
       .lte("start_date", endDate)
       .gte("end_date", startDate);
+    if (editing) q = q.neq("id", availability!.id);
+    const { count } = await q;
     return (count ?? 0) > 0;
   }
 
@@ -336,78 +361,95 @@ export function DeclareAbsenceDrawer({
     }
     setBusy(true);
     try {
-      if (!forceConfirm) {
-        const overlap = await checkOverlap();
-        if (overlap) {
-          setBusy(false);
-          const ok = window.confirm(
-            t("availability.overlapWarning", {
-              defaultValue:
-                "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
-            }),
-          );
-          if (!ok) return;
-          setForceConfirm(true);
-          setBusy(true);
-        }
-      }
-      const { data: inserted, error } = await supabase
-        .from("player_availabilities")
-        .insert({
-          player_id: playerId,
-          created_by_user_id: user!.id,
-          start_date: startDate,
-          end_date: endDate,
-          reason,
-          comment: comment.trim() || null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-
-      // Notify coaches (best-effort): in-app + email (server fn handles per-coach locale)
-      try {
-        const [playerRes, declarerRes] = await Promise.all([
-          supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
-          supabase
-            .from("profiles")
-            .select("first_name, full_name")
-            .eq("id", user!.id)
-            .maybeSingle(),
-        ]);
-        const p = playerRes.data;
-        const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
-        const declaredByName =
-          (declarerRes.data as any)?.first_name ||
-          ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
-          null;
-        // Only attribute if declarer is NOT the player themselves
-        const isSelf =
-          !!p &&
-          (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
-            ?.user_id === user!.id;
-        const attribution = isSelf ? null : declaredByName;
-        const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
-        const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(
-          name,
-          fmt(startDate),
-          fmt(endDate),
-          reasonLabel,
-          impactedEvents,
-          attribution,
+      const overlap = await checkOverlap();
+      if (overlap) {
+        toast.error(
+          t("availability.errors.overlap", {
+            defaultValue:
+              "Une absence est déjà déclarée sur ces dates. Édite l'existante à la place.",
+          }),
         );
-
-        // Email coaches via server fn (per-coach language, excludes caller)
-        if (inserted?.id) {
-          const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
-          notifyCoachesOfAbsence({ data: { availabilityId: inserted.id } }).catch(() => undefined);
-        }
-      } catch {
-        /* ignore notify errors */
+        setBusy(false);
+        return;
       }
 
-      toast.success(t("availability.saved", { defaultValue: "Absence enregistrée" }));
+      let insertedId: string | null = null;
+      if (editing) {
+        const { error } = await supabase
+          .from("player_availabilities")
+          .update({
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .eq("id", availability!.id);
+        if (error) throw error;
+        insertedId = availability!.id;
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("player_availabilities")
+          .insert({
+            player_id: playerId,
+            created_by_user_id: user!.id,
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        insertedId = inserted?.id ?? null;
+      }
+
+      // Notify coaches on CREATE only (best-effort)
+      if (!editing) {
+        try {
+          const [playerRes, declarerRes] = await Promise.all([
+            supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
+            supabase
+              .from("profiles")
+              .select("first_name, full_name")
+              .eq("id", user!.id)
+              .maybeSingle(),
+          ]);
+          const p = playerRes.data;
+          const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
+          const declaredByName =
+            (declarerRes.data as any)?.first_name ||
+            ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
+            null;
+          const isSelf =
+            !!p &&
+            (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
+              ?.user_id === user!.id;
+          const attribution = isSelf ? null : declaredByName;
+          const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
+          const fmt = (d: string) => new Date(d).toLocaleDateString();
+          await notifyCoaches(
+            name,
+            fmt(startDate),
+            fmt(endDate),
+            reasonLabel,
+            impactedEvents,
+            attribution,
+          );
+
+          if (insertedId) {
+            const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
+            notifyCoachesOfAbsence({ data: { availabilityId: insertedId } }).catch(() => undefined);
+          }
+        } catch {
+          /* ignore notify errors */
+        }
+      }
+
+      toast.success(
+        editing
+          ? t("availability.updated", { defaultValue: "Absence mise à jour" })
+          : t("availability.saved", { defaultValue: "Absence enregistrée" }),
+      );
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
       qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
       qc.invalidateQueries({ queryKey: ["event-availabilities"] });
