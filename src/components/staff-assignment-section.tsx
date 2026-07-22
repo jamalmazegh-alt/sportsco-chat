@@ -264,7 +264,15 @@ export function StaffAssignmentSection({
               </span>
             )}
           </div>
-          <div className="text-[11px] text-muted-foreground truncate">{meta}</div>
+          <div className="text-[11px] text-muted-foreground truncate">{baseMeta}</div>
+          {absenceLabel && (
+            <div className={cn(
+              "text-[11px] truncate",
+              status === "unavailable" ? "text-destructive" : "text-amber-600 dark:text-amber-400",
+            )}>
+              {absenceLabel}
+            </div>
+          )}
         </div>
         <StatusDot status={status} />
         {isAssigned ? (
