@@ -274,7 +274,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
               </section>
 
               {/* Roles editor */}
-              {!isSelf && isMember && (
+              {isMember && (
                 <section className="rounded-xl border border-border bg-card p-4 space-y-3">
                   <div>
                     <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
