@@ -28,12 +28,18 @@ import { getEventAudienceContext } from "@/lib/needs/needs.functions";
 import {
   listMeetingAttendees,
   previewMeetingAudience,
-  setMeetingAttendees,
+  syncMeetingAttendees,
   updateMeetingAttendanceStatus,
   type MeetingAttendeeRow,
 } from "@/lib/meetings/meetings.functions";
+import { summarizeSources } from "@/lib/meetings/attendee-sources";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
+type RequiresConfirmationEntry = {
+  user_id: string;
+  full_name: string | null;
+  status: string | null;
+};
 
 function initials(name: string | null): string {
   if (!name) return "?";
@@ -153,40 +159,45 @@ export function MeetingAttendeesSection({
 
         {isStaff && attendees.length > 0 && (
           <ul className="divide-y">
-            {attendees.map((a) => (
-              <li key={a.id} className="flex items-center gap-3 py-2">
-                <Avatar className="h-9 w-9">
-                  {a.avatar_url && <AvatarImage src={a.avatar_url} alt="" />}
-                  <AvatarFallback>{initials(a.full_name)}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium">
-                    {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+            {attendees.map((a) => {
+              const chips = summarizeSources(a.sources);
+              return (
+                <li key={a.id} className="flex items-center gap-3 py-2">
+                  <Avatar className="h-9 w-9">
+                    {a.avatar_url && <AvatarImage src={a.avatar_url} alt="" />}
+                    <AvatarFallback>{initials(a.full_name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">
+                      {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                      {chips.map((chip) => (
+                        <Badge key={chip.key} variant="outline" className="text-[10px]">
+                          {chip.kind === "manual"
+                            ? t("meetings:source.manual", {
+                                defaultValue: "ajouté manuellement",
+                              })
+                            : chip.label}
+                        </Badge>
+                      ))}
+                      {a.roles.slice(0, 3).map((r) => (
+                        <Badge key={r} variant="secondary" className="text-[10px]">
+                          {r}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                    {a.added_manually && (
-                      <Badge variant="outline" className="text-[10px]">
-                        {t("meetings:source.manual", {
-                          defaultValue: "ajouté manuellement",
-                        })}
-                      </Badge>
-                    )}
-                    {a.roles.slice(0, 3).map((r) => (
-                      <Badge key={r} variant="secondary" className="text-[10px]">
-                        {r}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <StatusButtons
-                  value={a.status}
-                  onChange={(status) =>
-                    updateStatus.mutate({ user_id: a.user_id, status })
-                  }
-                  disabled={updateStatus.isPending}
-                />
-              </li>
-            ))}
+                  <StatusButtons
+                    value={a.status}
+                    onChange={(status) =>
+                      updateStatus.mutate({ user_id: a.user_id, status })
+                    }
+                    disabled={updateStatus.isPending}
+                  />
+                </li>
+              );
+            })}
           </ul>
         )}
       </CardContent>
@@ -239,7 +250,9 @@ function ManageAttendeesDialog({
   onDone: () => void;
 }) {
   const { t } = useTranslation();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<RequiresConfirmationEntry[]>([]);
 
   const ctxFn = useServerFn(getEventAudienceContext);
   const ctxQuery = useQuery({
@@ -266,21 +279,34 @@ function ManageAttendeesDialog({
     enabled: open && (audiences.length > 0 || manualUserIds.length > 0),
   });
 
-  const saveFn = useServerFn(setMeetingAttendees);
-  const save = useMutation({
-    mutationFn: () =>
-      saveFn({
-        data: { event_id: eventId, audiences, manual_user_ids: manualUserIds },
+  const syncFn = useServerFn(syncMeetingAttendees);
+  const sync = useMutation({
+    mutationFn: (confirmIds: string[]) =>
+      syncFn({
+        data: {
+          event_id: eventId,
+          audiences,
+          manual_user_ids: manualUserIds,
+          confirm_remove_user_ids: confirmIds,
+          dry_run: false,
+        },
       }),
     onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ["meeting-attendees", eventId] });
       toast.success(
-        t("meetings:save.success", {
-          defaultValue: "{{count}} personne(s) convoquée(s)",
-          count: r.inserted_count,
+        t("meetings:sync.success", {
+          defaultValue: "{{added}} ajouté(s), {{removed}} retiré(s)",
+          added: r.added_count,
+          removed: r.removed_count,
         }),
       );
-      setOpen(false);
-      onDone();
+      if (r.requires_confirmation.length > 0) {
+        setPendingConfirm(r.requires_confirmation);
+      } else {
+        setPendingConfirm([]);
+        setOpen(false);
+        onDone();
+      }
     },
     onError: (e: Error) =>
       toast.error(t(`meetings:errors.${e.message}`, { defaultValue: e.message })),
@@ -289,58 +315,117 @@ function ManageAttendeesDialog({
   const hasSelection = audiences.length > 0 || manualUserIds.length > 0;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <UserPlus className="mr-2 h-4 w-4" />
-          {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
-          </DialogTitle>
-          <DialogDescription>
-            {t("meetings:manage.desc", {
-              defaultValue:
-                "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
-            })}
-          </DialogDescription>
-        </DialogHeader>
-
-        {ctxQuery.isLoading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            {t("common.loading", { defaultValue: "Chargement…" })}
-          </div>
-        ) : (
-          <AudiencePickerBody
-            ctx={ctxQuery.data ?? null}
-            state={state}
-            controls={controls}
-            preview={{
-              count: previewQuery.data?.count ?? null,
-              loading: previewQuery.isFetching,
-            }}
-            enablePreassign
-          />
-        )}
-
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={save.isPending}
-          >
-            {t("common.cancel", { defaultValue: "Annuler" })}
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button size="sm" variant="outline">
+            <UserPlus className="mr-2 h-4 w-4" />
+            {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
           </Button>
-          <Button onClick={() => save.mutate()} disabled={!hasSelection || save.isPending}>
-            {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogTrigger>
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
+            </DialogTitle>
+            <DialogDescription>
+              {t("meetings:manage.desc", {
+                defaultValue:
+                  "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+
+          {ctxQuery.isLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {t("common.loading", { defaultValue: "Chargement…" })}
+            </div>
+          ) : (
+            <AudiencePickerBody
+              ctx={ctxQuery.data ?? null}
+              state={state}
+              controls={controls}
+              preview={{
+                count: previewQuery.data?.count ?? null,
+                loading: previewQuery.isFetching,
+              }}
+              enablePreassign
+            />
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={sync.isPending}
+            >
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </Button>
+            <Button
+              onClick={() => sync.mutate([])}
+              disabled={!hasSelection || sync.isPending}
+            >
+              {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={pendingConfirm.length > 0}
+        onOpenChange={(o) => {
+          if (!o) setPendingConfirm([]);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {t("meetings:confirmRemove.title", {
+                defaultValue: "Retirer des personnes ayant déjà répondu ?",
+              })}
+            </DialogTitle>
+            <DialogDescription>
+              {t("meetings:confirmRemove.desc", {
+                defaultValue:
+                  "Ces personnes ont déjà répondu ou été pointées. Les retirer supprimera aussi leur réponse et leur présence enregistrées. Elles restent convoquées tant que vous ne confirmez pas.",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+
+          <ul className="divide-y">
+            {pendingConfirm.map((p) => (
+              <li key={p.user_id} className="flex items-center justify-between gap-2 py-2">
+                <span className="text-sm">
+                  {p.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                </span>
+                {p.status && (
+                  <AttendancePill status={p.status as AttendanceStatus} />
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPendingConfirm([])}
+              disabled={sync.isPending}
+            >
+              {t("meetings:confirmRemove.keep", { defaultValue: "Les conserver" })}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => sync.mutate(pendingConfirm.map((p) => p.user_id))}
+              disabled={sync.isPending}
+            >
+              {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:confirmRemove.confirm", { defaultValue: "Retirer quand même" })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
