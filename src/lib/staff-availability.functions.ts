@@ -14,12 +14,12 @@ export type TeamCoachForAvailability = {
 
 const STAFF_ROLES = new Set(["coach", "assistant_coach", "admin", "dirigeant"]);
 
-function profileName(profile: unknown): string {
-  const p = profile as {
-    first_name?: string | null;
-    last_name?: string | null;
-    full_name?: string | null;
-  } | null;
+function profileName(profile: {
+  first_name?: string | null;
+  last_name?: string | null;
+  full_name?: string | null;
+} | null | undefined): string {
+  const p = profile;
   const built = `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim();
   return built || p?.full_name || "—";
 }
@@ -62,22 +62,34 @@ export const listTeamCoachesForAvailability = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("team_members")
-      .select("user_id, role, profiles:user_id(id, first_name, last_name, full_name)")
+      .select("user_id, role")
       .eq("team_id", data.teamId)
       .not("user_id", "is", null);
     if (error) throw error;
 
+    const staffRows = (rows ?? []).filter(
+      (row) => Boolean(row.user_id) && STAFF_ROLES.has(String(row.role)),
+    );
+    const ids = [...new Set(staffRows.map((row) => row.user_id))];
+    if (ids.length === 0) return [];
+
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from("profiles")
+      .select("id, first_name, last_name, full_name")
+      .in("id", ids);
+    if (profilesError) throw profilesError;
+
+    const profilesById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
     const seen = new Set<string>();
-    return (rows ?? [])
-      .filter((row: any) => {
-        if (!row.user_id || seen.has(row.user_id)) return false;
-        if (!STAFF_ROLES.has(String(row.role))) return false;
+    return staffRows
+      .filter((row) => {
+        if (seen.has(row.user_id)) return false;
         seen.add(row.user_id);
         return true;
       })
-      .map((row: any) => ({
+      .map((row) => ({
         user_id: row.user_id,
-        full_name: profileName(row.profiles),
+        full_name: profileName(profilesById.get(row.user_id)),
         role: String(row.role),
       }))
       .sort((a, b) => a.full_name.localeCompare(b.full_name));
