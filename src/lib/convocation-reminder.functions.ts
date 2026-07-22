@@ -225,6 +225,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             meetingPoint: ev.meeting_point ?? undefined,
             meetingPointMapsUrl,
             competitionName: ev.competition_name ?? ev.competition_type ?? undefined,
+            coachNames,
             teamName: ev.teams?.name ?? undefined,
             clubName: ev.teams?.clubs?.name ?? undefined,
             clubLogoUrl: ev.teams?.clubs?.logo_url ?? undefined,
