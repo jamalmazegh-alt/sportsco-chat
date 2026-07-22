@@ -88,6 +88,21 @@ function detectBrowserLang(): SupportedLang {
   return "en";
 }
 
+function resolveInitialLang(): SupportedLang {
+  if (typeof window === "undefined") return "en";
+  try {
+    const stored = window.localStorage.getItem("i18nextLng");
+    if (stored && (SUPPORTED_LANGS as readonly string[]).includes(stored)) {
+      return stored as SupportedLang;
+    }
+  } catch {
+    /* ignore storage errors */
+  }
+  return detectBrowserLang();
+}
+
+const initialLang = resolveInitialLang();
+
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
@@ -169,7 +184,7 @@ if (!i18n.isInitialized) {
         publications: nlPublications,
       },
     },
-    lng: "en",
+    lng: initialLang,
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     defaultNS: "common",
@@ -179,13 +194,9 @@ if (!i18n.isInitialized) {
   });
 }
 
-// After hydration: prefer stored language, else browser detection.
+// Client-only: reconcile if init ran before storage was readable (rare).
 if (typeof window !== "undefined") {
-  const stored = window.localStorage.getItem("i18nextLng") as SupportedLang | null;
-  const target: SupportedLang =
-    stored && (SUPPORTED_LANGS as readonly string[]).includes(stored)
-      ? stored
-      : detectBrowserLang();
+  const target = resolveInitialLang();
   if (target !== i18n.language) {
     queueMicrotask(() => {
       i18n.changeLanguage(target);
