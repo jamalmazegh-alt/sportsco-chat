@@ -56,6 +56,9 @@ import { template as eventNeedDecisionTemplate } from "./event-need-decision";
 import { template as eventNeedSignupTemplate } from "./event-need-signup";
 import { template as wallMessageTemplate } from "./wall-message";
 import { template as publicationPollTemplate } from "./publication-poll";
+import { template as eventStaffAssignmentTemplate } from "./event-staff-assignment";
+
+
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
@@ -97,4 +100,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "event-need-signup": eventNeedSignupTemplate,
   "wall-message": wallMessageTemplate,
   "publication-poll": publicationPollTemplate,
+  "event-staff-assignment": eventStaffAssignmentTemplate,
 };
