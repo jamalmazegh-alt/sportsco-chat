@@ -95,9 +95,8 @@ function AuthLayout() {
               <Outlet />
             </div>
           </div>
-          <SupportFab />
-          <AssistantFab />
           <BottomNav />
+
         </div>
       );
     }
