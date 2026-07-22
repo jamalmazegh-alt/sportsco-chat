@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Button, Heading, Img, Section, Text } from "@react-email/components";
+import { Button, Heading, Text } from "@react-email/components";
 import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
+
 
 type Locale = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 type Action = "assigned" | "unassigned";
