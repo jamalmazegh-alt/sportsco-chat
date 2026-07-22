@@ -252,6 +252,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
   });
   const ranking = data?.ranking ?? [];
   const top = useMemo(() => ranking.slice(0, 5), [ranking]);
+  const displayName = challengeDisplayName(challenge, (k, o) => i18n.t(`challenges:${k}`, o));
 
   const handleExport = () => {
     const rows = ranking.map((row: any, i: number) => ({
@@ -266,7 +267,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
       { key: "player", header: t("stats.player", { defaultValue: "Joueur" }) },
       { key: "score", header: t("stats.score", { defaultValue: "Score" }) },
     ]);
-    const safe = (challenge.name ?? "challenge").replace(/[^a-z0-9-_]+/gi, "_");
+    const safe = (displayName ?? "challenge").replace(/[^a-z0-9-_]+/gi, "_");
     downloadCsv(`ranking_${safe}.csv`, csv);
   };
 
@@ -275,7 +276,7 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
           <span>{challenge.icon ?? "🎯"}</span>
-          <span className="flex-1 truncate">{challenge.name}</span>
+          <span className="flex-1 truncate">{displayName}</span>
           {ranking.length > 0 && (
             <Button
               variant="ghost"
