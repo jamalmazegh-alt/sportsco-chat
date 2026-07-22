@@ -394,7 +394,15 @@ function AddChallenge({
   // Unified list: reusable existing challenges first (marked "Populaire"),
   // then brand-new templates. One consistent card style, no section split.
   type Item =
-    | { kind: "existing"; id: string; name: string; icon: string; typeLabel: string; popular: true }
+    | {
+        kind: "existing";
+        id: string;
+        templateKey: string | null;
+        name: string;
+        icon: string;
+        typeLabel: string;
+        popular: true;
+      }
     | {
         kind: "template";
         key: string;
@@ -409,7 +417,8 @@ function AddChallenge({
     const existing: Item[] = reusable.map((c) => ({
       kind: "existing" as const,
       id: c.id,
-      name: c.name,
+      templateKey: c.template_key ?? null,
+      name: challengeDisplayName(c, t),
       icon: c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯"),
       typeLabel: t(`types.${c.kind}`),
       popular: true,
@@ -423,7 +432,9 @@ function AddChallenge({
       typeLabel: t(`types.${tpl.kind}`),
       popular: false,
     }));
-    return [...existing, ...tpls];
+    return groupJugglingVariants<Item>([...existing, ...tpls], (it) =>
+      it.kind === "existing" ? it.templateKey : it.key,
+    );
   }, [reusable, templates, t]);
 
   return (
