@@ -171,15 +171,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const header = { textAlign: "center" as const, margin: "0 0 20px" };
-const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
-const brand = {
-  fontSize: "13px",
-  fontWeight: "bold" as const,
-  color: "#0f172a",
-  margin: "8px 0 0",
-  textAlign: "center" as const,
-};
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 8px" };
 const h2 = { fontSize: "16px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };
