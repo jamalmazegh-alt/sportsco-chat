@@ -1158,28 +1158,31 @@ function EventDetail() {
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
         const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-        // Coach (first admin/coach) for the team — best-effort
-        let coachName: string | undefined;
+        // Assigned coaches for this event (event_staff_assignments).
+        // Only staff explicitly assigned to this event are listed in the email.
+        let coachNames: string[] | undefined;
         try {
-          const { data: coachRows } = await supabase
-            .from("team_members")
-            .select("user_id, role")
-            .eq("team_id", event.team_id)
-            .in("role", ["coach", "admin"])
-            .limit(1);
-          const coachUserId = coachRows?.[0]?.user_id;
-          if (coachUserId) {
-            const { data: coachProfile } = await supabase
+          const { data: assignRows } = await supabase
+            .from("event_staff_assignments")
+            .select("user_id")
+            .eq("event_id", event.id);
+          const ids = Array.from(
+            new Set((assignRows ?? []).map((r: any) => r.user_id).filter(Boolean)),
+          );
+          if (ids.length > 0) {
+            const { data: profs } = await supabase
               .from("profiles")
-              .select("full_name, first_name, last_name")
-              .eq("id", coachUserId)
-              .maybeSingle();
-            coachName =
-              (coachProfile as any)?.full_name ||
-              [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
-                .filter(Boolean)
-                .join(" ") ||
-              undefined;
+              .select("id, full_name, first_name, last_name")
+              .in("id", ids);
+            coachNames = (profs ?? [])
+              .map(
+                (p: any) =>
+                  p.full_name ||
+                  [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+                  "",
+              )
+              .filter(Boolean);
+            if (coachNames.length === 0) coachNames = undefined;
           }
         } catch {
           // ignore
