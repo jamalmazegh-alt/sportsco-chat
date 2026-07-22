@@ -2030,6 +2030,115 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
 // ---- Sub-components ----
 
+function MeetingAudienceStep({
+  clubId,
+  teams,
+  value,
+  onChange,
+  onContinue,
+  onSkip,
+  t,
+}: {
+  clubId: string | null;
+  teams: Team[];
+  value: EventWizardState["meetingAudience"];
+  onChange: (v: NonNullable<EventWizardState["meetingAudience"]>) => void;
+  onContinue: () => void;
+  onSkip: () => void;
+  t: (k: string, opts?: Record<string, unknown>) => string;
+}) {
+  const audience = useAudienceState({
+    scalar: new Set((value?.scalar ?? []) as Array<
+      "convoked_players" | "convoked_parents" | "club_members" | "club_educators"
+      | "club_staff" | "club_admins" | "club_tournament_managers"
+    >),
+    groupIds: new Set(value?.groupIds ?? []),
+    teamPicks: (value?.teamPicks ?? []).map((tp) => ({
+      team_id: tp.team_id,
+      kind: tp.kind as TeamKind,
+    })),
+    category: value?.category ?? "",
+    preassigned: (value?.preassigned ?? []) as PreassignedPerson[],
+  });
+
+  // Fetch active club_groups to populate the picker context.
+  const { data: groups = [] } = useQuery({
+    queryKey: ["club-groups-active", clubId],
+    enabled: Boolean(clubId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("club_groups")
+        .select("id, name")
+        .eq("club_id", clubId!)
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; name: string }>;
+    },
+  });
+
+  const nonInternalTeams = useMemo(() => teams.filter((t) => t.id), [teams]);
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const tm of teams) {
+      const cat = (tm as unknown as { age_group?: string | null }).age_group;
+      if (cat && cat.trim()) set.add(cat.trim());
+    }
+    return Array.from(set).sort();
+  }, [teams]);
+
+  const ctx: AudienceCtx = useMemo(
+    () => ({
+      club_id: clubId ?? undefined,
+      teams: nonInternalTeams.map((tm) => ({
+        id: tm.id,
+        name: tm.name,
+        age_group: (tm as unknown as { age_group?: string | null }).age_group ?? null,
+      })),
+      groups,
+      categories,
+    }),
+    [clubId, nonInternalTeams, groups, categories],
+  );
+
+  // Sync picker state back to the wizard whenever it changes.
+  const audienceState: AudienceState = audience.state;
+  useEffect(() => {
+    onChange({
+      scalar: Array.from(audienceState.scalar),
+      groupIds: Array.from(audienceState.groupIds),
+      teamPicks: audienceState.teamPicks,
+      category: audienceState.category,
+      preassigned: audienceState.preassigned,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audienceState]);
+
+  const hasAny =
+    audienceState.scalar.size > 0 ||
+    audienceState.groupIds.size > 0 ||
+    audienceState.teamPicks.length > 0 ||
+    audienceState.category.trim().length > 0 ||
+    audienceState.preassigned.length > 0;
+
+  return (
+    <StepQuestion
+      title={t("eventWizard.q.audience", { defaultValue: "Qui participe ? (facultatif)" })}
+    >
+      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} />
+      <div className="flex gap-2 pt-2">
+        <Button variant="outline" className="flex-1" onClick={onSkip}>
+          {t("eventWizard.skip", { defaultValue: "Passer" })}
+        </Button>
+        <Button className="flex-1" onClick={onContinue} disabled={!hasAny}>
+          {t("eventWizard.continue", { defaultValue: "Continuer" })}
+        </Button>
+      </div>
+    </StepQuestion>
+  );
+}
+
 function StepQuestion({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
