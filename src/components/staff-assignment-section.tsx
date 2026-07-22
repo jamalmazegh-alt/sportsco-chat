@@ -230,12 +230,26 @@ export function StaffAssignmentSection({
 
   const renderRow = (c: Candidate) => {
     const status = statusByUser.get(c.user_id) ?? "available";
+    const absence = absenceByUser.get(c.user_id);
     const isAssigned = assignedIds.has(c.user_id);
     const roleLabel =
       c.role === "assistant_coach"
         ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
         : t("teams.role.coach", { defaultValue: "Coach" });
-    const meta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
+    const baseMeta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
+    const fmt = (d: string) => {
+      const [y, m, day] = d.split("-");
+      return `${day}/${m}`;
+    };
+    const absenceLabel = absence
+      ? absence.start === absence.end
+        ? t("staffAssignment.absentOn", { defaultValue: "Absent le {{d}}", d: fmt(absence.start) })
+        : t("staffAssignment.absentRange", {
+            defaultValue: "Absent du {{s}} au {{e}}",
+            s: fmt(absence.start),
+            e: fmt(absence.end),
+          })
+      : null;
     return (
       <li key={c.user_id} className="py-2 flex items-center gap-3">
         <span className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold shrink-0">
