@@ -291,6 +291,117 @@ export const updateMeetingAttendanceStatus = createServerFn({ method: "POST" })
     return { ok: true, status: data.status };
   });
 
+async function notifyNewMeetingAttendees(eventId: string, userIds: string[]): Promise<void> {
+  if (userIds.length === 0) return;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: ev } = await supabaseAdmin
+    .from("events")
+    .select("id, title")
+    .eq("id", eventId)
+    .maybeSingle();
+  const title = (ev as { title?: string } | null)?.title ?? "Réunion";
+  const body = "Vous êtes convoqué(e) à cette réunion.";
+  const link = `/events/${eventId}`;
+
+  const { error } = await supabaseAdmin.from("notifications").insert(
+    userIds.map((uid) => ({ user_id: uid, type: "convocation", title, body, link })),
+  );
+  if (error) console.error("[meetings] notify insert failed", error);
+
+  try {
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+    await Promise.allSettled(
+      userIds.map((uid) =>
+        sendPushToUser(uid, { title, body, url: link, tag: `meeting-${eventId}` }),
+      ),
+    );
+  } catch (e) {
+    console.warn("[meetings] push dispatch failed", e);
+  }
+}
+
+export const syncMeetingAttendees = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => SyncInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await loadMeetingClubAsStaff(supabase as SupaLike, userId, data.event_id);
+
+    const { selectors, manualUserIds } = splitAudiences(
+      data.audiences as unknown as AudienceLike[],
+      data.manual_user_ids,
+    );
+
+    const { data: rpcData, error } = await (supabase as SupaLike).rpc(
+      "sync_meeting_attendees_atomic",
+      {
+        _event_id: data.event_id,
+        _actor: userId,
+        _audiences: selectors,
+        _manual_user_ids: manualUserIds,
+        _confirm_remove: data.confirm_remove_user_ids,
+        _dry_run: data.dry_run,
+      },
+    );
+    if (error) throw new Error(error.message);
+    const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      added_user_ids: string[] | null;
+      removed_user_ids: string[] | null;
+      kept_count: number;
+      requires_confirmation_user_ids: string[] | null;
+    } | null;
+    if (!row) throw new Error("sync_failed");
+
+    const added = row.added_user_ids ?? [];
+    const requiresIds = row.requires_confirmation_user_ids ?? [];
+
+    if (!data.dry_run && added.length > 0) {
+      try {
+        await notifyNewMeetingAttendees(data.event_id, added);
+      } catch (e) {
+        console.error("[syncMeetingAttendees] notify failed", e);
+      }
+    }
+
+    let requiresConfirmation: Array<{
+      user_id: string;
+      full_name: string | null;
+      status: string | null;
+    }> = [];
+    if (requiresIds.length > 0) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [{ data: profs }, { data: rows }] = await Promise.all([
+        supabaseAdmin.from("profiles").select("id, full_name").in("id", requiresIds),
+        (supabaseAdmin as SupaLike)
+          .from("meeting_attendees")
+          .select("user_id, status")
+          .eq("event_id", data.event_id)
+          .in("user_id", requiresIds),
+      ]);
+      const nameBy: Record<string, string | null> = {};
+      for (const p of profs ?? []) {
+        const pr = p as SupaLike;
+        nameBy[pr.id as string] = (pr.full_name as string | null) ?? null;
+      }
+      const statusBy: Record<string, string> = {};
+      for (const r of (rows ?? []) as SupaLike[]) {
+        statusBy[r.user_id as string] = r.status as string;
+      }
+      requiresConfirmation = requiresIds.map((uid) => ({
+        user_id: uid,
+        full_name: nameBy[uid] ?? null,
+        status: statusBy[uid] ?? null,
+      }));
+    }
+
+    return {
+      added_count: added.length,
+      removed_count: (row.removed_user_ids ?? []).length,
+      kept_count: row.kept_count ?? 0,
+      requires_confirmation: requiresConfirmation,
+    };
+  });
+
 type JsonPrimitive = string | number | boolean | null;
 type Json = JsonPrimitive | { [k: string]: Json } | Json[];
 
