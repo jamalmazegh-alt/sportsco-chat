@@ -456,8 +456,9 @@ function EventDetail() {
       const { data, error } = await supabase
         .from("events")
         .select(
-          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id",
+          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id, event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name))",
         )
+
         .eq("id", eventId)
         .single();
       if (error) throw error;
