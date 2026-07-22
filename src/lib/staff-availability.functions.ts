@@ -12,7 +12,7 @@ export type TeamCoachForAvailability = {
   role: string;
 };
 
-const STAFF_ROLES = new Set(["coach", "assistant_coach"]);
+const STAFF_ROLES = new Set(["coach", "assistant_coach", "admin", "dirigeant"]);
 
 function profileName(profile: unknown): string {
   const p = profile as {
