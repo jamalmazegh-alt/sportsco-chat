@@ -47,6 +47,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { StaffCoverageBadge } from "@/components/staff-coverage-badge";
 
 type Status = "available" | "tentative" | "unavailable";
 
