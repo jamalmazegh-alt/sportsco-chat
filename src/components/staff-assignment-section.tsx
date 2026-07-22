@@ -405,10 +405,12 @@ export function StaffAssignmentSection({
 
       {people.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          {t("staffAssignment.noPeople", {
-            defaultValue: "Aucun coach disponible pour cet événement.",
+          {t("staffAssignment.noCoachInClub", {
+            defaultValue:
+              "Aucun coach dans ce club. Ajoute des coachs aux équipes pour pouvoir en assigner.",
           })}
         </p>
+
       ) : (
         <ul className="divide-y divide-border">{people.map(renderRow)}</ul>
       )}
