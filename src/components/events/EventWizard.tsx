@@ -372,6 +372,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       type,
       durationMin: defaultDuration(type),
       startTime: s.startTime || defaultStartTime(type),
+      // Meetings use the dedicated attendees table, not player convocations.
+      convocScope: type === "meeting" ? "none" : s.convocScope,
       step: s.step + 1,
     }));
   }
