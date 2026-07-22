@@ -7921,6 +7921,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_assignable_staff: {
+        Args: { p_event_id: string }
+        Returns: {
+          full_name: string
+          is_event_team_staff: boolean
+          role: string
+          user_id: string
+          usual_team_name: string
+        }[]
+      }
       get_call_up_visibility_config: {
         Args: { _id: string; _scope: string }
         Returns: {
