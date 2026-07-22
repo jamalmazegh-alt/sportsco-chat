@@ -85,7 +85,9 @@ export function DeclareAbsenceDrawer({
   playerId: initialPlayerId,
   teamId,
   onCreated,
+  availability,
 }: Props) {
+  const editing = !!availability;
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
 
