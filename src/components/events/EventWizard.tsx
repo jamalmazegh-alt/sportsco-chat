@@ -485,10 +485,54 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         return { kind: "series" as const, ...res };
       }
 
+      // Meetings with "internal" scope: resolve the club's internal team at
+      // submit time so it also works even if the effect hasn't landed yet.
+      let workingState = state;
+      if (
+        state.type === "meeting" &&
+        state.meetingScope === "internal" &&
+        !state.teamId &&
+        activeClubId
+      ) {
+        const { data: internalId, error: rpcErr } = await supabase.rpc(
+          "get_or_create_internal_team",
+          { _club_id: activeClubId },
+        );
+        if (rpcErr || !internalId) throw new Error(rpcErr?.message ?? "internal_team_failed");
+        workingState = { ...state, teamId: internalId as string };
+        setState(workingState);
+      }
+
       // Single event — goes through the shared createEvent server fn (no local insert).
-      const input = toEventPayloadInput(state, title);
+      const input = toEventPayloadInput(workingState, title);
       if (!input) throw new Error("missing-fields");
       const { id } = await createEventFn({ data: input });
+
+      // Meetings: if the user picked an audience, register attendees now.
+      if (workingState.type === "meeting" && workingState.meetingAudience) {
+        const aud = workingState.meetingAudience;
+        const hasAny =
+          aud.scalar.length > 0 ||
+          aud.groupIds.length > 0 ||
+          aud.teamPicks.length > 0 ||
+          aud.category.trim().length > 0 ||
+          aud.preassigned.length > 0;
+        if (hasAny) {
+          const selectors = buildMeetingAudiencesFromDraft(aud, id);
+          try {
+            await setMeetingAttendeesFn({
+              data: {
+                event_id: id,
+                audiences: selectors,
+                manual_user_ids: aud.preassigned.map((p) => p.user_id),
+              },
+            });
+          } catch (e) {
+            console.error("[EventWizard] setMeetingAttendees failed", e);
+          }
+        }
+      }
+
       return { kind: "single" as const, eventId: id };
     },
     onSuccess: (res) => {
