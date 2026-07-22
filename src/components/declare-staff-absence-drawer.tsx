@@ -196,7 +196,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated }: Pro
                 <Calendar
                   mode="range"
                   numberOfMonths={1}
-                  selected={range}
+                  selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
                   onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
                     // 3rd click starts a new range at the clicked day instead of extending the end.
                     if (range.from && range.to && clickedDay) {
