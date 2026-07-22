@@ -156,7 +156,13 @@ function StaffAvailabilitiesPage() {
         </p>
       </div>
 
-      <Button className="w-full h-11" onClick={() => setDrawerOpen(true)}>
+      <Button
+        className="w-full h-11"
+        onClick={() => {
+          setEditing(null);
+          setDrawerOpen(true);
+        }}
+      >
         <Plus className="h-4 w-4" />
         {t("staffAvailability.declareCta", { defaultValue: "Déclarer une indisponibilité" })}
       </Button>
