@@ -28,18 +28,6 @@ export function HeaderActions() {
 
   return (
     <div className="flex items-center gap-1.5">
-      {showAssistant && (
-        <Link
-          to="/assistant"
-          aria-label={t("assistant.open", { defaultValue: "Open assistant" })}
-          className={cn(
-            "h-9 w-9 rounded-full bg-primary text-primary-foreground shadow-sm",
-            "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
-          )}
-        >
-          <Bot className="h-4 w-4" />
-        </Link>
-      )}
       {showSupport && (
         <Link
           to="/support"
@@ -50,6 +38,18 @@ export function HeaderActions() {
           )}
         >
           <LifeBuoy className="h-4 w-4" />
+        </Link>
+      )}
+      {showAssistant && (
+        <Link
+          to="/assistant"
+          aria-label={t("assistant.open", { defaultValue: "Open assistant" })}
+          className={cn(
+            "h-9 w-9 rounded-full bg-primary text-primary-foreground shadow-sm",
+            "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
+          )}
+        >
+          <Bot className="h-4 w-4" />
         </Link>
       )}
     </div>
