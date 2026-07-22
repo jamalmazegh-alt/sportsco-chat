@@ -71,7 +71,7 @@ function useTeamCoaches(teamId: string | undefined) {
         .from("team_members")
         .select("user_id, role, profiles:user_id(id, first_name, last_name, full_name)")
         .eq("team_id", teamId!)
-        .in("role", ["coach", "assistant_coach"] as any);
+        .in("role", ["coach"] as any);
       if (error) throw error;
       const seen = new Set<string>();
       return (data ?? [])
