@@ -68,8 +68,7 @@ export const listTeamCoachesForAvailability = createServerFn({ method: "POST" })
     if (error) throw error;
 
     const staffRows = (rows ?? []).filter(
-      (row): row is { user_id: string; role: string } =>
-        Boolean(row.user_id) && STAFF_ROLES.has(String(row.role)),
+      (row) => Boolean(row.user_id) && STAFF_ROLES.has(String(row.role)),
     );
     const ids = [...new Set(staffRows.map((row) => row.user_id))];
     if (ids.length === 0) return [];
