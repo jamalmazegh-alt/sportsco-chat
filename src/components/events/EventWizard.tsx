@@ -56,6 +56,15 @@ import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
 import { createEvent } from "@/lib/events/events.functions";
+import { setMeetingAttendees } from "@/lib/meetings/meetings.functions";
+import {
+  AudiencePickerBody,
+  useAudienceState,
+  type AudienceCtx,
+  type AudienceState,
+  type PreassignedPerson,
+  type TeamKind,
+} from "@/components/needs/audience-picker";
 import {
   defaultDuration,
   defaultStartTime,
@@ -105,6 +114,7 @@ type Step =
   | "official"
   | "location"
   | "convocation"
+  | "audience"
   | "carpool"
   | "comment"
   | "summary";
@@ -181,6 +191,24 @@ function halvesToMinutes(label: string): number | null {
   return parseInt(m[1], 10) * parseInt(m[2], 10);
 }
 
+/** Build audience selectors from the wizard's serialized meeting audience draft. */
+function buildMeetingAudiencesFromDraft(
+  aud: NonNullable<EventWizardState["meetingAudience"]>,
+  eventId: string,
+): Array<Record<string, unknown>> {
+  const scalarNeedsEvent = new Set(["convoked_players", "convoked_parents"]);
+  const list: Array<Record<string, unknown>> = [];
+  for (const key of aud.scalar) {
+    if (scalarNeedsEvent.has(key)) list.push({ type: key, event_id: eventId });
+    else list.push({ type: key });
+  }
+  for (const gid of aud.groupIds) list.push({ type: "club_group", group_id: gid });
+  for (const tp of aud.teamPicks) list.push({ type: tp.kind, team_id: tp.team_id });
+  if (aud.category.trim()) list.push({ type: "category_educators", category: aud.category.trim() });
+  return list;
+}
+
+
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
@@ -188,6 +216,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const navigate = useNavigate();
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
+  const setMeetingAttendeesFn = useServerFn(setMeetingAttendees);
   const { activeClubId } = useAuth();
 
   const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
@@ -254,12 +283,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
     const s: Step[] = ["type"];
-    // Meetings are always attached to the club's internal team, so we don't
-    // ask the user to pick one. All other types keep the classic "team" step.
-    if (state.type !== "meeting") s.push("team");
+    // Meetings keep the team step, but with an extra "Internal meeting" tile
+    // that resolves to the club's internal transverse team.
+    s.push("team");
     // "Other" events: ask for a name up-front (e.g. camp/stage title).
     if (state.type === "other") s.push("name");
-    // Meetings need a title too (no team-derived default).
+    // Meetings need a title too (no team-derived default when internal).
     if (state.type === "meeting") s.push("name");
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
@@ -287,9 +316,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     // Recurring trainings: only day + time + duration, no extra steps.
     if (!isRecurring) {
       if (state.type !== "match") s.push("location");
-      // Meetings manage attendees on the event page, not through the
-      // convocation flow, so skip the "convocation" question.
-      if (state.type !== "meeting") s.push("convocation");
+      // Meetings: ask who to invite (optional) instead of the convocation flow.
+      if (state.type === "meeting") s.push("audience");
+      else s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
       s.push("comment");
@@ -297,6 +326,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     s.push("summary");
     return s;
   }, [state.type, state.isHome, state.recurrence]);
+
 
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
 
@@ -313,9 +343,17 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     screenRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [current]);
 
-  // Meetings: silently resolve the club's internal team (get_or_create).
+  // Internal meetings: resolve the club's internal transverse team on demand.
+  // Only when the user explicitly picked the "Réunion interne" option.
   useEffect(() => {
-    if (state.type !== "meeting" || state.teamId || !activeClubId) return;
+    if (
+      state.type !== "meeting" ||
+      state.meetingScope !== "internal" ||
+      state.teamId ||
+      !activeClubId
+    ) {
+      return;
+    }
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase.rpc("get_or_create_internal_team", {
@@ -327,7 +365,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     return () => {
       cancelled = true;
     };
-  }, [state.type, state.teamId, activeClubId]);
+  }, [state.type, state.meetingScope, state.teamId, activeClubId]);
+
 
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
@@ -464,10 +503,54 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         return { kind: "series" as const, ...res };
       }
 
+      // Meetings with "internal" scope: resolve the club's internal team at
+      // submit time so it also works even if the effect hasn't landed yet.
+      let workingState = state;
+      if (
+        state.type === "meeting" &&
+        state.meetingScope === "internal" &&
+        !state.teamId &&
+        activeClubId
+      ) {
+        const { data: internalId, error: rpcErr } = await supabase.rpc(
+          "get_or_create_internal_team",
+          { _club_id: activeClubId },
+        );
+        if (rpcErr || !internalId) throw new Error(rpcErr?.message ?? "internal_team_failed");
+        workingState = { ...state, teamId: internalId as string };
+        setState(workingState);
+      }
+
       // Single event — goes through the shared createEvent server fn (no local insert).
-      const input = toEventPayloadInput(state, title);
+      const input = toEventPayloadInput(workingState, title);
       if (!input) throw new Error("missing-fields");
       const { id } = await createEventFn({ data: input });
+
+      // Meetings: if the user picked an audience, register attendees now.
+      if (workingState.type === "meeting" && workingState.meetingAudience) {
+        const aud = workingState.meetingAudience;
+        const hasAny =
+          aud.scalar.length > 0 ||
+          aud.groupIds.length > 0 ||
+          aud.teamPicks.length > 0 ||
+          aud.category.trim().length > 0 ||
+          aud.preassigned.length > 0;
+        if (hasAny) {
+          const selectors = buildMeetingAudiencesFromDraft(aud, id);
+          try {
+            await setMeetingAttendeesFn({
+              data: {
+                event_id: id,
+                audiences: selectors,
+                manual_user_ids: aud.preassigned.map((p) => p.user_id),
+              },
+            });
+          } catch (e) {
+            console.error("[EventWizard] setMeetingAttendees failed", e);
+          }
+        }
+      }
+
       return { kind: "single" as const, eventId: id };
     },
     onSuccess: (res) => {
@@ -554,6 +637,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
     convocation: t("eventWizard.hint.convocation", { defaultValue: "À qui on envoie ?" }),
+    audience: t("eventWizard.hint.audience", {
+      defaultValue: "Qui inviter à cette réunion ? (facultatif)",
+    }),
     carpool: t("eventWizard.hint.carpool", { defaultValue: "Activer le covoiturage ?" }),
     comment: t("eventWizard.hint.comment", {
       defaultValue: "Un commentaire à ajouter ? (facultatif)",
@@ -599,6 +685,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     location: { text: t("eventWizard.qShort.location", { defaultValue: "Où" }), mark: "?" },
     convocation: {
       text: t("eventWizard.qShort.convocation", { defaultValue: "Convoquer auto" }),
+      mark: "?",
+    },
+    audience: {
+      text: t("eventWizard.qShort.audience", { defaultValue: "Qui participe" }),
       mark: "?",
     },
     carpool: { text: t("eventWizard.qShort.carpool", { defaultValue: "Covoiturage" }), mark: "?" },
@@ -710,26 +800,57 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
         {current === "team" && (
           <StepQuestion title={t("eventWizard.q.team", { defaultValue: "Quelle équipe ?" })}>
-            {teams.length === 0 ? (
+            {teams.length === 0 && state.type !== "meeting" ? (
               <p className="text-sm text-muted-foreground">
                 {t("eventWizard.noTeams", { defaultValue: "Aucune équipe disponible." })}
               </p>
             ) : (
-              teams.map((tm, i) => {
-                const palette: DoorColor[] = ["green", "blue", "purple", "amber", "red", "pink"];
-                return (
+              <>
+                {teams.map((tm, i) => {
+                  const palette: DoorColor[] = ["green", "blue", "purple", "amber", "red", "pink"];
+                  return (
+                    <DoorButton
+                      key={tm.id}
+                      icon="👥"
+                      label={tm.name}
+                      subtitle={tm.sport ?? undefined}
+                      color={palette[i % palette.length]}
+                      active={state.teamId === tm.id && state.meetingScope !== "internal"}
+                      onClick={() => {
+                        setState((s) => ({
+                          ...s,
+                          teamId: tm.id,
+                          meetingScope: s.type === "meeting" ? "team" : s.meetingScope,
+                          step: s.step + 1,
+                        }));
+                      }}
+                    />
+                  );
+                })}
+                {state.type === "meeting" && (
                   <DoorButton
-                    key={tm.id}
-                    icon="👥"
-                    label={tm.name}
-                    subtitle={tm.sport ?? undefined}
-                    color={palette[i % palette.length]}
-                    active={state.teamId === tm.id}
-                    onClick={() => answer("teamId", tm.id)}
+                    icon="🏛️"
+                    label={t("eventWizard.meetingInternal.label", {
+                      defaultValue: "Réunion interne du club (sans équipe)",
+                    })}
+                    subtitle={t("eventWizard.meetingInternal.subtitle", {
+                      defaultValue: "CODIR, bureau, éducateurs… visible par admins et invités",
+                    })}
+                    color="purple"
+                    active={state.meetingScope === "internal"}
+                    onClick={() => {
+                      setState((s) => ({
+                        ...s,
+                        meetingScope: "internal",
+                        teamId: "",
+                        step: s.step + 1,
+                      }));
+                    }}
                   />
-                );
-              })
+                )}
+              </>
             )}
+
           </StepQuestion>
         )}
 
@@ -1746,6 +1867,23 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
+        {current === "audience" && (
+          <MeetingAudienceStep
+            clubId={activeClubId ?? null}
+            teams={teams}
+            value={state.meetingAudience}
+            onChange={(v) => setState((s) => ({ ...s, meetingAudience: v }))}
+            onContinue={() => go(1)}
+            onSkip={() => {
+              setState((s) => ({ ...s, meetingAudience: undefined }));
+              go(1);
+            }}
+            t={t}
+          />
+        )}
+
+
+
         {current === "carpool" && (
           <StepQuestion
             title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}
@@ -1892,6 +2030,115 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
 // ---- Sub-components ----
 
+function MeetingAudienceStep({
+  clubId,
+  teams,
+  value,
+  onChange,
+  onContinue,
+  onSkip,
+  t,
+}: {
+  clubId: string | null;
+  teams: Team[];
+  value: EventWizardState["meetingAudience"];
+  onChange: (v: NonNullable<EventWizardState["meetingAudience"]>) => void;
+  onContinue: () => void;
+  onSkip: () => void;
+  t: (k: string, opts?: Record<string, unknown>) => string;
+}) {
+  const audience = useAudienceState({
+    scalar: new Set((value?.scalar ?? []) as Array<
+      "convoked_players" | "convoked_parents" | "club_members" | "club_educators"
+      | "club_staff" | "club_admins" | "club_tournament_managers"
+    >),
+    groupIds: new Set(value?.groupIds ?? []),
+    teamPicks: (value?.teamPicks ?? []).map((tp) => ({
+      team_id: tp.team_id,
+      kind: tp.kind as TeamKind,
+    })),
+    category: value?.category ?? "",
+    preassigned: (value?.preassigned ?? []) as PreassignedPerson[],
+  });
+
+  // Fetch active club_groups to populate the picker context.
+  const { data: groups = [] } = useQuery({
+    queryKey: ["club-groups-active", clubId],
+    enabled: Boolean(clubId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("club_groups")
+        .select("id, name")
+        .eq("club_id", clubId!)
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; name: string }>;
+    },
+  });
+
+  const nonInternalTeams = useMemo(() => teams.filter((t) => t.id), [teams]);
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const tm of teams) {
+      const cat = (tm as unknown as { age_group?: string | null }).age_group;
+      if (cat && cat.trim()) set.add(cat.trim());
+    }
+    return Array.from(set).sort();
+  }, [teams]);
+
+  const ctx: AudienceCtx = useMemo(
+    () => ({
+      club_id: clubId ?? undefined,
+      teams: nonInternalTeams.map((tm) => ({
+        id: tm.id,
+        name: tm.name,
+        age_group: (tm as unknown as { age_group?: string | null }).age_group ?? null,
+      })),
+      groups,
+      categories,
+    }),
+    [clubId, nonInternalTeams, groups, categories],
+  );
+
+  // Sync picker state back to the wizard whenever it changes.
+  const audienceState: AudienceState = audience.state;
+  useEffect(() => {
+    onChange({
+      scalar: Array.from(audienceState.scalar),
+      groupIds: Array.from(audienceState.groupIds),
+      teamPicks: audienceState.teamPicks,
+      category: audienceState.category,
+      preassigned: audienceState.preassigned,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audienceState]);
+
+  const hasAny =
+    audienceState.scalar.size > 0 ||
+    audienceState.groupIds.size > 0 ||
+    audienceState.teamPicks.length > 0 ||
+    audienceState.category.trim().length > 0 ||
+    audienceState.preassigned.length > 0;
+
+  return (
+    <StepQuestion
+      title={t("eventWizard.q.audience", { defaultValue: "Qui participe ? (facultatif)" })}
+    >
+      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} />
+      <div className="flex gap-2 pt-2">
+        <Button variant="outline" className="flex-1" onClick={onSkip}>
+          {t("eventWizard.skip", { defaultValue: "Passer" })}
+        </Button>
+        <Button className="flex-1" onClick={onContinue} disabled={!hasAny}>
+          {t("eventWizard.continue", { defaultValue: "Continuer" })}
+        </Button>
+      </div>
+    </StepQuestion>
+  );
+}
+
 function StepQuestion({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
@@ -2022,6 +2269,7 @@ const STEP_ICONS: Record<Step, LucideIcon> = {
   official: Trophy,
   location: MapPin,
   convocation: Mail,
+  audience: Users,
   carpool: Car,
   comment: MessageSquare,
   summary: CheckCircle2,

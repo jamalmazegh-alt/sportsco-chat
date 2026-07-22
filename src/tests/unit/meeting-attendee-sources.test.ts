@@ -33,6 +33,11 @@ describe("summarizeSources", () => {
     expect(chips).toEqual([{ key: "manual", kind: "manual", label: "ajouté manuellement" }]);
   });
 
+  it("maps creator (organisateur)", () => {
+    const chips = summarizeSources([{ type: "creator" }]);
+    expect(chips).toEqual([{ key: "creator", kind: "manual", label: "organisateur" }]);
+  });
+
   it("groups club audiences under the club kind", () => {
     const chips = summarizeSources([
       { type: "club_educators" },
