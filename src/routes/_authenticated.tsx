@@ -17,8 +17,7 @@ const CLUB_LOCKED_ALLOWED = ["/admin", "/profile", "/support"];
 function isPathAllowed(pathname: string, list: string[]): boolean {
   return list.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
-import { AssistantFab } from "@/components/assistant-fab";
-import { SupportFab } from "@/components/support-fab";
+import { HeaderActions } from "@/components/header-actions";
 import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
 import { TrialBanner } from "@/components/trial-banner";
