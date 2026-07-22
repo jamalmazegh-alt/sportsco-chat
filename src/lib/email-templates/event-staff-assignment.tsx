@@ -198,17 +198,8 @@ const EventStaffAssignmentEmail = ({
   const c = COPY[pickLocale(locale)];
   const isAssigned = action === "assigned";
   return (
-    <EmailShell preview={isAssigned ? c.subjectAssigned(eventLabel) : c.subjectUnassigned(eventLabel)} locale={"fr"}>
-      <Section style={header}>
-        <Img
-          src="https://www.clubero.app/clubero-logo.png"
-          alt="Clubero"
-          width="56"
-          height="56"
-          style={logo}
-        />
-        <Text style={brand}>{c.brand}</Text>
-      </Section>
+    <EmailShell preview={isAssigned ? c.subjectAssigned(eventLabel) : c.subjectUnassigned(eventLabel)} locale={locale}>
+
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{isAssigned ? c.titleAssigned : c.titleUnassigned}</Heading>
       <Text style={text}>
