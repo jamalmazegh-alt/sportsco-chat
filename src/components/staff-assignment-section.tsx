@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { dispatchStaffAssignmentPush } from "@/lib/push-dispatch.functions";
+import { dispatchStaffAssignmentEmail } from "@/lib/staff-assignment-notify.functions";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -194,6 +195,9 @@ export function StaffAssignmentSection({
       dispatchStaffAssignmentPush({
         data: { eventId, userId, action: "assigned" },
       }).catch((e) => console.warn("[staff] assign push failed", (e as Error).message));
+      dispatchStaffAssignmentEmail({
+        data: { eventId, userId, action: "assigned", origin: window.location.origin },
+      }).catch((e) => console.warn("[staff] assign email failed", (e as Error).message));
     },
     onError: (e: any) => {
       const msg = String(e?.message ?? "");
@@ -226,6 +230,9 @@ export function StaffAssignmentSection({
       dispatchStaffAssignmentPush({
         data: { eventId, userId, action: "unassigned" },
       }).catch((e) => console.warn("[staff] unassign push failed", (e as Error).message));
+      dispatchStaffAssignmentEmail({
+        data: { eventId, userId, action: "unassigned", origin: window.location.origin },
+      }).catch((e) => console.warn("[staff] unassign email failed", (e as Error).message));
     },
     onError: (e: any) => toast.error(String(e?.message ?? "Erreur")),
   });
