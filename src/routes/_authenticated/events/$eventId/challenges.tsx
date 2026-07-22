@@ -26,6 +26,36 @@ import {
 import { NewRecordBadge } from "@/components/challenge-badges";
 import i18n from "@/lib/i18n";
 
+/**
+ * Reorder a list so all items whose template_key starts with "juggling"
+ * appear consecutively, at the position of the first juggling item.
+ * Preserves relative order otherwise. Used in both the challenges list
+ * and the "add activity" picker so the 4 juggling variants stay grouped.
+ */
+function groupJugglingVariants<T>(items: T[], getKey: (item: T) => string | null): T[] {
+  const firstIdx = items.findIndex((it) => getKey(it)?.startsWith("juggling"));
+  if (firstIdx < 0) return items;
+  const juggling = items.filter((it) => getKey(it)?.startsWith("juggling"));
+  const others = items.filter((it) => !getKey(it)?.startsWith("juggling"));
+  const out = [...others];
+  out.splice(firstIdx, 0, ...juggling);
+  return out;
+}
+
+/** Display name for an existing challenge: prefer i18n template name so
+ * renames (e.g. "Jonglerie" → "Jonglerie libre") take effect for challenges
+ * created before the rename. Falls back to the stored DB name. */
+function challengeDisplayName(
+  c: { name: string; template_key?: string | null },
+  t: (k: string, opts?: any) => string,
+): string {
+  if (c.template_key) {
+    const translated = t(`templates.${c.template_key}.name`, { defaultValue: "" });
+    if (translated) return translated;
+  }
+  return c.name;
+}
+
 export const Route = createFileRoute("/_authenticated/events/$eventId/challenges")({
   component: EventChallengesPage,
   head: () => ({
