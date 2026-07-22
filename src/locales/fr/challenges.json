@@ -32,8 +32,20 @@
       "description": "Toucher la barre transversale — cumul saison."
     },
     "juggling": {
-      "name": "Jonglerie",
+      "name": "Jonglerie libre",
       "description": "Nombre max de jongles d'affilée — record."
+    },
+    "jugglingLeftFoot": {
+      "name": "Jonglerie pied gauche",
+      "description": "Jongles du pied gauche d'affilée — record."
+    },
+    "jugglingRightFoot": {
+      "name": "Jonglerie pied droit",
+      "description": "Jongles du pied droit d'affilée — record."
+    },
+    "jugglingHead": {
+      "name": "Jonglerie tête",
+      "description": "Jongles de la tête d'affilée — record."
     },
     "leger": {
       "name": "Luc Léger",
@@ -79,7 +91,10 @@
       "name": "Slalom en dribble",
       "description": "Parcours chronométré en dribble — le plus petit temps gagne."
     },
-    "sprint40m": { "name": "Sprint 40 m", "description": "Temps sur 40 m — le plus petit gagne." },
+    "sprint40m": {
+      "name": "Sprint 40 m",
+      "description": "Temps sur 40 m — le plus petit gagne."
+    },
     "agilityRunRugby": {
       "name": "Parcours d'agilité",
       "description": "Parcours chronométré d'évitement — le plus petit temps gagne."
@@ -112,7 +127,10 @@
       "name": "Précision de passe",
       "description": "Passes réussies sur cibles — score cumulé."
     },
-    "pushPower": { "name": "Poussée en mêlée", "description": "Force de poussée mesurée — score." },
+    "pushPower": {
+      "name": "Poussée en mêlée",
+      "description": "Force de poussée mesurée — score."
+    },
     "serveAccuracy": {
       "name": "Précision au service",
       "description": "Services placés sur zones — score cumulé."
@@ -134,7 +152,6 @@
       "description": "Balles placées sur cibles — score cumulé."
     }
   },
-
   "list": {
     "title": "Défis & activités",
     "empty": "Aucun défi pour l'instant.",

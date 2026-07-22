@@ -32,8 +32,20 @@
       "description": "Colpire la traversa — totale stagione."
     },
     "juggling": {
-      "name": "Palleggi",
+      "name": "Palleggi liberi",
       "description": "Numero massimo di palleggi di fila — record."
+    },
+    "jugglingLeftFoot": {
+      "name": "Palleggi piede sinistro",
+      "description": "Massimo di palleggi consecutivi col piede sinistro — record."
+    },
+    "jugglingRightFoot": {
+      "name": "Palleggi piede destro",
+      "description": "Massimo di palleggi consecutivi col piede destro — record."
+    },
+    "jugglingHead": {
+      "name": "Palleggi di testa",
+      "description": "Massimo di palleggi consecutivi di testa — record."
     },
     "leger": {
       "name": "Luc Léger",

@@ -32,8 +32,20 @@
       "description": "Hit the crossbar — cumulative over the season."
     },
     "juggling": {
-      "name": "Juggling",
+      "name": "Free juggling",
       "description": "Longest streak of ball juggles — record."
+    },
+    "jugglingLeftFoot": {
+      "name": "Left-foot juggling",
+      "description": "Most consecutive left-foot juggles — record."
+    },
+    "jugglingRightFoot": {
+      "name": "Right-foot juggling",
+      "description": "Most consecutive right-foot juggles — record."
+    },
+    "jugglingHead": {
+      "name": "Header juggling",
+      "description": "Most consecutive header juggles — record."
     },
     "leger": {
       "name": "Léger shuttle",
