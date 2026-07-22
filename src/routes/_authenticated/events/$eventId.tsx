@@ -4294,11 +4294,11 @@ function EventDetail() {
           clubId={eventTeam.club_id}
           eventDate={eventDateStr}
         />
-      ) : (
+      ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
         <StaffAssignmentReadOnly
           assignments={(event as any)?.event_staff_assignments}
         />
-      )}
+      ) : null}
 
 
 
