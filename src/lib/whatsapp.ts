@@ -25,6 +25,7 @@ type Dict = {
   meetingTime: string; // "Convocation :" label inside message body
   endTime: string;
   meetingPoint: string;
+  coachLabel: string;
   squad: (n: number) => string;
   lineup: (formation?: string) => string;
   startingXI: string;
@@ -44,6 +45,7 @@ type Dict = {
   datePattern: string;
   timePattern: string;
 };
+
 
 const DICTS: Record<WaLocale, Dict> = {
   fr: {
