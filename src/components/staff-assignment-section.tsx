@@ -128,18 +128,24 @@ export function StaffAssignmentSection({
     staleTime: 30_000,
   });
 
-  const statusByUser = useMemo(() => {
-    const map = new Map<string, Status>();
+  const absenceByUser = useMemo(() => {
+    const map = new Map<string, { status: Status; start: string; end: string }>();
     for (const r of availabilityRows as any[]) {
       if (r.status !== "active") continue;
       if (r.start_date > eventDate || r.end_date < eventDate) continue;
-      const prev = map.get(r.user_id);
       const next: Status = r.certainty === "confirmed" ? "unavailable" : "tentative";
-      if (prev === "unavailable") continue;
-      map.set(r.user_id, next);
+      const prev = map.get(r.user_id);
+      if (prev?.status === "unavailable") continue;
+      map.set(r.user_id, { status: next, start: r.start_date, end: r.end_date });
     }
     return map;
   }, [availabilityRows, eventDate]);
+
+  const statusByUser = useMemo(() => {
+    const m = new Map<string, Status>();
+    absenceByUser.forEach((v, k) => m.set(k, v.status));
+    return m;
+  }, [absenceByUser]);
 
   const assignedIds = useMemo(
     () => new Set(assignments.map((a) => a.user_id)),
@@ -224,12 +230,26 @@ export function StaffAssignmentSection({
 
   const renderRow = (c: Candidate) => {
     const status = statusByUser.get(c.user_id) ?? "available";
+    const absence = absenceByUser.get(c.user_id);
     const isAssigned = assignedIds.has(c.user_id);
     const roleLabel =
       c.role === "assistant_coach"
         ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
         : t("teams.role.coach", { defaultValue: "Coach" });
-    const meta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
+    const baseMeta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
+    const fmt = (d: string) => {
+      const [y, m, day] = d.split("-");
+      return `${day}/${m}`;
+    };
+    const absenceLabel = absence
+      ? absence.start === absence.end
+        ? t("staffAssignment.absentOn", { defaultValue: "Absent le {{d}}", d: fmt(absence.start) })
+        : t("staffAssignment.absentRange", {
+            defaultValue: "Absent du {{s}} au {{e}}",
+            s: fmt(absence.start),
+            e: fmt(absence.end),
+          })
+      : null;
     return (
       <li key={c.user_id} className="py-2 flex items-center gap-3">
         <span className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold shrink-0">
@@ -244,7 +264,15 @@ export function StaffAssignmentSection({
               </span>
             )}
           </div>
-          <div className="text-[11px] text-muted-foreground truncate">{meta}</div>
+          <div className="text-[11px] text-muted-foreground truncate">{baseMeta}</div>
+          {absenceLabel && (
+            <div className={cn(
+              "text-[11px] truncate",
+              status === "unavailable" ? "text-destructive" : "text-amber-600 dark:text-amber-400",
+            )}>
+              {absenceLabel}
+            </div>
+          )}
         </div>
         <StatusDot status={status} />
         {isAssigned ? (
