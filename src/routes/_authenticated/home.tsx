@@ -98,14 +98,13 @@ function HomePage() {
   const hasSponsor = (sponsorsForHome?.length ?? 0) > 0;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
-    queryKey: ["teams", activeClubId],
+    queryKey: ["teams", activeClubId, "with-internal"],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, sport, championship, competitions")
+        .select("id, name, sport, championship, competitions, is_internal")
         .eq("club_id", activeClubId!)
-        .eq("is_internal", false)
         .is("deleted_at", null)
         .is("archived_at", null)
         .order("name");
@@ -130,10 +129,14 @@ function HomePage() {
         .order("starts_at", { ascending: true })
         .limit(3);
       if (error) throw error;
-      return (data ?? []).map((e) => ({
-        ...e,
-        team_name: teams.find((t) => t.id === e.team_id)?.name ?? "",
-      }));
+      return (data ?? []).map((e) => {
+        const team = teams.find((t) => t.id === e.team_id);
+        const isInternal = Boolean((team as { is_internal?: boolean } | undefined)?.is_internal);
+        return {
+          ...e,
+          team_name: isInternal ? "" : (team?.name ?? ""),
+        };
+      });
     },
   });
 
