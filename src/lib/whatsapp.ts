@@ -236,6 +236,10 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   if (input.meetingPoint) {
     lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
   }
+  if (input.coachNames && input.coachNames.length > 0) {
+    lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
+  }
+
 
   if (input.description) {
     lines.push("");
