@@ -66,6 +66,7 @@ import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { EventNeedsSection } from "@/components/needs/event-needs-section";
+import { MeetingAttendeesSection } from "@/components/meetings/meeting-attendees-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
@@ -4550,6 +4551,10 @@ function EventDetail() {
         sport={eventTeam?.sport ?? null}
         teamId={event.team_id ?? null}
       />
+
+      {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
+      <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
+
 
       <EventChat eventId={eventId} />
 
