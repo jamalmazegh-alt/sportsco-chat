@@ -498,21 +498,19 @@ export function DeclareAbsenceDrawer({
                 <Calendar
                   mode="range"
                   numberOfMonths={1}
-                  selected={{
-                    from: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
-                    to: endDate ? new Date(`${endDate}T00:00:00`) : undefined,
-                  }}
-                  onSelect={(range: { from?: Date; to?: Date } | undefined) => {
-                    if (!range) return;
-                    if (range.from) {
-                      const s = format(range.from, "yyyy-MM-dd");
-                      setStartDate(s);
-                      setEndDate(range.to ? format(range.to, "yyyy-MM-dd") : s);
+                  selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
+                  onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
+                    // 3rd click: start a fresh range at the clicked day instead of extending.
+                    if (range.from && range.to && clickedDay) {
+                      setRange({ from: clickedDay, to: undefined });
+                      return;
                     }
+                    setRange(next ?? {});
                   }}
                   initialFocus
                   className="p-3 pointer-events-auto"
                 />
+
               </PopoverContent>
             </Popover>
           </div>
