@@ -492,7 +492,7 @@ function HomePage() {
               </button>
               <EventCreateChooser
                 clubId={activeClubId}
-                teams={teams ?? []}
+                teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)}
                 userId={user.id}
                 open={createOpen}
                 onOpenChange={setCreateOpen}
@@ -503,7 +503,7 @@ function HomePage() {
               />
             </>
           )}
-          {activeClubId && <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />}
+          {activeClubId && <HomeQuickCards clubId={activeClubId} teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)} />}
         </div>
       )}
 
