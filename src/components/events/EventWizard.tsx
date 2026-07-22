@@ -198,6 +198,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   const navigate = useNavigate();
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
+  const setMeetingAttendeesFn = useServerFn(setMeetingAttendees);
   const { activeClubId } = useAuth();
 
   const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
