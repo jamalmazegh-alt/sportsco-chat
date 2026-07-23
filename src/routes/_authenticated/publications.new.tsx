@@ -607,14 +607,109 @@ function NewPublicationPage() {
                 )}
               </div>
 
-              {/* Custom groups quick chips */}
-              {groups.length > 0 && (
-                <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
-                  <Label className="text-[11px] uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
-                    <UsersRound className="h-3.5 w-3.5" />
-                    {t("publications:audience.types.groupe_personnalise")}
+              {/* Teams quick chips — clearly separated block */}
+              {teams.length > 0 && (
+                <div className="rounded-lg border-2 border-sky-500/40 bg-sky-500/5 p-3">
+                  <Label className="text-[11px] uppercase tracking-wide font-semibold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
+                    <Trophy className="h-3.5 w-3.5" />
+                    {t("publications:audience.teamsBlock", { defaultValue: "Équipes" })}
                   </Label>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {t("publications:audience.teamsHint", {
+                      defaultValue: "Choisissez joueurs et/ou parents par équipe",
+                    })}
+                  </p>
+                  <div className="mt-2 space-y-1.5">
+                    {teams.map((tm) => {
+                      const playersActive = audiences.some(
+                        (a) => a.audience_type === "joueurs_equipe" && a.team_id === tm.id,
+                      );
+                      const parentsActive = audiences.some(
+                        (a) => a.audience_type === "parents_equipe" && a.team_id === tm.id,
+                      );
+                      const togglePlayers = () => {
+                        if (playersActive) {
+                          setAudiences((prev) =>
+                            prev.filter(
+                              (a) =>
+                                !(a.audience_type === "joueurs_equipe" && a.team_id === tm.id),
+                            ),
+                          );
+                        } else {
+                          addAudience({ audience_type: "joueurs_equipe", team_id: tm.id });
+                        }
+                      };
+                      const toggleParents = () => {
+                        if (parentsActive) {
+                          setAudiences((prev) =>
+                            prev.filter(
+                              (a) =>
+                                !(a.audience_type === "parents_equipe" && a.team_id === tm.id),
+                            ),
+                          );
+                        } else {
+                          addAudience({ audience_type: "parents_equipe", team_id: tm.id });
+                        }
+                      };
+                      return (
+                        <div
+                          key={tm.id}
+                          className="flex items-center justify-between gap-2 rounded-md bg-background/60 border border-sky-500/20 px-2 py-1.5"
+                        >
+                          <span className="inline-flex items-center gap-1.5 text-sm font-medium truncate">
+                            <Trophy className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                            <span className="truncate">{tm.name}</span>
+                          </span>
+                          <div className="flex flex-wrap gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={togglePlayers}
+                              aria-pressed={playersActive}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] motion-safe:transition-colors ${
+                                playersActive
+                                  ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200"
+                                  : "border-border bg-background hover:bg-muted text-foreground"
+                              }`}
+                            >
+                              <Users className="h-3 w-3" />
+                              {t("publications:audience.types.joueurs_equipe")}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={toggleParents}
+                              aria-pressed={parentsActive}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] motion-safe:transition-colors ${
+                                parentsActive
+                                  ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-200"
+                                  : "border-border bg-background hover:bg-muted text-foreground"
+                              }`}
+                            >
+                              <UserRound className="h-3 w-3" />
+                              {t("publications:audience.types.parents_equipe")}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom groups quick chips — clearly separated block */}
+              {groups.length > 0 && (
+                <div className="rounded-lg border-2 border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
+                  <Label className="text-[11px] uppercase tracking-wide font-semibold text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
+                    <UsersRound className="h-3.5 w-3.5" />
+                    {t("publications:audience.groupsBlock", {
+                      defaultValue: "Groupes personnalisés",
+                    })}
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {t("publications:audience.groupsHint", {
+                      defaultValue: "Groupes transversaux créés dans l'admin du club",
+                    })}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {groups.map((g) => {
                       const active = audiences.some(
                         (a) => a.audience_type === "groupe_personnalise" && a.group_id === g.id,
