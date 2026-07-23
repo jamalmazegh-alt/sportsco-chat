@@ -31,12 +31,15 @@ const UpdateStatusInput = z.object({
   comment: z.string().trim().max(1000).nullish(),
 });
 
-const SyncInput = z.object({
+const RecipientsInput = z.object({
   event_id: z.string().uuid(),
+  user_ids: z.array(z.string().uuid()).min(1).max(500),
+});
+
+const PreviewListInput = z.object({
+  club_id: z.string().uuid(),
   audiences: AudienceSpecSchema.default([]),
   manual_user_ids: z.array(z.string().uuid()).max(500).default([]),
-  confirm_remove_user_ids: z.array(z.string().uuid()).max(500).default([]),
-  dry_run: z.boolean().default(false),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
