@@ -404,6 +404,7 @@ export function UrgencyCenter({ className }: Props) {
       }}
       onRefresh={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
       className={className}
+      failedSourcesDebug={status.failedSources.join(", ")}
       footer={
         hiddenCount > 0 && !expanded ? (
           <button
