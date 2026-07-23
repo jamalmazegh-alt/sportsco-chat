@@ -2170,39 +2170,17 @@ function MeetingAudienceStep({
     audienceState.category.trim().length > 0 ||
     audienceState.preassigned.length > 0;
 
-  const previewFn = useServerFn(previewMeetingAttendeesList);
-  const previewPayload = useMemo(() => {
-    const draft = {
+  const draftAudience = useMemo(
+    () => ({
       scalar: Array.from(audienceState.scalar),
       groupIds: Array.from(audienceState.groupIds),
       teamPicks: audienceState.teamPicks,
       category: audienceState.category,
       preassigned: audienceState.preassigned,
-    } as NonNullable<EventWizardState["meetingAudience"]>;
-    const selectors = buildMeetingAudiencesFromDraft(
-      draft,
-      "00000000-0000-0000-0000-000000000000",
-    );
-    const manualUserIds = draft.preassigned.map((p) => p.user_id);
-    return { selectors, manualUserIds };
-  }, [audienceState]);
-  const preview = useQuery({
-    queryKey: [
-      "meeting-preview-list",
-      clubId,
-      previewPayload.selectors,
-      previewPayload.manualUserIds,
-    ],
-    enabled: Boolean(clubId) && hasAny,
-    queryFn: () =>
-      previewFn({
-        data: {
-          club_id: clubId!,
-          audiences: previewPayload.selectors,
-          manual_user_ids: previewPayload.manualUserIds,
-        },
-      }),
-  });
+    }),
+    [audienceState],
+  );
+  const preview = useMeetingAttendeesPreview(clubId, draftAudience);
 
   return (
     <StepQuestion
@@ -2215,35 +2193,21 @@ function MeetingAudienceStep({
         enablePreassign
       />
       {hasAny && (
-        <div className="rounded-xl border bg-muted/30 p-3 space-y-2">
-          <div className="text-xs font-semibold">
-            {preview.isFetching
+        <div className="rounded-lg border bg-muted/30 px-3 py-2 flex items-center gap-2 text-sm">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">
+            {preview.query.isFetching
               ? t("eventWizard.meetingPreview.loading", { defaultValue: "Calcul en cours…" })
-              : t("eventWizard.meetingPreview.count", {
-                  defaultValue: "{{count}} personnes seront convoquées",
-                  count: preview.data?.count ?? 0,
+              : t("eventWizard.meetingPreview.countShort", {
+                  defaultValue: "{{count}} personne(s) sélectionnée(s)",
+                  count: preview.query.data?.count ?? 0,
                 })}
-          </div>
-          {(preview.data?.people?.length ?? 0) > 0 && (
-            <details className="text-xs text-muted-foreground">
-              <summary className="cursor-pointer">
-                {t("eventWizard.meetingPreview.toggle", { defaultValue: "Voir la liste" })}
-              </summary>
-              <ul className="mt-2 space-y-0.5 max-h-40 overflow-y-auto">
-                {preview.data!.people.map((p) => (
-                  <li key={p.user_id}>
-                    {p.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
-          <p className="text-[11px] text-muted-foreground">
-            {t("eventWizard.meetingPreview.notice", {
-              defaultValue:
-                "En créant la réunion, les invitations seront envoyées automatiquement (notification, push et e-mail) aux personnes convoquées.",
+          </span>
+          <span className="ml-auto text-xs text-muted-foreground">
+            {t("eventWizard.meetingPreview.reviewOnSummary", {
+              defaultValue: "Aperçu détaillé à l'étape finale",
             })}
-          </p>
+          </span>
         </div>
       )}
       <div className="flex gap-2 pt-2">
