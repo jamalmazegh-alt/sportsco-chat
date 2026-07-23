@@ -439,6 +439,7 @@ interface DeckProps {
   onRefresh: () => void;
   className?: string;
   footer?: React.ReactNode;
+  failedSourcesDebug?: string;
 }
 
 const SWIPE_THRESHOLD = 90; // px
