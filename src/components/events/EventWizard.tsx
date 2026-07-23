@@ -2129,13 +2129,18 @@ function MeetingAudienceStep({
 
   const previewFn = useServerFn(previewMeetingAttendeesList);
   const previewPayload = useMemo(() => {
-    const { selectors, manualUserIds } = buildAudienceSelectors({
+    const draft = {
       scalar: Array.from(audienceState.scalar),
       groupIds: Array.from(audienceState.groupIds),
       teamPicks: audienceState.teamPicks,
       category: audienceState.category,
       preassigned: audienceState.preassigned,
-    });
+    } as NonNullable<EventWizardState["meetingAudience"]>;
+    const selectors = buildMeetingAudiencesFromDraft(
+      draft,
+      "00000000-0000-0000-0000-000000000000",
+    );
+    const manualUserIds = draft.preassigned.map((p) => p.user_id);
     return { selectors, manualUserIds };
   }, [audienceState]);
   const preview = useQuery({
