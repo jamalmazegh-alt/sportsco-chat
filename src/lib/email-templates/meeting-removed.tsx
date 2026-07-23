@@ -33,7 +33,8 @@ const COPY: Record<
         Vous n'êtes plus convoqué·e à la réunion <strong>{t}</strong>
         {c ? (
           <>
-            {" "}organisée par <strong>{c}</strong>
+            {" "}
+            organisée par <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -51,7 +52,8 @@ const COPY: Record<
         You are no longer invited to the meeting <strong>{t}</strong>
         {c ? (
           <>
-            {" "}organised by <strong>{c}</strong>
+            {" "}
+            organised by <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -69,10 +71,11 @@ const COPY: Record<
         Sie sind nicht mehr zur Besprechung <strong>{t}</strong>
         {c ? (
           <>
-            {" "}von <strong>{c}</strong>
+            {" "}
+            von <strong>{c}</strong>
           </>
-        ) : null}
-        {" "}eingeladen.
+        ) : null}{" "}
+        eingeladen.
       </>
     ),
     cta: "Besprechung ansehen",
@@ -87,7 +90,8 @@ const COPY: Record<
         Ya no estás convocado·a a la reunión <strong>{t}</strong>
         {c ? (
           <>
-            {" "}organizada por <strong>{c}</strong>
+            {" "}
+            organizada por <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -105,7 +109,8 @@ const COPY: Record<
         Non sei più convocato·a alla riunione <strong>{t}</strong>
         {c ? (
           <>
-            {" "}organizzata da <strong>{c}</strong>
+            {" "}
+            organizzata da <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -123,7 +128,8 @@ const COPY: Record<
         Je bent niet meer uitgenodigd voor de vergadering <strong>{t}</strong>
         {c ? (
           <>
-            {" "}van <strong>{c}</strong>
+            {" "}
+            van <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -141,7 +147,8 @@ const COPY: Record<
         Você não está mais convocado·a para a reunião <strong>{t}</strong>
         {c ? (
           <>
-            {" "}organizada por <strong>{c}</strong>
+            {" "}
+            organizada por <strong>{c}</strong>
           </>
         ) : null}
         .
@@ -159,13 +166,7 @@ function pickLocale(l?: string): Locale {
     : "fr";
 }
 
-const MeetingRemovedEmail = ({
-  displayName,
-  meetingTitle,
-  clubName,
-  eventUrl,
-  locale,
-}: Props) => {
+const MeetingRemovedEmail = ({ displayName, meetingTitle, clubName, eventUrl, locale }: Props) => {
   const c = COPY[pickLocale(locale)];
   return (
     <EmailShell preview={c.preview(meetingTitle)} locale={locale}>
