@@ -155,7 +155,8 @@ async function seedUnavailability(opts: {
   const { error } = await admin.from("staff_availabilities").insert({
     club_id: club.clubId,
     user_id: club.coach.userId,
-    created_by_user_id: club.coach.userId,
+    // INSERT policy requires created_by_user_id = auth.uid() (E2E admin client).
+    created_by_user_id: club.admin.userId,
     start_date: start,
     end_date: end,
     reason: "vacation",

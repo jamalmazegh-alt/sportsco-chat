@@ -30,14 +30,15 @@
 
 ### Effectif & joueurs
 
-| Feature                                                | Valeur                            | Statut                 | Evidence                                                    |
-| ------------------------------------------------------ | --------------------------------- | ---------------------- | ----------------------------------------------------------- |
-| Fiche joueur (avatar, historique, feedback, sanctions) | Carnet de vie sportif             | shipped                | `players/$playerId.tsx`                                     |
-| Player_parents & guardians                             | Autorité parentale, notif famille | shipped                | tables `player_parents`, `player_guardians`                 |
-| Achievements & timeline joueur                         | Journal sportif                   | shipped                | `player_achievements`, `player_timeline_events`             |
-| Import CSV joueurs (superadmin + club)                 | Onboarding en masse               | shipped                | `lib/superadmin-import/`                                    |
-| Profils publics `/p/:slug`, `/coach/:slug`, `/players` | Vitrine joueur                    | **partial (V2 gated)** | `config/features.ts` `public_player_profiles=false`         |
-| Follows inter-clubs                                    | Réseau sportif ouvert             | **partial (V2 gated)** | `follow-ups.tsx`, `following.tsx`, flag `social_network_v2` |
+| Feature                                                | Valeur                            | Statut                 | Evidence                                            |
+| ------------------------------------------------------ | --------------------------------- | ---------------------- | --------------------------------------------------- |
+| Fiche joueur (avatar, historique, feedback, sanctions) | Carnet de vie sportif             | shipped                | `players/$playerId.tsx`                             |
+| Player_parents & guardians                             | Autorité parentale, notif famille | shipped                | tables `player_parents`, `player_guardians`         |
+| Achievements & timeline joueur                         | Journal sportif                   | shipped                | `player_achievements`, `player_timeline_events`     |
+| Import CSV joueurs (superadmin + club)                 | Onboarding en masse               | shipped                | `lib/superadmin-import/`                            |
+| Profils publics `/p/:slug`, `/coach/:slug`, `/players` | Vitrine joueur                    | **partial (V2 gated)** | `config/features.ts` `public_player_profiles=false` |
+| Follows inter-clubs                                    | Réseau sportif ouvert             | **partial (V2 gated)** | `following.tsx`, flag `social_network_v2`           |
+| Relances convocations (`/follow-ups`)                  | Ops club (réponses en attente)    | **kept (V1)**          | `follow-ups.tsx`, `admin-kpis` → `/follow-ups`      |
 
 ### Tournois
 
