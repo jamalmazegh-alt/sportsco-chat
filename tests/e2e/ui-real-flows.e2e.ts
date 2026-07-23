@@ -12,17 +12,11 @@ import { createClient } from "@supabase/supabase-js";
 import { isV2 } from "./_fixtures/features";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, tx, uniqueName, navTo, MOBILE_VIEWPORT } from "./_fixtures/ui";
+import { loginViaUI, loginViaForm, tx, uniqueName, navTo, MOBILE_VIEWPORT } from "./_fixtures/ui";
 
 test.describe("auth", () => {
   test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
-    await page.goto("/login");
-    await page.getByLabel(tx("auth.email")).fill(process.env.E2E_ADMIN_EMAIL!);
-    // `#password` — getByLabel(auth.password) clashes with the show/hide toggle.
-    await page.locator("#password").fill(process.env.E2E_ADMIN_PASSWORD!);
-    await page.getByRole("button", { name: tx("auth.login") }).click();
-
-    await page.waitForURL(/\/home(\?.*)?$/);
+    await loginViaForm(page, "admin");
     await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible();
     await expect(page.locator("#password")).toHaveCount(0);
   });

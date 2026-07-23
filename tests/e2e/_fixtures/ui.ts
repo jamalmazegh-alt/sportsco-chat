@@ -6,6 +6,7 @@
  */
 import { type Page, expect } from "@playwright/test";
 import { E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD, E2E_COACH, E2E_PLAYER, E2E_PARENT } from "./admin";
+import { loginAs } from "./auth";
 import { tx, txOr, type Ns } from "./i18n-matchers";
 
 export { tx, txOr, type Ns };
@@ -31,19 +32,46 @@ function credsFor(role: UiRole): { email: string; password: string } {
 }
 
 /**
- * Connexion via le VRAI formulaire. login.tsx fait
- * window.location.replace("/home") en cas de succès.
+ * Authentifie un rôle pour les parcours UI.
  *
- * Password field: use `#password` — `getByLabel(auth.password)` also matches
- * the show/hide toggle (`aria-label="Afficher le mot de passe"`).
+ * Utilise l'injection de session (`loginAs`) — même mécanisme que les specs
+ * 00→25 / beta-closure. Le formulaire `/login` est couvert séparément par
+ * `loginViaForm` (smoke auth). Évite les timeouts 30s dus aux inputs
+ * contrôlés React + `window.location.replace` sous Playwright.
  */
 export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
+  const creds = credsFor(role);
+  await loginAs(page, creds);
+  await page.goto("/home");
+  await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
+    timeout: 30_000,
+  });
+}
+
+/**
+ * Connexion via le VRAI formulaire `/login` (smoke uniquement).
+ * login.tsx fait `window.location.replace("/home")` en cas de succès.
+ */
+export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<void> {
   const { email, password } = credsFor(role);
   await page.goto("/login");
-  await page.getByLabel(tx("auth.email")).fill(email);
+  await expect(page.locator("#email")).toBeVisible();
+
+  // Click + fill: plus fiable que getByLabel sur le layout floating-label.
+  // `#password` — getByLabel(auth.password) matche aussi le toggle show/hide.
+  await page.locator("#email").click();
+  await page.locator("#email").fill(email);
+  await expect(page.locator("#email")).toHaveValue(email);
+  await page.locator("#password").click();
   await page.locator("#password").fill(password);
-  await page.getByRole("button", { name: tx("auth.login") }).click();
-  await page.waitForURL(/\/home(\?.*)?$/, { timeout: 30_000 });
+  await expect(page.locator("#password")).toHaveValue(password);
+
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
+      timeout: 45_000,
+    }),
+    page.locator("form.card button.cta[type='submit']").click(),
+  ]);
 }
 
 /** Navigation via la vraie bottom-nav (accessible + multilingue). */
