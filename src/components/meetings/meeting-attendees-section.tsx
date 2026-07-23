@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Users, Loader2, UserPlus, Check, X, HelpCircle } from "lucide-react";
+import { Users, Loader2, UserPlus, Check, X, HelpCircle, MoreVertical, Send, UserMinus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AttendancePill } from "@/components/attendance-pill";
 import {
   AudiencePickerBody,
@@ -33,6 +49,8 @@ import { getEventAudienceContext } from "@/lib/needs/needs.functions";
 import {
   listMeetingAttendees,
   previewMeetingAudience,
+  removeMeetingAttendees,
+  resendMeetingConvocation,
   syncMeetingAttendees,
   updateMeetingAttendanceStatus,
   type MeetingAttendeeRow,
@@ -82,6 +100,39 @@ export function MeetingAttendeesSection({
       }),
     onSuccess: () => refresh(),
     onError: (e: Error) => toast.error(e.message),
+  });
+
+  const resendFn = useServerFn(resendMeetingConvocation);
+  const resendOne = useMutation({
+    mutationFn: (userId: string) =>
+      resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () =>
+      toast.success(
+        t("meetings:row.resend.success", {
+          defaultValue: "Convocation renvoyée",
+        }),
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removeFn = useServerFn(removeMeetingAttendees);
+  const [removeTarget, setRemoveTarget] = useState<MeetingAttendeeRow | null>(null);
+  const removeOne = useMutation({
+    mutationFn: (userId: string) =>
+      removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () => {
+      toast.success(
+        t("meetings:row.remove.success", {
+          defaultValue: "Convocation annulée",
+        }),
+      );
+      setRemoveTarget(null);
+      refresh();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setRemoveTarget(null);
+    },
   });
 
   if (eventType !== "meeting") return null;
@@ -319,6 +370,40 @@ export function MeetingAttendeesSection({
                       onChange={(status) => updateStatus.mutate({ user_id: a.user_id, status })}
                       disabled={updateStatus.isPending}
                     />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          aria-label={t("meetings:row.actions", {
+                            defaultValue: "Actions",
+                          })}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => resendOne.mutate(a.user_id)}
+                          disabled={resendOne.isPending}
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          {t("meetings:row.resend.cta", {
+                            defaultValue: "Relancer la convocation",
+                          })}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => setRemoveTarget(a)}
+                        >
+                          <UserMinus className="mr-2 h-4 w-4" />
+                          {t("meetings:row.remove.cta", {
+                            defaultValue: "Annuler la convocation",
+                          })}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </li>
                 );
               })}
@@ -326,6 +411,45 @@ export function MeetingAttendeesSection({
           </>
         )}
       </div>
+
+      <AlertDialog
+        open={!!removeTarget}
+        onOpenChange={(o) => !o && !removeOne.isPending && setRemoveTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("meetings:row.remove.confirmTitle", {
+                defaultValue: "Annuler la convocation ?",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("meetings:row.remove.confirmDesc", {
+                defaultValue:
+                  "{{name}} sera retiré(e) de la réunion et recevra une notification de retrait.",
+                name: removeTarget?.full_name ?? t("common.unknown", { defaultValue: "Inconnu" }),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeOne.isPending}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeOne.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (removeTarget) removeOne.mutate(removeTarget.user_id);
+              }}
+            >
+              {removeOne.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:row.remove.confirmCta", {
+                defaultValue: "Retirer",
+              })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
