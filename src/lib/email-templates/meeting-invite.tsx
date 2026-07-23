@@ -43,7 +43,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Vous êtes convoqué·e à la réunion <strong>{t}</strong>
-        {c ? (<>{" "}organisée par <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            organisée par <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "Quand",
@@ -65,7 +71,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         You are invited to the meeting <strong>{t}</strong>
-        {c ? (<>{" "}organised by <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            organised by <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "When",
@@ -87,7 +99,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Sie sind zur Besprechung <strong>{t}</strong>
-        {c ? (<>{" "}von <strong>{c}</strong></>) : null}{" "}eingeladen.
+        {c ? (
+          <>
+            {" "}
+            von <strong>{c}</strong>
+          </>
+        ) : null}{" "}
+        eingeladen.
       </>
     ),
     whenLabel: "Wann",
@@ -109,7 +127,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Estás convocado·a a la reunión <strong>{t}</strong>
-        {c ? (<>{" "}organizada por <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            organizada por <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "Cuándo",
@@ -131,7 +155,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Sei convocato·a alla riunione <strong>{t}</strong>
-        {c ? (<>{" "}organizzata da <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            organizzata da <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "Quando",
@@ -153,7 +183,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Je bent uitgenodigd voor de vergadering <strong>{t}</strong>
-        {c ? (<>{" "}van <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            van <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "Wanneer",
@@ -175,7 +211,13 @@ const COPY: Record<
     body: (t, c) => (
       <>
         Você foi convocado·a para a reunião <strong>{t}</strong>
-        {c ? (<>{" "}organizada por <strong>{c}</strong></>) : null}.
+        {c ? (
+          <>
+            {" "}
+            organizada por <strong>{c}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     whenLabel: "Quando",

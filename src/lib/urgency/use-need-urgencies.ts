@@ -20,12 +20,7 @@ import { listMyOpenNeeds } from "@/lib/needs/needs.functions";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { dateLocale } from "@/lib/date-locale";
 import { severityForStart as pureSeverityForStart, type SeverityThresholds } from "./pure";
-import type {
-  UrgencyCollectorResult,
-  UrgencyItem,
-  UrgencyRole,
-  UrgencySeverity,
-} from "./types";
+import type { UrgencyCollectorResult, UrgencyItem, UrgencyRole, UrgencySeverity } from "./types";
 
 const DAY_MS = 86_400_000;
 
@@ -66,10 +61,7 @@ export type ComputeOpenNeedUrgenciesArgs = {
  * Ré-export local pour compat des tests. Délègue à la fonction pure
  * partagée avec les seuils propres aux besoins (48 h / 7 j).
  */
-export function severityForStart(
-  startsAt: string,
-  now: Date = new Date(),
-): UrgencySeverity | null {
+export function severityForStart(startsAt: string, now: Date = new Date()): UrgencySeverity | null {
   return pureSeverityForStart(startsAt, now, NEED_THRESHOLDS);
 }
 
@@ -78,8 +70,15 @@ export function severityForStart(
  * quand plusieurs entrées portent le même needId (mergeUrgencies fait le reste).
  */
 export function computeOpenNeedUrgencies(args: ComputeOpenNeedUrgenciesArgs): UrgencyItem[] {
-  const { needs, role, now = new Date(), formatWhen, labelForRole, seatsSuffix, fallbackTitle } =
-    args;
+  const {
+    needs,
+    role,
+    now = new Date(),
+    formatWhen,
+    labelForRole,
+    seatsSuffix,
+    fallbackTitle,
+  } = args;
   const items: UrgencyItem[] = [];
   const seen = new Set<string>();
 

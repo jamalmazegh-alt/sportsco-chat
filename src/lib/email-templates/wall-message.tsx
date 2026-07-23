@@ -22,13 +22,16 @@ interface Props {
   locale?: Locale;
 }
 
-const T: Record<Locale, {
-  preview: (author: string, club: string) => string;
-  hello: (n?: string | null) => string;
-  intro: (author: string, club: string) => string;
-  cta: string;
-  footer: string;
-}> = {
+const T: Record<
+  Locale,
+  {
+    preview: (author: string, club: string) => string;
+    hello: (n?: string | null) => string;
+    intro: (author: string, club: string) => string;
+    cta: string;
+    footer: string;
+  }
+> = {
   fr: {
     preview: (a, c) => `Nouveau message de ${c} — ${a}`,
     hello: () => "Bonjour,",
@@ -48,7 +51,8 @@ const T: Record<Locale, {
     hello: () => "Hallo,",
     intro: (a, c) => `${a} hat eine Nachricht an der ${c}-Pinnwand veröffentlicht.`,
     cta: "Zur Pinnwand",
-    footer: "Du erhältst diese E-Mail, weil du Mitglied des Vereins und von dieser Nachricht betroffen bist.",
+    footer:
+      "Du erhältst diese E-Mail, weil du Mitglied des Vereins und von dieser Nachricht betroffen bist.",
   },
   es: {
     preview: (a, c) => `Nuevo mensaje de ${c} — ${a}`,

@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
-  
   CheckCircle2,
   ChevronsUpDown,
   CircleDashed,
@@ -60,7 +59,12 @@ type Candidate = {
   isReinforcement: boolean;
 };
 
-function formatName(p: { first_name?: string | null; last_name?: string | null; full_name?: string | null } | null | undefined) {
+function formatName(
+  p:
+    | { first_name?: string | null; last_name?: string | null; full_name?: string | null }
+    | null
+    | undefined,
+) {
   if (!p) return "—";
   const built = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim();
   return built || p.full_name || "—";
@@ -110,8 +114,6 @@ export function StaffAssignmentSection({
     },
   });
 
-
-
   const { data: assignments = [] } = useQuery({
     queryKey: ["event-staff-assignments", eventId],
     enabled: !!eventId,
@@ -160,10 +162,7 @@ export function StaffAssignmentSection({
     return m;
   }, [absenceByUser]);
 
-  const assignedIds = useMemo(
-    () => new Set(assignments.map((a) => a.user_id)),
-    [assignments],
-  );
+  const assignedIds = useMemo(() => new Set(assignments.map((a) => a.user_id)), [assignments]);
 
   // Tri : assignés en tête, puis staff équipe avant renforts, puis alpha.
   const people = useMemo<Candidate[]>(() => {
@@ -182,7 +181,9 @@ export function StaffAssignmentSection({
 
   const assignMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { error } = await supabase
         .from("event_staff_assignments")
         .insert({ event_id: eventId, user_id: userId, assigned_by: user?.id ?? null });
@@ -299,10 +300,14 @@ export function StaffAssignmentSection({
           </div>
           <div className="text-[11px] text-muted-foreground truncate">{baseMeta}</div>
           {absenceLabel && (
-            <div className={cn(
-              "text-[11px] truncate",
-              status === "unavailable" ? "text-destructive" : "text-amber-600 dark:text-amber-400",
-            )}>
+            <div
+              className={cn(
+                "text-[11px] truncate",
+                status === "unavailable"
+                  ? "text-destructive"
+                  : "text-amber-600 dark:text-amber-400",
+              )}
+            >
               {absenceLabel}
             </div>
           )}
@@ -323,7 +328,8 @@ export function StaffAssignmentSection({
   };
 
   const availableCount = useMemo(
-    () => people.filter((c) => (statusByUser.get(c.user_id) ?? "available") !== "unavailable").length,
+    () =>
+      people.filter((c) => (statusByUser.get(c.user_id) ?? "available") !== "unavailable").length,
     [people, statusByUser],
   );
   const coverageState: "assured" | "unassigned" | "uncovered" =
@@ -374,10 +380,10 @@ export function StaffAssignmentSection({
                     defaultValue: "Aucun coach dans ce club",
                   })
                 : unassignedPeople.length === 0
-                ? t("staffAssignment.allAssigned", {
-                    defaultValue: "Tous les coachs sont assignés",
-                  })
-                : t("staffAssignment.addCoach", { defaultValue: "Assigner un coach" })}
+                  ? t("staffAssignment.allAssigned", {
+                      defaultValue: "Tous les coachs sont assignés",
+                    })
+                  : t("staffAssignment.addCoach", { defaultValue: "Assigner un coach" })}
             </span>
             <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
           </Button>
@@ -463,7 +469,6 @@ export function StaffAssignmentSection({
         </PopoverContent>
       </Popover>
 
-
       <AlertDialog
         open={!!pendingConflict}
         onOpenChange={(open) => {
@@ -480,15 +485,12 @@ export function StaffAssignmentSection({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {t("staffAssignment.conflict.body", {
-                defaultValue:
-                  "Ce coach présente un conflit sur ce créneau. Continuer ?",
+                defaultValue: "Ce coach présente un conflit sur ce créneau. Continuer ?",
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("common.cancel", { defaultValue: "Annuler" })}
-            </AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (pendingConflict) assignMutation.mutate(pendingConflict.user_id);
@@ -510,16 +512,16 @@ function StatusDot({ status }: { status: Status }) {
     status === "unavailable"
       ? "text-destructive"
       : status === "tentative"
-      ? "text-amber-500"
-      : "text-emerald-500";
+        ? "text-amber-500"
+        : "text-emerald-500";
   const Icon =
     status === "unavailable" ? MinusCircle : status === "tentative" ? CircleDashed : CheckCircle2;
   const label =
     status === "unavailable"
       ? t("staffAvailability.status.unavailable", { defaultValue: "Indisponible" })
       : status === "tentative"
-      ? t("staffAvailability.status.tentative", { defaultValue: "Incertain" })
-      : t("staffAvailability.status.available", { defaultValue: "Disponible" });
+        ? t("staffAvailability.status.tentative", { defaultValue: "Incertain" })
+        : t("staffAvailability.status.available", { defaultValue: "Disponible" });
   return (
     <span className={cn("inline-flex items-center gap-1 text-[11px]", cls)} title={label}>
       <Icon className="h-3.5 w-3.5" />

@@ -256,7 +256,7 @@ export function useBuildCluberoSession({
     dirtyKeys.current.clear();
     for (const k of keys) {
       // Sequential to avoid overwhelming; questions are small.
-      // eslint-disable-next-line no-await-in-loop
+
       await saveAnswer(k);
       if (closedRef.current) return;
     }

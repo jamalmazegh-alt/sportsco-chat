@@ -84,13 +84,8 @@ import {
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
 import { listClubMembersWithContext } from "@/lib/needs/needs.functions";
-import {
-  formatMemberContextSubline,
-  type MemberContext,
-} from "@/lib/needs/member-context";
+import { formatMemberContextSubline, type MemberContext } from "@/lib/needs/member-context";
 import { PersonRow } from "@/components/shared/person-row";
-
-
 
 export const Route = createFileRoute("/_authenticated/admin/groups")({
   component: GroupsPage,
@@ -114,7 +109,6 @@ type ClubMemberRow = {
   children_names?: string[];
 };
 
-
 type TeamRow = {
   id: string;
   name: string;
@@ -137,11 +131,7 @@ function displayName(m: {
   first_name?: string | null;
   last_name?: string | null;
 }) {
-  return (
-    m.full_name?.trim() ||
-    [m.first_name, m.last_name].filter(Boolean).join(" ").trim() ||
-    "—"
-  );
+  return m.full_name?.trim() || [m.first_name, m.last_name].filter(Boolean).join(" ").trim() || "—";
 }
 
 function useRoleLabel() {
@@ -254,7 +244,6 @@ function GroupsPage() {
     },
   });
 
-
   // Load teams for the "bulk add from team/category" picker.
   const teamsQ = useQuery({
     queryKey: ["teams-for-groups", activeClubId],
@@ -271,8 +260,7 @@ function GroupsPage() {
     },
   });
 
-  const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ["club-groups", activeClubId] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["club-groups", activeClubId] });
 
   const createMut = useMutation({
     mutationFn: async (input: { name: string; description: string | null }) =>
@@ -283,11 +271,7 @@ function GroupsPage() {
       invalidate();
     },
     onError: (e: Error) =>
-      toast.error(
-        e.message === "group_name_taken"
-          ? t("groups.errors.nameTaken")
-          : e.message,
-      ),
+      toast.error(e.message === "group_name_taken" ? t("groups.errors.nameTaken") : e.message),
   });
 
   const updateMut = useMutation({
@@ -303,11 +287,7 @@ function GroupsPage() {
       invalidate();
     },
     onError: (e: Error) =>
-      toast.error(
-        e.message === "group_name_taken"
-          ? t("groups.errors.nameTaken")
-          : e.message,
-      ),
+      toast.error(e.message === "group_name_taken" ? t("groups.errors.nameTaken") : e.message),
   });
 
   const deleteMut = useMutation({
@@ -354,10 +334,7 @@ function GroupsPage() {
             const resolvedCount = groupsQ.data?.resolved_counts?.[g.id] ?? 0;
             const expanded = expandedId === g.id;
             return (
-              <div
-                key={g.id}
-                className="rounded-lg border border-border bg-card overflow-hidden"
-              >
+              <div key={g.id} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 p-3">
                   <button
                     className="p-1 -m-1 rounded hover:bg-muted/40"
@@ -390,11 +367,7 @@ function GroupsPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={t("common.actions")}
-                      >
+                      <Button variant="ghost" size="icon" aria-label={t("common.actions")}>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -435,7 +408,6 @@ function GroupsPage() {
                     clubId={activeClubId}
                     allMembers={membersQ.data ?? []}
                     teams={teamsQ.data ?? []}
-
                   />
                 )}
               </div>
@@ -444,19 +416,14 @@ function GroupsPage() {
         </div>
       )}
 
-      <AlertDialog
-        open={!!confirmDelete}
-        onOpenChange={(o) => !o && setConfirmDelete(null)}
-      >
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("groups.delete")}</AlertDialogTitle>
             <AlertDialogDescription>{t("groups.deleteConfirm")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("common.cancel")}
-            </AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
@@ -469,8 +436,6 @@ function GroupsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-
 
       <GroupFormDialog
         open={creating}
@@ -485,9 +450,7 @@ function GroupsPage() {
         title={t("groups.edit")}
         initial={editing ?? undefined}
         submitting={updateMut.isPending}
-        onSubmit={(v) =>
-          editing && updateMut.mutate({ id: editing.id, ...v })
-        }
+        onSubmit={(v) => editing && updateMut.mutate({ id: editing.id, ...v })}
         showActive
       />
     </div>
@@ -501,11 +464,7 @@ function GroupFormDialog(props: {
   initial?: GroupRow;
   submitting?: boolean;
   showActive?: boolean;
-  onSubmit: (v: {
-    name: string;
-    description: string | null;
-    is_active?: boolean;
-  }) => void;
+  onSubmit: (v: { name: string; description: string | null; is_active?: boolean }) => void;
 }) {
   const { t } = useTranslation();
   const [name, setName] = useState(props.initial?.name ?? "");
@@ -650,7 +609,12 @@ function GroupMembersPanel({
   });
 
   const resolvedQ = useQuery({
-    queryKey: ["club-group-resolved-count", groupId, rulesQ.data?.rules?.length ?? 0, membersQ.data?.members?.length ?? 0],
+    queryKey: [
+      "club-group-resolved-count",
+      groupId,
+      rulesQ.data?.rules?.length ?? 0,
+      membersQ.data?.members?.length ?? 0,
+    ],
     queryFn: () => resolvedCountFn({ data: { club_id: clubId, group_id: groupId } }),
   });
 
@@ -670,14 +634,11 @@ function GroupMembersPanel({
   const sublineLabels = useMemo(
     () => ({
       playerSubline: (c: string) => t("common:person.playerSubline", { category: c }),
-      playerSublineMulti: (c: string) =>
-        t("common:person.playerSublineMulti", { categories: c }),
+      playerSublineMulti: (c: string) => t("common:person.playerSublineMulti", { categories: c }),
       parentSubline: (c: string) => t("common:person.parentSubline", { children: c }),
     }),
     [t],
   );
-
-
 
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["club-group-members", groupId] });
@@ -695,8 +656,7 @@ function GroupMembersPanel({
     onError: (e: Error) => toast.error(e.message),
   });
   const removeMut = useMutation({
-    mutationFn: (member_id: string) =>
-      removeFn({ data: { group_id: groupId, member_id } }),
+    mutationFn: (member_id: string) => removeFn({ data: { group_id: groupId, member_id } }),
     onSuccess: () => {
       toast.success(t("groups.memberRemoved"));
       invalidateAll();
@@ -742,10 +702,7 @@ function GroupMembersPanel({
     return Array.from(s).sort();
   }, [teams]);
 
-  const teamNameById = useMemo(
-    () => new Map(teams.map((tm) => [tm.id, tm])),
-    [teams],
-  );
+  const teamNameById = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
 
   function ruleLabel(r: RuleRow) {
     const base = t(`groups.bulk.${r.rule_type}`);
@@ -762,23 +719,50 @@ function GroupMembersPanel({
   const ruleStyle = (rt: ClubGroupRuleType): { Icon: LucideIcon; cls: string } => {
     switch (rt) {
       case "club_admins":
-        return { Icon: ShieldCheck, cls: "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-300" };
+        return {
+          Icon: ShieldCheck,
+          cls: "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-300",
+        };
       case "club_staff":
-        return { Icon: Shield, cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" };
+        return {
+          Icon: Shield,
+          cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+        };
       case "club_tournament_managers":
-        return { Icon: Trophy, cls: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-300" };
+        return {
+          Icon: Trophy,
+          cls: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-300",
+        };
       case "club_educators":
-        return { Icon: GraduationCap, cls: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300" };
+        return {
+          Icon: GraduationCap,
+          cls: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+        };
       case "club_members":
-        return { Icon: Users, cls: "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300" };
+        return {
+          Icon: Users,
+          cls: "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300",
+        };
       case "team_players":
-        return { Icon: Trophy, cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" };
+        return {
+          Icon: Trophy,
+          cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+        };
       case "team_parents":
-        return { Icon: UserRound, cls: "border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300" };
+        return {
+          Icon: UserRound,
+          cls: "border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+        };
       case "team_educators":
-        return { Icon: Flag, cls: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300" };
+        return {
+          Icon: Flag,
+          cls: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300",
+        };
       case "category_educators":
-        return { Icon: Tag, cls: "border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300" };
+        return {
+          Icon: Tag,
+          cls: "border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300",
+        };
     }
   };
 
@@ -814,40 +798,34 @@ function GroupMembersPanel({
           {t("groups.dynamicSubgroups")}
         </Label>
         {rules.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">
-            {t("groups.noSubgroups")}
-          </p>
+          <p className="text-xs text-muted-foreground italic">{t("groups.noSubgroups")}</p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
             {rules.map((r) => {
               const { Icon: RuleIcon, cls } = ruleStyle(r.rule_type);
               return (
-              <Badge
-                key={r.id}
-                variant="outline"
-                className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
-              >
-                <RuleIcon className="h-3 w-3" />
-                <button
-                  type="button"
-                  className="text-xs hover:underline"
-                  onClick={() => setPreviewRule(r)}
-                  aria-label={t("groups.subgroupPreview")}
-                >
-                  {ruleLabel(r)}
-                </button>
-                <span className="text-[9px] font-semibold tracking-wider opacity-70 px-1 rounded bg-background/40">
-                  {t("groups.dynamicBadge")}
-                </span>
-                <button
-                  type="button"
-                  className="ml-0.5 rounded hover:bg-muted p-0.5"
-                  onClick={() => removeRuleMut.mutate(r.id)}
-                  aria-label={t("groups.subgroupRemove")}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
+                <Badge key={r.id} variant="outline" className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}>
+                  <RuleIcon className="h-3 w-3" />
+                  <button
+                    type="button"
+                    className="text-xs hover:underline"
+                    onClick={() => setPreviewRule(r)}
+                    aria-label={t("groups.subgroupPreview")}
+                  >
+                    {ruleLabel(r)}
+                  </button>
+                  <span className="text-[9px] font-semibold tracking-wider opacity-70 px-1 rounded bg-background/40">
+                    {t("groups.dynamicBadge")}
+                  </span>
+                  <button
+                    type="button"
+                    className="ml-0.5 rounded hover:bg-muted p-0.5"
+                    onClick={() => removeRuleMut.mutate(r.id)}
+                    aria-label={t("groups.subgroupRemove")}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
               );
             })}
           </div>
@@ -910,7 +888,6 @@ function GroupMembersPanel({
         </div>
       </div>
 
-
       {/* Individual members */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -921,9 +898,7 @@ function GroupMembersPanel({
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           </div>
         ) : (membersQ.data?.members ?? []).length === 0 ? (
-          <div className="text-sm text-muted-foreground italic">
-            {t("groups.noMembers")}
-          </div>
+          <div className="text-sm text-muted-foreground italic">{t("groups.noMembers")}</div>
         ) : (
           <ul className="divide-y divide-border/60 rounded-md border border-border bg-background">
             {(membersQ.data?.members ?? []).map((m) => {
@@ -932,9 +907,10 @@ function GroupMembersPanel({
                 first_name: m.profile?.first_name,
                 last_name: m.profile?.last_name,
               });
-              const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
-                .filter((r, i, arr) => r && arr.indexOf(r) === i);
-              const ctx = m.user_id ? contextByUserId.get(m.user_id) ?? null : null;
+              const roleList = (
+                m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : []
+              ).filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const ctx = m.user_id ? (contextByUserId.get(m.user_id) ?? null) : null;
               const subline = formatMemberContextSubline(ctx, sublineLabels);
               return (
                 <li key={m.id} className="px-3">
@@ -977,8 +953,9 @@ function GroupMembersPanel({
         {search.trim() && candidates.length > 0 && (
           <ul className="rounded-md border border-border bg-background divide-y divide-border max-h-64 overflow-auto">
             {candidates.map((m) => {
-              const roleList = (m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [])
-                .filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const roleList = (
+                m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : []
+              ).filter((r, i, arr) => r && arr.indexOf(r) === i);
               const subline = formatMemberContextSubline(m.context, sublineLabels);
               return (
                 <li key={m.id} className="px-3">
@@ -1013,7 +990,6 @@ function GroupMembersPanel({
         clubId={clubId}
         onClose={() => setPreviewRule(null)}
       />
-
     </div>
   );
 }
@@ -1053,7 +1029,6 @@ function RulePreviewDialog({
   ruleLabel: string;
   clubId: string;
   onClose: () => void;
-
 }) {
   const { t } = useTranslation();
   const detailsFn = useServerFn(previewGroupRuleDetails);
@@ -1078,9 +1053,7 @@ function RulePreviewDialog({
 
   const rows = useMemo(() => {
     const list = previewQ.data?.rows ?? [];
-    return [...list].sort((a, b) =>
-      (a.full_name ?? "").localeCompare(b.full_name ?? ""),
-    );
+    return [...list].sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
   }, [previewQ.data]);
 
   return (
@@ -1091,9 +1064,7 @@ function RulePreviewDialog({
             <Layers className="h-4 w-4 text-primary" />
             {ruleLabel}
           </DialogTitle>
-          <DialogDescription>
-            {t("groups.subgroupPreviewDescription")}
-          </DialogDescription>
+          <DialogDescription>{t("groups.subgroupPreviewDescription")}</DialogDescription>
         </DialogHeader>
 
         {previewQ.isLoading ? (
@@ -1115,14 +1086,10 @@ function RulePreviewDialog({
                   {m.full_name?.trim() || m.email || "—"}
                 </span>
                 {m.subtitle ? (
-                  <span className="text-xs text-muted-foreground truncate">
-                    {m.subtitle}
-                  </span>
+                  <span className="text-xs text-muted-foreground truncate">{m.subtitle}</span>
                 ) : null}
                 {m.email ? (
-                  <span className="text-xs text-muted-foreground truncate">
-                    {m.email}
-                  </span>
+                  <span className="text-xs text-muted-foreground truncate">{m.email}</span>
                 ) : null}
                 <div className="flex flex-wrap gap-1">
                   <RoleBadges roles={m.roles ?? []} fallback={null} />
@@ -1149,5 +1116,3 @@ function RulePreviewDialog({
     </Dialog>
   );
 }
-
-

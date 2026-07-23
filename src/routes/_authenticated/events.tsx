@@ -637,7 +637,9 @@ function EventsPage() {
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("events.searchPlaceholder", { defaultValue: "Rechercher un événement…" })}
+            placeholder={t("events.searchPlaceholder", {
+              defaultValue: "Rechercher un événement…",
+            })}
             className="pl-9"
           />
         </div>
@@ -686,7 +688,12 @@ function EventsPage() {
           }
           action={
             searchQuery.trim() ? (
-              <Button size="sm" variant="outline" className="h-9" onClick={() => setSearchQuery("")}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9"
+                onClick={() => setSearchQuery("")}
+              >
                 {t("events.clearSearch", { defaultValue: "Effacer la recherche" })}
               </Button>
             ) : isCoach && user ? (

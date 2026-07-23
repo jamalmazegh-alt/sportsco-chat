@@ -79,9 +79,7 @@ const Email = ({
             {typeof capacity === "number" && capacity > 0 ? (
               <Text style={cardHint}>{t.seats(capacity)}</Text>
             ) : null}
-            <Text style={cardHint}>
-              {validationMode === "auto" ? t.auto : t.manual}
-            </Text>
+            <Text style={cardHint}>{validationMode === "auto" ? t.auto : t.manual}</Text>
           </Section>
           <Section style={{ textAlign: "center", margin: "24px 0" }}>
             <Button href={eventUrl} style={btn}>

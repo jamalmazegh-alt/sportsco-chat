@@ -49,11 +49,7 @@ export type PersonRowProps = {
 };
 
 function initialsFrom(name: string): string {
-  const parts = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2);
+  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
   if (parts.length === 0) return "?";
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("");
 }
@@ -110,9 +106,7 @@ export function PersonRow({
           )}
         </div>
         {subline && (
-          <div className="mt-1 text-xs text-muted-foreground leading-snug">
-            {subline}
-          </div>
+          <div className="mt-1 text-xs text-muted-foreground leading-snug">{subline}</div>
         )}
       </div>
       {action && <div className="flex-shrink-0 self-start pt-0.5">{action}</div>}

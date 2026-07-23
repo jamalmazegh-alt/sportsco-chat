@@ -1496,11 +1496,10 @@ function TeamDetail() {
                 .filter((e: string) => !!e),
             );
             const pendingForP = pendingInvitesByPlayer?.get(p.id);
-            const hasParentPendingInvite = !!pendingForP
-              && [...pendingForP.emails].some((e) => parentEmailsSet.has(e));
+            const hasParentPendingInvite =
+              !!pendingForP && [...pendingForP.emails].some((e) => parentEmailsSet.has(e));
             const hasPendingInvite =
-              !linked &&
-              (minorParentMode ? hasParentPendingInvite : !!pendingForP);
+              !linked && (minorParentMode ? hasParentPendingInvite : !!pendingForP);
             const allFailures = inviteFailuresByPlayer?.[p.id] ?? [];
             const failures = minorParentMode
               ? allFailures.filter((f: any) =>
@@ -1514,7 +1513,6 @@ function TeamDetail() {
               parentsForP.length > 0 &&
               !hasFailedInvite &&
               !hasPendingInvite;
-
 
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
@@ -1612,7 +1610,6 @@ function TeamDetail() {
                             ? t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })
                             : t("players.accountInactive")}
                         </span>
-
                       ) : (
                         <span className="text-muted-foreground">
                           {p.preferred_position ?? t("players.accountInactive")}

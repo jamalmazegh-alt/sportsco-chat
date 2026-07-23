@@ -34,15 +34,12 @@ describe("publications — preview_publication_audience", () => {
     ];
 
     const cAdmin = await signInAs("adminA");
-    const { data: prev, error: prevErr } = await cAdmin.rpc(
-      "preview_publication_audience" as any,
-      {
-        _club_id: fx.clubA,
-        _event_id: null,
-        _audiences: audiences,
-        _manual_member_ids: [],
-      },
-    );
+    const { data: prev, error: prevErr } = await cAdmin.rpc("preview_publication_audience" as any, {
+      _club_id: fx.clubA,
+      _event_id: null,
+      _audiences: audiences,
+      _manual_member_ids: [],
+    });
     expect(prevErr, prevErr?.message).toBeNull();
     const previewRow = Array.isArray(prev) ? prev[0] : prev;
     const previewCount = previewRow.count as number;
@@ -63,14 +60,15 @@ describe("publications — preview_publication_audience", () => {
       .single();
     const pubId = pub!.id as string;
     created.push(pubId);
-    await admin.from("club_publication_audiences").insert(
-      audiences.map((a) => ({ publication_id: pubId, ...a })),
-    );
+    await admin
+      .from("club_publication_audiences")
+      .insert(audiences.map((a) => ({ publication_id: pubId, ...a })));
 
-    const { data: pubRes, error: pubErr } = await cAdmin.rpc(
-      "publish_publication_atomic" as any,
-      { _publication_id: pubId, _kind: "publish", _dispatch_id: null },
-    );
+    const { data: pubRes, error: pubErr } = await cAdmin.rpc("publish_publication_atomic" as any, {
+      _publication_id: pubId,
+      _kind: "publish",
+      _dispatch_id: null,
+    });
     expect(pubErr, pubErr?.message).toBeNull();
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
 
@@ -89,15 +87,12 @@ describe("publications — preview_publication_audience", () => {
 
     const cAdmin = await signInAs("adminA");
     // 1) Preview with selection_manuelle marker + manual list.
-    const { data: prev, error: prevErr } = await cAdmin.rpc(
-      "preview_publication_audience" as any,
-      {
-        _club_id: fx.clubA,
-        _event_id: null,
-        _audiences: [{ audience_type: "selection_manuelle" }],
-        _manual_member_ids: manual,
-      },
-    );
+    const { data: prev, error: prevErr } = await cAdmin.rpc("preview_publication_audience" as any, {
+      _club_id: fx.clubA,
+      _event_id: null,
+      _audiences: [{ audience_type: "selection_manuelle" }],
+      _manual_member_ids: manual,
+    });
     expect(prevErr, prevErr?.message).toBeNull();
     const previewCount = (Array.isArray(prev) ? prev[0] : prev).count as number;
     expect(previewCount).toBeGreaterThan(0);
@@ -131,10 +126,11 @@ describe("publications — preview_publication_audience", () => {
       .from("club_publication_manual_members")
       .insert(manual.map((m) => ({ publication_id: pubId, member_id: m })));
 
-    const { data: pubRes, error: pubErr } = await cAdmin.rpc(
-      "publish_publication_atomic" as any,
-      { _publication_id: pubId, _kind: "publish", _dispatch_id: null },
-    );
+    const { data: pubRes, error: pubErr } = await cAdmin.rpc("publish_publication_atomic" as any, {
+      _publication_id: pubId,
+      _kind: "publish",
+      _dispatch_id: null,
+    });
     expect(pubErr, pubErr?.message).toBeNull();
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
     expect(row.recipients_count).toBe(previewCount);
@@ -163,4 +159,3 @@ describe("publications — preview_publication_audience", () => {
     expect(error!.message.toLowerCase()).toContain("forbidden");
   });
 });
-

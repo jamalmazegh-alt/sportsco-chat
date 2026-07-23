@@ -47,10 +47,7 @@ import { listSeasons } from "@/lib/seasons.functions";
 
 export const Route = createFileRoute("/_authenticated/publications/new")({
   head: () => ({
-    meta: [
-      { title: "Nouvelle publication · Clubero" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Nouvelle publication · Clubero" }, { name: "robots", content: "noindex" }],
   }),
   component: NewPublicationPage,
 });
@@ -281,8 +278,7 @@ function NewPublicationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewKey, activeClubId]);
 
-  const canStep1 =
-    title.trim().length > 0 && pollOptions.filter((s) => s.trim()).length >= 2;
+  const canStep1 = title.trim().length > 0 && pollOptions.filter((s) => s.trim()).length >= 2;
   const canSubmit =
     (audiences.length > 0 || manualMemberIds.length > 0) &&
     (publishToWall || sendEmail) &&
@@ -351,9 +347,7 @@ function NewPublicationPage() {
   }
   const canAdd =
     !!addKind &&
-    ((needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind))
-      ? !!addParam
-      : true);
+    (needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind) ? !!addParam : true);
 
   // Available kinds in the "add" select — filter out already-picked scalars.
   const availableKinds: KindKey[] = useMemo(() => {
@@ -361,8 +355,7 @@ function NewPublicationPage() {
     if (!hasAudience({ audience_type: "educateurs" })) list.push("educateurs");
     if (!hasAudience({ audience_type: "dirigeants" })) list.push("dirigeants");
     if (teams.length > 0) list.push("joueurs_equipe", "parents_equipe");
-    if (activeSeason && categories.length > 0)
-      list.push("joueurs_categorie", "parents_categorie");
+    if (activeSeason && categories.length > 0) list.push("joueurs_categorie", "parents_categorie");
     if (groups.length > 0) list.push("groupe_personnalise");
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -390,7 +383,6 @@ function NewPublicationPage() {
         onRemove: () => removeAudienceAt(i),
       };
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audiences, teams, groups, t]);
 
   const scalarSuggestions = [
@@ -424,9 +416,7 @@ function NewPublicationPage() {
         <Card>
           <CardContent className="py-5 space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="pub-title">
-                {t("publications:form.questionLabel")}
-              </Label>
+              <Label htmlFor="pub-title">{t("publications:form.questionLabel")}</Label>
               <Input
                 id="pub-title"
                 value={title}
@@ -436,9 +426,7 @@ function NewPublicationPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="pub-content">
-                {t("publications:form.descriptionLabel")}
-              </Label>
+              <Label htmlFor="pub-content">{t("publications:form.descriptionLabel")}</Label>
               <Textarea
                 id="pub-content"
                 value={content}
@@ -577,7 +565,8 @@ function NewPublicationPage() {
                       {manualPlayers.length > 0 && (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white pl-2.5 pr-2.5 py-1 text-xs font-medium shadow-sm">
                           <Users className="h-3 w-3" />
-                          {t("publications:audience.types.selection_manuelle")} · {manualPlayers.length}
+                          {t("publications:audience.types.selection_manuelle")} ·{" "}
+                          {manualPlayers.length}
                         </span>
                       )}
                     </div>
@@ -721,7 +710,8 @@ function NewPublicationPage() {
                     </SelectContent>
                   </Select>
 
-                  {addKind && (needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind)) ? (
+                  {addKind &&
+                  (needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind)) ? (
                     <Select value={addParam} onValueChange={setAddParam}>
                       <SelectTrigger>
                         <SelectValue
@@ -840,9 +830,14 @@ function NewPublicationPage() {
                   className="mt-0.5"
                 />
                 <div>
-                  <div className="text-sm">{t("publications:new.wall", "Mur + notification push")}</div>
+                  <div className="text-sm">
+                    {t("publications:new.wall", "Mur + notification push")}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {t("publications:new.wallDesc", "Apparaît sur le fil du club et envoie une push aux destinataires.")}
+                    {t(
+                      "publications:new.wallDesc",
+                      "Apparaît sur le fil du club et envoie une push aux destinataires.",
+                    )}
                   </div>
                 </div>
               </label>

@@ -188,7 +188,17 @@ if (!i18n.isInitialized) {
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     defaultNS: "common",
-    ns: ["common", "marketing", "support", "tournaments", "challenges", "buildClubero", "camps", "needs", "publications"],
+    ns: [
+      "common",
+      "marketing",
+      "support",
+      "tournaments",
+      "challenges",
+      "buildClubero",
+      "camps",
+      "needs",
+      "publications",
+    ],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });

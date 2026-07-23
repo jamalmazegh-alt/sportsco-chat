@@ -44,9 +44,7 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
         )
         .eq("team_id", teamId)
         .eq("role", "player");
-      const players = (tm ?? [])
-        .map((r: any) => r.players)
-        .filter((p: any) => p && !p.deleted_at);
+      const players = (tm ?? []).map((r: any) => r.players).filter((p: any) => p && !p.deleted_at);
 
       const { data: events } = await supabase
         .from("events")

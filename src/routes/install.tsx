@@ -148,14 +148,18 @@ function InstallPage() {
                 <Apple className="h-4 w-4 text-white/80" />
                 <span className="text-sm font-semibold">{t("install.platformAppleTitle")}</span>
               </div>
-              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">{t("install.platformAppleDesc")}</p>
+              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">
+                {t("install.platformAppleDesc")}
+              </p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
               <div className="flex items-center gap-2">
                 <AndroidIcon className="h-4 w-4 text-emerald-400" />
                 <span className="text-sm font-semibold">{t("install.platformAndroidTitle")}</span>
               </div>
-              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">{t("install.platformAndroidDesc")}</p>
+              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">
+                {t("install.platformAndroidDesc")}
+              </p>
             </div>
           </div>
           <p className="mt-3 text-xs text-white/50">{t("install.platformCompareNote")}</p>

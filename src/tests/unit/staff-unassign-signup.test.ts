@@ -49,7 +49,15 @@ function makeDeps(overrides?: { signupStatus?: string; isStaff?: boolean }) {
   const notify = async (p: any) => {
     notifyCalls.push(p);
   };
-  return { supabase, supabaseAdmin, recomputeCoverage, notify, updates, notifyCalls, recomputeCalls };
+  return {
+    supabase,
+    supabaseAdmin,
+    recomputeCoverage,
+    notify,
+    updates,
+    notifyCalls,
+    recomputeCalls,
+  };
 }
 
 describe("staffUnassignSignup", () => {

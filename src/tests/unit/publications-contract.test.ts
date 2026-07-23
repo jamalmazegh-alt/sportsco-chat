@@ -37,7 +37,9 @@ const UUID = "11111111-1111-4111-8111-111111111111";
 
 describe("publications — audience input contract", () => {
   it("accepts team-scoped audience", () => {
-    expect(AudienceInput.safeParse({ audience_type: "joueurs_equipe", team_id: UUID }).success).toBe(true);
+    expect(
+      AudienceInput.safeParse({ audience_type: "joueurs_equipe", team_id: UUID }).success,
+    ).toBe(true);
   });
 
   it("accepts season-scoped category audience", () => {
@@ -93,7 +95,8 @@ describe("publications — poll anonymity threshold logic", () => {
   it("anonymous with 0 votes → hidden", () => expect(belowThreshold("anonymous", 0)).toBe(true));
   it("anonymous with 2 votes → hidden", () => expect(belowThreshold("anonymous", 2)).toBe(true));
   it("anonymous with 3 votes → visible", () => expect(belowThreshold("anonymous", 3)).toBe(false));
-  it("staff_visible with 0 votes → visible", () => expect(belowThreshold("staff_visible", 0)).toBe(false));
+  it("staff_visible with 0 votes → visible", () =>
+    expect(belowThreshold("staff_visible", 0)).toBe(false));
 });
 
 describe("publications — create input requires at least one target", () => {
@@ -109,9 +112,7 @@ describe("publications — create input requires at least one target", () => {
     });
 
   it("accepts manual-only publication", () => {
-    expect(
-      CreateInput.safeParse({ audiences: [], manualMemberIds: [UUID] }).success,
-    ).toBe(true);
+    expect(CreateInput.safeParse({ audiences: [], manualMemberIds: [UUID] }).success).toBe(true);
   });
   it("accepts audience-only publication", () => {
     expect(
@@ -126,4 +127,3 @@ describe("publications — create input requires at least one target", () => {
     expect(r.success).toBe(false);
   });
 });
-

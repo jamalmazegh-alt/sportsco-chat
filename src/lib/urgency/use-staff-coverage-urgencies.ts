@@ -133,8 +133,7 @@ export function useStaffCoverageUrgencies(): UrgencyCollectorResult & { isPendin
   const { user, activeClubId } = useAuth();
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
-  const isStaff =
-    isAdmin || roles.includes("coach") || roles.includes("assistant_coach");
+  const isStaff = isAdmin || roles.includes("coach") || roles.includes("assistant_coach");
   const enabled = !!activeClubId && !!user && isStaff;
 
   const nowIso = new Date().toISOString();

@@ -59,7 +59,9 @@ export function formatFromHeader(from: string): string {
   if (!m || !m[1]) return from;
   const name = m[1];
   const addr = m[2];
-  const display = /[^\x00-\x7F]/.test(name)
+  // Non-ASCII display names need RFC-2047; avoid control-char regex (eslint).
+  const needsRfc2047 = [...name].some((c) => c.charCodeAt(0) > 127);
+  const display = needsRfc2047
     ? `=?UTF-8?B?${b64utf8(name)}?=`
     : `"${name.replace(/([\\"])/g, "\\$1")}"`;
   return `${display} <${addr}>`;

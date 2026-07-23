@@ -287,7 +287,12 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
           actionType: "convocation.email_backfill",
           resourceType: "event",
           resourceId: eventId,
-          status: res.failed === 0 && res.enqueued > 0 ? "success" : res.enqueued === 0 ? "failure" : "warning",
+          status:
+            res.failed === 0 && res.enqueued > 0
+              ? "success"
+              : res.enqueued === 0
+                ? "failure"
+                : "warning",
           metadata: {
             dispatch_id: dispatchId,
             convocations: res.convocations,

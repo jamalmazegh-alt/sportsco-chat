@@ -334,9 +334,7 @@ describe("event_needs — Phase 1 backend (RPCs + apply regression)", () => {
 
     // (c) draft avec une publication → refus 'need_has_publications'
     const withPubId = await insertNeed({ status: "draft" });
-    await admin
-      .from("event_need_publications")
-      .insert({ need_id: withPubId, recipients_count: 0 });
+    await admin.from("event_need_publications").insert({ need_id: withPubId, recipients_count: 0 });
     const koPub = await admin.rpc("delete_event_need_draft", {
       _need_id: withPubId,
       _actor: fx.users.adminA.userId,

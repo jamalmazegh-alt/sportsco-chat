@@ -194,10 +194,30 @@ export function MeetingAttendeesSection({
 
               <div className="grid grid-cols-4 gap-1.5 mt-2.5">
                 {[
-                  { key: "present", val: counts.present, label: t("attendance.present"), tone: "bg-emerald-300" },
-                  { key: "uncertain", val: counts.uncertain, label: t("attendance.uncertain"), tone: "bg-amber-300" },
-                  { key: "absent", val: counts.absent, label: t("attendance.absent"), tone: "bg-rose-300" },
-                  { key: "pending", val: counts.pending, label: t("attendance.pending"), tone: "bg-white/60" },
+                  {
+                    key: "present",
+                    val: counts.present,
+                    label: t("attendance.present"),
+                    tone: "bg-emerald-300",
+                  },
+                  {
+                    key: "uncertain",
+                    val: counts.uncertain,
+                    label: t("attendance.uncertain"),
+                    tone: "bg-amber-300",
+                  },
+                  {
+                    key: "absent",
+                    val: counts.absent,
+                    label: t("attendance.absent"),
+                    tone: "bg-rose-300",
+                  },
+                  {
+                    key: "pending",
+                    val: counts.pending,
+                    label: t("attendance.pending"),
+                    tone: "bg-white/60",
+                  },
                 ].map((b) => (
                   <div
                     key={b.key}
@@ -280,7 +300,11 @@ export function MeetingAttendeesSection({
                       </div>
                       <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                         {chips.map((chip) => (
-                          <Badge key={chip.key} variant="outline" className="text-[10px] font-normal">
+                          <Badge
+                            key={chip.key}
+                            variant="outline"
+                            className="text-[10px] font-normal"
+                          >
                             {chip.kind === "manual"
                               ? t("meetings:source.manual", {
                                   defaultValue: "ajouté manuellement",
@@ -292,9 +316,7 @@ export function MeetingAttendeesSection({
                     </div>
                     <StatusButtons
                       value={a.status}
-                      onChange={(status) =>
-                        updateStatus.mutate({ user_id: a.user_id, status })
-                      }
+                      onChange={(status) => updateStatus.mutate({ user_id: a.user_id, status })}
                       disabled={updateStatus.isPending}
                     />
                   </li>
@@ -317,12 +339,7 @@ function StatusButtons({
   onChange: (s: AttendanceStatus) => void;
   disabled?: boolean;
 }) {
-  const btn = (
-    s: AttendanceStatus,
-    Icon: typeof Check,
-    activeCls: string,
-    label: string,
-  ) => (
+  const btn = (s: AttendanceStatus, Icon: typeof Check, activeCls: string, label: string) => (
     <Button
       key={s}
       type="button"
@@ -421,10 +438,7 @@ function AttendeesEditor({
   const { state, controls, buildAudiences } = useAudienceState(initialSelection);
 
   const audiences = useMemo(() => buildAudiences(eventId), [buildAudiences, eventId]);
-  const manualUserIds = useMemo(
-    () => state.preassigned.map((p) => p.user_id),
-    [state.preassigned],
-  );
+  const manualUserIds = useMemo(() => state.preassigned.map((p) => p.user_id), [state.preassigned]);
 
   const previewFn = useServerFn(previewMeetingAudience);
   const previewQuery = useQuery({
@@ -495,10 +509,7 @@ function AttendeesEditor({
         <Button variant="outline" onClick={onClose} disabled={sync.isPending}>
           {t("common.cancel", { defaultValue: "Annuler" })}
         </Button>
-        <Button
-          onClick={() => sync.mutate([])}
-          disabled={!hasSelection || sync.isPending}
-        >
+        <Button onClick={() => sync.mutate([])} disabled={!hasSelection || sync.isPending}>
           {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {hasExistingAttendees
             ? t("meetings:manage.save", { defaultValue: "Enregistrer" })

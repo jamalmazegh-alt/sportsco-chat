@@ -13,10 +13,7 @@ let failed = 0;
 
 for (const ns of NAMESPACES) {
   try {
-    const out = execSync(
-      `rg -n --no-heading 't\\("${ns}\\.' src/ || true`,
-      { encoding: "utf8" },
-    );
+    const out = execSync(`rg -n --no-heading 't\\("${ns}\\.' src/ || true`, { encoding: "utf8" });
     const hits = out.trim().split("\n").filter(Boolean);
     if (hits.length) {
       failed += hits.length;

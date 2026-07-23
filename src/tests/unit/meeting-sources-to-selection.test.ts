@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  sourcesToSelection,
-  type AttendeeForSelection,
-} from "@/lib/meetings/sources-to-selection";
+import { sourcesToSelection, type AttendeeForSelection } from "@/lib/meetings/sources-to-selection";
 
 const att = (partial: Partial<AttendeeForSelection>): AttendeeForSelection => ({
   user_id: partial.user_id ?? "u",

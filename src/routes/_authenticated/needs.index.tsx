@@ -52,8 +52,7 @@ function NeedsFeedPage() {
       toast.success(t("needs:signup.applied"));
       invalidate();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const withdrawM = useMutation({
     mutationFn: (signup_id: string) => withdrawFn({ data: { signup_id } }),
@@ -61,8 +60,7 @@ function NeedsFeedPage() {
       toast.success(t("needs:signup.withdrawn"));
       invalidate();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const unavailM = useMutation({
     mutationFn: (need_id: string) => unavailableFn({ data: { need_id } }),
@@ -70,8 +68,7 @@ function NeedsFeedPage() {
       toast.success(t("needs:unavailable.confirmed"));
       invalidate();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -83,15 +80,11 @@ function NeedsFeedPage() {
     (n) => n.my_signup?.status !== "unavailable" && n.my_signup?.status !== "declined",
   );
   const hasActiveSignup = (n: any) =>
-    n.my_signup &&
-    n.my_signup.status !== "withdrawn" &&
-    n.my_signup.status !== "declined";
+    n.my_signup && n.my_signup.status !== "withdrawn" && n.my_signup.status !== "declined";
   const recentlyFilled = activeNeeds.filter(
     (n) => !hasActiveSignup(n) && isRecentlyFilledVisible(n),
   );
-  const primaryActive = activeNeeds.filter(
-    (n) => !recentlyFilled.some((rf) => rf.id === n.id),
-  );
+  const primaryActive = activeNeeds.filter((n) => !recentlyFilled.some((rf) => rf.id === n.id));
   const unavailNeeds = allNeeds.filter((n) => n.my_signup?.status === "unavailable");
   const declinedNeeds = allNeeds.filter((n) => n.my_signup?.status === "declined");
 
@@ -100,9 +93,7 @@ function NeedsFeedPage() {
       <div className="flex items-center gap-2">
         <BackLink to="/home" className="mr-1" />
         <HandHelping className="h-5 w-5 text-primary" />
-        <h1 className="text-xl font-extrabold tracking-tight">
-          {t("needs:feed.title")}
-        </h1>
+        <h1 className="text-xl font-extrabold tracking-tight">{t("needs:feed.title")}</h1>
       </div>
 
       {isLoading && <p className="text-sm text-muted-foreground">…</p>}

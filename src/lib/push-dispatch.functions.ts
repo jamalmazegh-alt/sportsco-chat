@@ -685,9 +685,7 @@ export const dispatchStaffAssignmentPush = createServerFn({ method: "POST" })
     }
 
     const title =
-      data.action === "assigned"
-        ? "👤 Assigné à un événement"
-        : "👤 Assignation retirée";
+      data.action === "assigned" ? "👤 Assigné à un événement" : "👤 Assignation retirée";
     const body =
       data.action === "assigned"
         ? `${headline} — ${dateStr} à ${timeStr}`
@@ -704,4 +702,3 @@ export const dispatchStaffAssignmentPush = createServerFn({ method: "POST" })
     });
     return { sent: result.sent };
   });
-

@@ -11,7 +11,10 @@ describe("summarizeSources", () => {
 
   it("maps team sources with and without names", () => {
     const chips = summarizeSources(
-      [{ type: "team_players", team_id: "t1" }, { type: "team_parents", team_id: "t2" }],
+      [
+        { type: "team_players", team_id: "t1" },
+        { type: "team_parents", team_id: "t2" },
+      ],
       { teamNameById: { t1: "U15" } },
     );
     expect(chips).toEqual([
@@ -22,7 +25,10 @@ describe("summarizeSources", () => {
 
   it("maps group sources with and without names", () => {
     const chips = summarizeSources(
-      [{ type: "club_group", group_id: "g1" }, { type: "club_group", group_id: "g2" }],
+      [
+        { type: "club_group", group_id: "g1" },
+        { type: "club_group", group_id: "g2" },
+      ],
       { groupNameById: { g1: "Bureau" } },
     );
     expect(chips.map((c) => c.label)).toEqual(["Bureau", "groupe"]);
@@ -39,10 +45,7 @@ describe("summarizeSources", () => {
   });
 
   it("groups club audiences under the club kind", () => {
-    const chips = summarizeSources([
-      { type: "club_educators" },
-      { type: "club_admins" },
-    ]);
+    const chips = summarizeSources([{ type: "club_educators" }, { type: "club_admins" }]);
     expect(chips.map((c) => c.kind)).toEqual(["club", "club"]);
     expect(chips.every((c) => c.label === "club")).toBe(true);
   });

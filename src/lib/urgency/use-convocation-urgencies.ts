@@ -139,8 +139,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
               }),
               anchorAt: ev.starts_at,
               primaryAction: { kind: "respond", eventId },
-              quickRespondConvocationId:
-                convocIds.length === 1 ? convocIds[0] : undefined,
+              quickRespondConvocationId: convocIds.length === 1 ? convocIds[0] : undefined,
             });
           }
         }

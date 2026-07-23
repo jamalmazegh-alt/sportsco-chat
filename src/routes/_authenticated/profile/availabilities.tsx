@@ -87,9 +87,7 @@ function StaffAvailabilitiesPage() {
       const today = new Date().toISOString().slice(0, 10);
       const { data, error } = await supabase
         .from("staff_availabilities")
-        .select(
-          "id, club_id, start_date, end_date, reason, certainty, visibility, comment, status",
-        )
+        .select("id, club_id, start_date, end_date, reason, certainty, visibility, comment, status")
         .eq("user_id", user!.id)
         .eq("club_id", activeClubId!)
         .neq("status", "cancelled")
@@ -115,9 +113,7 @@ function StaffAvailabilitiesPage() {
       toast.error(error.message);
       return;
     }
-    toast.success(
-      t("staffAvailability.cancelled", { defaultValue: "Indisponibilité supprimée" }),
-    );
+    toast.success(t("staffAvailability.cancelled", { defaultValue: "Indisponibilité supprimée" }));
     qc.invalidateQueries({ queryKey: ["my-staff-availabilities"] });
     qc.invalidateQueries({ queryKey: ["staff-availabilities"] });
   }
@@ -144,8 +140,7 @@ function StaffAvailabilitiesPage() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {t("staffAvailability.subtitle", {
-            defaultValue:
-              "Périodes où tu ne seras pas disponible pour encadrer tes équipes.",
+            defaultValue: "Périodes où tu ne seras pas disponible pour encadrer tes équipes.",
           })}
           {club?.name ? (
             <>
@@ -227,9 +222,7 @@ function StaffAvailabilitiesPage() {
                     {t(`availability.reason.${r.reason}`, { defaultValue: r.reason })}
                   </div>
                   {r.comment && (
-                    <div className="mt-1 text-xs text-foreground/80 line-clamp-3">
-                      {r.comment}
-                    </div>
+                    <div className="mt-1 text-xs text-foreground/80 line-clamp-3">{r.comment}</div>
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">

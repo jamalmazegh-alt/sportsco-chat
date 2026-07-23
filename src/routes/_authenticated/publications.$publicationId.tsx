@@ -36,7 +36,6 @@ import {
   listPublicationRecipients,
 } from "@/lib/publications/publications.functions";
 
-
 const SearchSchema = z.object({
   vote: z.string().uuid().optional(),
 });
@@ -44,10 +43,7 @@ const SearchSchema = z.object({
 export const Route = createFileRoute("/_authenticated/publications/$publicationId")({
   validateSearch: (search) => SearchSchema.parse(search),
   head: () => ({
-    meta: [
-      { title: "Publication · Clubero" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Publication · Clubero" }, { name: "robots", content: "noindex" }],
   }),
   component: PublicationDetailPage,
 });
@@ -95,15 +91,12 @@ function PublicationDetailPage() {
   // Deep-link intent (?vote=<optionId>) : pré-sélection uniquement.
   // Ne jamais auto-cast au chargement — l'utilisateur confirme explicitement.
   const options = data?.options ?? [];
-  const voteIntentIsValid =
-    !!voteIntent && options.some((o) => o.id === voteIntent);
+  const voteIntentIsValid = !!voteIntent && options.some((o) => o.id === voteIntent);
   useEffect(() => {
     if (!data || !isPoll || isClosed) return;
     if (!voteIntent) return;
     if (!voteIntentIsValid) {
-      toast.error(
-        t("publications:errors.voteIntentInvalid", "Cette option n'existe pas ou plus."),
-      );
+      toast.error(t("publications:errors.voteIntentInvalid", "Cette option n'existe pas ou plus."));
       return;
     }
     if (!canVote) return;
@@ -111,7 +104,6 @@ function PublicationDetailPage() {
     if (selectedOption == null) setSelectedOption(voteIntent);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.publication?.id, voteIntent, voteIntentIsValid]);
-
 
   const { data: results } = useQuery({
     queryKey: ["publication-results", publicationId],
@@ -180,7 +172,9 @@ function PublicationDetailPage() {
     );
   }
   if (!data?.publication) {
-    return <div className="p-6">{t("publications:detail.notFound", "Publication introuvable")}</div>;
+    return (
+      <div className="p-6">{t("publications:detail.notFound", "Publication introuvable")}</div>
+    );
   }
 
   const pub = data.publication;
@@ -242,7 +236,11 @@ function PublicationDetailPage() {
                   <DropdownMenuItem
                     className="text-destructive"
                     onClick={() => {
-                      if (confirm(t("publications:detail.confirmDelete", "Supprimer cette publication ?"))) {
+                      if (
+                        confirm(
+                          t("publications:detail.confirmDelete", "Supprimer cette publication ?"),
+                        )
+                      ) {
                         deleteMut.mutate();
                       }
                     }}
@@ -255,9 +253,7 @@ function PublicationDetailPage() {
             )}
           </div>
 
-          {pub.content && (
-            <div className="text-sm whitespace-pre-wrap">{pub.content}</div>
-          )}
+          {pub.content && <div className="text-sm whitespace-pre-wrap">{pub.content}</div>}
 
           {isPoll && data.options.length > 0 && (
             <div className="space-y-3 pt-2">
@@ -270,11 +266,12 @@ function PublicationDetailPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {eligibleSubjects.map((s) => {
                       const key = subjectKey(s);
-                      const isActive = key === (selectedSubjectKey ?? subjectKey(eligibleSubjects[0]));
+                      const isActive =
+                        key === (selectedSubjectKey ?? subjectKey(eligibleSubjects[0]));
                       const label =
                         s.subjectKind === "user"
                           ? t("publications:detail.votingAsSelf", "Moi")
-                          : s.label ?? t("publications:detail.player", "Joueur");
+                          : (s.label ?? t("publications:detail.player", "Joueur"));
                       return (
                         <Button
                           key={key}
@@ -292,13 +289,16 @@ function PublicationDetailPage() {
                   </div>
                 </div>
               )}
-              {canVote && eligibleSubjects.length === 1 && activeSubject?.relation === "guardian" && activeSubject.label && (
-                <div className="text-xs text-muted-foreground">
-                  {t("publications:detail.votingForChild", "Vous votez pour {{name}}", {
-                    name: activeSubject.label,
-                  })}
-                </div>
-              )}
+              {canVote &&
+                eligibleSubjects.length === 1 &&
+                activeSubject?.relation === "guardian" &&
+                activeSubject.label && (
+                  <div className="text-xs text-muted-foreground">
+                    {t("publications:detail.votingForChild", "Vous votez pour {{name}}", {
+                      name: activeSubject.label,
+                    })}
+                  </div>
+                )}
 
               {canVote && (!myCurrentOption || isChangingVote) ? (
                 <>
@@ -352,43 +352,42 @@ function PublicationDetailPage() {
               ) : (
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    {(results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))).map(
-                      (r: any) => {
-                        const isMine = myCurrentOption === r.option_id;
-                        const count = r.vote_count;
-                        const pct =
-                          count == null
-                            ? null
-                            : totalVotes > 0
-                              ? Math.round((count / totalVotes) * 100)
-                              : 0;
-                        return (
-                          <div key={r.option_id} className="space-y-1">
-                            <div className="flex justify-between text-sm">
-                              <span className={isMine ? "font-medium" : ""}>
-                                {r.label} {isMine && "✓"}
-                              </span>
-                              <span className="text-muted-foreground text-xs">
-                                {count == null
-                                  ? t("publications:detail.masked", "—")
-                                  : `${count} · ${pct}%`}
-                              </span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className={`h-full ${isMine ? "bg-primary" : "bg-primary/40"}`}
-                                style={{
-                                  width:
-                                    count == null
-                                      ? "0%"
-                                      : `${Math.round((count / maxCount) * 100)}%`,
-                                }}
-                              />
-                            </div>
+                    {(
+                      results?.rows ??
+                      data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
+                    ).map((r: any) => {
+                      const isMine = myCurrentOption === r.option_id;
+                      const count = r.vote_count;
+                      const pct =
+                        count == null
+                          ? null
+                          : totalVotes > 0
+                            ? Math.round((count / totalVotes) * 100)
+                            : 0;
+                      return (
+                        <div key={r.option_id} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className={isMine ? "font-medium" : ""}>
+                              {r.label} {isMine && "✓"}
+                            </span>
+                            <span className="text-muted-foreground text-xs">
+                              {count == null
+                                ? t("publications:detail.masked", "—")
+                                : `${count} · ${pct}%`}
+                            </span>
                           </div>
-                        );
-                      },
-                    )}
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${isMine ? "bg-primary" : "bg-primary/40"}`}
+                              style={{
+                                width:
+                                  count == null ? "0%" : `${Math.round((count / maxCount) * 100)}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                     {results?.rows?.some((r) => r.below_threshold) && (
                       <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
                         <Info className="h-3.5 w-3.5 mt-0.5" />
@@ -418,7 +417,8 @@ function PublicationDetailPage() {
           <CardContent className="py-4 space-y-2">
             <div className="font-medium text-sm flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t("publications:detail.recipientsTitle", "Destinataires")} ({recipients?.recipients?.length ?? 0})
+              {t("publications:detail.recipientsTitle", "Destinataires")} (
+              {recipients?.recipients?.length ?? 0})
             </div>
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {(recipients?.recipients ?? []).map((r: any, i: number) => (

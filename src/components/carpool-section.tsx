@@ -67,7 +67,6 @@ export function CarpoolSection({
   carpoolEnabled,
   onToggleEnabled,
 }: Props) {
-
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -245,173 +244,178 @@ export function CarpoolSection({
             </p>
           </div>
         ) : (
-        <div className="p-4 space-y-3">
-          <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
-            {t("carpool.disclaimer")}
-          </p>
+          <div className="p-4 space-y-3">
+            <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
+              {t("carpool.disclaimer")}
+            </p>
 
-          {isCoach && total > 0 && (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">
-                  {t("carpool.coverage", { n: covered, total })}
-                </span>
-                <span className="font-semibold tabular-nums">{pct}%</span>
+            {isCoach && total > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">
+                    {t("carpool.coverage", { n: covered, total })}
+                  </span>
+                  <span className="font-semibold tabular-nums">{pct}%</span>
+                </div>
+
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={cn("h-full transition-all", coverageColor)}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                {withoutTransport.length > 0 && (
+                  <p className="text-xs text-muted-foreground pt-1">
+                    <span className="font-medium text-foreground">
+                      {t("carpool.noTransport")} :
+                    </span>{" "}
+                    {withoutTransport
+                      .map(
+                        (c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`,
+                      )
+                      .join(", ")}
+                  </p>
+                )}
               </div>
-
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className={cn("h-full transition-all", coverageColor)}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              {withoutTransport.length > 0 && (
-                <p className="text-xs text-muted-foreground pt-1">
-                  <span className="font-medium text-foreground">{t("carpool.noTransport")} :</span>{" "}
-                  {withoutTransport
-                    .map(
-                      (c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`,
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Drivers list */}
-          <div className="space-y-2">
-            {carpools.length === 0 && (
-              <p className="text-xs text-muted-foreground italic">{t("carpool.noDriversYet")}</p>
             )}
-            {carpools.map((cp) => {
-              const ridersForThisCarpool = passengers.filter((p) => p.carpool_id === cp.id);
-              const takenSeats = ridersForThisCarpool.length;
-              const seatsLeft = Math.max(0, cp.total_seats - takenSeats);
-              const isMine = cp.driver_user_id === user?.id;
-              const iAmBookedHere = myBooking?.carpool_id === cp.id;
-              const passengerPlayerNames = ridersForThisCarpool
-                .flatMap((p) => p.player_ids ?? [])
-                .map((pid) => playerById.get(pid))
-                .filter(Boolean)
-                .map((pl) => pl!.first_name)
-                .join(", ");
 
-              return (
-                <div key={cp.id} className="rounded-xl border border-border p-3 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-sm font-semibold">
-                        <Car className="h-3.5 w-3.5" /> {cp.driver_name}
-                        <span className="text-muted-foreground font-normal">
-                          · {t(`carpool.vehicleType.${cp.vehicle_type}`)}
-                        </span>
+            {/* Drivers list */}
+            <div className="space-y-2">
+              {carpools.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">{t("carpool.noDriversYet")}</p>
+              )}
+              {carpools.map((cp) => {
+                const ridersForThisCarpool = passengers.filter((p) => p.carpool_id === cp.id);
+                const takenSeats = ridersForThisCarpool.length;
+                const seatsLeft = Math.max(0, cp.total_seats - takenSeats);
+                const isMine = cp.driver_user_id === user?.id;
+                const iAmBookedHere = myBooking?.carpool_id === cp.id;
+                const passengerPlayerNames = ridersForThisCarpool
+                  .flatMap((p) => p.player_ids ?? [])
+                  .map((pid) => playerById.get(pid))
+                  .filter(Boolean)
+                  .map((pl) => pl!.first_name)
+                  .join(", ");
+
+                return (
+                  <div key={cp.id} className="rounded-xl border border-border p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 text-sm font-semibold">
+                          <Car className="h-3.5 w-3.5" /> {cp.driver_name}
+                          <span className="text-muted-foreground font-normal">
+                            · {t(`carpool.vehicleType.${cp.vehicle_type}`)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {seatsLeft === 0
+                            ? t("carpool.full")
+                            : t("carpool.seatsLeft", { count: seatsLeft })}
+                        </p>
+                        {cp.departure_note && (
+                          <p className="text-xs text-foreground/80 italic mt-1">
+                            "{cp.departure_note}"
+                          </p>
+                        )}
+                        {passengerPlayerNames && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            <span className="font-medium text-foreground">
+                              {t("carpool.takes")} :
+                            </span>{" "}
+                            {passengerPlayerNames}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {seatsLeft === 0
-                          ? t("carpool.full")
-                          : t("carpool.seatsLeft", { count: seatsLeft })}
-                      </p>
-                      {cp.departure_note && (
-                        <p className="text-xs text-foreground/80 italic mt-1">
-                          "{cp.departure_note}"
-                        </p>
-                      )}
-                      {passengerPlayerNames && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium text-foreground">
-                            {t("carpool.takes")} :
-                          </span>{" "}
-                          {passengerPlayerNames}
-                        </p>
+                      {(isMine || isCoach) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 shrink-0"
+                          onClick={async () => {
+                            if (!confirm(t("carpool.remove") + " ?")) return;
+                            const { error } = await supabase
+                              .from("carpools")
+                              .delete()
+                              .eq("id", cp.id);
+                            if (error) toast.error(error.message);
+                            else qc.invalidateQueries({ queryKey: ["carpools", eventId] });
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
                       )}
                     </div>
-                    {(isMine || isCoach) && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 shrink-0"
-                        onClick={async () => {
-                          if (!confirm(t("carpool.remove") + " ?")) return;
-                          const { error } = await supabase
-                            .from("carpools")
-                            .delete()
-                            .eq("id", cp.id);
-                          if (error) toast.error(error.message);
-                          else qc.invalidateQueries({ queryKey: ["carpools", eventId] });
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    )}
-                  </div>
-                  {iAmBookedHere ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full"
-                      onClick={async () => {
-                        const { error } = await supabase
-                          .from("carpool_passengers")
-                          .delete()
-                          .eq("id", myBooking!.id);
-                        if (error) toast.error(error.message);
-                        else qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
-                      }}
-                    >
-                      {t("carpool.cancel")}
-                    </Button>
-                  ) : (
-                    !isMine &&
-                    canParticipate && (
+                    {iAmBookedHere ? (
                       <Button
                         size="sm"
+                        variant="outline"
                         className="w-full"
-                        disabled={seatsLeft === 0 || !!myBooking}
-                        onClick={() => setReserveCarpool(cp)}
+                        onClick={async () => {
+                          const { error } = await supabase
+                            .from("carpool_passengers")
+                            .delete()
+                            .eq("id", myBooking!.id);
+                          if (error) toast.error(error.message);
+                          else qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
+                        }}
                       >
-                        {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
+                        {t("carpool.cancel")}
                       </Button>
-                    )
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {myBookingCarpool && (
-            <div className="rounded-lg bg-primary/10 border border-primary/30 p-2.5 text-xs">
-              ✅ {t("carpool.youTravelWith", { name: myBookingCarpool.driver_name })}
+                    ) : (
+                      !isMine &&
+                      canParticipate && (
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          disabled={seatsLeft === 0 || !!myBooking}
+                          onClick={() => setReserveCarpool(cp)}
+                        >
+                          {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          )}
 
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2 pt-1">
-            {!myCarpool && (
-              <Button
-                size="sm"
-                variant={isCoach ? "default" : "ghost"}
-                onClick={() => setOfferOpen(true)}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
-              </Button>
+            {myBookingCarpool && (
+              <div className="rounded-lg bg-primary/10 border border-primary/30 p-2.5 text-xs">
+                ✅ {t("carpool.youTravelWith", { name: myBookingCarpool.driver_name })}
+              </div>
             )}
-            {!isCoach && !myBooking && !myCarpool && bookableConvocations.length > 0 && !myNeed && (
-              <Button size="sm" variant="outline" onClick={() => setNeedOpen(true)}>
-                <HandHelping className="h-3.5 w-3.5" />
-                {t("carpool.iNeedRide")}
-              </Button>
-            )}
-            {myNeed && (
-              <span className="text-xs text-muted-foreground italic self-center">
-                ✓ {t("carpool.needRideRegistered")}
-              </span>
-            )}
+
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {!myCarpool && (
+                <Button
+                  size="sm"
+                  variant={isCoach ? "default" : "ghost"}
+                  onClick={() => setOfferOpen(true)}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
+                </Button>
+              )}
+              {!isCoach &&
+                !myBooking &&
+                !myCarpool &&
+                bookableConvocations.length > 0 &&
+                !myNeed && (
+                  <Button size="sm" variant="outline" onClick={() => setNeedOpen(true)}>
+                    <HandHelping className="h-3.5 w-3.5" />
+                    {t("carpool.iNeedRide")}
+                  </Button>
+                )}
+              {myNeed && (
+                <span className="text-xs text-muted-foreground italic self-center">
+                  ✓ {t("carpool.needRideRegistered")}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
         )}
       </div>
-
 
       {offerOpen && (
         <OfferDialog eventId={eventId} open={offerOpen} onClose={() => setOfferOpen(false)} />

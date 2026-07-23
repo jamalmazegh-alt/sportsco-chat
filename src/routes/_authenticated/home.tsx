@@ -60,7 +60,8 @@ function formatHomeEventTitle(event: {
   if (event.title.toLowerCase().includes(teamName.toLowerCase())) return event.title;
 
   const opponent = event.opponent?.trim();
-  if (opponent) return event.is_home === false ? `${opponent} vs ${teamName}` : `${teamName} vs ${opponent}`;
+  if (opponent)
+    return event.is_home === false ? `${opponent} vs ${teamName}` : `${teamName} vs ${opponent}`;
 
   const title = event.title.trim();
   if (/^(vs|contre)\b/i.test(title)) return `${teamName} ${title}`;
@@ -357,8 +358,6 @@ function HomePage() {
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
 
-
-
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
         <section>
@@ -503,7 +502,12 @@ function HomePage() {
               />
             </>
           )}
-          {activeClubId && <HomeQuickCards clubId={activeClubId} teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)} />}
+          {activeClubId && (
+            <HomeQuickCards
+              clubId={activeClubId}
+              teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)}
+            />
+          )}
         </div>
       )}
 

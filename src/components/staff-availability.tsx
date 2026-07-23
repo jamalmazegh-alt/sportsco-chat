@@ -137,12 +137,7 @@ export function StaffAvailabilityForEvent({
   const isLoading = cLoading || rLoading;
 
   return (
-    <section
-      className={cn(
-        "rounded-2xl border border-border bg-card p-4 space-y-3",
-        className,
-      )}
-    >
+    <section className={cn("rounded-2xl border border-border bg-card p-4 space-y-3", className)}>
       <div className="flex items-center gap-2">
         <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
           <Users className="h-4 w-4" />
@@ -153,8 +148,7 @@ export function StaffAvailabilityForEvent({
           </h3>
           <p className="text-[11px] text-muted-foreground">
             {t("staffAvailability.eventHint", {
-              defaultValue:
-                "Statut des coachs de l'équipe sur ce créneau (visible staff/admins).",
+              defaultValue: "Statut des coachs de l'équipe sur ce créneau (visible staff/admins).",
             })}
           </p>
         </div>
@@ -177,9 +171,9 @@ export function StaffAvailabilityForEvent({
             const status = statusForDate(list, date);
             const conflict =
               status !== "available"
-                ? list.find(
+                ? (list.find(
                     (r) => r.status === "active" && r.start_date <= date && r.end_date >= date,
-                  ) ?? null
+                  ) ?? null)
                 : null;
             return (
               <li key={c.user_id} className="py-2 flex items-center gap-3">
@@ -377,9 +371,10 @@ export function StaffAvailabilityForTeamMonth({
                   r.certainty === "tentative"
                     ? "bg-amber-500/60"
                     : (STAFF_REASON_BG[r.reason ?? "other"] ?? "bg-destructive/70");
-                const label = r.can_view_reason && r.reason
-                  ? t(`availability.reason.${r.reason}`, { defaultValue: r.reason })
-                  : t("staffAvailability.masked", { defaultValue: "Indisponible" });
+                const label =
+                  r.can_view_reason && r.reason
+                    ? t(`availability.reason.${r.reason}`, { defaultValue: r.reason })
+                    : t("staffAvailability.masked", { defaultValue: "Indisponible" });
                 return (
                   <div
                     key={r.id}

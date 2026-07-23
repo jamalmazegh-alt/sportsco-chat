@@ -21,9 +21,7 @@ export async function dispatchMeetingConvocation(
   // Contexte réunion + club (pour brand fromName).
   const { data: ev } = await supabaseAdmin
     .from("events")
-    .select(
-      "id, title, starts_at, location, team_id, teams:team_id(club_id, clubs:club_id(name))",
-    )
+    .select("id, title, starts_at, location, team_id, teams:team_id(club_id, clubs:club_id(name))")
     .eq("id", params.eventId)
     .maybeSingle();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

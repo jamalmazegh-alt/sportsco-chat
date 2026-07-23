@@ -32,7 +32,6 @@ import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
-
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
   id: string;
@@ -236,7 +235,6 @@ export function WallFeed({ clubId }: { clubId: string }) {
     setLoading(false);
   }
 
-
   useEffect(() => {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
@@ -313,7 +311,6 @@ export function WallFeed({ clubId }: { clubId: string }) {
     };
     // eslint-disable-next-line
   }, [clubId]);
-
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
@@ -894,10 +891,7 @@ function AudiencePicker({
       })}
       {groups.length > 0 && (
         <>
-          <span
-            aria-hidden
-            className="h-4 w-px bg-border mx-1 self-center"
-          />
+          <span aria-hidden className="h-4 w-px bg-border mx-1 self-center" />
           <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
             <Users className="h-3 w-3" />
             {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
@@ -1082,7 +1076,6 @@ function WallGrouped({
     );
   }
 
-
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
     const isExternal = p.source && p.source !== "clubero";
@@ -1248,7 +1241,11 @@ function WallGrouped({
           </h2>
           <ul className="space-y-2.5">
             {group.items.map((entry) =>
-              entry.kind === "post" ? renderItem(entry.post) : <PollCard key={entry.poll.id} poll={entry.poll} />,
+              entry.kind === "post" ? (
+                renderItem(entry.post)
+              ) : (
+                <PollCard key={entry.poll.id} poll={entry.poll} />
+              ),
             )}
           </ul>
         </section>
@@ -1306,51 +1303,54 @@ function PollCard({ poll }: { poll: PollItem }) {
         {poll.content && (
           <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
         )}
-        {isClosed && poll.options && poll.options.length > 0 && (() => {
-          const total = poll.options.reduce((s, o) => s + o.votes, 0);
-          const belowThreshold =
-            isAnonymous && poll.options.some((o) => o.votes > 0 && o.votes < 3);
-          if (belowThreshold) {
+        {isClosed &&
+          poll.options &&
+          poll.options.length > 0 &&
+          (() => {
+            const total = poll.options.reduce((s, o) => s + o.votes, 0);
+            const belowThreshold =
+              isAnonymous && poll.options.some((o) => o.votes > 0 && o.votes < 3);
+            if (belowThreshold) {
+              return (
+                <p className="text-[11px] text-muted-foreground mt-2 italic">
+                  {t("publications:poll.belowThreshold", {
+                    defaultValue: "Pas assez de réponses pour afficher les résultats",
+                  })}
+                </p>
+              );
+            }
+            const max = Math.max(1, ...poll.options.map((o) => o.votes));
+            const winner = poll.options.reduce((a, b) => (b.votes > a.votes ? b : a));
             return (
-              <p className="text-[11px] text-muted-foreground mt-2 italic">
-                {t("publications:poll.belowThreshold", {
-                  defaultValue: "Pas assez de réponses pour afficher les résultats",
+              <ul className="mt-2 space-y-1.5">
+                {poll.options.map((o) => {
+                  const pct = total === 0 ? 0 : Math.round((o.votes / total) * 100);
+                  const isWinner = total > 0 && o.id === winner.id && o.votes > 0;
+                  return (
+                    <li key={o.id} className="text-xs">
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <span className={cn("truncate", isWinner && "font-semibold")}>
+                          {o.label}
+                        </span>
+                        <span className="tabular-nums text-muted-foreground shrink-0">
+                          {o.votes} · {pct}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all",
+                            isWinner ? "bg-primary" : "bg-primary/40",
+                          )}
+                          style={{ width: `${total === 0 ? 0 : (o.votes / max) * 100}%` }}
+                        />
+                      </div>
+                    </li>
+                  );
                 })}
-              </p>
+              </ul>
             );
-          }
-          const max = Math.max(1, ...poll.options.map((o) => o.votes));
-          const winner = poll.options.reduce((a, b) => (b.votes > a.votes ? b : a));
-          return (
-            <ul className="mt-2 space-y-1.5">
-              {poll.options.map((o) => {
-                const pct = total === 0 ? 0 : Math.round((o.votes / total) * 100);
-                const isWinner = total > 0 && o.id === winner.id && o.votes > 0;
-                return (
-                  <li key={o.id} className="text-xs">
-                    <div className="flex items-center justify-between gap-2 mb-0.5">
-                      <span className={cn("truncate", isWinner && "font-semibold")}>
-                        {o.label}
-                      </span>
-                      <span className="tabular-nums text-muted-foreground shrink-0">
-                        {o.votes} · {pct}%
-                      </span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className={cn(
-                          "h-full rounded-full transition-all",
-                          isWinner ? "bg-primary" : "bg-primary/40",
-                        )}
-                        style={{ width: `${total === 0 ? 0 : (o.votes / max) * 100}%` }}
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          );
-        })()}
+          })()}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <span className="text-[11px] text-muted-foreground tabular-nums">
             {t("publications:card.voters", {
@@ -1370,7 +1370,6 @@ function PollCard({ poll }: { poll: PollItem }) {
     </li>
   );
 }
-
 
 function CommentBlock({
   post,

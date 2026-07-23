@@ -208,7 +208,6 @@ function buildMeetingAudiencesFromDraft(
   return list;
 }
 
-
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
@@ -327,7 +326,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     return s;
   }, [state.type, state.isHome, state.recurrence, state.meetingScope]);
 
-
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
 
   function go(delta: number) {
@@ -366,7 +364,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       cancelled = true;
     };
   }, [state.type, state.meetingScope, state.teamId, activeClubId]);
-
 
   const selectedTeam = teams.find((tm) => tm.id === state.teamId);
   const title = autoTitle(state, selectedTeam?.name, t);
@@ -854,7 +851,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 )}
               </>
             )}
-
           </StepQuestion>
         )}
 
@@ -1886,8 +1882,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           />
         )}
 
-
-
         {current === "carpool" && (
           <StepQuestion
             title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}
@@ -2052,10 +2046,17 @@ function MeetingAudienceStep({
   t: (k: string, opts?: Record<string, unknown>) => string;
 }) {
   const audience = useAudienceState({
-    scalar: new Set((value?.scalar ?? []) as Array<
-      "convoked_players" | "convoked_parents" | "club_members" | "club_educators"
-      | "club_staff" | "club_admins" | "club_tournament_managers"
-    >),
+    scalar: new Set(
+      (value?.scalar ?? []) as Array<
+        | "convoked_players"
+        | "convoked_parents"
+        | "club_members"
+        | "club_educators"
+        | "club_staff"
+        | "club_admins"
+        | "club_tournament_managers"
+      >,
+    ),
     groupIds: new Set(value?.groupIds ?? []),
     teamPicks: (value?.teamPicks ?? []).map((tp) => ({
       team_id: tp.team_id,
@@ -2130,7 +2131,12 @@ function MeetingAudienceStep({
     <StepQuestion
       title={t("eventWizard.q.audience", { defaultValue: "Qui participe ? (facultatif)" })}
     >
-      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} enablePreassign />
+      <AudiencePickerBody
+        ctx={ctx}
+        state={audienceState}
+        controls={audience.controls}
+        enablePreassign
+      />
       <div className="flex gap-2 pt-2">
         <Button variant="outline" className="flex-1" onClick={onSkip}>
           {t("eventWizard.skip", { defaultValue: "Passer" })}

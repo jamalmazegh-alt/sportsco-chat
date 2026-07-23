@@ -103,14 +103,7 @@ function resolve(locale?: Locale) {
   return (locale && T[locale]) || T.fr;
 }
 
-const Email = ({
-  question,
-  description,
-  options,
-  resultsUrl,
-  clubName,
-  locale = "fr",
-}: Props) => {
+const Email = ({ question, description, options, resultsUrl, clubName, locale = "fr" }: Props) => {
   const t = resolve(locale);
   const c = clubName?.trim() || "Clubero";
   return (
@@ -161,8 +154,16 @@ export const template = {
     question: "Disponible samedi à 9h ?",
     description: "Merci de répondre avant vendredi soir.",
     options: [
-      { id: "a", label: "Oui, je serai là", url: "https://www.clubero.app/publications/demo?vote=a" },
-      { id: "b", label: "Non, indisponible", url: "https://www.clubero.app/publications/demo?vote=b" },
+      {
+        id: "a",
+        label: "Oui, je serai là",
+        url: "https://www.clubero.app/publications/demo?vote=a",
+      },
+      {
+        id: "b",
+        label: "Non, indisponible",
+        url: "https://www.clubero.app/publications/demo?vote=b",
+      },
     ],
     resultsUrl: "https://www.clubero.app/publications/demo",
     clubName: "ESAP",

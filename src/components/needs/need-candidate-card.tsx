@@ -88,11 +88,7 @@ export function NeedCandidateCard({
       >
         <Icon className="h-4 w-4" strokeWidth={2.4} />
       </div>
-      <Link
-        to="/events/$eventId"
-        params={{ eventId: need.event_id }}
-        className="min-w-0 flex-1"
-      >
+      <Link to="/events/$eventId" params={{ eventId: need.event_id }} className="min-w-0 flex-1">
         <p className="text-[13px] font-bold leading-tight truncate">{label}</p>
         <p className="text-[11px] text-muted-foreground truncate">
           {need.events?.title}
@@ -156,10 +152,7 @@ export function NeedCandidateCard({
         )}
         {unavailable && (
           <>
-            <Badge
-              variant="outline"
-              className="text-[10px] font-medium text-muted-foreground"
-            >
+            <Badge variant="outline" className="text-[10px] font-medium text-muted-foreground">
               {t("needs:unavailable.confirmed")}
             </Badge>
             {onApply && (

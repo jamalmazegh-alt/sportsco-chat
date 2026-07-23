@@ -14,7 +14,9 @@ const ASSISTANT_HIDE = [
 const SUPPORT_HIDE = ["/support", "/login", "/onboarding"];
 
 function hidden(pathname: string, list: string[]): boolean {
-  return list.some((p) => (p.endsWith("/") ? pathname.startsWith(p) : pathname === p || pathname.startsWith(p + "/")));
+  return list.some((p) =>
+    p.endsWith("/") ? pathname.startsWith(p) : pathname === p || pathname.startsWith(p + "/"),
+  );
 }
 
 export function HeaderActions() {

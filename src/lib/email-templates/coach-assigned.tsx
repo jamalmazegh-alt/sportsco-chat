@@ -139,7 +139,6 @@ const CoachAssignedEmail = ({ displayName, teamName, clubName, teamUrl, locale }
   const club = clubName ?? "";
   return (
     <EmailShell preview={c.preview(team, club)} locale={locale}>
-
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(team, club)}</Text>

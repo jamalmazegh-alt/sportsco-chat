@@ -31,31 +31,85 @@ type Visual = {
 
 const VISUALS: Record<string, Visual> = {
   // Football
-  ref_center: { Icon: Megaphone, chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" },
-  ref_line: { Icon: Flag, chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300" },
-  delegate: { Icon: ClipboardList, chip: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300" },
+  ref_center: {
+    Icon: Megaphone,
+    chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300",
+  },
+  ref_line: {
+    Icon: Flag,
+    chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300",
+  },
+  delegate: {
+    Icon: ClipboardList,
+    chip: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300",
+  },
   // Basket
-  scoretable: { Icon: Table, chip: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300" },
-  timekeeper: { Icon: Timer, chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300" },
-  scorer: { Icon: PencilLine, chip: "bg-sky-100 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300" },
-  shotclock_24: { Icon: Hourglass, chip: "bg-violet-100 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300" },
+  scoretable: {
+    Icon: Table,
+    chip: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300",
+  },
+  timekeeper: {
+    Icon: Timer,
+    chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300",
+  },
+  scorer: {
+    Icon: PencilLine,
+    chip: "bg-sky-100 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300",
+  },
+  shotclock_24: {
+    Icon: Hourglass,
+    chip: "bg-violet-100 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300",
+  },
   // Handball
-  table_secretary: { Icon: ClipboardEdit, chip: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300" },
-  timekeeper_handball: { Icon: Timer, chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300" },
+  table_secretary: {
+    Icon: ClipboardEdit,
+    chip: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300",
+  },
+  timekeeper_handball: {
+    Icon: Timer,
+    chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300",
+  },
   // Volley
-  line_judge: { Icon: Flag, chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300" },
-  setup_volley: { Icon: Wrench, chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300" },
+  line_judge: {
+    Icon: Flag,
+    chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300",
+  },
+  setup_volley: {
+    Icon: Wrench,
+    chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300",
+  },
   // Universels
-  concession: { Icon: CupSoda, chip: "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300" },
-  welcome: { Icon: Handshake, chip: "bg-pink-100 text-pink-700 dark:bg-pink-950/50 dark:text-pink-300" },
+  concession: {
+    Icon: CupSoda,
+    chip: "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300",
+  },
+  welcome: {
+    Icon: Handshake,
+    chip: "bg-pink-100 text-pink-700 dark:bg-pink-950/50 dark:text-pink-300",
+  },
   setup: { Icon: Wrench, chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300" },
-  teardown: { Icon: PackageOpen, chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300" },
-  photographer: { Icon: Camera, chip: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300" },
-  animation: { Icon: Music, chip: "bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300" },
-  other: { Icon: Sparkles, chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200" },
+  teardown: {
+    Icon: PackageOpen,
+    chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
+  },
+  photographer: {
+    Icon: Camera,
+    chip: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300",
+  },
+  animation: {
+    Icon: Music,
+    chip: "bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300",
+  },
+  other: {
+    Icon: Sparkles,
+    chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200",
+  },
 };
 
-const FALLBACK: Visual = { Icon: HandHelping, chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200" };
+const FALLBACK: Visual = {
+  Icon: HandHelping,
+  chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200",
+};
 
 export function getNeedVisual(roleKey: string | null | undefined): Visual {
   if (!roleKey) return FALLBACK;

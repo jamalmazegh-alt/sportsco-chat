@@ -56,7 +56,6 @@ const CreateInput = z
     path: ["audiences"],
   });
 
-
 // ---------------------------------------------------------------------------
 // createPublication — persists all rows then calls publish_publication_atomic
 // ---------------------------------------------------------------------------
@@ -80,7 +79,6 @@ export const createPublication = createServerFn({ method: "POST" })
     if (!data.publishToWall && !data.sendEmail) {
       throw new Response("delivery_required", { status: 400 });
     }
-
 
     // Insert publication
     const { data: pub, error: pubErr } = await supabase
@@ -130,7 +128,6 @@ export const createPublication = createServerFn({ method: "POST" })
       });
     }
     if (audRows.length) {
-
       const { error } = await supabase.from("club_publication_audiences").insert(audRows);
       if (error) throw new Response(`audience_insert_failed: ${error.message}`, { status: 500 });
     }
@@ -172,11 +169,14 @@ export const createPublication = createServerFn({ method: "POST" })
     }
 
     // Snapshot recipients + create dispatch row
-    const { data: pubRes, error: rpcErr } = await supabase.rpc("publish_publication_atomic" as any, {
-      _publication_id: publicationId,
-      _kind: "publish",
-      _dispatch_id: null,
-    });
+    const { data: pubRes, error: rpcErr } = await supabase.rpc(
+      "publish_publication_atomic" as any,
+      {
+        _publication_id: publicationId,
+        _kind: "publish",
+        _dispatch_id: null,
+      },
+    );
     if (rpcErr) {
       console.error("[createPublication] publish_atomic failed", rpcErr);
       throw new Response(`publish_failed: ${rpcErr.message}`, { status: 500 });
@@ -290,16 +290,18 @@ export const getPollResults = createServerFn({ method: "POST" })
       _publication_id: data.publicationId,
     });
     if (error) throw new Response(`results_failed: ${error.message}`, { status: 500 });
-    return { rows: (rows ?? []) as Array<{
-      option_id: string;
-      label: string;
-      sort_order: number;
-      vote_count: number;
-      total_voters: number;
-      below_threshold: boolean;
-      is_anonymous: boolean;
-      is_closed: boolean;
-    }> };
+    return {
+      rows: (rows ?? []) as Array<{
+        option_id: string;
+        label: string;
+        sort_order: number;
+        vote_count: number;
+        total_voters: number;
+        below_threshold: boolean;
+        is_anonymous: boolean;
+        is_closed: boolean;
+      }>,
+    };
   });
 
 // ---------------------------------------------------------------------------
@@ -385,7 +387,11 @@ export const previewPublicationAudience = createServerFn({ method: "POST" })
 // ---------------------------------------------------------------------------
 export const listPublications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ clubId: z.string().uuid(), limit: z.number().min(1).max(100).default(50) }).parse(raw))
+  .inputValidator((raw) =>
+    z
+      .object({ clubId: z.string().uuid(), limit: z.number().min(1).max(100).default(50) })
+      .parse(raw),
+  )
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("club_publications")
@@ -420,24 +426,27 @@ export const getPublication = createServerFn({ method: "POST" })
     if (pubErr) throw new Response(`get_failed: ${pubErr.message}`, { status: 500 });
     if (!pub) throw new Response("not_found", { status: 404 });
 
-    const [{ data: opts }, { data: eligible, error: eligibleErr }, { data: staff }] = await Promise.all([
-      supabase
-        .from("club_poll_options")
-        .select("id, label, sort_order")
-        .eq("publication_id", data.publicationId)
-        .order("sort_order", { ascending: true }),
-      supabase.rpc("get_eligible_vote_subjects" as any, { _publication_id: data.publicationId }),
-      supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
-    ]);
+    const [{ data: opts }, { data: eligible, error: eligibleErr }, { data: staff }] =
+      await Promise.all([
+        supabase
+          .from("club_poll_options")
+          .select("id, label, sort_order")
+          .eq("publication_id", data.publicationId)
+          .order("sort_order", { ascending: true }),
+        supabase.rpc("get_eligible_vote_subjects" as any, { _publication_id: data.publicationId }),
+        supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
+      ]);
     if (eligibleErr) throw new Response(`eligible_failed: ${eligibleErr.message}`, { status: 500 });
 
-    const eligibleSubjects = ((eligible ?? []) as Array<{
-      subject_kind: string;
-      subject_id: string;
-      relation: string;
-      label: string | null;
-      current_option_id: string | null;
-    }>).map((r) => ({
+    const eligibleSubjects = (
+      (eligible ?? []) as Array<{
+        subject_kind: string;
+        subject_id: string;
+        relation: string;
+        label: string | null;
+        current_option_id: string | null;
+      }>
+    ).map((r) => ({
       subjectKind: r.subject_kind as "user" | "player",
       subjectId: r.subject_id,
       relation: r.relation as "self" | "guardian",
@@ -452,4 +461,3 @@ export const getPublication = createServerFn({ method: "POST" })
       isStaff: !!staff,
     };
   });
-

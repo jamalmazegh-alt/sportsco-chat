@@ -58,10 +58,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PersonRow } from "@/components/shared/person-row";
-import {
-  formatMemberContextSubline,
-  type MemberContext,
-} from "@/lib/needs/member-context";
+import { formatMemberContextSubline, type MemberContext } from "@/lib/needs/member-context";
 import {
   Select,
   SelectContent,
@@ -78,7 +75,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-
 
 import {
   listEventNeeds,
@@ -107,7 +103,6 @@ import {
 import { NEED_TEMPLATES, type NeedTemplate } from "@/lib/needs/templates";
 import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { getNeedVisual, resolveNeedLabel } from "./need-visuals";
-
 
 type Props = {
   eventId: string;
@@ -149,7 +144,6 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
 
   return (
     <Card id="needs" className="border-[1.5px] scroll-mt-24">
-
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -172,7 +166,10 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
                 {t("needs:section.coverageAll")}
               </Badge>
             ) : (
-              <Badge variant="outline" className="border-amber-300 text-amber-700 dark:text-amber-300">
+              <Badge
+                variant="outline"
+                className="border-amber-300 text-amber-700 dark:text-amber-300"
+              >
                 <AlertCircle className="h-3 w-3 mr-1" />
                 {t("needs:section.coverageMissing", { count: missingSeats })}
               </Badge>
@@ -181,9 +178,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
         )}
 
         {isStaff && needs.length === 0 && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("needs:section.emptyStaff")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{t("needs:section.emptyStaff")}</p>
         )}
       </CardHeader>
       <CardContent className="space-y-3">
@@ -211,7 +206,6 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           onSaved={refresh}
         />
       )}
-
     </Card>
   );
 }
@@ -271,7 +265,7 @@ function NeedRow({
   const [editAudienceOpen, setEditAudienceOpen] = useState(false);
   const [viewRecipientsOpen, setViewRecipientsOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
-  
+
   const [editOpen, setEditOpen] = useState(false);
   const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
@@ -291,14 +285,11 @@ function NeedRow({
     mutationFn: () => apply({ data: { need_id: need.id } }),
     onSuccess: (r: { status: string } | null | undefined) => {
       toast.success(
-        r?.status === "confirmed"
-          ? t("needs:signup.confirmed")
-          : t("needs:signup.applied"),
+        r?.status === "confirmed" ? t("needs:signup.confirmed") : t("needs:signup.applied"),
       );
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const withdrawM = useMutation({
     mutationFn: () => withdraw({ data: { signup_id: mySignup!.id } }),
@@ -306,8 +297,7 @@ function NeedRow({
       toast.success(t("needs:signup.withdrawn"));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const declareUnavailM = useMutation({
     mutationFn: () => declareUnavail({ data: { need_id: need.id } }),
@@ -315,8 +305,7 @@ function NeedRow({
       toast.success(t("needs:unavailable.confirmed"));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const closeM = useMutation({
     mutationFn: () => close({ data: { need_id: need.id } }),
@@ -325,8 +314,7 @@ function NeedRow({
       setCloseConfirmOpen(false);
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const reopenM = useMutation({
     mutationFn: () => reopen({ data: { need_id: need.id } }),
@@ -334,8 +322,7 @@ function NeedRow({
       toast.success(t("needs:status.reopened", { defaultValue: "Besoin rouvert" }));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
@@ -344,8 +331,7 @@ function NeedRow({
       setCancelConfirmOpen(false);
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const deleteM = useMutation({
     mutationFn: () => deleteFn({ data: { need_id: need.id } }),
@@ -354,8 +340,7 @@ function NeedRow({
       setDeleteConfirmOpen(false);
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   /* -------------------- badges (S1 · pastille 2) -------------------- */
@@ -455,7 +440,12 @@ function NeedRow({
         <div className="min-w-0 flex-1">
           {/* Ligne titre : icône · libellé · badge d'état */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0", needChip)}>
+            <span
+              className={cn(
+                "inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0",
+                needChip,
+              )}
+            >
               <NeedIcon className="h-4 w-4" />
             </span>
             <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
@@ -485,15 +475,12 @@ function NeedRow({
               <div className="w-full mt-1 rounded-md border border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/60 dark:bg-emerald-950/20 px-2 py-1 divide-y divide-emerald-100 dark:divide-emerald-900/60">
                 {need.confirmed_signups!.map((s) => {
                   const ctx = s.context;
-                  const roles =
-                    ctx?.primary_role ? [ctx.primary_role] : [];
+                  const roles = ctx?.primary_role ? [ctx.primary_role] : [];
                   const subline = formatMemberContextSubline(ctx, {
-                    playerSubline: (c) =>
-                      t("common:person.playerSubline", { category: c }),
+                    playerSubline: (c) => t("common:person.playerSubline", { category: c }),
                     playerSublineMulti: (c) =>
                       t("common:person.playerSublineMulti", { categories: c }),
-                    parentSubline: (c) =>
-                      t("common:person.parentSubline", { children: c }),
+                    parentSubline: (c) => t("common:person.parentSubline", { children: c }),
                   });
                   return (
                     <PersonRow
@@ -531,10 +518,7 @@ function NeedRow({
                 </DropdownMenuItem>
               )}
               {isClosed && (
-                <DropdownMenuItem
-                  onClick={() => reopenM.mutate()}
-                  disabled={reopenM.isPending}
-                >
+                <DropdownMenuItem onClick={() => reopenM.mutate()} disabled={reopenM.isPending}>
                   <RotateCcw className="h-3.5 w-3.5 mr-2" />
                   {t("needs:menu.reopenNeed", { defaultValue: "Rouvrir" })}
                 </DropdownMenuItem>
@@ -592,9 +576,7 @@ function NeedRow({
             <Users className="h-3.5 w-3.5 mr-1" />
             {t("needs:card.applicationsCta")}
             {pendingCount > 0 && (
-              <span className="ml-1.5 tabular-nums font-semibold">
-                · {pendingCount}
-              </span>
+              <span className="ml-1.5 tabular-nums font-semibold">· {pendingCount}</span>
             )}
           </Button>
         )}
@@ -613,7 +595,6 @@ function NeedRow({
         )}
 
         {/* S1-5 : « Assigner » vit DANS le dialog Candidatures (StaffSignupsDialog), pas sur la carte. */}
-
 
         {/* Membre — S5 : 3 états normalisés + « Je me propose » / « Pas dispo » permanent */}
         {!isStaff && isOpen && (
@@ -693,8 +674,6 @@ function NeedRow({
         )}
       </div>
 
-
-
       {publishOpen && (
         <PublishDialog
           open={publishOpen}
@@ -773,7 +752,10 @@ function NeedRow({
             <AlertDialogDescription>
               {confirmedCount === 0
                 ? t("needs:closeDialog2.descriptionEmpty")
-                : t("needs:closeDialog2.description", { count: confirmedCount, confirmed: confirmedCount })}
+                : t("needs:closeDialog2.description", {
+                    count: confirmedCount,
+                    confirmed: confirmedCount,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -801,10 +783,19 @@ function NeedRow({
               {confirmedCount === 0 && pendingCount === 0
                 ? t("needs:cancelDialog2.descriptionNone")
                 : confirmedCount > 0 && pendingCount === 0
-                  ? t("needs:cancelDialog2.descriptionOnlyConfirmed", { count: confirmedCount, confirmed: confirmedCount })
+                  ? t("needs:cancelDialog2.descriptionOnlyConfirmed", {
+                      count: confirmedCount,
+                      confirmed: confirmedCount,
+                    })
                   : confirmedCount === 0 && pendingCount > 0
-                    ? t("needs:cancelDialog2.descriptionOnlyPending", { count: pendingCount, pending: pendingCount })
-                    : t("needs:cancelDialog2.descriptionMany", { confirmed: confirmedCount, pending: pendingCount })}
+                    ? t("needs:cancelDialog2.descriptionOnlyPending", {
+                        count: pendingCount,
+                        pending: pendingCount,
+                      })
+                    : t("needs:cancelDialog2.descriptionMany", {
+                        confirmed: confirmedCount,
+                        pending: pendingCount,
+                      })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -829,9 +820,7 @@ function NeedRow({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("needs:deleteDraft.title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("needs:deleteDraft.description")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("needs:deleteDraft.description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("needs:deleteDraft.abort")}</AlertDialogCancel>
@@ -852,7 +841,6 @@ function NeedRow({
     </div>
   );
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* CreateNeedDialog                                                           */
@@ -944,15 +932,13 @@ function NeedFormDialog({
     // Always keep the current role_key visible when editing so it stays selectable.
     if (initial) used.delete(initial.role_key);
     return NEED_TEMPLATES.filter((tpl) => {
-      const sportOk =
-        tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
+      const sportOk = tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
       if (!sportOk) return false;
       // "other" is always allowed (multiple custom needs are OK).
       if (tpl.key === "other") return true;
       return !used.has(tpl.key);
     });
   }, [sport, initial, existingRoleKeys]);
-
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
@@ -968,9 +954,7 @@ function NeedFormDialog({
   );
 
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [capacity, setCapacity] = useState(
-    initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
-  );
+  const [capacity, setCapacity] = useState(initial?.capacity ?? currentTpl.suggestedCapacity ?? 1);
   const [mode, setMode] = useState<"auto" | "manual">(
     initial?.validation_mode ?? currentTpl.suggestedValidationMode ?? "auto",
   );
@@ -993,8 +977,7 @@ function NeedFormDialog({
   // Saves as draft only when neither broadcast audience nor pre-assignments are set.
   // Any audience selection (broadcast OR pre-assignments) triggers publication.
   const wantsPublish =
-    showAudienceStep &&
-    (audiences.length > 0 || audState.preassigned.length > 0);
+    showAudienceStep && (audiences.length > 0 || audState.preassigned.length > 0);
 
   const saveM = useMutation({
     mutationFn: async () => {
@@ -1032,8 +1015,7 @@ function NeedFormDialog({
       const hasPreassign = showAudienceStep && audState.preassigned.length > 0;
       const shouldPublish =
         showAudienceStep &&
-        (audiences.length > 0 ||
-          (hasPreassign && (!isEdit || initial?.status !== "open")));
+        (audiences.length > 0 || (hasPreassign && (!isEdit || initial?.status !== "open")));
       if (shouldPublish) {
         published = await publish({ data: { need_id: needId, audiences } });
       }
@@ -1051,8 +1033,12 @@ function NeedFormDialog({
           }
         }
       }
-      return { id: needId, __published: published, __preassignedCount: preassignedCount, __wasEdit: isEdit };
-
+      return {
+        id: needId,
+        __published: published,
+        __preassignedCount: preassignedCount,
+        __wasEdit: isEdit,
+      };
     },
     onSuccess: (r) => {
       const pre = (r as { __preassignedCount?: number })?.__preassignedCount ?? 0;
@@ -1135,7 +1121,12 @@ function NeedFormDialog({
                           templateLocked && "opacity-60 cursor-not-allowed",
                         )}
                       >
-                        <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
+                        <span
+                          className={cn(
+                            "inline-flex h-5 w-5 items-center justify-center rounded-full",
+                            active ? "bg-primary-foreground/20 text-primary-foreground" : chip,
+                          )}
+                        >
                           <TplIcon className="h-3 w-3" />
                         </span>
                         {t(`needs:templates.${tpl.key}`)}
@@ -1144,9 +1135,7 @@ function NeedFormDialog({
                   })}
                 </div>
                 {templateLocked && (
-                  <p className="text-xs text-muted-foreground">
-                    {t("needs:edit.templateLocked")}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t("needs:edit.templateLocked")}</p>
                 )}
               </div>
 
@@ -1238,8 +1227,6 @@ function NeedFormDialog({
               />
             </div>
           )}
-
-
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
@@ -1268,9 +1255,7 @@ function NeedFormDialog({
                   {t("common.save")}
                 </Button>
               ) : (
-                <Button onClick={() => setStep(2)}>
-                  {t("needs:wizard.continueToRecipients")}
-                </Button>
+                <Button onClick={() => setStep(2)}>{t("needs:wizard.continueToRecipients")}</Button>
               )}
             </>
           )}
@@ -1376,9 +1361,7 @@ function PublishDialog({
       if (r?.was_idempotent_skip) {
         toast.success(t("needs:publish.successIdempotent"));
       } else if (isPublish) {
-        toast.success(
-          t("needs:publish.success", { count: r?.recipients_count ?? 0 }),
-        );
+        toast.success(t("needs:publish.success", { count: r?.recipients_count ?? 0 }));
       } else if (isResend) {
         toast.success(
           t("needs:resend.success", { count: r?.notified_count ?? r?.recipients_count ?? 0 }),
@@ -1425,11 +1408,8 @@ function PublishDialog({
           preview={{ count: previewCount, loading: previewLoading }}
         />
 
-
         {isEditAudience && (
-          <p className="text-xs text-muted-foreground mt-2">
-            {t("needs:editAudience.deltaHint")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-2">{t("needs:editAudience.deltaHint")}</p>
         )}
 
         <DialogFooter>
@@ -1438,11 +1418,7 @@ function PublishDialog({
           </Button>
           <Button
             onClick={() => publishM.mutate()}
-            disabled={
-              publishM.isPending ||
-              audiences.length === 0 ||
-              (previewCount ?? 0) === 0
-            }
+            disabled={publishM.isPending || audiences.length === 0 || (previewCount ?? 0) === 0}
           >
             {publishM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
             {t(ctaKey)}
@@ -1461,7 +1437,8 @@ const ROLE_COLORS: Record<string, string> = {
   admin: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300",
   coach: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300",
   assistant_coach: "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300",
-  staff: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300",
+  staff:
+    "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300",
   tournament_manager:
     "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300",
   player: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300",
@@ -1493,7 +1470,6 @@ function StaffSignupsDialog({
   onChanged: () => void;
   defaultAddOpen?: boolean;
 }) {
-
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
@@ -1509,8 +1485,7 @@ function StaffSignupsDialog({
   });
 
   const decideM = useMutation({
-    mutationFn: (v: { signup_id: string; decision: "confirm" | "decline" }) =>
-      decide({ data: v }),
+    mutationFn: (v: { signup_id: string; decision: "confirm" | "decline" }) => decide({ data: v }),
     onSuccess: () => {
       refetch();
       onChanged();
@@ -1537,17 +1512,12 @@ function StaffSignupsDialog({
     onMutate: (uid) => setAddPendingUser(uid),
     onSettled: () => setAddPendingUser(null),
     onSuccess: (r: { already?: boolean } | null | undefined) => {
-      toast.success(
-        r?.already
-          ? t("needs:staff.alreadyConfirmed")
-          : t("needs:staff.manualAdded"),
-      );
+      toast.success(r?.already ? t("needs:staff.alreadyConfirmed") : t("needs:staff.manualAdded"));
       refetch();
       onChanged();
       qc.invalidateQueries({ queryKey: ["need-add-members", needId] });
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const unassignM = useMutation({
@@ -1558,8 +1528,7 @@ function StaffSignupsDialog({
       onChanged();
       qc.invalidateQueries({ queryKey: ["need-signups", needId] });
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const signups = (data?.signups ?? []) as StaffSignup[];
@@ -1567,8 +1536,7 @@ function StaffSignupsDialog({
   const confirmedCount = signups.filter((s) => s.status === "confirmed").length;
   const isFull = confirmedCount >= capacity;
   const pendingIds = pending.map((s) => s.id);
-  const allPendingSelected =
-    pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
+  const allPendingSelected = pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
 
   const toggleOne = (id: string) => {
     setSelected((prev) => {
@@ -1596,10 +1564,10 @@ function StaffSignupsDialog({
         toast.success(
           decision === "confirm"
             ? t("needs:staff.bulkConfirmed", {
-                count: ok
+                count: ok,
               })
             : t("needs:staff.bulkDeclined", {
-                count: ok
+                count: ok,
               }),
         );
       }
@@ -1623,7 +1591,7 @@ function StaffSignupsDialog({
               count: pending.length + signups.filter((s) => s.status === "confirmed").length,
               pending: pending.length,
               confirmed: signups.filter((s) => s.status === "confirmed").length,
-              seats: signups.filter((s) => s.status === "confirmed").length
+              seats: signups.filter((s) => s.status === "confirmed").length,
             })}
           </p>
         </DialogHeader>
@@ -1631,14 +1599,11 @@ function StaffSignupsDialog({
         {pending.length > 0 && (
           <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/40 p-2">
             <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-              <Checkbox
-                checked={allPendingSelected}
-                onCheckedChange={toggleAll}
-              />
+              <Checkbox checked={allPendingSelected} onCheckedChange={toggleAll} />
               {allPendingSelected
                 ? t("common.deselectAll")
                 : t("needs:staff.selectAllPending", {
-                    count: pending.length
+                    count: pending.length,
                   })}
             </label>
             <div className="flex items-center gap-1">
@@ -1670,8 +1635,6 @@ function StaffSignupsDialog({
 
         {/* S4-4 : Assigner section moved below signups list */}
 
-
-
         <div className="space-y-1 max-h-[60vh] overflow-y-auto">
           {signups.map((s) => {
             const isPending = s.status === "applied";
@@ -1680,8 +1643,7 @@ function StaffSignupsDialog({
             const sublineParts: React.ReactNode[] = [];
             const ctxSubline = formatMemberContextSubline(s.context, {
               playerSubline: (c) => t("common:person.playerSubline", { category: c }),
-              playerSublineMulti: (c) =>
-                t("common:person.playerSublineMulti", { categories: c }),
+              playerSublineMulti: (c) => t("common:person.playerSublineMulti", { categories: c }),
               parentSubline: (c) => t("common:person.parentSubline", { children: c }),
             });
             if (ctxSubline) sublineParts.push(<span key="ctx">{ctxSubline}</span>);
@@ -1737,9 +1699,7 @@ function StaffSignupsDialog({
                           <Button
                             size="sm"
                             variant="default"
-                            onClick={() =>
-                              decideM.mutate({ signup_id: s.id, decision: "confirm" })
-                            }
+                            onClick={() => decideM.mutate({ signup_id: s.id, decision: "confirm" })}
                             disabled={decideM.isPending || bulkPending || isFull}
                             title={isFull ? t("needs:staff.fullTitle") : undefined}
                           >
@@ -1748,9 +1708,7 @@ function StaffSignupsDialog({
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              decideM.mutate({ signup_id: s.id, decision: "decline" })
-                            }
+                            onClick={() => decideM.mutate({ signup_id: s.id, decision: "decline" })}
                             disabled={decideM.isPending || bulkPending}
                           >
                             <X className="h-3.5 w-3.5" />
@@ -1784,7 +1742,6 @@ function StaffSignupsDialog({
           )}
         </div>
 
-
         {/* S4-4 : Assigner replié en bas — notification automatique à l'assigné */}
         <div className="rounded-md border bg-muted/20 p-2 space-y-2 mt-2">
           <button
@@ -1796,9 +1753,7 @@ function StaffSignupsDialog({
               <UserPlus className="h-3.5 w-3.5" />
               {t("needs:applications.assignSection")}
             </span>
-            <span className="text-[10px] text-muted-foreground">
-              {addOpen ? "−" : "+"}
-            </span>
+            <span className="text-[10px] text-muted-foreground">{addOpen ? "−" : "+"}</span>
           </button>
           {addOpen && (
             <>
@@ -1836,7 +1791,8 @@ function StaffSignupsDialog({
                   )}
                   {(memberResults?.members ?? []).map((m) => {
                     const ctxSubline = formatMemberContextSubline(
-                      (m as { context?: import("@/lib/needs/member-context").MemberContext | null }).context ?? null,
+                      (m as { context?: import("@/lib/needs/member-context").MemberContext | null })
+                        .context ?? null,
                       {
                         playerSubline: (c) => t("common:person.playerSubline", { category: c }),
                         playerSublineMulti: (c) =>
@@ -1845,33 +1801,33 @@ function StaffSignupsDialog({
                       },
                     );
                     return (
-                    <PersonRow
-                      key={m.member_id}
-                      className="rounded border bg-background px-2"
-                      compact
-                      name={m.full_name ?? t("common.unknown")}
-                      roles={m.roles}
-                      subline={ctxSubline ?? undefined}
-                      action={
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-7 text-[11px]"
-                          onClick={() => addManualM.mutate(m.user_id)}
-                          disabled={addPendingUser === m.user_id || isFull}
-                        >
-                          {addPendingUser === m.user_id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <>
-                              <Plus className="h-3 w-3 mr-1" />
-                              {t("needs:applications.assignCta")}
-                            </>
-                          )}
-                        </Button>
-                      }
-                    />
-                  );
+                      <PersonRow
+                        key={m.member_id}
+                        className="rounded border bg-background px-2"
+                        compact
+                        name={m.full_name ?? t("common.unknown")}
+                        roles={m.roles}
+                        subline={ctxSubline ?? undefined}
+                        action={
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-[11px]"
+                            onClick={() => addManualM.mutate(m.user_id)}
+                            disabled={addPendingUser === m.user_id || isFull}
+                          >
+                            {addPendingUser === m.user_id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <Plus className="h-3 w-3 mr-1" />
+                                {t("needs:applications.assignCta")}
+                              </>
+                            )}
+                          </Button>
+                        }
+                      />
+                    );
                   })}
                 </div>
               </div>
@@ -1920,9 +1876,7 @@ function NeedRecipientsDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t("needs:recipients.title")}</DialogTitle>
-          <DialogDescription>
-            {t("needs:recipients.desc", { need: needLabel })}
-          </DialogDescription>
+          <DialogDescription>{t("needs:recipients.desc", { need: needLabel })}</DialogDescription>
         </DialogHeader>
 
         <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1">
@@ -1965,4 +1919,3 @@ function NeedRecipientsDialog({
     </Dialog>
   );
 }
-

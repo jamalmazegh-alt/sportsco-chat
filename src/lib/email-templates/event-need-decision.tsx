@@ -135,9 +135,7 @@ export const template = {
     const t = T[loc];
     const label = (data.needLabel as string) ?? "";
     if (data.decision === "unassign") return t.previewUnassign(label);
-    return data.decision === "confirm"
-      ? t.previewConfirm(label)
-      : t.previewDecline(label);
+    return data.decision === "confirm" ? t.previewConfirm(label) : t.previewDecline(label);
   },
   displayName: "Event need — decision",
   previewData: {

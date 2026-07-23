@@ -46,7 +46,6 @@ type Dict = {
   timePattern: string;
 };
 
-
 const DICTS: Record<WaLocale, Dict> = {
   fr: {
     convocation: "Convocation",
@@ -239,7 +238,6 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   if (input.coachNames && input.coachNames.length > 0) {
     lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
   }
-
 
   if (input.description) {
     lines.push("");

@@ -45,7 +45,6 @@ import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { searchClubMembersForAssignment } from "@/lib/needs/needs.functions";
 import { PersonRow } from "@/components/shared/person-row";
 
-
 export type ScalarAudienceKey =
   | "convoked_players"
   | "convoked_parents"
@@ -81,8 +80,6 @@ export type PreassignedPerson = {
   full_name: string | null;
 };
 
-
-
 export type AudienceState = {
   scalar: Set<ScalarAudienceKey>;
   groupIds: Set<string>;
@@ -92,17 +89,11 @@ export type AudienceState = {
 };
 
 export function useAudienceState(defaults: Partial<AudienceState> = {}) {
-  const [scalar, setScalar] = useState<Set<ScalarAudienceKey>>(
-    defaults.scalar ?? new Set(),
-  );
+  const [scalar, setScalar] = useState<Set<ScalarAudienceKey>>(defaults.scalar ?? new Set());
   const [groupIds, setGroupIds] = useState<Set<string>>(defaults.groupIds ?? new Set());
-  const [teamPicks, setTeamPicks] = useState<AudienceState["teamPicks"]>(
-    defaults.teamPicks ?? [],
-  );
+  const [teamPicks, setTeamPicks] = useState<AudienceState["teamPicks"]>(defaults.teamPicks ?? []);
   const [category, setCategory] = useState<string>(defaults.category ?? "");
-  const [preassigned, setPreassigned] = useState<PreassignedPerson[]>(
-    defaults.preassigned ?? [],
-  );
+  const [preassigned, setPreassigned] = useState<PreassignedPerson[]>(defaults.preassigned ?? []);
 
   const state = useMemo<AudienceState>(
     () => ({ scalar, groupIds, teamPicks, category, preassigned }),
@@ -129,9 +120,7 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
     });
   };
   const addPreassigned = (p: PreassignedPerson) => {
-    setPreassigned((prev) =>
-      prev.some((x) => x.user_id === p.user_id) ? prev : [...prev, p],
-    );
+    setPreassigned((prev) => (prev.some((x) => x.user_id === p.user_id) ? prev : [...prev, p]));
   };
   const removePreassigned = (user_id: string) => {
     setPreassigned((prev) => prev.filter((p) => p.user_id !== user_id));
@@ -152,11 +141,17 @@ export function useAudienceState(defaults: Partial<AudienceState> = {}) {
 
   return {
     state,
-    controls: { toggleScalar, toggleGroup, toggleTeam, setCategory, addPreassigned, removePreassigned },
+    controls: {
+      toggleScalar,
+      toggleGroup,
+      toggleTeam,
+      setCategory,
+      addPreassigned,
+      removePreassigned,
+    },
     buildAudiences,
   };
 }
-
 
 export function useHydratedAudiences(
   eventId: string,
@@ -171,11 +166,7 @@ export function useHydratedAudiences(
 /* Kind registry — labels, icons, colors                              */
 /* ------------------------------------------------------------------ */
 
-type KindKey =
-  | ScalarAudienceKey
-  | "club_group"
-  | TeamKind
-  | "category_educators";
+type KindKey = ScalarAudienceKey | "club_group" | TeamKind | "category_educators";
 
 const KIND_META: Record<KindKey, { Icon: LucideIcon; cls: string }> = {
   convoked_players: {
@@ -264,11 +255,9 @@ export function AudiencePickerBody({
   capacity?: number;
   enablePreassign?: boolean;
 }) {
-
   const { t } = useTranslation();
   const [kind, setKind] = useState<KindKey | "">("");
   const [param, setParam] = useState<string>("");
-
 
   const teamNameById = useMemo(
     () => new Map((ctx?.teams ?? []).map((tm) => [tm.id, tm])),
@@ -391,15 +380,11 @@ export function AudiencePickerBody({
         onToggle: () => controls.toggleScalar(k),
       });
     }
-    const eventTeam = ctx.event_team_id
-      ? ctx.teams.find((t) => t.id === ctx.event_team_id)
-      : null;
+    const eventTeam = ctx.event_team_id ? ctx.teams.find((t) => t.id === ctx.event_team_id) : null;
     if (eventTeam) {
       const teamKinds: TeamKind[] = ["team_players", "team_parents", "team_educators"];
       for (const kind of teamKinds) {
-        const active = state.teamPicks.some(
-          (p) => p.team_id === eventTeam.id && p.kind === kind,
-        );
+        const active = state.teamPicks.some((p) => p.team_id === eventTeam.id && p.kind === kind);
         list.push({
           id: `sg-t-${eventTeam.id}-${kind}`,
           kind,
@@ -421,7 +406,6 @@ export function AudiencePickerBody({
     }
     return list;
   }, [ctx, state.scalar, state.teamPicks, state.category, controls, t]);
-
 
   const clubAudienceSuggestions: Suggestion[] = useMemo(() => {
     const clubKeys: ScalarAudienceKey[] = [
@@ -453,9 +437,7 @@ export function AudiencePickerBody({
     state.groupIds.size === 0 &&
     state.teamPicks.length === 0 &&
     !state.category &&
-    [...state.scalar].every(
-      (k) => k === "convoked_players" || k === "convoked_parents",
-    );
+    [...state.scalar].every((k) => k === "convoked_players" || k === "convoked_parents");
 
   type SuggestionT = {
     id: string;
@@ -491,9 +473,6 @@ export function AudiencePickerBody({
 
   return (
     <div className="space-y-3">
-
-
-
       {/* Selected audiences — sticky, high-visibility */}
       <div className="sticky top-0 z-10 -mx-1 px-1 pt-1 pb-2 bg-background">
         {chips.length === 0 ? (
@@ -504,9 +483,7 @@ export function AudiencePickerBody({
             {t("needs:audiences.selected.empty")}
           </div>
         ) : (
-          <div
-            className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)] motion-safe:transition-shadow"
-          >
+          <div className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)] motion-safe:transition-shadow">
             <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold">
               <UserCheck className="h-3.5 w-3.5" />
               {t("needs:audiences.selected.title")}
@@ -567,8 +544,6 @@ export function AudiencePickerBody({
         )}
       </div>
 
-
-
       {/* Custom groups — highlighted */}
       {customGroupSuggestions.length > 0 && (
         <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5">
@@ -578,7 +553,11 @@ export function AudiencePickerBody({
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {customGroupSuggestions.map((s) => (
-              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+              <SuggestionChip
+                key={s.id}
+                s={s}
+                takenLabel={t("needs:audiences.selected.takenAria")}
+              />
             ))}
           </div>
         </div>
@@ -593,7 +572,11 @@ export function AudiencePickerBody({
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {eventSuggestions.map((s) => (
-              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+              <SuggestionChip
+                key={s.id}
+                s={s}
+                takenLabel={t("needs:audiences.selected.takenAria")}
+              />
             ))}
           </div>
         </div>
@@ -608,12 +591,15 @@ export function AudiencePickerBody({
           </Label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {clubAudienceSuggestions.map((s) => (
-              <SuggestionChip key={s.id} s={s} takenLabel={t("needs:audiences.selected.takenAria")} />
+              <SuggestionChip
+                key={s.id}
+                s={s}
+                takenLabel={t("needs:audiences.selected.takenAria")}
+              />
             ))}
           </div>
         </div>
       )}
-
 
       {/* Other audiences — generic add row */}
       <div>
@@ -629,9 +615,7 @@ export function AudiencePickerBody({
             }}
           >
             <SelectTrigger>
-              <SelectValue
-                placeholder={t("needs:audiences.pickKind")}
-              />
+              <SelectValue placeholder={t("needs:audiences.pickKind")} />
             </SelectTrigger>
             <SelectContent>
               {availableKinds
@@ -653,9 +637,7 @@ export function AudiencePickerBody({
           {kind && (needsTeam(kind) || needsGroup(kind) || needsCategory(kind)) ? (
             <Select value={param} onValueChange={setParam}>
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("needs:audiences.pickParam")}
-                />
+                <SelectValue placeholder={t("needs:audiences.pickParam")} />
               </SelectTrigger>
               <SelectContent>
                 {needsGroup(kind) &&
@@ -670,9 +652,7 @@ export function AudiencePickerBody({
                       (ctx?.teams ?? [])
                         .filter(
                           (tm) =>
-                            !state.teamPicks.some(
-                              (p) => p.team_id === tm.id && p.kind === kind,
-                            ),
+                            !state.teamPicks.some((p) => p.team_id === tm.id && p.kind === kind),
                         )
                         .map((tm) => [tm.id, tm]),
                     ).values(),
@@ -694,20 +674,13 @@ export function AudiencePickerBody({
             <div />
           )}
 
-          <Button
-            type="button"
-            size="sm"
-            disabled={!canSubmit()}
-            onClick={submit}
-          >
+          <Button type="button" size="sm" disabled={!canSubmit()} onClick={submit}>
             <Plus className="h-4 w-4 mr-1" />
             {t("needs:audiences.add", { defaultValue: "Ajouter" })}
           </Button>
         </div>
         {ctx && ctx.groups.length === 0 && (
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            {t("needs:audiences.noGroups")}
-          </p>
+          <p className="mt-2 text-[11px] text-muted-foreground">{t("needs:audiences.noGroups")}</p>
         )}
       </div>
 
@@ -757,8 +730,7 @@ function PreassignPanel({
     staleTime: 15_000,
   });
 
-  const atCapacity =
-    typeof capacity === "number" && capacity > 0 && selected.length >= capacity;
+  const atCapacity = typeof capacity === "number" && capacity > 0 && selected.length >= capacity;
 
   return (
     <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2.5">
@@ -834,18 +806,17 @@ function PreassignPanel({
                     (m as any).context ?? {
                       primary_role: primary,
                       player_category: m.player_category ?? null,
-                      player_categories: (m as unknown as { player_categories?: string[] })
-                        .player_categories ?? (m.player_category ? [m.player_category] : []),
+                      player_categories:
+                        (m as unknown as { player_categories?: string[] }).player_categories ??
+                        (m.player_category ? [m.player_category] : []),
                       children: m.children ?? [],
                       coached_teams: m.coached_teams ?? [],
                     },
                     {
-                      playerSubline: (c) =>
-                        t("common:person.playerSubline", { category: c }),
+                      playerSubline: (c) => t("common:person.playerSubline", { category: c }),
                       playerSublineMulti: (c) =>
                         t("common:person.playerSublineMulti", { categories: c }),
-                      parentSubline: (c) =>
-                        t("common:person.parentSubline", { children: c }),
+                      parentSubline: (c) => t("common:person.parentSubline", { children: c }),
                     },
                   );
                   return (
@@ -877,5 +848,3 @@ function PreassignPanel({
     </div>
   );
 }
-
-

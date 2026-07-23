@@ -59,7 +59,6 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       .eq("id", data.convocationId)
       .maybeSingle();
 
-
     if (!conv) return { ok: false as const, reason: "not_found" };
     const ev: any = (conv as any).events;
     if (!ev) return { ok: false as const, reason: "no_event" };
@@ -173,7 +172,6 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
         .filter(Boolean);
       return names.length > 0 ? names : undefined;
     })();
-
 
     // 6. Build recipients + send emails (fire-and-forget per recipient).
     const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];

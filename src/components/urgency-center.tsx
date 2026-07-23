@@ -148,7 +148,6 @@ export function UrgencyCenter({ className }: Props) {
   // TEMP DEBUG — log which insight sources failed so we can diagnose the partial banner.
   useEffect(() => {
     if (hasFailures) {
-      // eslint-disable-next-line no-console
       console.warn("[UrgencyCenter] failed sources:", status.failedSources, {
         errors: (status as any).errors,
         status,
@@ -246,10 +245,7 @@ export function UrgencyCenter({ className }: Props) {
     }
   }
 
-  async function handleQuickRespond(
-    item: UrgencyItem,
-    status: "present" | "uncertain" | "absent",
-  ) {
+  async function handleQuickRespond(item: UrgencyItem, status: "present" | "uncertain" | "absent") {
     const convocationId = item.quickRespondConvocationId;
     if (!convocationId) return;
     setBusyIds((s) => new Set(s).add(item.id));
@@ -350,19 +346,14 @@ export function UrgencyCenter({ className }: Props) {
     }
   }
 
-  async function handleNeedRespond(
-    item: UrgencyItem,
-    choice: "available" | "unavailable",
-  ) {
+  async function handleNeedRespond(item: UrgencyItem, choice: "available" | "unavailable") {
     if (item.primaryAction.kind !== "open-need") return;
     const needId = item.primaryAction.needId;
     setBusyIds((s) => new Set(s).add(item.id));
     try {
       if (choice === "available") {
         await applyNeedFn({ data: { need_id: needId } });
-        toast.success(
-          t("needs:insight.appliedToast", { defaultValue: "Candidature envoyée" }),
-        );
+        toast.success(t("needs:insight.appliedToast", { defaultValue: "Candidature envoyée" }));
       } else {
         await declareUnavailableFn({ data: { need_id: needId } });
         toast.success(
@@ -432,10 +423,7 @@ interface DeckProps {
     item: UrgencyItem,
     status: "present" | "uncertain" | "absent",
   ) => void | Promise<void>;
-  onNeedRespond: (
-    item: UrgencyItem,
-    choice: "available" | "unavailable",
-  ) => void | Promise<void>;
+  onNeedRespond: (item: UrgencyItem, choice: "available" | "unavailable") => void | Promise<void>;
   onDismiss: (id: string) => void;
   onRefresh: () => void;
   className?: string;
@@ -550,7 +538,8 @@ function UrgencyDeck({
           <div className="space-y-0.5">
             <div>
               {t("urgency.partialError", {
-                defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
+                defaultValue:
+                  "Certaines sources sont indisponibles, la liste peut être incomplète.",
               })}
             </div>
             <div className="font-mono text-[10px] opacity-80">
@@ -650,8 +639,7 @@ function UrgencyDeck({
                                 disabled={busy || !isTop}
                                 className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
                                 style={{
-                                  background:
-                                    "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
                                 }}
                               >
                                 {busy ? (
@@ -702,8 +690,7 @@ function UrgencyDeck({
                                 disabled={busy || !isTop}
                                 className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
                                 style={{
-                                  background:
-                                    "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
                                 }}
                               >
                                 {busy ? (
@@ -752,8 +739,7 @@ function UrgencyDeck({
                               disabled={busy || !isTop}
                               className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
                               style={{
-                                background:
-                                  "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
                               }}
                             >
                               {busy ? (

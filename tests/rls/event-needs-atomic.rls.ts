@@ -110,10 +110,7 @@ describe("event needs — atomic RPCs (Lot 1 / Phase A consolidation)", () => {
   });
 
   afterAll(async () => {
-    await admin
-      .from("event_needs")
-      .delete()
-      .in("id", [publishNeedId, confirmNeedId, autoNeedId]);
+    await admin.from("event_needs").delete().in("id", [publishNeedId, confirmNeedId, autoNeedId]);
   });
 
   it("(A) double-tap publish → 1 publication + second call flagged idempotent", async () => {
@@ -138,8 +135,8 @@ describe("event needs — atomic RPCs (Lot 1 / Phase A consolidation)", () => {
     expect(r1.error).toBeNull();
     expect(r2.error).toBeNull();
     const rows = [
-      (Array.isArray(r1.data) ? r1.data[0] : r1.data),
-      (Array.isArray(r2.data) ? r2.data[0] : r2.data),
+      Array.isArray(r1.data) ? r1.data[0] : r1.data,
+      Array.isArray(r2.data) ? r2.data[0] : r2.data,
     ];
     const skipped = rows.filter((r) => r?.was_idempotent_skip);
     const fresh = rows.filter((r) => !r?.was_idempotent_skip);

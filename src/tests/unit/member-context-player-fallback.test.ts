@@ -21,7 +21,6 @@ function makeAdmin(data: {
   }>;
   teamMembersByPlayer: Array<{ player_id: string; team_id: string }>;
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return {
     from(table: string) {
       const state: {
@@ -38,36 +37,28 @@ function makeAdmin(data: {
         },
         eq(col: string, val: unknown) {
           state.cols.push(col);
-          state.filters.push(
-            (r) => (r as Record<string, unknown>)[col] === val,
-          );
+          state.filters.push((r) => (r as Record<string, unknown>)[col] === val);
           return api;
         },
         in(col: string, vals: unknown[]) {
           state.cols.push(col);
           const set = new Set(vals);
-          state.filters.push((r) =>
-            set.has((r as Record<string, unknown>)[col]),
-          );
+          state.filters.push((r) => set.has((r as Record<string, unknown>)[col]));
           return api;
         },
         is(col: string, val: unknown) {
           state.cols.push(col);
-          state.filters.push(
-            (r) => (r as Record<string, unknown>)[col] === val,
-          );
+          state.filters.push((r) => (r as Record<string, unknown>)[col] === val);
           return api;
         },
         then(resolve: (v: { data: unknown[] }) => unknown) {
           let rows: unknown[] = state.rows;
           if (table === "team_members") {
             const usesPlayerId = state.cols.includes("player_id");
-            rows = usesPlayerId
-              ? data.teamMembersByPlayer
-              : data.teamMembersByUser;
+            rows = usesPlayerId ? data.teamMembersByPlayer : data.teamMembersByUser;
           }
-          const filtered = (rows as Array<Record<string, unknown>>).filter(
-            (r) => state.filters.every((f) => f(r)),
+          const filtered = (rows as Array<Record<string, unknown>>).filter((r) =>
+            state.filters.every((f) => f(r)),
           );
           return Promise.resolve(resolve({ data: filtered }));
         },

@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/select";
 import { searchUsers } from "@/lib/superadmin.functions";
 import { createSupportTicketOnBehalf } from "@/lib/support.functions";
-import {
-  SUPPORT_CATEGORIES,
-  SUPPORT_PRIORITIES,
-} from "@/lib/support-constants";
+import { SUPPORT_CATEGORIES, SUPPORT_PRIORITIES } from "@/lib/support-constants";
 
 type UserRow = {
   id: string;

@@ -32,7 +32,7 @@ async function insertPublication(opts: {
       publication_type: opts.type,
       title: opts.title,
       content: "test",
-      poll_visibility: opts.type === "poll" ? opts.pollVisibility ?? "staff_visible" : null,
+      poll_visibility: opts.type === "poll" ? (opts.pollVisibility ?? "staff_visible") : null,
       publish_to_wall: true,
       send_email: false,
       email_body: null,
