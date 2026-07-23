@@ -31,9 +31,14 @@ bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 | `E2E_ADMIN_EMAIL` / `_PASSWORD` (+ coach/player/parent) | secrets E2E                                                       |
 | `E2E_REAL_AI`                                           | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
 | `E2E_UI`                                                | `1` pour passer le timeout global à 90s (sinon 30s)               |
+| `E2E_TOURNAMENT_ID`                                     | optionnel — classement tournoi (`ui-real-flows`)                  |
+| `E2E_CLUB_SLUG` / `E2E_CAMP_SLUG`                       | optionnel — pages publiques stages (`29-camps`)                   |
 
 Seed manuel : `bun run seed:e2e` (idempotent, réécrit les mots de passe pour
 matcher les secrets). Voir `tests/e2e/_fixtures/README.md`.
+
+Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`31`.
+Matrice et dettes : `docs/dev/e2e-coverage-gaps.md`.
 
 ## Stratégie
 

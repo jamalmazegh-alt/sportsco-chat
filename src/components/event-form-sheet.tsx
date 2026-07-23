@@ -785,6 +785,7 @@ export function EventFormSheet({
           <div className="space-y-1.5">
             <Label>{t("events.name")}</Label>
             <Input
+              data-testid="event-name-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={type === "training" ? t("events.types.training") : ""}
@@ -842,6 +843,7 @@ export function EventFormSheet({
             <div className="space-y-1.5">
               <Label>{t("events.opponent")}</Label>
               <Input
+                data-testid="event-opponent-input"
                 required
                 value={opponent ?? ""}
                 onChange={(e) => setOpponent(e.target.value)}

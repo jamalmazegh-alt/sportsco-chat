@@ -135,6 +135,7 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
                   {t("form.title", { defaultValue: "Titre" })}
                 </label>
                 <Input
+                  data-testid="camp-title-input"
                   value={draft.title}
                   onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                   placeholder={t("form.titlePlaceholder", {
