@@ -58,6 +58,7 @@ import { template as wallMessageTemplate } from "./wall-message";
 import { template as publicationPollTemplate } from "./publication-poll";
 import { template as eventStaffAssignmentTemplate } from "./event-staff-assignment";
 import { template as meetingInviteTemplate } from "./meeting-invite";
+import { template as meetingRemovedTemplate } from "./meeting-removed";
 
 
 
@@ -103,4 +104,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "publication-poll": publicationPollTemplate,
   "event-staff-assignment": eventStaffAssignmentTemplate,
   "meeting-invite": meetingInviteTemplate,
+  "meeting-removed": meetingRemovedTemplate,
 };

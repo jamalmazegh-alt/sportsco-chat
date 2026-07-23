@@ -114,6 +114,7 @@ export function MeetingAttendeesSection({
             eventId={eventId}
             onDone={refresh}
             initialSelection={sourcesToSelection(attendees)}
+            hasExistingAttendees={total > 0}
           />
         )}
       </CardHeader>
@@ -259,10 +260,12 @@ function ManageAttendeesDialog({
   eventId,
   onDone,
   initialSelection,
+  hasExistingAttendees,
 }: {
   eventId: string;
   onDone: () => void;
   initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -293,6 +296,7 @@ function ManageAttendeesDialog({
             key={eventId}
             eventId={eventId}
             initialSelection={initialSelection}
+            hasExistingAttendees={hasExistingAttendees}
             onClose={() => setOpen(false)}
             onDone={onDone}
           />
