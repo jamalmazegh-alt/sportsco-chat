@@ -8,7 +8,9 @@
  * Lancer avec E2E_UI=1 (timeout 90 s).
  */
 import { test, expect, type Page } from "@playwright/test";
-import { admin } from "./_fixtures/admin";
+import { createClient } from "@supabase/supabase-js";
+import { isV2 } from "./_fixtures/features";
+import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import { loginViaUI, tx, uniqueName, navTo, MOBILE_VIEWPORT } from "./_fixtures/ui";
 
@@ -273,24 +275,49 @@ test.describe("classement tournoi", () => {
 
 test.describe("confidentialité", () => {
   let club: SeededClub;
-  let publicSlug: string;
+  let minorSlug: string;
+  let adultSlug: string;
+
   test.beforeAll(async () => {
     club = await createTestClub("ui-privacy");
-    publicSlug = `e2e-minor-${club.runId}`;
-    const { error } = await admin
+    minorSlug = `e2e-minor-${club.runId}`;
+    adultSlug = `e2e-adult-${club.runId}`;
+
+    // Mineur : slug posé, profil public OFF (le trigger DB refuse l'activation).
+    const { error: minorErr } = await admin
       .from("players")
-      .update({ birth_date: "2015-01-01", public_slug: publicSlug })
+      .update({
+        birth_date: "2015-01-01",
+        public_slug: minorSlug,
+        public_profile_enabled: false,
+      })
       .eq("id", club.player1.id);
-    if (error) {
-      console.warn(`[ui-privacy] player update skipped: ${error.message}`);
-    }
+    if (minorErr) throw new Error(`[ui-privacy] minor player update: ${minorErr.message}`);
+
+    // Majeur : profil public activé — contrôle positif obligatoire pour la RPC.
+    const { error: adultErr } = await admin
+      .from("players")
+      .update({
+        birth_date: "1995-06-15",
+        public_slug: adultSlug,
+        public_profile_enabled: true,
+      })
+      .eq("id", club.player2WithParent.id);
+    if (adultErr) throw new Error(`[ui-privacy] adult player update: ${adultErr.message}`);
   });
+
   test.afterAll(async () => {
     await club.cleanup();
   });
 
   test("le profil public d'un mineur n'est pas accessible publiquement", async ({ page }) => {
-    await page.goto(`/p/${publicSlug}`);
+    test.skip(
+      !isV2("public_player_profiles"),
+      "public_player_profiles=false (flag de build, src/config/features.ts) — " +
+        "/p/$slug redirige toujours vers / en bêta V1 ; la règle mineur n'est pas exercée par l'UI.",
+    );
+
+    await page.goto(`/p/${minorSlug}`);
 
     const protectedText = page.getByText(/priv|protég|protect|introuvable|not found|404/i).first();
     const isProtected = (await protectedText.count()) > 0;
@@ -298,6 +325,40 @@ test.describe("confidentialité", () => {
 
     expect(isProtected || redirectedAway).toBeTruthy();
     await expect(page.getByText(club.prefix)).toHaveCount(0);
+  });
+
+  test("la DB refuse d'activer un profil public pour un mineur", async () => {
+    const { error } = await admin
+      .from("players")
+      .update({ public_profile_enabled: true })
+      .eq("id", club.player1.id);
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/not allowed for minors/i);
+  });
+
+  test("RPC get_public_player_profile masque un mineur (pas de profil public)", async () => {
+    const anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false },
+    });
+    const { data, error } = await anonClient.rpc("get_public_player_profile", {
+      _slug: minorSlug,
+    });
+    expect(error).toBeNull();
+    expect(data).toBeNull();
+  });
+
+  test("RPC get_public_player_profile expose un majeur", async () => {
+    const anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false },
+    });
+    const { data, error } = await anonClient.rpc("get_public_player_profile", {
+      _slug: adultSlug,
+    });
+    expect(error).toBeNull();
+    expect(data).not.toBeNull();
+    const player = (data as { player?: { id?: string; first_name?: string } } | null)?.player;
+    expect(player?.id).toBe(club.player2WithParent.id);
+    expect(player?.first_name).toBeTruthy();
   });
 });
 

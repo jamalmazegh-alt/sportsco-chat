@@ -79,13 +79,25 @@ test.describe("indisponibilités staff", () => {
     ).toBeVisible();
   });
 
-  test("une indisponibilité admins_only n'est pas visible par un joueur", async ({ page }) => {
-    await seedUnavailability({ visibility: "admins_only" });
+  test("une indisponibilité admins_only : motif visible admin, masqué joueur", async ({
+    page,
+    browser,
+  }) => {
+    const marker = uniqueName("invis");
+    await seedUnavailability({ visibility: "admins_only", comment: marker });
 
-    await loginViaUI(page, "player");
-    await page.goto(`/teams/${club.teamId}`);
+    // Contrôle positif : sans ça, l'absence chez le joueur ne prouve rien.
+    await loginViaUI(page, "admin");
+    await page.goto(`/teams/${club.teamId}/availability`);
+    await expect(page.locator(`[title*="${marker}"]`)).toHaveCount(1, { timeout: 15_000 });
 
-    await expect(page.getByText(/admins_only/i)).toHaveCount(0);
+    const playerCtx = await browser.newContext();
+    const playerPage = await playerCtx.newPage();
+    await loginViaUI(playerPage, "player");
+    await playerPage.goto(`/teams/${club.teamId}/availability`);
+    await expect(playerPage.locator(`[title*="${marker}"]`)).toHaveCount(0);
+    await expect(playerPage.getByText(marker)).toHaveCount(0);
+    await playerCtx.close();
   });
 });
 
@@ -134,7 +146,10 @@ test.describe("réunions", () => {
   });
 });
 
-async function seedUnavailability(opts: { visibility: "admins_only" | "staff" }): Promise<void> {
+async function seedUnavailability(opts: {
+  visibility: "admins_only" | "staff";
+  comment: string;
+}): Promise<void> {
   const start = new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString().slice(0, 10);
   const end = new Date(Date.now() + 4 * 24 * 3600 * 1000).toISOString().slice(0, 10);
   const { error } = await admin.from("staff_availabilities").insert({
@@ -147,8 +162,9 @@ async function seedUnavailability(opts: { visibility: "admins_only" | "staff" })
     certainty: "confirmed",
     visibility: opts.visibility,
     status: "active",
+    comment: opts.comment,
   });
-  if (error) console.warn(`[seedUnavailability] ${error.message}`);
+  if (error) throw new Error(`seedUnavailability: ${error.message}`);
 }
 
 async function seedMeeting(title: string): Promise<string> {

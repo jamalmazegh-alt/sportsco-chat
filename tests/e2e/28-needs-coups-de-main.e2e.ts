@@ -157,21 +157,23 @@ async function seedNeed(label: string, opts: { published: boolean }): Promise<st
       team_id: club.teamId,
       created_by: club.coach.userId,
     });
-    if (audErr) console.warn(`[seedNeed] audience: ${audErr.message}`);
+    if (audErr) throw new Error(`seedNeed audience: ${audErr.message}`);
   }
   return data.id as string;
 }
 
 async function seedSignup(needId: string): Promise<void> {
-  const { data: member } = await admin
+  const { data: member, error: memberErr } = await admin
     .from("club_members")
     .select("id")
     .eq("club_id", club.clubId)
     .eq("user_id", club.player2WithParent.parent.userId)
     .maybeSingle();
+  if (memberErr) throw new Error(`seedSignup member lookup: ${memberErr.message}`);
   if (!member) {
-    console.warn("[seedSignup] parent club_member not found — skip");
-    return;
+    throw new Error(
+      `seedSignup: parent club_member not found (club=${club.clubId}, user=${club.player2WithParent.parent.userId})`,
+    );
   }
   const { error } = await admin.from("event_need_signups").insert({
     need_id: needId,
@@ -179,5 +181,5 @@ async function seedSignup(needId: string): Promise<void> {
     user_id: club.player2WithParent.parent.userId,
     status: "applied",
   });
-  if (error) console.warn(`[seedSignup] ${error.message}`);
+  if (error) throw new Error(`seedSignup: ${error.message}`);
 }
