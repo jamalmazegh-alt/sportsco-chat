@@ -102,8 +102,8 @@ export const createEvent = createServerFn({ method: "POST" })
           } as never,
           { onConflict: "event_id,user_id" },
         );
-      } catch {
-        /* never block create */
+      } catch (e) {
+        console.error("[createEvent] meeting_attendees creator auto-insert failed", e);
       }
     }
 
