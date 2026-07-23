@@ -71,11 +71,17 @@ Workflow `.github/workflows/e2e-tests.yml` :
 
 - **Cron** : 4 AM UTC (après les RLS de 3 AM)
 - **Manuel** : Actions → E2E Tests → Run workflow
+- **Avant les tests** : `supabase db push --include-all --yes` sur bughunt
+  (même anti-dérive que le workflow RLS — le schéma QA suit `main`)
 - Démarre Vite localement contre bughunt, puis `bun run test:e2e`
 - `globalSetup` auto-répare les users E2E via `SUPABASE_SERVICE_ROLE_KEY`
   (guard `E2E_TARGET_PROJECT_REF`)
 - Rapport HTML uploadé en artifact (14 jours)
 - Issue auto sur échec cron (labels `e2e` + `bug`)
+
+Pour forcer une sync immédiate de bughunt sans attendre le cron E2E :
+Actions → **RLS Security Tests** → Run workflow (branche `main`).
+Ce workflow pousse aussi les migrations, puis exécute la suite RLS.
 
 ## Ajouter un test
 
