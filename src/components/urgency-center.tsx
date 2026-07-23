@@ -455,6 +455,7 @@ function UrgencyDeck({
   onRefresh,
   className,
   footer,
+  failedSourcesDebug,
 }: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
