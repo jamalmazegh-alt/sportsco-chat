@@ -309,11 +309,13 @@ function ManageAttendeesDialog({
 function AttendeesEditor({
   eventId,
   initialSelection,
+  hasExistingAttendees,
   onClose,
   onDone,
 }: {
   eventId: string;
   initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
   onClose: () => void;
   onDone: () => void;
 }) {
