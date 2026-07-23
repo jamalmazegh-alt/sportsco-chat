@@ -3742,6 +3742,7 @@ export type Database = {
           invited_at: string
           member_id: string | null
           responded_at: string | null
+          response_token: string
           sources: Json
           status: Database["public"]["Enums"]["attendance_status"]
           updated_at: string
@@ -3757,6 +3758,7 @@ export type Database = {
           invited_at?: string
           member_id?: string | null
           responded_at?: string | null
+          response_token?: string
           sources?: Json
           status?: Database["public"]["Enums"]["attendance_status"]
           updated_at?: string
@@ -3772,6 +3774,7 @@ export type Database = {
           invited_at?: string
           member_id?: string | null
           responded_at?: string | null
+          response_token?: string
           sources?: Json
           status?: Database["public"]["Enums"]["attendance_status"]
           updated_at?: string
@@ -8072,6 +8075,17 @@ export type Database = {
           subject_kind: string
         }[]
       }
+      get_meeting_response_by_token: {
+        Args: { _token: string }
+        Returns: {
+          event_id: string
+          location: string
+          meeting_title: string
+          responded_at: string
+          starts_at: string
+          status: Database["public"]["Enums"]["attendance_status"]
+        }[]
+      }
       get_member_invite_info: {
         Args: { _token: string }
         Returns: {
@@ -8402,6 +8416,13 @@ export type Database = {
           subject_kind: string
           subject_user_id: string
         }[]
+      }
+      respond_meeting_via_token: {
+        Args: {
+          _status: Database["public"]["Enums"]["attendance_status"]
+          _token: string
+        }
+        Returns: boolean
       }
       respond_via_token: {
         Args: {
