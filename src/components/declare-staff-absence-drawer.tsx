@@ -230,7 +230,11 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
             <Label>{t("availability.dates", { defaultValue: "Période d'absence" })}</Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-11 w-full justify-start font-normal">
+                <Button
+                  data-testid="availability-range-trigger"
+                  variant="outline"
+                  className="h-11 w-full justify-start font-normal"
+                >
                   <CalendarIcon className="h-4 w-4" />
                   {range.from ? (
                     !range.to || range.from.getTime() === range.to.getTime() ? (

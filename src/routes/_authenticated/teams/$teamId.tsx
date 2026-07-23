@@ -1273,6 +1273,7 @@ function TeamDetail() {
                           <div className="space-y-1.5">
                             <Label>{t("players.firstName")}</Label>
                             <Input
+                              data-testid="player-first-name-input"
                               required
                               value={first}
                               onChange={(e) => setFirst(e.target.value)}
@@ -1281,6 +1282,7 @@ function TeamDetail() {
                           <div className="space-y-1.5">
                             <Label>{t("players.lastName")}</Label>
                             <Input
+                              data-testid="player-last-name-input"
                               required
                               value={last}
                               onChange={(e) => setLast(e.target.value)}
