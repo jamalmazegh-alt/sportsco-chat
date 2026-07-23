@@ -2004,6 +2004,15 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               seriesCount={seriesCount}
               t={t}
             />
+            {state.type === "meeting" &&
+              state.meetingScope === "internal" &&
+              state.meetingAudience && (
+                <MeetingAttendeesSummaryCard
+                  clubId={activeClubId ?? null}
+                  audience={state.meetingAudience}
+                  t={t}
+                />
+              )}
           </div>
         )}
       </div>
