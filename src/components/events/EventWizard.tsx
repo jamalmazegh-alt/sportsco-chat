@@ -208,6 +208,49 @@ function buildMeetingAudiencesFromDraft(
   return list;
 }
 
+/** Shared hook: preview de la liste des convoqués d'une réunion interne
+ *  (utilisé à la fois par l'étape "Qui participe ?" et par le récap final). */
+function useMeetingAttendeesPreview(
+  clubId: string | null | undefined,
+  aud: EventWizardState["meetingAudience"] | null | undefined,
+) {
+  const previewFn = useServerFn(previewMeetingAttendeesList);
+  const payload = useMemo(() => {
+    const draft = aud ?? {
+      scalar: [] as string[],
+      groupIds: [] as string[],
+      teamPicks: [] as Array<{ team_id: string; kind: TeamKind }>,
+      category: "",
+      preassigned: [] as PreassignedPerson[],
+    };
+    const selectors = buildMeetingAudiencesFromDraft(
+      draft as NonNullable<EventWizardState["meetingAudience"]>,
+      "00000000-0000-0000-0000-000000000000",
+    );
+    const manualUserIds = (draft.preassigned ?? []).map((p) => p.user_id);
+    return { selectors, manualUserIds };
+  }, [aud]);
+  const hasAny =
+    (aud?.scalar?.length ?? 0) > 0 ||
+    (aud?.groupIds?.length ?? 0) > 0 ||
+    (aud?.teamPicks?.length ?? 0) > 0 ||
+    ((aud?.category ?? "").trim() ?? "").length > 0 ||
+    (aud?.preassigned?.length ?? 0) > 0;
+  const query = useQuery({
+    queryKey: ["meeting-preview-list", clubId, payload.selectors, payload.manualUserIds],
+    enabled: Boolean(clubId) && hasAny,
+    queryFn: () =>
+      previewFn({
+        data: {
+          club_id: clubId!,
+          audiences: payload.selectors,
+          manual_user_ids: payload.manualUserIds,
+        },
+      }),
+  });
+  return { hasAny, query };
+}
+
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
