@@ -7,6 +7,9 @@ import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Convocation lifecycle", () => {
+  // Serial: cancel → resend → reschedule share convId / eventId.
+  test.describe.configure({ mode: "serial" });
+
   let club: SeededClub;
   let convId: string;
 

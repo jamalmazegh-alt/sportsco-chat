@@ -7,6 +7,10 @@ import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Convocations — respond", () => {
+  // Serial: later tests mutate convocations created earlier; retries must
+  // re-seed + re-run the group instead of orphaning conv ids.
+  test.describe.configure({ mode: "serial" });
+
   let club: SeededClub;
   let conv1: string;
   let conv2: string;

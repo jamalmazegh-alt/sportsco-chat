@@ -22,6 +22,7 @@
  */
 import { test, expect } from "@playwright/test";
 import { loginAs } from "./_fixtures/auth";
+import { assertNoV2Ctas, FORBIDDEN_CTA_LABELS } from "./_fixtures/beta-closure";
 
 const BASE = process.env.E2E_BASE_URL || "http://localhost:8080";
 
@@ -51,19 +52,6 @@ const ROLES: RoleSpec[] = [
     passwordEnv: "E2E_TOURN_STAFF_PASSWORD",
     optional: true,
   },
-];
-
-// Labels strictement interdits hors d'un flip de flag V2.
-const FORBIDDEN_LABELS: RegExp[] = [
-  /Suivre\b/i,
-  /Following/i,
-  /Mettre en relation/i,
-  /Connecter Stripe/i,
-  /\bPayer\b/i,
-  /Cotisation/i,
-  /Acheter un pack/i,
-  /Profil public/i,
-  /Cagnotte/i,
 ];
 
 // Liens autorisés dans la bottom-nav (V1 stricte).
@@ -96,11 +84,8 @@ test.describe("Beta closure — authenticated role matrix (mobile 375)", () => {
       // Attend que l'app soit hydratée (présence de la bottom-nav).
       await page.waitForSelector("nav[aria-label]", { timeout: 15_000 }).catch(() => {});
 
-      // 1) Aucune étiquette V2 visible dans le DOM rendu.
-      const html = await page.content();
-      for (const re of FORBIDDEN_LABELS) {
-        expect(html, `${role.name}: forbidden CTA ${re} on /home`).not.toMatch(re);
-      }
+      // 1) Aucune étiquette / href V2 dans le chrome interactif (pas le HTML brut).
+      await assertNoV2Ctas(page, `${role.name} /home`);
 
       // 2) Bottom-nav : tous les liens sont dans la whitelist V1.
       const navHrefs = await page.$$eval("nav[aria-label] a[href]", (els) =>
@@ -122,7 +107,7 @@ test.describe("Beta closure — authenticated role matrix (mobile 375)", () => {
       );
       if (checklist) {
         const text = (await checklist.textContent()) ?? "";
-        for (const re of FORBIDDEN_LABELS) {
+        for (const re of FORBIDDEN_CTA_LABELS) {
           expect(text, `${role.name}: onboarding checklist contient ${re}`).not.toMatch(re);
         }
       }

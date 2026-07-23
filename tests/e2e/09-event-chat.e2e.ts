@@ -7,6 +7,9 @@ import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Event chat", () => {
+  // Serial: player reply depends on coach post + shared event fixture.
+  test.describe.configure({ mode: "serial" });
+
   let club: SeededClub;
   test.beforeAll(async () => {
     club = await createTestClub("chat");
