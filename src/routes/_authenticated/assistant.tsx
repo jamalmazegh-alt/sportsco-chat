@@ -76,16 +76,23 @@ function AssistantPage() {
     };
   }, []);
 
+  const langRef = useRef<string>(i18n.language || "fr");
+  useEffect(() => {
+    langRef.current = i18n.language || "fr";
+  }, [i18n.language]);
+
   const [transport] = useState(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        headers: () =>
-          authTokenRef.current
-            ? { Authorization: `Bearer ${authTokenRef.current}` }
-            : ({} as Record<string, string>),
+        headers: () => {
+          const h: Record<string, string> = { "x-user-language": langRef.current };
+          if (authTokenRef.current) h.Authorization = `Bearer ${authTokenRef.current}`;
+          return h;
+        },
       }),
   );
+
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
     id: "clubero-assistant",
