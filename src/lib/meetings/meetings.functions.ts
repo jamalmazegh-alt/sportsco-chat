@@ -340,6 +340,7 @@ export const syncMeetingAttendees = createServerFn({ method: "POST" })
     if (!row) throw new Error("sync_failed");
 
     const added = row.added_user_ids ?? [];
+    const removed = row.removed_user_ids ?? [];
     const requiresIds = row.requires_confirmation_user_ids ?? [];
 
     if (!data.dry_run && added.length > 0) {
@@ -351,6 +352,18 @@ export const syncMeetingAttendees = createServerFn({ method: "POST" })
         });
       } catch (e) {
         console.error("[syncMeetingAttendees] dispatch failed", e);
+      }
+    }
+
+    if (!data.dry_run && removed.length > 0) {
+      try {
+        const { dispatchMeetingRemoval } = await import("./dispatch.server");
+        await dispatchMeetingRemoval({
+          eventId: data.event_id,
+          recipientUserIds: removed,
+        });
+      } catch (e) {
+        console.error("[syncMeetingAttendees] removal dispatch failed", e);
       }
     }
 
@@ -387,7 +400,7 @@ export const syncMeetingAttendees = createServerFn({ method: "POST" })
 
     return {
       added_count: added.length,
-      removed_count: (row.removed_user_ids ?? []).length,
+      removed_count: removed.length,
       kept_count: row.kept_count ?? 0,
       requires_confirmation: requiresConfirmation,
     };

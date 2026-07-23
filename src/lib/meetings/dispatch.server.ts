@@ -119,3 +119,116 @@ export async function dispatchMeetingConvocation(
 
   return { dispatched };
 }
+
+export interface DispatchMeetingRemovalParams {
+  eventId: string;
+  /** Uniquement les personnes RÉELLEMENT retirées. */
+  recipientUserIds: string[];
+}
+
+/**
+ * Notifie in-app + push + e-mail les personnes retirées d'une réunion.
+ * Best-effort — n'échoue jamais le flux appelant.
+ */
+export async function dispatchMeetingRemoval(
+  params: DispatchMeetingRemovalParams,
+): Promise<{ dispatched: number }> {
+  const uids = Array.from(new Set(params.recipientUserIds.filter(Boolean)));
+  if (uids.length === 0) return { dispatched: 0 };
+
+  const { data: ev } = await supabaseAdmin
+    .from("events")
+    .select("id, title, teams:team_id(club_id, clubs:club_id(name))")
+    .eq("id", params.eventId)
+    .maybeSingle();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const evRow = ev as any;
+  const meetingTitle = (evRow?.title as string | null) ?? "Réunion";
+  const clubName = (evRow?.teams?.clubs?.name as string | null) ?? null;
+
+  const link = `/events/${params.eventId}`;
+  const bodyText = "Vous n'êtes plus convoqué(e) à cette réunion.";
+
+  // 1) In-app
+  try {
+    const { error } = await supabaseAdmin.from("notifications").insert(
+      uids.map((uid) => ({
+        user_id: uid,
+        type: "convocation",
+        title: meetingTitle,
+        body: bodyText,
+        link,
+      })),
+    );
+    if (error) console.error("[meetings dispatch] removal notifications insert failed", error);
+  } catch (e) {
+    console.error("[meetings dispatch] removal notifications insert threw", e);
+  }
+
+  // 2) Push
+  try {
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+    await Promise.allSettled(
+      uids.map((uid) =>
+        sendPushToUser(uid, {
+          title: meetingTitle,
+          body: bodyText,
+          url: link,
+          tag: `meeting-removed-${params.eventId}`,
+        }),
+      ),
+    );
+  } catch (e) {
+    console.warn("[meetings dispatch] removal push failed", e);
+  }
+
+  // 3) E-mail — idempotence par (event, uid, timestamp minute) pour permettre
+  // qu'une personne retirée / ré-invitée / re-retirée puisse être re-notifiée.
+  const { data: profiles } = await supabaseAdmin
+    .from("profiles")
+    .select("id, first_name, preferred_language")
+    .in("id", uids);
+  const profileById = new Map(
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p as { first_name: string | null; preferred_language: string | null },
+    ]),
+  );
+  const stamp = new Date().toISOString().slice(0, 16); // minute granularity
+
+  let dispatched = 0;
+  for (const uid of uids) {
+    try {
+      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(uid);
+      const email = userData?.user?.email;
+      if (!email) continue;
+      const p = profileById.get(uid);
+      const locale = (p?.preferred_language ?? "fr").toLowerCase().slice(0, 2);
+      await enqueueTransactionalEmailServer({
+        templateName: "meeting-removed",
+        recipientEmail: email,
+        idempotencyKey: `meeting-removed-${params.eventId}-${uid}-${stamp}`,
+        dispatchId: params.eventId,
+        eventId: params.eventId,
+        recipientId: uid,
+        notificationType: "meeting_removed",
+        fromName: clubName ? `${clubName} via Clubero` : undefined,
+        templateData: {
+          displayName: p?.first_name ?? null,
+          locale,
+          meetingTitle,
+          clubName,
+          eventUrl: link,
+        },
+      });
+      dispatched++;
+    } catch (e) {
+      console.error("[meetings dispatch] removal email failed", {
+        uid,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  return { dispatched };
+}

@@ -9,7 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Users, Loader2, UserPlus, Check, X, HelpCircle } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -93,32 +93,134 @@ export function MeetingAttendeesSection({
   const total = attendees.length;
 
   return (
-    <Card>
-      <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 space-y-0 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <CardTitle className="flex min-w-0 flex-wrap items-center gap-2 text-base">
-          <Users className="h-4 w-4 shrink-0" />
-          <span className="min-w-0">
-            {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
-          </span>
-          {total > 0 && (
-            <Badge variant="secondary" className="shrink-0">
-              {t("meetings:section.count", {
-                defaultValue: "{{count}} convoqué(s)",
-                count: total,
-              })}
-            </Badge>
-          )}
-        </CardTitle>
-        {isStaff && (
-          <ManageAttendeesDialog
-            eventId={eventId}
-            onDone={refresh}
-            initialSelection={sourcesToSelection(attendees)}
-          />
-        )}
-      </CardHeader>
+    <section className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
+      {(() => {
+        const totalP = counts.present + counts.uncertain + counts.absent + counts.pending;
+        const respondedP = totalP - counts.pending;
+        const rate = totalP === 0 ? 0 : Math.round((respondedP / totalP) * 100);
+        const pct = (n: number) => (totalP === 0 ? 0 : (n / totalP) * 100);
 
-      <CardContent className="space-y-4">
+        if (total === 0) {
+          return (
+            <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/70">
+              <div className="min-w-0 flex items-center gap-2">
+                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <h2 className="text-base font-extrabold tracking-tight text-foreground">
+                  {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                </h2>
+              </div>
+              {isStaff && (
+                <ManageAttendeesDialog
+                  eventId={eventId}
+                  onDone={refresh}
+                  initialSelection={sourcesToSelection(attendees)}
+                  hasExistingAttendees={total > 0}
+                />
+              )}
+            </header>
+          );
+        }
+
+        return (
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
+            <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
+            <div className="relative px-4 pt-3 pb-3.5">
+              <div className="flex items-start justify-between gap-3 mb-2.5">
+                <div className="min-w-0 flex items-center gap-2 flex-wrap">
+                  <Users className="h-4 w-4 shrink-0" />
+                  <h2 className="text-sm font-extrabold tracking-tight">
+                    {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                  </h2>
+                  <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
+                    {t("meetings:section.count", {
+                      defaultValue: "{{count}} convoqué(s)",
+                      count: total,
+                    })}
+                  </span>
+                </div>
+                {isStaff && (
+                  <ManageAttendeesDialog
+                    eventId={eventId}
+                    onDone={refresh}
+                    initialSelection={sourcesToSelection(attendees)}
+                    hasExistingAttendees={total > 0}
+                  />
+                )}
+              </div>
+
+              <div className="flex items-end justify-between gap-3 mb-2">
+                <div className="leading-none">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
+                      {rate}
+                    </span>
+                    <span className="text-lg font-bold text-white/80">%</span>
+                  </div>
+                  <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
+                    {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                  </p>
+                </div>
+                <div className="text-right leading-tight">
+                  <p className="text-xs font-bold tabular-nums">
+                    {respondedP}
+                    <span className="text-white/65 font-medium">/{totalP}</span>{" "}
+                    <span className="text-white/85 font-semibold">
+                      {t("attendance.responded", { defaultValue: "réponses" })}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
+                {counts.present > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.present)}%` }}
+                    className="bg-gradient-to-r from-emerald-300 to-emerald-200"
+                  />
+                )}
+                {counts.uncertain > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.uncertain)}%` }}
+                    className="bg-gradient-to-r from-amber-300 to-amber-200"
+                  />
+                )}
+                {counts.absent > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.absent)}%` }}
+                    className="bg-gradient-to-r from-rose-300 to-rose-200"
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5 mt-2.5">
+                {[
+                  { key: "present", val: counts.present, label: t("attendance.present"), tone: "bg-emerald-300" },
+                  { key: "uncertain", val: counts.uncertain, label: t("attendance.uncertain"), tone: "bg-amber-300" },
+                  { key: "absent", val: counts.absent, label: t("attendance.absent"), tone: "bg-rose-300" },
+                  { key: "pending", val: counts.pending, label: t("attendance.pending"), tone: "bg-white/60" },
+                ].map((b) => (
+                  <div
+                    key={b.key}
+                    className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
+                      <span className="text-sm font-extrabold tabular-nums leading-none">
+                        {b.val}
+                      </span>
+                    </div>
+                    <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
+                      {b.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      <div className="p-4 space-y-4">
         {listQuery.isLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -139,22 +241,9 @@ export function MeetingAttendeesSection({
           </p>
         )}
 
-        {total > 0 && (
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <AttendancePill status="present" />
-            <span className="tabular-nums">{counts.present}</span>
-            <AttendancePill status="uncertain" />
-            <span className="tabular-nums">{counts.uncertain}</span>
-            <AttendancePill status="absent" />
-            <span className="tabular-nums">{counts.absent}</span>
-            <AttendancePill status="pending" />
-            <span className="tabular-nums">{counts.pending}</span>
-          </div>
-        )}
-
         {!isStaff && data?.my_attendance && (
-          <div className="flex items-center justify-between gap-2 rounded-md border p-3">
-            <span className="text-sm">
+          <div className="flex items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/30 p-3">
+            <span className="text-sm font-medium">
               {t("meetings:self.prompt", { defaultValue: "Votre présence :" })}
             </span>
             <StatusButtons
@@ -171,50 +260,51 @@ export function MeetingAttendeesSection({
         )}
 
         {isStaff && attendees.length > 0 && (
-          <ul className="divide-y">
-            {attendees.map((a) => {
-              const chips = summarizeSources(a.sources);
-              return (
-                <li key={a.id} className="flex items-center gap-3 py-2">
-                  <Avatar className="h-9 w-9">
-                    {a.avatar_url && <AvatarImage src={a.avatar_url} alt="" />}
-                    <AvatarFallback>{initials(a.full_name)}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">
-                      {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+          <>
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground px-1">
+              <span>{t("attendance.convokedHeader", { defaultValue: "Convoqués" })}</span>
+              <span>{t("attendance.responseHeader", { defaultValue: "Réponse" })}</span>
+            </div>
+            <ul className="divide-y divide-border/70">
+              {attendees.map((a) => {
+                const chips = summarizeSources(a.sources);
+                return (
+                  <li key={a.id} className="flex items-center gap-3 py-2.5">
+                    <Avatar className="h-9 w-9 shrink-0">
+                      {a.avatar_url && <AvatarImage src={a.avatar_url} alt="" />}
+                      <AvatarFallback>{initials(a.full_name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold">
+                        {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                      </div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                        {chips.map((chip) => (
+                          <Badge key={chip.key} variant="outline" className="text-[10px] font-normal">
+                            {chip.kind === "manual"
+                              ? t("meetings:source.manual", {
+                                  defaultValue: "ajouté manuellement",
+                                })
+                              : chip.label}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                      {chips.map((chip) => (
-                        <Badge key={chip.key} variant="outline" className="text-[10px]">
-                          {chip.kind === "manual"
-                            ? t("meetings:source.manual", {
-                                defaultValue: "ajouté manuellement",
-                              })
-                            : chip.label}
-                        </Badge>
-                      ))}
-                      {a.roles.slice(0, 3).map((r) => (
-                        <Badge key={r} variant="secondary" className="text-[10px]">
-                          {r}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <StatusButtons
-                    value={a.status}
-                    onChange={(status) =>
-                      updateStatus.mutate({ user_id: a.user_id, status })
-                    }
-                    disabled={updateStatus.isPending}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+                    <StatusButtons
+                      value={a.status}
+                      onChange={(status) =>
+                        updateStatus.mutate({ user_id: a.user_id, status })
+                      }
+                      disabled={updateStatus.isPending}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
@@ -259,10 +349,12 @@ function ManageAttendeesDialog({
   eventId,
   onDone,
   initialSelection,
+  hasExistingAttendees,
 }: {
   eventId: string;
   onDone: () => void;
   initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -293,6 +385,7 @@ function ManageAttendeesDialog({
             key={eventId}
             eventId={eventId}
             initialSelection={initialSelection}
+            hasExistingAttendees={hasExistingAttendees}
             onClose={() => setOpen(false)}
             onDone={onDone}
           />
@@ -305,11 +398,13 @@ function ManageAttendeesDialog({
 function AttendeesEditor({
   eventId,
   initialSelection,
+  hasExistingAttendees,
   onClose,
   onDone,
 }: {
   eventId: string;
   initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
   onClose: () => void;
   onDone: () => void;
 }) {
@@ -405,7 +500,9 @@ function AttendeesEditor({
           disabled={!hasSelection || sync.isPending}
         >
           {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+          {hasExistingAttendees
+            ? t("meetings:manage.save", { defaultValue: "Enregistrer" })
+            : t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
         </Button>
       </DialogFooter>
 
