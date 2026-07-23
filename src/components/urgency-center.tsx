@@ -145,6 +145,17 @@ export function UrgencyCenter({ className }: Props) {
 
   const hasFailures = status.failedSources.length > 0;
 
+  // TEMP DEBUG — log which insight sources failed so we can diagnose the partial banner.
+  useEffect(() => {
+    if (hasFailures) {
+      // eslint-disable-next-line no-console
+      console.warn("[UrgencyCenter] failed sources:", status.failedSources, {
+        errors: (status as any).errors,
+        status,
+      });
+    }
+  }, [hasFailures, status]);
+
   if (surface === "pending") {
     return (
       <section className={cn("space-y-2", className)}>
@@ -393,6 +404,7 @@ export function UrgencyCenter({ className }: Props) {
       }}
       onRefresh={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
       className={className}
+      failedSourcesDebug={status.failedSources.join(", ")}
       footer={
         hiddenCount > 0 && !expanded ? (
           <button
@@ -428,6 +440,7 @@ interface DeckProps {
   onRefresh: () => void;
   className?: string;
   footer?: React.ReactNode;
+  failedSourcesDebug?: string;
 }
 
 const SWIPE_THRESHOLD = 90; // px
@@ -443,6 +456,7 @@ function UrgencyDeck({
   onRefresh,
   className,
   footer,
+  failedSourcesDebug,
 }: DeckProps) {
   const { t } = useTranslation();
   const [topIdx, setTopIdx] = useState(0);
@@ -531,11 +545,18 @@ function UrgencyDeck({
       </div>
 
       {hasFailures && (
-        <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} />
-          {t("urgency.partialError", {
-            defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
-          })}
+        <div className="flex items-start gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" strokeWidth={2.4} />
+          <div className="space-y-0.5">
+            <div>
+              {t("urgency.partialError", {
+                defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
+              })}
+            </div>
+            <div className="font-mono text-[10px] opacity-80">
+              debug: {failedSourcesDebug ?? "n/a"}
+            </div>
+          </div>
         </div>
       )}
 
