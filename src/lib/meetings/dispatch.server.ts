@@ -10,6 +10,11 @@ export interface DispatchMeetingConvocationParams {
   eventId: string;
   /** Uniquement les NOUVEAUX convoqués — jamais toute la liste. */
   recipientUserIds: string[];
+  /**
+   * Renvoi manuel : suffixe la clé d'idempotence e-mail avec un horodatage
+   * afin de contourner la déduplication et forcer l'envoi.
+   */
+  resend?: boolean;
 }
 
 export async function dispatchMeetingConvocation(
