@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Users, Loader2, UserPlus, Check, X, HelpCircle } from "lucide-react";
+import { Users, Loader2, UserPlus, Check, X, HelpCircle, MoreVertical, Send, UserMinus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
