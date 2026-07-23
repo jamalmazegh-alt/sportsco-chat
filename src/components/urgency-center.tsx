@@ -145,6 +145,17 @@ export function UrgencyCenter({ className }: Props) {
 
   const hasFailures = status.failedSources.length > 0;
 
+  // TEMP DEBUG — log which insight sources failed so we can diagnose the partial banner.
+  useEffect(() => {
+    if (hasFailures) {
+      // eslint-disable-next-line no-console
+      console.warn("[UrgencyCenter] failed sources:", status.failedSources, {
+        errors: (status as any).errors,
+        status,
+      });
+    }
+  }, [hasFailures, status]);
+
   if (surface === "pending") {
     return (
       <section className={cn("space-y-2", className)}>
