@@ -317,7 +317,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     if (!isRecurring) {
       if (state.type !== "match") s.push("location");
       // Meetings: ask who to invite (optional) instead of the convocation flow.
-      if (state.type === "meeting") s.push("audience");
+      if (state.type === "meeting" && state.meetingScope === "internal") s.push("audience");
       else s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
