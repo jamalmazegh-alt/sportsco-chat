@@ -1,6 +1,15 @@
 name: RLS Security Tests
 
 on:
+  # Nightly: push pending migrations to bughunt then run the suite.
+  schedule:
+    - cron: "0 3 * * *" # 3 AM UTC — before E2E at 4 AM
+  # Keep bughunt in sync whenever migrations land on main.
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - ".github/workflows/rls-tests.yml"
   workflow_dispatch:
     inputs:
       reason:
@@ -36,11 +45,20 @@ jobs:
 
       - name: Log trigger reason
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "🖐️ Lancement manuel — ${{ inputs.reason }}"
-          else
-            echo "🌙 Lancement automatique (cron nocturne)"
-          fi
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              echo "🖐️ Lancement manuel — ${{ inputs.reason }}"
+              ;;
+            schedule)
+              echo "🌙 Lancement automatique (cron nocturne 03:00 UTC)"
+              ;;
+            push)
+              echo "📦 Lancement auto — push migrations sur main (${{ github.sha }})"
+              ;;
+            *)
+              echo "▶️ Trigger: ${{ github.event_name }}"
+              ;;
+          esac
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1

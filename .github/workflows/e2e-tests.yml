@@ -35,6 +35,23 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Keep bughunt schema aligned with main before E2E (same anti-dérive step as RLS).
+      # Without this, nightly Playwright can pass seed but fail on RPCs/policies that
+      # exist in git but were never pushed to the QA project.
+      - name: Push pending migrations (anti-dérive bughunt)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_ID"
+          supabase db push --include-all --yes
+
       - name: Start app (bughunt Supabase)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
