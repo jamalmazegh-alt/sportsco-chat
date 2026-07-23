@@ -101,10 +101,23 @@ export const setMeetingAttendees = createServerFn({ method: "POST" })
     } | null;
     if (!row) throw new Error("set_attendees_failed");
 
+    const insertedIds = row.inserted_user_ids ?? [];
+    if (insertedIds.length > 0) {
+      try {
+        const { dispatchMeetingConvocation } = await import("./dispatch.server");
+        await dispatchMeetingConvocation({
+          eventId: data.event_id,
+          recipientUserIds: insertedIds,
+        });
+      } catch (e) {
+        console.error("[setMeetingAttendees] dispatch failed", e);
+      }
+    }
+
     return {
       attendees_count: row.attendees_count,
       inserted_count: row.inserted_count,
-      inserted_user_ids: row.inserted_user_ids ?? [],
+      inserted_user_ids: insertedIds,
     };
   });
 
