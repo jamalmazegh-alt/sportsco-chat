@@ -102,6 +102,39 @@ export function MeetingAttendeesSection({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const resendFn = useServerFn(resendMeetingConvocation);
+  const resendOne = useMutation({
+    mutationFn: (userId: string) =>
+      resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () =>
+      toast.success(
+        t("meetings:row.resend.success", {
+          defaultValue: "Convocation renvoyée",
+        }),
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removeFn = useServerFn(removeMeetingAttendees);
+  const [removeTarget, setRemoveTarget] = useState<MeetingAttendeeRow | null>(null);
+  const removeOne = useMutation({
+    mutationFn: (userId: string) =>
+      removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () => {
+      toast.success(
+        t("meetings:row.remove.success", {
+          defaultValue: "Convocation annulée",
+        }),
+      );
+      setRemoveTarget(null);
+      refresh();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setRemoveTarget(null);
+    },
+  });
+
   if (eventType !== "meeting") return null;
 
   const data = listQuery.data;
