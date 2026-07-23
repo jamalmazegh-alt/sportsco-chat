@@ -317,7 +317,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     if (!isRecurring) {
       if (state.type !== "match") s.push("location");
       // Meetings: ask who to invite (optional) instead of the convocation flow.
-      if (state.type === "meeting") s.push("audience");
+      if (state.type === "meeting" && state.meetingScope === "internal") s.push("audience");
       else s.push("convocation");
       if (state.type === "match" && state.isHome === "away") s.push("carpool");
       if (state.type === "training") s.push("carpool");
@@ -527,7 +527,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       const { id } = await createEventFn({ data: input });
 
       // Meetings: if the user picked an audience, register attendees now.
-      if (workingState.type === "meeting" && workingState.meetingAudience) {
+      if (
+        workingState.type === "meeting" &&
+        workingState.meetingScope === "internal" &&
+        workingState.meetingAudience
+      ) {
         const aud = workingState.meetingAudience;
         const hasAny =
           aud.scalar.length > 0 ||
@@ -2126,7 +2130,7 @@ function MeetingAudienceStep({
     <StepQuestion
       title={t("eventWizard.q.audience", { defaultValue: "Qui participe ? (facultatif)" })}
     >
-      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} />
+      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} enablePreassign />
       <div className="flex gap-2 pt-2">
         <Button variant="outline" className="flex-1" onClick={onSkip}>
           {t("eventWizard.skip", { defaultValue: "Passer" })}

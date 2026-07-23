@@ -482,7 +482,7 @@ function EventDetail() {
         const { data } = await supabase
           .from("teams")
           .select(
-            "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+            "id, name, club_id, is_internal, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
           )
           .eq("id", event!.team_id);
         return data ?? [];
@@ -491,7 +491,7 @@ function EventDetail() {
       const { data } = await supabase
         .from("teams")
         .select(
-          "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+          "id, name, club_id, is_internal, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
         )
         .eq("club_id", current.club_id)
         .is("deleted_at", null)
@@ -521,6 +521,8 @@ function EventDetail() {
     [teams, event?.team_id],
   );
   const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
+  const isInternalMeeting =
+    event?.type === "meeting" && (eventTeam as any)?.is_internal === true;
   const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
@@ -2286,7 +2288,9 @@ function EventDetail() {
   const showFeedbackButton = isPastMatch && isCoach;
   // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
   // même si l'utilisateur n'a pas de réponse personnelle à donner.
-  const showConvocationSection = isCoach
+  const showConvocationSection = isInternalMeeting
+    ? false
+    : isCoach
     ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
     : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
 
@@ -2796,7 +2800,7 @@ function EventDetail() {
       </Dialog>
 
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
-      {isCoach &&
+      {!isInternalMeeting && isCoach &&
         (() => {
           const team = eventTeam as any;
           if (!team) return null;
@@ -4288,18 +4292,20 @@ function EventDetail() {
       )}
 
 
-      {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
-        <StaffAssignmentSection
-          eventId={event.id}
-          teamId={event.team_id}
-          clubId={eventTeam.club_id}
-          eventDate={eventDateStr}
-        />
-      ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-        <StaffAssignmentReadOnly
-          assignments={(event as any)?.event_staff_assignments}
-        />
-      ) : null}
+      {!isInternalMeeting && (
+        isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+          <StaffAssignmentSection
+            eventId={event.id}
+            teamId={event.team_id}
+            clubId={eventTeam.club_id}
+            eventDate={eventDateStr}
+          />
+        ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
+          <StaffAssignmentReadOnly
+            assignments={(event as any)?.event_staff_assignments}
+          />
+        ) : null
+      )}
 
 
 
@@ -4553,7 +4559,9 @@ function EventDetail() {
       />
 
       {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
+      {isInternalMeeting && (
+        <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
+      )}
 
 
       <EventChat eventId={eventId} />
