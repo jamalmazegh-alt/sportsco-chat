@@ -136,39 +136,94 @@ export const Route = createFileRoute("/api/chat")({
 
           getMyUpcomingEvents: tool({
             description:
-              "Liste les prochains événements (entraînements, matchs) auxquels l'utilisateur ou ses enfants sont convoqués, avec leur statut de réponse.",
+              "Liste les prochains événements (entraînements, matchs, réunions) : convocations du user/de ses enfants + événements des équipes qu'il coache/admin + événements du club s'il est admin/dirigeant.",
             inputSchema: z.object({
-              limit: z.number().int().min(1).max(20).optional(),
+              limit: z.number().int().min(1).max(30).optional(),
             }),
-            execute: async ({ limit = 10 }) => {
-              const playerIds = await getMyPlayerIds();
-              if (playerIds.length === 0) return { events: [] };
-              const { data } = await supabase
-                .from("convocations")
-                .select(
-                  "status, player_id, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))",
+            execute: async ({ limit = 15 }) => {
+              const nowIso = new Date().toISOString();
+              const [playerIds, teamIds] = await Promise.all([
+                getMyPlayerIds(),
+                getManagedTeamIds(),
+              ]);
+
+              type Row = {
+                id: string;
+                title: string;
+                type: string;
+                starts_at: string;
+                location: string | null;
+                opponent: string | null;
+                team: string | null;
+                my_status?: string | null;
+                source: "convocation" | "managed_team";
+              };
+              const byId = new Map<string, Row>();
+
+              // From convocations
+              if (playerIds.length > 0) {
+                const { data } = await supabase
+                  .from("convocations")
+                  .select(
+                    "status, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))",
+                  )
+                  .in("player_id", playerIds);
+                for (const c of (data ?? []) as any[]) {
+                  const ev = c.event;
+                  if (!ev || ev.status !== "published") continue;
+                  if (new Date(ev.starts_at).toISOString() < nowIso) continue;
+                  if (!byId.has(ev.id)) {
+                    byId.set(ev.id, {
+                      id: ev.id,
+                      title: ev.title,
+                      type: ev.type,
+                      starts_at: ev.starts_at,
+                      location: ev.location,
+                      opponent: ev.opponent,
+                      team: ev.team?.name ?? null,
+                      my_status: c.status,
+                      source: "convocation",
+                    });
+                  }
+                }
+              }
+
+              // From managed teams (coach/admin/dirigeant)
+              if (teamIds.length > 0) {
+                const { data } = await supabase
+                  .from("events")
+                  .select(
+                    "id, title, type, starts_at, location, opponent, status, team:team_id(name)",
+                  )
+                  .in("team_id", teamIds)
+                  .eq("status", "published")
+                  .gte("starts_at", nowIso)
+                  .order("starts_at", { ascending: true })
+                  .limit(50);
+                for (const ev of (data ?? []) as any[]) {
+                  if (!byId.has(ev.id)) {
+                    byId.set(ev.id, {
+                      id: ev.id,
+                      title: ev.title,
+                      type: ev.type,
+                      starts_at: ev.starts_at,
+                      location: ev.location,
+                      opponent: ev.opponent,
+                      team: ev.team?.name ?? null,
+                      my_status: null,
+                      source: "managed_team",
+                    });
+                  }
+                }
+              }
+
+              const events = Array.from(byId.values())
+                .sort(
+                  (a, b) =>
+                    new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
                 )
-                .in("player_id", playerIds)
-                .order("created_at", { ascending: false });
-              const now = new Date();
-              const events = (data ?? [])
-                .filter(
-                  (c: any) =>
-                    c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now,
-                )
-                .map((c: any) => ({
-                  id: c.event.id,
-                  title: c.event.title,
-                  type: c.event.type,
-                  starts_at: c.event.starts_at,
-                  location: c.event.location,
-                  opponent: c.event.opponent,
-                  team: c.event.team?.name,
-                  my_status: c.status,
-                }))
-                .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
                 .slice(0, limit);
-              return { events };
+              return { events, counts: { total: events.length } };
             },
           }),
 
