@@ -304,34 +304,8 @@ export const updateMeetingAttendanceStatus = createServerFn({ method: "POST" })
     return { ok: true, status: data.status };
   });
 
-async function notifyNewMeetingAttendees(eventId: string, userIds: string[]): Promise<void> {
-  if (userIds.length === 0) return;
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: ev } = await supabaseAdmin
-    .from("events")
-    .select("id, title")
-    .eq("id", eventId)
-    .maybeSingle();
-  const title = (ev as { title?: string } | null)?.title ?? "Réunion";
-  const body = "Vous êtes convoqué(e) à cette réunion.";
-  const link = `/events/${eventId}`;
-
-  const { error } = await supabaseAdmin.from("notifications").insert(
-    userIds.map((uid) => ({ user_id: uid, type: "convocation", title, body, link })),
-  );
-  if (error) console.error("[meetings] notify insert failed", error);
-
-  try {
-    const { sendPushToUser } = await import("@/lib/push-send.server");
-    await Promise.allSettled(
-      userIds.map((uid) =>
-        sendPushToUser(uid, { title, body, url: link, tag: `meeting-${eventId}` }),
-      ),
-    );
-  } catch (e) {
-    console.warn("[meetings] push dispatch failed", e);
-  }
-}
+// notifyNewMeetingAttendees a été remplacé par dispatchMeetingConvocation
+// (src/lib/meetings/dispatch.server.ts) qui gère in-app + push + e-mail.
 
 export const syncMeetingAttendees = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -370,9 +344,13 @@ export const syncMeetingAttendees = createServerFn({ method: "POST" })
 
     if (!data.dry_run && added.length > 0) {
       try {
-        await notifyNewMeetingAttendees(data.event_id, added);
+        const { dispatchMeetingConvocation } = await import("./dispatch.server");
+        await dispatchMeetingConvocation({
+          eventId: data.event_id,
+          recipientUserIds: added,
+        });
       } catch (e) {
-        console.error("[syncMeetingAttendees] notify failed", e);
+        console.error("[syncMeetingAttendees] dispatch failed", e);
       }
     }
 
