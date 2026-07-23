@@ -2,12 +2,13 @@
  * E2E "admin" client — a regular Supabase client authenticated as the
  * pre-created E2E admin user (NOT service_role).
  *
- * Why no service_role? Lovable Cloud doesn't expose the service_role key to
- * GitHub Actions. So we sign in once in playwright globalSetup as a dedicated
- * E2E admin user (E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD), stash the access
- * token in process.env.E2E_ADMIN_ACCESS_TOKEN, and create a synchronous
- * client here that sends that token on every request. All operations go
- * through RLS as that user, so the user must be admin of the E2E test club.
+ * Why no service_role on the exported client? Tests must exercise RLS the
+ * same way the app does. CI *does* have SUPABASE_SERVICE_ROLE_KEY, but only
+ * globalSetup/ensure-seed uses it to create/repair fixture users. Here we
+ * sign in as the dedicated E2E admin (E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD),
+ * stash the access token in process.env.E2E_ADMIN_ACCESS_TOKEN, and create a
+ * synchronous client that sends that token on every request. All operations
+ * go through RLS as that user, so the user must be admin of the E2E test club.
  *
  * The `admin` export keeps its name so existing test files don't need
  * changes, but it is NOT a service_role client. `admin.auth.admin.*` calls

@@ -21,23 +21,30 @@ bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 
 ## Variables d'env requises
 
-| Var                         | Source                                                            |
-| --------------------------- | ----------------------------------------------------------------- |
-| `SUPABASE_URL`              | `https://woawmhuntajpiezmmgzm.supabase.co`                        |
-| `SUPABASE_SERVICE_ROLE_KEY` | Lovable Cloud → Backend (secret)                                  |
-| `SUPABASE_PUBLISHABLE_KEY`  | `.env` (publique)                                                 |
-| `E2E_BASE_URL`              | **obligatoire** — URL preview Lovable                             |
-| `E2E_REAL_AI`               | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
-| `E2E_UI`                    | `1` pour passer le timeout global à 90s (sinon 30s)               |
+| Var                                                     | Source                                                            |
+| ------------------------------------------------------- | ----------------------------------------------------------------- |
+| `SUPABASE_URL`                                          | projet **bughunt** (même que RLS)                                 |
+| `SUPABASE_PUBLISHABLE_KEY`                              | anon key bughunt                                                  |
+| `SUPABASE_SERVICE_ROLE_KEY`                             | service role bughunt — auto-seed + SSR                            |
+| `E2E_TARGET_PROJECT_REF`                                | ref projet bughunt (doit matcher `SUPABASE_URL`)                  |
+| `E2E_BASE_URL`                                          | **obligatoire** — en CI `http://127.0.0.1:8080`                   |
+| `E2E_ADMIN_EMAIL` / `_PASSWORD` (+ coach/player/parent) | secrets E2E                                                       |
+| `E2E_REAL_AI`                                           | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
+| `E2E_UI`                                                | `1` pour passer le timeout global à 90s (sinon 30s)               |
+
+Seed manuel : `bun run seed:e2e` (idempotent, réécrit les mots de passe pour
+matcher les secrets). Voir `tests/e2e/_fixtures/README.md`.
 
 ## Stratégie
 
-Approche **hybride** : seed via service role + login programmatique + actions
-ciblées + vérif via client RLS. Plus rapide et moins flaky qu'une UI E2E pure,
-et ça teste réellement les flux (RLS, server functions, triggers, etc.).
+Approche **hybride** : seed via service role (users + club partagés) + login
+programmatique + actions ciblées + vérif via client RLS. Plus rapide et moins
+flaky qu'une UI E2E pure, et ça teste réellement les flux (RLS, server
+functions, triggers, etc.).
 
-Chaque test crée son propre club isolé via `createTestClub(suiteName)` et
-nettoie en `afterAll`. Aucune dépendance entre fichiers.
+Chaque suite crée son propre **team / players / event** isolé via
+`createTestClub(suiteName)` sur le club E2E partagé, et nettoie en `afterAll`.
+Aucune dépendance entre fichiers.
 
 ## Couverture
 
@@ -64,6 +71,9 @@ Workflow `.github/workflows/e2e-tests.yml` :
 
 - **Cron** : 4 AM UTC (après les RLS de 3 AM)
 - **Manuel** : Actions → E2E Tests → Run workflow
+- Démarre Vite localement contre bughunt, puis `bun run test:e2e`
+- `globalSetup` auto-répare les users E2E via `SUPABASE_SERVICE_ROLE_KEY`
+  (guard `E2E_TARGET_PROJECT_REF`)
 - Rapport HTML uploadé en artifact (14 jours)
 - Issue auto sur échec cron (labels `e2e` + `bug`)
 
