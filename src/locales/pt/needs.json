@@ -120,6 +120,7 @@
     "customGroups": "Custom groups",
     "eventRelevant": "Suggested for this event",
     "otherAudiences": "Other audiences",
+    "add": "Adicionar",
     "pickKind": "Pick a type…",
     "pickParam": "Pick one…",
     "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
