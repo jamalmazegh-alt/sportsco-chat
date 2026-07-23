@@ -417,6 +417,132 @@ export const syncMeetingAttendees = createServerFn({ method: "POST" })
     };
   });
 
+export const resendMeetingConvocation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => RecipientsInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await loadMeetingClubAsStaff(supabase as SupaLike, userId, data.event_id);
+
+    // Ne renvoyer qu'aux convoqués existants (garde-fou).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await (supabaseAdmin as SupaLike)
+      .from("meeting_attendees")
+      .select("user_id")
+      .eq("event_id", data.event_id)
+      .in("user_id", data.user_ids);
+    const existingIds = Array.from(
+      new Set(
+        ((rows ?? []) as Array<{ user_id: string | null }>)
+          .map((r) => r.user_id)
+          .filter((v): v is string => typeof v === "string"),
+      ),
+    );
+    if (existingIds.length === 0) return { dispatched: 0 };
+
+    const { dispatchMeetingConvocation } = await import("./dispatch.server");
+    const res = await dispatchMeetingConvocation({
+      eventId: data.event_id,
+      recipientUserIds: existingIds,
+      resend: true,
+    });
+    return { dispatched: res.dispatched };
+  });
+
+export const removeMeetingAttendees = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => RecipientsInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await loadMeetingClubAsStaff(supabase as SupaLike, userId, data.event_id);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existing } = await (supabaseAdmin as SupaLike)
+      .from("meeting_attendees")
+      .select("user_id")
+      .eq("event_id", data.event_id)
+      .in("user_id", data.user_ids);
+    const removedIds = Array.from(
+      new Set(
+        ((existing ?? []) as Array<{ user_id: string | null }>)
+          .map((r) => r.user_id)
+          .filter((v): v is string => typeof v === "string"),
+      ),
+    );
+    if (removedIds.length === 0) return { removed_count: 0, notified_count: 0 };
+
+    const { error } = await (supabaseAdmin as SupaLike)
+      .from("meeting_attendees")
+      .delete()
+      .eq("event_id", data.event_id)
+      .in("user_id", removedIds);
+    if (error) throw new Error(error.message);
+
+    let notified = 0;
+    try {
+      const { dispatchMeetingRemoval } = await import("./dispatch.server");
+      const r = await dispatchMeetingRemoval({
+        eventId: data.event_id,
+        recipientUserIds: removedIds,
+      });
+      notified = r.dispatched;
+    } catch (e) {
+      console.error("[removeMeetingAttendees] removal dispatch failed", e);
+    }
+
+    return { removed_count: removedIds.length, notified_count: notified };
+  });
+
+export const previewMeetingAttendeesList = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => PreviewListInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: data.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { selectors, manualUserIds } = splitAudiences(
+      data.audiences as unknown as AudienceLike[],
+      data.manual_user_ids,
+    );
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("resolve_audience_members", {
+      _club_id: data.club_id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _spec: selectors as any,
+    });
+    if (error) throw new Error(error.message);
+
+    const resolved = new Set<string>(
+      ((rows ?? []) as Array<{ user_id: string | null }>)
+        .map((r) => r.user_id)
+        .filter((v): v is string => typeof v === "string"),
+    );
+    for (const uid of manualUserIds) resolved.add(uid);
+
+    const ids = Array.from(resolved);
+    if (ids.length === 0) return { count: 0, people: [] as Array<{ user_id: string; full_name: string | null }> };
+
+    const { data: profs } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", ids);
+    const nameBy = new Map<string, string | null>();
+    for (const p of (profs ?? []) as Array<{ id: string; full_name: string | null }>) {
+      nameBy.set(p.id, p.full_name ?? null);
+    }
+    const people = ids
+      .map((uid) => ({ user_id: uid, full_name: nameBy.get(uid) ?? null }))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
+
+    return { count: ids.length, people };
+  });
+
 type JsonPrimitive = string | number | boolean | null;
 type Json = JsonPrimitive | { [k: string]: Json } | Json[];
 
