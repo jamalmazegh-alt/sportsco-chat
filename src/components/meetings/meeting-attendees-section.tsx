@@ -370,6 +370,40 @@ export function MeetingAttendeesSection({
                       onChange={(status) => updateStatus.mutate({ user_id: a.user_id, status })}
                       disabled={updateStatus.isPending}
                     />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          aria-label={t("meetings:row.actions", {
+                            defaultValue: "Actions",
+                          })}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => resendOne.mutate(a.user_id)}
+                          disabled={resendOne.isPending}
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          {t("meetings:row.resend.cta", {
+                            defaultValue: "Relancer la convocation",
+                          })}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => setRemoveTarget(a)}
+                        >
+                          <UserMinus className="mr-2 h-4 w-4" />
+                          {t("meetings:row.remove.cta", {
+                            defaultValue: "Annuler la convocation",
+                          })}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </li>
                 );
               })}
@@ -377,6 +411,45 @@ export function MeetingAttendeesSection({
           </>
         )}
       </div>
+
+      <AlertDialog
+        open={!!removeTarget}
+        onOpenChange={(o) => !o && !removeOne.isPending && setRemoveTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("meetings:row.remove.confirmTitle", {
+                defaultValue: "Annuler la convocation ?",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("meetings:row.remove.confirmDesc", {
+                defaultValue:
+                  "{{name}} sera retiré(e) de la réunion et recevra une notification de retrait.",
+                name: removeTarget?.full_name ?? t("common.unknown", { defaultValue: "Inconnu" }),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeOne.isPending}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeOne.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (removeTarget) removeOne.mutate(removeTarget.user_id);
+              }}
+            >
+              {removeOne.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:row.remove.confirmCta", {
+                defaultValue: "Retirer",
+              })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
