@@ -325,7 +325,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     }
     s.push("summary");
     return s;
-  }, [state.type, state.isHome, state.recurrence]);
+  }, [state.type, state.isHome, state.recurrence, state.meetingScope]);
 
 
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
