@@ -148,7 +148,7 @@ function AssistantPage() {
         ];
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-72px)]">
+    <div className="flex flex-col h-[calc(100dvh-72px-164px)] min-h-[400px]">
       <header className="px-5 pt-6 pb-3 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
           <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
