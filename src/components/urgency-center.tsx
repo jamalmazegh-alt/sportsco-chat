@@ -542,11 +542,18 @@ function UrgencyDeck({
       </div>
 
       {hasFailures && (
-        <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} />
-          {t("urgency.partialError", {
-            defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
-          })}
+        <div className="flex items-start gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" strokeWidth={2.4} />
+          <div className="space-y-0.5">
+            <div>
+              {t("urgency.partialError", {
+                defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
+              })}
+            </div>
+            <div className="font-mono text-[10px] opacity-80">
+              debug: {status.failedSources.join(", ")}
+            </div>
+          </div>
         </div>
       )}
 
