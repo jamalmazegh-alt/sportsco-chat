@@ -2800,7 +2800,7 @@ function EventDetail() {
       </Dialog>
 
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
-      {isCoach &&
+      {!isInternalMeeting && isCoach &&
         (() => {
           const team = eventTeam as any;
           if (!team) return null;
