@@ -53,21 +53,6 @@ test.describe("publications — sondages", () => {
     await expect(page.getByText(tx("list.anonymous", "publications")).first()).toBeVisible();
   });
 
-  test("l'anonymat est verrouillé après création (aucun contrôle d'édition)", async ({ page }) => {
-    const question = uniqueName("poll-lock");
-    const pubId = await seedPoll(question, "anonymous");
-
-    await loginViaUI(page, "admin");
-    await page.goto(`/publications/${pubId}`);
-
-    await expect(page.getByText(question)).toBeVisible();
-    await expect(page.locator("#v-anon")).toHaveCount(0);
-    await expect(page.locator("#v-staff")).toHaveCount(0);
-    await expect(
-      page.getByRole("button", { name: tx("new.visibility", "publications") }),
-    ).toHaveCount(0);
-  });
-
   test("un joueur vote et son vote est enregistré", async ({ page }) => {
     const question = uniqueName("poll-vote");
     const pubId = await seedPoll(question, "anonymous");
@@ -151,7 +136,7 @@ async function seedPoll(
     audience_type: "joueurs_equipe",
     team_id: club.teamId,
   });
-  if (audErr) console.warn(`[seedPoll] audience: ${audErr.message}`);
+  if (audErr) throw new Error(`seedPoll audience: ${audErr.message}`);
 
   return data.id as string;
 }

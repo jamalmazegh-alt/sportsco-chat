@@ -29,7 +29,12 @@
 
 ## 3. Feature flags
 
-- `fundraising_v2` / `payments_v2` : **off** en beta → tests admin/member payments se `skip` si redirect.
+- `fundraising_v2` : **off** en beta → fichier `30-payments-fundraising.e2e.ts`
+  skippé **au niveau fichier** via `isV2("fundraising_v2")` (rapport : N skipped,
+  motif flag — pas de faux verts par détection de redirect).
+- `public_player_profiles` : **off** en beta → le test UI `/p/$slug` mineur dans
+  `ui-real-flows` est skippé avec motif explicite ; la règle mineur/majeur est
+  couverte via RPC `get_public_player_profile` (hors flag UI).
 - Publications, needs, camps, groups : **pas** gated par `isV2`.
 
 ## 4. data-testid ajoutés
@@ -55,9 +60,17 @@ E2E_UI=1              # timeout 90s
 
 ## 6. Reste non couvert
 
-Consentement parental / mineurs (`player_guardians`), push, SES idempotence,
-challenges, training_series, seasons UX, sponsors/venues, build Clubero,
-tournament flights, support view sessions.
+Consentement parental / mineurs (`player_guardians`) côté UI (RPC couverte),
+push, SES idempotence, challenges, training_series, seasons UX, sponsors/venues,
+build Clubero, tournament flights, support view sessions.
+
+**Anonymat sondage verrouillé après création** — retiré de `26-publications-polls.e2e.ts`.
+La page détail (`publications.$publicationId`) n'expose aucun contrôle de
+visibilité (`#v-anon` / `#v-staff` n'existent que sur `publications.new`).
+Le trigger SQL `_guard_publication_visibility` ne bloque un changement de
+`poll_visibility` **qu'après des votes** (`poll_visibility_locked_with_votes`).
+Pas de surface UI à exercer ; un test « absence de #v-anon » serait creux.
+À re-couvrir quand une UI d'édition / un lock immédiat post-création existera.
 
 ## 7. Dette i18n
 

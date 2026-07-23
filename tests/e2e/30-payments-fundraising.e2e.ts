@@ -1,17 +1,26 @@
 /**
  * 30 — Paiements & collectes
  *
- * UI admin (`/admin/payments/*`) is gated by `isV2("fundraising_v2")` which is
- * OFF in beta. Those tests skip cleanly when redirected. Member `/payments`
- * surface stays testable for empty/redirect behaviour.
+ * Admin + member payment UIs are gated by `isV2("fundraising_v2")`, a
+ * build-time flag (false in beta V1). The whole file skips when the flag is
+ * off so the report shows "skipped, flag off" rather than false greens via
+ * URL-redirect detection.
  */
 import { test, expect } from "@playwright/test";
+import { isV2 } from "./_fixtures/features";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import { loginViaUI, tx, uniqueName } from "./_fixtures/ui";
 
+test.describe.configure({ mode: "serial" });
+test.skip(
+  !isV2("fundraising_v2"),
+  "fundraising_v2=false (flag de build, src/config/features.ts) — " +
+    "specs paiements inactives en bêta V1.",
+);
+
 let club: SeededClub;
-let seasonId: string | null = null;
+let seasonId: string;
 
 test.beforeAll(async () => {
   club = await createTestClub("payments");
@@ -28,11 +37,10 @@ test.beforeAll(async () => {
     })
     .select("id")
     .single();
-  if (error) {
-    console.warn(`[payments] season seed skipped: ${error.message}`);
-  } else {
-    seasonId = data.id;
+  if (error || !data) {
+    throw new Error(`[payments] season seed failed: ${error?.message ?? "no data"}`);
   }
+  seasonId = data.id;
 });
 test.afterAll(async () => {
   if (seasonId) {
@@ -43,24 +51,17 @@ test.afterAll(async () => {
 });
 
 test.describe("collectes — administration", () => {
-  test("admin ouvre la page des collectes (ou est redirigé si V2 off)", async ({ page }) => {
+  test("admin ouvre la page des collectes", async ({ page }) => {
     await loginViaUI(page, "admin");
     await page.goto("/admin/payments/items");
 
-    // fundraising_v2=false → redirect /admin. Accept either surface.
-    const onItems = page.url().includes("/admin/payments/items");
-    if (!onItems) {
-      test.skip(true, "fundraising_v2 désactivé — /admin/payments/items redirige.");
-    }
+    await expect(page).toHaveURL(/\/admin\/payments\/items/);
     await expect(page.getByText(tx("fundraising.title"))).toBeVisible();
   });
 
   test("admin crée une collecte", async ({ page }) => {
     await loginViaUI(page, "admin");
     await page.goto("/admin/payments/items");
-    if (!page.url().includes("/admin/payments/items")) {
-      test.skip(true, "fundraising_v2 désactivé.");
-    }
 
     const title = uniqueName("pay");
     await page.getByRole("button", { name: tx("fundraising.newButton") }).click();
@@ -74,9 +75,6 @@ test.describe("collectes — administration", () => {
   test("sans saison active, l'écran invite à configurer les saisons", async ({ page }) => {
     await loginViaUI(page, "admin");
     await page.goto("/admin/payments/items");
-    if (!page.url().includes("/admin/payments/items")) {
-      test.skip(true, "fundraising_v2 désactivé.");
-    }
 
     await expect(
       page
@@ -92,10 +90,7 @@ test.describe("paiements — vue membre", () => {
     await loginViaUI(page, "parent");
     await page.goto("/payments");
 
-    // May redirect if payments_v2 off — accept home/admin redirect or empty state.
-    if (!page.url().includes("/payments")) {
-      test.skip(true, "payments route masquée (feature flag).");
-    }
+    await expect(page).toHaveURL(/\/payments/);
     await expect(page.getByText(tx("payments.title"))).toBeVisible();
     await expect(
       page.getByText(tx("payments.emptyTitle")).or(page.getByText(tx("payments.subtitle"))),
@@ -105,9 +100,6 @@ test.describe("paiements — vue membre", () => {
   test("la vue famille est accessible depuis /payments", async ({ page }) => {
     await loginViaUI(page, "parent");
     await page.goto("/payments");
-    if (!page.url().includes("/payments")) {
-      test.skip(true, "payments route masquée.");
-    }
 
     await page.getByRole("link", { name: tx("payments.familyView") }).click();
     await expect(page).toHaveURL(/\/payments\/family/);
@@ -116,25 +108,17 @@ test.describe("paiements — vue membre", () => {
   test("les reçus sont accessibles", async ({ page }) => {
     await loginViaUI(page, "parent");
     await page.goto("/payments");
-    if (!page.url().includes("/payments")) {
-      test.skip(true, "payments route masquée.");
-    }
 
     await page.getByRole("link", { name: tx("payments.receipts") }).click();
     await expect(page).toHaveURL(/\/payments\/receipts/);
   });
 
   test("une obligation partiellement payée est signalée", async ({ page }) => {
-    test.skip(!seasonId, "season seed unavailable");
     const itemId = await seedPaymentItem(uniqueName("pay"));
-    test.skip(!itemId, "payment_item seed failed (RLS or schema)");
-    await seedObligation(itemId!);
+    await seedObligation(itemId);
 
     await loginViaUI(page, "parent");
     await page.goto("/payments");
-    if (!page.url().includes("/payments")) {
-      test.skip(true, "payments route masquée.");
-    }
 
     await expect(page.getByText(tx("payments.status.partiallyPaid")).first()).toBeVisible();
   });
@@ -149,8 +133,7 @@ test.describe("paiements — cloisonnement", () => {
   });
 });
 
-async function seedPaymentItem(title: string): Promise<string | null> {
-  if (!seasonId) return null;
+async function seedPaymentItem(title: string): Promise<string> {
   const { data, error } = await admin
     .from("payment_items")
     .insert({
@@ -167,8 +150,7 @@ async function seedPaymentItem(title: string): Promise<string | null> {
     .select("id")
     .single();
   if (error || !data) {
-    console.warn(`seedPaymentItem: ${error?.message}`);
-    return null;
+    throw new Error(`seedPaymentItem: ${error?.message ?? "no data"}`);
   }
   return data.id as string;
 }
@@ -182,5 +164,5 @@ async function seedObligation(itemId: string): Promise<void> {
     status: "partially_paid",
     payer_user_id: club.player2WithParent.parent.userId,
   });
-  if (error) console.warn(`[seedObligation] ${error.message}`);
+  if (error) throw new Error(`seedObligation: ${error.message}`);
 }
