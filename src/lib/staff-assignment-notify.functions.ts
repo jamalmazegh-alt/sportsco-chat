@@ -4,6 +4,7 @@ import * as React from "react";
 import { render } from "@react-email/components";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { assertClubRole } from "@/lib/authz.server";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 
 const Input = z.object({
@@ -12,6 +13,9 @@ const Input = z.object({
   action: z.enum(["assigned", "unassigned"]),
   origin: z.string().url().optional(),
 });
+
+/** Roles that may assign/unassign event staff (mirrors RLS insert/delete). */
+const STAFF_MANAGER_ROLES = ["admin", "dirigeant", "coach", "assistant_coach"] as const;
 
 /**
  * Sends an email to a user newly assigned to (or removed from) an event.
@@ -22,10 +26,30 @@ export const dispatchStaffAssignmentEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => Input.parse(input))
   .handler(async ({ data, context }) => {
-    const { userId: actorId } = context;
+    const { userId: actorId, supabase } = context;
     const { eventId, userId, action, origin } = data;
 
     if (actorId === userId) return { sent: false, reason: "self" as const };
+
+    // Resolve club from the event first, then authorize — supabaseAdmin below
+    // can read auth.users emails, so client-provided eventId/userId must not
+    // be trusted without a club-role check.
+    const { data: ev } = await supabaseAdmin
+      .from("events")
+      .select("id, title, starts_at, type, team_id, opponent, teams:team_id(name, club_id)")
+      .eq("id", eventId)
+      .maybeSingle();
+    if (!ev) return { sent: false, reason: "no_event" as const };
+
+    const clubId = (ev as { teams?: { club_id?: string } | null }).teams?.club_id ?? null;
+    if (!clubId) return { sent: false, reason: "no_event" as const };
+
+    await assertClubRole({
+      supabase,
+      userId: actorId,
+      clubId,
+      allowedRoles: STAFF_MANAGER_ROLES,
+    });
 
     const stableMessageId = `staff-${action}-${eventId}-${userId}`;
 
@@ -38,19 +62,11 @@ export const dispatchStaffAssignmentEmail = createServerFn({ method: "POST" })
       return { sent: false, reason: "duplicate" as const };
     }
 
-    const [{ data: ev }, { data: profile }] = await Promise.all([
-      supabaseAdmin
-        .from("events")
-        .select("id, title, starts_at, type, team_id, opponent, teams:team_id(name)")
-        .eq("id", eventId)
-        .maybeSingle(),
-      supabaseAdmin
-        .from("profiles")
-        .select("id, first_name, preferred_language")
-        .eq("id", userId)
-        .maybeSingle(),
-    ]);
-    if (!ev) return { sent: false, reason: "no_event" as const };
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id, first_name, preferred_language")
+      .eq("id", userId)
+      .maybeSingle();
 
     const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
     const recipientEmail = authUser?.user?.email;
