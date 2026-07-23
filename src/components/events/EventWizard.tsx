@@ -2130,7 +2130,7 @@ function MeetingAudienceStep({
     <StepQuestion
       title={t("eventWizard.q.audience", { defaultValue: "Qui participe ? (facultatif)" })}
     >
-      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} />
+      <AudiencePickerBody ctx={ctx} state={audienceState} controls={audience.controls} enablePreassign />
       <div className="flex gap-2 pt-2">
         <Button variant="outline" className="flex-1" onClick={onSkip}>
           {t("eventWizard.skip", { defaultValue: "Passer" })}
