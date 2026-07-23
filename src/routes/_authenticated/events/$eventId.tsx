@@ -521,6 +521,8 @@ function EventDetail() {
     [teams, event?.team_id],
   );
   const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
+  const isInternalMeeting =
+    event?.type === "meeting" && (eventTeam as any)?.is_internal === true;
   const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
