@@ -4559,7 +4559,9 @@ function EventDetail() {
       />
 
       {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
+      {isInternalMeeting && (
+        <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
+      )}
 
 
       <EventChat eventId={eventId} />
