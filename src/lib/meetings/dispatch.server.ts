@@ -81,6 +81,21 @@ export async function dispatchMeetingConvocation(
     ]),
   );
 
+  // Récupère les tokens de réponse pour cet événement / ces convoqués.
+  const { data: attendees } = await supabaseAdmin
+    .from("meeting_attendees")
+    .select("user_id, response_token")
+    .eq("event_id", params.eventId)
+    .in("user_id", uids);
+  const tokenByUid = new Map<string, string>();
+  for (const row of attendees ?? []) {
+    if (row.user_id && row.response_token) {
+      tokenByUid.set(row.user_id as string, row.response_token as string);
+    }
+  }
+
+  const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
+
   let dispatched = 0;
   for (const uid of uids) {
     try {
@@ -89,6 +104,8 @@ export async function dispatchMeetingConvocation(
       if (!email) continue;
       const p = profileById.get(uid);
       const locale = (p?.preferred_language ?? "fr").toLowerCase().slice(0, 2);
+      const token = tokenByUid.get(uid);
+      const respondUrl = token ? `${baseUrl}/rm/${token}` : null;
       await enqueueTransactionalEmailServer({
         templateName: "meeting-invite",
         recipientEmail: email,
@@ -106,6 +123,7 @@ export async function dispatchMeetingConvocation(
           location,
           clubName,
           eventUrl: link,
+          respondUrl,
         },
       });
       dispatched++;

@@ -46,6 +46,7 @@ import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminEmailDispatchesRouteImport } from './routes/superadmin/email-dispatches'
 import { Route as SuperadminBuildCluberoRouteImport } from './routes/superadmin/build-clubero'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
+import { Route as RmTokenRouteImport } from './routes/rm.$token'
 import { Route as RegisterPlayerRouteImport } from './routes/register_.player'
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -363,6 +364,11 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const RmTokenRoute = RmTokenRouteImport.update({
+  id: '/rm/$token',
+  path: '/rm/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterPlayerRoute = RegisterPlayerRouteImport.update({
   id: '/register_/player',
@@ -1161,6 +1167,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
@@ -1327,6 +1334,7 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
@@ -1498,6 +1506,7 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register_/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
@@ -1670,6 +1679,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
@@ -1836,6 +1846,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
@@ -2006,6 +2017,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register_/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
@@ -2165,6 +2177,7 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   RTokenRoute: typeof RTokenRoute
   RegisterPlayerRoute: typeof RegisterPlayerRoute
+  RmTokenRoute: typeof RmTokenRoute
   SupportViewSessionIdRoute: typeof SupportViewSessionIdRouteWithChildren
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
@@ -2476,6 +2489,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/billing'
       preLoaderRoute: typeof SuperadminBillingRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/rm/$token': {
+      id: '/rm/$token'
+      path: '/rm/$token'
+      fullPath: '/rm/$token'
+      preLoaderRoute: typeof RmTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/register_/player': {
       id: '/register_/player'
@@ -3800,6 +3820,7 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   RTokenRoute: RTokenRoute,
   RegisterPlayerRoute: RegisterPlayerRoute,
+  RmTokenRoute: RmTokenRoute,
   SupportViewSessionIdRoute: SupportViewSessionIdRouteWithChildren,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
