@@ -1106,6 +1106,18 @@ export const Route = createFileRoute("/api/chat")({
         const abortController = new AbortController();
         const timeoutId = setTimeout(() => abortController.abort(), 60_000);
         try {
+          const rawLang = (request.headers.get("x-user-language") || "fr").toLowerCase().split("-")[0];
+          const ctxLang: "fr" | "en" = rawLang === "en" ? "en" : "fr";
+          const langNames: Record<string, string> = {
+            fr: "français",
+            en: "English",
+            es: "español",
+            de: "Deutsch",
+            it: "italiano",
+            pt: "português",
+            nl: "Nederlands",
+          };
+          const userLangName = langNames[rawLang] || rawLang;
           const result = streamText({
             model,
             system: (() => {
@@ -1123,7 +1135,7 @@ export const Route = createFileRoute("/api/chat")({
               // reflects the actual V1 beta state today (see src/config/features.ts).
               const featureContext = buildFeatureContext({
                 audience: "member",
-                lang: "fr",
+                lang: ctxLang,
                 flags: {
                   payments_v2: false,
                   fundraising_v2: false,
@@ -1131,8 +1143,10 @@ export const Route = createFileRoute("/api/chat")({
                   public_player_profiles: false,
                 },
               });
-              return `Date et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}\n\n---\n\n${featureContext}`;
+              const langDirective = `LANGUE DE RÉPONSE OBLIGATOIRE : réponds TOUJOURS en ${userLangName} (code BCP-47 : ${rawLang}), quelle que soit la langue du prompt système, des tools ou du contexte ci-dessous. Traduis naturellement les libellés, messages d'erreur et récapitulatifs. Si l'utilisateur t'écrit dans une autre langue, adapte-toi à sa langue.`;
+              return `${langDirective}\n\nDate et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}\n\n---\n\n${featureContext}`;
             })(),
+
             tools,
             stopWhen: stepCountIs(50),
             messages: await convertToModelMessages(messages as UIMessage[]),
