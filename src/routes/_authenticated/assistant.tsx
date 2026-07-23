@@ -93,7 +93,6 @@ function AssistantPage() {
       }),
   );
 
-
   const { messages, sendMessage, status, setMessages, stop } = useChat({
     id: "clubero-assistant",
     messages: initialMessages,
