@@ -527,7 +527,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       const { id } = await createEventFn({ data: input });
 
       // Meetings: if the user picked an audience, register attendees now.
-      if (workingState.type === "meeting" && workingState.meetingAudience) {
+      if (
+        workingState.type === "meeting" &&
+        workingState.meetingScope === "internal" &&
+        workingState.meetingAudience
+      ) {
         const aud = workingState.meetingAudience;
         const hasAny =
           aud.scalar.length > 0 ||
