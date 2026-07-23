@@ -4292,18 +4292,20 @@ function EventDetail() {
       )}
 
 
-      {isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
-        <StaffAssignmentSection
-          eventId={event.id}
-          teamId={event.team_id}
-          clubId={eventTeam.club_id}
-          eventDate={eventDateStr}
-        />
-      ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-        <StaffAssignmentReadOnly
-          assignments={(event as any)?.event_staff_assignments}
-        />
-      ) : null}
+      {!isInternalMeeting && (
+        isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+          <StaffAssignmentSection
+            eventId={event.id}
+            teamId={event.team_id}
+            clubId={eventTeam.club_id}
+            eventDate={eventDateStr}
+          />
+        ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
+          <StaffAssignmentReadOnly
+            assignments={(event as any)?.event_staff_assignments}
+          />
+        ) : null
+      )}
 
 
 
