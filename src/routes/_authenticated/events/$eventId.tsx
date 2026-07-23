@@ -482,7 +482,7 @@ function EventDetail() {
         const { data } = await supabase
           .from("teams")
           .select(
-            "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+            "id, name, club_id, is_internal, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
           )
           .eq("id", event!.team_id);
         return data ?? [];
