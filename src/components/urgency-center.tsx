@@ -551,7 +551,7 @@ function UrgencyDeck({
               })}
             </div>
             <div className="font-mono text-[10px] opacity-80">
-              debug: {status.failedSources.join(", ")}
+              debug: {failedSourcesDebug ?? "n/a"}
             </div>
           </div>
         </div>
