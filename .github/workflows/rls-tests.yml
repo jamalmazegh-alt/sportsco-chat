@@ -54,7 +54,8 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
-          supabase db push --include-all
+          # --yes: non-interactive CI (avoids hanging on the push confirmation prompt)
+          supabase db push --include-all --yes
 
       - name: Run RLS tests
         env:

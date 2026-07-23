@@ -1103,7 +1103,9 @@ export const Route = createFileRoute("/api/chat")({
         const abortController = new AbortController();
         const timeoutId = setTimeout(() => abortController.abort(), 60_000);
         try {
-          const rawLang = (request.headers.get("x-user-language") || "fr").toLowerCase().split("-")[0];
+          const rawLang = (request.headers.get("x-user-language") || "fr")
+            .toLowerCase()
+            .split("-")[0];
           const ctxLang: "fr" | "en" = rawLang === "en" ? "en" : "fr";
           const langNames: Record<string, string> = {
             fr: "français",
