@@ -109,10 +109,13 @@ export async function dispatchMeetingConvocation(
       const locale = (p?.preferred_language ?? "fr").toLowerCase().slice(0, 2);
       const token = tokenByUid.get(uid);
       const respondUrl = token ? `${baseUrl}/rm/${token}` : null;
+      const idempotencyKey = params.resend
+        ? `meeting-invite-${params.eventId}-${uid}-resend-${Date.now()}`
+        : `meeting-invite-${params.eventId}-${uid}`;
       await enqueueTransactionalEmailServer({
         templateName: "meeting-invite",
         recipientEmail: email,
-        idempotencyKey: `meeting-invite-${params.eventId}-${uid}`,
+        idempotencyKey,
         dispatchId: params.eventId,
         eventId: params.eventId,
         recipientId: uid,
