@@ -49,6 +49,8 @@ import { getEventAudienceContext } from "@/lib/needs/needs.functions";
 import {
   listMeetingAttendees,
   previewMeetingAudience,
+  removeMeetingAttendees,
+  resendMeetingConvocation,
   syncMeetingAttendees,
   updateMeetingAttendanceStatus,
   type MeetingAttendeeRow,
