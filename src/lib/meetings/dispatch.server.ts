@@ -1,0 +1,121 @@
+/**
+ * Dispatcher pour les convocations de réunion (interne).
+ * Envoie in-app + push + e-mail aux nouveaux convoqués uniquement.
+ * Best-effort : les erreurs de push/e-mail ne bloquent jamais l'invitation.
+ */
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+
+export interface DispatchMeetingConvocationParams {
+  eventId: string;
+  /** Uniquement les NOUVEAUX convoqués — jamais toute la liste. */
+  recipientUserIds: string[];
+}
+
+export async function dispatchMeetingConvocation(
+  params: DispatchMeetingConvocationParams,
+): Promise<{ dispatched: number }> {
+  const uids = Array.from(new Set(params.recipientUserIds.filter(Boolean)));
+  if (uids.length === 0) return { dispatched: 0 };
+
+  // Contexte réunion + club (pour brand fromName).
+  const { data: ev } = await supabaseAdmin
+    .from("events")
+    .select(
+      "id, title, starts_at, location, team_id, teams:team_id(club_id, clubs:club_id(name))",
+    )
+    .eq("id", params.eventId)
+    .maybeSingle();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const evRow = ev as any;
+  const meetingTitle = (evRow?.title as string | null) ?? "Réunion";
+  const startsAt = (evRow?.starts_at as string | null) ?? null;
+  const location = (evRow?.location as string | null) ?? null;
+  const clubName = (evRow?.teams?.clubs?.name as string | null) ?? null;
+
+  const link = `/events/${params.eventId}`;
+  const bodyText = "Vous êtes convoqué(e) à cette réunion.";
+
+  // 1) In-app
+  try {
+    const { error } = await supabaseAdmin.from("notifications").insert(
+      uids.map((uid) => ({
+        user_id: uid,
+        type: "convocation",
+        title: meetingTitle,
+        body: bodyText,
+        link,
+      })),
+    );
+    if (error) console.error("[meetings dispatch] notifications insert failed", error);
+  } catch (e) {
+    console.error("[meetings dispatch] notifications insert threw", e);
+  }
+
+  // 2) Push (best-effort)
+  try {
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+    await Promise.allSettled(
+      uids.map((uid) =>
+        sendPushToUser(uid, {
+          title: meetingTitle,
+          body: bodyText,
+          url: link,
+          tag: `meeting-${params.eventId}`,
+        }),
+      ),
+    );
+  } catch (e) {
+    console.warn("[meetings dispatch] push failed", e);
+  }
+
+  // 3) E-mail — best-effort, une entrée par destinataire, idempotent via key.
+  const { data: profiles } = await supabaseAdmin
+    .from("profiles")
+    .select("id, first_name, preferred_language")
+    .in("id", uids);
+  const profileById = new Map(
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p as { first_name: string | null; preferred_language: string | null },
+    ]),
+  );
+
+  let dispatched = 0;
+  for (const uid of uids) {
+    try {
+      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(uid);
+      const email = userData?.user?.email;
+      if (!email) continue;
+      const p = profileById.get(uid);
+      const locale = (p?.preferred_language ?? "fr").toLowerCase().slice(0, 2);
+      await enqueueTransactionalEmailServer({
+        templateName: "meeting-invite",
+        recipientEmail: email,
+        idempotencyKey: `meeting-invite-${params.eventId}-${uid}`,
+        dispatchId: params.eventId,
+        eventId: params.eventId,
+        recipientId: uid,
+        notificationType: "meeting_invite",
+        fromName: clubName ? `${clubName} via Clubero` : undefined,
+        templateData: {
+          displayName: p?.first_name ?? null,
+          locale,
+          meetingTitle,
+          meetingStartsAt: startsAt,
+          location,
+          clubName,
+          eventUrl: link,
+        },
+      });
+      dispatched++;
+    } catch (e) {
+      console.error("[meetings dispatch] email failed", {
+        uid,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  return { dispatched };
+}
