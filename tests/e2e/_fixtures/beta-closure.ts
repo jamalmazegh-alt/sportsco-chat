@@ -41,7 +41,7 @@ export const FORBIDDEN_BUTTON_LABELS: RegExp[] = [
 /** Paths that must not appear as navigable hrefs while V2 flags are off. */
 export const FORBIDDEN_HREF_PREFIXES = [
   "/following",
-  "/follow-ups",
+  // `/follow-ups` is V1 (relances de convocations) — not social_network_v2.
   "/payments",
   "/tournaments/new-from-pass",
   "/tournaments/pass-success",

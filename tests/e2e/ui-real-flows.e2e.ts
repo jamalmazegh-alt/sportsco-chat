@@ -18,12 +18,13 @@ test.describe("auth", () => {
   test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
     await page.goto("/login");
     await page.getByLabel(tx("auth.email")).fill(process.env.E2E_ADMIN_EMAIL!);
-    await page.getByLabel(tx("auth.password")).fill(process.env.E2E_ADMIN_PASSWORD!);
+    // `#password` — getByLabel(auth.password) clashes with the show/hide toggle.
+    await page.locator("#password").fill(process.env.E2E_ADMIN_PASSWORD!);
     await page.getByRole("button", { name: tx("auth.login") }).click();
 
     await page.waitForURL(/\/home(\?.*)?$/);
     await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible();
-    await expect(page.getByLabel(tx("auth.password"))).toHaveCount(0);
+    await expect(page.locator("#password")).toHaveCount(0);
   });
 });
 

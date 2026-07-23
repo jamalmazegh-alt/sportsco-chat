@@ -33,12 +33,15 @@ function credsFor(role: UiRole): { email: string; password: string } {
 /**
  * Connexion via le VRAI formulaire. login.tsx fait
  * window.location.replace("/home") en cas de succès.
+ *
+ * Password field: use `#password` — `getByLabel(auth.password)` also matches
+ * the show/hide toggle (`aria-label="Afficher le mot de passe"`).
  */
 export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
   const { email, password } = credsFor(role);
   await page.goto("/login");
   await page.getByLabel(tx("auth.email")).fill(email);
-  await page.getByLabel(tx("auth.password")).fill(password);
+  await page.locator("#password").fill(password);
   await page.getByRole("button", { name: tx("auth.login") }).click();
   await page.waitForURL(/\/home(\?.*)?$/, { timeout: 30_000 });
 }
