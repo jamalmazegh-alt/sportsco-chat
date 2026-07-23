@@ -411,7 +411,9 @@ function AttendeesEditor({
           disabled={!hasSelection || sync.isPending}
         >
           {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+          {hasExistingAttendees
+            ? t("meetings:manage.save", { defaultValue: "Enregistrer" })
+            : t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
         </Button>
       </DialogFooter>
 
