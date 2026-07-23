@@ -19,7 +19,6 @@ export function installDomTranslationGuard(): void {
     Node.prototype.removeChild = function <T extends Node>(this: Node, child: T): T {
       if (child.parentNode !== this) {
         if (typeof console !== "undefined") {
-          // eslint-disable-next-line no-console
           console.warn(
             "[dom-translation-guard] Suppressed removeChild on detached node (likely browser translation).",
           );
@@ -37,7 +36,6 @@ export function installDomTranslationGuard(): void {
     ): T {
       if (referenceNode && referenceNode.parentNode !== this) {
         if (typeof console !== "undefined") {
-          // eslint-disable-next-line no-console
           console.warn(
             "[dom-translation-guard] Suppressed insertBefore with detached reference node (likely browser translation).",
           );

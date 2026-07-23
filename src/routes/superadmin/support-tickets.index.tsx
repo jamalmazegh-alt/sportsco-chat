@@ -84,7 +84,6 @@ function AdminTicketsPage() {
 
       <CreateTicketOnBehalfDialog open={createOpen} onOpenChange={setCreateOpen} />
 
-
       <div className="grid sm:grid-cols-4 gap-2 mb-4">
         <div className="relative sm:col-span-2">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -15,17 +15,11 @@
 export type SignupLike = {
   id: string;
   user_id: string | null;
-  status:
-    | "applied"
-    | "confirmed"
-    | "declined"
-    | "withdrawn"
-    | "unavailable"
-    | (string & {});
+  status: "applied" | "confirmed" | "declined" | "withdrawn" | "unavailable" | (string & {});
 };
 
 export type CloseNeedPlan = {
-  toDecline: string[];             // signup ids
+  toDecline: string[]; // signup ids
   toNotify: { signupId: string; userId: string }[];
 };
 
@@ -40,7 +34,7 @@ export function planCloseNeed(signups: SignupLike[]): CloseNeedPlan {
 }
 
 export type CancelNeedPlan = {
-  toNotifyUserIds: string[];       // deduplicated
+  toNotifyUserIds: string[]; // deduplicated
 };
 
 export function planCancelNeed(signups: SignupLike[]): CancelNeedPlan {

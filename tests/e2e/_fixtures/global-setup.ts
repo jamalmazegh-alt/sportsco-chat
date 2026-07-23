@@ -1,25 +1,18 @@
 /**
  * Playwright globalSetup — runs once before all E2E tests.
  *
- * Signs in the 4 pre-created E2E users (admin / coach / player / parent),
- * exposes their access tokens + user ids via process.env so the synchronous
- * `admin` client in tests/e2e/_fixtures/admin.ts can attach the admin token
- * as a Bearer header, and so the club fixture can wire the real user ids
- * into team_members / player_parents / etc.
- *
- * Also resolves the pre-existing E2E test club (E2E_CLUB_NAME) and exports
- * its id as E2E_CLUB_ID.
+ * 1. When SUPABASE_SERVICE_ROLE_KEY + E2E_TARGET_PROJECT_REF are set, idempotently
+ *    creates/repairs the 4 E2E users and the "E2E Test Club" so GitHub secrets
+ *    stay the source of truth for passwords (fixes nightly "Invalid login credentials").
+ * 2. Signs in the 4 users, exposes tokens + user ids via process.env.
+ * 3. Resolves E2E_CLUB_ID from the pre-existing / freshly-seeded club.
  */
 import { createClient } from "@supabase/supabase-js";
+import { ensureE2ESeed, E2E_ROLE_ENV, type E2ERole } from "./ensure-seed";
 
-type Role = "admin" | "coach" | "player" | "parent";
+type Role = E2ERole;
 
-const ENV_KEYS: Record<Role, { email: string; password: string }> = {
-  admin: { email: "E2E_ADMIN_EMAIL", password: "E2E_ADMIN_PASSWORD" },
-  coach: { email: "E2E_COACH_EMAIL", password: "E2E_COACH_PASSWORD" },
-  player: { email: "E2E_PLAYER_EMAIL", password: "E2E_PLAYER_PASSWORD" },
-  parent: { email: "E2E_PARENT_EMAIL", password: "E2E_PARENT_PASSWORD" },
-};
+const ENV_KEYS = E2E_ROLE_ENV;
 
 export default async function globalSetup() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
@@ -36,6 +29,18 @@ export default async function globalSetup() {
   const adminPassword = process.env[ENV_KEYS.admin.password];
   if (!adminEmail || !adminPassword) return;
 
+  // Repair / create fixture users when service_role is available (CI nightly).
+  const seed = await ensureE2ESeed(process.env);
+  if (seed.skipped) {
+    console.log(`[globalSetup] ensure-seed skipped: ${seed.reason}`);
+  } else {
+    console.log(
+      `[globalSetup] ensure-seed ok on ${seed.projectRef} — club ${seed.clubId}, ` +
+        `${seed.users.length} users ready`,
+    );
+    process.env.E2E_CLUB_ID = seed.clubId;
+  }
+
   async function signIn(role: Role): Promise<string | null> {
     const email = process.env[ENV_KEYS[role].email];
     const password = process.env[ENV_KEYS[role].password];
@@ -50,9 +55,12 @@ export default async function globalSetup() {
     });
     const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error || !data.session || !data.user) {
+      const hint = process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? "ensure-seed ran but sign-in still failed — check anon key / project mismatch."
+        : "Set SUPABASE_SERVICE_ROLE_KEY + E2E_TARGET_PROJECT_REF so globalSetup can auto-repair users, " +
+          "or recreate the user manually (see tests/e2e/_fixtures/README.md).";
       throw new Error(
-        `[globalSetup] ${role} signIn failed for ${email}: ${error?.message ?? "no session"}. ` +
-          "Check the user exists, the password is correct, and the email is confirmed.",
+        `[globalSetup] ${role} signIn failed for ${email}: ${error?.message ?? "no session"}. ${hint}`,
       );
     }
     const upper = role.toUpperCase();
@@ -85,23 +93,26 @@ export default async function globalSetup() {
   }
 
   // 3. Resolve the pre-existing test club id using an authenticated client
-  //    (RLS on `clubs` blocks anonymous SELECT).
-  const authedClient = createClient(url, anonKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    },
-  });
-  const { data: club, error: clubErr } = await authedClient
-    .from("clubs")
-    .select("id, name")
-    .eq("name", clubName)
-    .maybeSingle();
-  if (clubErr || !club) {
-    throw new Error(
-      `[globalSetup] Could not find club "${clubName}". Create it manually and add ${adminEmail} as admin. ` +
-        `(${clubErr?.message ?? "not found"})`,
-    );
+  //    (RLS on `clubs` blocks anonymous SELECT) — unless ensure-seed already set it.
+  if (!process.env.E2E_CLUB_ID) {
+    const authedClient = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      },
+    });
+    const { data: club, error: clubErr } = await authedClient
+      .from("clubs")
+      .select("id, name")
+      .eq("name", clubName)
+      .maybeSingle();
+    if (clubErr || !club) {
+      throw new Error(
+        `[globalSetup] Could not find club "${clubName}". Create it manually and add ${adminEmail} as admin, ` +
+          `or provide SUPABASE_SERVICE_ROLE_KEY + E2E_TARGET_PROJECT_REF for auto-seed. ` +
+          `(${clubErr?.message ?? "not found"})`,
+      );
+    }
+    process.env.E2E_CLUB_ID = club.id;
   }
-  process.env.E2E_CLUB_ID = club.id;
 }

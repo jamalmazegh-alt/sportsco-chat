@@ -92,18 +92,16 @@ export const createEvent = createServerFn({ method: "POST" })
     if (payload.type === "meeting") {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin
-          .from("meeting_attendees")
-          .upsert(
-            {
-              event_id: row.id as string,
-              user_id: userId,
-              added_manually: true,
-              status: "pending",
-              sources: [{ type: "creator" }] as never,
-            } as never,
-            { onConflict: "event_id,user_id" },
-          );
+        await supabaseAdmin.from("meeting_attendees").upsert(
+          {
+            event_id: row.id as string,
+            user_id: userId,
+            added_manually: true,
+            status: "pending",
+            sources: [{ type: "creator" }] as never,
+          } as never,
+          { onConflict: "event_id,user_id" },
+        );
       } catch {
         /* never block create */
       }

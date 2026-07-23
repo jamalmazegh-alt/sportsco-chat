@@ -40,7 +40,11 @@ export function GlobalSearch() {
     enabled: !!activeClubId && open,
     queryFn: async () => {
       const [teamsRes, playersRes, eventsRes] = await Promise.all([
-        supabase.from("teams").select("id, name, age_group").eq("club_id", activeClubId!).eq("is_internal", false),
+        supabase
+          .from("teams")
+          .select("id, name, age_group")
+          .eq("club_id", activeClubId!)
+          .eq("is_internal", false),
         supabase
           .from("players")
           .select("id, first_name, last_name, jersey_number")

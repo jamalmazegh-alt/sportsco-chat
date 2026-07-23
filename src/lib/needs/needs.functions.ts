@@ -330,8 +330,6 @@ export const republishEventNeed = createServerFn({ method: "POST" })
 /* 2. publishEventNeed — audiences + publication + open + dispatch          */
 /* ------------------------------------------------------------------------ */
 
-
-
 export const publishEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => PublishInput.parse(input))
@@ -628,7 +626,6 @@ export const reopenEventNeed = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-
 export const cancelEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => NeedIdInput.parse(input))
@@ -875,14 +872,14 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const mySignupByNeed: Record<string, MySignup> = {};
     for (const s of (mySignups ?? []) as MySignup[]) mySignupByNeed[s.need_id] = s;
 
-
     // Dernière publication par besoin (recipients_count + published_at).
     const { data: pubs } = await supabaseAdmin
       .from("event_need_publications")
       .select("need_id, recipients_count, published_at")
       .in("need_id", needIds)
       .order("published_at", { ascending: false });
-    const lastPubByNeed: Record<string, { recipients_count: number | null; published_at: string }> = {};
+    const lastPubByNeed: Record<string, { recipients_count: number | null; published_at: string }> =
+      {};
     for (const p of pubs ?? []) {
       if (!lastPubByNeed[p.need_id]) {
         lastPubByNeed[p.need_id] = {
@@ -1024,7 +1021,7 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
     return {
       signups: (signups ?? []).map((s) => {
         const prof = (s.user_id && profiles[s.user_id]) || { full_name: null };
-        const dob = s.user_id ? birthByUser[s.user_id] ?? null : null;
+        const dob = s.user_id ? (birthByUser[s.user_id] ?? null) : null;
         return {
           ...s,
           profile: { full_name: prof.full_name },
@@ -1125,11 +1122,7 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
     });
 
     const cats = Array.from(
-      new Set(
-        teams
-          .map((t) => t.age_group?.trim())
-          .filter((c): c is string => !!c),
-      ),
+      new Set(teams.map((t) => t.age_group?.trim()).filter((c): c is string => !!c)),
     ).sort();
 
     return {
@@ -1201,8 +1194,7 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eventTeamId = ((ev as any)?.team_id as string | null) ?? null;
-    const eventCategory =
-      teams.find((t) => t.id === eventTeamId)?.age_group?.trim() || null;
+    const eventCategory = teams.find((t) => t.id === eventTeamId)?.age_group?.trim() || null;
 
     return {
       club_id: clubId,
@@ -1214,7 +1206,6 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
       event_category: eventCategory,
     };
   });
-
 
 /* ------------------------------------------------------------------------ */
 /* 12ter. previewEventAudience — preview par event_id (avant création need) */
@@ -1483,12 +1474,14 @@ export const listClubMembersWithContext = createServerFn({ method: "POST" })
           .from("profiles")
           .select("id, full_name, first_name, last_name")
           .in("id", userIds)
-      : { data: [] as Array<{
-          id: string;
-          full_name: string | null;
-          first_name: string | null;
-          last_name: string | null;
-        }> };
+      : {
+          data: [] as Array<{
+            id: string;
+            full_name: string | null;
+            first_name: string | null;
+            last_name: string | null;
+          }>,
+        };
     const profileById = new Map(
       (profs ?? []).map((p) => [
         (p as { id: string }).id,
@@ -1539,8 +1532,6 @@ export const listClubMembersWithContext = createServerFn({ method: "POST" })
 
     return { members: rows };
   });
-
-
 
 /* ------------------------------------------------------------------------ */
 /* 12quinquies. staffAddManualSignup — staff adds a confirmed participant  */
@@ -1730,9 +1721,7 @@ export async function _staffUnassignSignupImpl(deps: {
 
 export const staffUnassignSignup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ signup_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ signup_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1746,8 +1735,6 @@ export const staffUnassignSignup = createServerFn({ method: "POST" })
       notify: notifyApplicantOfDecision,
     });
   });
-
-
 
 /* ------------------------------------------------------------------------ */
 /* 10. listMyOpenNeeds — feed membre "Coups de main" (toutes évènements)    */
@@ -1808,9 +1795,7 @@ export const listMyOpenNeeds = createServerFn({ method: "POST" })
 
 export const listNeedRecipients = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ need_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ need_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const need = await loadNeedCore(data.need_id);
@@ -1838,7 +1823,9 @@ export const listNeedRecipients = createServerFn({ method: "POST" })
     );
 
     if (uniqUserIds.length === 0) {
-      return { recipients: [] as Array<{ user_id: string; full_name: string | null; roles: string[] }> };
+      return {
+        recipients: [] as Array<{ user_id: string; full_name: string | null; roles: string[] }>,
+      };
     }
 
     const [{ data: profs }, { data: members }] = await Promise.all([

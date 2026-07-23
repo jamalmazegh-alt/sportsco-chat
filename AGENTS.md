@@ -40,7 +40,10 @@ Install Playwright browsers before E2E: `bunx playwright install --with-deps chr
 
 ### E2E prerequisites
 
-E2E credentials (`E2E_ADMIN_EMAIL`, etc.) and a seeded "E2E Test Club" are **not** in `.env.example`. See `tests/e2e/_fixtures/README.md` and `docs/dev/e2e.md`.
+E2E credentials (`E2E_ADMIN_EMAIL`, etc.) live in GitHub Actions secrets. CI
+auto-seeds the 4 E2E users + "E2E Test Club" via `SUPABASE_SERVICE_ROLE_KEY`
+(guarded by `E2E_TARGET_PROJECT_REF` / `SUPABASE_PROJECT_ID`). See
+`tests/e2e/_fixtures/README.md` and `docs/dev/e2e.md`. Locally: `bun run seed:e2e`.
 
 ### Optional server secrets
 

@@ -326,7 +326,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                             <label
                               className={
                                 "flex items-center gap-3 p-2 rounded-lg " +
-                                (isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/40 cursor-pointer")
+                                (isDisabled
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "hover:bg-muted/40 cursor-pointer")
                               }
                             >
                               <Checkbox

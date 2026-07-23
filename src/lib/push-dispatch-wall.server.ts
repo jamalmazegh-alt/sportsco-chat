@@ -19,9 +19,15 @@ const MINOR_PUSH_THRESHOLD_YEARS = 16;
 const I18N: Record<string, { title: string; body: (a: string) => string }> = {
   fr: { title: "Nouveau message sur le mur", body: (a) => `${a} a publié un nouveau message` },
   en: { title: "New post on the wall", body: (a) => `${a} posted a new message` },
-  de: { title: "Neuer Beitrag an der Pinnwand", body: (a) => `${a} hat einen neuen Beitrag veröffentlicht` },
+  de: {
+    title: "Neuer Beitrag an der Pinnwand",
+    body: (a) => `${a} hat einen neuen Beitrag veröffentlicht`,
+  },
   es: { title: "Nuevo mensaje en el muro", body: (a) => `${a} publicó un nuevo mensaje` },
-  it: { title: "Nuovo messaggio sulla bacheca", body: (a) => `${a} ha pubblicato un nuovo messaggio` },
+  it: {
+    title: "Nuovo messaggio sulla bacheca",
+    body: (a) => `${a} ha pubblicato un nuovo messaggio`,
+  },
   nl: { title: "Nieuw bericht op de muur", body: (a) => `${a} heeft een nieuw bericht geplaatst` },
   pt: { title: "Nova mensagem no mural", body: (a) => `${a} publicou uma nova mensagem` },
 };

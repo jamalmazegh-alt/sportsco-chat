@@ -44,7 +44,6 @@ async function assertClubAdmin(supabase: any, clubId: string, callerId: string) 
   }
 }
 
-
 async function assertTournamentAdmin(supabaseAuth: any, tournamentId: string, callerId: string) {
   const { data, error } = await supabaseAuth.rpc("can_manage_tournament_members", {
     _user_id: callerId,
@@ -168,8 +167,6 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       .eq("club_id", data.club_id)
       .eq("user_id", data.user_id);
     if (upErr) throw new Response(upErr.message, { status: 500 });
-
-
 
     await logPermissionChange({
       actorId: userId,

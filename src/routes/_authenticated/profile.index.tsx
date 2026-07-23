@@ -75,8 +75,7 @@ function ProfilePage() {
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
   const canManageLogo = isAdmin || roles.includes("dirigeant");
-  const isCoachLike =
-    isAdmin || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoachLike = isAdmin || roles.includes("coach") || roles.includes("assistant_coach");
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();

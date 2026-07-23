@@ -227,8 +227,8 @@ function BackfillPanel({ onDone }: { onDone: () => void }) {
       </summary>
       <div className="mt-3 space-y-2">
         <p className="text-xs text-muted-foreground">
-          Colle les <strong>event IDs</strong> (UUID, un par ligne ou séparés par des virgules).
-          Un dispatch <em>Renvoi (manual_resend)</em> sera créé par événement, avec metadata{" "}
+          Colle les <strong>event IDs</strong> (UUID, un par ligne ou séparés par des virgules). Un
+          dispatch <em>Renvoi (manual_resend)</em> sera créé par événement, avec metadata{" "}
           <code>reason=backfill_missing_initial</code>. Une entrée{" "}
           <code>convocation.email_backfill</code> apparaîtra dans les logs superadmin.
         </p>

@@ -342,8 +342,7 @@ export const addClubGroupRule = createServerFn({ method: "POST" })
       group_id: data.group_id,
       rule_type: data.rule_type,
       team_id: teamTypes.includes(data.rule_type) ? (data.team_id ?? null) : null,
-      category:
-        data.rule_type === "category_educators" ? (data.category ?? null) : null,
+      category: data.rule_type === "category_educators" ? (data.category ?? null) : null,
       created_by: userId,
     };
     const { data: row, error } = await supabase
@@ -435,5 +434,3 @@ export const previewGroupRuleDetails = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { rows: (rows ?? []) as GroupRuleDetailRow[] };
   });
-
-

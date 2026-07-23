@@ -42,7 +42,6 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 
-
 type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
 
 type Reason = "vacation" | "injury" | "school" | "family" | "work" | "other";
@@ -133,7 +132,6 @@ export function DeclareAbsenceDrawer({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialPlayerId, availability?.id]);
-
 
   // Candidates:
   // - if teamId provided → all players of the team (coach flow)
@@ -407,7 +405,11 @@ export function DeclareAbsenceDrawer({
       if (!editing) {
         try {
           const [playerRes, declarerRes] = await Promise.all([
-            supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
+            supabase
+              .from("players")
+              .select("first_name, last_name")
+              .eq("id", playerId)
+              .maybeSingle(),
             supabase
               .from("profiles")
               .select("first_name, full_name")
@@ -552,7 +554,6 @@ export function DeclareAbsenceDrawer({
                   initialFocus
                   className="p-3 pointer-events-auto"
                 />
-
               </PopoverContent>
             </Popover>
           </div>
@@ -571,7 +572,6 @@ export function DeclareAbsenceDrawer({
               ))}
             </div>
           </div>
-
 
           <div className="space-y-1.5">
             <Label>{t("availability.comment", { defaultValue: "Commentaire" })}</Label>

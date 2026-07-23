@@ -31,10 +31,7 @@ const CLUB_TYPES = new Set([
   "convoked_parents",
 ]);
 
-export function summarizeSources(
-  sources: unknown,
-  names: ProvenanceNames = {},
-): ProvenanceChip[] {
+export function summarizeSources(sources: unknown, names: ProvenanceNames = {}): ProvenanceChip[] {
   if (!Array.isArray(sources)) return [];
   const seen = new Set<string>();
   const chips: ProvenanceChip[] = [];

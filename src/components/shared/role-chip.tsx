@@ -26,18 +26,12 @@ export type CanonicalRole =
   | "parent";
 
 const CLASSES: Record<CanonicalRole, string> = {
-  admin:
-    "text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-950/50",
-  staff:
-    "text-violet-700 bg-violet-100 dark:text-violet-300 dark:bg-violet-950/50",
-  coach:
-    "text-emerald-800 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/50",
-  tournament_manager:
-    "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/50",
-  player:
-    "text-teal-800 bg-teal-100 dark:text-teal-300 dark:bg-teal-950/50",
-  parent:
-    "text-pink-700 bg-pink-100 dark:text-pink-300 dark:bg-pink-950/50",
+  admin: "text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-950/50",
+  staff: "text-violet-700 bg-violet-100 dark:text-violet-300 dark:bg-violet-950/50",
+  coach: "text-emerald-800 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/50",
+  tournament_manager: "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/50",
+  player: "text-teal-800 bg-teal-100 dark:text-teal-300 dark:bg-teal-950/50",
+  parent: "text-pink-700 bg-pink-100 dark:text-pink-300 dark:bg-pink-950/50",
 };
 
 /**
@@ -84,8 +78,7 @@ type Props = {
 
 export function RoleChip({ role, className }: Props) {
   const { t } = useTranslation();
-  const canonical =
-    typeof role === "string" ? canonicalizeRole(role) : (role ?? null);
+  const canonical = typeof role === "string" ? canonicalizeRole(role) : (role ?? null);
   if (!canonical) return null;
   return (
     <span

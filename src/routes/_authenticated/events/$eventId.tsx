@@ -521,8 +521,7 @@ function EventDetail() {
     [teams, event?.team_id],
   );
   const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
-  const isInternalMeeting =
-    event?.type === "meeting" && (eventTeam as any)?.is_internal === true;
+  const isInternalMeeting = event?.type === "meeting" && (eventTeam as any)?.is_internal === true;
   const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
@@ -1175,14 +1174,11 @@ function EventDetail() {
           const names = rows
             .map((r) => {
               const p = r.profiles ?? {};
-              return (
-                p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
-              );
+              return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
             })
             .filter(Boolean);
           return names.length > 0 ? names : undefined;
         })();
-
 
         // Full squad list (names of ALL convoked players for this event:
         // already-existing convocations + newly inserted)
@@ -2003,14 +1999,11 @@ function EventDetail() {
         const names = rows
           .map((r) => {
             const p = r.profiles ?? {};
-            return (
-              p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
-            );
+            return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
           })
           .filter(Boolean);
         return names.length > 0 ? names : undefined;
       })();
-
 
       const idemBase = Date.now();
 
@@ -2291,8 +2284,8 @@ function EventDetail() {
   const showConvocationSection = isInternalMeeting
     ? false
     : isCoach
-    ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
-    : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
+      ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
+      : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -2800,7 +2793,8 @@ function EventDetail() {
       </Dialog>
 
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
-      {!isInternalMeeting && isCoach &&
+      {!isInternalMeeting &&
+        isCoach &&
         (() => {
           const team = eventTeam as any;
           if (!team) return null;
@@ -2827,9 +2821,7 @@ function EventDetail() {
             const names = rows
               .map((r) => {
                 const p = r.profiles ?? {};
-                return (
-                  p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || ""
-                );
+                return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
               })
               .filter(Boolean);
             return names.length > 0 ? names : undefined;
@@ -4291,9 +4283,8 @@ function EventDetail() {
         </section>
       )}
 
-
-      {!isInternalMeeting && (
-        isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+      {!isInternalMeeting &&
+        (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
           <StaffAssignmentSection
             eventId={event.id}
             teamId={event.team_id}
@@ -4301,13 +4292,8 @@ function EventDetail() {
             eventDate={eventDateStr}
           />
         ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-          <StaffAssignmentReadOnly
-            assignments={(event as any)?.event_staff_assignments}
-          />
-        ) : null
-      )}
-
-
+          <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
+        ) : null)}
 
       <ConvocationDetailDialog
         open={!!detailConvocId}
@@ -4550,7 +4536,6 @@ function EventDetail() {
           />
         )}
 
-
       <EventNeedsSection
         eventId={eventId}
         eventType={event.type}
@@ -4559,13 +4544,9 @@ function EventDetail() {
       />
 
       {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      {isInternalMeeting && (
-        <MeetingAttendeesSection eventId={eventId} eventType={event.type} />
-      )}
-
+      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
 
       <EventChat eventId={eventId} />
-
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (

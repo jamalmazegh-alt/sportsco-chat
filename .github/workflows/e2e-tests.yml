@@ -67,6 +67,13 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Service role: globalSetup auto-creates/repairs the 4 E2E users + club
+          # so secrets stay the password source of truth (avoids nightly
+          # "Invalid login credentials" when bughunt auth drifts).
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Hard target guard — ensure-seed refuses to mutate auth unless the
+          # ref extracted from SUPABASE_URL matches (bughunt only).
+          E2E_TARGET_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
           E2E_BASE_URL: http://127.0.0.1:8080
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
@@ -104,5 +111,16 @@ jobs:
               repo: context.repo.repo,
               title: `🚨 E2E tests failed — ${new Date().toISOString().slice(0, 10)}`,
               labels: ['e2e', 'bug'],
-              body: `Nightly E2E test run failed.\n\n**Run:** ${runUrl}\n\nCheck the artifacts for the Playwright HTML report.`,
+              body: [
+                'Nightly E2E test run failed.',
+                '',
+                `**Run:** ${runUrl}`,
+                '',
+                'Check the Playwright HTML report artifact.',
+                '',
+                'If `globalSetup` reports `Invalid login credentials`, confirm:',
+                '- `SUPABASE_SERVICE_ROLE_KEY` + `SUPABASE_PROJECT_ID` secrets are set',
+                '- `SUPABASE_URL` matches the bughunt project (`E2E_TARGET_PROJECT_REF`)',
+                '- E2E `E2E_*_EMAIL` / `E2E_*_PASSWORD` secrets are non-empty',
+              ].join('\n'),
             });

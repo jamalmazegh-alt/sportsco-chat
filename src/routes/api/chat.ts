@@ -219,10 +219,7 @@ export const Route = createFileRoute("/api/chat")({
               }
 
               const events = Array.from(byId.values())
-                .sort(
-                  (a, b) =>
-                    new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-                )
+                .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
                 .slice(0, limit);
               return { events, counts: { total: events.length } };
             },

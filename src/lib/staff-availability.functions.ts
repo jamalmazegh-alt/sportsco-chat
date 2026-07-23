@@ -14,11 +14,16 @@ export type TeamCoachForAvailability = {
 
 const STAFF_ROLES = new Set(["coach", "assistant_coach", "admin", "dirigeant"]);
 
-function profileName(profile: {
-  first_name?: string | null;
-  last_name?: string | null;
-  full_name?: string | null;
-} | null | undefined): string {
+function profileName(
+  profile:
+    | {
+        first_name?: string | null;
+        last_name?: string | null;
+        full_name?: string | null;
+      }
+    | null
+    | undefined,
+): string {
   const p = profile;
   const built = `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim();
   return built || p?.full_name || "—";
@@ -37,22 +42,23 @@ export const listTeamCoachesForAvailability = createServerFn({ method: "POST" })
       .maybeSingle();
     if (teamError || !team) return [];
 
-    const [{ data: callerRows }, { data: hasClubStaffRole }, { data: canViewTeam }] = await Promise.all([
-      supabase
-        .from("team_members")
-        .select("role")
-        .eq("team_id", data.teamId)
-        .eq("user_id", userId),
-      (supabase as any).rpc("has_club_role_any", {
-        _user_id: userId,
-        _club_id: team.club_id,
-        _roles: ["admin", "dirigeant", "coach", "assistant_coach"],
-      }),
-      (supabase as any).rpc("can_view_team", {
-        _user_id: userId,
-        _team_id: data.teamId,
-      }),
-    ]);
+    const [{ data: callerRows }, { data: hasClubStaffRole }, { data: canViewTeam }] =
+      await Promise.all([
+        supabase
+          .from("team_members")
+          .select("role")
+          .eq("team_id", data.teamId)
+          .eq("user_id", userId),
+        (supabase as any).rpc("has_club_role_any", {
+          _user_id: userId,
+          _club_id: team.club_id,
+          _roles: ["admin", "dirigeant", "coach", "assistant_coach"],
+        }),
+        (supabase as any).rpc("can_view_team", {
+          _user_id: userId,
+          _team_id: data.teamId,
+        }),
+      ]);
 
     const isTeamStaff = (callerRows ?? []).some((row: { role: string }) =>
       STAFF_ROLES.has(String(row.role)),

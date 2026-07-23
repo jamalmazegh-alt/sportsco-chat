@@ -75,7 +75,10 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
     .select("id, first_name, preferred_language")
     .in("id", params.recipientUserIds);
   const profileById = new Map(
-    (profiles ?? []).map((p) => [p.id as string, p as { first_name: string | null; preferred_language: string | null }]),
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p as { first_name: string | null; preferred_language: string | null },
+    ]),
   );
 
   // Get emails from auth.users via admin.listUsers is expensive; use RPC or
@@ -324,9 +327,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
 
   // Email
   try {
-    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(
-      params.applicantUserId,
-    );
+    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(params.applicantUserId);
     const email = userData?.user?.email;
     if (!email) return;
     const { data: profile } = await supabaseAdmin
@@ -383,9 +384,7 @@ export async function notifyNeedCancelled(params: { needId: string }) {
   // Dédupliqué : un seul dispatch par personne (confirmed ET applied).
   const uids = Array.from(
     new Set(
-      (signups ?? [])
-        .map((s) => s.user_id as string | null)
-        .filter((v): v is string => Boolean(v)),
+      (signups ?? []).map((s) => s.user_id as string | null).filter((v): v is string => Boolean(v)),
     ),
   );
   if (uids.length === 0) return { dispatched: 0 };

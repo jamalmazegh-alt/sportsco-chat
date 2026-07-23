@@ -139,8 +139,7 @@ export async function buildMemberContextByUser(
       team_id: string | null;
     }>) {
       if (!r.player_id || !r.team_id) continue;
-      if (!teamsByPlayerId.has(r.player_id))
-        teamsByPlayerId.set(r.player_id, new Set());
+      if (!teamsByPlayerId.has(r.player_id)) teamsByPlayerId.set(r.player_id, new Set());
       teamsByPlayerId.get(r.player_id)!.add(r.team_id);
     }
     for (const [uid, pid] of playerIdByUser.entries()) {
@@ -232,9 +231,7 @@ export async function buildMemberContextByUser(
         .map((pid) => {
           const info = childInfo.get(pid);
           if (!info) return null;
-          const cat = info.team_id
-            ? teamById.get(info.team_id)?.age_group ?? null
-            : null;
+          const cat = info.team_id ? (teamById.get(info.team_id)?.age_group ?? null) : null;
           return { name: info.name, category: cat };
         })
         .filter((c): c is { name: string; category: string | null } => !!c);

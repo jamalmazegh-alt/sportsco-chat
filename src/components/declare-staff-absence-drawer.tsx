@@ -42,7 +42,6 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 
-
 type Reason = "vacation" | "injury" | "school" | "training" | "family" | "work" | "other";
 type Certainty = "confirmed" | "tentative";
 type Visibility = "staff" | "admins_only";
@@ -118,7 +117,6 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, availability?.id]);
 
-
   async function onSubmit() {
     if (!user || !activeClubId) {
       toast.error(
@@ -129,17 +127,13 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
       return;
     }
     if (!range.from) {
-      toast.error(
-        t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
-      );
+      toast.error(t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }));
       return;
     }
     const startDate = format(range.from, "yyyy-MM-dd");
     const endDate = format(range.to ?? range.from, "yyyy-MM-dd");
     if (endDate < startDate) {
-      toast.error(
-        t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }),
-      );
+      toast.error(t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }));
       return;
     }
     setBusy(true);
@@ -272,7 +266,6 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
             </Popover>
           </div>
 
-
           <div className="space-y-1.5">
             <Label>{t("availability.reasonLabel", { defaultValue: "Motif" })}</Label>
             <div className="grid grid-cols-2 gap-2">
@@ -288,13 +281,9 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
             </div>
           </div>
 
-
-
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>
-                {t("staffAvailability.certainty", { defaultValue: "Certitude" })}
-              </Label>
+              <Label>{t("staffAvailability.certainty", { defaultValue: "Certitude" })}</Label>
               <Select value={certainty} onValueChange={(v) => setCertainty(v as Certainty)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -320,13 +309,8 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>
-                {t("staffAvailability.visibility", { defaultValue: "Visibilité" })}
-              </Label>
-              <Select
-                value={visibility}
-                onValueChange={(v) => setVisibility(v as Visibility)}
-              >
+              <Label>{t("staffAvailability.visibility", { defaultValue: "Visibilité" })}</Label>
+              <Select value={visibility} onValueChange={(v) => setVisibility(v as Visibility)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

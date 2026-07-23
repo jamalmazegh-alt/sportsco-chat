@@ -60,8 +60,6 @@ import { template as eventStaffAssignmentTemplate } from "./event-staff-assignme
 import { template as meetingInviteTemplate } from "./meeting-invite";
 import { template as meetingRemovedTemplate } from "./meeting-removed";
 
-
-
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
   "player-invite": playerInviteTemplate,

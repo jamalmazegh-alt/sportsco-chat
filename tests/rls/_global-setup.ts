@@ -66,7 +66,8 @@ async function sweepStaleRlsRows(): Promise<void> {
   const safeDelete = async (label: string, fn: () => Promise<{ error: unknown }>) => {
     try {
       const { error } = await fn();
-      if (error) console.warn(`[rls] sweep ${label}: ${(error as { message?: string }).message ?? error}`);
+      if (error)
+        console.warn(`[rls] sweep ${label}: ${(error as { message?: string }).message ?? error}`);
     } catch (e) {
       console.warn(`[rls] sweep ${label} threw:`, e);
     }
@@ -84,7 +85,7 @@ async function sweepStaleRlsRows(): Promise<void> {
   // Auth users — sweep every account whose email starts with `__rls_`.
   try {
     let page = 1;
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
       if (error) {
@@ -106,7 +107,6 @@ async function sweepStaleRlsRows(): Promise<void> {
 
   console.log(`[rls] Sweep complete.`);
 }
-
 
 const ROLES: Role[] = [
   "adminA",

@@ -30,9 +30,7 @@ describe("computeCoverage — Lot 4b", () => {
   });
 
   it("assignation présente ⇒ couvert (même sans staff équipe dispo)", () => {
-    const d = computeCoverage(
-      base({ teamStaffUserIds: [], assignmentsCount: 1 }),
-    );
+    const d = computeCoverage(base({ teamStaffUserIds: [], assignmentsCount: 1 }));
     expect(d.covered).toBe(true);
     expect(d.reason).toBe("has-assignment");
   });

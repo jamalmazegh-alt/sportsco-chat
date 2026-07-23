@@ -29,7 +29,6 @@ function resolveLocale(...candidates: Array<string | null | undefined>): Locale 
 // Le seuil "mineur" n'est plus codé en dur : on délègue à la fonction SQL
 // public.player_is_minor(_player_id) qui applique le seuil configuré (club/locale).
 
-
 export const sendWallPostEmails = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => InputSchema.parse(input))
@@ -80,11 +79,7 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
     const clubName = ((club as any)?.name as string | null) ?? null;
     const clubDefaultLang = ((club as any)?.default_language as string | null) ?? null;
 
-    const audienceType = post.audience_type as
-      | "club"
-      | "team"
-      | "multi_team"
-      | "group";
+    const audienceType = post.audience_type as "club" | "team" | "multi_team" | "group";
     const audienceTeamIds = (post.audience_team_ids as string[] | null) ?? null;
     const audienceGroupIds = (post.audience_group_ids as string[] | null) ?? null;
 

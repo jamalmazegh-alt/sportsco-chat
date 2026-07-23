@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  planCloseNeed,
-  planCancelNeed,
-  type SignupLike,
-} from "@/lib/needs/close-cancel-plan";
+import { planCloseNeed, planCancelNeed, type SignupLike } from "@/lib/needs/close-cancel-plan";
 
 const s = (
   id: string,
@@ -51,10 +47,7 @@ describe("planCancelNeed", () => {
   });
 
   it("ignores signups without user_id", () => {
-    const plan = planCancelNeed([
-      s("a", "applied", null),
-      s("b", "confirmed", "u2"),
-    ]);
+    const plan = planCancelNeed([s("a", "applied", null), s("b", "confirmed", "u2")]);
     expect(plan.toNotifyUserIds).toEqual(["u2"]);
   });
 

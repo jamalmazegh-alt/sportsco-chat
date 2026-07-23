@@ -4,10 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { ChevronRight, HandHelping } from "lucide-react";
-import {
-  listMyOpenNeeds,
-  withdrawSignup,
-} from "@/lib/needs/needs.functions";
+import { listMyOpenNeeds, withdrawSignup } from "@/lib/needs/needs.functions";
 import { NeedCandidateCard } from "@/components/needs/need-candidate-card";
 import { severityForStart } from "@/lib/urgency/pure";
 import { fmt } from "@/lib/date-locale";
@@ -35,9 +32,7 @@ export function isImminentEngagement(
   now: Date = new Date(),
 ): boolean {
   if (!startsAt) return false;
-  return (
-    severityForStart(startsAt, now, { criticalHours: 48, highHours: 48 }) === "critical"
-  );
+  return severityForStart(startsAt, now, { criticalHours: 48, highHours: 48 }) === "critical";
 }
 
 export function HomeNeedsCard() {
@@ -70,8 +65,7 @@ export function HomeNeedsCard() {
       toast.success(t("needs:signup.withdrawn"));
       invalidate();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const allNeeds = (data?.needs ?? []) as any[];
@@ -87,8 +81,12 @@ export function HomeNeedsCard() {
     .filter(hasActiveSignup)
     .slice()
     .sort((a, b) => {
-      const ta = a.events?.starts_at ? new Date(a.events.starts_at).getTime() : Number.POSITIVE_INFINITY;
-      const tb = b.events?.starts_at ? new Date(b.events.starts_at).getTime() : Number.POSITIVE_INFINITY;
+      const ta = a.events?.starts_at
+        ? new Date(a.events.starts_at).getTime()
+        : Number.POSITIVE_INFINITY;
+      const tb = b.events?.starts_at
+        ? new Date(b.events.starts_at).getTime()
+        : Number.POSITIVE_INFINITY;
       return ta - tb;
     });
 

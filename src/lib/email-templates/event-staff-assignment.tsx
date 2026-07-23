@@ -3,7 +3,6 @@ import { Button, Heading, Text } from "@react-email/components";
 import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
-
 type Locale = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 type Action = "assigned" | "unassigned";
 
@@ -43,14 +42,32 @@ const COPY: Record<
     bodyAssigned: (e, t, d, tm) => (
       <>
         Tu as été assigné en tant qu'<strong>encadrant</strong> à <strong>{e}</strong>
-        {tm ? <> de <strong>{tm}</strong></> : null}, le <strong>{d}</strong>
-        {t ? <> à <strong>{t}</strong></> : null}.
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        , le <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            à <strong>{t}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     bodyUnassigned: (e, tm) => (
       <>
         Tu n'es plus <strong>encadrant</strong> de <strong>{e}</strong>
-        {tm ? <> de <strong>{tm}</strong></> : null}.
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     ctaAssigned: "Voir l'événement",
@@ -68,14 +85,32 @@ const COPY: Record<
     bodyAssigned: (e, t, d, tm) => (
       <>
         You have been assigned as <strong>event staff</strong> to <strong>{e}</strong>
-        {tm ? <> of <strong>{tm}</strong></> : null}, on <strong>{d}</strong>
-        {t ? <> at <strong>{t}</strong></> : null}.
+        {tm ? (
+          <>
+            {" "}
+            of <strong>{tm}</strong>
+          </>
+        ) : null}
+        , on <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            at <strong>{t}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     bodyUnassigned: (e, tm) => (
       <>
         You are no longer <strong>event staff</strong> for <strong>{e}</strong>
-        {tm ? <> of <strong>{tm}</strong></> : null}.
+        {tm ? (
+          <>
+            {" "}
+            of <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
       </>
     ),
     ctaAssigned: "Open the event",
@@ -91,10 +126,29 @@ const COPY: Record<
     titleAssigned: "Du wurdest einem Ereignis zugewiesen",
     titleUnassigned: "Zuweisung entfernt",
     bodyAssigned: (e, t, d, tm) => (
-      <>Du wurdest als <strong>Betreuer</strong> für <strong>{e}</strong>{tm ? <> von <strong>{tm}</strong></> : null} am <strong>{d}</strong>{t ? <> um <strong>{t}</strong></> : null} zugewiesen.</>
+      <>
+        Du wurdest als <strong>Betreuer</strong> für <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            von <strong>{tm}</strong>
+          </>
+        ) : null}{" "}
+        am <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            um <strong>{t}</strong>
+          </>
+        ) : null}{" "}
+        zugewiesen.
+      </>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Du bist nicht mehr <strong>Betreuer</strong> von <strong>{e}</strong>{tm ? <> ({tm})</> : null}.</>
+      <>
+        Du bist nicht mehr <strong>Betreuer</strong> von <strong>{e}</strong>
+        {tm ? <> ({tm})</> : null}.
+      </>
     ),
     ctaAssigned: "Ereignis öffnen",
     ctaUnassigned: "Ereignis öffnen",
@@ -109,10 +163,35 @@ const COPY: Record<
     titleAssigned: "Has sido asignado a un evento",
     titleUnassigned: "Asignación retirada",
     bodyAssigned: (e, t, d, tm) => (
-      <>Has sido asignado como <strong>responsable</strong> a <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, el <strong>{d}</strong>{t ? <> a las <strong>{t}</strong></> : null}.</>
+      <>
+        Has sido asignado como <strong>responsable</strong> a <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        , el <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            a las <strong>{t}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Ya no eres <strong>responsable</strong> de <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
+      <>
+        Ya no eres <strong>responsable</strong> de <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     ctaAssigned: "Abrir el evento",
     ctaUnassigned: "Abrir el evento",
@@ -127,10 +206,35 @@ const COPY: Record<
     titleAssigned: "Sei stato assegnato a un evento",
     titleUnassigned: "Assegnazione rimossa",
     bodyAssigned: (e, t, d, tm) => (
-      <>Sei stato assegnato come <strong>responsabile</strong> a <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}, il <strong>{d}</strong>{t ? <> alle <strong>{t}</strong></> : null}.</>
+      <>
+        Sei stato assegnato come <strong>responsabile</strong> a <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            di <strong>{tm}</strong>
+          </>
+        ) : null}
+        , il <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            alle <strong>{t}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Non sei più <strong>responsabile</strong> di <strong>{e}</strong>{tm ? <> di <strong>{tm}</strong></> : null}.</>
+      <>
+        Non sei più <strong>responsabile</strong> di <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            di <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     ctaAssigned: "Apri l'evento",
     ctaUnassigned: "Apri l'evento",
@@ -145,10 +249,35 @@ const COPY: Record<
     titleAssigned: "Je bent toegewezen aan een evenement",
     titleUnassigned: "Toewijzing verwijderd",
     bodyAssigned: (e, t, d, tm) => (
-      <>Je bent toegewezen als <strong>begeleider</strong> aan <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}, op <strong>{d}</strong>{t ? <> om <strong>{t}</strong></> : null}.</>
+      <>
+        Je bent toegewezen als <strong>begeleider</strong> aan <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            van <strong>{tm}</strong>
+          </>
+        ) : null}
+        , op <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            om <strong>{t}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Je bent niet meer <strong>begeleider</strong> van <strong>{e}</strong>{tm ? <> van <strong>{tm}</strong></> : null}.</>
+      <>
+        Je bent niet meer <strong>begeleider</strong> van <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            van <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     ctaAssigned: "Evenement openen",
     ctaUnassigned: "Evenement openen",
@@ -163,10 +292,35 @@ const COPY: Record<
     titleAssigned: "Você foi designado a um evento",
     titleUnassigned: "Designação removida",
     bodyAssigned: (e, t, d, tm) => (
-      <>Você foi designado como <strong>responsável</strong> em <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}, em <strong>{d}</strong>{t ? <> às <strong>{t}</strong></> : null}.</>
+      <>
+        Você foi designado como <strong>responsável</strong> em <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        , em <strong>{d}</strong>
+        {t ? (
+          <>
+            {" "}
+            às <strong>{t}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     bodyUnassigned: (e, tm) => (
-      <>Você não é mais <strong>responsável</strong> por <strong>{e}</strong>{tm ? <> de <strong>{tm}</strong></> : null}.</>
+      <>
+        Você não é mais <strong>responsável</strong> por <strong>{e}</strong>
+        {tm ? (
+          <>
+            {" "}
+            de <strong>{tm}</strong>
+          </>
+        ) : null}
+        .
+      </>
     ),
     ctaAssigned: "Abrir o evento",
     ctaUnassigned: "Abrir o evento",
@@ -176,7 +330,6 @@ const COPY: Record<
     at: "às",
   },
 };
-
 
 function pickLocale(l?: string): Locale {
   const v = (l ?? "fr").toLowerCase().slice(0, 2);
@@ -198,8 +351,10 @@ const EventStaffAssignmentEmail = ({
   const c = COPY[pickLocale(locale)];
   const isAssigned = action === "assigned";
   return (
-    <EmailShell preview={isAssigned ? c.subjectAssigned(eventLabel) : c.subjectUnassigned(eventLabel)} locale={locale}>
-
+    <EmailShell
+      preview={isAssigned ? c.subjectAssigned(eventLabel) : c.subjectUnassigned(eventLabel)}
+      locale={locale}
+    >
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{isAssigned ? c.titleAssigned : c.titleUnassigned}</Heading>
       <Text style={text}>

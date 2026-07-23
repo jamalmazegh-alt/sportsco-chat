@@ -197,8 +197,6 @@ function DispatchDetailPage() {
         </div>
       </header>
 
-
-
       {isLoading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
@@ -306,10 +304,7 @@ function DispatchDetailPage() {
                         <td className="px-3 py-2 text-xs">
                           {r.attempt_count}
                           {r.mismatch_count > 0 && (
-                            <span className="text-destructive">
-                              {" "}
-                              · mismatch {r.mismatch_count}
-                            </span>
+                            <span className="text-destructive"> · mismatch {r.mismatch_count}</span>
                           )}
                         </td>
                         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">

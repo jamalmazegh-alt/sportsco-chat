@@ -17,8 +17,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *
  * Optional:
  *   - E2E_CLUB_NAME             defaults to "E2E Test Club"
+ *   - SUPABASE_SERVICE_ROLE_KEY + E2E_TARGET_PROJECT_REF
+ *                               auto-create/repair E2E users + club in globalSetup
  *
- * See tests/e2e/_fixtures/README.md for one-time setup instructions.
+ * See tests/e2e/_fixtures/README.md for setup instructions.
  */
 const BASE_URL = process.env.E2E_BASE_URL;
 if (!BASE_URL) {
