@@ -94,12 +94,14 @@ export function MeetingAttendeesSection({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Users className="h-4 w-4" />
-          {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+      <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 space-y-0 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <CardTitle className="flex min-w-0 flex-wrap items-center gap-2 text-base">
+          <Users className="h-4 w-4 shrink-0" />
+          <span className="min-w-0">
+            {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+          </span>
           {total > 0 && (
-            <Badge variant="secondary" className="ml-2">
+            <Badge variant="secondary" className="shrink-0">
               {t("meetings:section.count", {
                 defaultValue: "{{count}} convoqué(s)",
                 count: total,
