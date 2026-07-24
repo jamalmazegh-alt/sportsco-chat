@@ -37,8 +37,7 @@ const T = {
       club
         ? `${player} has just been linked to your Clubero account as a parent at ${club}.`
         : `${player} has just been linked to your Clubero account as a parent.`,
-    detail:
-      "You will now receive their call-ups, messages and notifications on this account.",
+    detail: "You will now receive their call-ups, messages and notifications on this account.",
     open: "Open Clubero",
     foot: "You are receiving this email because a child was linked to your Clubero account.",
   },
@@ -67,7 +66,10 @@ export const template = {
   component: Email,
   subject: (d) => {
     const l = pickLocale((d as any).locale);
-    return pick(l).subject((d as any).playerName as string, (d as any).clubName as string | undefined);
+    return pick(l).subject(
+      (d as any).playerName as string,
+      (d as any).clubName as string | undefined,
+    );
   },
   displayName: "Parent — child linked",
   previewData: {

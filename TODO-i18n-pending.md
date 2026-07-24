@@ -10,18 +10,15 @@ chooseGroup, chooseTeam, chooseCategory, categoryPlaceholder, preview_one,
 preview_other, previewNone, previewLoading, success, successIdempotent),
 `publishedBadge.*` (at_one, at_other, unpublished), `audiences.*`
 (club_group, team_players, team_parents, team_educators, category_educators
-+ the 7 existing scalars), `staff.*` (title, empty, minorPending, license),
-`pendingApplications_one`, `pendingApplications_other`, `confirmCancel`.
+
+- the 7 existing scalars), `staff.*` (title, empty, minorPending, license),
+  `pendingApplications_one`, `pendingApplications_other`, `confirmCancel`.
 
 FR and EN are reviewed and final. DE/ES/IT/NL/PT are **clones of EN** for
 parity — they must be replaced by native translations. Also `seats.remaining`
 was migrated to i18next v4 plural convention (`remaining_one` /
 `remaining_other`) — the 5 non-FR/EN locales inherited the EN plural fallback
 and need native review too.
-
-
-
-
 
 # Challenge templates — pending translations & skipped templates
 
@@ -106,6 +103,7 @@ Clones EN → DE/ES/IT/NL/PT pour :
 ## `needs.json` — Modifier destinataires vs Relancer (DE/ES/IT/NL/PT)
 
 Added the following keys to distinguish two staff intents on a published need:
+
 - `actions.resend`, `actions.notifyNew`
 - `menu.editAudience`
 - `resend.title`, `resend.success_one`, `resend.success_other`
@@ -118,7 +116,7 @@ translations.
 
 ## `common.json` — groups defaultValue removal (DE/ES/IT/NL/PT)
 
-Added `common.actions` scalar. All groups.* keys referenced in
+Added `common.actions` scalar. All groups.\* keys referenced in
 `src/routes/_authenticated/admin/groups.tsx` (parentOf, emailOnly,
 individualMembers, addIndividual, errors.nameTaken, common.cancel/save)
 already existed with native translations. `common.actions` was added
@@ -132,6 +130,7 @@ from the rules → subgroups rename).
 
 Sélection d'audience mise en avant (dialog « Qui prévenir ? »). Nouvelles clés
 sous `audiences.*` :
+
 - `customGroups`, `eventRelevant`, `otherAudiences`, `pickKind`, `pickParam`, `noGroups`
 - `selected.title`, `selected.empty`, `selected.emptyConvocation`,
   `selected.loading`, `selected.count_one`, `selected.count_other`,
@@ -146,8 +145,10 @@ Nouvelles clés `menu.viewRecipients` et bloc `recipients.*` (title, desc,
 empty, count_one/other). FR et EN sont finaux. DE/ES/IT/NL/PT sont des
 **clones EN** — à remplacer par des traductions natives.
 
-## needs.myFeed.* + needs.withdrawDialog.* (2026-07-19)
+## needs.myFeed._ + needs.withdrawDialog._ (2026-07-19)
+
 Clones EN → DE/ES/IT/NL/PT pour :
+
 - needs.myFeed.engagementsCount_one/other
 - needs.myFeed.nextLabel
 - needs.myFeed.plusOthers_one/other
@@ -160,6 +161,7 @@ soignés. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par des
 traductions natives lors de Phase B.
 
 Blocs concernés :
+
 - `type.*`, `delivery.*`, `actions.*`, `poll.*`, `state.*`
 - `confirm.close/delete/resend/refresh.*`, `confirm.confirm/cancel`
 - `audience.*` (dont `audience.types.*` pour les 10 audiences)
@@ -170,11 +172,13 @@ Blocs concernés :
 Phase B added `list.*`, `new.*`, and `detail.*` sections to publications.json.
 FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
 
-## publications.detail.votingAs*, votingForChild, player (2026-07-20)
+## publications.detail.votingAs\*, votingForChild, player (2026-07-20)
+
 - FR: traduit
 - EN: traduit
 - DE/ES/IT/NL/PT: clone EN, à traduire
 
 ## publications.new.pickCategory/pickEvent/pickMembers/searchPlaceholder/addPlayersBtn/addParentsBtn + publications.audience.recipientsCount/recipientsBreakdown/none/previewError (2026-07-20 wizard audiences)
+
 - FR/EN: traduit
 - DE/ES/IT/NL/PT: traductions natives fournies pour ces clés (bloc wizard categories/convocations/manual + compteur preview)

@@ -1020,8 +1020,7 @@ export const runImport = createServerFn({ method: "POST" })
                   ? seasonLabelFromEndYear(endYear)
                   : fallbackSeasonLabel;
               const computedCategory = computeFffCategory(r.date_naissance, endYear);
-              const sportForSeason =
-                (fixedTeam?.sport ?? r.sport ?? null) as string | null;
+              const sportForSeason = (fixedTeam?.sport ?? r.sport ?? null) as string | null;
               const { data: existingSeason } = await supabaseAdmin
                 .from("player_seasons")
                 .select("id, category, team_id, sport")
@@ -1062,7 +1061,6 @@ export const runImport = createServerFn({ method: "POST" })
                 error: e instanceof Error ? e.message : String(e),
               });
             }
-
 
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();

@@ -38,7 +38,8 @@ function PlayerAuditPage() {
         </div>
         <h1 className="text-xl font-semibold mt-1">Historique du joueur</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Toutes les modifications de fiche, convocations, feedback, suspensions, disponibilités et jalons.
+          Toutes les modifications de fiche, convocations, feedback, suspensions, disponibilités et
+          jalons.
         </p>
         <Link to="/superadmin/clubs" className="text-xs text-muted-foreground hover:underline">
           ← Retour aux clubs
@@ -46,7 +47,9 @@ function PlayerAuditPage() {
       </header>
 
       {isLoading ? (
-        <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        <div className="flex justify-center py-16">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
       ) : rows.length === 0 ? (
         <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">
           Aucun événement.
@@ -62,7 +65,12 @@ function PlayerAuditPage() {
                 <div className="text-sm font-medium">{r.action}</div>
                 <div className="text-xs text-muted-foreground">
                   {fmt(r.occurred_at)}
-                  {r.actor_name && <> · par <span className="font-medium text-foreground">{r.actor_name}</span></>}
+                  {r.actor_name && (
+                    <>
+                      {" "}
+                      · par <span className="font-medium text-foreground">{r.actor_name}</span>
+                    </>
+                  )}
                 </div>
                 {r.details && Object.keys(r.details as object).length > 0 && (
                   <pre className="mt-1.5 text-[11px] bg-muted/40 rounded px-2 py-1.5 overflow-x-auto whitespace-pre-wrap break-words">

@@ -66,9 +66,7 @@ function TeamStaffWallPage() {
     },
   });
 
-  const activeMembership = memberships.find(
-    (m) => m.club_id === (team?.club_id ?? activeClubId),
-  );
+  const activeMembership = memberships.find((m) => m.club_id === (team?.club_id ?? activeClubId));
   const roles = new Set<string>(activeMembership?.roles ?? []);
   const isStaff =
     roles.has("admin") ||
@@ -87,8 +85,7 @@ function TeamStaffWallPage() {
       <div className="p-6 space-y-3">
         <p className="text-sm text-muted-foreground">
           {t("teams.staffWallForbidden", {
-            defaultValue:
-              "Cet espace est réservé aux éducateurs et dirigeants de l'équipe.",
+            defaultValue: "Cet espace est réservé aux éducateurs et dirigeants de l'équipe.",
           })}
         </p>
         <Button asChild size="sm" variant="outline">

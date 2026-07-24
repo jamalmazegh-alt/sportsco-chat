@@ -493,7 +493,6 @@ function NeedRow({
           )}
         </div>
 
-
         {/* Menu ⋯ contextuel — dernier élément aligné en top-right */}
         {showMenu && (
           <DropdownMenu>
@@ -563,7 +562,6 @@ function NeedRow({
 
       {/* Actions ligne — primaire d'abord (Candidatures / Publier / Relancer), puis secondaires */}
       <div className="mt-2 flex flex-wrap gap-1.5">
-
         {/* Staff — Candidatures (primaire quand il y a des candidatures en attente) */}
         {isStaff && isOpen && (
           <Button

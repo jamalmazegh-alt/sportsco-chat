@@ -82,7 +82,6 @@ function EventsPage() {
   const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
-
   const { data: club } = useQuery({
     queryKey: ["club", activeClubId],
     enabled: !!activeClubId,
@@ -163,9 +162,7 @@ function EventsPage() {
   const internalTeamIds = useMemo(
     () =>
       new Set(
-        (teams ?? [])
-          .filter((t) => (t as { is_internal?: boolean }).is_internal)
-          .map((t) => t.id),
+        (teams ?? []).filter((t) => (t as { is_internal?: boolean }).is_internal).map((t) => t.id),
       ),
     [teams],
   );
@@ -205,7 +202,6 @@ function EventsPage() {
       return true;
     });
   }, [events, filters, internalTeamIds, searchQuery, hideTrainings]);
-
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
@@ -652,7 +648,6 @@ function EventsPage() {
           </div>
         </div>
       )}
-
 
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">

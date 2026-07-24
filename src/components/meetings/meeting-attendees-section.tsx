@@ -7,7 +7,17 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Users, Loader2, UserPlus, Check, X, HelpCircle, MoreVertical, Send, UserMinus } from "lucide-react";
+import {
+  Users,
+  Loader2,
+  UserPlus,
+  Check,
+  X,
+  HelpCircle,
+  MoreVertical,
+  Send,
+  UserMinus,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -104,8 +114,7 @@ export function MeetingAttendeesSection({
 
   const resendFn = useServerFn(resendMeetingConvocation);
   const resendOne = useMutation({
-    mutationFn: (userId: string) =>
-      resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    mutationFn: (userId: string) => resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
     onSuccess: () =>
       toast.success(
         t("meetings:row.resend.success", {
@@ -118,8 +127,7 @@ export function MeetingAttendeesSection({
   const removeFn = useServerFn(removeMeetingAttendees);
   const [removeTarget, setRemoveTarget] = useState<MeetingAttendeeRow | null>(null);
   const removeOne = useMutation({
-    mutationFn: (userId: string) =>
-      removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    mutationFn: (userId: string) => removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
     onSuccess: () => {
       toast.success(
         t("meetings:row.remove.success", {

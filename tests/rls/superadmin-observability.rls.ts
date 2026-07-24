@@ -12,11 +12,31 @@ import { getFixtures, type Role } from "./_setup";
 
 const NON_SUPER_ROLES: Role[] = ["adminA", "coachA", "parentA", "playerA"];
 
-const RPCS: Array<{ name: string; args: (fx: ReturnType<typeof getFixtures>) => Record<string, unknown> }> = [
-  { name: "superadmin_invite_batches", args: () => ({ _template: null, _club_id: null, _from: null, _to: null, _limit: 10 }) },
+const RPCS: Array<{
+  name: string;
+  args: (fx: ReturnType<typeof getFixtures>) => Record<string, unknown>;
+}> = [
+  {
+    name: "superadmin_invite_batches",
+    args: () => ({ _template: null, _club_id: null, _from: null, _to: null, _limit: 10 }),
+  },
   { name: "superadmin_invite_batch_rows", args: () => ({ _batch_id: "any" }) },
-  { name: "superadmin_notifications_emails", args: () => ({ _template: null, _status: null, _from: null, _to: null, _search: null, _limit: 10, _offset: 0 }) },
-  { name: "superadmin_notifications_push", args: () => ({ _kind: null, _from: null, _to: null, _limit: 10, _offset: 0 }) },
+  {
+    name: "superadmin_notifications_emails",
+    args: () => ({
+      _template: null,
+      _status: null,
+      _from: null,
+      _to: null,
+      _search: null,
+      _limit: 10,
+      _offset: 0,
+    }),
+  },
+  {
+    name: "superadmin_notifications_push",
+    args: () => ({ _kind: null, _from: null, _to: null, _limit: 10, _offset: 0 }),
+  },
   { name: "superadmin_club_roster", args: (fx) => ({ _club_id: fx.clubA }) },
   { name: "superadmin_player_audit", args: (fx) => ({ _player_id: fx.playerA, _limit: 10 }) },
 ];

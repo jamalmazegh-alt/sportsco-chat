@@ -19,8 +19,7 @@ function InviteBatchesPage() {
   const [template, setTemplate] = useState<string>("");
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "invite-batches", template],
-    queryFn: () =>
-      listInviteBatches({ data: { template: template || null, limit: 200 } }),
+    queryFn: () => listInviteBatches({ data: { template: template || null, limit: 200 } }),
     staleTime: 15_000,
   });
   const rows = data?.rows ?? [];
@@ -71,7 +70,11 @@ function InviteBatchesPage() {
   );
 }
 
-function BatchRow({ row }: { row: NonNullable<Awaited<ReturnType<typeof listInviteBatches>>["rows"]>[number] }) {
+function BatchRow({
+  row,
+}: {
+  row: NonNullable<Awaited<ReturnType<typeof listInviteBatches>>["rows"]>[number];
+}) {
   const [open, setOpen] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["superadmin", "invite-batch-rows", row.batch_id],
@@ -88,7 +91,9 @@ function BatchRow({ row }: { row: NonNullable<Awaited<ReturnType<typeof listInvi
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium truncate">
             {row.template_name}
-            {row.club_name ? <span className="text-muted-foreground"> · {row.club_name}</span> : null}
+            {row.club_name ? (
+              <span className="text-muted-foreground"> · {row.club_name}</span>
+            ) : null}
           </div>
           <div className="text-xs text-muted-foreground">{fmt(row.bucket_start)}</div>
         </div>
@@ -117,16 +122,19 @@ function BatchRow({ row }: { row: NonNullable<Awaited<ReturnType<typeof listInvi
                       r.status === "sent" || r.status === "delivered"
                         ? "success"
                         : r.status === "pending" || r.status === "processing"
-                        ? "info"
-                        : r.status === "suppressed"
-                        ? "warn"
-                        : "danger"
+                          ? "info"
+                          : r.status === "suppressed"
+                            ? "warn"
+                            : "danger"
                     }
                   >
                     {r.status}
                   </StatusBadge>
                   {r.error_message && (
-                    <span className="text-xs text-destructive truncate max-w-[240px]" title={r.error_message}>
+                    <span
+                      className="text-xs text-destructive truncate max-w-[240px]"
+                      title={r.error_message}
+                    >
                       {r.error_message}
                     </span>
                   )}
