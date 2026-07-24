@@ -179,6 +179,7 @@ function EventsPage() {
       : null;
     return events.filter((e) => {
       if (!filters.showCancelled && e.status === "cancelled") return false;
+      if (hideTrainings && e.type === "training") return false;
       if (filters.types.size > 0 && !filters.types.has(e.type as any)) return false;
       if (filters.teamIds.size > 0 && !filters.teamIds.has(e.team_id)) return false;
       if (!filters.includeInternal && internalTeamIds.has(e.team_id)) return false;
