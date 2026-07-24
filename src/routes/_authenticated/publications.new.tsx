@@ -670,9 +670,9 @@ function NewPublicationPage() {
                       return (
                         <div
                           key={tm.id}
-                          className="flex items-center justify-between gap-2 rounded-md bg-background/60 border border-sky-500/20 px-2 py-1.5"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-md bg-background/60 border border-sky-500/20 px-2 py-1.5"
                         >
-                          <span className="inline-flex items-center gap-1.5 text-sm font-medium truncate">
+                          <span className="inline-flex items-center gap-1.5 text-sm font-medium min-w-0">
                             <Trophy className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                             <span className="truncate">{tm.name}</span>
                           </span>
@@ -795,87 +795,6 @@ function NewPublicationPage() {
                 </div>
               </div>
 
-              {/* Generic add row — team / category / group */}
-              <div>
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t("publications:audience.addAnother", {
-                    defaultValue: "Ajouter une audience",
-                  })}
-                </Label>
-                <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
-                  <Select
-                    value={addKind}
-                    onValueChange={(v) => {
-                      setAddKind(v as KindKey);
-                      setAddParam("");
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("publications:audience.pickKind", {
-                          defaultValue: "Type d'audience",
-                        })}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableKinds
-                        .filter((k) => k !== "educateurs" && k !== "dirigeants")
-                        .map((k) => {
-                          const { Icon } = KIND_META[k];
-                          return (
-                            <SelectItem key={k} value={k}>
-                              <span className="inline-flex items-center gap-2">
-                                <Icon className="h-3.5 w-3.5" />
-                                {kindLabel(k)}
-                              </span>
-                            </SelectItem>
-                          );
-                        })}
-                    </SelectContent>
-                  </Select>
-
-                  {addKind &&
-                  (needsTeam(addKind) || needsCategory(addKind) || needsGroup(addKind)) ? (
-                    <Select value={addParam} onValueChange={setAddParam}>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("publications:audience.pickParam", {
-                            defaultValue: "Choisir…",
-                          })}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {needsTeam(addKind) &&
-                          teams.map((tm) => (
-                            <SelectItem key={tm.id} value={tm.id}>
-                              {tm.name}
-                            </SelectItem>
-                          ))}
-                        {needsCategory(addKind) &&
-                          categories.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              {c}
-                              {activeSeason ? ` · ${activeSeason.label}` : ""}
-                            </SelectItem>
-                          ))}
-                        {needsGroup(addKind) &&
-                          groups.map((g) => (
-                            <SelectItem key={g.id} value={g.id}>
-                              {g.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div />
-                  )}
-
-                  <Button type="button" size="sm" disabled={!canAdd} onClick={submitAdd}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    {t("common:add", "Ajouter")}
-                  </Button>
-                </div>
-              </div>
 
               {/* Manual player selection */}
               <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2.5 space-y-1.5">
