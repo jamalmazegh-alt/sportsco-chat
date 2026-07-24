@@ -23,6 +23,7 @@ import {
   normalizeHeader,
 } from "./schemas";
 import { parseTemplate } from "./template-parse";
+import { computeFffCategory, parseSeasonEndYear, seasonLabelFromEndYear } from "@/lib/fff-category";
 
 const log = createLogger("superadmin-import");
 
