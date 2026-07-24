@@ -1139,18 +1139,29 @@ function AudienceBadge({
     );
   }
   if (post.audience_type === "team_staff") {
-    const t0 = post.audience_team_ids?.[0];
-    const teamName = t0 ? (teamsById.get(t0)?.name ?? null) : null;
+    const liveT = (post.audience_team_ids ?? [])
+      .map((id) => teamsById.get(id))
+      .filter((x): x is Team => !!x);
+    let teamLabel: string | null = null;
+    if (liveT.length === 1) teamLabel = liveT[0].name;
+    else if (liveT.length === 2) teamLabel = `${liveT[0].name} + ${liveT[1].name}`;
+    else if (liveT.length > 2)
+      teamLabel = t("wall.scope.plusOthers", {
+        defaultValue: "{{first}} + {{n}} autres",
+        first: liveT[0].name,
+        n: liveT.length - 1,
+      });
+    const tooltip = liveT.length
+      ? `${t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" })} · ${liveT.map((x) => x.name).join(" · ")}`
+      : t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" });
     return (
       <span
         className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
-        title={t("wall.staff.badgeTitle", {
-          defaultValue: "Message privé au staff de l'équipe",
-        })}
+        title={tooltip}
       >
         <Lock className="h-2.5 w-2.5" />
-        {teamName
-          ? t("wall.staff.badgeWithTeam", { defaultValue: "Staff {{team}}", team: teamName })
+        {teamLabel
+          ? t("wall.staff.badgeWithTeam", { defaultValue: "Staff {{team}}", team: teamLabel })
           : t("wall.staff.badge", { defaultValue: "Staff équipe" })}
       </span>
     );
