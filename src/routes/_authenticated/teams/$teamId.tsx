@@ -1070,7 +1070,7 @@ function TeamDetail() {
           roles.includes("assistant_coach")) && (
           <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-violet-500" />
+              <LockIcon className="h-4 w-4 text-violet-500" />
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 {t("teams.staffWall", { defaultValue: "Mur Staff" })}
               </h2>
