@@ -358,7 +358,7 @@ function NewPublicationPage() {
     const list: KindKey[] = [];
     if (!hasAudience({ audience_type: "educateurs" })) list.push("educateurs");
     if (!hasAudience({ audience_type: "dirigeants" })) list.push("dirigeants");
-    if (teams.length > 0) list.push("joueurs_equipe", "parents_equipe", "staff_equipe");
+    if (teams.length > 0) list.push("joueurs_equipe", "parents_equipe");
     if (activeSeason && categories.length > 0) list.push("joueurs_categorie", "parents_categorie");
     if (groups.length > 0) list.push("groupe_personnalise");
     return list;
