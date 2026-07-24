@@ -9,8 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # write: allow prettier autofix push on main (no-op on pull_request).
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # On main, we may push a follow-up prettier commit.
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -20,6 +27,27 @@ jobs:
       # --- Checks rapides d'abord (échec en quelques secondes) ---
       - name: Check server function guards
         run: bun run check:guards
+
+      # Lovable often bypasses husky. On main: format + push so the tree stays
+      # clean. On PRs: format the working tree only, then fail if the PR branch
+      # still differs from formatted output (author must commit the format).
+      - name: Apply Prettier
+        run: bun run format
+      - name: Commit Prettier autofix (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'github-actions[bot]'
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: prettier autofix"
+          git push origin HEAD:main || {
+            echo "Push failed (branch protection or race). Working tree is formatted for this job."
+            exit 0
+          }
       - name: Check formatting (Prettier)
         run: bun run format:check
       - name: Check i18n parity

@@ -1,0 +1,69 @@
+name: Prettier autofix
+
+# Lovable (and other cloud editors) often push straight to main and bypass
+# husky / lint-staged. This job reformats with the repo Prettier config and
+# pushes a follow-up commit so format:check does not stay red forever.
+#
+# Loop safety: skips when the head commit is already from github-actions[bot].
+# GITHUB_TOKEN pushes do not re-trigger workflows — the companion "PR checks"
+# job still formats its own working tree before format:check (see unit-tests.yml).
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: prettier-autofix-main
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    if: github.event.head_commit.author.name != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need the branch tip for a clean push after format.
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Prettier
+        run: bun run format
+
+      - name: Commit and push if needed
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No formatting changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: prettier autofix"
+          # Retry briefly on race with concurrent Lovable pushes.
+          for i in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "Pushed prettier autofix."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — rebase and retry…"
+            git pull --rebase origin main
+            bun run format
+            if ! git diff --quiet; then
+              git add -A
+              git commit --amend --no-edit || true
+            fi
+            sleep $((i * 2))
+          done
+          echo "Could not push prettier autofix after retries."
+          exit 1
