@@ -11,6 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import {
   Calendar,
   Plus,
   Users,
@@ -77,7 +85,9 @@ function EventsPage() {
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [hideTrainings, setHideTrainings] = useState(false);
+  const [teamFilter, setTeamFilter] = useState<string>("all");
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
+
 
   const { data: club } = useQuery({
     queryKey: ["club", activeClubId],
@@ -162,6 +172,7 @@ function EventsPage() {
     return events.filter((e) => {
       if (!showCancelled && e.status === "cancelled") return false;
       if (hideTrainings && e.type === "training") return false;
+      if (teamFilter !== "all" && e.team_id !== teamFilter) return false;
       if (!showPast) {
         const d = new Date(e.starts_at);
         if (isPast(d) && !isToday(d)) return false;
@@ -175,7 +186,8 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, hideTrainings, searchQuery]);
+  }, [events, showPast, showCancelled, hideTrainings, teamFilter, searchQuery]);
+
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
@@ -631,19 +643,41 @@ function EventsPage() {
       </div>
 
       {view === "list" && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("events.searchPlaceholder", {
-              defaultValue: "Rechercher un événement…",
-            })}
-            className="pl-9"
-          />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("events.searchPlaceholder", {
+                defaultValue: "Rechercher un événement…",
+              })}
+              className="pl-9"
+            />
+          </div>
+          {isCoach && visibleTeams.length > 1 && (
+            <Select value={teamFilter} onValueChange={setTeamFilter}>
+              <SelectTrigger className="sm:w-56">
+                <SelectValue
+                  placeholder={t("events.filterByTeam", { defaultValue: "Filtrer par équipe" })}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  {t("events.allTeams", { defaultValue: "Toutes les équipes" })}
+                </SelectItem>
+                {visibleTeams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       )}
+
 
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
