@@ -607,14 +607,31 @@ function EventsPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {view === "list" && (
-            <EventsFilterSheet
-              filters={filters}
-              onChange={setFilters}
-              teams={visibleTeams}
-              isCoach={isCoach}
-              hasInternalTeam={hasInternalTeam}
-              pastCount={pastCount}
-            />
+            <>
+              <button
+                type="button"
+                onClick={() => setHideTrainings((v) => !v)}
+                aria-pressed={hideTrainings}
+                className={cn(
+                  "inline-flex items-center gap-1.5 h-9 rounded-md border px-3 text-xs font-medium transition-colors",
+                  hideTrainings
+                    ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                )}
+                title={t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              >
+                <Dumbbell className="h-3.5 w-3.5" />
+                {t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              </button>
+              <EventsFilterSheet
+                filters={filters}
+                onChange={setFilters}
+                teams={visibleTeams}
+                isCoach={isCoach}
+                hasInternalTeam={hasInternalTeam}
+                pastCount={pastCount}
+              />
+            </>
           )}
         </div>
       </div>
