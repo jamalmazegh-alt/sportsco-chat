@@ -32,6 +32,7 @@ import {
   getFields,
   templateMatchRatio,
 } from "@/lib/superadmin-import/schemas";
+import { normalizeSheetCell } from "@/lib/superadmin-import/sheet-date";
 
 export const Route = createFileRoute("/superadmin/onboarding/import")({
   component: ImportPage,
@@ -54,7 +55,7 @@ function cleanSheetRows(rows: Array<Record<string, unknown>>) {
       const out: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(row)) {
         if (key === "__rowNum__" || key.trim() === "") continue;
-        out[key] = typeof value === "string" ? value.trim() : value;
+        out[key] = normalizeSheetCell(value);
       }
       return out;
     })
