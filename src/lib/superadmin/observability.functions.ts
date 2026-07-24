@@ -32,6 +32,7 @@ export const listInviteBatches = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => BatchesInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_invite_batches", {
       _template: data.template ?? null,
       _club_id: data.clubId ?? null,
@@ -60,6 +61,7 @@ export const getInviteBatchRows = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ batchId: z.string() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_invite_batch_rows", {
       _batch_id: data.batchId,
     } as never);
@@ -94,6 +96,7 @@ export const listNotificationEmails = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => EmailsInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_notifications_emails", {
       _template: data.template ?? null,
       _status: data.status ?? null,
@@ -130,6 +133,7 @@ export const listNotificationPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => PushInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_notifications_push", {
       _kind: data.kind ?? null,
       _from: data.from ?? null,
@@ -174,6 +178,7 @@ export const getClubRoster = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_club_roster", {
       _club_id: data.clubId,
     } as never);
@@ -197,6 +202,7 @@ export const getPlayerAudit = createServerFn({ method: "POST" })
     z.object({ playerId: z.string().uuid(), limit: z.number().int().min(1).max(2000).default(500) }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const { data: rows, error } = await context.supabase.rpc("superadmin_player_audit", {
       _player_id: data.playerId,
       _limit: data.limit,
