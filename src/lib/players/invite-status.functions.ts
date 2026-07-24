@@ -45,8 +45,10 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
     const { data: rows } = await supabaseAdmin
       .from("email_send_log")
       .select("recipient_email, status, error_message, message_id, created_at")
+      .eq("template_name", "player-invite")
       .in("recipient_email", emails)
       .order("created_at", { ascending: false });
+
 
     // Latest status per message_id
     const latestByMessage = new Map<
