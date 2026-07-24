@@ -79,7 +79,12 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
     const clubName = ((club as any)?.name as string | null) ?? null;
     const clubDefaultLang = ((club as any)?.default_language as string | null) ?? null;
 
-    const audienceType = post.audience_type as "club" | "team" | "multi_team" | "group";
+    const audienceType = post.audience_type as
+      | "club"
+      | "team"
+      | "multi_team"
+      | "group"
+      | "team_staff";
     const audienceTeamIds = (post.audience_team_ids as string[] | null) ?? null;
     const audienceGroupIds = (post.audience_group_ids as string[] | null) ?? null;
 
