@@ -1090,11 +1090,11 @@ function PlayerProfile() {
                   const contactLine = parentContactLine(pp, displayName);
                   const emailKey = pp.email?.trim().toLowerCase() ?? "";
                   const inviteSent = !linked && !!emailKey && invitedEmails.has(emailKey);
-                  const inviteFailedError =
-                    !linked && !!emailKey && !inviteSent
-                      ? (failedEmailsMap.get(emailKey) ?? null)
-                      : undefined;
-                  const inviteFailed = inviteFailedError !== undefined;
+                  const inviteFailed =
+                    !linked && !!emailKey && !inviteSent && failedEmailsMap.has(emailKey);
+                  const inviteFailedError = inviteFailed
+                    ? (failedEmailsMap.get(emailKey) ?? null)
+                    : null;
                   return (
                     <li
                       key={pp.id}
