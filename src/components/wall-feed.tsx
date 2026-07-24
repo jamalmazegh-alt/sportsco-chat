@@ -583,7 +583,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         const { data: tm } = await supabase
           .from("team_members")
           .select("user_id, role")
-          .eq("team_id", staffTeamId!)
+          .in("team_id", staffTeams ?? [])
           .in("role", ["coach", "dirigeant"]);
         for (const r of tm ?? []) {
           const uid = (r as any).user_id as string | null;
