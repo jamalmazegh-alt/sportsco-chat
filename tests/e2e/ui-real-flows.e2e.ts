@@ -7,7 +7,7 @@
  *
  * Lancer avec E2E_UI=1 (timeout 90 s).
  */
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { isV2 } from "./_fixtures/features";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
@@ -19,6 +19,7 @@ import {
   uniqueName,
   navTo,
   openClassicEventForm,
+  fillEventStartDateTime,
   MOBILE_VIEWPORT,
 } from "./_fixtures/ui";
 
@@ -106,7 +107,9 @@ test.describe("événements", () => {
     await page.getByRole("option", { name: tx("events.types.training") }).click();
 
     await page.getByTestId("event-name-input").fill(title);
-    await setEventDateTime(page);
+    // Default mode is recurring (hides Publish) — switch to single session.
+    await page.getByRole("button", { name: tx("events.series.modeSingle") }).click();
+    await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 1 });
 
     await page.getByRole("button", { name: tx("events.publish") }).click();
 
@@ -128,27 +131,17 @@ test.describe("événements", () => {
     await page.getByRole("option", { name: tx("events.types.match") }).click();
 
     await page.getByTestId("event-opponent-input").fill(opponent);
-    await setEventDateTime(page);
+    // Home matches require a venue — Away keeps Publish enabled without one.
+    await page.getByRole("button", { name: tx("events.away") }).click();
+    await fillEventStartDateTime(page, { dateIndex: 1, timeIndex: 1 });
 
-    await page.getByRole("button", { name: tx("events.publish") }).click();
+    const publish = page.getByRole("button", { name: tx("events.publish") });
+    await expect(publish).toBeEnabled({ timeout: 10_000 });
+    await publish.click();
 
     await expect(page.getByText(new RegExp(opponent))).toBeVisible();
   });
 });
-
-async function setEventDateTime(page: Page) {
-  const dateButton = page.getByRole("button", { name: /—|\d{1,2}\s\w{3}/ }).first();
-  if (await dateButton.count()) {
-    await dateButton.click().catch(() => {});
-    const day = page.getByRole("gridcell").getByRole("button").nth(15);
-    await day.click().catch(() => {});
-  }
-  const timeBox = page.getByRole("textbox");
-  await timeBox
-    .first()
-    .fill("18:00")
-    .catch(() => {});
-}
 
 test.describe("convocations — envoi", () => {
   let club: SeededClub;
@@ -168,11 +161,30 @@ test.describe("convocations — envoi", () => {
       .first()
       .click();
 
-    const confirm = page.getByRole("button", { name: tx("events.resend.confirm") });
-    if (await confirm.count()) await confirm.click();
+    // Player-picker dialog: Continue stays disabled at (0) until a selection.
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    const selectAll = dialog.getByRole("checkbox", { name: tx("attendance.selectAll") });
+    if (await selectAll.count()) {
+      await selectAll.check();
+    } else {
+      await dialog.getByRole("checkbox").first().check();
+    }
+    // Label is "Continue (N)" — regex from common.continue matches the prefix.
+    const continueBtn = dialog.getByRole("button", { name: tx("common.continue") });
+    await expect(continueBtn).toBeEnabled({ timeout: 10_000 });
+    await continueBtn.click();
+
+    const confirm = page
+      .getByRole("button", { name: tx("attendance.confirmSend") })
+      .or(page.getByRole("button", { name: tx("events.resend.confirm") }));
+    if (await confirm.count()) await confirm.first().click();
 
     await expect(
-      page.getByText(tx("events.convocationsSent")).or(page.getByText(tx("attendance.present"))),
+      page
+        .getByText(tx("events.convocationsSent"))
+        .or(page.getByText(tx("attendance.present")))
+        .first(),
     ).toBeVisible();
   });
 });
@@ -211,7 +223,8 @@ test.describe("tournois", () => {
     const name = uniqueName("Tournoi");
 
     await loginViaUI(page, "admin");
-    await navTo(page, "nav.tournaments");
+    // Bottom nav has no Tournaments item in regular club mode — deep-link.
+    await page.goto("/tournaments");
     await expect(page).toHaveURL(/\/tournaments$/);
 
     await page

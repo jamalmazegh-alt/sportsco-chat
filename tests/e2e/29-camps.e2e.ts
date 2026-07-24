@@ -42,13 +42,20 @@ test.describe("stages — administration", () => {
     await page.getByRole("button", { name: tx("chooser.classic", "camps") }).click();
 
     await page.getByTestId("camp-title-input").fill(name);
-    await page.locator('input[type="date"]').nth(0).fill(start);
-    await page.locator('input[type="date"]').nth(1).fill(end);
+    const startInput = page.locator('input[type="date"]').nth(0);
+    const endInput = page.locator('input[type="date"]').nth(1);
+    await startInput.fill(start);
+    await endInput.fill(end);
+    await expect(startInput).toHaveValue(start);
+    await expect(endInput).toHaveValue(end);
     const capacity = page.locator('input[type="number"]').first();
-    if (await capacity.count()) await capacity.fill("20");
+    await capacity.fill("20");
 
-    await page.getByRole("button", { name: tx("list.create", "camps") }).click();
-    await expect(page.getByText(name)).toBeVisible({ timeout: 15_000 });
+    const createBtn = page.getByRole("button", { name: tx("list.create", "camps") });
+    await expect(createBtn).toBeEnabled({ timeout: 10_000 });
+    await createBtn.click();
+    await page.waitForURL(/\/admin\/camps\/[0-9a-f-]+/, { timeout: 20_000 });
+    await expect(page.getByText(name).first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("le filtre par statut restreint la liste", async ({ page }) => {
