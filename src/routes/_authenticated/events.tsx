@@ -79,6 +79,7 @@ function EventsPage() {
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<EventsFilters>(DEFAULT_EVENTS_FILTERS);
+  const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
 
