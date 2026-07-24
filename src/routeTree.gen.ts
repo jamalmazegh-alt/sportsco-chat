@@ -42,7 +42,9 @@ import { Route as SupportViewSessionIdRouteImport } from './routes/support-view.
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
+import { Route as SuperadminNotificationsRouteImport } from './routes/superadmin/notifications'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
+import { Route as SuperadminInviteBatchesRouteImport } from './routes/superadmin/invite-batches'
 import { Route as SuperadminEmailDispatchesRouteImport } from './routes/superadmin/email-dispatches'
 import { Route as SuperadminBuildCluberoRouteImport } from './routes/superadmin/build-clubero'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
@@ -130,6 +132,8 @@ import { Route as AuthenticatedAdminCampsIndexRouteImport } from './routes/_auth
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
 import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
+import { Route as SuperadminPlayersPlayerIdAuditRouteImport } from './routes/superadmin/players.$playerId.audit'
+import { Route as SuperadminClubsClubIdRosterRouteImport } from './routes/superadmin/clubs.$clubId_.roster'
 import { Route as SuperadminClubsClubIdInvitesRouteImport } from './routes/superadmin/clubs.$clubId_.invites'
 import { Route as StagesClubSlugCampSlugInscriptionRouteImport } from './routes/stages.$clubSlug.$campSlug.inscription'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -344,9 +348,19 @@ const SuperadminSettingsRoute = SuperadminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => SuperadminRoute,
 } as any)
+const SuperadminNotificationsRoute = SuperadminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SuperadminRoute,
+} as any)
 const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminInviteBatchesRoute = SuperadminInviteBatchesRouteImport.update({
+  id: '/invite-batches',
+  path: '/invite-batches',
   getParentRoute: () => SuperadminRoute,
 } as any)
 const SuperadminEmailDispatchesRoute =
@@ -826,6 +840,18 @@ const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
   path: '/pay/$registrationId',
   getParentRoute: () => TSlugRoute,
 } as any)
+const SuperadminPlayersPlayerIdAuditRoute =
+  SuperadminPlayersPlayerIdAuditRouteImport.update({
+    id: '/players/$playerId/audit',
+    path: '/players/$playerId/audit',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
+const SuperadminClubsClubIdRosterRoute =
+  SuperadminClubsClubIdRosterRouteImport.update({
+    id: '/clubs/$clubId_/roster',
+    path: '/clubs/$clubId/roster',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
 const SuperadminClubsClubIdInvitesRoute =
   SuperadminClubsClubIdInvitesRouteImport.update({
     id: '/clubs/$clubId_/invites',
@@ -1171,7 +1197,9 @@ export interface FileRoutesByFullPath {
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1279,6 +1307,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1338,7 +1368,9 @@ export interface FileRoutesByTo {
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1445,6 +1477,8 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1510,7 +1544,9 @@ export interface FileRoutesById {
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1618,6 +1654,8 @@ export interface FileRoutesById {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId_/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId_/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug_/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1683,7 +1721,9 @@ export interface FileRouteTypes {
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1791,6 +1831,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId/invites'
+    | '/superadmin/clubs/$clubId/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -1850,7 +1892,9 @@ export interface FileRouteTypes {
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1957,6 +2001,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId/invites'
+    | '/superadmin/clubs/$clubId/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -2021,7 +2067,9 @@ export interface FileRouteTypes {
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -2129,6 +2177,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId_/invites'
+    | '/superadmin/clubs/$clubId_/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/tournament/$slug_/roster/$token'
@@ -2462,11 +2512,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminSettingsRouteImport
       parentRoute: typeof SuperadminRoute
     }
+    '/superadmin/notifications': {
+      id: '/superadmin/notifications'
+      path: '/notifications'
+      fullPath: '/superadmin/notifications'
+      preLoaderRoute: typeof SuperadminNotificationsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/superadmin/logs': {
       id: '/superadmin/logs'
       path: '/logs'
       fullPath: '/superadmin/logs'
       preLoaderRoute: typeof SuperadminLogsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/invite-batches': {
+      id: '/superadmin/invite-batches'
+      path: '/invite-batches'
+      fullPath: '/superadmin/invite-batches'
+      preLoaderRoute: typeof SuperadminInviteBatchesRouteImport
       parentRoute: typeof SuperadminRoute
     }
     '/superadmin/email-dispatches': {
@@ -3077,6 +3141,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/t/$slug/pay/$registrationId'
       preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
       parentRoute: typeof TSlugRoute
+    }
+    '/superadmin/players/$playerId/audit': {
+      id: '/superadmin/players/$playerId/audit'
+      path: '/players/$playerId/audit'
+      fullPath: '/superadmin/players/$playerId/audit'
+      preLoaderRoute: typeof SuperadminPlayersPlayerIdAuditRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/clubs/$clubId_/roster': {
+      id: '/superadmin/clubs/$clubId_/roster'
+      path: '/clubs/$clubId/roster'
+      fullPath: '/superadmin/clubs/$clubId/roster'
+      preLoaderRoute: typeof SuperadminClubsClubIdRosterRouteImport
+      parentRoute: typeof SuperadminRoute
     }
     '/superadmin/clubs/$clubId_/invites': {
       id: '/superadmin/clubs/$clubId_/invites'
@@ -3703,7 +3781,9 @@ interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
   SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
   SuperadminEmailDispatchesRoute: typeof SuperadminEmailDispatchesRoute
+  SuperadminInviteBatchesRoute: typeof SuperadminInviteBatchesRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
+  SuperadminNotificationsRoute: typeof SuperadminNotificationsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRoute
@@ -3716,13 +3796,17 @@ interface SuperadminRouteChildren {
   SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
   SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
   SuperadminClubsClubIdInvitesRoute: typeof SuperadminClubsClubIdInvitesRoute
+  SuperadminClubsClubIdRosterRoute: typeof SuperadminClubsClubIdRosterRoute
+  SuperadminPlayersPlayerIdAuditRoute: typeof SuperadminPlayersPlayerIdAuditRoute
 }
 
 const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminBillingRoute: SuperadminBillingRoute,
   SuperadminBuildCluberoRoute: SuperadminBuildCluberoRoute,
   SuperadminEmailDispatchesRoute: SuperadminEmailDispatchesRoute,
+  SuperadminInviteBatchesRoute: SuperadminInviteBatchesRoute,
   SuperadminLogsRoute: SuperadminLogsRoute,
+  SuperadminNotificationsRoute: SuperadminNotificationsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRoute,
@@ -3736,6 +3820,8 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
   SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
   SuperadminClubsClubIdInvitesRoute: SuperadminClubsClubIdInvitesRoute,
+  SuperadminClubsClubIdRosterRoute: SuperadminClubsClubIdRosterRoute,
+  SuperadminPlayersPlayerIdAuditRoute: SuperadminPlayersPlayerIdAuditRoute,
 }
 
 const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(

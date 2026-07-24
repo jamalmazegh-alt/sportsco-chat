@@ -25,6 +25,7 @@ import {
   Upload,
   MessageCircleHeart,
   Mail,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,8 @@ const NAV: NavItem[] = [
   { to: "/superadmin/billing", label: "Billing", icon: CreditCard },
   { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
   { to: "/superadmin/email-dispatches", label: "Email sending", icon: Mail },
+  { to: "/superadmin/invite-batches", label: "Invite batches", icon: Mail },
+  { to: "/superadmin/notifications", label: "Notifications", icon: Bell },
   { to: "/superadmin/support", label: "Support hub", icon: LifeBuoy },
   { to: "/superadmin/support-tickets", label: "Tickets", icon: LifeBuoy },
   { to: "/superadmin/build-clubero", label: "Marketing campaign", icon: MessageCircleHeart },
