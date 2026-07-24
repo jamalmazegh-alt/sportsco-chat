@@ -70,11 +70,9 @@ describe("superadmin observability: guard is invoked and rejects non-super", () 
     const rej = mod.listInviteBatches({ data: {} } as never).catch((e) => e);
     const err = await rej;
     // Either the Response we threw, or a wrapper that still carries status 403.
-    if (err instanceof Response) {
-      expect(err.status).toBe(403);
-    } else {
-      expect(String(err)).toMatch(/Forbidden|403/);
-    }
+    const status = (err as { status?: number })?.status;
+    expect(status).toBe(403);
+
     expect(forbidden).toHaveBeenCalled();
   });
 });
