@@ -322,7 +322,7 @@ function TeamDetail() {
   });
 
   // Failed invite emails per player (bounced/failed/dlq/complained/suppressed).
-  const { data: inviteFailuresByPlayer } = useQuery({
+  const { data: inviteFailuresByPlayer, isPending: inviteFailuresLoading } = useQuery({
     queryKey: ["team-invite-failures", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
