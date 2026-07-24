@@ -670,9 +670,9 @@ function NewPublicationPage() {
                       return (
                         <div
                           key={tm.id}
-                          className="flex items-center justify-between gap-2 rounded-md bg-background/60 border border-sky-500/20 px-2 py-1.5"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-md bg-background/60 border border-sky-500/20 px-2 py-1.5"
                         >
-                          <span className="inline-flex items-center gap-1.5 text-sm font-medium truncate">
+                          <span className="inline-flex items-center gap-1.5 text-sm font-medium min-w-0">
                             <Trophy className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                             <span className="truncate">{tm.name}</span>
                           </span>
