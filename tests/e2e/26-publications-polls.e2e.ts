@@ -114,6 +114,9 @@ async function seedPoll(
   question: string,
   visibility: "anonymous" | "staff_visible",
 ): Promise<string> {
+  // Mirror createPublication: insert draft rows, then publish_publication_atomic
+  // so club_publication_recipients exist. Without recipients, get_eligible_vote_subjects
+  // is empty (no vote UI) and cast_poll_vote raises "forbidden".
   const { data, error } = await admin
     .from("club_publications")
     .insert({
@@ -124,7 +127,6 @@ async function seedPoll(
       poll_visibility: visibility,
       publish_to_wall: true,
       send_email: false,
-      published_at: new Date().toISOString(),
     })
     .select("id")
     .single();
@@ -142,6 +144,13 @@ async function seedPoll(
     team_id: club.teamId,
   });
   if (audErr) throw new Error(`seedPoll audience: ${audErr.message}`);
+
+  const { error: pubErr } = await admin.rpc("publish_publication_atomic" as any, {
+    _publication_id: data.id,
+    _kind: "publish",
+    _dispatch_id: null,
+  });
+  if (pubErr) throw new Error(`seedPoll publish: ${pubErr.message}`);
 
   return data.id as string;
 }

@@ -8,7 +8,8 @@ service_role).
 
 When `SUPABASE_SERVICE_ROLE_KEY` **and** `E2E_TARGET_PROJECT_REF` are set,
 `globalSetup` (or `bun run seed:e2e`) **idempotently** creates/repairs the
-4 users (password reset to match secrets), profiles, club, and memberships.
+4 users (password reset to match secrets), profiles, club, memberships, and
+the latest required `user_consents` (so `ConsentGate` does not block UI specs).
 
 ```bash
 export SUPABASE_URL=https://<bughunt-ref>.supabase.co
