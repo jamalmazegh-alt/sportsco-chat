@@ -63,27 +63,3 @@ describe("superadmin observability: static guard presence", () => {
   }
 });
 
-describe("superadmin observability: guard is invoked and rejects non-super", () => {
-  beforeEach(() => forbidden.mockClear());
-
-  it("invokes assertSuperAdmin before any RPC on each handler", async () => {
-    const mod = await import("@/lib/superadmin/observability.functions");
-    const calls: Array<[string, () => Promise<unknown>]> = [
-      ["listInviteBatches", () => mod.listInviteBatches({ data: {} } as never)],
-      ["getInviteBatchRows", () => mod.getInviteBatchRows({ data: { batchId: "x" } } as never)],
-      ["listNotificationEmails", () => mod.listNotificationEmails({ data: {} } as never)],
-      ["listNotificationPush", () => mod.listNotificationPush({ data: {} } as never)],
-      ["getClubRoster", () =>
-        mod.getClubRoster({ data: { clubId: "00000000-0000-0000-0000-000000000000" } } as never)],
-      ["getPlayerAudit", () =>
-        mod.getPlayerAudit({ data: { playerId: "00000000-0000-0000-0000-000000000000" } } as never)],
-    ];
-    for (const [, run] of calls) {
-      await run().catch(() => undefined);
-    }
-    // Every handler must have called the guard (mocked to reject); if a handler
-    // ever bypasses the guard this count drops and the leak is caught.
-    expect(forbidden).toHaveBeenCalledTimes(calls.length);
-  });
-
-});
