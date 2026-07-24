@@ -30,11 +30,12 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     if (!links || links.length === 0) return { sent: 0 };
 
     const playerIds = links.map((l: any) => l.player_id);
-    const { data: already } = await supabaseAdmin
+    const { data: already } = await (supabaseAdmin as any)
       .from("parent_link_notifications")
       .select("player_id")
       .eq("parent_user_id", userId)
       .in("player_id", playerIds);
+
     const notifiedSet = new Set((already ?? []).map((r: any) => r.player_id));
     const pending = links.filter((l: any) => !notifiedSet.has(l.player_id));
     if (pending.length === 0) return { sent: 0 };
@@ -52,13 +53,14 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     // If the parent disabled email notifications, record the pending links as
     // notified so we don't recheck every login, and skip sending.
     if (prof && (prof as any).notifications_email === false) {
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from("parent_link_notifications")
         .insert(
           pending.map((p: any) => ({ parent_user_id: userId, player_id: p.player_id })),
         );
       return { sent: 0 };
     }
+
 
     const locale = (prof as any)?.preferred_language === "en" ? "en" : "fr";
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
@@ -87,9 +89,10 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
             locale,
           },
         });
-        await supabaseAdmin
+        await (supabaseAdmin as any)
           .from("parent_link_notifications")
           .insert({ parent_user_id: userId, player_id: link.player_id });
+
         sent += 1;
       } catch (e) {
         console.error("[parent-child-linked] email failed", {
