@@ -27,14 +27,23 @@ bun run dev
 
 ### Lint / test / build
 
-| Command             | Notes                                                                                   |
-| ------------------- | --------------------------------------------------------------------------------------- |
-| `bun run lint`      | ESLint — may report many pre-existing issues in the repo                                |
-| `bun run typecheck` | `tsc --noEmit`                                                                          |
-| `bun run test`      | Unit tests (Vitest, no external deps) — 305 tests                                       |
-| `bun run test:rls`  | Requires remote Supabase + `SUPABASE_SERVICE_ROLE_KEY`                                  |
-| `bun run test:e2e`  | Requires `E2E_BASE_URL`, pre-seeded E2E users in Supabase, Playwright Chromium          |
-| `bun run build`     | Production build (~30s); needs `NODE_OPTIONS=--max-old-space-size=8192` (set in script) |
+| Command                | Notes                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `bun run lint`         | ESLint — may report many pre-existing issues in the repo                                |
+| `bun run format`       | Prettier write (`.prettierrc`: printWidth 100, double quotes, trailing commas)          |
+| `bun run format:check` | Must stay green — CI blocks on drift                                                    |
+| `bun run typecheck`    | `tsc --noEmit`                                                                          |
+| `bun run test`         | Unit tests (Vitest, no external deps) — 305 tests                                       |
+| `bun run test:rls`     | Requires remote Supabase + `SUPABASE_SERVICE_ROLE_KEY`                                  |
+| `bun run test:e2e`     | Requires `E2E_BASE_URL`, pre-seeded E2E users in Supabase, Playwright Chromium          |
+| `bun run build`        | Production build (~30s); needs `NODE_OPTIONS=--max-old-space-size=8192` (set in script) |
+
+### Formatting (Lovable / AI editors)
+
+Lovable commits often skip husky. Before finishing a change, run `bun run format`
+(or format only touched files with `bunx prettier --write <paths>`). Config is in
+`.prettierrc`. On `main`, `.github/workflows/prettier-autofix.yml` also auto-commits
+a `chore: prettier autofix` follow-up when needed.
 
 Install Playwright browsers before E2E: `bunx playwright install --with-deps chromium`.
 
