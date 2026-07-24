@@ -740,9 +740,17 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     return <WallFeedSkeleton />;
   }
 
-  const canPost =
-    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isStaffMode = !!staffTeamId;
+  const canPost = isStaffMode
+    ? roles.includes("admin") ||
+      roles.includes("dirigeant") ||
+      roles.includes("coach") ||
+      roles.includes("assistant_coach")
+    : roles.includes("admin") ||
+      roles.includes("coach") ||
+      roles.includes("assistant_coach");
   const audienceMissing =
+    !isStaffMode &&
     canPost &&
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
     audience !== null &&
@@ -756,28 +764,43 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
             clubId={clubId}
             value={body}
             onChange={setBody}
-            placeholder={t("wall.placeholder")}
+            placeholder={
+              isStaffMode
+                ? t("wall.staff.placeholder", {
+                    defaultValue: "Message privé au staff de cette équipe…",
+                  })
+                : t("wall.placeholder")
+            }
             rows={3}
           />
-          <AudiencePicker
-            teams={targetableTeams}
-            value={audience}
-            onChange={(next) => {
-              setAudience(next);
-              if (next !== null) setAudienceGroups([]);
-            }}
-            groups={targetableGroups}
-            groupValue={audienceGroups}
-            onGroupChange={(next) => {
-              setAudienceGroups(next);
-              if (next.length > 0) setAudience([]);
-            }}
-            canPickClubWide={
-              roles.includes("admin") ||
-              roles.includes("dirigeant") ||
-              targetableTeams.length === allTeams.length
-            }
-          />
+          {isStaffMode ? (
+            <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("wall.staff.audienceLocked", {
+                defaultValue: "Visible uniquement par le staff de l'équipe et les admins du club.",
+              })}
+            </p>
+          ) : (
+            <AudiencePicker
+              teams={targetableTeams}
+              value={audience}
+              onChange={(next) => {
+                setAudience(next);
+                if (next !== null) setAudienceGroups([]);
+              }}
+              groups={targetableGroups}
+              groupValue={audienceGroups}
+              onGroupChange={(next) => {
+                setAudienceGroups(next);
+                if (next.length > 0) setAudience([]);
+              }}
+              canPickClubWide={
+                roles.includes("admin") ||
+                roles.includes("dirigeant") ||
+                targetableTeams.length === allTeams.length
+              }
+            />
+          )}
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
             <input
@@ -788,19 +811,21 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
             />
             {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
           </label>
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
-            <Button asChild size="sm" variant="outline">
-              <Link to="/publications/new">
-                <BarChart3 className="h-4 w-4 mr-1.5" />
-                {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link to="/publications">
-                {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
-              </Link>
-            </Button>
-          </div>
+          {!isStaffMode && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/publications/new">
+                  <BarChart3 className="h-4 w-4 mr-1.5" />
+                  {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link to="/publications">
+                  {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+                </Link>
+              </Button>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
