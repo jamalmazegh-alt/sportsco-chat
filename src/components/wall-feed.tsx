@@ -720,6 +720,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     setAtts([]);
     setAudienceGroups([]);
     setSendEmail(false);
+    setStaffAudienceMode(false);
     // Reset audience to the per-role default for the next post.
     if (isPriv) setAudience(null);
     else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
