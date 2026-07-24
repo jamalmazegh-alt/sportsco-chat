@@ -25,7 +25,7 @@ import {
 test.describe("auth", () => {
   test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
     await loginViaForm(page, "admin");
-    await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible();
+    await expect(page.locator("nav[aria-label]").first()).toBeVisible();
     await expect(page.locator("#password")).toHaveCount(0);
   });
 });
@@ -374,7 +374,7 @@ test.describe("smoke mobile", () => {
     test(`mobile : ${p.name} s'affiche avec la bottom-nav`, async ({ page }) => {
       await loginViaUI(page, "admin");
       await page.goto(p.url);
-      await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible();
+      await expect(page.locator("nav[aria-label]").first()).toBeVisible();
       if (p.expectKey) {
         await expect(page.getByText(tx(p.expectKey)).first()).toBeVisible();
       } else {

@@ -58,11 +58,12 @@ E2E_CAMP_SLUG=…       # formulaire d'inscription
 E2E_UI=1              # timeout 90s (posé dans le workflow E2E CI)
 ```
 
-`loginViaUI` injecte la session (`loginAs`) puis attend `/home` **et** la
-bottom-nav (memberships hydratés). Le formulaire `/login` est exercé une fois
-via `loginViaForm`. Les créations d'événement passent par
-`openClassicEventForm` (`EventCreateChooser` → formulaire classique) — les
-testids `event-*-input` n'existent pas dans l'assistant guidé.
+`loginViaUI` injecte la session (`loginAs`) puis `goto /home` avec
+`waitUntil: "domcontentloaded"` (comme beta-closure — le défaut `load`
+timeout ~30s sur `/home` en CI) et attend `nav[aria-label]`. Le formulaire
+`/login` est exercé une fois via `loginViaForm`. Les créations d'événement
+passent par `openClassicEventForm` (`EventCreateChooser` → formulaire
+classique) — les testids `event-*-input` n'existent pas dans l'assistant.
 
 ## 6. Reste non couvert
 

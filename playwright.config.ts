@@ -50,7 +50,9 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   fullyParallel: false, // shared pre-existing club → run sequentially
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  // 1 retry: enough to absorb flakes, not enough to burn a 60m job on a
+  // systematically broken UI helper (2 retries × ~32s × N tests ⇒ cancel).
+  retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: process.env.CI ? [["html", { open: "never" }], ["list"]] : "list",
   use: {
