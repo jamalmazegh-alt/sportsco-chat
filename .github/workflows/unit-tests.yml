@@ -20,6 +20,13 @@ jobs:
       # --- Checks rapides d'abord (échec en quelques secondes) ---
       - name: Check server function guards
         run: bun run check:guards
+
+      # Lovable pushes bypass husky. On main, format the working tree so this
+      # job can proceed (prettier-autofix.yml commits the same fix to git).
+      # On pull_request, fail hard if the branch is not already formatted.
+      - name: Apply Prettier (main working tree)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: bun run format
       - name: Check formatting (Prettier)
         run: bun run format:check
       - name: Check i18n parity
