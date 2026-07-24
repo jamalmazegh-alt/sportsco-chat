@@ -55,7 +55,8 @@ test.describe("stages — administration", () => {
     await expect(createBtn).toBeEnabled({ timeout: 10_000 });
     await createBtn.click();
     await page.waitForURL(/\/admin\/camps\/[0-9a-f-]+/, { timeout: 20_000 });
-    await expect(page.getByText(name).first()).toBeVisible({ timeout: 15_000 });
+    // Detail editor keeps the title in an input — getByText misses values.
+    await expect(page.getByDisplayValue(name).first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("le filtre par statut restreint la liste", async ({ page }) => {

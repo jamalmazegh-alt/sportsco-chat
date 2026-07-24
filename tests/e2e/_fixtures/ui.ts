@@ -132,18 +132,22 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await dismissBlockingOverlays(page);
   await expect(page.locator("#email")).toBeVisible();
 
-  // Click + fill: plus fiable que getByLabel sur le layout floating-label.
-  // `#password` — getByLabel(auth.password) matche aussi le toggle show/hide.
+  // Floating-label layout: click then pressSequentially so controlled inputs keep values.
   await page.locator("#email").click();
-  await page.locator("#email").fill(email);
+  await page.locator("#email").fill("");
+  await page.locator("#email").pressSequentially(email, { delay: 10 });
   await expect(page.locator("#email")).toHaveValue(email);
   await page.locator("#password").click();
-  await page.locator("#password").fill(password);
+  await page.locator("#password").fill("");
+  await page.locator("#password").pressSequentially(password, { delay: 10 });
   await expect(page.locator("#password")).toHaveValue(password);
 
-  const submit = page.locator("form.card button.cta[type='submit']");
-  await expect(submit).toBeEnabled();
-  await submit.click();
+  await dismissBlockingOverlays(page);
+  const submit = page
+    .locator("form.card button.cta[type='submit']")
+    .or(page.getByRole("button", { name: /Se connecter|Log in|Sign in/i }));
+  await expect(submit.first()).toBeEnabled();
+  await submit.first().click();
   await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
     timeout: 45_000,
   });
@@ -176,10 +180,8 @@ export async function openClassicEventForm(page: Page): Promise<void> {
 
 /**
  * Remplit date + heure de début dans `EventFormSheet`.
- * Les champs n'ont pas de testid — on scope au dialog et on cible le
- * TimePicker (`placeholder=HH:MM`) plutôt que le premier `—` (convoc avant start).
  *
- * Indices (0-based) within the open dialog:
+ * Indices (0-based) within the open event dialog:
  * - meeting: dateIndex 0, timeIndex 0
  * - match:   dateIndex 1 (match date), timeIndex 1
  * - training (single session): dateIndex 0, timeIndex 1 (start, after convoc)
@@ -191,9 +193,13 @@ export async function fillEventStartDateTime(
   const time = opts.time ?? "18:00";
   const dateIndex = opts.dateIndex ?? 0;
   const timeIndex = opts.timeIndex ?? 0;
-  const root = page.getByRole("dialog").last();
+  const root = page
+    .getByRole("dialog")
+    .filter({ has: page.getByRole("heading", { level: 2 }) })
+    .first();
 
-  const dateButtons = root.locator("button").filter({ has: page.locator("svg.lucide-calendar") });
+  // Class segment match — lucide may emit lucide-calendar / lucide-Calendar.
+  const dateButtons = root.locator("button:has(svg[class*='calendar'])");
   await expect(dateButtons.nth(dateIndex)).toBeVisible({ timeout: 10_000 });
   await dateButtons.nth(dateIndex).click();
   const day = page.getByRole("gridcell").getByRole("button").filter({ hasText: /^\d+$/ });
@@ -201,7 +207,7 @@ export async function fillEventStartDateTime(
   if (count === 0) throw new Error("fillEventStartDateTime: no calendar day buttons");
   await day.nth(Math.min(14, count - 1)).click();
 
-  const clockButtons = root.locator("button").filter({ has: page.locator("svg.lucide-clock") });
+  const clockButtons = root.locator("button:has(svg[class*='clock'])");
   await expect(clockButtons.nth(timeIndex)).toBeVisible({ timeout: 10_000 });
   await clockButtons.nth(timeIndex).click();
   const hhmm = page.locator('input[placeholder="HH:MM"]');
@@ -211,11 +217,16 @@ export async function fillEventStartDateTime(
 }
 
 /**
- * Label « Destinataires / Recipients » on the publication audience step.
- * Plain getByText() also matches helper copy containing "recipients".
+ * Audience step marker on publication create.
+ * Radix Label is not always exposed as role=label; "Recipients" also appears
+ * inside delivery helper copy — prefer the step chrome / exact label node.
  */
 export function publicationAudienceLabel(page: Page) {
-  return page.getByRole("label", { name: tx("new.audienceLabel", "publications") });
+  return page
+    .locator("label")
+    .filter({ hasText: tx("new.audienceLabel", "publications") })
+    .first()
+    .or(page.getByText(/Step\s*2\s*\/\s*2|Étape\s*2\s*\/\s*2/i));
 }
 
 /**

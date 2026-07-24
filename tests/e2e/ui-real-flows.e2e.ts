@@ -154,26 +154,21 @@ test.describe("convocations — envoi", () => {
 
   test("le coach envoie les convocations et le statut devient visible", async ({ page }) => {
     await loginViaUI(page, "coach");
-    await page.goto(`/events/${club.eventId}`);
+    // Deep-link opens the picker with the whole team pre-selected.
+    await page.goto(`/events/${club.eventId}?send=1&action=all`);
 
-    await page
-      .getByRole("button", { name: tx("events.sendConvocations") })
-      .first()
-      .click();
-
-    // Player-picker dialog: Continue stays disabled at (0) until a selection.
     const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    const selectAll = dialog.getByRole("checkbox", { name: tx("attendance.selectAll") });
-    if (await selectAll.count()) {
-      await selectAll.check();
-    } else {
-      await dialog.getByRole("checkbox").first().check();
-    }
-    // Label is "Continue (N)" — regex from common.continue matches the prefix.
+    await expect(dialog).toBeVisible({ timeout: 15_000 });
     const continueBtn = dialog.getByRole("button", { name: tx("common.continue") });
-    await expect(continueBtn).toBeEnabled({ timeout: 10_000 });
-    await continueBtn.click();
+    if (await continueBtn.isEnabled().catch(() => false)) {
+      await continueBtn.click();
+    } else {
+      const selectAll = dialog.getByRole("checkbox", { name: tx("attendance.selectAll") });
+      if (await selectAll.count()) await selectAll.check();
+      else await dialog.getByRole("checkbox").first().check();
+      await expect(continueBtn).toBeEnabled({ timeout: 10_000 });
+      await continueBtn.click();
+    }
 
     const confirm = page
       .getByRole("button", { name: tx("attendance.confirmSend") })

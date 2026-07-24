@@ -103,9 +103,8 @@ test.describe("besoins — parcours destinataire", () => {
     await loginViaUI(page, "player");
     await page.goto("/needs");
 
-    await expect(
-      page.getByText(tx("feed.empty", "needs")).or(page.getByText(tx("feed.title", "needs"))),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: tx("feed.title", "needs") })).toBeVisible();
+    await expect(page.getByText(tx("feed.empty", "needs")).first()).toBeVisible();
   });
 });
 
@@ -154,9 +153,10 @@ async function seedNeed(label: string, opts: { published: boolean }): Promise<st
   if (opts.published) {
     // RLS feed visibility uses event_need_publication_recipients via
     // user_is_need_recipient — audiences alone are not enough.
+    // `admin` is the E2E admin JWT (not service_role): RPC requires auth.uid()=_actor.
     const { error: pubErr } = await admin.rpc("publish_event_need_atomic" as any, {
       _need_id: data.id,
-      _actor: club.coach.userId,
+      _actor: club.admin.userId,
       _audiences: [{ type: "team_parents", team_id: club.teamId }],
     });
     if (pubErr) throw new Error(`seedNeed publish: ${pubErr.message}`);
