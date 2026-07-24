@@ -49,7 +49,6 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
       .in("recipient_email", emails)
       .order("created_at", { ascending: false });
 
-
     // Latest status per message_id
     const latestByMessage = new Map<
       string,

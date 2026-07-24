@@ -94,9 +94,17 @@ export function EventsFilterSheet({
 
   const typeOptions: Array<{ key: EventTypeKey; label: string; icon: typeof Dumbbell }> = useMemo(
     () => [
-      { key: "training", label: t("events.typeTraining", { defaultValue: "Entraînement" }), icon: Dumbbell },
+      {
+        key: "training",
+        label: t("events.typeTraining", { defaultValue: "Entraînement" }),
+        icon: Dumbbell,
+      },
       { key: "match", label: t("events.typeMatch", { defaultValue: "Match" }), icon: Trophy },
-      { key: "tournament", label: t("events.typeTournament", { defaultValue: "Tournoi" }), icon: Trophy },
+      {
+        key: "tournament",
+        label: t("events.typeTournament", { defaultValue: "Tournoi" }),
+        icon: Trophy,
+      },
       { key: "meeting", label: t("events.typeMeeting", { defaultValue: "Réunion" }), icon: Users },
       { key: "other", label: t("events.typeOther", { defaultValue: "Autre" }), icon: CalendarIcon },
     ],
@@ -180,7 +188,9 @@ export function EventsFilterSheet({
           </Section>
 
           {/* Home / Away */}
-          {(draft.types.size === 0 || draft.types.has("match") || draft.types.has("tournament")) && (
+          {(draft.types.size === 0 ||
+            draft.types.has("match") ||
+            draft.types.has("tournament")) && (
             <Section title={t("events.filterVenue", { defaultValue: "Lieu" })}>
               <div className="flex flex-wrap gap-2">
                 <ChipButton
@@ -288,9 +298,7 @@ export function EventsFilterSheet({
               {isCoach && hasInternalTeam && (
                 <ChipButton
                   active={!draft.includeInternal}
-                  onClick={() =>
-                    setDraft({ ...draft, includeInternal: !draft.includeInternal })
-                  }
+                  onClick={() => setDraft({ ...draft, includeInternal: !draft.includeInternal })}
                 >
                   <Building2 className="h-3.5 w-3.5" />
                   {t("events.hideInternalMeetings", {
@@ -383,7 +391,10 @@ function DateField({
             type="button"
             variant="outline"
             size="sm"
-            className={cn("w-full justify-start h-9 font-normal", !value && "text-muted-foreground")}
+            className={cn(
+              "w-full justify-start h-9 font-normal",
+              !value && "text-muted-foreground",
+            )}
           >
             <CalendarIcon className="mr-2 h-3.5 w-3.5" />
             {value ? format(value, "PPP", { locale }) : "—"}

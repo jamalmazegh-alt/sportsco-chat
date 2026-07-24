@@ -10,9 +10,9 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-
-
-const FILE = fileURLToPath(new URL("../../lib/superadmin/observability.functions.ts", import.meta.url));
+const FILE = fileURLToPath(
+  new URL("../../lib/superadmin/observability.functions.ts", import.meta.url),
+);
 
 describe("superadmin observability: static guard presence", () => {
   const src = readFileSync(FILE, "utf8");
@@ -48,4 +48,3 @@ describe("superadmin observability: static guard presence", () => {
     });
   }
 });
-

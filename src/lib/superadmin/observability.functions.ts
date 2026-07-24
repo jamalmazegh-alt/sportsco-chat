@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertSuperAdmin } from "@/lib/authz.server";
 
-
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
 
 // ---------- Invite batches ----------
@@ -199,7 +198,12 @@ export type PlayerAuditRow = {
 export const getPlayerAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ playerId: z.string().uuid(), limit: z.number().int().min(1).max(2000).default(500) }).parse(input),
+    z
+      .object({
+        playerId: z.string().uuid(),
+        limit: z.number().int().min(1).max(2000).default(500),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);

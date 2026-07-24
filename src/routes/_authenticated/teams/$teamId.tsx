@@ -1089,7 +1089,6 @@ function TeamDetail() {
           </Link>
         )}
 
-
       <TeamCoaches
         teamId={teamId}
         clubId={(team as any)?.club_id}
@@ -1480,8 +1479,6 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
-
-
           {(() => {
             const list = [...(players ?? [])] as any[];
             if (!isCoach && myPlayerIds && myPlayerIds.size > 0) {
@@ -1666,7 +1663,6 @@ function TeamDetail() {
                       <span className="text-muted-foreground">{p.preferred_position ?? ""}</span>
                     )}
                   </p>
-
                 </div>
               </>
             );

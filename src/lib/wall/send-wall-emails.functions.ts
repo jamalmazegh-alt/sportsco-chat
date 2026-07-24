@@ -209,7 +209,6 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
       }
     }
 
-
     // 3) Routage mineur → parents.
     //    - Un joueur mineur est déterminé via la fonction SQL public.player_is_minor
     //      (seuil configuré côté club/locale ; ex. FR = 15 ans).

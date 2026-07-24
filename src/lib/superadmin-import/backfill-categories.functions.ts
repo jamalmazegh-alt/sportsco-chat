@@ -16,11 +16,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import {
-  computeFffCategory,
-  parseSeasonEndYear,
-  seasonLabelFromEndYear,
-} from "@/lib/fff-category";
+import { computeFffCategory, parseSeasonEndYear, seasonLabelFromEndYear } from "@/lib/fff-category";
 
 async function assertClubAdminOrSuper(
   supabase: import("@supabase/supabase-js").SupabaseClient,
@@ -101,10 +97,7 @@ export const recomputePlayerCategoriesForSeason = createServerFn({ method: "POST
     // Charger les birth_date des joueurs concernés.
     const playerIds = Array.from(new Set(rows.map((r) => r.player_id)));
     const { data: players } = playerIds.length
-      ? await supabaseAdmin
-          .from("players")
-          .select("id, birth_date")
-          .in("id", playerIds)
+      ? await supabaseAdmin.from("players").select("id, birth_date").in("id", playerIds)
       : { data: [] as Array<{ id: string; birth_date: string | null }> };
     const dobByPlayer = new Map<string, string | null>();
     for (const p of (players ?? []) as Array<{ id: string; birth_date: string | null }>) {

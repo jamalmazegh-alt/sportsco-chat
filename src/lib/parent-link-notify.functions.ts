@@ -55,12 +55,9 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     if (prof && (prof as any).notifications_email === false) {
       await (supabaseAdmin as any)
         .from("parent_link_notifications")
-        .insert(
-          pending.map((p: any) => ({ parent_user_id: userId, player_id: p.player_id })),
-        );
+        .insert(pending.map((p: any) => ({ parent_user_id: userId, player_id: p.player_id })));
       return { sent: 0 };
     }
-
 
     const locale = (prof as any)?.preferred_language === "en" ? "en" : "fr";
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";

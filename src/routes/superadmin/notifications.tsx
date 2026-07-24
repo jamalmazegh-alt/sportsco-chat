@@ -36,7 +36,9 @@ function NotificationsPage() {
         <button
           onClick={() => setTab("email")}
           className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
-            tab === "email" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"
+            tab === "email"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground"
           }`}
         >
           <Mail className="inline h-3.5 w-3.5 mr-1" /> Emails
@@ -44,7 +46,9 @@ function NotificationsPage() {
         <button
           onClick={() => setTab("push")}
           className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${
-            tab === "push" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"
+            tab === "push"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground"
           }`}
         >
           <Bell className="inline h-3.5 w-3.5 mr-1" /> Push
@@ -77,8 +81,18 @@ function EmailsTab() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <Input placeholder="Recherche email" value={search} onChange={(e) => setSearch(e.target.value)} className="h-8" />
-        <Input placeholder="Template" value={template} onChange={(e) => setTemplate(e.target.value)} className="h-8 w-52" />
+        <Input
+          placeholder="Recherche email"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-8"
+        />
+        <Input
+          placeholder="Template"
+          value={template}
+          onChange={(e) => setTemplate(e.target.value)}
+          className="h-8 w-52"
+        />
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
@@ -98,7 +112,9 @@ function EmailsTab() {
         </Button>
       </div>
       {isLoading ? (
-        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin" /></div>
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : (
         <div className="rounded-lg border border-border overflow-hidden">
           <table className="w-full text-sm">
@@ -114,7 +130,9 @@ function EmailsTab() {
             <tbody className="divide-y divide-border">
               {rows.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20">
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">{fmt(r.created_at)}</td>
+                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
+                    {fmt(r.created_at)}
+                  </td>
                   <td className="px-3 py-2">{r.template_name}</td>
                   <td className="px-3 py-2 truncate max-w-[240px]">{r.recipient_email}</td>
                   <td className="px-3 py-2">
@@ -123,10 +141,10 @@ function EmailsTab() {
                         r.status === "sent" || r.status === "delivered"
                           ? "success"
                           : r.status === "pending" || r.status === "processing"
-                          ? "info"
-                          : r.status === "suppressed"
-                          ? "warn"
-                          : "danger"
+                            ? "info"
+                            : r.status === "suppressed"
+                              ? "warn"
+                              : "danger"
                       }
                     >
                       {r.status}
@@ -159,13 +177,20 @@ function PushTab() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <Input placeholder="Type (ex: convocation, wall_post)" value={kind} onChange={(e) => setKind(e.target.value)} className="h-8 w-64" />
+        <Input
+          placeholder="Type (ex: convocation, wall_post)"
+          value={kind}
+          onChange={(e) => setKind(e.target.value)}
+          className="h-8 w-64"
+        />
         <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
         </Button>
       </div>
       {isLoading ? (
-        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin" /></div>
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : (
         <div className="rounded-lg border border-border overflow-hidden">
           <table className="w-full text-sm">
@@ -182,7 +207,9 @@ function PushTab() {
             <tbody className="divide-y divide-border">
               {rows.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20">
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">{fmt(r.dispatched_at)}</td>
+                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
+                    {fmt(r.dispatched_at)}
+                  </td>
                   <td className="px-3 py-2">{r.kind}</td>
                   <td className="px-3 py-2">{r.targets_count}</td>
                   <td className="px-3 py-2">{r.sent_count}</td>

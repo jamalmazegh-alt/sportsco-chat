@@ -34,9 +34,22 @@ function ClubRosterPage() {
             .includes(qq),
         )
       : rows;
-    const map = new Map<string, { team_id: string; team_name: string; team_age_group: string | null; players: ClubRosterRow[] }>();
+    const map = new Map<
+      string,
+      {
+        team_id: string;
+        team_name: string;
+        team_age_group: string | null;
+        players: ClubRosterRow[];
+      }
+    >();
     for (const r of filtered) {
-      const g = map.get(r.team_id) ?? { team_id: r.team_id, team_name: r.team_name, team_age_group: r.team_age_group, players: [] };
+      const g = map.get(r.team_id) ?? {
+        team_id: r.team_id,
+        team_name: r.team_name,
+        team_age_group: r.team_age_group,
+        players: [],
+      };
       g.players.push(r);
       map.set(r.team_id, g);
     }
@@ -56,22 +69,35 @@ function ClubRosterPage() {
               Statut d'activation du compte pour chaque joueur et chaque parent.
             </p>
           </div>
-          <Input placeholder="Rechercher joueur / parent" value={q} onChange={(e) => setQ(e.target.value)} className="h-8 w-72" />
+          <Input
+            placeholder="Rechercher joueur / parent"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="h-8 w-72"
+          />
         </div>
-        <Link to="/superadmin/clubs/$clubId" params={{ clubId }} className="text-xs text-muted-foreground hover:underline">
+        <Link
+          to="/superadmin/clubs/$clubId"
+          params={{ clubId }}
+          className="text-xs text-muted-foreground hover:underline"
+        >
           ← Retour au club
         </Link>
       </header>
 
       {isLoading ? (
-        <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        <div className="flex justify-center py-16">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
       ) : (
         <div className="space-y-4">
           {grouped.map((g) => (
             <TeamBlock key={g.team_id} team={g} />
           ))}
           {grouped.length === 0 && (
-            <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">Aucun résultat.</div>
+            <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">
+              Aucun résultat.
+            </div>
           )}
         </div>
       )}
@@ -79,15 +105,29 @@ function ClubRosterPage() {
   );
 }
 
-function TeamBlock({ team }: { team: { team_id: string; team_name: string; team_age_group: string | null; players: ClubRosterRow[] } }) {
+function TeamBlock({
+  team,
+}: {
+  team: {
+    team_id: string;
+    team_name: string;
+    team_age_group: string | null;
+    players: ClubRosterRow[];
+  };
+}) {
   const [open, setOpen] = useState(true);
   return (
     <div className="rounded-lg border border-border overflow-hidden bg-card">
-      <button onClick={() => setOpen((v) => !v)} className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted/40 text-left">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted/40 text-left"
+      >
         {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         <div className="flex-1 min-w-0">
           <div className="font-medium">{team.team_name}</div>
-          {team.team_age_group && <div className="text-xs text-muted-foreground">{team.team_age_group}</div>}
+          {team.team_age_group && (
+            <div className="text-xs text-muted-foreground">{team.team_age_group}</div>
+          )}
         </div>
         <div className="text-xs text-muted-foreground">{team.players.length} joueurs</div>
       </button>
@@ -107,10 +147,19 @@ function PlayerRow({ p }: { p: ClubRosterRow }) {
   const active = !!p.player_user_id && !!p.player_last_sign_in_at;
   return (
     <div className="bg-background">
-      <button onClick={() => setOpen((v) => !v)} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 text-left">
-        {open ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 text-left"
+      >
+        {open ? (
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+        )}
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium">{p.player_first_name} {p.player_last_name}</div>
+          <div className="text-sm font-medium">
+            {p.player_first_name} {p.player_last_name}
+          </div>
           <div className="text-xs text-muted-foreground truncate">
             {p.player_birth_date && `né(e) ${fmt(p.player_birth_date)} · `}
             {p.player_email ?? "pas d'email"}

@@ -526,7 +526,8 @@ export const previewMeetingAttendeesList = createServerFn({ method: "POST" })
     for (const uid of manualUserIds) resolved.add(uid);
 
     const ids = Array.from(resolved);
-    if (ids.length === 0) return { count: 0, people: [] as Array<{ user_id: string; full_name: string | null }> };
+    if (ids.length === 0)
+      return { count: 0, people: [] as Array<{ user_id: string; full_name: string | null }> };
 
     const { data: profs } = await supabaseAdmin
       .from("profiles")

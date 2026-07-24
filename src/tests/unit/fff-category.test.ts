@@ -3,11 +3,7 @@
  * Helpers purs — pas de dépendance DB.
  */
 import { describe, it, expect } from "vitest";
-import {
-  computeFffCategory,
-  parseSeasonEndYear,
-  seasonLabelFromEndYear,
-} from "@/lib/fff-category";
+import { computeFffCategory, parseSeasonEndYear, seasonLabelFromEndYear } from "@/lib/fff-category";
 
 describe("parseSeasonEndYear", () => {
   it("parses YYYY-YYYY", () => {

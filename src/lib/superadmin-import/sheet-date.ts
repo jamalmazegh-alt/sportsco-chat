@@ -29,14 +29,10 @@ export function isStrictIsoDate(s: string): boolean {
   const d = Number(m[3]);
   if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
   const dt = new Date(Date.UTC(y, mo - 1, d));
-  return (
-    dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d
-  );
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
 }
 
-export type ParsedDate =
-  | { iso: string; ambiguous: false }
-  | { iso: null; ambiguous: boolean };
+export type ParsedDate = { iso: string; ambiguous: false } | { iso: null; ambiguous: boolean };
 
 /**
  * Parse une chaîne date "utilisateur" en ISO strict.
@@ -72,9 +68,7 @@ export function parseFlexibleDate(input: string): ParsedDate {
       return { iso: null, ambiguous: false };
     }
     const iso = `${y}-${String(mo).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return isStrictIsoDate(iso)
-      ? { iso, ambiguous: false }
-      : { iso: null, ambiguous: false };
+    return isStrictIsoDate(iso) ? { iso, ambiguous: false } : { iso: null, ambiguous: false };
   }
 
   const n = Number(trimmed);
@@ -83,9 +77,7 @@ export function parseFlexibleDate(input: string): ParsedDate {
     const iso = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
       d.getUTCDate(),
     ).padStart(2, "0")}`;
-    return isStrictIsoDate(iso)
-      ? { iso, ambiguous: false }
-      : { iso: null, ambiguous: false };
+    return isStrictIsoDate(iso) ? { iso, ambiguous: false } : { iso: null, ambiguous: false };
   }
 
   return { iso: null, ambiguous: false };

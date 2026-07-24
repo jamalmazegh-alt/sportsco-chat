@@ -135,17 +135,13 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "success" | "warn";
-}) {
+function Stat({ label, value, tone }: { label: string; value: number; tone?: "success" | "warn" }) {
   const color =
-    tone === "success" ? "text-emerald-600" : tone === "warn" ? "text-amber-600" : "text-foreground";
+    tone === "success"
+      ? "text-emerald-600"
+      : tone === "warn"
+        ? "text-amber-600"
+        : "text-foreground";
   return (
     <div className="rounded-md bg-card border border-border p-2">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>

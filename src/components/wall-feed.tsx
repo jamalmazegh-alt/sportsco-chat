@@ -746,9 +746,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       roles.includes("dirigeant") ||
       roles.includes("coach") ||
       roles.includes("assistant_coach")
-    : roles.includes("admin") ||
-      roles.includes("coach") ||
-      roles.includes("assistant_coach");
+    : roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const audienceMissing =
     !isStaffMode &&
     canPost &&
@@ -990,7 +988,6 @@ function AudiencePicker({
     </div>
   );
 }
-
 
 // Reusable audience badge — used on each post in the feed.
 // Mirrors push scopeLabel logic; "Tout le club" is the only translated label,

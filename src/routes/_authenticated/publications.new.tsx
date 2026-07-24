@@ -631,8 +631,7 @@ function NewPublicationPage() {
                         if (playersActive) {
                           setAudiences((prev) =>
                             prev.filter(
-                              (a) =>
-                                !(a.audience_type === "joueurs_equipe" && a.team_id === tm.id),
+                              (a) => !(a.audience_type === "joueurs_equipe" && a.team_id === tm.id),
                             ),
                           );
                         } else {
@@ -643,8 +642,7 @@ function NewPublicationPage() {
                         if (parentsActive) {
                           setAudiences((prev) =>
                             prev.filter(
-                              (a) =>
-                                !(a.audience_type === "parents_equipe" && a.team_id === tm.id),
+                              (a) => !(a.audience_type === "parents_equipe" && a.team_id === tm.id),
                             ),
                           );
                         } else {

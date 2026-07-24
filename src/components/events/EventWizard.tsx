@@ -56,7 +56,10 @@ import { cn } from "@/lib/utils";
 import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
 import { createEvent } from "@/lib/events/events.functions";
-import { setMeetingAttendees, previewMeetingAttendeesList } from "@/lib/meetings/meetings.functions";
+import {
+  setMeetingAttendees,
+  previewMeetingAttendeesList,
+} from "@/lib/meetings/meetings.functions";
 import {
   AudiencePickerBody,
   useAudienceState,
@@ -2291,10 +2294,7 @@ function MeetingAttendeesSummaryCard({
                 .map((w) => w[0]?.toUpperCase() ?? "")
                 .join("") || "?";
             return (
-              <li
-                key={p.user_id}
-                className="flex items-center gap-2 rounded-md px-2 py-1.5"
-              >
+              <li key={p.user_id} className="flex items-center gap-2 rounded-md px-2 py-1.5">
                 <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-[11px] font-semibold flex items-center justify-center">
                   {initials}
                 </div>
@@ -2325,7 +2325,6 @@ function MeetingAttendeesSummaryCard({
     </div>
   );
 }
-
 
 function StepQuestion({ title, children }: { title: string; children: React.ReactNode }) {
   return (
