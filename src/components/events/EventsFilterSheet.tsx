@@ -371,7 +371,7 @@ function DateField({
   label: string;
   value?: Date;
   onChange: (d: Date | undefined) => void;
-  locale: Locale;
+  locale: typeof fr;
 }) {
   const [open, setOpen] = useState(false);
   return (
