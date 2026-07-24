@@ -42,7 +42,7 @@ type Comment = {
   author?: Profile | null;
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
-type AudienceType = "club" | "team" | "multi_team" | "group";
+type AudienceType = "club" | "team" | "multi_team" | "group" | "team_staff";
 type Team = { id: string; name: string };
 type Group = { id: string; name: string };
 type Post = {
@@ -99,7 +99,7 @@ const SOURCE_META: Record<
   },
 };
 
-export function WallFeed({ clubId }: { clubId: string }) {
+export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
@@ -138,13 +138,19 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .single();
     setCommentsEnabled(!!club?.wall_comments_enabled);
 
-    const { data: rawPosts } = await supabase
+    let postsQuery = supabase
       .from("wall_posts")
       .select(
         "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
       )
       .eq("club_id", clubId)
-      .is("deleted_at", null)
+      .is("deleted_at", null);
+    if (staffTeamId) {
+      postsQuery = postsQuery
+        .eq("audience_type", "team_staff")
+        .contains("audience_team_ids", [staffTeamId]);
+    }
+    const { data: rawPosts } = await postsQuery
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
@@ -242,6 +248,10 @@ export function WallFeed({ clubId }: { clubId: string }) {
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
   useEffect(() => {
+    if (staffTeamId) {
+      setPolls([]);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
@@ -429,20 +439,24 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if ((!body.trim() && atts.length === 0) || !user) return;
 
     // Resolve final audience for the insert.
+    //   staffTeamId set  → audience_type='team_staff', audience_team_ids=[staffTeamId]
     //   groups non-empty → audience_type='group', audience_group_ids=[…], team_ids=null
     //   null             → "Tout le club"
     //   [] (forced)      → coach must pick at least one team
     //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const hasGroups = audienceGroups.length > 0;
-    const audienceForInsert: string[] | null = hasGroups
-      ? null
-      : audience === null
+    const isStaffMode = !!staffTeamId;
+    const hasGroups = !isStaffMode && audienceGroups.length > 0;
+    const audienceForInsert: string[] | null = isStaffMode
+      ? [staffTeamId!]
+      : hasGroups
         ? null
-        : audience.length === 0
+        : audience === null
           ? null
-          : audience;
-    if (!isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
+          : audience.length === 0
+            ? null
+            : audience;
+    if (!isStaffMode && !isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -451,13 +465,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
       return;
     }
 
-    const audienceTypeForInsert: AudienceType = hasGroups
-      ? "group"
-      : audienceForInsert === null
-        ? "club"
-        : audienceForInsert.length === 1
-          ? "team"
-          : "multi_team";
+    const audienceTypeForInsert: AudienceType = isStaffMode
+      ? "team_staff"
+      : hasGroups
+        ? "group"
+        : audienceForInsert === null
+          ? "club"
+          : audienceForInsert.length === 1
+            ? "team"
+            : "multi_team";
 
     setPosting(true);
     const insertPayload = {
@@ -541,7 +557,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
       // Recipient set for in-app notifications must mirror the post audience
       // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
       const recipientSet = new Set<string>();
-      if (hasGroups) {
+      if (isStaffMode) {
+        // Staff wall: coaches + dirigeants of that team, plus club admins/dirigeants.
+        const { data: priv } = await supabase
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        const { data: tm } = await supabase
+          .from("team_members")
+          .select("user_id, role")
+          .eq("team_id", staffTeamId!)
+          .in("role", ["coach", "dirigeant"]);
+        for (const r of tm ?? []) {
+          const uid = (r as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else if (hasGroups) {
         // Admins/dirigeants always see every post.
         const { data: priv } = await supabase
           .from("club_members")
@@ -704,9 +740,17 @@ export function WallFeed({ clubId }: { clubId: string }) {
     return <WallFeedSkeleton />;
   }
 
-  const canPost =
-    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isStaffMode = !!staffTeamId;
+  const canPost = isStaffMode
+    ? roles.includes("admin") ||
+      roles.includes("dirigeant") ||
+      roles.includes("coach") ||
+      roles.includes("assistant_coach")
+    : roles.includes("admin") ||
+      roles.includes("coach") ||
+      roles.includes("assistant_coach");
   const audienceMissing =
+    !isStaffMode &&
     canPost &&
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
     audience !== null &&
@@ -720,28 +764,43 @@ export function WallFeed({ clubId }: { clubId: string }) {
             clubId={clubId}
             value={body}
             onChange={setBody}
-            placeholder={t("wall.placeholder")}
+            placeholder={
+              isStaffMode
+                ? t("wall.staff.placeholder", {
+                    defaultValue: "Message privé au staff de cette équipe…",
+                  })
+                : t("wall.placeholder")
+            }
             rows={3}
           />
-          <AudiencePicker
-            teams={targetableTeams}
-            value={audience}
-            onChange={(next) => {
-              setAudience(next);
-              if (next !== null) setAudienceGroups([]);
-            }}
-            groups={targetableGroups}
-            groupValue={audienceGroups}
-            onGroupChange={(next) => {
-              setAudienceGroups(next);
-              if (next.length > 0) setAudience([]);
-            }}
-            canPickClubWide={
-              roles.includes("admin") ||
-              roles.includes("dirigeant") ||
-              targetableTeams.length === allTeams.length
-            }
-          />
+          {isStaffMode ? (
+            <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("wall.staff.audienceLocked", {
+                defaultValue: "Visible uniquement par le staff de l'équipe et les admins du club.",
+              })}
+            </p>
+          ) : (
+            <AudiencePicker
+              teams={targetableTeams}
+              value={audience}
+              onChange={(next) => {
+                setAudience(next);
+                if (next !== null) setAudienceGroups([]);
+              }}
+              groups={targetableGroups}
+              groupValue={audienceGroups}
+              onGroupChange={(next) => {
+                setAudienceGroups(next);
+                if (next.length > 0) setAudience([]);
+              }}
+              canPickClubWide={
+                roles.includes("admin") ||
+                roles.includes("dirigeant") ||
+                targetableTeams.length === allTeams.length
+              }
+            />
+          )}
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
             <input
@@ -752,19 +811,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
             />
             {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
           </label>
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
-            <Button asChild size="sm" variant="outline">
-              <Link to="/publications/new">
-                <BarChart3 className="h-4 w-4 mr-1.5" />
-                {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link to="/publications">
-                {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
-              </Link>
-            </Button>
-          </div>
+          {!isStaffMode && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/publications/new">
+                  <BarChart3 className="h-4 w-4 mr-1.5" />
+                  {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link to="/publications">
+                  {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+                </Link>
+              </Button>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
@@ -976,6 +1037,23 @@ function AudienceBadge({
       >
         <Users className="h-2.5 w-2.5" />
         {gLabel}
+      </span>
+    );
+  }
+  if (post.audience_type === "team_staff") {
+    const t0 = post.audience_team_ids?.[0];
+    const teamName = t0 ? (teamsById.get(t0)?.name ?? null) : null;
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
+        title={t("wall.staff.badgeTitle", {
+          defaultValue: "Message privé au staff de l'équipe",
+        })}
+      >
+        <Lock className="h-2.5 w-2.5" />
+        {teamName
+          ? t("wall.staff.badgeWithTeam", { defaultValue: "Staff {{team}}", team: teamName })
+          : t("wall.staff.badge", { defaultValue: "Staff équipe" })}
       </span>
     );
   }

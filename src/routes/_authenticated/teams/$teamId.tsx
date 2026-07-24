@@ -38,7 +38,9 @@ import {
   Upload,
   BarChart3,
   Trophy,
+  Lock as LockIcon,
 } from "lucide-react";
+import { WallFeed } from "@/components/wall-feed";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
@@ -1060,6 +1062,29 @@ function TeamDetail() {
       </Link>
 
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />}
+
+      {team?.club_id &&
+        (roles.includes("admin") ||
+          roles.includes("dirigeant") ||
+          roles.includes("coach") ||
+          roles.includes("assistant_coach")) && (
+          <section className="space-y-2">
+            <div className="flex items-center gap-2">
+              <LockIcon className="h-4 w-4 text-violet-500" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("teams.staffWall", { defaultValue: "Mur Staff" })}
+              </h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("teams.staffWallHint", {
+                defaultValue:
+                  "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
+              })}
+            </p>
+            <WallFeed clubId={team.club_id} staffTeamId={teamId} />
+          </section>
+        )}
+
 
       <TeamCoaches
         teamId={teamId}
