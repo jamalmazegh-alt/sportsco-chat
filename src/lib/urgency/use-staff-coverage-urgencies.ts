@@ -162,7 +162,7 @@ export function useStaffCoverageUrgencies(): UrgencyCollectorResult & { isPendin
           .from("team_members")
           .select("team_id, role")
           .eq("user_id", user!.id)
-          .in("role", ["coach", "assistant_coach"] as any);
+          .in("role", ["coach"] as any);
         if (mErr) throw mErr;
         scopedTeamIds = Array.from(
           new Set((mine ?? []).map((r) => r.team_id).filter((id) => clubTeamIds.has(id))),
@@ -189,7 +189,7 @@ export function useStaffCoverageUrgencies(): UrgencyCollectorResult & { isPendin
         .from("team_members")
         .select("team_id, user_id, role")
         .in("team_id", scopedTeamIds)
-        .in("role", ["coach", "assistant_coach"] as any);
+        .in("role", ["coach"] as any);
       if (sErr) throw sErr;
       const staffByTeam = new Map<string, Set<string>>();
       for (const r of staffRows ?? []) {
