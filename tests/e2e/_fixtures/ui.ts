@@ -35,10 +35,23 @@ function credsFor(role: UiRole): { email: string; password: string } {
  * Attend la bottom-nav (app hydratée + memberships).
  * Même signal que `25-beta-closure-roles-auth` — `nav[aria-label]` plutôt
  * qu'un match i18n strict sur `nav.primary` (évite les courses de locale).
+ *
+ * ConsentGate shows a spinner (no nav) while status loads, then may open a
+ * modal. Race nav vs privacy dialog, dismiss overlays, then require nav.
  */
 async function waitForAppShell(page: Page): Promise<void> {
-  await page.waitForSelector("nav[aria-label]", { timeout: 30_000 });
-  await expect(page.locator("nav[aria-label]").first()).toBeVisible();
+  const nav = page.locator("nav[aria-label]").first();
+  const privacyDialog = page.getByRole("dialog").filter({
+    has: page.getByRole("heading", { name: /Your privacy|Votre vie privée/i }),
+  });
+  await Promise.race([
+    nav.waitFor({ state: "visible", timeout: 30_000 }),
+    privacyDialog.waitFor({ state: "visible", timeout: 30_000 }),
+  ]).catch(() => {
+    /* fall through — dismiss + final expect below */
+  });
+  await dismissBlockingOverlays(page);
+  await expect(nav).toBeVisible({ timeout: 30_000 });
 }
 
 /**
@@ -63,7 +76,6 @@ export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
     timeout: 15_000,
   });
   await waitForAppShell(page);
-  await dismissBlockingOverlays(page);
 }
 
 /**
@@ -104,7 +116,20 @@ export async function dismissBlockingOverlays(page: Page): Promise<void> {
  */
 export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<void> {
   const { email, password } = credsFor(role);
+  // loginAs is not used here — still pre-accept cookies so the banner does not
+  // intercept the submit CTA (z-[100] fixed bottom).
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem(
+        "clubero_cookie_consent",
+        JSON.stringify({ necessary: true, analytics: true, marketing: true }),
+      );
+    } catch {
+      /* ignore */
+    }
+  });
   await page.goto("/login", { waitUntil: "domcontentloaded" });
+  await dismissBlockingOverlays(page);
   await expect(page.locator("#email")).toBeVisible();
 
   // Click + fill: plus fiable que getByLabel sur le layout floating-label.
@@ -123,7 +148,6 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
     timeout: 45_000,
   });
   await waitForAppShell(page);
-  await dismissBlockingOverlays(page);
 }
 
 /** Navigation via la vraie bottom-nav (accessible + multilingue). */
@@ -148,6 +172,50 @@ export async function openClassicEventForm(page: Page): Promise<void> {
   await expect(
     page.getByTestId("event-name-input").or(page.getByTestId("event-opponent-input")),
   ).toBeVisible({ timeout: 15_000 });
+}
+
+/**
+ * Remplit date + heure de début dans `EventFormSheet`.
+ * Les champs n'ont pas de testid — on scope au dialog et on cible le
+ * TimePicker (`placeholder=HH:MM`) plutôt que le premier `—` (convoc avant start).
+ *
+ * Indices (0-based) within the open dialog:
+ * - meeting: dateIndex 0, timeIndex 0
+ * - match:   dateIndex 1 (match date), timeIndex 1
+ * - training (single session): dateIndex 0, timeIndex 1 (start, after convoc)
+ */
+export async function fillEventStartDateTime(
+  page: Page,
+  opts: { time?: string; dateIndex?: number; timeIndex?: number } = {},
+): Promise<void> {
+  const time = opts.time ?? "18:00";
+  const dateIndex = opts.dateIndex ?? 0;
+  const timeIndex = opts.timeIndex ?? 0;
+  const root = page.getByRole("dialog").last();
+
+  const dateButtons = root.locator("button").filter({ has: page.locator("svg.lucide-calendar") });
+  await expect(dateButtons.nth(dateIndex)).toBeVisible({ timeout: 10_000 });
+  await dateButtons.nth(dateIndex).click();
+  const day = page.getByRole("gridcell").getByRole("button").filter({ hasText: /^\d+$/ });
+  const count = await day.count();
+  if (count === 0) throw new Error("fillEventStartDateTime: no calendar day buttons");
+  await day.nth(Math.min(14, count - 1)).click();
+
+  const clockButtons = root.locator("button").filter({ has: page.locator("svg.lucide-clock") });
+  await expect(clockButtons.nth(timeIndex)).toBeVisible({ timeout: 10_000 });
+  await clockButtons.nth(timeIndex).click();
+  const hhmm = page.locator('input[placeholder="HH:MM"]');
+  await expect(hhmm).toBeVisible({ timeout: 5_000 });
+  await hhmm.fill(time);
+  await page.keyboard.press("Enter");
+}
+
+/**
+ * Label « Destinataires / Recipients » on the publication audience step.
+ * Plain getByText() also matches helper copy containing "recipients".
+ */
+export function publicationAudienceLabel(page: Page) {
+  return page.getByRole("label", { name: tx("new.audienceLabel", "publications") });
 }
 
 /**

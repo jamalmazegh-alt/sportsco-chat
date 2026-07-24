@@ -125,12 +125,15 @@ test.describe("besoins — couverture", () => {
       .first()
       .click();
     await page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") }).click();
+    // Menu opens a confirm alertdialog — must confirm before the toast fires.
+    const confirm = page.getByRole("alertdialog");
+    await expect(confirm).toBeVisible();
+    await confirm.getByRole("button", { name: tx("actions.close", "needs") }).click();
     await expectToast(page, tx("status.closed", "needs"));
   });
 });
 
 async function seedNeed(label: string, opts: { published: boolean }): Promise<string> {
-  const now = new Date().toISOString();
   const { data, error } = await admin
     .from("event_needs")
     .insert({
@@ -141,9 +144,7 @@ async function seedNeed(label: string, opts: { published: boolean }): Promise<st
       label,
       capacity: 2,
       validation_mode: "auto",
-      status: opts.published ? "open" : "draft",
-      first_published_at: opts.published ? now : null,
-      last_published_at: opts.published ? now : null,
+      status: "draft",
       created_by: club.coach.userId,
     })
     .select("id")
@@ -151,18 +152,14 @@ async function seedNeed(label: string, opts: { published: boolean }): Promise<st
   if (error || !data) throw new Error(`seedNeed: ${error?.message}`);
 
   if (opts.published) {
-    await admin.from("event_need_publications").insert({
-      need_id: data.id,
-      published_by: club.coach.userId,
-      recipients_count: 0,
+    // RLS feed visibility uses event_need_publication_recipients via
+    // user_is_need_recipient — audiences alone are not enough.
+    const { error: pubErr } = await admin.rpc("publish_event_need_atomic" as any, {
+      _need_id: data.id,
+      _actor: club.coach.userId,
+      _audiences: [{ type: "team_parents", team_id: club.teamId }],
     });
-    const { error: audErr } = await admin.from("event_need_audiences").insert({
-      need_id: data.id,
-      audience_type: "team_parents",
-      team_id: club.teamId,
-      created_by: club.coach.userId,
-    });
-    if (audErr) throw new Error(`seedNeed audience: ${audErr.message}`);
+    if (pubErr) throw new Error(`seedNeed publish: ${pubErr.message}`);
   }
   return data.id as string;
 }

@@ -6,7 +6,7 @@
 import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, tx, uniqueName } from "./_fixtures/ui";
+import { loginViaUI, publicationAudienceLabel, tx, uniqueName } from "./_fixtures/ui";
 
 let club: SeededClub;
 
@@ -66,7 +66,7 @@ test.describe("groupes du club", () => {
     await opts.nth(1).fill("B");
     await page.getByRole("button", { name: tx("common.next") }).click();
 
-    await expect(page.getByText(tx("new.audienceLabel", "publications"))).toBeVisible();
+    await expect(publicationAudienceLabel(page)).toBeVisible();
     await expect(page.getByText(name)).toHaveCount(0);
   });
 

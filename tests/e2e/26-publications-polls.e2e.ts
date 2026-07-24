@@ -7,7 +7,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, tx, uniqueName, expectToast } from "./_fixtures/ui";
+import { loginViaUI, tx, uniqueName, expectToast, publicationAudienceLabel } from "./_fixtures/ui";
 
 let club: SeededClub;
 
@@ -43,7 +43,7 @@ test.describe("publications — sondages", () => {
     await page.locator("#v-anon").click();
     await page.getByRole("button", { name: tx("common.next") }).click();
 
-    await expect(page.getByText(tx("new.audienceLabel", "publications"))).toBeVisible();
+    await expect(publicationAudienceLabel(page)).toBeVisible();
     await selectSeededTeamAudience(page);
 
     await page.getByRole("button", { name: tx("new.publish", "publications") }).click();
@@ -91,9 +91,17 @@ test.describe("publications — sondages", () => {
 
     await loginViaUI(page, "admin");
     await page.goto(`/publications/${pubId}`);
+    await expect(page.getByRole("heading", { name: question })).toBeVisible({ timeout: 15_000 });
 
-    // Close lives in the ⋯ (MoreHorizontal) dropdown, not as a top-level button.
-    await page.locator("button:has(svg.lucide-more-horizontal)").click();
+    // Close lives in the staff ⋯ dropdown (MoreHorizontal / ellipsis).
+    const more = page
+      .locator("button")
+      .filter({
+        has: page.locator("svg.lucide-more-horizontal, svg.lucide-ellipsis"),
+      })
+      .first();
+    await expect(more).toBeVisible({ timeout: 15_000 });
+    await more.click();
     await page.getByRole("menuitem", { name: tx("detail.close", "publications") }).click();
     await expectToast(page, tx("detail.closed", "publications"));
 

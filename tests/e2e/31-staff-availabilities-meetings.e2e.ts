@@ -9,7 +9,14 @@
 import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, openClassicEventForm, tx, txOr, uniqueName } from "./_fixtures/ui";
+import {
+  fillEventStartDateTime,
+  loginViaUI,
+  openClassicEventForm,
+  tx,
+  txOr,
+  uniqueName,
+} from "./_fixtures/ui";
 
 let club: SeededClub;
 
@@ -74,10 +81,14 @@ test.describe("indisponibilités staff", () => {
     await loginViaUI(page, "player");
     await page.goto("/profile/availabilities");
 
+    // Title + empty copy are both visible — avoid .or() strict-mode dual match.
     await expect(
-      page
-        .getByText(txOr("staffAvailability.empty", "Aucune indisponibilité"))
-        .or(page.getByText(txOr("staffAvailability.title", "Mes indisponibilités"))),
+      page.getByRole("heading", {
+        name: txOr("staffAvailability.title", "Mes indisponibilités"),
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(txOr("staffAvailability.empty", "Aucune indisponibilité")).first(),
     ).toBeVisible();
   });
 
@@ -119,6 +130,7 @@ test.describe("réunions", () => {
     await page.getByRole("option", { name: tx("events.types.meeting") }).click();
 
     await page.getByTestId("event-name-input").fill(title);
+    await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 0 });
     await page.getByRole("button", { name: tx("events.publish") }).click();
 
     await expect(page.getByText(title)).toBeVisible({ timeout: 15_000 });
