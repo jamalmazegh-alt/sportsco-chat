@@ -148,7 +148,8 @@
       "educateurs": "Éducateurs",
       "dirigeants": "Dirigeants",
       "groupe_personnalise": "Groupe personnalisé",
-      "selection_manuelle": "Sélection manuelle"
+      "selection_manuelle": "Sélection manuelle",
+      "staff_equipe": "Staff de l’équipe"
     },
     "recipientsBreakdown": "({{players}} joueurs · {{users}} utilisateurs)",
     "none": "0 destinataire",

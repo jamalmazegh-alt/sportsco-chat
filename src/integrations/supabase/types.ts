@@ -8943,6 +8943,7 @@ export type Database = {
         | "dirigeants"
         | "groupe_personnalise"
         | "selection_manuelle"
+        | "staff_equipe"
       publication_dispatch_kind:
         | "publish"
         | "audience_refresh"
@@ -9247,6 +9248,7 @@ export const Constants = {
         "dirigeants",
         "groupe_personnalise",
         "selection_manuelle",
+        "staff_equipe",
       ],
       publication_dispatch_kind: [
         "publish",

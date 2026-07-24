@@ -148,7 +148,8 @@
       "educateurs": "Coaches",
       "dirigeants": "Board members",
       "groupe_personnalise": "Custom group",
-      "selection_manuelle": "Manual selection"
+      "selection_manuelle": "Manual selection",
+      "staff_equipe": "Staff del equipo"
     },
     "recipientsBreakdown": "({{players}} jugadores · {{users}} usuarios)",
     "none": "0 destinatarios",
