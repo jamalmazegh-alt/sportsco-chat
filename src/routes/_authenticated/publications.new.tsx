@@ -795,7 +795,6 @@ function NewPublicationPage() {
                 </div>
               </div>
 
-
               {/* Manual player selection */}
               <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2.5 space-y-1.5">
                 <Label className="text-[11px] uppercase tracking-wide text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
