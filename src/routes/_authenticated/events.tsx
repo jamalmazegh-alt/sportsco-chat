@@ -204,7 +204,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, filters, internalTeamIds, searchQuery]);
+  }, [events, filters, internalTeamIds, searchQuery, hideTrainings]);
 
 
   const pastCount = useMemo(() => {
