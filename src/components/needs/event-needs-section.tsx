@@ -432,21 +432,21 @@ function NeedRow({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-background/50 p-3 transition-colors",
+        "rounded-lg border bg-background/50 p-2.5 transition-colors",
         isReadOnly && "opacity-70",
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {/* Ligne titre : icône · libellé · badge d'état */}
           <div className="flex items-center gap-2 flex-wrap">
             <span
               className={cn(
-                "inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0",
+                "inline-flex h-6 w-6 items-center justify-center rounded-full shrink-0",
                 needChip,
               )}
             >
-              <NeedIcon className="h-4 w-4" />
+              <NeedIcon className="h-3.5 w-3.5" />
             </span>
             <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
             {statusBadge}
@@ -454,48 +454,45 @@ function NeedRow({
 
           {/* Description (optionnelle) */}
           {need.description && (
-            <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-line">
+            <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line line-clamp-2">
               {need.description}
             </p>
           )}
 
-          {/* Ligne méta unique — publication + mode (S1 · pastille 3) */}
-          {(metaLine || !isDraft) && (
-            <div className="mt-2 text-[11px] text-muted-foreground flex items-center gap-1.5 flex-wrap">
-              {metaLine && <span>{metaLine}</span>}
-              {metaLine && <span aria-hidden>·</span>}
-              <span>{t(`needs:validationMode.${need.validation_mode}`)}</span>
+          {/* Ligne méta + places fusionnée (S1 · pastilles 3-4-5) */}
+          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap text-[11px] text-muted-foreground">
+            {metaLine && <span>{metaLine}</span>}
+            {metaLine && <span aria-hidden>·</span>}
+            <span>{t(`needs:validationMode.${need.validation_mode}`)}</span>
+            <span aria-hidden>·</span>
+            {seatsPill}
+          </div>
+
+          {isStaff && (need.confirmed_signups?.length ?? 0) > 0 && (
+            <div className="w-full mt-1.5 rounded-md border border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/60 dark:bg-emerald-950/20 px-2 py-1 divide-y divide-emerald-100 dark:divide-emerald-900/60">
+              {need.confirmed_signups!.map((s) => {
+                const ctx = s.context;
+                const roles = ctx?.primary_role ? [ctx.primary_role] : [];
+                const subline = formatMemberContextSubline(ctx, {
+                  playerSubline: (c) => t("common:person.playerSubline", { category: c }),
+                  playerSublineMulti: (c) =>
+                    t("common:person.playerSublineMulti", { categories: c }),
+                  parentSubline: (c) => t("common:person.parentSubline", { children: c }),
+                });
+                return (
+                  <PersonRow
+                    key={s.user_id}
+                    compact
+                    name={s.full_name ?? t("common.unknown")}
+                    roles={roles}
+                    subline={subline}
+                  />
+                );
+              })}
             </div>
           )}
-
-          {/* Pill places + confirmés visibles (S1 · pastille 4 + 5) */}
-          <div className="mt-2.5 flex items-center gap-2 flex-wrap">
-            {seatsPill}
-            {isStaff && (need.confirmed_signups?.length ?? 0) > 0 && (
-              <div className="w-full mt-1 rounded-md border border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/60 dark:bg-emerald-950/20 px-2 py-1 divide-y divide-emerald-100 dark:divide-emerald-900/60">
-                {need.confirmed_signups!.map((s) => {
-                  const ctx = s.context;
-                  const roles = ctx?.primary_role ? [ctx.primary_role] : [];
-                  const subline = formatMemberContextSubline(ctx, {
-                    playerSubline: (c) => t("common:person.playerSubline", { category: c }),
-                    playerSublineMulti: (c) =>
-                      t("common:person.playerSublineMulti", { categories: c }),
-                    parentSubline: (c) => t("common:person.parentSubline", { children: c }),
-                  });
-                  return (
-                    <PersonRow
-                      key={s.user_id}
-                      compact
-                      name={s.full_name ?? t("common.unknown")}
-                      roles={roles}
-                      subline={subline}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
+
 
         {/* Menu ⋯ contextuel — dernier élément aligné en top-right */}
         {showMenu && (
