@@ -25,6 +25,7 @@ import {
   Upload,
   MessageCircleHeart,
   Mail,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
