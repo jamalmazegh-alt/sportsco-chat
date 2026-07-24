@@ -128,6 +128,9 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const [sendEmail, setSendEmail] = useState(false);
   // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
   const [audience, setAudience] = useState<string[] | null>(null);
+  // When true (and staffTeamId not set), the team pill selection publishes to
+  // `team_staff` — coaches+dirigeants of the selected teams, plus club admins.
+  const [staffAudienceMode, setStaffAudienceMode] = useState(false);
 
   async function load() {
     setLoading(true);
