@@ -123,6 +123,8 @@ function NewPublicationPage() {
         .from("teams")
         .select("id, name")
         .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
+        .is("archived_at", null)
         .order("name");
       return data ?? [];
     },
