@@ -219,7 +219,7 @@ async function ensureClubAndMemberships(
     }
   }
 
-  return clubId;
+  return clubId!;
 }
 
 export type EnsureSeedResult =
