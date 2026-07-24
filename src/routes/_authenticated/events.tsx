@@ -161,17 +161,39 @@ function EventsPage() {
     },
   });
 
+  const internalTeamIds = useMemo(
+    () =>
+      new Set(
+        (teams ?? [])
+          .filter((t) => (t as { is_internal?: boolean }).is_internal)
+          .map((t) => t.id),
+      ),
+    [teams],
+  );
+  const hasInternalTeam = internalTeamIds.size > 0;
+
   const visibleEvents = useMemo(() => {
     if (!events) return [];
     const q = searchQuery.trim().toLowerCase();
+    const fromTs = filters.dateFrom ? startOfDay(filters.dateFrom).getTime() : null;
+    const toTs = filters.dateTo
+      ? startOfDay(filters.dateTo).getTime() + 24 * 60 * 60 * 1000 - 1
+      : null;
     return events.filter((e) => {
-      if (!showCancelled && e.status === "cancelled") return false;
-      if (hideTrainings && e.type === "training") return false;
-      if (teamFilter !== "all" && e.team_id !== teamFilter) return false;
-      if (!showPast) {
-        const d = new Date(e.starts_at);
+      if (!filters.showCancelled && e.status === "cancelled") return false;
+      if (filters.types.size > 0 && !filters.types.has(e.type as any)) return false;
+      if (filters.teamIds.size > 0 && !filters.teamIds.has(e.team_id)) return false;
+      if (!filters.includeInternal && internalTeamIds.has(e.team_id)) return false;
+      if (filters.homeAway !== "all" && (e.type === "match" || e.type === "tournament")) {
+        if (filters.homeAway === "home" && e.is_home === false) return false;
+        if (filters.homeAway === "away" && e.is_home !== false) return false;
+      }
+      const d = new Date(e.starts_at);
+      if (!filters.showPast) {
         if (isPast(d) && !isToday(d)) return false;
       }
+      if (fromTs !== null && d.getTime() < fromTs) return false;
+      if (toTs !== null && d.getTime() > toTs) return false;
       if (q) {
         const haystack = [e.title, e.opponent, e.team_name, e.competition_name, e.location]
           .filter(Boolean)
@@ -181,7 +203,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, hideTrainings, teamFilter, searchQuery]);
+  }, [events, filters, internalTeamIds, searchQuery]);
 
 
   const pastCount = useMemo(() => {
