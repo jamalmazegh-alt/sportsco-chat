@@ -145,6 +145,8 @@ async function ensureProfiles(
       full_name: `E2E ${label}`,
       first_name: "E2E",
       last_name: label,
+      // Match ConsentGate locale after login (use-auth switches i18n to this).
+      preferred_language: "en",
     };
   });
   const { error } = await service.from("profiles").upsert(rows);
@@ -312,16 +314,16 @@ export async function ensureE2ESeed(
 
 /**
  * Grant the latest *required* consent versions (terms / privacy / data_processing)
- * for every E2E user. Playwright uses `locale: fr-FR`; the ConsentGate loads
- * versions by `i18n.language.slice(0,2)`, so we cover `fr` + `en`.
+ * for every E2E user, for both `en` and `fr`.
  *
- * Without this, UI specs (26–31) hit the blocking "Your privacy" modal and
- * time out before any real assertion — including poll vote flows.
+ * Profiles default to preferred_language=en (ConsentGate loads en docs after
+ * login) while Playwright boots with locale fr-FR. Seeding only one locale left
+ * the gate open → whole UI suite (26–31) blocked by "Your privacy".
  */
 export async function ensureRequiredConsents(
   service: SupabaseClient,
   userIds: string[],
-  locales: string[] = ["fr", "en"],
+  locales: string[] = ["en", "fr"],
 ): Promise<number> {
   if (!userIds.length) return 0;
 
@@ -334,7 +336,7 @@ export async function ensureRequiredConsents(
     .order("version", { ascending: false });
   if (vErr) throw new Error(`[e2e-seed] consent_versions: ${vErr.message}`);
 
-  // Latest version id per (kind, locale).
+  // Latest version id per (kind, locale) — grant ALL of them.
   const latest = new Map<string, { id: string; kind: string; locale: string }>();
   for (const v of versions ?? []) {
     const key = `${v.kind}:${v.locale}`;
@@ -347,18 +349,9 @@ export async function ensureRequiredConsents(
     return 0;
   }
 
-  // Prefer fr when both fr+en exist for the same kind (Playwright locale).
-  const byKind = new Map<string, { id: string; kind: string; locale: string }>();
-  for (const row of latest.values()) {
-    const prev = byKind.get(row.kind);
-    if (!prev || (row.locale === "fr" && prev.locale !== "fr")) {
-      byKind.set(row.kind, row);
-    }
-  }
-
   let inserted = 0;
   for (const userId of userIds) {
-    for (const v of byKind.values()) {
+    for (const v of latest.values()) {
       const { data: existing, error: exErr } = await service
         .from("user_consents")
         .select("id")
@@ -370,7 +363,9 @@ export async function ensureRequiredConsents(
         .is("on_behalf_of_player_id", null)
         .maybeSingle();
       if (exErr) {
-        throw new Error(`[e2e-seed] user_consents lookup (${v.kind}): ${exErr.message}`);
+        throw new Error(
+          `[e2e-seed] user_consents lookup (${v.kind}/${v.locale}): ${exErr.message}`,
+        );
       }
       if (existing) continue;
 
@@ -382,14 +377,17 @@ export async function ensureRequiredConsents(
         on_behalf_of_player_id: null,
       });
       if (insErr) {
-        throw new Error(`[e2e-seed] user_consents insert (${userId}/${v.kind}): ${insErr.message}`);
+        throw new Error(
+          `[e2e-seed] user_consents insert (${userId}/${v.kind}/${v.locale}): ${insErr.message}`,
+        );
       }
       inserted += 1;
     }
   }
 
   console.log(
-    `[e2e-seed] required consents: ${inserted} row(s) inserted for ${userIds.length} user(s)`,
+    `[e2e-seed] required consents: ${inserted} row(s) inserted for ${userIds.length} user(s) ` +
+      `(${latest.size} version(s) across locales)`,
   );
   return inserted;
 }
