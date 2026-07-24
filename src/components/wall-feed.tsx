@@ -851,76 +851,85 @@ function AudiencePicker({
   }
   if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-xs font-medium text-muted-foreground mr-1">
-        {t("wall.audienceTo", { defaultValue: "À :" })}
-      </span>
-      {canPickClubWide && (
-        <button
-          type="button"
-          onClick={() => {
-            onGroupChange([]);
-            onChange(null);
-          }}
-          className={cn(
-            "text-xs px-2.5 py-1 rounded-full border transition-colors",
-            isClubWide
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-background text-foreground border-border hover:bg-accent",
-          )}
-        >
-          {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
-        </button>
-      )}
-      {teams.map((tt) => {
-        const active = !groupsActive && !isClubWide && (value ?? []).includes(tt.id);
-        return (
+    <div className="space-y-2">
+      {/* Teams row (+ "Tout le club") */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs font-medium text-muted-foreground mr-1">
+          {t("wall.audienceTo", { defaultValue: "À :" })}
+        </span>
+        {canPickClubWide && (
           <button
-            key={tt.id}
             type="button"
-            onClick={() => toggleTeam(tt.id)}
+            onClick={() => {
+              onGroupChange([]);
+              onChange(null);
+            }}
             className={cn(
               "text-xs px-2.5 py-1 rounded-full border transition-colors",
-              active
+              isClubWide
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background text-foreground border-border hover:bg-accent",
             )}
           >
-            {tt.name}
+            {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
           </button>
-        );
-      })}
+        )}
+        {teams.map((tt) => {
+          const active = !groupsActive && !isClubWide && (value ?? []).includes(tt.id);
+          return (
+            <button
+              key={tt.id}
+              type="button"
+              onClick={() => toggleTeam(tt.id)}
+              className={cn(
+                "text-xs px-2.5 py-1 rounded-full border transition-colors",
+                active
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-border hover:bg-accent",
+              )}
+            >
+              {tt.name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Groups block — clearly separated below teams */}
       {groups.length > 0 && (
-        <>
-          <span aria-hidden className="h-4 w-px bg-border mx-1 self-center" />
-          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-            <Users className="h-3 w-3" />
-            {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
-          </span>
-        </>
+        <div className="rounded-lg border border-dashed border-amber-500/40 bg-amber-500/5 p-2">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Users className="h-3 w-3 text-amber-700 dark:text-amber-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-300">
+              {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {groups.map((g) => {
+              const active = groupValue.includes(g.id);
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => toggleGroup(g.id)}
+                  className={cn(
+                    "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-dashed transition-colors",
+                    active
+                      ? "bg-amber-500 text-white border-amber-500"
+                      : "bg-background text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10",
+                  )}
+                >
+                  <Users className="h-3 w-3" />
+                  {g.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
-      {groups.map((g) => {
-        const active = groupValue.includes(g.id);
-        return (
-          <button
-            key={g.id}
-            type="button"
-            onClick={() => toggleGroup(g.id)}
-            className={cn(
-              "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-dashed transition-colors",
-              active
-                ? "bg-amber-500 text-white border-amber-500"
-                : "bg-amber-500/5 text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10",
-            )}
-          >
-            <Users className="h-3 w-3" />
-            {g.name}
-          </button>
-        );
-      })}
     </div>
   );
 }
+
 
 // Reusable audience badge — used on each post in the feed.
 // Mirrors push scopeLabel logic; "Tout le club" is the only translated label,
