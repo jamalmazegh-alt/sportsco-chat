@@ -248,6 +248,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
   useEffect(() => {
+    if (staffTeamId) {
+      setPolls([]);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
