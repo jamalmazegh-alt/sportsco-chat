@@ -439,20 +439,24 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     if ((!body.trim() && atts.length === 0) || !user) return;
 
     // Resolve final audience for the insert.
+    //   staffTeamId set  → audience_type='team_staff', audience_team_ids=[staffTeamId]
     //   groups non-empty → audience_type='group', audience_group_ids=[…], team_ids=null
     //   null             → "Tout le club"
     //   [] (forced)      → coach must pick at least one team
     //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const hasGroups = audienceGroups.length > 0;
-    const audienceForInsert: string[] | null = hasGroups
-      ? null
-      : audience === null
+    const isStaffMode = !!staffTeamId;
+    const hasGroups = !isStaffMode && audienceGroups.length > 0;
+    const audienceForInsert: string[] | null = isStaffMode
+      ? [staffTeamId!]
+      : hasGroups
         ? null
-        : audience.length === 0
+        : audience === null
           ? null
-          : audience;
-    if (!isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
+          : audience.length === 0
+            ? null
+            : audience;
+    if (!isStaffMode && !isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -461,13 +465,15 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       return;
     }
 
-    const audienceTypeForInsert: AudienceType = hasGroups
-      ? "group"
-      : audienceForInsert === null
-        ? "club"
-        : audienceForInsert.length === 1
-          ? "team"
-          : "multi_team";
+    const audienceTypeForInsert: AudienceType = isStaffMode
+      ? "team_staff"
+      : hasGroups
+        ? "group"
+        : audienceForInsert === null
+          ? "club"
+          : audienceForInsert.length === 1
+            ? "team"
+            : "multi_team";
 
     setPosting(true);
     const insertPayload = {
