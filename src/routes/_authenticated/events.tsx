@@ -11,12 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  EventsFilterSheet,
+  DEFAULT_EVENTS_FILTERS,
+  type EventsFilters,
+} from "@/components/events/EventsFilterSheet";
 
 import {
   Calendar,
