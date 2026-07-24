@@ -488,6 +488,8 @@ function ClubDetail() {
         </Card>
       </section>
 
+      <RecomputeCategoriesPanel clubId={clubId} />
+
       <ClubObservabilityPanel clubId={clubId} />
     </div>
   );
