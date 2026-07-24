@@ -918,6 +918,9 @@ function AudiencePicker({
   groupValue,
   onGroupChange,
   canPickClubWide,
+  staffMode,
+  onStaffModeChange,
+  canPickStaff,
 }: {
   teams: Team[];
   value: string[] | null;
@@ -926,12 +929,14 @@ function AudiencePicker({
   groupValue: string[];
   onGroupChange: (next: string[]) => void;
   canPickClubWide: boolean;
+  staffMode: boolean;
+  onStaffModeChange: (next: boolean) => void;
+  canPickStaff: boolean;
 }) {
   const { t } = useTranslation();
   const groupsActive = groupValue.length > 0;
-  const isClubWide = !groupsActive && value === null;
+  const isClubWide = !groupsActive && !staffMode && value === null;
   function toggleTeam(id: string) {
-    // Picking a team switches out of "group" mode.
     if (groupsActive) onGroupChange([]);
     if (value === null) {
       onChange([id]);
@@ -947,14 +952,13 @@ function AudiencePicker({
     if (groupValue.includes(id)) {
       onGroupChange(groupValue.filter((x) => x !== id));
     } else {
-      // Switching to group mode clears any team selection.
       onGroupChange([...groupValue, id]);
     }
   }
   if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
   return (
     <div className="space-y-2">
-      {/* Teams row (+ "Tout le club") */}
+      {/* Mode selector */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-xs font-medium text-muted-foreground mr-1">
           {t("wall.audienceTo", { defaultValue: "À :" })}
@@ -964,6 +968,7 @@ function AudiencePicker({
             type="button"
             onClick={() => {
               onGroupChange([]);
+              onStaffModeChange(false);
               onChange(null);
             }}
             className={cn(
@@ -976,25 +981,78 @@ function AudiencePicker({
             {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
           </button>
         )}
-        {teams.map((tt) => {
-          const active = !groupsActive && !isClubWide && (value ?? []).includes(tt.id);
-          return (
-            <button
-              key={tt.id}
-              type="button"
-              onClick={() => toggleTeam(tt.id)}
-              className={cn(
-                "text-xs px-2.5 py-1 rounded-full border transition-colors",
-                active
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background text-foreground border-border hover:bg-accent",
-              )}
-            >
-              {tt.name}
-            </button>
-          );
-        })}
+        {teams.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              if (staffMode) onStaffModeChange(false);
+              else {
+                onStaffModeChange(false); // ensure teams mode = players+parents
+              }
+            }}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              !groupsActive && !isClubWide && !staffMode
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-accent",
+            )}
+          >
+            {t("wall.scope.teams", { defaultValue: "Équipes (joueurs+parents)" })}
+          </button>
+        )}
+        {canPickStaff && (
+          <button
+            type="button"
+            onClick={() => onStaffModeChange(true)}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1",
+              staffMode
+                ? "bg-violet-600 text-white border-violet-600"
+                : "bg-background text-violet-700 dark:text-violet-300 border-violet-500/40 hover:bg-violet-500/10",
+            )}
+            title={t("wall.scope.staffTeamsHint", {
+              defaultValue: "Coachs et dirigeants des équipes sélectionnées uniquement",
+            })}
+          >
+            <Lock className="h-3 w-3" />
+            {t("wall.scope.staffTeams", { defaultValue: "Staff d'équipes" })}
+          </button>
+        )}
       </div>
+
+      {/* Team pills (shown for both "teams" and "staff of teams" modes) */}
+      {!isClubWide && !groupsActive && (
+        <div className="flex flex-wrap items-center gap-1.5 pl-2 border-l-2 border-border">
+          {teams.map((tt) => {
+            const active = (value ?? []).includes(tt.id);
+            return (
+              <button
+                key={tt.id}
+                type="button"
+                onClick={() => toggleTeam(tt.id)}
+                className={cn(
+                  "text-xs px-2.5 py-1 rounded-full border transition-colors",
+                  active
+                    ? staffMode
+                      ? "bg-violet-500 text-white border-violet-500"
+                      : "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-foreground border-border hover:bg-accent",
+                )}
+              >
+                {tt.name}
+              </button>
+            );
+          })}
+          {staffMode && (
+            <span className="text-[11px] text-violet-700 dark:text-violet-300 inline-flex items-center gap-1 ml-1">
+              <Lock className="h-3 w-3" />
+              {t("wall.scope.staffTeamsShort", {
+                defaultValue: "→ coachs + dirigeants uniquement",
+              })}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Groups block — clearly separated below teams */}
       {groups.length > 0 && (
