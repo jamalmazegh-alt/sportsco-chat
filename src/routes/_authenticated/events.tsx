@@ -28,8 +28,6 @@ import {
   List,
   CalendarDays,
   Ban,
-  Eye,
-  EyeOff,
   Clock,
   Search,
 } from "lucide-react";
