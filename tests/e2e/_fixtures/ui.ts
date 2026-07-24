@@ -46,6 +46,11 @@ export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
   await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
     timeout: 30_000,
   });
+  // Memberships / bottom-nav hydrated — avoids racing admin pages that
+  // `<Navigate to="/profile">` when `useMyRoles()` is still empty.
+  await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 /**
@@ -66,18 +71,41 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await page.locator("#password").fill(password);
   await expect(page.locator("#password")).toHaveValue(password);
 
-  await Promise.all([
-    page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
-      timeout: 45_000,
-    }),
-    page.locator("form.card button.cta[type='submit']").click(),
-  ]);
+  // Sequential (not Promise.all): `window.location.replace` is more reliable
+  // when the click fully settles before we assert navigation.
+  const submit = page.locator("form.card button.cta[type='submit']");
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
+    timeout: 45_000,
+  });
+  await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 /** Navigation via la vraie bottom-nav (accessible + multilingue). */
 export async function navTo(page: Page, navKey: string): Promise<void> {
   const nav = page.getByRole("navigation", { name: tx("nav.primary") });
   await nav.getByRole("link", { name: tx(navKey) }).click();
+}
+
+/**
+ * Ouvre le formulaire classique de création d'événement.
+ *
+ * `/events` → « Nouvel événement » ouvre d'abord `EventCreateChooser`
+ * (assistant vs classique). Les testids `event-*-input` n'existent que
+ * dans `EventFormSheet` (mode classique).
+ */
+export async function openClassicEventForm(page: Page): Promise<void> {
+  await page
+    .getByRole("button", { name: tx("events.create") })
+    .first()
+    .click();
+  await page.getByRole("button", { name: tx("eventCreateChooser.classic") }).click();
+  await expect(
+    page.getByTestId("event-name-input").or(page.getByTestId("event-opponent-input")),
+  ).toBeVisible({ timeout: 15_000 });
 }
 
 /**

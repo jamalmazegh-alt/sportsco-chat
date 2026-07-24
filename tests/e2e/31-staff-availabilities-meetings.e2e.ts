@@ -9,7 +9,7 @@
 import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, tx, txOr, uniqueName } from "./_fixtures/ui";
+import { loginViaUI, openClassicEventForm, tx, txOr, uniqueName } from "./_fixtures/ui";
 
 let club: SeededClub;
 
@@ -27,7 +27,9 @@ test.describe("indisponibilités staff", () => {
     await page.goto("/profile/availabilities");
 
     await expect(
-      page.getByText(txOr("staffAvailability.title", "Mes indisponibilités")),
+      page.getByRole("heading", {
+        name: txOr("staffAvailability.title", "Mes indisponibilités"),
+      }),
     ).toBeVisible();
     await expect(
       page.getByRole("button", {
@@ -108,10 +110,7 @@ test.describe("réunions", () => {
     await loginViaUI(page, "coach");
     await page.goto("/events");
 
-    await page
-      .getByRole("button", { name: tx("events.create") })
-      .first()
-      .click();
+    await openClassicEventForm(page);
 
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: new RegExp(club.prefix) }).click();
