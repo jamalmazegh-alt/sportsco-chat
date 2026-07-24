@@ -34,9 +34,7 @@ async function createUser(label: string): Promise<AdHoc> {
     email_confirm: true,
   });
   if (error || !data.user) throw new Error(`createUser(${label}): ${error?.message}`);
-  await admin
-    .from("profiles")
-    .upsert({ id: data.user.id, full_name: `RLS wall-staff ${label}` });
+  await admin.from("profiles").upsert({ id: data.user.id, full_name: `RLS wall-staff ${label}` });
   return { email, userId: data.user.id };
 }
 
