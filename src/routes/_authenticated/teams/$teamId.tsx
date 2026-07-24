@@ -340,7 +340,7 @@ function TeamDetail() {
   });
 
   // Parents grouped by player — used to know which contacts remain to invite.
-  const { data: parentsByPlayer } = useQuery({
+  const { data: parentsByPlayer, isPending: parentsByPlayerLoading } = useQuery({
     queryKey: ["team-parents-by-player", teamId],
     enabled: !!players && players.length > 0 && isCoach,
     queryFn: async () => {
