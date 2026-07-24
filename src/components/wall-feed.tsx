@@ -449,17 +449,38 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
     const isStaffMode = !!staffTeamId;
-    const hasGroups = !isStaffMode && audienceGroups.length > 0;
+    // "Staff d'équipes" composer mode: team pill selection publishes as team_staff.
+    const isStaffPick = !isStaffMode && staffAudienceMode;
+    const hasGroups = !isStaffMode && !isStaffPick && audienceGroups.length > 0;
     const audienceForInsert: string[] | null = isStaffMode
       ? [staffTeamId!]
-      : hasGroups
-        ? null
-        : audience === null
+      : isStaffPick
+        ? audience === null || audience.length === 0
           ? null
-          : audience.length === 0
+          : audience
+        : hasGroups
+          ? null
+          : audience === null
             ? null
-            : audience;
-    if (!isStaffMode && !isPriv && !hasGroups && audienceForInsert === null && audience !== null) {
+            : audience.length === 0
+              ? null
+              : audience;
+    if (isStaffPick && (audienceForInsert === null || audienceForInsert.length === 0)) {
+      toast.error(
+        t("wall.staff.pickTeamRequired", {
+          defaultValue: "Choisis au moins une équipe pour cibler son staff.",
+        }),
+      );
+      return;
+    }
+    if (
+      !isStaffMode &&
+      !isStaffPick &&
+      !isPriv &&
+      !hasGroups &&
+      audienceForInsert === null &&
+      audience !== null
+    ) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -468,15 +489,16 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       return;
     }
 
-    const audienceTypeForInsert: AudienceType = isStaffMode
-      ? "team_staff"
-      : hasGroups
-        ? "group"
-        : audienceForInsert === null
-          ? "club"
-          : audienceForInsert.length === 1
-            ? "team"
-            : "multi_team";
+    const audienceTypeForInsert: AudienceType =
+      isStaffMode || isStaffPick
+        ? "team_staff"
+        : hasGroups
+          ? "group"
+          : audienceForInsert === null
+            ? "club"
+            : audienceForInsert.length === 1
+              ? "team"
+              : "multi_team";
 
     setPosting(true);
     const insertPayload = {
