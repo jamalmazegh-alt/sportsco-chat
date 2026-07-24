@@ -18,9 +18,14 @@ const isEmail = (v: string | null): string | null => {
   if (!v) return null;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Email invalide";
 };
+import { isStrictIsoDate, parseFlexibleDate } from "./sheet-date";
+
 const isIsoDate = (v: string | null): string | null => {
   if (!v) return null;
-  return /^\d{4}-\d{2}-\d{2}$/.test(v) ? null : "Date attendue YYYY-MM-DD";
+  if (isStrictIsoDate(v)) return null;
+  const { ambiguous } = parseFlexibleDate(v);
+  if (ambiguous) return "Date ambiguë — fournir AAAA-MM-JJ";
+  return "Date invalide — attendue AAAA-MM-JJ";
 };
 const isHHMM = (v: string | null): string | null => {
   if (!v) return null;
