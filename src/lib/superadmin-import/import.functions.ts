@@ -717,6 +717,24 @@ export const runImport = createServerFn({ method: "POST" })
           teamsByNorm.set(normTeamKey(t.name, t.sport, t.age_group), t.id);
         }
 
+        // Preload the club's current season (used as a fallback when the row
+        // omits `saison`). Import doesn't create seasons — if none is current,
+        // we derive a label from today so `player_seasons.season_label`
+        // (NOT NULL) always has a sensible value.
+        const { data: currentSeasonRow } = await supabaseAdmin
+          .from("seasons")
+          .select("label")
+          .eq("club_id", data.clubId)
+          .eq("is_current", true)
+          .maybeSingle();
+        const fallbackSeasonEndYear = (() => {
+          const today = new Date();
+          const y = today.getUTCFullYear();
+          return today.getUTCMonth() >= 6 ? y + 1 : y;
+        })();
+        const fallbackSeasonLabel =
+          currentSeasonRow?.label ?? seasonLabelFromEndYear(fallbackSeasonEndYear);
+
         // Load full club roster (active + soft-deleted) once — identity index.
         type ExistingPlayer = {
           id: string;
