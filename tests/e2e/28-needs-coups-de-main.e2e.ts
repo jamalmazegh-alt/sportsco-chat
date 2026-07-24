@@ -27,7 +27,8 @@ test.describe("besoins — création côté staff", () => {
     await loginViaUI(page, "coach");
     await page.goto(`/events/${club.eventId}`);
 
-    await expect(page.locator("#needs")).toBeVisible();
+    // Section mounts after the needs query — wait explicitly (returns null while loading).
+    await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(tx("section.title", "needs"))).toBeVisible();
 
     await page.getByRole("button", { name: tx("section.add", "needs") }).click();
@@ -58,6 +59,7 @@ test.describe("besoins — création côté staff", () => {
     await loginViaUI(page, "coach");
     await page.goto(`/events/${club.eventId}`);
 
+    await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(label)).toBeVisible();
     await expect(page.getByText(tx("badge.unpublished", "needs")).first()).toBeVisible();
   });
@@ -114,6 +116,9 @@ test.describe("besoins — couverture", () => {
 
     await loginViaUI(page, "coach");
     await page.goto(`/events/${club.eventId}`);
+
+    await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(label)).toBeVisible();
 
     await page
       .getByRole("button", { name: tx("card.menuLabel", "needs") })

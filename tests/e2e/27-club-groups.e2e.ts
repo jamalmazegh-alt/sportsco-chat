@@ -24,12 +24,12 @@ test.describe("groupes du club", () => {
 
     await loginViaUI(page, "admin");
     await page.goto("/admin/groups");
-    await expect(page.getByText(tx("groups.title"))).toBeVisible();
+    await expect(page.getByRole("heading", { name: tx("groups.title") })).toBeVisible();
 
     await page.getByRole("button", { name: tx("groups.create") }).click();
 
-    await page.getByLabel(tx("groups.name")).fill(name);
-    await page.getByLabel(tx("groups.description")).fill("Groupe E2E");
+    await page.locator("#group-name").fill(name);
+    await page.locator("#group-desc").fill("Groupe E2E");
 
     await page.getByRole("button", { name: tx("common.save") }).click();
 
@@ -42,6 +42,7 @@ test.describe("groupes du club", () => {
 
     await loginViaUI(page, "admin");
     await page.goto("/admin/groups");
+    await expect(page.getByRole("heading", { name: tx("groups.title") })).toBeVisible();
 
     await page
       .getByRole("button", { name: tx("groups.manageMembers") })
@@ -59,12 +60,13 @@ test.describe("groupes du club", () => {
     await loginViaUI(page, "admin");
     await page.goto("/publications/new");
 
-    await page.getByLabel(tx("form.questionLabel", "publications")).fill(uniqueName("q"));
+    await page.locator("#pub-title").fill(uniqueName("q"));
     const opts = page.getByPlaceholder(/Option\s*\d/i);
     await opts.nth(0).fill("A");
     await opts.nth(1).fill("B");
     await page.getByRole("button", { name: tx("common.next") }).click();
 
+    await expect(page.getByText(tx("new.audienceLabel", "publications"))).toBeVisible();
     await expect(page.getByText(name)).toHaveCount(0);
   });
 

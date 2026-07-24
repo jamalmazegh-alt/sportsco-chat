@@ -55,8 +55,14 @@ Needs : champs déjà en `#need-label` / `#need-capacity` — pas de testid supp
 E2E_TOURNAMENT_ID=…   # classement tournoi
 E2E_CLUB_SLUG=…       # pages publiques /stages/$clubSlug/…
 E2E_CAMP_SLUG=…       # formulaire d'inscription
-E2E_UI=1              # timeout 90s
+E2E_UI=1              # timeout 90s (posé dans le workflow E2E CI)
 ```
+
+`loginViaUI` injecte la session (`loginAs`) puis attend `/home` **et** la
+bottom-nav (memberships hydratés). Le formulaire `/login` est exercé une fois
+via `loginViaForm`. Les créations d'événement passent par
+`openClassicEventForm` (`EventCreateChooser` → formulaire classique) — les
+testids `event-*-input` n'existent pas dans l'assistant guidé.
 
 ## 6. Reste non couvert
 

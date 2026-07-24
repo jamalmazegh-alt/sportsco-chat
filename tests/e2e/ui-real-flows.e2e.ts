@@ -12,7 +12,15 @@ import { createClient } from "@supabase/supabase-js";
 import { isV2 } from "./_fixtures/features";
 import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { loginViaUI, loginViaForm, tx, uniqueName, navTo, MOBILE_VIEWPORT } from "./_fixtures/ui";
+import {
+  loginViaUI,
+  loginViaForm,
+  tx,
+  uniqueName,
+  navTo,
+  openClassicEventForm,
+  MOBILE_VIEWPORT,
+} from "./_fixtures/ui";
 
 test.describe("auth", () => {
   test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
@@ -89,10 +97,7 @@ test.describe("événements", () => {
     await navTo(page, "nav.events");
     await expect(page).toHaveURL(/\/events$/);
 
-    await page
-      .getByRole("button", { name: tx("events.create") })
-      .first()
-      .click();
+    await openClassicEventForm(page);
 
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: new RegExp(club.prefix) }).click();
@@ -114,10 +119,7 @@ test.describe("événements", () => {
     await loginViaUI(page, "coach");
     await navTo(page, "nav.events");
 
-    await page
-      .getByRole("button", { name: tx("events.create") })
-      .first()
-      .click();
+    await openClassicEventForm(page);
 
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: new RegExp(club.prefix) }).click();
@@ -360,8 +362,9 @@ test.describe("confidentialité", () => {
 test.describe("smoke mobile", () => {
   test.use({ viewport: MOBILE_VIEWPORT });
 
-  const pages: { name: string; url: string; expectKey: string }[] = [
-    { name: "dashboard", url: "/home", expectKey: "nav.primary" },
+  // expectKey must be VISIBLE copy (not aria-labels like nav.primary).
+  const pages: { name: string; url: string; expectKey: string | null }[] = [
+    { name: "dashboard", url: "/home", expectKey: null },
     { name: "équipes", url: "/teams", expectKey: "teams.title" },
     { name: "événements", url: "/events", expectKey: "events.title" },
     { name: "tournois", url: "/tournaments", expectKey: "nav.tournaments" },
@@ -372,7 +375,12 @@ test.describe("smoke mobile", () => {
       await loginViaUI(page, "admin");
       await page.goto(p.url);
       await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible();
-      await expect(page.getByText(tx(p.expectKey)).first()).toBeVisible();
+      if (p.expectKey) {
+        await expect(page.getByText(tx(p.expectKey)).first()).toBeVisible();
+      } else {
+        // Home: greeting is the stable visible anchor (nav.primary is aria-only).
+        await expect(page.getByRole("heading").first()).toBeVisible();
+      }
     });
   }
 });

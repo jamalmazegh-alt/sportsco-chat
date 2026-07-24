@@ -4,7 +4,7 @@
  * Seeds aligned on schema: publication_type, poll_visibility, author_id;
  * club_poll_options.sort_order (not position); no status column.
  */
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import { loginViaUI, tx, uniqueName, expectToast } from "./_fixtures/ui";
@@ -30,7 +30,8 @@ test.describe("publications — sondages", () => {
     await loginViaUI(page, "admin");
     await page.goto("/publications/new");
 
-    await page.getByLabel(tx("form.questionLabel", "publications")).fill(question);
+    // Prefer stable id — getByLabel("Question") is brittle across locales/overlays.
+    await page.locator("#pub-title").fill(question);
 
     const optionInputs = page.getByPlaceholder(/Option\s*\d/i);
     await optionInputs.nth(0).fill("Samedi");
@@ -60,13 +61,7 @@ test.describe("publications — sondages", () => {
     await loginViaUI(page, "player");
     await page.goto(`/publications/${pubId}`);
 
-    await page
-      .getByRole("button", { name: /Samedi/i })
-      .first()
-      .click();
-    const confirm = page.getByRole("button", { name: tx("detail.confirmVote", "publications") });
-    if (await confirm.count()) await confirm.first().click();
-
+    await castVoteForOption(page, /Samedi/i);
     await expectToast(page, tx("detail.voted", "publications"));
   });
 
@@ -77,19 +72,16 @@ test.describe("publications — sondages", () => {
     await loginViaUI(page, "parent");
     await page.goto(`/publications/${pubId}`);
 
-    await expect(page.getByText(tx("detail.votingAs", "publications"))).toBeVisible();
-    await page
-      .getByRole("button", { name: new RegExp(club.prefix, "i") })
-      .first()
-      .click();
+    // Multi-subject → "Je vote en tant que"; single child → "Vous votez pour …".
+    await expect(
+      page
+        .getByText(tx("detail.votingAs", "publications"))
+        .or(page.getByText(tx("detail.votingForChild", "publications"))),
+    ).toBeVisible();
+    const childBtn = page.getByRole("button", { name: new RegExp(club.prefix, "i") });
+    if (await childBtn.count()) await childBtn.first().click();
 
-    await page
-      .getByRole("button", { name: /Samedi/i })
-      .first()
-      .click();
-    const confirm = page.getByRole("button", { name: tx("detail.confirmVote", "publications") });
-    if (await confirm.count()) await confirm.first().click();
-
+    await castVoteForOption(page, /Samedi/i);
     await expectToast(page, tx("detail.voted", "publications"));
   });
 
@@ -99,12 +91,24 @@ test.describe("publications — sondages", () => {
 
     await loginViaUI(page, "admin");
     await page.goto(`/publications/${pubId}`);
-    await page.getByRole("button", { name: tx("detail.close", "publications") }).click();
+
+    // Close lives in the ⋯ (MoreHorizontal) dropdown, not as a top-level button.
+    await page.locator("button:has(svg.lucide-more-horizontal)").click();
+    await page.getByRole("menuitem", { name: tx("detail.close", "publications") }).click();
     await expectToast(page, tx("detail.closed", "publications"));
 
     await expect(page.getByText(tx("list.closed", "publications")).first()).toBeVisible();
   });
 });
+
+async function castVoteForOption(page: Page, option: RegExp): Promise<void> {
+  // Options are radios in <label>, not buttons named after the option.
+  await page.locator("label").filter({ hasText: option }).first().click();
+  const confirm = page.getByRole("button", { name: tx("detail.confirmVote", "publications") });
+  const vote = page.getByRole("button", { name: tx("detail.vote", "publications") });
+  if (await confirm.count()) await confirm.first().click();
+  else await vote.first().click();
+}
 
 async function seedPoll(
   question: string,
@@ -120,6 +124,7 @@ async function seedPoll(
       poll_visibility: visibility,
       publish_to_wall: true,
       send_email: false,
+      published_at: new Date().toISOString(),
     })
     .select("id")
     .single();
@@ -141,26 +146,14 @@ async function seedPoll(
   return data.id as string;
 }
 
-async function selectSeededTeamAudience(page: import("@playwright/test").Page) {
-  const selects = page.getByRole("combobox");
-  if (await selects.count()) {
-    await selects.first().click();
-    await page
-      .getByRole("option", { name: tx("audience.types.joueurs_equipe", "publications") })
-      .click()
-      .catch(() => {});
-    await selects
-      .nth(1)
-      .click()
-      .catch(() => {});
-    await page
-      .getByRole("option", { name: new RegExp(club.prefix, "i") })
-      .click()
-      .catch(() => {});
-    await page
-      .getByRole("button", { name: tx("common.add") })
-      .first()
-      .click()
-      .catch(() => {});
-  }
+/** Audience step uses team chips (+ Joueurs / + Parents), not comboboxes. */
+async function selectSeededTeamAudience(page: Page) {
+  const teamRow = page
+    .locator("div.flex.items-center.justify-between")
+    .filter({ hasText: new RegExp(club.prefix, "i") })
+    .first();
+  await expect(teamRow).toBeVisible({ timeout: 15_000 });
+  await teamRow
+    .getByRole("button", { name: tx("audience.types.joueurs_equipe", "publications") })
+    .click();
 }

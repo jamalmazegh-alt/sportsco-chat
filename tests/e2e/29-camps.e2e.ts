@@ -22,8 +22,9 @@ test.describe("stages — administration", () => {
   test("admin ouvre la liste des stages", async ({ page }) => {
     await loginViaUI(page, "admin");
     await page.goto("/admin/camps");
+    await expect(page).toHaveURL(/\/admin\/camps/);
 
-    await expect(page.getByText(tx("list.title", "camps"))).toBeVisible();
+    await expect(page.getByRole("heading", { name: tx("list.title", "camps") })).toBeVisible();
     await expect(page.getByRole("button", { name: tx("list.new", "camps") })).toBeVisible();
   });
 
@@ -34,11 +35,11 @@ test.describe("stages — administration", () => {
 
     await loginViaUI(page, "admin");
     await page.goto("/admin/camps");
+    await expect(page.getByRole("heading", { name: tx("list.title", "camps") })).toBeVisible();
     await page.getByRole("button", { name: tx("list.new", "camps") }).click();
 
-    // Prefer classic path when the chooser is shown.
-    const classic = page.getByText(tx("chooser.classic", "camps"));
-    if (await classic.count()) await classic.click();
+    // Chooser: assistant vs classic — testids live on the classic form.
+    await page.getByRole("button", { name: tx("chooser.classic", "camps") }).click();
 
     await page.getByTestId("camp-title-input").fill(name);
     await page.locator('input[type="date"]').nth(0).fill(start);
@@ -58,6 +59,7 @@ test.describe("stages — administration", () => {
 
     await loginViaUI(page, "admin");
     await page.goto("/admin/camps");
+    await expect(page.getByRole("heading", { name: tx("list.title", "camps") })).toBeVisible();
 
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: tx("status.published", "camps") }).click();
