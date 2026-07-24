@@ -79,6 +79,7 @@ function EventsPage() {
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<EventsFilters>(DEFAULT_EVENTS_FILTERS);
+  const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
 
@@ -179,6 +180,7 @@ function EventsPage() {
       : null;
     return events.filter((e) => {
       if (!filters.showCancelled && e.status === "cancelled") return false;
+      if (hideTrainings && e.type === "training") return false;
       if (filters.types.size > 0 && !filters.types.has(e.type as any)) return false;
       if (filters.teamIds.size > 0 && !filters.teamIds.has(e.team_id)) return false;
       if (!filters.includeInternal && internalTeamIds.has(e.team_id)) return false;
@@ -202,7 +204,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, filters, internalTeamIds, searchQuery]);
+  }, [events, filters, internalTeamIds, searchQuery, hideTrainings]);
 
 
   const pastCount = useMemo(() => {
@@ -605,14 +607,31 @@ function EventsPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {view === "list" && (
-            <EventsFilterSheet
-              filters={filters}
-              onChange={setFilters}
-              teams={visibleTeams}
-              isCoach={isCoach}
-              hasInternalTeam={hasInternalTeam}
-              pastCount={pastCount}
-            />
+            <>
+              <button
+                type="button"
+                onClick={() => setHideTrainings((v) => !v)}
+                aria-pressed={hideTrainings}
+                className={cn(
+                  "inline-flex items-center gap-1.5 h-9 rounded-md border px-3 text-xs font-medium transition-colors",
+                  hideTrainings
+                    ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                )}
+                title={t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              >
+                <Dumbbell className="h-3.5 w-3.5" />
+                {t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              </button>
+              <EventsFilterSheet
+                filters={filters}
+                onChange={setFilters}
+                teams={visibleTeams}
+                isCoach={isCoach}
+                hasInternalTeam={hasInternalTeam}
+                pastCount={pastCount}
+              />
+            </>
           )}
         </div>
       </div>
