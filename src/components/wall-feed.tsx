@@ -557,7 +557,27 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       // Recipient set for in-app notifications must mirror the post audience
       // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
       const recipientSet = new Set<string>();
-      if (hasGroups) {
+      if (isStaffMode) {
+        // Staff wall: coaches + dirigeants of that team, plus club admins/dirigeants.
+        const { data: priv } = await supabase
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        const { data: tm } = await supabase
+          .from("team_members")
+          .select("user_id, role")
+          .eq("team_id", staffTeamId!)
+          .in("role", ["coach", "dirigeant"]);
+        for (const r of tm ?? []) {
+          const uid = (r as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else if (hasGroups) {
         // Admins/dirigeants always see every post.
         const { data: priv } = await supabase
           .from("club_members")
