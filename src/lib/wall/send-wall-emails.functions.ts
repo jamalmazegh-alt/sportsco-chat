@@ -182,7 +182,6 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
           }
         }
       }
-    }
     } else if (audienceType === "team_staff") {
       // Club admins/dirigeants + team coaches/dirigeants only. No players/parents.
       const { data: priv } = await supabaseAdmin
