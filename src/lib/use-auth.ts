@@ -99,9 +99,16 @@ export function useAuthState(): AuthState {
     // on their child's club instead of the "create a club" screen.
     try {
       await (supabase.rpc as any)("link_parent_memberships");
+      // Fire-and-forget: send a one-shot email for any child that was just
+      // linked to this parent account. Server-side dedupe via
+      // parent_link_notifications guarantees a single email per (parent, child).
+      import("@/lib/parent-link-notify.functions")
+        .then((m) => m.notifyNewlyLinkedChildren())
+        .catch((e) => console.warn("notifyNewlyLinkedChildren failed:", e));
     } catch (e) {
       console.warn("link_parent_memberships failed:", e);
     }
+
     const { data, error } = await supabase
       .from("club_members")
       .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
