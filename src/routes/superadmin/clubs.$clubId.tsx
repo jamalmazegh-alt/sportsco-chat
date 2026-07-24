@@ -36,6 +36,7 @@ import {
   type OnboardingStep,
 } from "@/components/superadmin/OnboardingProgress";
 import { ClubObservabilityPanel } from "@/components/superadmin/ClubObservabilityPanel";
+import { RecomputeCategoriesPanel } from "@/components/superadmin/RecomputeCategoriesPanel";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
