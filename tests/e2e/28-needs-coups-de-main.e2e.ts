@@ -128,7 +128,7 @@ test.describe("besoins — couverture", () => {
     // Menu opens a confirm alertdialog — must confirm before the toast fires.
     const confirm = page.getByRole("alertdialog");
     await expect(confirm).toBeVisible();
-    await confirm.getByRole("button", { name: tx("actions.close", "needs") }).click();
+    await confirm.getByRole("button", { name: tx("closeDialog2.confirm", "needs") }).click();
     await expectToast(page, tx("status.closed", "needs"));
   });
 });
