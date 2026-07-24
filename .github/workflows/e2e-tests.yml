@@ -69,8 +69,16 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
+          set -euo pipefail
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
-          supabase db push --include-all --yes
+          if ! out="$(supabase db push --include-all --yes 2>&1)"; then
+            echo "$out"
+            if echo "$out" | grep -q "Remote migration versions not found"; then
+              echo "::error::Bughunt schema is ahead of this commit (Lovable often lands migrations on main minutes earlier). Rebase/re-run on latest main — do not migration repair from CI."
+            fi
+            exit 1
+          fi
+          echo "$out"
 
       - name: Start app (bughunt Supabase)
         env:
@@ -181,14 +189,25 @@ jobs:
         with:
           version: latest
 
+      # Core already synced bughunt when it succeeded. Re-push only when
+      # core was skipped (suite=ui) or failed before / during db push.
       - name: Push pending migrations (anti-dérive bughunt)
+        if: needs.e2e-core.result != 'success'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
+          set -euo pipefail
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
-          supabase db push --include-all --yes
+          if ! out="$(supabase db push --include-all --yes 2>&1)"; then
+            echo "$out"
+            if echo "$out" | grep -q "Remote migration versions not found"; then
+              echo "::error::Bughunt schema is ahead of this commit (Lovable often lands migrations on main minutes earlier). Rebase/re-run on latest main — do not migration repair from CI."
+            fi
+            exit 1
+          fi
+          echo "$out"
 
       - name: Start app (bughunt Supabase)
         env:
