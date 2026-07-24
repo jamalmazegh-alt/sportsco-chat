@@ -631,6 +631,9 @@ function NewPublicationPage() {
                       const parentsActive = audiences.some(
                         (a) => a.audience_type === "parents_equipe" && a.team_id === tm.id,
                       );
+                      const staffActive = audiences.some(
+                        (a) => a.audience_type === "staff_equipe" && a.team_id === tm.id,
+                      );
                       const togglePlayers = () => {
                         if (playersActive) {
                           setAudiences((prev) =>
@@ -651,6 +654,17 @@ function NewPublicationPage() {
                           );
                         } else {
                           addAudience({ audience_type: "parents_equipe", team_id: tm.id });
+                        }
+                      };
+                      const toggleStaff = () => {
+                        if (staffActive) {
+                          setAudiences((prev) =>
+                            prev.filter(
+                              (a) => !(a.audience_type === "staff_equipe" && a.team_id === tm.id),
+                            ),
+                          );
+                        } else {
+                          addAudience({ audience_type: "staff_equipe", team_id: tm.id });
                         }
                       };
                       return (
@@ -688,6 +702,19 @@ function NewPublicationPage() {
                             >
                               <UserRound className="h-3 w-3" />
                               {t("publications:audience.types.parents_equipe")}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={toggleStaff}
+                              aria-pressed={staffActive}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] motion-safe:transition-colors ${
+                                staffActive
+                                  ? "bg-violet-100 dark:bg-violet-900/30 border-violet-500 text-violet-800 dark:text-violet-200"
+                                  : "border-border bg-background hover:bg-muted text-foreground"
+                              }`}
+                            >
+                              <Shield className="h-3 w-3" />
+                              {t("publications:audience.types.staff_equipe")}
                             </button>
                           </div>
                         </div>
