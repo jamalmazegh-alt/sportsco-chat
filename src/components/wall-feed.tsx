@@ -99,7 +99,7 @@ const SOURCE_META: Record<
   },
 };
 
-export function WallFeed({ clubId }: { clubId: string }) {
+export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
