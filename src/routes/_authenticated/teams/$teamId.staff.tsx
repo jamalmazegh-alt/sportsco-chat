@@ -1,96 +1,131 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Lock, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useMyRoles } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
 import { WallFeed } from "@/components/wall-feed";
-import i18n from "@/lib/i18n";
+import { useAuth } from "@/lib/auth-context";
+
+function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="p-6 space-y-3">
+      <p className="text-sm text-destructive">{String(error?.message ?? error)}</p>
+      <Button
+        onClick={() => {
+          reset();
+          router.invalidate();
+        }}
+        size="sm"
+      >
+        Réessayer
+      </Button>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/staff")({
-  component: TeamStaffWall,
+  component: TeamStaffWallPage,
   head: () => ({
     meta: [
-      { title: i18n.t("teams.staffWall", { defaultValue: "Mur Staff" }) },
+      { title: "Mur Staff — Clubero" },
       {
         name: "description",
-        content: i18n.t("teams.staffWallHint", {
-          defaultValue:
-            "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
-        }),
+        content: "Espace privé des éducateurs et dirigeants de l'équipe.",
       },
+      { property: "og:title", content: "Mur Staff — Clubero" },
+      {
+        property: "og:description",
+        content: "Espace privé des éducateurs et dirigeants de l'équipe.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
     ],
   }),
+  errorComponent: ErrorBoundary,
+  notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
 });
 
-function TeamStaffWall() {
+function TeamStaffWallPage() {
   const { teamId } = Route.useParams();
   const { t } = useTranslation();
-  const roles = useMyRoles();
+  const { memberships, activeClubId } = useAuth();
 
   const { data: team, isLoading } = useQuery({
-    queryKey: ["team-staff-wall", teamId],
+    queryKey: ["team-basic", teamId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("teams")
         .select("id, name, club_id")
         .eq("id", teamId)
         .maybeSingle();
+      if (error) throw error;
       return data;
     },
   });
 
-  const canAccess =
-    roles.includes("admin") ||
-    roles.includes("dirigeant") ||
-    roles.includes("coach") ||
-    roles.includes("assistant_coach");
+  const activeMembership = memberships.find(
+    (m) => m.club_id === (team?.club_id ?? activeClubId),
+  );
+  const roles = new Set<string>(activeMembership?.roles ?? []);
+  const isStaff =
+    roles.has("admin") ||
+    roles.has("dirigeant") ||
+    roles.has("coach") ||
+    roles.has("assistant_coach");
 
-  if (isLoading) return null;
-  if (!team) {
-    return (
-      <div className="p-4">
-        <p className="text-sm text-muted-foreground">{t("common.notFound", { defaultValue: "Introuvable" })}</p>
-      </div>
-    );
+  if (isLoading) {
+    return <div className="p-6 text-sm text-muted-foreground">Chargement…</div>;
   }
-  if (!canAccess) {
+  if (!team) {
+    return <div className="p-6 text-sm">Équipe introuvable</div>;
+  }
+  if (!isStaff) {
     return (
-      <div className="p-4">
+      <div className="p-6 space-y-3">
         <p className="text-sm text-muted-foreground">
-          {t("common.forbidden", { defaultValue: "Accès refusé" })}
+          {t("teams.staffWallForbidden", {
+            defaultValue:
+              "Cet espace est réservé aux éducateurs et dirigeants de l'équipe.",
+          })}
         </p>
+        <Button asChild size="sm" variant="outline">
+          <Link to="/teams/$teamId" params={{ teamId }}>
+            <ArrowLeft className="h-4 w-4 mr-1.5" />
+            {t("common.back", { defaultValue: "Retour" })}
+          </Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 p-4 pb-24">
+    <div className="p-4 space-y-4 max-w-3xl mx-auto">
       <div className="flex items-center gap-2">
-        <Link
-          to="/teams/$teamId"
-          params={{ teamId }}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {(team as any).name}
-        </Link>
-      </div>
-      <div className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-3">
-        <div className="flex items-center gap-2">
-          <Lock className="h-4 w-4 text-violet-600 dark:text-violet-300" />
-          <h1 className="text-base font-semibold">
-            {t("teams.staffWall", { defaultValue: "Mur Staff" })}
-          </h1>
+        <Button asChild size="icon" variant="ghost">
+          <Link to="/teams/$teamId" params={{ teamId }} aria-label="Retour à l'équipe">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4 text-violet-500 shrink-0" />
+            <h1 className="text-lg font-semibold truncate">
+              {t("teams.staffWall", { defaultValue: "Mur Staff" })} · {team.name}
+            </h1>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("teams.staffWallHint", {
+              defaultValue:
+                "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
+            })}
+          </p>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {t("teams.staffWallHint", {
-            defaultValue:
-              "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
-          })}
-        </p>
       </div>
-      <WallFeed clubId={(team as any).club_id} staffTeamId={teamId} />
+
+      {team.club_id && <WallFeed clubId={team.club_id} staffTeamId={teamId} />}
     </div>
   );
 }

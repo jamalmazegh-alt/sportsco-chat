@@ -1071,15 +1071,13 @@ function TeamDetail() {
           <Link
             to="/teams/$teamId/staff"
             params={{ teamId }}
-            className="flex items-center gap-3 rounded-2xl border border-violet-500/30 bg-violet-500/5 px-4 py-3 active:scale-[0.99] transition-transform hover:bg-violet-500/10"
+            className="flex items-center gap-3 rounded-lg border border-violet-200 dark:border-violet-900/60 bg-violet-50/50 dark:bg-violet-950/20 p-3 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors"
           >
-            <div className="h-9 w-9 rounded-xl bg-violet-500/15 flex items-center justify-center shrink-0">
-              <LockIcon className="h-4 w-4 text-violet-600 dark:text-violet-300" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">
+            <LockIcon className="h-5 w-5 text-violet-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold">
                 {t("teams.staffWall", { defaultValue: "Mur Staff" })}
-              </p>
+              </div>
               <p className="text-xs text-muted-foreground">
                 {t("teams.staffWallHint", {
                   defaultValue:
