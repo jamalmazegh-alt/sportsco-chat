@@ -1576,10 +1576,21 @@ function TeamDetail() {
                   <p className="text-xs mt-0.5 truncate">
                     {linked ? (
                       <span className="text-muted-foreground">
-                        {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
+                        {isCoach ? (
+                          <>
+                            {t("players.accountActive")}
+                            {p.preferred_position ? (
+                              <span className="opacity-70"> · {p.preferred_position}</span>
+                            ) : null}
+                          </>
+                        ) : (
+                          (p.preferred_position ?? "")
+                        )}
                       </span>
                     ) : isCoach ? (
-                      hasFailedInvite ? (
+                      inviteStatusesLoading ? (
+                        <span className="text-muted-foreground opacity-60">…</span>
+                      ) : hasFailedInvite ? (
                         <span
                           className="inline-flex items-center gap-1 text-red-600"
                           title={failures
@@ -1621,6 +1632,7 @@ function TeamDetail() {
                       <span className="text-muted-foreground">{p.preferred_position ?? ""}</span>
                     )}
                   </p>
+
                 </div>
               </>
             );
