@@ -42,6 +42,7 @@ import { Route as SupportViewSessionIdRouteImport } from './routes/support-view.
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
+import { Route as SuperadminNotificationsRouteImport } from './routes/superadmin/notifications'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminInviteBatchesRouteImport } from './routes/superadmin/invite-batches'
 import { Route as SuperadminEmailDispatchesRouteImport } from './routes/superadmin/email-dispatches'
@@ -343,6 +344,11 @@ const SuperadminSupportRoute = SuperadminSupportRouteImport.update({
 const SuperadminSettingsRoute = SuperadminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminNotificationsRoute = SuperadminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => SuperadminRoute,
 } as any)
 const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
@@ -1179,6 +1185,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1347,6 +1354,7 @@ export interface FileRoutesByTo {
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1520,6 +1528,7 @@ export interface FileRoutesById {
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
   '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1694,6 +1703,7 @@ export interface FileRouteTypes {
     | '/superadmin/email-dispatches'
     | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1862,6 +1872,7 @@ export interface FileRouteTypes {
     | '/superadmin/email-dispatches'
     | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -2034,6 +2045,7 @@ export interface FileRouteTypes {
     | '/superadmin/email-dispatches'
     | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -2472,6 +2484,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/superadmin/settings'
       preLoaderRoute: typeof SuperadminSettingsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/notifications': {
+      id: '/superadmin/notifications'
+      path: '/notifications'
+      fullPath: '/superadmin/notifications'
+      preLoaderRoute: typeof SuperadminNotificationsRouteImport
       parentRoute: typeof SuperadminRoute
     }
     '/superadmin/logs': {
@@ -3724,6 +3743,7 @@ interface SuperadminRouteChildren {
   SuperadminEmailDispatchesRoute: typeof SuperadminEmailDispatchesRoute
   SuperadminInviteBatchesRoute: typeof SuperadminInviteBatchesRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
+  SuperadminNotificationsRoute: typeof SuperadminNotificationsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRoute
@@ -3744,6 +3764,7 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminEmailDispatchesRoute: SuperadminEmailDispatchesRoute,
   SuperadminInviteBatchesRoute: SuperadminInviteBatchesRoute,
   SuperadminLogsRoute: SuperadminLogsRoute,
+  SuperadminNotificationsRoute: SuperadminNotificationsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRoute,
