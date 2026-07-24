@@ -59,6 +59,8 @@ import { template as publicationPollTemplate } from "./publication-poll";
 import { template as eventStaffAssignmentTemplate } from "./event-staff-assignment";
 import { template as meetingInviteTemplate } from "./meeting-invite";
 import { template as meetingRemovedTemplate } from "./meeting-removed";
+import { template as parentChildLinkedTemplate } from "./parent-child-linked";
+
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
@@ -103,4 +105,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "event-staff-assignment": eventStaffAssignmentTemplate,
   "meeting-invite": meetingInviteTemplate,
   "meeting-removed": meetingRemovedTemplate,
+  "parent-child-linked": parentChildLinkedTemplate,
 };
+
