@@ -59,6 +59,7 @@ type Audience =
   | { audience_type: "dirigeants" }
   | { audience_type: "joueurs_equipe"; team_id: string }
   | { audience_type: "parents_equipe"; team_id: string }
+  | { audience_type: "staff_equipe"; team_id: string }
   | { audience_type: "joueurs_categorie"; category_label: string; season_id: string }
   | { audience_type: "parents_categorie"; category_label: string; season_id: string }
   | { audience_type: "groupe_personnalise"; group_id: string };
@@ -72,13 +73,14 @@ const KIND_META: Record<KindKey, { Icon: LucideIcon }> = {
   dirigeants: { Icon: Shield },
   joueurs_equipe: { Icon: Trophy },
   parents_equipe: { Icon: UserRound },
+  staff_equipe: { Icon: Shield },
   joueurs_categorie: { Icon: Tag },
   parents_categorie: { Icon: UserRound },
   groupe_personnalise: { Icon: UsersRound },
 };
 
 function needsTeam(k: KindKey) {
-  return k === "joueurs_equipe" || k === "parents_equipe";
+  return k === "joueurs_equipe" || k === "parents_equipe" || k === "staff_equipe";
 }
 function needsCategory(k: KindKey) {
   return k === "joueurs_categorie" || k === "parents_categorie";
