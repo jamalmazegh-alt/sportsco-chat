@@ -1471,7 +1471,10 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
+            const inviteStatusesLoading =
+              isCoach && (pendingInvitesLoading || inviteFailuresLoading || parentsByPlayerLoading);
             const hasContactHint = hasOpenContact(p);
+
             const parentsForP = parentsByPlayer?.get(p.id) ?? [];
             const isMinorP = (() => {
               if (!p.birth_date) return false;
