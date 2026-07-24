@@ -42,7 +42,7 @@ type Comment = {
   author?: Profile | null;
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
-type AudienceType = "club" | "team" | "multi_team" | "group";
+type AudienceType = "club" | "team" | "multi_team" | "group" | "team_staff";
 type Team = { id: string; name: string };
 type Group = { id: string; name: string };
 type Post = {
