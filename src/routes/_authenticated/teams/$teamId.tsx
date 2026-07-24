@@ -1068,21 +1068,25 @@ function TeamDetail() {
           roles.includes("dirigeant") ||
           roles.includes("coach") ||
           roles.includes("assistant_coach")) && (
-          <section className="space-y-2">
-            <div className="flex items-center gap-2">
-              <LockIcon className="h-4 w-4 text-violet-500" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <Link
+            to="/teams/$teamId/staff"
+            params={{ teamId }}
+            className="flex items-center gap-3 rounded-lg border border-violet-200 dark:border-violet-900/60 bg-violet-50/50 dark:bg-violet-950/20 p-3 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors"
+          >
+            <LockIcon className="h-5 w-5 text-violet-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold">
                 {t("teams.staffWall", { defaultValue: "Mur Staff" })}
-              </h2>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("teams.staffWallHint", {
+                  defaultValue:
+                    "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
+                })}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t("teams.staffWallHint", {
-                defaultValue:
-                  "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
-              })}
-            </p>
-            <WallFeed clubId={team.club_id} staffTeamId={teamId} />
-          </section>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          </Link>
         )}
 
 
