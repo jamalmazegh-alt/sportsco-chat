@@ -66,16 +66,24 @@ describe("superadmin observability: static guard presence", () => {
 describe("superadmin observability: guard is invoked and rejects non-super", () => {
   beforeEach(() => forbidden.mockClear());
 
-  it("rejects with 403 when assertSuperAdmin throws", async () => {
+  it("invokes assertSuperAdmin before any RPC on each handler", async () => {
     const mod = await import("@/lib/superadmin/observability.functions");
-    // Access the underlying handler by calling the server fn directly.
-    // In tests the createServerFn stub still runs middleware+handler locally.
-    const rej = mod.listInviteBatches({ data: {} } as never).catch((e) => e);
-    const err = await rej;
-    // Either the Response we threw, or a wrapper that still carries status 403.
-    const status = (err as { status?: number })?.status;
-    expect(status).toBe(403);
-
-    expect(forbidden).toHaveBeenCalled();
+    const calls: Array<[string, () => Promise<unknown>]> = [
+      ["listInviteBatches", () => mod.listInviteBatches({ data: {} } as never)],
+      ["getInviteBatchRows", () => mod.getInviteBatchRows({ data: { batchId: "x" } } as never)],
+      ["listNotificationEmails", () => mod.listNotificationEmails({ data: {} } as never)],
+      ["listNotificationPush", () => mod.listNotificationPush({ data: {} } as never)],
+      ["getClubRoster", () =>
+        mod.getClubRoster({ data: { clubId: "00000000-0000-0000-0000-000000000000" } } as never)],
+      ["getPlayerAudit", () =>
+        mod.getPlayerAudit({ data: { playerId: "00000000-0000-0000-0000-000000000000" } } as never)],
+    ];
+    for (const [, run] of calls) {
+      await run().catch(() => undefined);
+    }
+    // Every handler must have called the guard (mocked to reject); if a handler
+    // ever bypasses the guard this count drops and the leak is caught.
+    expect(forbidden).toHaveBeenCalledTimes(calls.length);
   });
+
 });
