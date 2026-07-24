@@ -813,6 +813,30 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
               }
             />
           )}
+          {!isStaffMode && Array.isArray(audience) && audience.length >= 1 && (
+            <label className="flex items-start gap-2 rounded-lg border border-violet-500/30 bg-violet-500/5 p-2 text-xs select-none cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-3.5 w-3.5 rounded border-border"
+                checked={staffOnly}
+                onChange={(e) => setStaffOnly(e.target.checked)}
+              />
+              <span className="flex-1">
+                <span className="inline-flex items-center gap-1 font-medium text-violet-700 dark:text-violet-300">
+                  <Lock className="h-3 w-3" />
+                  {t("wall.compose.staffOnly", {
+                    defaultValue: "Réserver au staff (éducateurs et dirigeants)",
+                  })}
+                </span>
+                <span className="block text-muted-foreground mt-0.5">
+                  {t("wall.compose.staffOnlyHint", {
+                    defaultValue:
+                      "Le message ne sera visible que par les éducateurs et dirigeants de la ou des équipes sélectionnées, ainsi que les admins du club.",
+                  })}
+                </span>
+              </span>
+            </label>
+          )}
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
             <input
