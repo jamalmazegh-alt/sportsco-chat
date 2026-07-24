@@ -183,6 +183,33 @@ export const sendWallPostEmails = createServerFn({ method: "POST" })
         }
       }
     }
+    } else if (audienceType === "team_staff") {
+      // Club admins/dirigeants + team coaches/dirigeants only. No players/parents.
+      const { data: priv } = await supabaseAdmin
+        .from("club_members")
+        .select("user_id, role")
+        .eq("club_id", post.club_id)
+        .in("role", ["admin", "dirigeant"]);
+      for (const m of priv ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const uid = (m as any).user_id as string | null;
+        if (uid) recipientUserSet.add(uid);
+      }
+      const teamIds = audienceTeamIds ?? [];
+      if (teamIds.length) {
+        const { data: tm } = await supabaseAdmin
+          .from("team_members")
+          .select("user_id, role")
+          .in("team_id", teamIds)
+          .in("role", ["coach", "dirigeant"]);
+        for (const r of tm ?? []) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const uid = (r as any).user_id as string | null;
+          if (uid) recipientUserSet.add(uid);
+        }
+      }
+    }
+
 
     // 3) Routage mineur → parents.
     //    - Un joueur mineur est déterminé via la fonction SQL public.player_is_minor
