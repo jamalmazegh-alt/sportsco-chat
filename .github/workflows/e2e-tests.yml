@@ -9,19 +9,33 @@ on:
         description: "Why are you running these tests manually?"
         required: false
         default: "Manual run"
+      suite:
+        description: "Which suite to run"
+        type: choice
+        options:
+          - all
+          - core
+          - ui
+        default: all
 
 concurrency:
   group: e2e-tests
   cancel-in-progress: false
 
+# Shared club on bughunt → never run core + ui in parallel.
 jobs:
-  e2e:
-    name: Playwright E2E
+  e2e-core:
+    name: E2E core (00–25)
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event.inputs.suite == 'all' ||
+      github.event.inputs.suite == 'core' ||
+      github.event.inputs.suite == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -40,9 +54,6 @@ jobs:
         with:
           version: latest
 
-      # Keep bughunt schema aligned with main before E2E (same anti-dérive step as RLS).
-      # Without this, nightly Playwright can pass seed but fail on RPCs/policies that
-      # exist in git but were never pushed to the QA project.
       - name: Push pending migrations (anti-dérive bughunt)
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -56,17 +67,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          # Service-role key: required for SSR pages/server fns that use
-          # supabaseAdmin (e.g. /tournament/$slug, /tournaments). Without it the
-          # app 500s on any server-rendered admin query — matches prod runtime.
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          # Optional: when set, the live AI assistant test (14) can actually run.
-          # When absent the test skips cleanly instead of hard-failing.
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
-          # Cron secret: lets /api/public/hooks/payment-reminders authenticate
-          # so the beta-closure test can reach the payments_v2 {skipped} path.
           PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
         run: |
           bun run dev -- --host 127.0.0.1 --port 8080 &
@@ -80,20 +84,14 @@ jobs:
           echo "App failed to start within 120s"
           exit 1
 
-      - name: Run E2E tests
+      - name: Run E2E core (API / RLS / beta-closure)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          # Service role: globalSetup auto-creates/repairs the 4 E2E users + club
-          # so secrets stay the password source of truth (avoids nightly
-          # "Invalid login credentials" when bughunt auth drifts).
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          # Hard target guard — ensure-seed refuses to mutate auth unless the
-          # ref extracted from SUPABASE_URL matches (bughunt only).
           E2E_TARGET_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
           E2E_BASE_URL: http://127.0.0.1:8080
-          # UI suite (26–31, ui-real-flows) needs the 90s Playwright timeout.
-          E2E_UI: "1"
+          E2E_SUITE: core
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
           E2E_COACH_EMAIL: ${{ secrets.E2E_COACH_EMAIL }}
@@ -103,23 +101,20 @@ jobs:
           E2E_PARENT_EMAIL: ${{ secrets.E2E_PARENT_EMAIL }}
           E2E_PARENT_PASSWORD: ${{ secrets.E2E_PARENT_PASSWORD }}
           E2E_REAL_AI: ${{ github.event_name == 'schedule' && '1' || '0' }}
-          # Exposed so the runner can detect the key and skip test 14 cleanly
-          # when it's absent (a live-AI test must not hard-fail without a key).
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
-          # Same cron secret as the app step, so the test can send a matching
-          # x-cron-secret header and assert the {skipped:true} response.
           PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
-        run: bun run test:e2e
+        run: bun run test:e2e:core
 
-      - name: Upload Playwright report
+      - name: Upload Playwright report (core)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-core
           path: playwright-report/
           retention-days: 14
+          if-no-files-found: warn
 
-      - name: Create issue on cron failure
+      - name: Create issue on cron failure (core)
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@v7
         with:
@@ -128,18 +123,131 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 E2E tests failed — ${new Date().toISOString().slice(0, 10)}`,
+              title: `🚨 E2E core failed — ${new Date().toISOString().slice(0, 10)}`,
               labels: ['e2e', 'bug'],
               body: [
-                'Nightly E2E test run failed.',
+                'Nightly E2E **core** suite (00–25) failed.',
                 '',
                 `**Run:** ${runUrl}`,
                 '',
-                'Check the Playwright HTML report artifact.',
+                'Artifact: `playwright-report-core`.',
+              ].join('\n'),
+            });
+
+  e2e-ui:
+    name: E2E UI (26–31 + ui-real-flows)
+    # Sequential behind core when both run (shared bughunt club).
+    # Still run UI if core failed — don't hide UI regressions.
+    needs: [e2e-core]
+    if: >-
+      always() &&
+      needs.e2e-core.result != 'cancelled' &&
+      (
+        github.event_name == 'schedule' ||
+        github.event.inputs.suite == 'all' ||
+        github.event.inputs.suite == 'ui' ||
+        github.event.inputs.suite == ''
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install deps
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Push pending migrations (anti-dérive bughunt)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_ID"
+          supabase db push --include-all --yes
+
+      - name: Start app (bughunt Supabase)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
+        run: |
+          bun run dev -- --host 127.0.0.1 --port 8080 &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8080/ >/dev/null; then
+              echo "App ready on http://127.0.0.1:8080"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App failed to start within 120s"
+          exit 1
+
+      - name: Run E2E UI flows
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          E2E_TARGET_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
+          E2E_BASE_URL: http://127.0.0.1:8080
+          E2E_SUITE: ui
+          E2E_UI: "1"
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          E2E_COACH_EMAIL: ${{ secrets.E2E_COACH_EMAIL }}
+          E2E_COACH_PASSWORD: ${{ secrets.E2E_COACH_PASSWORD }}
+          E2E_PLAYER_EMAIL: ${{ secrets.E2E_PLAYER_EMAIL }}
+          E2E_PLAYER_PASSWORD: ${{ secrets.E2E_PLAYER_PASSWORD }}
+          E2E_PARENT_EMAIL: ${{ secrets.E2E_PARENT_EMAIL }}
+          E2E_PARENT_PASSWORD: ${{ secrets.E2E_PARENT_PASSWORD }}
+          E2E_REAL_AI: "0"
+          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
+        run: bun run test:e2e:flows
+
+      - name: Upload Playwright report (ui)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-ui
+          path: playwright-report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Create issue on cron failure (ui)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 E2E UI failed — ${new Date().toISOString().slice(0, 10)}`,
+              labels: ['e2e', 'bug'],
+              body: [
+                'Nightly E2E **UI** suite (26–31 + ui-real-flows) failed.',
                 '',
-                'If `globalSetup` reports `Invalid login credentials`, confirm:',
-                '- `SUPABASE_SERVICE_ROLE_KEY` + `SUPABASE_PROJECT_ID` secrets are set',
-                '- `SUPABASE_URL` matches the bughunt project (`E2E_TARGET_PROJECT_REF`)',
-                '- E2E `E2E_*_EMAIL` / `E2E_*_PASSWORD` secrets are non-empty',
+                `**Run:** ${runUrl}`,
+                '',
+                'Artifact: `playwright-report-ui`.',
               ].join('\n'),
             });

@@ -65,6 +65,9 @@ timeout ~30s sur `/home` en CI) et attend `nav[aria-label]`. Le formulaire
 passent par `openClassicEventForm` (`EventCreateChooser` → formulaire
 classique) — les testids `event-*-input` n'existent pas dans l'assistant.
 
+CI : jobs séparés `E2E core (00–25)` puis `E2E UI (26–31 + ui-real-flows)`
+(`E2E_SUITE`, artifacts distincts). `workflow_dispatch` → `suite=all|core|ui`.
+
 ## 6. Reste non couvert
 
 Consentement parental / mineurs (`player_guardians`) côté UI (RPC couverte),

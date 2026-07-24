@@ -7,6 +7,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /**
  * Playwright config for Clubero E2E tests.
  *
+ * Two projects (also runnable via package scripts):
+ *   - core  — 00→25 : API / RLS / beta-closure (~4–15 min)
+ *   - ui    — 26→31 + ui-real-flows : real UI clicks (needs E2E_UI=1)
+ *
  * Required env vars:
  *   - E2E_BASE_URL              preview/published URL under test
  *   - SUPABASE_URL              same as the app's VITE_SUPABASE_URL
@@ -19,6 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *   - E2E_CLUB_NAME             defaults to "E2E Test Club"
  *   - SUPABASE_SERVICE_ROLE_KEY + E2E_TARGET_PROJECT_REF
  *                               auto-create/repair E2E users + club in globalSetup
+ *   - E2E_SUITE=core|ui         when set, only that project runs (CI jobs)
  *
  * See tests/e2e/_fixtures/README.md for setup instructions.
  */
@@ -40,18 +45,58 @@ const HAS_E2E_CONFIG = Boolean(
   process.env.E2E_ADMIN_PASSWORD,
 );
 
+/** 00–25 — data/RLS/beta-closure (historically ~4–6 min green). */
+const CORE_MATCH = /\/(0[0-9]|1[0-9]|2[0-5])-[^/]+\.e2e\.ts$/;
+/** 26–31 + ui-real-flows — real UI clicks. */
+const UI_MATCH = /(\/(2[6-9]|3[0-1])-[^/]+\.e2e\.ts$|\/ui-real-flows\.e2e\.ts$)/;
+
+const suite = process.env.E2E_SUITE; // "core" | "ui" | unset (= both)
+
+const chromium = { ...devices["Desktop Chrome"] };
+
+const projects = HAS_E2E_CONFIG
+  ? [
+      ...(suite === "ui"
+        ? []
+        : [
+            {
+              name: "core",
+              testMatch: CORE_MATCH,
+              use: chromium,
+              timeout: 30_000,
+            },
+          ]),
+      ...(suite === "core"
+        ? []
+        : [
+            {
+              name: "ui",
+              testMatch: UI_MATCH,
+              use: chromium,
+              // UI flows need headroom (wizards, toasts, choosers).
+              timeout: 90_000,
+            },
+          ]),
+    ]
+  : [
+      {
+        name: "chromium",
+        testMatch: /00-missing-supabase-config\.e2e\.ts$/,
+        use: chromium,
+      },
+    ];
+
 export default defineConfig({
   testDir: "./tests/e2e",
-  testMatch: HAS_E2E_CONFIG ? /.*\.e2e\.ts$/ : /00-missing-supabase-config\.e2e\.ts$/,
   globalSetup: HAS_E2E_CONFIG
     ? path.join(__dirname, "tests/e2e/_fixtures/global-setup.ts")
     : undefined,
-  timeout: process.env.E2E_UI === "1" ? 90_000 : 30_000,
+  // Default; each project overrides (core 30s / ui 90s).
+  timeout: process.env.E2E_UI === "1" || suite === "ui" ? 90_000 : 30_000,
   expect: { timeout: 15_000 },
   fullyParallel: false, // shared pre-existing club → run sequentially
   forbidOnly: !!process.env.CI,
-  // 1 retry: enough to absorb flakes, not enough to burn a 60m job on a
-  // systematically broken UI helper (2 retries × ~32s × N tests ⇒ cancel).
+  // 1 retry: absorb flakes without burning a job on a broken helper.
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: process.env.CI ? [["html", { open: "never" }], ["list"]] : "list",
@@ -64,10 +109,5 @@ export default defineConfig({
     navigationTimeout: 30_000,
     locale: "fr-FR",
   },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-  ],
+  projects,
 });
