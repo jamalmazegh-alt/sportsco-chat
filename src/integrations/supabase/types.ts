@@ -3923,6 +3923,32 @@ export type Database = {
         }
         Relationships: []
       }
+      parent_link_notifications: {
+        Row: {
+          notified_at: string
+          parent_user_id: string
+          player_id: string
+        }
+        Insert: {
+          notified_at?: string
+          parent_user_id: string
+          player_id: string
+        }
+        Update: {
+          notified_at?: string
+          parent_user_id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_link_notifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_assignments: {
         Row: {
           club_id: string
