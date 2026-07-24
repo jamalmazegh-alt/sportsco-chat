@@ -25,7 +25,7 @@ function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createFileRoute("/_authenticated/teams/$teamId/staff")({
+export const Route = createFileRoute("/_authenticated/teams/$teamId_/staff")({
   component: TeamStaffWallPage,
   head: () => ({
     meta: [
