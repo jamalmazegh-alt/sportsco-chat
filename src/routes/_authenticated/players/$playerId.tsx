@@ -645,6 +645,16 @@ function PlayerProfile() {
                 {t("players.minor")}
               </span>
             )}
+            {(() => {
+              const now = new Date();
+              const seasonEndYear = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+              const cat = computeFffCategory(player.birth_date ?? null, seasonEndYear);
+              return cat ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {cat}
+                </span>
+              ) : null;
+            })()}
           </div>
           {playerTeams && playerTeams.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-1">
