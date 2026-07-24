@@ -40,7 +40,7 @@ import {
   Trophy,
   Lock as LockIcon,
 } from "lucide-react";
-import { WallFeed } from "@/components/wall-feed";
+
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
