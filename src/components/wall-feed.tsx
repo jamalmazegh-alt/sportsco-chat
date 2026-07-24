@@ -128,6 +128,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const [sendEmail, setSendEmail] = useState(false);
   // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
   const [audience, setAudience] = useState<string[] | null>(null);
+  // "Réserver au staff" toggle in main-wall composer: when true with 1+ teams
+  // selected, publishes as audience_type='team_staff' (only coaches/dirigeants
+  // of the target teams + club admins/dirigeants see it — never players/parents).
+  const [staffOnly, setStaffOnly] = useState(false);
 
   async function load() {
     setLoading(true);
