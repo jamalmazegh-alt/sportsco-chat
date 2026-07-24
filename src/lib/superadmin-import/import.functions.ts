@@ -1008,6 +1008,62 @@ export const runImport = createServerFn({ method: "POST" })
 
             const player = { id: playerId };
 
+            // Upsert `player_seasons` avec la catégorie FFF calculée.
+            // Non-destructif : si une ligne existe déjà pour (player, club,
+            // saison), on ne touche PAS à `category` (surclassement manuel
+            // saisi via l'UI /players/$playerId/seasons est préservé).
+            try {
+              const seasonLabelRaw = r.saison || fallbackSeasonLabel;
+              const endYear = parseSeasonEndYear(seasonLabelRaw) ?? fallbackSeasonEndYear;
+              const normalizedSeasonLabel =
+                parseSeasonEndYear(seasonLabelRaw) != null
+                  ? seasonLabelFromEndYear(endYear)
+                  : fallbackSeasonLabel;
+              const computedCategory = computeFffCategory(r.date_naissance, endYear);
+              const sportForSeason =
+                (fixedTeam?.sport ?? r.sport ?? null) as string | null;
+              const { data: existingSeason } = await supabaseAdmin
+                .from("player_seasons")
+                .select("id, category, team_id, sport")
+                .eq("player_id", playerId)
+                .eq("club_id", data.clubId)
+                .eq("season_label", normalizedSeasonLabel)
+                .maybeSingle();
+              if (!existingSeason) {
+                await supabaseAdmin.from("player_seasons").insert({
+                  player_id: playerId,
+                  club_id: data.clubId,
+                  team_id: teamId,
+                  season_label: normalizedSeasonLabel,
+                  sport: sportForSeason,
+                  category: computedCategory,
+                } as never);
+              } else {
+                // Blank-fill uniquement : jamais d'écrasement d'une valeur
+                // déjà saisie manuellement (protège les surclassements).
+                const patch: Record<string, unknown> = {};
+                if (!existingSeason.category && computedCategory) {
+                  patch.category = computedCategory;
+                }
+                if (!existingSeason.team_id && teamId) patch.team_id = teamId;
+                if (!existingSeason.sport && sportForSeason) patch.sport = sportForSeason;
+                if (Object.keys(patch).length > 0) {
+                  await supabaseAdmin
+                    .from("player_seasons")
+                    .update(patch as never)
+                    .eq("id", existingSeason.id);
+                }
+              }
+            } catch (e) {
+              // Non-bloquant : l'échec du calcul de catégorie ne doit pas
+              // faire échouer l'import du joueur (backfill possible ensuite).
+              log.warn("player_seasons upsert failed", {
+                playerId,
+                error: e instanceof Error ? e.message : String(e),
+              });
+            }
+
+
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
 
