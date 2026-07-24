@@ -297,7 +297,7 @@ function TeamDetail() {
   // Pending (unused) invites for the team's players, keyed by playerId, with
   // the contact points (email/phone) already invited so we can avoid blocking
   // a player when only *some* of its contacts have been invited/accepted.
-  const { data: pendingInvitesByPlayer } = useQuery({
+  const { data: pendingInvitesByPlayer, isPending: pendingInvitesLoading } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -322,7 +322,7 @@ function TeamDetail() {
   });
 
   // Failed invite emails per player (bounced/failed/dlq/complained/suppressed).
-  const { data: inviteFailuresByPlayer } = useQuery({
+  const { data: inviteFailuresByPlayer, isPending: inviteFailuresLoading } = useQuery({
     queryKey: ["team-invite-failures", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -340,7 +340,7 @@ function TeamDetail() {
   });
 
   // Parents grouped by player — used to know which contacts remain to invite.
-  const { data: parentsByPlayer } = useQuery({
+  const { data: parentsByPlayer, isPending: parentsByPlayerLoading } = useQuery({
     queryKey: ["team-parents-by-player", teamId],
     enabled: !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -1451,6 +1451,8 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
+
+
           {(() => {
             const list = [...(players ?? [])] as any[];
             if (!isCoach && myPlayerIds && myPlayerIds.size > 0) {
@@ -1469,7 +1471,10 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
+            const inviteStatusesLoading =
+              isCoach && (pendingInvitesLoading || inviteFailuresLoading || parentsByPlayerLoading);
             const hasContactHint = hasOpenContact(p);
+
             const parentsForP = parentsByPlayer?.get(p.id) ?? [];
             const isMinorP = (() => {
               if (!p.birth_date) return false;
@@ -1576,10 +1581,21 @@ function TeamDetail() {
                   <p className="text-xs mt-0.5 truncate">
                     {linked ? (
                       <span className="text-muted-foreground">
-                        {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
+                        {isCoach ? (
+                          <>
+                            {t("players.accountActive")}
+                            {p.preferred_position ? (
+                              <span className="opacity-70"> · {p.preferred_position}</span>
+                            ) : null}
+                          </>
+                        ) : (
+                          (p.preferred_position ?? "")
+                        )}
                       </span>
                     ) : isCoach ? (
-                      hasFailedInvite ? (
+                      inviteStatusesLoading ? (
+                        <span className="text-muted-foreground opacity-60">…</span>
+                      ) : hasFailedInvite ? (
                         <span
                           className="inline-flex items-center gap-1 text-red-600"
                           title={failures
@@ -1621,6 +1637,7 @@ function TeamDetail() {
                       <span className="text-muted-foreground">{p.preferred_position ?? ""}</span>
                     )}
                   </p>
+
                 </div>
               </>
             );
