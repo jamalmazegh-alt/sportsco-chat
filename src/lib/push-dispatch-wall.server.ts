@@ -125,7 +125,23 @@ export async function dispatchWallPostPushInternal(
     }
   }
 
-  if (audienceTeamIds === null) {
+  if (audienceType === "team_staff") {
+    // Restrict to coaches/dirigeants of the target team(s). Club admins/dirigeants
+    // were already added above.
+    const teamIds = liveTeams.map((t) => t.id);
+    if (teamIds.length > 0) {
+      const { data: staffRows } = await supabaseAdmin
+        .from("team_members")
+        .select("user_id, role")
+        .in("team_id", teamIds)
+        .in("role", ["coach", "dirigeant"]);
+      // Reset candidates to admins/dirigeants + team staff only.
+      for (const r of staffRows ?? []) {
+        const uid = (r as any).user_id as string | null;
+        if (uid) candidates.add(uid);
+      }
+    }
+  } else if (audienceTeamIds === null) {
     const { data: members } = await supabaseAdmin
       .from("club_members")
       .select("user_id")
