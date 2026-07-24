@@ -11,8 +11,11 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const forbidden = vi.hoisted(() => vi.fn(async () => {
-  throw new Response("Forbidden", { status: 403 });
+  const err = new Error("Forbidden") as Error & { status: number };
+  err.status = 403;
+  throw err;
 }));
+
 
 vi.mock("@/lib/authz.server", () => ({ assertSuperAdmin: forbidden }));
 vi.mock("@/integrations/supabase/auth-middleware", () => ({
