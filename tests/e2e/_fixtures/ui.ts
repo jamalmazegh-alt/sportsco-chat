@@ -32,25 +32,37 @@ function credsFor(role: UiRole): { email: string; password: string } {
 }
 
 /**
+ * Attend la bottom-nav (app hydratée + memberships).
+ * Même signal que `25-beta-closure-roles-auth` — `nav[aria-label]` plutôt
+ * qu'un match i18n strict sur `nav.primary` (évite les courses de locale).
+ */
+async function waitForAppShell(page: Page): Promise<void> {
+  await page.waitForSelector("nav[aria-label]", { timeout: 30_000 });
+  await expect(page.locator("nav[aria-label]").first()).toBeVisible();
+}
+
+/**
  * Authentifie un rôle pour les parcours UI.
  *
  * Utilise l'injection de session (`loginAs`) — même mécanisme que les specs
  * 00→25 / beta-closure. Le formulaire `/login` est couvert séparément par
- * `loginViaForm` (smoke auth). Évite les timeouts 30s dus aux inputs
- * contrôlés React + `window.location.replace` sous Playwright.
+ * `loginViaForm` (smoke auth).
+ *
+ * Important: `waitUntil: "domcontentloaded"` (comme beta-closure). Le défaut
+ * Playwright `load` timeout ~30s sur `/home` quand des assets/WS restent
+ * ouverts — c'est ce qui faisait échouer toute la suite UI à ~32s.
  */
 export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
   const creds = credsFor(role);
   await loginAs(page, creds);
-  await page.goto("/home");
+  const res = await page.goto("/home", { waitUntil: "domcontentloaded" });
+  if ((res?.status() ?? 0) >= 400) {
+    throw new Error(`loginViaUI(${role}): /home returned HTTP ${res?.status()}`);
+  }
   await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
-    timeout: 30_000,
+    timeout: 15_000,
   });
-  // Memberships / bottom-nav hydrated — avoids racing admin pages that
-  // `<Navigate to="/profile">` when `useMyRoles()` is still empty.
-  await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible({
-    timeout: 30_000,
-  });
+  await waitForAppShell(page);
 }
 
 /**
@@ -59,7 +71,7 @@ export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
  */
 export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<void> {
   const { email, password } = credsFor(role);
-  await page.goto("/login");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
   await expect(page.locator("#email")).toBeVisible();
 
   // Click + fill: plus fiable que getByLabel sur le layout floating-label.
@@ -71,22 +83,18 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await page.locator("#password").fill(password);
   await expect(page.locator("#password")).toHaveValue(password);
 
-  // Sequential (not Promise.all): `window.location.replace` is more reliable
-  // when the click fully settles before we assert navigation.
   const submit = page.locator("form.card button.cta[type='submit']");
   await expect(submit).toBeEnabled();
   await submit.click();
   await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
     timeout: 45_000,
   });
-  await expect(page.getByRole("navigation", { name: tx("nav.primary") })).toBeVisible({
-    timeout: 30_000,
-  });
+  await waitForAppShell(page);
 }
 
 /** Navigation via la vraie bottom-nav (accessible + multilingue). */
 export async function navTo(page: Page, navKey: string): Promise<void> {
-  const nav = page.getByRole("navigation", { name: tx("nav.primary") });
+  const nav = page.locator("nav[aria-label]").first();
   await nav.getByRole("link", { name: tx(navKey) }).click();
 }
 

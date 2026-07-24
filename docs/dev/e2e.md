@@ -6,10 +6,16 @@ Complètent les **226 tests unitaires** (`bun test`) et les **111 tests RLS** (`
 ## Lancer en local
 
 ```bash
-# Toute la suite
+# Toute la suite (core puis ui, projects Playwright)
 bun run test:e2e
 
-# UI interactive (debug, watch, replay)
+# Core seulement — 00→25 (API / RLS / beta-closure, ~5–15 min)
+bun run test:e2e:core
+
+# UI flows seulement — 26→31 + ui-real-flows (clics réels)
+bun run test:e2e:flows
+
+# UI interactive Playwright (debug, watch, replay)
 bun run test:e2e:ui
 
 # Mode headed (voir le navigateur)
@@ -18,6 +24,10 @@ bun run test:e2e:headed
 # Un seul fichier
 bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 ```
+
+En CI : deux jobs séquentiels (`E2E core` puis `E2E UI`), artifacts
+`playwright-report-core` / `playwright-report-ui`. Le
+`workflow_dispatch` accepte `suite=all|core|ui`.
 
 ## Variables d'env requises
 
@@ -30,14 +40,17 @@ bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 | `E2E_BASE_URL`                                          | **obligatoire** — en CI `http://127.0.0.1:8080`                   |
 | `E2E_ADMIN_EMAIL` / `_PASSWORD` (+ coach/player/parent) | secrets E2E                                                       |
 | `E2E_REAL_AI`                                           | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
-| `E2E_UI`                                                | `1` pour passer le timeout global à 90s (sinon 30s)               |
+| `E2E_UI`                                                | `1` pour timeout 90s (auto via `test:e2e:flows`)                  |
+| `E2E_SUITE`                                             | `core` \| `ui` — restreint le project Playwright (jobs CI)        |
 | `E2E_TOURNAMENT_ID`                                     | optionnel — classement tournoi (`ui-real-flows`)                  |
 | `E2E_CLUB_SLUG` / `E2E_CAMP_SLUG`                       | optionnel — pages publiques stages (`29-camps`)                   |
 
 Seed manuel : `bun run seed:e2e` (idempotent, réécrit les mots de passe pour
 matcher les secrets). Voir `tests/e2e/_fixtures/README.md`.
 
-Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`31`.
+Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`31`
+(= project Playwright `ui` / `bun run test:e2e:flows`). Le core `00`→`25`
+reste isolé (`bun run test:e2e:core`).
 Matrice et dettes : `docs/dev/e2e-coverage-gaps.md`.
 
 ## Stratégie

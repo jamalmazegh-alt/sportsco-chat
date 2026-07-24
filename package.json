@@ -16,6 +16,8 @@
     "test": "vitest run --config vitest.config.ts",
     "test:rls": "vitest run --config tests/rls/vitest.config.ts",
     "test:e2e": "playwright test",
+    "test:e2e:core": "E2E_SUITE=core playwright test --project=core",
+    "test:e2e:flows": "E2E_SUITE=ui E2E_UI=1 playwright test --project=ui",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "seed:e2e": "bun run scripts/seed-e2e.ts",
