@@ -77,7 +77,9 @@ function EventsPage() {
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [hideTrainings, setHideTrainings] = useState(false);
+  const [teamFilter, setTeamFilter] = useState<string>("all");
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
+
 
   const { data: club } = useQuery({
     queryKey: ["club", activeClubId],
