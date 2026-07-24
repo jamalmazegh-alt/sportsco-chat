@@ -63,6 +63,39 @@ export async function loginViaUI(page: Page, role: UiRole): Promise<void> {
     timeout: 15_000,
   });
   await waitForAppShell(page);
+  await dismissBlockingOverlays(page);
+}
+
+/**
+ * ConsentGate + cookie banner block all clicks when E2E users lack up-to-date
+ * user_consents (or cookie localStorage). globalSetup seeds consents; this is
+ * a UI safety net so a version bump mid-suite does not red the whole UI job.
+ */
+export async function dismissBlockingOverlays(page: Page): Promise<void> {
+  const cookieAccept = page.getByRole("button", { name: /Accept all|Accepter tout/i });
+  if (await cookieAccept.isVisible().catch(() => false)) {
+    await cookieAccept.click();
+  }
+
+  const dialog = page.getByRole("dialog").filter({
+    has: page.getByRole("heading", { name: /Your privacy|Votre vie privée/i }),
+  });
+  if (!(await dialog.isVisible().catch(() => false))) return;
+
+  const checkboxes = dialog.getByRole("checkbox");
+  const n = await checkboxes.count();
+  for (let i = 0; i < n; i += 1) {
+    const box = checkboxes.nth(i);
+    if (!(await box.isChecked().catch(() => false))) {
+      await box.click();
+    }
+  }
+  const accept = dialog.getByRole("button", {
+    name: /Accept and continue|Accepter et continuer/i,
+  });
+  await expect(accept).toBeEnabled({ timeout: 10_000 });
+  await accept.click();
+  await expect(dialog).toBeHidden({ timeout: 15_000 });
 }
 
 /**
@@ -90,6 +123,7 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
     timeout: 45_000,
   });
   await waitForAppShell(page);
+  await dismissBlockingOverlays(page);
 }
 
 /** Navigation via la vraie bottom-nav (accessible + multilingue). */

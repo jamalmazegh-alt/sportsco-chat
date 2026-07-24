@@ -36,12 +36,14 @@ export const getConsentStatus = createServerFn({ method: "GET" })
       .order("granted_at", { ascending: false });
     if (cErr) throw cErr;
 
-    const accepted = new Map<string, (typeof mine)[number]>();
-    for (const c of mine ?? []) if (!accepted.has(c.kind)) accepted.set(c.kind, c);
-
+    // Match by exact version_id for the locale's latest doc — NOT "latest consent
+    // row per kind". Profiles default to preferred_language=en while Playwright
+    // boots as fr-FR; users may have accepted fr then switched to en (or vice
+    // versa). Taking only the newest row per kind falsely re-opens ConsentGate.
     const items = Array.from(latestByKind.values()).map((v) => {
-      const a = accepted.get(v.kind);
-      const upToDate = a && a.granted && !a.withdrawn_at && a.version_id === v.id;
+      const rows = (mine ?? []).filter((c) => c.kind === v.kind && c.granted && !c.withdrawn_at);
+      const match = rows.find((c) => c.version_id === v.id);
+      const latestGranted = rows[0];
       return {
         kind: v.kind,
         version_id: v.id,
@@ -49,9 +51,9 @@ export const getConsentStatus = createServerFn({ method: "GET" })
         required: v.required,
         title: v.title,
         content_md: v.content_md,
-        granted: !!(a && a.granted && !a.withdrawn_at),
-        upToDate: !!upToDate,
-        consent_id: a?.id ?? null,
+        granted: !!latestGranted,
+        upToDate: !!match,
+        consent_id: match?.id ?? latestGranted?.id ?? null,
       };
     });
 

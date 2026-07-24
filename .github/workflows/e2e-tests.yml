@@ -3,6 +3,14 @@ name: E2E Tests (Playwright)
 on:
   schedule:
     - cron: "0 4 * * *" # 4 AM UTC, after RLS tests at 3 AM
+  # Validate E2E fixture / UI auth changes on PRs (same-repo secrets available).
+  pull_request:
+    paths:
+      - "tests/e2e/**"
+      - "src/lib/privacy.functions.ts"
+      - "src/components/consent-gate.tsx"
+      - "src/components/cookie-consent.tsx"
+      - ".github/workflows/e2e-tests.yml"
   workflow_dispatch:
     inputs:
       reason:
@@ -28,6 +36,7 @@ jobs:
     name: E2E core (00–25)
     if: >-
       github.event_name == 'schedule' ||
+      github.event_name == 'pull_request' ||
       github.event.inputs.suite == 'all' ||
       github.event.inputs.suite == 'core' ||
       github.event.inputs.suite == ''
@@ -144,6 +153,7 @@ jobs:
       needs.e2e-core.result != 'cancelled' &&
       (
         github.event_name == 'schedule' ||
+        github.event_name == 'pull_request' ||
         github.event.inputs.suite == 'all' ||
         github.event.inputs.suite == 'ui' ||
         github.event.inputs.suite == ''
