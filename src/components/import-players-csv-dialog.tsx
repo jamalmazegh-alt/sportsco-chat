@@ -15,6 +15,7 @@ import {
   type PlayerImportPreview,
 } from "@/lib/superadmin-import/import.functions";
 import { type AnalysisResult, getFields } from "@/lib/superadmin-import/schemas";
+import { normalizeSheetCell } from "@/lib/superadmin-import/sheet-date";
 
 /**
  * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
@@ -57,7 +58,7 @@ function cleanSheetRows(rows: Array<Record<string, unknown>>) {
       const out: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(row)) {
         if (k === "__rowNum__" || k.trim() === "") continue;
-        out[k] = typeof v === "string" ? v.trim() : v;
+        out[k] = normalizeSheetCell(v);
       }
       return out;
     })
@@ -199,7 +200,7 @@ export function ImportPlayersCsvDialog({
         const rows = cleanSheetRows(
           XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
             defval: "",
-            raw: false,
+            raw: true,
             blankrows: false,
           }),
         );
