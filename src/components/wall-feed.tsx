@@ -449,10 +449,18 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     //   [] (forced)      → coach must pick at least one team
     //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const isStaffMode = !!staffTeamId;
+    const isStaffModeRoute = !!staffTeamId;
+    const useStaffOnly =
+      !isStaffModeRoute && staffOnly && Array.isArray(audience) && audience.length >= 1;
+    const isStaffMode = isStaffModeRoute || useStaffOnly;
+    const staffTeams: string[] | null = isStaffModeRoute
+      ? [staffTeamId!]
+      : useStaffOnly
+        ? (audience as string[])
+        : null;
     const hasGroups = !isStaffMode && audienceGroups.length > 0;
     const audienceForInsert: string[] | null = isStaffMode
-      ? [staffTeamId!]
+      ? staffTeams
       : hasGroups
         ? null
         : audience === null
