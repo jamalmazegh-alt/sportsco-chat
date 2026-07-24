@@ -7,8 +7,8 @@
  * 2. Signs in the 4 users, exposes tokens + user ids via process.env.
  * 3. Resolves E2E_CLUB_ID from the pre-existing / freshly-seeded club.
  */
-import { createClient } from "@supabase/supabase-js";
-import { ensureE2ESeed, E2E_ROLE_ENV, type E2ERole } from "./ensure-seed";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { ensureE2ESeed, ensureRequiredConsents, E2E_ROLE_ENV, type E2ERole } from "./ensure-seed";
 
 type Role = E2ERole;
 
@@ -114,5 +114,36 @@ export default async function globalSetup() {
       );
     }
     process.env.E2E_CLUB_ID = club.id;
+  }
+
+  // 4. ConsentGate: always (re)grant required consents after sign-in.
+  //    ensure-seed already does this via service_role when available; the
+  //    per-user JWT path covers skipped seed and re-applies after version bumps.
+  await grantConsentsViaUserTokens(url, anonKey);
+}
+
+/**
+ * Fallback when service_role seed did not run: each signed-in E2E user inserts
+ * their own required consent rows (RLS: user_consents_insert checks auth.uid()).
+ */
+async function grantConsentsViaUserTokens(url: string, anonKey: string): Promise<void> {
+  const roles: E2ERole[] = ["admin", "coach", "player", "parent"];
+  for (const role of roles) {
+    const upper = role.toUpperCase();
+    const token = process.env[`E2E_${upper}_ACCESS_TOKEN`];
+    const userId = process.env[`E2E_${upper}_USER_ID`];
+    if (!token || !userId) continue;
+
+    const client: SupabaseClient = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    try {
+      await ensureRequiredConsents(client, [userId]);
+    } catch (e) {
+      console.warn(
+        `[globalSetup] consent grant for ${role} failed: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
   }
 }

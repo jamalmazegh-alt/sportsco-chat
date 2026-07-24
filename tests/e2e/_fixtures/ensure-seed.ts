@@ -302,5 +302,94 @@ export async function ensureE2ESeed(
     users: users.map((u) => ({ userId: u.userId, role: u.role })),
   });
 
+  await ensureRequiredConsents(
+    service,
+    users.map((u) => u.userId),
+  );
+
   return { skipped: false, projectRef, clubId, users };
+}
+
+/**
+ * Grant the latest *required* consent versions (terms / privacy / data_processing)
+ * for every E2E user. Playwright uses `locale: fr-FR`; the ConsentGate loads
+ * versions by `i18n.language.slice(0,2)`, so we cover `fr` + `en`.
+ *
+ * Without this, UI specs (26–31) hit the blocking "Your privacy" modal and
+ * time out before any real assertion — including poll vote flows.
+ */
+export async function ensureRequiredConsents(
+  service: SupabaseClient,
+  userIds: string[],
+  locales: string[] = ["fr", "en"],
+): Promise<number> {
+  if (!userIds.length) return 0;
+
+  const { data: versions, error: vErr } = await service
+    .from("consent_versions")
+    .select("id, kind, locale, required, version")
+    .eq("required", true)
+    .in("kind", ["terms", "privacy", "data_processing"])
+    .in("locale", locales)
+    .order("version", { ascending: false });
+  if (vErr) throw new Error(`[e2e-seed] consent_versions: ${vErr.message}`);
+
+  // Latest version id per (kind, locale).
+  const latest = new Map<string, { id: string; kind: string; locale: string }>();
+  for (const v of versions ?? []) {
+    const key = `${v.kind}:${v.locale}`;
+    if (!latest.has(key)) {
+      latest.set(key, { id: v.id as string, kind: v.kind as string, locale: v.locale as string });
+    }
+  }
+  if (latest.size === 0) {
+    console.warn("[e2e-seed] no required consent_versions found — ConsentGate may still block UI");
+    return 0;
+  }
+
+  // Prefer fr when both fr+en exist for the same kind (Playwright locale).
+  const byKind = new Map<string, { id: string; kind: string; locale: string }>();
+  for (const row of latest.values()) {
+    const prev = byKind.get(row.kind);
+    if (!prev || (row.locale === "fr" && prev.locale !== "fr")) {
+      byKind.set(row.kind, row);
+    }
+  }
+
+  let inserted = 0;
+  for (const userId of userIds) {
+    for (const v of byKind.values()) {
+      const { data: existing, error: exErr } = await service
+        .from("user_consents")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("kind", v.kind)
+        .eq("version_id", v.id)
+        .eq("granted", true)
+        .is("withdrawn_at", null)
+        .is("on_behalf_of_player_id", null)
+        .maybeSingle();
+      if (exErr) {
+        throw new Error(`[e2e-seed] user_consents lookup (${v.kind}): ${exErr.message}`);
+      }
+      if (existing) continue;
+
+      const { error: insErr } = await service.from("user_consents").insert({
+        user_id: userId,
+        kind: v.kind,
+        version_id: v.id,
+        granted: true,
+        on_behalf_of_player_id: null,
+      });
+      if (insErr) {
+        throw new Error(`[e2e-seed] user_consents insert (${userId}/${v.kind}): ${insErr.message}`);
+      }
+      inserted += 1;
+    }
+  }
+
+  console.log(
+    `[e2e-seed] required consents: ${inserted} row(s) inserted for ${userIds.length} user(s)`,
+  );
+  return inserted;
 }
