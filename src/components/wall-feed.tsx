@@ -985,10 +985,9 @@ function AudiencePicker({
           <button
             type="button"
             onClick={() => {
-              if (staffMode) onStaffModeChange(false);
-              else {
-                onStaffModeChange(false); // ensure teams mode = players+parents
-              }
+              onGroupChange([]);
+              onStaffModeChange(false);
+              if (value === null) onChange([]);
             }}
             className={cn(
               "text-xs px-2.5 py-1 rounded-full border transition-colors",
@@ -1003,7 +1002,11 @@ function AudiencePicker({
         {canPickStaff && (
           <button
             type="button"
-            onClick={() => onStaffModeChange(true)}
+            onClick={() => {
+              onGroupChange([]);
+              if (value === null) onChange([]);
+              onStaffModeChange(true);
+            }}
             className={cn(
               "text-xs px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1",
               staffMode
