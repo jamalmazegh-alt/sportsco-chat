@@ -819,13 +819,27 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
               groupValue={audienceGroups}
               onGroupChange={(next) => {
                 setAudienceGroups(next);
-                if (next.length > 0) setAudience([]);
+                if (next.length > 0) {
+                  setAudience([]);
+                  setStaffAudienceMode(false);
+                }
               }}
               canPickClubWide={
-                roles.includes("admin") ||
-                roles.includes("dirigeant") ||
-                targetableTeams.length === allTeams.length
+                !staffAudienceMode &&
+                (roles.includes("admin") ||
+                  roles.includes("dirigeant") ||
+                  targetableTeams.length === allTeams.length)
               }
+              staffMode={staffAudienceMode}
+              onStaffModeChange={(next) => {
+                setStaffAudienceMode(next);
+                if (next) {
+                  // Switching to Staff mode: clear groups & "Tout le club".
+                  setAudienceGroups([]);
+                  if (audience === null) setAudience([]);
+                }
+              }}
+              canPickStaff={targetableTeams.length > 0}
             />
           )}
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
