@@ -6,25 +6,11 @@
  * of minors), so we assert both by static inspection AND by invoking each handler with
  * a stub context whose assertSuperAdmin rejects.
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const forbidden = vi.hoisted(() => vi.fn(async () => {
-  const err = new Error("Forbidden") as Error & { status: number };
-  err.status = 403;
-  throw err;
-}));
 
-
-vi.mock("@/lib/authz.server", () => ({ assertSuperAdmin: forbidden }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({
-  requireSupabaseAuth: {
-    // Passthrough middleware stub — the createServerFn builder just needs
-    // something that behaves like a middleware object.
-    _tag: "middleware",
-  },
-}));
 
 const FILE = fileURLToPath(new URL("../../lib/superadmin/observability.functions.ts", import.meta.url));
 
