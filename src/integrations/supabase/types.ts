@@ -8287,6 +8287,7 @@ export type Database = {
         Returns: boolean
       }
       is_v2: { Args: { _key: string }; Returns: boolean }
+      jsonb_diff: { Args: { _new: Json; _old: Json }; Returns: Json }
       link_parent_memberships: { Args: never; Returns: number }
       list_public_players: {
         Args: {
@@ -8586,6 +8587,113 @@ export type Database = {
           count_7d: number
           last_action_type: string
           last_activity_at: string
+        }[]
+      }
+      superadmin_club_roster: {
+        Args: { _club_id: string }
+        Returns: {
+          parents: Json
+          player_birth_date: string
+          player_child_platform_access: boolean
+          player_email: string
+          player_first_name: string
+          player_id: string
+          player_last_invite_at: string
+          player_last_name: string
+          player_last_sign_in_at: string
+          player_phone: string
+          player_user_id: string
+          team_age_group: string
+          team_id: string
+          team_name: string
+        }[]
+      }
+      superadmin_invite_batch_rows: {
+        Args: { _batch_id: string }
+        Returns: {
+          attempt_count: number
+          created_at: string
+          dispatch_id: string
+          error_message: string
+          id: string
+          message_id: string
+          metadata: Json
+          recipient_email: string
+          status: string
+          template_name: string
+        }[]
+      }
+      superadmin_invite_batches: {
+        Args: {
+          _club_id?: string
+          _from?: string
+          _limit?: number
+          _template?: string
+          _to?: string
+        }
+        Returns: {
+          batch_id: string
+          bucket_start: string
+          club_id: string
+          club_name: string
+          failed: number
+          pending: number
+          sent: number
+          suppressed: number
+          template_name: string
+          total: number
+        }[]
+      }
+      superadmin_notifications_emails: {
+        Args: {
+          _from?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _status?: string
+          _template?: string
+          _to?: string
+        }
+        Returns: {
+          attempt_count: number
+          created_at: string
+          error_message: string
+          id: string
+          message_id: string
+          metadata: Json
+          recipient_email: string
+          status: string
+          template_name: string
+        }[]
+      }
+      superadmin_notifications_push: {
+        Args: {
+          _from?: string
+          _kind?: string
+          _limit?: number
+          _offset?: number
+          _to?: string
+        }
+        Returns: {
+          dispatched_at: string
+          first_opened_at: string
+          id: string
+          kind: string
+          opened_count: number
+          ref_id: string
+          sent_count: number
+          targets_count: number
+        }[]
+      }
+      superadmin_player_audit: {
+        Args: { _limit?: number; _player_id: string }
+        Returns: {
+          action: string
+          actor_name: string
+          actor_user_id: string
+          details: Json
+          occurred_at: string
+          source: string
         }[]
       }
       superadmin_product_activity: {
