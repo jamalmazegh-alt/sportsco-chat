@@ -433,8 +433,10 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
         const { data: logs } = await supabaseAdmin
           .from("email_send_log")
           .select("message_id, recipient_email, status, error_message, created_at")
+          .eq("template_name", "player-invite")
           .in("message_id", messageIds)
           .order("created_at", { ascending: false });
+
         const seen = new Set<string>();
         for (const l of logs ?? []) {
           const mid = (l as any).message_id as string;
