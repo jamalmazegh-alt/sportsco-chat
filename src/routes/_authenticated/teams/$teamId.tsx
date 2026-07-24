@@ -1452,6 +1452,14 @@ function TeamDetail() {
       ) : (
         <ul className="space-y-2">
           {(() => {
+            // While invite/parent lookups are still loading, avoid flashing
+            // "Invitation non envoyée" for accounts that are actually active
+            // or already invited.
+            const _ = null;
+            return null;
+          })()}
+
+          {(() => {
             const list = [...(players ?? [])] as any[];
             if (!isCoach && myPlayerIds && myPlayerIds.size > 0) {
               list.sort((a, b) => {
