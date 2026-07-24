@@ -297,7 +297,7 @@ function TeamDetail() {
   // Pending (unused) invites for the team's players, keyed by playerId, with
   // the contact points (email/phone) already invited so we can avoid blocking
   // a player when only *some* of its contacts have been invited/accepted.
-  const { data: pendingInvitesByPlayer } = useQuery({
+  const { data: pendingInvitesByPlayer, isPending: pendingInvitesLoading } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
