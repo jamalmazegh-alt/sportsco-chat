@@ -562,7 +562,8 @@ function NeedRow({
       </div>
 
       {/* Actions ligne — primaire d'abord (Candidatures / Publier / Relancer), puis secondaires */}
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-1.5">
+
         {/* Staff — Candidatures (primaire quand il y a des candidatures en attente) */}
         {isStaff && isOpen && (
           <Button
