@@ -285,7 +285,7 @@ function ImportPage() {
       const rows = cleanSheetRows(
         XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
           defval: "",
-          raw: false,
+          raw: true,
           blankrows: false,
         }),
       );
