@@ -1,74 +1,97 @@
 
-# Nouvelles pages superadmin
+## Objectif
 
-4 sections indépendantes ajoutées dans la nav superadmin, chacune sur sa propre route.
+Ajouter un mur privé du staff par équipe, sans dupliquer le moteur de publications. Une seule nouvelle valeur d'audience (`team_staff`) et une vue filtrée dans la page équipe.
 
-## 1. Batches player-invite (`/superadmin/invites`)
+## Ce qui existe et qu'on réutilise tel quel
 
-**Vue liste des batches** (une ligne = un envoi groupé, regroupé par `created_at` tronqué + club + initiateur, fenêtre 2 min) :
-- Date, club, initiateur, template, total, ✅ envoyés, 🟡 pending, 🔴 échoués/DLQ
-- Filtres : club, période, statut
+- Table `club_publications` + `club_publication_audiences` (déjà polymorphe).
+- Enum `publication_audience_type` (à étendre d'une valeur).
+- Résolveur `public._resolve_audience_subjects(club_id, audiences, manual[])` (à étendre).
+- `wall_posts` / `wall_comments` / `club_poll_*` / `club_publication_media` — inchangés.
+- Feed `wall-feed.tsx`, composer `publications.new.tsx`, dispatch (`send-wall-emails.functions.ts`, `push-dispatch-wall.server.ts`) — étendus, pas dupliqués.
+- Helpers RLS existants : `is_club_staff`, `is_club_admin`, `team_members`, `is_assignable_staff`.
 
-**Drill-down `/superadmin/invites/$batchId`** : liste plate des destinataires du batch avec statut détaillé, erreur, bouton "relancer" (réutilise `email-retry.functions.ts` existant).
+## Backend (une seule migration)
 
-Batch ID = hash déterministe `date-tronquée + club + template`. Focus initial : `player-invite`, mais le filtre template permet `convocation-invite`, `tournament-invite`, etc.
+1. `ALTER TYPE publication_audience_type ADD VALUE 'team_staff';`
+2. Colonne `team_id uuid` déjà présente sur `club_publication_audiences` (utilisée par `joueurs_equipe`). Aucune modif de schéma nécessaire.
+3. Nouveau helper SECURITY DEFINER `public.is_team_staff(_team_id uuid, _user_id uuid) returns boolean` :
+   - `true` si l'utilisateur est dans `team_members` avec un rôle staff (coach, assistant_coach, dirigeant, admin),
+   - OU s'il est admin/dirigeant du club propriétaire de l'équipe,
+   - `STABLE`, `search_path = public`, `REVOKE FROM PUBLIC/anon`, `GRANT EXECUTE TO authenticated, service_role`.
+4. Extension de `_resolve_audience_subjects` : quand `audience_type = 'team_staff'` avec `team_id`, retourner les `user_id` de tous les membres du staff de cette équipe + admins du club. Réutilise la même colonne `subjects` (users), pas de nouveau canal.
+5. RLS `wall_posts` — ajouter une clause `PERMISSIVE` SELECT :
+   `EXISTS (SELECT 1 FROM club_publication_audiences a WHERE a.publication_id = wall_posts.publication_id AND a.audience_type = 'team_staff' AND public.is_team_staff(a.team_id, auth.uid()))`.
+   Idem pour `wall_comments`, `club_poll_options`, `club_poll_votes`, `club_publication_media` — chacun via la publication liée. Les RESTRICTIVE existants ne changent pas (défense en profondeur : la base permissive doit couvrir *tous* les chemins — checklist `docs/security/rls-policy-checklist.md` §3).
+6. Notifications : dispatch email/push (`send-wall-emails` + `push-dispatch-wall`) lit déjà les `subjects` retournés par le résolveur → aucune modif métier, uniquement s'assurer que la nouvelle valeur d'enum est acceptée dans les Zod côté serveur.
 
-## 2. Journal notifications (`/superadmin/notifications`)
+## Tests RLS (obligatoires, cf. checklist §3)
 
-Tabs : **Emails** | **Push**.
+Nouveau fichier `tests/rls/wall.team-staff-audience.rls.ts` :
 
-**Emails** : table déduplicée par `message_id` (dernière ligne). Colonnes : timestamp, template, destinataire, statut (badge coloré), club (déduit du contexte), erreur. Filtres : template (multi), statut, période, recherche destinataire, club. Pagination 50/page.
+- coach équipe A voit publication `team_staff` équipe A ✅
+- coach équipe B ne voit pas publication `team_staff` équipe A ✅
+- admin club A voit toutes les publications `team_staff` du club ✅
+- joueur équipe A ne voit pas la publication `team_staff` équipe A ✅
+- parent lié à joueur équipe A ne voit pas la publication ✅
+- anonyme / autre club → refusés ✅
+- coach A peut commenter, réagir, voter le sondage ; joueur A → refusé
+- appel direct `_resolve_audience_subjects` par un authentifié non-staff → cohérence (SECURITY DEFINER, mais lecture seule via `is_team_staff`)
 
-**Push** : lit `push_dispatch_log`. Colonnes : timestamp, kind (convocation/reminder/wall/etc.), targets, sent, opened, taux d'ouverture. Ajouter GRANT + policy SELECT superadmin (actuellement `no_select`).
+## Frontend
 
-## 3. Arborescence clubs → équipes → joueurs (`/superadmin/clubs/$clubId/roster`)
+### 1. Composer (`src/routes/_authenticated/publications.new.tsx`)
 
-Nouvel onglet dans la page club existante.
+- Étendre `Audience` union : `| { audience_type: "team_staff"; team_id: string }`.
+- Nouvelle section « Staff d'une équipe » dans le sélecteur d'audience, sous « Équipes », avec la même liste d'équipes (checkbox unique par équipe).
+- Réutiliser le rendu chip existant.
+- Aucune modif du reste du flow (draft → publish → dispatch).
 
-**Structure** : accordion par équipe, chaque équipe liste les joueurs. Ligne joueur dépliable → parents.
+### 2. Zod côté serveur (`src/lib/publications/publications.functions.ts`)
 
-**Colonnes joueur** : nom, catégorie FFF, email/tel, statut compte (Actif / Invité / Pas de compte), dernière connexion (via `auth.users.last_sign_in_at`), date dernière invite envoyée.
+- Ajouter au `discriminatedUnion` : `z.object({ audience_type: z.literal("team_staff"), team_id: z.string().uuid() })`.
 
-**Colonnes parent** (sous chaque joueur mineur) : nom, email, tel, statut compte, dernière connexion, date d'activation, date dernière invite.
+### 3. Nouvel onglet Staff dans la page équipe
 
-Données via nouvelle RPC `superadmin_club_roster(_club_id)` (SECURITY DEFINER) qui joint players / teams / player_parents / profiles / auth.users / member_invites / email_send_log.
+Fichier : `src/routes/_authenticated/teams/$teamId.tsx` (ou son layout de tabs). Ajouter l'onglet « Staff » à côté de Mur/Calendrier/Joueurs/Documents.
 
-## 4. Audit trail joueur (`/superadmin/players/$playerId/audit`)
+- Gate d'affichage de l'onglet : n'apparaît que si `is_team_staff(teamId, currentUser)` côté client (via un flag déjà chargé pour le membre ou un petit RPC `has_team_staff_access(team_id)`). RLS reste le vrai gate.
+- Le contenu réutilise `<WallFeed />` avec un filtre :
+  - nouvelle prop `filter={{ kind: "team_staff", teamId }}`
+  - le fetch existant de `wall-feed` accepte déjà un filtre par audience — on ajoute la branche.
+- Bouton **Publier** dans cet onglet : ouvre le composer existant en mode pré-rempli et **verrouillé** : audience forcée `{ audience_type: "team_staff", team_id }`, sélecteur d'audience masqué.
 
-Timeline complète pour un joueur donné. Source unifiée :
-- **Modifs joueur** : nouveau trigger sur `players` → écrit dans `audit_logs` (action = `player.updated`, diff avant/après en jsonb).
-- **Modifs parents rattachés** : trigger sur `profiles` (nom, tel) pour les parents liés → `audit_logs` action `parent.profile_updated`.
-- **Liens parent** : trigger sur `player_parents` INSERT/DELETE → `audit_logs` action `player.parent_linked` / `parent_unlinked`.
-- **Événements existants** : convocations (`convocations`), feedbacks (`player_feedback`), suspensions (`player_suspensions`), disponibilités (`player_availabilities`), achievements (`player_achievements`), timeline (`player_timeline_events`) — lus directement, pas de nouveau trigger.
+### 4. Feed club (`wall-feed.tsx`)
 
-**UI** : timeline chrono inversé, groupée par jour, filtres par type. Chaque entrée : qui (acteur), quoi (action + diff), quand.
+- Aucune modif du filtre par défaut : les publications `team_staff` remontent dans le feed club uniquement pour les utilisateurs qui les voient déjà via RLS (staff équipe + admin club). Un petit badge visuel « Staff · U13 » sur la carte pour distinguer.
 
-Accès depuis la fiche joueur superadmin via bouton "Historique complet".
+## Fichiers touchés
 
-## Détails techniques
+Backend :
+- `supabase/migrations/<new>_team_staff_audience.sql` (enum + helper + extension résolveur + policies RLS)
+- `tests/rls/wall.team-staff-audience.rls.ts` (nouveau)
 
-**Nouvelles migrations** :
-1. Triggers d'audit `players` + `profiles` (parents) + `player_parents` → écrit dans `audit_logs` avec `actor_user_id = auth.uid()`, `entity_type = 'player'`, `entity_id = player.id`, `metadata` contient le diff.
-2. RPC `superadmin_club_roster(_club_id uuid)` SECURITY DEFINER — garde `has_super_admin(auth.uid())`.
-3. RPC `superadmin_invite_batches(_from, _to, _template, _club_id)` — regroupement par fenêtre temporelle.
-4. RPC `superadmin_player_audit(_player_id)` — union des sources ci-dessus.
-5. GRANT SELECT + policy superadmin sur `push_dispatch_log` (remplace `no_select`).
+Frontend :
+- `src/lib/publications/publications.functions.ts` (Zod)
+- `src/routes/_authenticated/publications.new.tsx` (audience)
+- `src/routes/_authenticated/teams/$teamId.tsx` (onglet Staff)
+- `src/components/wall-feed.tsx` (filtre + badge)
+- `src/locales/*/publications.json` (libellé `audience.types.team_staff`, badge)
 
-**Server functions** : nouveau fichier `src/lib/superadmin/roster.functions.ts`, `invites-batches.functions.ts`, `notifications.functions.ts`, `player-audit.functions.ts` — toutes `.middleware([requireSupabaseAuth])` + garde `has_super_admin` côté RPC.
+## Hors périmètre
 
-**Nav** : ajoute 3 entrées dans `src/routes/superadmin.tsx` NAV : "Invitations", "Notifications", "Rosters" (déjà accessible via clubs, mais raccourci global).
+- Aucun nouveau moteur, table, worker, ou schéma de notification.
+- Aucune migration de données : les groupes manuels existants ne sont pas touchés.
+- Pas de refonte du composer (juste une audience de plus).
 
-**Réutilisations** :
-- Filtres et pagination : pattern existant de `email-dispatches.tsx`.
-- Retry : `email-retry.functions.ts` déjà en place.
-- Table déduplication : queries de référence de `email-dashboard-monitoring-guide`.
+## Critères d'acceptation (mapping)
 
-## Ordre d'exécution
-
-1. Migration audit triggers + RPC roster + RPC batches + RPC player_audit + push policy.
-2. Server functions (4 fichiers).
-3. Routes UI (4 nouvelles routes + onglet roster dans club).
-4. Nav update.
-5. `bun run test` + `bun run check:guards`.
-
-Livré en une passe. Aucune modif des flux d'envoi existants — lecture seule + triggers d'audit.
+- Une publi Staff U13 créée depuis le club → onglet Staff U13 : identiques (même `publication_id`).
+- Publi créée depuis Staff U13 → visible dans le mur club pour staff/admins uniquement.
+- Une seule ligne `club_publications` par publication (vérifié en RLS tests).
+- Commentaires/réactions/sondages partagés (tables uniques, `publication_id` FK).
+- Joueurs/parents ne voient jamais `team_staff` (RLS tests dédiés).
+- Coaches équipe B ne voient pas `team_staff` équipe A (RLS test).
+- Admin club voit tous les Staff (RLS test).
+- Aucun groupe manuel requis (résolveur calcule automatiquement).
