@@ -11,12 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  EventsFilterSheet,
+  DEFAULT_EVENTS_FILTERS,
+  type EventsFilters,
+} from "@/components/events/EventsFilterSheet";
 
 import {
   Calendar,
@@ -30,8 +28,6 @@ import {
   List,
   CalendarDays,
   Ban,
-  Eye,
-  EyeOff,
   Clock,
   Search,
 } from "lucide-react";
@@ -78,14 +74,11 @@ function EventsPage() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [showPast, setShowPast] = useState(false);
-  const [showCancelled, setShowCancelled] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [hideTrainings, setHideTrainings] = useState(false);
-  const [teamFilter, setTeamFilter] = useState<string>("all");
+  const [filters, setFilters] = useState<EventsFilters>(DEFAULT_EVENTS_FILTERS);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
 
@@ -166,17 +159,39 @@ function EventsPage() {
     },
   });
 
+  const internalTeamIds = useMemo(
+    () =>
+      new Set(
+        (teams ?? [])
+          .filter((t) => (t as { is_internal?: boolean }).is_internal)
+          .map((t) => t.id),
+      ),
+    [teams],
+  );
+  const hasInternalTeam = internalTeamIds.size > 0;
+
   const visibleEvents = useMemo(() => {
     if (!events) return [];
     const q = searchQuery.trim().toLowerCase();
+    const fromTs = filters.dateFrom ? startOfDay(filters.dateFrom).getTime() : null;
+    const toTs = filters.dateTo
+      ? startOfDay(filters.dateTo).getTime() + 24 * 60 * 60 * 1000 - 1
+      : null;
     return events.filter((e) => {
-      if (!showCancelled && e.status === "cancelled") return false;
-      if (hideTrainings && e.type === "training") return false;
-      if (teamFilter !== "all" && e.team_id !== teamFilter) return false;
-      if (!showPast) {
-        const d = new Date(e.starts_at);
+      if (!filters.showCancelled && e.status === "cancelled") return false;
+      if (filters.types.size > 0 && !filters.types.has(e.type as any)) return false;
+      if (filters.teamIds.size > 0 && !filters.teamIds.has(e.team_id)) return false;
+      if (!filters.includeInternal && internalTeamIds.has(e.team_id)) return false;
+      if (filters.homeAway !== "all" && (e.type === "match" || e.type === "tournament")) {
+        if (filters.homeAway === "home" && e.is_home === false) return false;
+        if (filters.homeAway === "away" && e.is_home !== false) return false;
+      }
+      const d = new Date(e.starts_at);
+      if (!filters.showPast) {
         if (isPast(d) && !isToday(d)) return false;
       }
+      if (fromTs !== null && d.getTime() < fromTs) return false;
+      if (toTs !== null && d.getTime() > toTs) return false;
       if (q) {
         const haystack = [e.title, e.opponent, e.team_name, e.competition_name, e.location]
           .filter(Boolean)
@@ -186,7 +201,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, hideTrainings, teamFilter, searchQuery]);
+  }, [events, filters, internalTeamIds, searchQuery]);
 
 
   const pastCount = useMemo(() => {
@@ -588,56 +603,15 @@ function EventsPage() {
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {view === "list" && pastCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowPast((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                showPast
-                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-            >
-              {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
-            </button>
-          )}
           {view === "list" && (
-            <button
-              type="button"
-              onClick={() => setShowCancelled((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                showCancelled
-                  ? "border-red-500/40 bg-red-500/10 text-red-700 hover:bg-red-500/15 dark:text-red-300"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-              title={t("events.cancelledToggle", { defaultValue: "Annulés" })}
-            >
-              <Ban className="h-3.5 w-3.5" />
-              {showCancelled
-                ? t("events.hideCancelled", { defaultValue: "Masquer annulés" })
-                : t("events.showCancelled", { defaultValue: "Voir annulés" })}
-            </button>
-          )}
-          {view === "list" && (
-            <button
-              type="button"
-              onClick={() => setHideTrainings((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                hideTrainings
-                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-              title={t("events.trainingsToggle", { defaultValue: "Entraînements" })}
-            >
-              <Dumbbell className="h-3.5 w-3.5" />
-              {hideTrainings
-                ? t("events.showTrainings", { defaultValue: "Voir entraînements" })
-                : t("events.hideTrainings", { defaultValue: "Masquer entraînements" })}
-            </button>
+            <EventsFilterSheet
+              filters={filters}
+              onChange={setFilters}
+              teams={visibleTeams}
+              isCoach={isCoach}
+              hasInternalTeam={hasInternalTeam}
+              pastCount={pastCount}
+            />
           )}
         </div>
       </div>
@@ -656,25 +630,6 @@ function EventsPage() {
               className="pl-9"
             />
           </div>
-          {isCoach && visibleTeams.length > 1 && (
-            <Select value={teamFilter} onValueChange={setTeamFilter}>
-              <SelectTrigger className="sm:w-56">
-                <SelectValue
-                  placeholder={t("events.filterByTeam", { defaultValue: "Filtrer par équipe" })}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  {t("events.allTeams", { defaultValue: "Toutes les équipes" })}
-                </SelectItem>
-                {visibleTeams.map((team) => (
-                  <SelectItem key={team.id} value={team.id}>
-                    {team.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
         </div>
       )}
 
