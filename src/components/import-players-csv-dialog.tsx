@@ -88,6 +88,16 @@ function downloadTemplate() {
     "+33600000002",
   ];
   const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  // Force la colonne date en texte ISO pour empêcher un tableur de la
+  // reformater en JJ/MM ou MM/JJ selon la locale de l'utilisateur.
+  const dateColIndex = FIELD_KEYS.indexOf("date_naissance");
+  if (dateColIndex >= 0) {
+    const ref = XLSX.utils.encode_cell({ r: 1, c: dateColIndex });
+    if (ws[ref]) {
+      ws[ref].t = "s";
+      ws[ref].z = "@";
+    }
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Joueurs");
   XLSX.writeFile(wb, "clubero-import-joueurs.xlsx");
