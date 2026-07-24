@@ -77,15 +77,11 @@ function EventsPage() {
   const isCoach =
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [showPast, setShowPast] = useState(false);
-  const [showCancelled, setShowCancelled] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [hideTrainings, setHideTrainings] = useState(false);
-  const [teamFilter, setTeamFilter] = useState<string>("all");
+  const [filters, setFilters] = useState<EventsFilters>(DEFAULT_EVENTS_FILTERS);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
 
