@@ -69,11 +69,19 @@ export async function enqueueTransactionalEmailServer(
     notification_type: params.notificationType ?? null,
   };
 
-  // Suppression check
+  // Suppression check — les bounces sont tolérés jusqu'à 3 tentatives ;
+  // les plaintes spam et désinscriptions bloquent immédiatement.
   const { data: suppressed } = await runStep("suppression_check", async () =>
-    supabaseAdmin.from("suppressed_emails").select("id").eq("email", normalized).maybeSingle(),
+    supabaseAdmin
+      .from("suppressed_emails")
+      .select("id, reason, bounce_count")
+      .eq("email", normalized)
+      .maybeSingle(),
   );
-  if (suppressed) {
+  const isBlocked =
+    !!suppressed &&
+    (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
+  if (isBlocked) {
     await supabaseAdmin.from("email_send_log").insert({
       message_id: messageId,
       template_name: params.templateName,

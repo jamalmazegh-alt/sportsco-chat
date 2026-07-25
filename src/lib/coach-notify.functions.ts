@@ -61,13 +61,18 @@ export const notifyCoachAssigned = createServerFn({ method: "POST" })
     const recipientEmail = authUser?.user?.email;
     if (!recipientEmail) return { sent: false, reason: "no_email" as const };
 
-    // Suppression check
+    // Suppression check — tolère 3 bounces avant blocage définitif.
     const { data: suppressed } = await supabaseAdmin
       .from("suppressed_emails")
-      .select("email")
+      .select("email, reason, bounce_count")
       .eq("email", recipientEmail.toLowerCase())
       .maybeSingle();
-    if (suppressed) return { sent: false, reason: "suppressed" as const };
+    if (
+      suppressed &&
+      (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3)
+    ) {
+      return { sent: false, reason: "suppressed" as const };
+    }
 
     const locale = (coach?.preferred_language ?? "fr").slice(0, 2).toLowerCase();
     const templateData = {
