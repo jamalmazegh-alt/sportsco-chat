@@ -1,23 +1,26 @@
-# Prompt — Offre Clubero Équipe à 9,99 € par équipe (v3, vérifié contre le code)
+# Prompt — Offre Clubero Équipe à 9,99 € par équipe (v4, vérifié contre le code)
 
-> Version révisée après audit du dépôt (2026-07-25) et corrections produit :
-> le club existe toujours (pas de « club personnel invisible » comme modèle produit),
-> pas de migration de club lors du passage à l'offre Club, joueurs illimités dans
-> l'offre Équipe (la limite de joueurs appartient à l'offre Découverte), entitlements V1
-> simples, exigences RLS et rétrocompatibilité renforcées.
-> Les sections « Contexte technique vérifié » et « Pièges connus » contiennent des faits
-> constatés dans le code : ne pas les réinventer, les re-vérifier rapidement avant de coder.
+> Historique : v2 = corrections issues de l'audit du dépôt ; v3 = corrections produit
+> (club réel, pas de migration de club, joueurs illimités en offre Équipe) ;
+> **v4 = quotas Découverte et éligibilité en fin d'essai, fusion de clubs hors V1,
+> contrôle atomique de la limite de joueurs, états d'accès A/B/C/D réconciliés avec les
+> entitlements, audit `exempt_until`, recherche de club sécurisée, friction multi-équipes
+> assumée.**
+>
+> Les sections « Contexte technique vérifié » et les pièges signalés contiennent des faits
+> constatés dans le code : ne pas les réinventer, les re-vérifier avant de coder.
+>
+> Documents liés :
+> - `docs/specs/offre-equipe-architecture-plan.md` — plan d'architecture (Lot 0)
+> - `docs/specs/offre-equipe-lot-0-bis.md` — investigations bloquantes (Lot 0 bis)
 
 ## Objectif et positionnement commercial
-
-Mettre en place une offre « Équipe » facturée par équipe, entre l'offre Découverte
-(gratuite) et l'offre Club existante :
 
 ```text
 Offre Découverte (gratuite)
 - une équipe ;
-- nombre de joueurs limité (configurable, recommandation : 15) ;
-- fonctionnalités éventuellement limitées ;
+- nombre de joueurs actifs limité (configurable, recommandation : 15) ;
+- quotas stricts (voir §11) ;
 - destinée à découvrir Clubero.
 
 Offre Équipe
@@ -33,92 +36,78 @@ Offre Club (existante : 49 €/mois ou 490 €/an)
 - fonctionnalités centrales et transverses du club.
 ```
 
-Un utilisateur doit pouvoir :
-
-- créer son club (structure réelle et visible) et sa première équipe ;
-- inviter un staff illimité sans surcoût ;
-- créer d'autres équipes dans le même club, chacune avec sa propre souscription
-  (périodicités mixtes possibles) ;
-- gérer toutes ses équipes depuis le même compte ;
-- passer plus tard à l'offre Club **sur le même club, sans aucune migration de données**.
+Un utilisateur doit pouvoir : créer son club (structure réelle et visible) et sa première
+équipe ; inviter un staff illimité sans surcoût ; créer d'autres équipes dans le même
+club, chacune avec sa souscription (périodicités mixtes) ; passer à l'offre Club **sur le
+même club, sans migration de données**.
 
 ---
 
-## 0. Contexte technique vérifié (état des lieux du dépôt)
+## 1. Contexte technique vérifié (état des lieux du dépôt)
 
-**Stack.** TanStack Start (React 19 + Vite), déployé sur Cloudflare Workers
-(`wrangler.jsonc`, `src/server.ts`). **Il n'y a pas de Supabase Edge Functions** : la
-logique serveur vit dans les server functions TanStack (`src/lib/*.functions.ts`,
-`src/modules/*/*.functions.ts`) et les routes API (`src/routes/api/**`,
-`src/routes/webhooks/**`). Gestionnaire de paquets : Bun. Schéma de référence :
-`src/integrations/supabase/types.ts`.
+**Stack.** TanStack Start (React 19 + Vite) sur Cloudflare Workers (`wrangler.jsonc`,
+`src/server.ts`). **Pas de Supabase Edge Functions** : la logique serveur vit dans les
+server functions TanStack (`src/lib/*.functions.ts`, `src/modules/*/*.functions.ts`) et
+les routes API (`src/routes/api/**`, `src/routes/webhooks/**`). Bun. Schéma de
+référence : `src/integrations/supabase/types.ts`.
 
-**Modèle de données.**
+**Modèle de données.** Hiérarchie stricte `clubs → teams` ; `teams.club_id` est **NOT
+NULL** (et doit le rester). Le mécanisme `clubs.is_personal` +
+`get_or_create_personal_club` existe mais est réservé au parcours organisateur de tournoi :
+**il ne définit pas le modèle produit de l'offre Équipe** (§2).
+Rôles : enum `app_role` = `admin | coach | parent | player | dirigeant | financial_admin` ;
+`club_members.roles text[]` porte les rôles fins (`assistant_coach`, `staff`…). Ne pas
+inventer de nouveaux rôles.
 
-- Hiérarchie stricte `clubs → teams` ; `teams.club_id` est **NOT NULL** (et doit le
-  rester). Il existe un mécanisme technique `clubs.is_personal` + RPC
-  `get_or_create_personal_club` / `convert_personal_club_to_real`, utilisé par le
-  parcours organisateur de tournoi. **Ce mécanisme ne définit pas le modèle produit de
-  l'offre Équipe** (voir §1) ; il peut au mieux servir de détail d'implémentation
-  temporaire, mais la cible est un vrai club visible.
-- Rôles : enum `app_role` = `admin | coach | parent | player | dirigeant | financial_admin`.
-  `club_members.roles text[]` porte les rôles fins (`assistant_coach`, `staff`,
-  `tournament_manager`…) ; `team_members.role` est un enum simple. **Ne pas inventer de
-  nouveaux rôles** : réutiliser ces valeurs, l'affichage fin est une affaire d'étiquettes.
+**Joueurs.** La table `players` possède `deleted_at` (soft delete) mais **aucun état
+« archivé »** ni colonne de statut ; le rattachement à une équipe passe par
+`team_members.player_id`. Toute règle de comptage doit partir de ce fait (§12).
 
-**Facturation existante (à réutiliser, pas à dupliquer).**
+**Facturation existante (à réutiliser).** Table `subscriptions` **une par club**
+(UNIQUE sur `club_id`), enums `subscription_plan` et `subscription_status`, champs
+d'exemption. Server functions complètes dans `src/lib/billing.functions.ts`, toutes
+verrouillées « club admin ». Webhook signé et idempotent
+(`src/lib/stripe-webhook-handler.server.ts`, table `stripe_webhook_events` — existe
+déjà). Prix dans `src/lib/stripe.server.ts` via env avec valeurs par défaut.
 
-- Table `subscriptions` **à raison d'une par club** (contrainte UNIQUE sur `club_id`),
-  enums `subscription_plan = monthly | yearly` et `subscription_status`
-  (`trialing | active | past_due | canceled | incomplete | incomplete_expired | unpaid | paused`),
-  champs d'exemption (`exempt_from_billing`, `exempt_until`…).
-- Server functions complètes dans `src/lib/billing.functions.ts` (checkout, portail,
-  annulation, réactivation, mise à jour de carte), toutes verrouillées sur « club admin ».
-- Webhook Stripe signé et idempotent : `src/lib/stripe-webhook-handler.server.ts`,
-  monté sur `src/routes/webhooks/stripe.ts`, avec table **`stripe_webhook_events`**
-  (idempotence par `event_id`) — elle existe déjà, ne pas la recréer. Le handler branche
-  sur `metadata.purpose` pour les paiements non-club (`tournament_single`,
-  `tournament_annual`, `tournament_pass`, `payment_obligation`).
-- Prix Stripe dans `src/lib/stripe.server.ts` via variables d'environnement avec valeurs
-  par défaut. Suivre le même motif pour les nouveaux prix.
-- **Piège vérifié — trigger d'essai.** `auto_create_trial_subscription` (AFTER INSERT ON
-  `clubs`) crée un essai **Club** de 14 jours pour tout club non-personnel. Sans
-  précaution, un club créé via l'onboarding Équipe recevrait un essai Club complet, ce qui
-  débloquerait les fonctionnalités Club **et la création de tournois** pendant 14 jours.
-  Le trigger doit être ajusté pour les clubs en facturation « par équipe » (voir §3).
-- Verrouillage : garde dans `src/routes/_authenticated.tsx`
-  (`ClubSubscriptionExpiredScreen`, `LockedClubShell`, listes `CLUB_LOCKED_ALLOWED` et
-  `TOURNAMENT_ONLY_ALLOWED`) — actuellement à portée **club entier**. Accès payant :
-  `src/lib/has-paid-access.ts` (+ `.server.ts`) et RPC SECURITY DEFINER
-  `club_has_active_subscription(_club_id)`.
-- Précédent structurel pour une facturation non-club : `tournament_entitlements`
-  (portée organisateur, plan/statut/validité, même webhook). C'est le gabarit à suivre
-  pour `team_subscriptions`.
+**Piège vérifié — trigger d'essai.** `auto_create_trial_subscription` (AFTER INSERT ON
+`clubs`) crée un essai **Club** de 14 jours pour tout club non-personnel. Sans précaution,
+un club créé via l'onboarding Équipe recevrait un essai Club complet, débloquant les
+fonctionnalités Club **et la création de tournois** pendant 14 jours (§4).
 
-**Tournois.** Module complet dans `src/modules/tournaments/`. La création est restreinte
-par la fonction SQL `can_create_tournament(_user_id)` : superadmin, OU entitlement tournoi
-actif, OU admin/dirigeant d'un club dont `club_has_active_subscription()` est vrai.
+**Piège vérifié — `exempt_until` ignoré en SQL.** `club_has_active_subscription`
+(`supabase/migrations/20260622120000_subscription_billing_exemption.sql:36`) teste
+`exempt_from_billing = true` **sans regarder `exempt_until`**, alors que
+`isBillingExempt` (`src/lib/has-paid-access.ts:22-25`) l'honore. La colonne a été ajoutée
+plus tard (`20260622170729_…sql:1`) sans mise à jour de la fonction. Une exemption
+expirée donne donc encore accès via RLS et `can_create_tournament`. **Correction
+soumise à l'audit préalable du Lot 0 bis §0 bis.3 — ne pas corriger à l'aveugle.**
 
-**Entitlements.** Aucun système centralisé d'entitlements ni de quotas n'existe : pas de
-`max_players`, pas de comptage de sièges. Mécanismes existants : `has-paid-access`,
-`club_has_active_subscription`, entitlements tournois, feature flags V2
-(`src/config/features.ts` + table `app_flags`).
+**Piège vérifié — rate limiter fail-open.** `checkRateLimit`
+(`src/lib/rate-limit.server.ts:46-52`) retourne `true` en cas d'erreur. Toute exigence
+fail-closed (§10) impose une variante dédiée, pas la réutilisation du helper.
 
-**i18n.** 7 locales (`fr, en, de, es, it, nl, pt`), parité des clés vérifiée en CI
-(`bun run check:i18n`). Tout texte UI passe par i18n dans toutes les locales — les
-libellés français cités ici sont la version `fr` des clés à créer.
+**Tournois.** Module complet dans `src/modules/tournaments/`. Création restreinte par
+`can_create_tournament(_user_id)` : superadmin, OU entitlement tournoi actif, OU
+admin/dirigeant d'un club dont `club_has_active_subscription()` est vrai.
 
-**Sécurité.** RLS par fonctions helpers SECURITY DEFINER (`is_team_staff`,
-`user_is_in_team`, `has_club_role`, `is_club_member`…). Sur `subscriptions`, les colonnes
-Stripe sont protégées par des **REVOKE au niveau colonne**. Tests RLS : `tests/rls/`,
-`bun run test:rls`. Linter de gardes serveur : `bun run check:guards`.
+**Entitlements.** Aucun système centralisé ni quota n'existe : pas de `max_players`, pas
+de comptage de sièges. Mécanismes existants : `has-paid-access`,
+`club_has_active_subscription`, entitlements tournois, feature flags V2.
+
+**i18n.** 7 locales (`fr, en, de, es, it, nl, pt`), parité vérifiée en CI
+(`bun run check:i18n`). Les libellés français cités ici sont la version `fr` des clés.
+
+**Sécurité.** RLS par helpers SECURITY DEFINER (`is_team_staff`, `user_is_in_team`,
+`has_club_role`…). Sur `subscriptions`, colonnes Stripe protégées par **REVOKE au niveau
+colonne**. Tests : `tests/rls/`, `bun run test:rls`, `bun run check:guards`.
 
 ---
 
-## 1. Modèle produit : l'utilisateur crée toujours un club
+## 2. Modèle produit : l'utilisateur crée toujours un club
 
-Même en offre Équipe, l'utilisateur crée fonctionnellement un **vrai club** (ou une vraie
-structure), visible dans l'interface, puis une ou plusieurs équipes à l'intérieur :
+Même en offre Équipe, l'utilisateur crée un **vrai club** visible, puis une ou plusieurs
+équipes à l'intérieur :
 
 ```text
 USAG Uckange
@@ -126,20 +115,13 @@ USAG Uckange
 └── U15 — offre Équipe annuelle
 ```
 
-Jamais, du point de vue de l'utilisateur, de « compte personnel → équipe isolée ».
+Jamais « compte personnel → équipe isolée » du point de vue de l'utilisateur.
 
-L'offre Équipe ne signifie pas que le club n'existe pas. Elle signifie uniquement que :
+L'offre Équipe signifie uniquement que : la facturation s'effectue équipe par équipe ;
+seules les équipes ayant une souscription active sont couvertes ; les fonctionnalités
+centrales Club restent bloquées.
 
-- la facturation s'effectue équipe par équipe ;
-- seules les équipes disposant d'une souscription active sont couvertes ;
-- les fonctionnalités centrales réservées à l'offre Club restent bloquées.
-
-Le club créé porte un **indicateur de couverture commerciale** (voir §3) qui le distingue
-d'un club sous offre Club, **sans modifier artificiellement son statut d'abonnement Club**.
-`clubs.is_personal` ne doit pas être utilisé comme modèle produit ; s'il sert de détail
-technique transitoire, cela doit rester invisible et temporaire.
-
-## 2. Séparation des concepts
+## 3. Séparation des concepts
 
 ```text
 Club              = organisation et identité
@@ -147,389 +129,394 @@ Club              = organisation et identité
 Team subscription = unité de facturation Équipe (couvre UNE équipe)
 Club subscription = couverture globale du club (table subscriptions existante)
 Billing owner     = personne responsable du paiement d'une team subscription
+Discovery owner   = personne portant le quota Découverte d'une équipe gratuite
 ```
 
-Un club peut exister sans abonnement Club tout en ayant plusieurs équipes couvertes
-individuellement, et des équipes non couvertes en lecture seule :
+Un club peut exister sans abonnement Club tout en ayant des équipes couvertes
+individuellement et des équipes non couvertes :
 
 ```text
 FC Exemple
 ├── U11 — abonnement Équipe mensuel
 ├── U13 — abonnement Équipe annuel
-└── Seniors — sans abonnement, lecture seule
+├── U15 — Découverte (quota club 1/2)
+└── Seniors — sans couverture, lecture seule
 ```
 
 Le prix ne dépend jamais du nombre de coaches, de comptes ou de membres du staff.
 
-## 3. Modèle technique
+## 4. Modèle technique
 
-- Ajouter un indicateur sur `clubs`, par exemple :
+- Indicateur sur `clubs` : `billing_mode = 'club' (défaut) | 'per_team'`.
+  `'club'` = comportement actuel inchangé pour tous les clubs existants ;
+  `'per_team'` = pas d'essai Club automatique (ajuster le trigger), couverture évaluée
+  équipe par équipe, fonctionnalités Club bloquées, identité gérable.
+- Table `team_subscriptions` (une ligne par équipe couverte), sur le modèle de
+  `tournament_entitlements` — schéma détaillé dans le plan d'architecture.
+- **Ne pas toucher** à `subscriptions`, à sa contrainte UNIQUE, ni à la sémantique de
+  `club_has_active_subscription` (§8).
+- Stripe : **une souscription distincte par équipe**, `metadata.purpose = "team_plan"` +
+  `metadata.team_id` posées sur la souscription (pas seulement sur la session).
+- Nouveaux prix `STRIPE_PRICE_TEAM_MONTHLY` / `STRIPE_PRICE_TEAM_YEARLY`, surchargeables
+  par env comme les prix existants.
 
-```text
-clubs.billing_mode = 'club' (défaut) | 'per_team'
-```
+## 5. Onboarding Équipe
 
-  - `'club'` : comportement actuel inchangé (essai Club auto, offre Club, verrouillage
-    club entier) — **valeur par défaut pour tous les clubs existants, zéro régression** ;
-  - `'per_team'` : pas d'essai Club automatique (ajuster le trigger
-    `auto_create_trial_subscription`), couverture évaluée équipe par équipe,
-    fonctionnalités Club bloquées.
-- Créer la table `team_subscriptions` (une ligne par équipe couverte), sur le modèle de
-  `tournament_entitlements` :
-
-```text
-team_subscriptions
-- id
-- team_id            (une seule souscription non résiliée par équipe)
-- club_id            (dénormalisé pour RLS et requêtes)
-- billing_owner_user_id   (exactement UN responsable actif à tout instant)
-- stripe_customer_id
-- stripe_subscription_id
-- stripe_price_id
-- plan_code          (team_monthly | team_yearly)
-- status             (réutiliser l'enum subscription_status existant)
-- trial_start / trial_end
-- current_period_start / current_period_end
-- cancel_at_period_end / canceled_at
-- created_at / updated_at
-```
-
-- **Ne pas toucher** à la table `subscriptions`, à sa contrainte UNIQUE sur `club_id`,
-  ni à la sémantique de `club_has_active_subscription` (voir §6).
-- Architecture Stripe : **une souscription Stripe distincte par équipe** (plus simple à
-  annuler équipe par équipe, à arrêter lors du passage à l'offre Club, à réconcilier via
-  webhooks). Réutiliser le `stripe_customer_id` du payeur entre ses équipes. Identifier
-  les événements via `metadata.purpose = "team_plan"` + `metadata.team_id` (métadonnées
-  posées sur la souscription Stripe elle-même, pas seulement sur la session de checkout).
-- Nouveaux prix dans `src/lib/stripe.server.ts` : `STRIPE_PRICE_TEAM_MONTHLY` (9,99 €)
-  et `STRIPE_PRICE_TEAM_YEARLY` (99,99 €), surchargeables par variables d'environnement.
-
-## 4. Onboarding Équipe
-
-L'onboarding actuel (`NoMembershipScreen` dans `src/routes/_authenticated.tsx`) propose
-« créer un club » ou « rejoindre via invitation ». Ajouter le choix :
+Ajouter au choix existant (« créer un club » / « rejoindre via invitation ») :
 
 > « Je souhaite gérer une ou plusieurs équipes » / « Je représente un club »
 
-Parcours Équipe — l'utilisateur crée un vrai club puis sa première équipe :
+Parcours : compte → **recherche d'un club existant (§10)** → nom du club/structure
+(obligatoire), logo (optionnel), sport principal → nom et catégorie de la première équipe
+→ **annonce des quotas si l'équipe n'est pas éligible à Découverte (§11.4)** → choix
+mensuel/annuel → essai ou souscription → accès à l'équipe → invitation du staff.
 
-1. création du compte ;
-2. **nom du club ou de la structure** (obligatoire), logo (optionnel), sport principal ;
-3. nom et catégorie de la première équipe ;
-4. choix mensuel / annuel ;
-5. essai gratuit ou souscription (checkout Stripe) ;
-6. accès à l'équipe ;
-7. invitation immédiate du staff.
+Le club créé est visible et gérable a minima (§9), avec `billing_mode = 'per_team'`.
 
-Le club créé est visible et gérable a minima (voir §8), avec `billing_mode = 'per_team'`.
+## 6. Équipes supplémentaires
 
-## 5. Équipes supplémentaires
+Bouton « Ajouter une équipe » : infos, catégorie, sport, tarif, périodicité, checkout,
+activation — dans le **même club**.
 
-Depuis son espace, bouton « Ajouter une équipe » : nom + infos, catégorie et sport,
-présentation du tarif, choix mensuel/annuel, checkout Stripe, activation — la nouvelle
-équipe est créée **dans le même club**.
+- « Chaque équipe supplémentaire est facturée 9,99 €/mois ou 99,99 €/an. »
+- Périodicités mixtes possibles ; pas de passage forcé à l'offre Club à la deuxième
+  équipe ; upsell Club informatif au-delà d'un seuil (≈ 5 équipes).
+- La condition `teams.length < 3` dans `src/routes/_authenticated/teams.tsx` est
+  cosmétique, pas un quota.
 
-- Afficher : « Chaque équipe supplémentaire est facturée 9,99 €/mois ou 99,99 €/an. »
-- Ne pas forcer le passage à l'offre Club à la deuxième équipe ; périodicités mixtes
-  possibles (U11 mensuel, U13 annuel…).
-- Upsell offre Club informatif (sans blocage) à partir d'un seuil, par exemple quand
-  5 équipes × 9,99 € approchent les 49 €/mois de l'offre Club.
-- Note : la condition `teams.length < 3` dans `src/routes/_authenticated/teams.tsx` est
-  cosmétique (affichage d'un CTA), pas un quota.
+## 7. États d'accès A/B/C/D
 
-## 6. Couverture, précédence et stricte séparation Club / Équipe
+> Ces quatre catégories n'existaient pas dans les versions précédentes du document ;
+> elles sont définies ici pour donner une base commune aux entitlements (§8) et à la
+> lecture seule (§15).
 
-Fonctions serveur centrales :
+| État | Situation | Création / gestion | Réponses aux objets existants | Acceptation d'invitation |
+|---|---|---|---|---|
+| **A — Actif** | Couverture `club_plan`, `team_plan`, `team_trial`, ou Découverte dans les quotas | ✅ | ✅ | ✅ |
+| **B — Grâce** | Paiement échoué, dans la fenêtre de grâce | ✅ (+ alerte au payeur) | ✅ | ✅ |
+| **C — Lecture seule souple** | Essai terminé sans bascule Découverte possible, couverture expirée, quota Découverte dépassé | ❌ | ✅ | ✅ |
+| **D — Lecture seule stricte** | Équipe archivée ou suspendue administrativement | ❌ | ❌ | ❌ |
+
+L'état **C est le comportement par défaut** de toute équipe sans couverture : bloquer
+la création et la gestion, mais **laisser les réponses aux objets déjà créés**. Empêcher
+un parent de répondre à une convocation pour un match qui a quand même lieu, ou un coach
+d'accepter une invitation qui régulariserait la situation, produit des dégâts
+fonctionnels sans effet commercial utile.
+
+Dans tous les états : **les données sont intégralement conservées**, la consultation
+reste possible, et un bouton de réactivation est affiché.
+
+## 8. Entitlements — V1 simple et extensible
+
+Centraliser les droits pour éviter les conditions dispersées dans le front, **sans
+construire un moteur de plans générique** en V1. API centrale :
 
 ```text
-get_team_coverage(team_id)            → club_plan | team_plan | team_trial | grace | expired | none
-get_team_entitlements(user_id, team_id) → entitlements effectifs
-team_has_paid_access(team_id)         → booléen (couverture Équipe OU Club)
+get_team_coverage(team_id)              → couverture résolue
+get_team_entitlements(user_id, team_id) → objet typé ci-dessous
+team_has_paid_access(team_id)           → booléen
 ```
 
-Règles de précédence :
-
-1. souscription Club active (ou exemption Club) sur le club → couverture Club ;
-2. sinon `team_subscription` active ou en essai → couverture Équipe ;
-3. sinon → grâce, expiré, ou aucune couverture (lecture seule à portée équipe).
-
-**Règle stricte — ne jamais mélanger les deux couvertures :**
-
-```text
-club_has_active_subscription(club_id)
-```
-
-doit continuer à signifier **exclusivement** « le club possède une vraie offre Club active
-ou une exemption Club valide ». La couverture Équipe utilise des fonctions distinctes.
-Ne jamais considérer qu'un club a une souscription active parce qu'une de ses équipes a
-une `team_subscription` — sous peine de débloquer accidentellement la création de
-tournois, les fonctionnalités centrales du club, les groupes transverses et les
-statistiques consolidées.
-
-**Anti double facturation (les deux sens) :**
-
-Quand une offre Club devient active pour un club :
-
-- bloquer tout nouvel achat d'abonnement Équipe pour ses équipes ;
-- identifier les `team_subscriptions` encore actives et appliquer la stratégie Stripe
-  retenue (résiliation fin de période ou prorata — décision §24) ;
-- garantir que chaque équipe reste couverte pendant la transition (jamais de trou de
-  couverture) ;
-- rendre l'opération idempotente.
-
-Quand une offre Club est résiliée :
-
-- les équipes peuvent éventuellement repasser en offre Équipe ;
-- **aucune souscription Équipe n'est recréée automatiquement** : consentement et checkout
-  explicites obligatoires.
-
-Le front-end ne décide jamais seul d'un droit payant : contrôles côté serveur et, pour
-les chemins critiques, RLS / RPC SECURITY DEFINER.
-
-## 7. Entitlements — V1 simple et extensible
-
-Centraliser les droits pour éviter les `if plan === "team"` dispersés dans le front,
-**sans construire dès la V1 un moteur de plans générique** pour tous les futurs produits.
-API centrale simple, retournant un objet typé :
+Objet retourné, réconcilié avec les états A/B/C/D :
 
 ```ts
 {
-  coverage: "club_plan" | "team_plan" | "team_trial" | "grace" | "expired" | "none",
+  coverage: "club_plan" | "team_plan" | "team_trial" | "discovery"
+          | "grace" | "expired" | "none",
+  accessState: "A" | "B" | "C" | "D",
+
+  // Gestion et création — vrai en A et B uniquement
   canManageTeam: boolean,
+  canManageTeamContent: boolean,      // créer/modifier événements, convocations,
+                                      // compositions, sondages, besoins, documents
   canInviteTeamStaff: boolean,
   canManagePlayers: boolean,
   canCreateEvents: boolean,
   canUseTeamWall: boolean,
-  canUseClubFeatures: boolean,
-  canManageClubIdentity: boolean,   // §8 — distinct de canUseClubFeatures
+
+  // Participation — reste vrai en C
+  canRespondToExistingObjects: boolean, // convocation, disponibilité, sondage, besoin
+  canAcceptTeamInvitation: boolean,
+
+  // Périmètre club
+  canUseClubFeatures: boolean,        // mur club, stats consolidées, groupes transverses…
+  canManageClubIdentity: boolean,     // nom, logo, sport — distinct du précédent
+
+  // Modules
   canCreateTournament: boolean,
-  maxPlayers: number | null         // null = illimité
+
+  // Quotas
+  maxPlayers: number | null           // null = illimité
 }
+```
+
+Correspondance états → champs :
+
+```text
+A : tout à true (selon l'offre : canUseClubFeatures false hors offre Club)
+B : identique à A, plus une alerte au responsable de facturation
+C : canManageTeam/…/canUseTeamWall = false
+    canRespondToExistingObjects = true, canAcceptTeamInvitation = true
+D : tout à false sauf la consultation
 ```
 
 **Limite de joueurs — portée par l'offre Découverte, PAS par l'offre Équipe :**
 
 ```text
-Offre Découverte : max_players configurable, recommandé à 15 (valeur à valider — §24)
-Offre Équipe     : max_players = null (illimité)
-Offre Club       : max_players = null (illimité)
+Offre Découverte : maxPlayers configurable, recommandé à 15 (à valider — §21)
+Offre Équipe     : maxPlayers = null (illimité)
+Offre Club       : maxPlayers = null (illimité)
 ```
-
-Règles de la limite (quand elle s'applique) :
-
-- contrôle **côté serveur**, jamais uniquement dans l'interface, jamais codé en dur dans
-  les écrans ; désactivable avec `null` ;
-- compter uniquement les **joueurs actifs** de l'équipe ; ne pas compter les joueurs
-  archivés ou supprimés ; définir le comportement des joueurs temporairement inactifs ;
-- empêcher le contournement archiver/restaurer en boucle ;
-- appliquer la même règle à la création manuelle, à l'import CSV et aux transferts entre
-  équipes ;
-- les invitations de parents ne comptent jamais comme des joueurs ;
-- coaches et staff restent illimités, y compris en Découverte (sauf décision commerciale
-  contraire) ;
-- à la limite atteinte : conserver tous les joueurs présents, bloquer ajout et import,
-  ne pas bloquer la consultation ni le fonctionnement, afficher un message commercial —
-  « Vous avez atteint la limite de 15 joueurs de l'offre Découverte. Passez à l'offre
-  Équipe pour ajouter un nombre illimité de joueurs… » — avec les boutons
-  « Passer à l'offre Équipe — 9,99 €/mois » et « Découvrir l'offre Club ».
 
 Fonctionnalités incluses dans l'offre Équipe : gestion d'équipe, joueurs (illimités),
 parents/responsables légaux, staff (illimité), événements, entraînements, matchs,
 convocations et réponses, présences, compositions, disponibilités joueurs et staff,
 besoins liés aux événements, communication et mur d'équipe, mur staff, sondages,
-notifications, emails transactionnels, documents, calendrier, statistiques
-individuelles/équipe déjà disponibles, import de joueurs, invitations
-parents/joueurs/coaches.
+notifications, emails transactionnels, documents, calendrier, statistiques déjà
+disponibles, import de joueurs, invitations.
 
-Exclusions (offre Club ou modules séparés) : mur général du club, tableau de bord et
-statistiques consolidées, groupes transverses, communication club entière, gestion
-centralisée de tous les membres et rôles, réunions Club, documents communs au club,
-gestion financière globale, CRM, sponsoring, modules premium futurs, IA réservée à
-d'autres offres, gestion de ligue/championnat, création et gestion de tournois.
+Exclusions : mur général du club, statistiques consolidées, groupes transverses,
+communication club entière, gestion centralisée des membres et rôles, réunions Club,
+documents communs au club, gestion financière globale, CRM, sponsoring, modules premium
+futurs, IA réservée à d'autres offres, ligue/championnat, création et gestion de tournois.
 
-## 8. Droits du club sous offre Équipe
+## 9. Droits du club sous offre Équipe
 
-Un club en `billing_mode = 'per_team'` doit pouvoir gérer le minimum nécessaire à son
-identité et à ses équipes, sans débloquer l'administration Club complète. **Éviter un
-`can_manage_club = false` trop large** qui empêcherait de modifier le nom ou le logo.
+Un club en `billing_mode = 'per_team'` gère le minimum nécessaire à son identité et à ses
+équipes. **Éviter un `can_manage_club = false` trop large** qui empêcherait de modifier le
+nom ou le logo.
 
-Autorisé (`canManageClubIdentity`) :
+Autorisé (`canManageClubIdentity`) : nom, logo, sport, informations publiques minimales,
+liste des équipes couvertes, page de facturation des équipes selon permissions.
 
-- nom du club, logo, sport ;
-- informations publiques minimales ;
-- liste des équipes couvertes ;
-- accès à la page de facturation des équipes selon les permissions.
+Bloqué (`canUseClubFeatures`) : mur général, statistiques consolidées, groupes
+transverses, communication globale, réunions Club, gestion centralisée des membres,
+fonctionnalités financières globales, création de tournois via l'abonnement Club.
 
-Bloqué (`canUseClubFeatures`) :
+## 10. Recherche de club et rattachement — périmètre V1
 
-- mur général du club, statistiques consolidées, groupes transverses, communication
-  globale, réunions Club, gestion centralisée de tous les membres, fonctionnalités
-  financières globales, création de tournois via l'abonnement Club.
+Pour éviter la prolifération de doublons, l'onboarding propose de rechercher un club
+existant avant d'en créer un.
 
-## 9. Tournois
+**Périmètre V1 strictement limité à :**
 
-- L'offre Équipe ne permet ni création, ni administration, ni inscriptions, ni génération
-  de groupes, ni gestion de matchs, ni classement d'un tournoi.
-- Une équipe inscrite ou invitée à un tournoi tiers peut consulter et utiliser les
-  fonctions qui la concernent (participation autorisée).
-- `can_create_tournament` continue de s'appuyer sur `club_has_active_subscription`, dont
-  la sémantique ne change pas (§6) ; avec le trigger d'essai ajusté pour les clubs
-  `per_team` (§3), aucun déblocage accidentel — à verrouiller par des tests de
-  régression explicites.
-- À la tentative de création : écran explicatif (pas d'erreur technique ni de page vide),
-  avec bouton d'upsell adapté (« Découvrir l'offre Tournoi » / « Activer le module
-  Tournoi » / « Contacter Clubero ») — les offres tournoi payantes existent déjà
-  (`tournament_entitlements`, pass). Tracker `tournament_upsell_viewed`.
+- recherche d'un club existant ;
+- suggestion limitée (nombre de résultats plafonné) ;
+- demande de rattachement ;
+- création d'un club distinct si la suggestion est incorrecte ;
+- signalement manuel d'un doublon à Clubero.
 
-## 10. Essai gratuit
+**Hors V1 :** le rapprochement complet de deux clubs et toute fusion impliquant des
+changements transversaux de `club_id`. Aucune fusion automatique ni semi-automatique.
+Le rapprochement de clubs devient un chantier ultérieur indépendant.
 
-- `trial_duration_days` configurable. **Décisions à valider (§24) :** durée de l'essai
-  Équipe (l'essai Club actuel est de 14 jours, le souhait initial était 30) et
-  articulation entre l'essai Équipe et l'offre Découverte gratuite (à la fin de l'essai :
-  lecture seule, ou bascule vers les limites Découverte ?).
-- L'essai Équipe est créé par le parcours de souscription Équipe côté serveur — pas par
-  le trigger sur `clubs` (qui ne s'applique pas aux clubs `per_team`).
-- Anti-abus côté serveur : par exemple un seul essai Équipe par compte et/ou par client
-  Stripe ; validation manuelle si comportement suspect. Éviter la création en série
-  d'équipes uniquement pour cumuler des essais.
-- Fin d'essai sans paiement : conserver toutes les données, passer l'équipe en lecture
-  seule (ou en Découverte selon la décision), permettre la consultation, bloquer
-  création/modification, afficher un bouton de réactivation. Ne jamais supprimer de
-  données automatiquement.
-- Réutiliser le mécanisme de rappels d'essai (`trial-reminders`).
+**Exigences de sécurité de l'endpoint de recherche :**
 
-## 11. Responsable de facturation
+- rate-limité avec un comportement **fail-closed** (le helper existant est fail-open —
+  §1 — donc variante dédiée obligatoire) ;
+- longueur minimale de recherche imposée ;
+- nombre de résultats limité ;
+- **uniquement les données publiques strictement nécessaires** ;
+- ne jamais exposer membres, emails, rôles, facturation ni équipes privées ;
+- journalisation des comportements suspects ;
+- demandes de rattachement créées **côté serveur**.
 
-**Règle : une `team_subscription` possède exactement un `billing_owner_user_id` actif à
-tout instant.**
+Réponse publique réduite à :
 
-Le responsable de facturation : a créé la souscription, paie, accède au portail Stripe,
-change la périodicité, annule, réactive. Il ne reçoit **aucun droit sportif ou
-administratif supplémentaire** ; réciproquement, être coach ne donne pas accès à la
-facturation. Permission dédiée `can_manage_team_billing` (payeur, propriétaire de
-l'équipe, admin autorisé, ou après transfert explicite).
+```text
+nom public
+logo public éventuel
+sport
+ville approximative
+token ou identifiant opaque de demande
+```
 
-Transfert de responsabilité — transactionnel et sécurisé :
+## 11. Offre Découverte : quotas et fin d'essai
 
-- vérifier l'éligibilité du nouveau responsable (membre autorisé de l'équipe/du club) ;
-- mettre à jour la responsabilité côté Clubero **sans recréer la souscription Stripe** ;
-- journaliser le transfert (audit) ;
-- notifier l'ancien et le nouveau responsable ;
-- empêcher le départ du payeur tant que le transfert (ou l'annulation) n'est pas terminé :
-  « Vous êtes actuellement responsable de la facturation de cette équipe. Transférez
-  d'abord la responsabilité à un autre membre autorisé ou annulez l'abonnement. »
+### 11.1 Quotas V1
 
-Le départ d'un coach non-payeur n'a aucun impact sur la souscription.
-Ne jamais exposer aux autres coaches : derniers chiffres du moyen de paiement, factures,
-adresse de facturation, identifiants Stripe du payeur.
+```text
+1 équipe Découverte maximum par utilisateur
+2 équipes Découverte maximum par club
+1 essai Équipe maximum par utilisateur
+```
 
-## 12. Passage à l'offre Club — Cas A : même club, changement de couverture
+### 11.2 Éligibilité à la bascule en fin d'essai
+
+La bascule automatique vers Découverte n'est autorisée que si **les deux quotas** sont
+respectés au moment de la fin d'essai :
+
+- le club possède moins de 2 équipes Découverte actives ;
+- le créateur ou bénéficiaire de l'équipe ne possède pas déjà une équipe Découverte
+  active.
+
+Si l'un des quotas est atteint :
+
+```text
+fin d'essai
+→ conservation intégrale des données
+→ équipe en lecture seule (état C)
+→ proposition Offre Équipe ou Offre Club
+```
+
+**Aucun grandfathering ne permet de dépasser les quotas Découverte.**
+
+Exemple :
+
+```text
+U13 — Découverte, Coach 1
+U15 — Découverte, Coach 2
+U17 — essai créé par Coach 1
+
+Fin de l'essai U17 : quota club 2/2 atteint ET quota Coach 1 atteint
+→ bascule refusée, U17 passe en lecture seule
+```
+
+### 11.3 Atomicité
+
+L'évaluation des quotas et la bascule doivent être **transactionnelles avec verrou**
+(deux fins d'essai simultanées dans un même club ne doivent jamais produire 3 équipes
+Découverte). Stratégie détaillée en Lot 0 bis §0 bis.1.2.
+
+### 11.4 Friction assumée et annoncée
+
+Un coach seul qui crée une deuxième équipe doit choisir immédiatement l'offre Équipe
+payante, sauf si cette équipe est créée et portée par un autre coach éligible du même
+club. **Cette restriction est intentionnelle et doit être annoncée avant la fin du
+wizard**, pas découverte à la fin de l'essai. Le message distingue les deux causes
+(quota utilisateur vs quota club), car la solution proposée diffère.
+
+## 12. Limite de joueurs : contrôle atomique obligatoire
+
+Un contrôle applicatif `count` puis `insert` est **interdit** : il ne résiste pas aux
+écritures concurrentes.
+
+Exigences :
+
+- vérification et insertion dans **une même transaction**, avec verrou approprié sur
+  l'équipe ; RPC ou fonction transactionnelle comme seul chemin d'ajout ;
+- trigger de défense en profondeur en filet ;
+- import CSV traité comme un **lot cohérent** — recommandation : refuser le lot avant
+  insertion s'il dépasserait le quota, plutôt que des erreurs ligne par ligne ;
+- test obligatoire : deux insertions concurrentes sur une équipe à 14 joueurs, quota 15
+  → **jamais plus de 15 joueurs actifs**.
+
+Règles de comptage : compter les joueurs **actifs** ; ne pas compter les joueurs
+supprimés ; définir le comportement des joueurs temporairement inactifs ; empêcher le
+contournement archiver/restaurer en boucle ; appliquer la même règle à la création
+manuelle, à l'import CSV et aux transferts entre équipes ; les invitations de parents ne
+comptent jamais ; coaches et staff illimités y compris en Découverte.
+
+À la limite atteinte : conserver tous les joueurs présents, bloquer ajout et import, ne
+pas bloquer la consultation, afficher — « Vous avez atteint la limite de 15 joueurs de
+l'offre Découverte. Passez à l'offre Équipe pour ajouter un nombre illimité de joueurs… »
+— avec « Passer à l'offre Équipe — 9,99 €/mois » et « Découvrir l'offre Club ».
+
+Stratégie complète en Lot 0 bis §0 bis.2 (dont la définition du « joueur actif », qui
+doit composer avec l'absence d'état « archivé » dans `players`).
+
+## 13. Couverture, précédence et stricte séparation Club / Équipe
+
+Précédence : (1) souscription Club active ou exemption Club → couverture Club ;
+(2) sinon `team_subscription` active ou en essai → couverture Équipe ; (3) sinon
+Découverte si les quotas le permettent ; (4) sinon grâce, expiré ou aucune couverture.
+
+**Règle stricte :** `club_has_active_subscription(club_id)` doit continuer à signifier
+**exclusivement** « le club possède une vraie offre Club active ou une exemption Club
+valide ». La couverture Équipe utilise des fonctions distinctes. Ne jamais considérer
+qu'un club a une souscription active parce qu'une de ses équipes a une
+`team_subscription` — sous peine de débloquer la création de tournois, les
+fonctionnalités centrales, les groupes transverses et les statistiques consolidées.
+
+**Anti double facturation, dans les deux sens.** Quand une offre Club devient active :
+bloquer tout nouvel achat Équipe pour ses équipes ; identifier les `team_subscriptions`
+vivantes et appliquer la stratégie Stripe retenue ; garantir la continuité de couverture ;
+opération idempotente. Quand une offre Club est résiliée : **aucune souscription Équipe
+n'est recréée automatiquement** — consentement et checkout explicites.
+
+Le front-end ne décide jamais seul d'un droit payant.
+
+## 14. Essai gratuit
+
+- `trial_duration_days` configurable. Décisions ouvertes en §21.
+- L'essai Équipe est créé par le parcours de souscription côté serveur — pas par le
+  trigger sur `clubs` (qui ne s'applique pas aux clubs `per_team`).
+- Anti-abus côté serveur : un seul essai Équipe par utilisateur (§11.1) ; validation
+  manuelle en cas de comportement suspect.
+- Fin d'essai : bascule Découverte **si et seulement si** les quotas le permettent (§11.2),
+  sinon état C. Jamais de suppression automatique de données.
+- Réutiliser le mécanisme de rappels d'essai existant.
+
+## 15. Lecture seule à portée équipe
+
+Le verrouillage actuel est club entier (`src/routes/_authenticated.tsx`). Ajouter une
+couche à portée **équipe**, active pour les clubs `per_team`, implémentant les états
+A/B/C/D (§7) : garde dans le layout d'équipe, application serveur via
+`team_has_paid_access` et les entitlements dans les server functions de mutation, RLS en
+défense en profondeur sur les chemins critiques.
+
+Point d'attention : les mutations « réponse » (convocation, disponibilité, sondage,
+besoin) et l'acceptation d'invitation doivent rester autorisées en état C — elles ne
+passent donc pas par la même garde que les mutations de gestion.
+
+## 16. Responsable de facturation
+
+**Une `team_subscription` possède exactement un `billing_owner_user_id` actif à tout
+instant.**
+
+Le responsable paie, accède au portail Stripe, change la périodicité, annule, réactive.
+Il ne reçoit **aucun droit sportif ou administratif supplémentaire** ; être coach ne donne
+pas accès à la facturation. Permission dédiée `can_manage_team_billing`.
+
+Transfert — transactionnel et sécurisé : vérifier l'éligibilité du nouveau responsable ;
+mettre à jour côté Clubero **sans recréer la souscription Stripe** ; journaliser ;
+notifier l'ancien et le nouveau responsable ; empêcher le départ du payeur tant que le
+transfert ou l'annulation n'est pas terminé.
+
+Le départ d'un coach non-payeur n'a aucun impact. Ne jamais exposer aux autres coaches :
+derniers chiffres du moyen de paiement, factures, adresse de facturation, identifiants
+Stripe.
+
+## 17. Passage à l'offre Club — Cas A : même club
 
 Si le club a été créé lors de l'onboarding Équipe, le passage à l'offre Club **ne
-nécessite ni nouvel espace club, ni conversion, ni déplacement d'équipes, ni changement
-de `club_id`**. C'est un simple changement de couverture commerciale :
+nécessite ni nouvel espace, ni conversion, ni déplacement d'équipes, ni changement de
+`club_id`** :
 
 ```text
-Avant :
-Club USAG (billing_mode = per_team)
-├── U13 — team_subscription active
-└── U15 — team_subscription active
-
-Après :
-Club USAG (billing_mode = club) — subscription Club active
-├── U13 — couverte par le Club
-└── U15 — couverte par le Club
+Avant : Club USAG (per_team) ├── U13 team_subscription ├── U15 team_subscription
+Après : Club USAG (club) — subscription Club active ├── U13 couverte ├── U15 couverte
 ```
 
-Déroulé : souscription Club sur le club existant (checkout Club actuel) → à confirmation
-(webhook), arrêt idempotent des `team_subscriptions` selon la règle commerciale retenue →
-couverture continue garantie pendant la transition → affichage clair : date de fin des
-abonnements Équipe, montant facturé, crédit/prorata éventuel, date de début de la
-couverture Club. Stripe est la source de vérité ; pas de calcul maison de proratas ;
-ne jamais promettre un remboursement avant le résultat Stripe.
+Déroulé : checkout Club existant → à confirmation par webhook, arrêt idempotent des
+`team_subscriptions` selon la règle retenue → couverture continue garantie → affichage
+des dates de fin, montant facturé, crédit/prorata éventuel, début de couverture Club.
+Stripe est la source de vérité ; pas de calcul maison de proratas ; ne jamais promettre
+un remboursement avant le résultat Stripe.
 
-## 13. Transfert d'une équipe vers un autre club — Cas B uniquement
+## 18. Transfert d'une équipe vers un autre club — Cas B
 
-Le parcours de « rattachement » ne concerne que le cas où une équipe créée dans un autre
-espace doit rejoindre un club existant. Il exige :
+Concerne uniquement une équipe créée dans un autre espace rejoignant un club existant.
+Exige : invitation explicite du club ; acceptation explicite d'un coach/responsable
+autorisé de l'équipe ; affichage des conséquences (historique, joueurs, parents,
+événements, convocations, documents conservés ; les autres coaches restent membres) ;
+changement de `club_id` avec contrôle RLS ; idempotence du traitement financier.
 
-- une invitation explicite du club : « Le club FC Exemple vous invite à rattacher
-  l'équipe U13 à son espace Clubero » ;
-- l'acceptation explicite d'un coach/responsable autorisé de l'équipe (personne d'autre
-  ne peut transférer une équipe) ;
-- l'affichage des conséquences avant validation : historique, joueurs, parents,
-  événements, convocations, documents conservés ; les autres coaches restent membres ;
-  couverture et facturation futures selon le club cible ;
-- le changement de `club_id` avec contrôle RLS et conservation des données ;
-- l'idempotence du traitement financier associé.
+**Conflit d'équipe équivalente dans le club cible (deux « U13 ») — V1 : pas de fusion.**
+Détecter le conflit, **bloquer** le transfert, demander à un administrateur de renommer,
+archiver ou traiter manuellement l'une des équipes. Ne jamais fusionner automatiquement
+joueurs, événements, membres et documents.
 
-**Conflit d'équipe équivalente déjà existante dans le club cible (ex. deux « U13 ») —
-V1 : pas de fusion automatique.** Comportement : détecter le conflit, bloquer le
-transfert, demander à un administrateur de renommer, archiver ou traiter manuellement
-l'une des équipes. Ne jamais fusionner automatiquement joueurs, événements, membres et
-documents.
+**La fusion de clubs entiers est hors V1** (§10).
 
-## 14. Utilisateurs multi-clubs
+## 19. Sécurité, RLS et rétrocompatibilité
 
-Le modèle supporte un même utilisateur présent dans plusieurs organisations :
+RLS strictes sur les nouvelles tables (helpers SECURITY DEFINER) ; REVOKE au niveau
+colonne sur les identifiants Stripe. Être payeur ne donne pas accès aux données
+personnelles/médicales des joueurs, aux autres équipes, ni à l'administration du club.
 
-```text
-Utilisateur A
-├── Coach U13 dans Club A
-├── Coach U15 dans Club B
-└── Responsable de facturation d'une équipe dans Club C
-```
-
-Les permissions sportives et financières sont évaluées **séparément pour chaque club et
-chaque équipe**. Ne jamais déduire des droits de facturation d'un rôle global de coach ou
-d'administrateur.
-
-## 15. Paiement échoué et période de grâce
-
-Réutiliser l'enum `subscription_status` existant. Période de grâce configurable : alerte
-au responsable de facturation, mise à jour du moyen de paiement (réutiliser
-`createUpdatePaymentMethodSession` / update-card-dialog), pas de coupure immédiate si la
-règle commerciale le permet. Après la grâce : lecture seule **à portée équipe** (le
-verrouillage actuel est club entier — il faut une déclinaison par équipe), données
-conservées, membres non retirés, invitations et historique intacts.
-
-## 16. Interface de facturation
-
-Page « Facturation et abonnements » listant chaque équipe et sa couverture :
-
-```text
-U13 — Offre Équipe mensuelle — 9,99 €/mois — Active — Prochaine échéance : 15 août 2026
-U15 — Offre Équipe annuelle — 99,99 €/an — Active — Prochaine échéance : 4 juillet 2027
-U18 — Couverte par l'offre Club — Aucune facturation Équipe
-```
-
-Selon les permissions : plan, statut, essai, responsable de facturation, échéance,
-périodicité, boutons gérer / changer de responsable / annuler / réactiver, et pour le
-Cas B un point d'entrée de rattachement. Plus « Ajouter une équipe — 9,99 €/mois ou
-99,99 €/an » et l'upsell Club informatif.
-
-S'inspirer de `src/routes/_authenticated/admin/billing.tsx`, mais avec une autorisation
-par `billing_owner` / `can_manage_team_billing` — **pas** par « club admin » (toutes les
-fonctions de `billing.functions.ts` sont actuellement verrouillées club-admin : nouveau
-chemin d'autorisation requis, pas un contournement).
-
-Prévoir la visibilité superadmin (console `src/routes/superadmin/billing.tsx`) et décider
-si l'exemption (`exempt_from_billing`) existe aussi pour les souscriptions Équipe
-(recommandé — §24).
-
-## 17. Sécurité et RLS
-
-- RLS strictes sur toutes les nouvelles tables (helpers SECURITY DEFINER), REVOKE au
-  niveau colonne sur les identifiants Stripe de `team_subscriptions` (comme sur
-  `subscriptions`).
-- Être payeur ne donne pas accès aux données personnelles/médicales des joueurs, aux
-  autres équipes, ni à l'administration du club.
-
-**Matrice de tests RLS obligatoire** — pour chaque nouvelle table, fonction ou policy,
-couvrir au minimum les profils :
-
-anonyme ; authentifié sans lien avec l'équipe ; joueur de l'équipe ; parent d'un joueur ;
-coach de l'équipe ; assistant coach ; dirigeant du même club ; administrateur du même
+**Matrice de tests RLS obligatoire** — 13 profils : anonyme ; authentifié sans lien ;
+joueur ; parent ; coach de l'équipe ; assistant coach ; dirigeant du club ; admin du
 club ; coach d'une autre équipe du même club ; membre d'un autre club ; responsable de
 facturation ; ancien responsable après transfert ; superadmin.
 
@@ -542,185 +529,156 @@ Un billing owner sans rôle sportif ne gagne aucun accès aux données des joueu
 Un membre d'un autre club ne voit aucune team_subscription.
 Les identifiants Stripe ne sont jamais lisibles directement côté client.
 Une offre Équipe ne permet jamais la création d'un tournoi.
+La recherche publique de club n'expose aucun membre, email, rôle ni donnée de facturation.
 ```
 
-Pour chaque policy : au moins un test autorisé, un test refusé, un test cross-club, un
-test après changement de rôle ou de responsable. Tests dans `tests/rls/`
-(`bun run test:rls`) ; `bun run check:guards` sur les nouvelles server functions.
+Pour chaque policy : un test autorisé, un refusé, un cross-club, un après changement de
+rôle/responsable.
 
-## 18. Migrations rétrocompatibles
+**Migrations rétrocompatibles :** ne pas modifier la contrainte UNIQUE sur
+`subscriptions.club_id` ; ne pas changer la signification de
+`club_has_active_subscription` (hors correctif `exempt_until` encadré par le Lot 0 bis) ;
+ne pas casser les webhooks Club ; ne pas modifier les parcours tournoi hors ajustement
+ciblé ; ne pas rendre nullable `teams.club_id` ; ne pas renommer ni supprimer de colonnes
+sans migration progressive ; prévoir un rollback par lot critique.
 
-Toutes les migrations doivent préserver le fonctionnement actuel de l'offre Club :
+## 20. Webhooks, notifications, i18n, tracking
 
-- ne pas modifier la contrainte UNIQUE sur `subscriptions.club_id` ;
-- ne pas changer la signification de `club_has_active_subscription` ;
-- ne pas casser les webhooks Club existants ;
-- ne pas modifier les parcours tournoi hors ajustement ciblé des droits ;
-- ne pas rendre nullable `teams.club_id` ;
-- ne pas renommer ni supprimer de colonnes existantes sans migration progressive ;
-- prévoir un rollback ou une stratégie de retour arrière pour chaque lot critique
-  (migrations additives, feature flag de lancement).
-
-## 19. Webhooks Stripe
-
-Étendre le handler existant (`stripe-webhook-handler.server.ts`) — ne pas en créer un
-second. Branche `metadata.purpose = "team_plan"` + `metadata.team_id` (métadonnées posées
-sur la souscription Stripe, pour que `customer.subscription.updated/deleted` les portent).
-La table `stripe_webhook_events` existe déjà pour l'idempotence.
-
-Événements : `checkout.session.completed`,
+**Webhooks.** Étendre le handler existant — ne pas en créer un second. Branche
+`metadata.purpose = "team_plan"` + `metadata.team_id` posées sur la souscription.
+Idempotence par `stripe_webhook_events`. Événements :
+`checkout.session.completed`,
 `customer.subscription.created/updated/deleted/trial_will_end/paused/resumed`,
-`invoice.payment_succeeded`, `invoice.payment_failed` (noms alignés sur ceux déjà
-traités). Pour chaque événement : vérifier la signature, dédupliquer par `event_id`,
-journaliser, rattacher précisément à l'équipe via les metadata, mettre à jour
-`team_subscriptions`, ne jamais faire confiance aux données client.
+`invoice.payment_succeeded`, `invoice.payment_failed`.
 
-## 20. Notifications
+**Notifications** (infra existante) : début et fin d'essai, **refus de bascule Découverte
+pour quota atteint**, activation, équipe supplémentaire, paiement réussi/échoué, moyen de
+paiement à mettre à jour, annulation programmée/effective, passage en lecture seule,
+transfert de responsabilité (ancien ET nouveau), invitation d'un coach, transfert
+d'équipe, fin de la facturation Équipe après passage Club. Les notifications financières
+vont prioritairement au responsable de facturation.
 
-Réutiliser l'infrastructure existante (emails transactionnels, push, rappels d'essai,
-`subscription-notify.server.ts`) pour : début et fin d'essai, activation, création d'une
-équipe supplémentaire, paiement réussi/échoué, moyen de paiement à mettre à jour,
-annulation programmée/effective, passage en lecture seule, transfert de responsabilité
-(ancien ET nouveau responsable), invitation d'un coach, transfert d'équipe (Cas B),
-fin de la facturation Équipe après passage à l'offre Club.
+**i18n.** Toutes les chaînes dans les 7 locales, `bun run check:i18n` vert. Mettre à jour
+`src/routes/pricing.tsx` et le marketing avec la grille Découverte / Équipe / Club
+(`src/locales/fr/marketing.json` mentionne des offres inexistantes en code).
 
-Les notifications financières vont prioritairement au responsable de facturation ; les
-autres coaches ne reçoivent que ce qui les concerne fonctionnellement.
-
-## 21. i18n et marketing
-
-- Toutes les chaînes UI en i18n, dans les **7 locales**, `bun run check:i18n` vert.
-- Mettre à jour la page pricing (`src/routes/pricing.tsx`) et les textes marketing avec
-  la grille à trois offres (Découverte / Équipe / Club). Attention :
-  `src/locales/fr/marketing.json` mentionne déjà des offres (« Découverte »,
-  « Fédération ») qui n'existent pas en code — aligner la grille affichée sur les offres
-  réelles.
-
-## 22. Tracking produit
-
-Événements analytiques sans données sensibles :
+**Tracking** (sans données sensibles) :
 
 ```text
-team_plan_checkout_started
-team_plan_activated
-team_plan_trial_started
-team_plan_trial_expired
-additional_team_created
-team_subscription_cancelled
-team_billing_owner_changed
-team_transferred_to_other_club
-club_plan_upgraded_from_team_plan
-team_feature_blocked
-discovery_player_limit_reached
-tournament_upsell_viewed
+team_plan_checkout_started        additional_team_created
+team_plan_activated               team_subscription_cancelled
+team_plan_trial_started           team_billing_owner_changed
+team_plan_trial_expired           team_transferred_to_other_club
+discovery_switch_granted          club_plan_upgraded_from_team_plan
+discovery_switch_refused_quota    team_feature_blocked
+discovery_player_limit_reached    tournament_upsell_viewed
+club_search_performed             club_attach_requested
 ```
 
-Objectifs : mesurer la création de deuxièmes équipes, le multi-équipes payant, la
-conversion vers l'offre Club, les fonctionnalités bloquées les plus demandées, l'impact
-de la limite Découverte, les tentatives d'accès au module Tournoi.
+## 21. Décisions à valider avant implémentation
 
-## 23. Critères d'acceptation
+1. Durée de l'essai Équipe : 14 jours (aligné Club) ou 30 jours ?
+2. Périmètre de l'offre Découverte : dans ce chantier ou chantier séparé ?
+3. Valeur de la limite Découverte (recommandation : 15 joueurs actifs).
+4. Porteur du quota Découverte : `teams.created_by` à créer, ou
+   `discovery_owner_user_id` sur la ligne de couverture (recommandé) ?
+5. Libération d'un quota Découverte : bascule rétroactive automatique (non recommandé)
+   ou demande explicite ?
+6. Règle d'arrêt des souscriptions Équipe au passage Club : fin de période ou prorata ?
+7. Exemption de facturation étendue aux souscriptions Équipe ?
+8. Séquencement du correctif `exempt_until` : avant le Lot 1 (recommandé) ou en parallèle ?
+9. Lancement derrière un feature flag ?
+10. Seuil et forme de l'upsell Club ; modèle commercial de l'upsell Tournoi.
+11. Import CSV : lot atomique strict (recommandé) ou option « importer ce qui rentre » ?
+
+## 22. Critères d'acceptation
 
 1. L'onboarding Équipe crée un vrai club visible + une équipe ; aucune équipe isolée ni
    club invisible du point de vue de l'utilisateur.
-2. Une équipe peut avoir un nombre illimité de coaches et de membres du staff ; les
-   coaches invités ne paient rien individuellement.
+2. Coaches et staff illimités ; les coaches invités ne paient rien individuellement.
 3. Une souscription Équipe couvre exactement une équipe ; un utilisateur peut payer
-   plusieurs équipes avec des périodicités différentes, gérées depuis le même compte.
-4. **L'offre Équipe n'a aucune limite de joueurs** ; la limite configurable appartient à
-   l'offre Découverte, contrôlée côté serveur, sur les joueurs actifs uniquement.
-5. Permissions sportives et permissions de facturation strictement séparées ; évaluées
-   par club et par équipe pour les utilisateurs multi-clubs.
-6. Chaque `team_subscription` a exactement un billing owner actif ; le transfert est
-   transactionnel, journalisé, notifié, sans recréation de la souscription Stripe ; le
-   départ du payeur exige un transfert ou une annulation préalable ; le départ d'un
-   non-payeur n'a aucun impact.
-7. `club_has_active_subscription` conserve sa sémantique exclusive « offre Club active ou
-   exemption Club » ; la couverture Équipe ne l'influence jamais.
-8. L'offre Équipe ne permet jamais de créer ni d'administrer un tournoi (y compris via le
-   trigger d'essai sur les clubs `per_team`) ; la participation à un tournoi tiers reste
-   possible.
-9. Le club sous offre Équipe peut gérer son identité (nom, logo, sport) sans accéder aux
-   fonctionnalités centrales Club.
-10. Le passage à l'offre Club sur le même club ne change aucun `club_id`, ne déplace
+   plusieurs équipes avec des périodicités différentes depuis le même compte.
+4. **L'offre Équipe n'a aucune limite de joueurs** ; la limite appartient à Découverte.
+5. **La limite de joueurs résiste à la concurrence** : deux insertions simultanées sur
+   une équipe à 14 joueurs (quota 15) ne produisent jamais 16 joueurs actifs.
+6. **Un import CSV dépassant le quota est refusé avant insertion**, sans insertion
+   partielle.
+7. **La bascule Découverte en fin d'essai n'a lieu que si les deux quotas sont
+   respectés** (moins de 2 équipes Découverte actives dans le club ET aucune équipe
+   Découverte active pour le bénéficiaire) ; sinon lecture seule, données conservées,
+   upsell affiché. Aucun grandfathering.
+8. **La friction multi-équipes est annoncée avant la fin du wizard**, avec un message
+   distinguant quota utilisateur et quota club.
+9. **Les réponses aux objets existants et l'acceptation d'invitation restent autorisées
+   en état C**, alors que la création et la gestion sont bloquées.
+10. Permissions sportives et de facturation strictement séparées, évaluées par club et
+    par équipe pour les utilisateurs multi-clubs.
+11. Chaque `team_subscription` a exactement un billing owner actif ; transfert
+    transactionnel, journalisé, notifié, sans recréation Stripe ; départ du payeur
+    impossible sans transfert ou annulation ; départ d'un non-payeur sans impact.
+12. `club_has_active_subscription` conserve sa sémantique exclusive ; la couverture
+    Équipe ne l'influence jamais.
+13. L'offre Équipe ne permet jamais de créer ni d'administrer un tournoi ; la
+    participation à un tournoi tiers reste possible.
+14. Le club sous offre Équipe peut gérer son identité sans accéder aux fonctionnalités
+    centrales Club.
+15. Le passage à l'offre Club sur le même club ne change aucun `club_id`, ne déplace
     aucune donnée, arrête les souscriptions Équipe de façon idempotente et sans trou de
-    couverture ; aucune double facturation Équipe + Club.
-11. À la résiliation d'une offre Club, aucune souscription Équipe n'est recréée sans
+    couverture ; aucune double facturation.
+16. À la résiliation d'une offre Club, aucune souscription Équipe n'est recréée sans
     consentement et checkout explicites.
-12. Le transfert d'équipe vers un autre club (Cas B) exige invitation + acceptation
-    autorisée ; les conflits d'équipes équivalentes bloquent le transfert (pas de fusion
-    automatique en V1).
-13. Les droits sont servis par l'API centrale (`get_team_coverage`,
-    `get_team_entitlements`, `team_has_paid_access`) ; aucun contrôle uniquement
-    front-end ne protège une fonctionnalité payante critique.
-14. Les webhooks Stripe sont la source de vérité et idempotents.
-15. Les données sont conservées après expiration ou annulation ; une équipe sans
-    couverture passe en lecture seule à portée équipe (pas club entier).
-16. La souscription Club existante (table, contrainte UNIQUE, webhook, trigger d'essai
-    pour les clubs `billing_mode='club'`) fonctionne sans régression ; les RLS
-    existantes ne régressent pas ; la matrice de tests RLS du §17 passe.
-17. Aucune information Stripe sensible n'est exposée côté client (REVOKE colonne inclus).
-18. `bun run check:i18n`, `bun run check:guards` et `bun run test:rls` passent.
+17. Le transfert d'équipe vers un autre club exige invitation + acceptation autorisée ;
+    les conflits d'équipes bloquent le transfert. **Aucune fusion de clubs en V1.**
+18. **La recherche publique de club est fail-closed, plafonnée en résultats, avec
+    longueur minimale, et n'expose que les données publiques listées au §10.**
+19. **Le correctif `exempt_until` n'est déployé qu'après l'inventaire et les décisions de
+    régularisation du Lot 0 bis.**
+20. Les droits sont servis par l'API centrale ; aucun contrôle uniquement front-end ne
+    protège une fonctionnalité payante critique.
+21. Les webhooks Stripe sont la source de vérité et idempotents.
+22. Les données sont conservées après expiration ou annulation ; lecture seule à portée
+    équipe, pas club entier.
+23. L'offre Club existante fonctionne sans régression ; la matrice RLS du §19 passe.
+24. Aucune information Stripe sensible n'est exposée côté client.
+25. `bun run check:i18n`, `bun run check:guards` et `bun run test:rls` passent.
 
-## 24. Décisions à valider avant implémentation
-
-1. Durée de l'essai Équipe : 14 jours (aligné Club) ou 30 jours ?
-2. Articulation essai Équipe / offre Découverte : fin d'essai → lecture seule, ou bascule
-   vers les limites Découverte ? L'offre Découverte est-elle dans le périmètre de ce
-   chantier ou d'un chantier séparé ?
-3. Valeur de la limite Découverte (recommandation : 15 joueurs actifs).
-4. Règle d'arrêt des souscriptions Équipe au passage à l'offre Club : fin de période ou
-   prorata immédiat (`proration_behavior`) ?
-5. Exemption de facturation (`exempt_from_billing`) étendue aux souscriptions Équipe ?
-6. Lancement derrière un feature flag (`app_flags`) ?
-7. Seuil et forme de l'upsell Club (informatif uniquement).
-8. Modèle commercial du bouton d'upsell Tournoi.
-
-## 25. Étape d'architecture obligatoire avant le code
+## 23. Étape d'architecture obligatoire avant le code
 
 Avant toute implémentation, produire un plan basé sur une **nouvelle vérification du
-dépôt**, contenant :
+dépôt** : schéma SQL ; migrations ; policies RLS et fonctions SECURITY DEFINER ; server
+functions ; événements Stripe et branche webhook ; écrans et routes ; stratégie de
+lecture seule à portée équipe ; impacts onboarding, offre Club, module Tournoi ;
+stratégie i18n ; tests unitaires, intégration, concurrence et RLS ; risques de
+régression ; déploiement et rollback.
 
-1. schéma SQL proposé ;
-2. migrations à créer ;
-3. policies RLS et fonctions SECURITY DEFINER ;
-4. server functions à créer ou modifier ;
-5. événements Stripe et branche webhook ;
-6. écrans et routes concernés ;
-7. stratégie de lecture seule à portée équipe ;
-8. impacts sur l'onboarding ;
-9. impacts sur l'offre Club existante ;
-10. impacts sur le module Tournoi ;
-11. stratégie i18n ;
-12. tests unitaires, intégration et RLS ;
-13. risques de régression ;
-14. stratégie de déploiement et rollback.
+Aucun refactor transversal ni modification de production avant validation.
 
-Aucun refactor transversal ni modification de production avant validation de ce plan.
+## 24. Découpage en lots
 
-## 26. Découpage en lots
-
-- **Lot 0 — Architecture et validation** : audit final du dépôt, modèle de données, flux
-  de couverture, Stripe, RLS, UI et migrations. Aucun code fonctionnel.
+- **Lot 0 — Architecture et validation** : audit final, modèle de données, flux de
+  couverture, Stripe, RLS, UI, migrations. Aucun code fonctionnel.
+- **Lot 0 bis — Investigations bloquantes** : quotas Découverte et éligibilité en fin
+  d'essai ; stratégie atomique de la limite de joueurs ; audit `exempt_until` et
+  décisions de régularisation. Aucun code fonctionnel.
 - **Lot 1 — Modèle de couverture** : `clubs.billing_mode`, `team_subscriptions`,
-  couverture par équipe, helpers d'accès (`get_team_coverage`, `team_has_paid_access`),
-  RLS + REVOKE colonnes Stripe, distinction stricte Club plan / Team plan, ajustement du
-  trigger d'essai, tests de régression `can_create_tournament`.
-- **Lot 2 — Onboarding club + première équipe** : création d'un vrai club, création de la
-  première équipe, choix mensuel/annuel, essai ou checkout, activation, invitation du
-  staff.
+  couverture par équipe, helpers d'accès, états A/B/C/D, RLS + REVOKE, distinction
+  stricte Club/Équipe, ajustement du trigger d'essai, tests de régression tournois.
+- **Lot 2 — Onboarding club + première équipe** : recherche de club sécurisée, création
+  d'un vrai club, première équipe, annonce des quotas, choix mensuel/annuel, essai ou
+  checkout, activation, invitation du staff.
 - **Lot 3 — Stripe et facturation** : branche webhook `team_plan`, portail, changement de
   périodicité, paiement échoué, grâce, annulation, réactivation, notifications.
 - **Lot 4 — Équipes supplémentaires** : plusieurs équipes dans le même club, périodicités
-  mixtes, écran de synthèse, facturation indépendante, upsell offre Club.
-- **Lot 5 — Permissions et restrictions fonctionnelles** : fonctionnalités Équipe,
-  fonctionnalités Club bloquées (avec `canManageClubIdentity`), tournois, lecture seule à
-  portée équipe, i18n, tracking.
+  mixtes, écran de synthèse, facturation indépendante, upsell Club.
+- **Lot 5 — Permissions et restrictions** : entitlements A/B/C/D appliqués, quotas
+  Découverte et limite de joueurs atomique, fonctionnalités Club bloquées, tournois,
+  lecture seule à portée équipe, i18n, tracking.
 - **Lot 6 — Responsable de facturation** : transfert transactionnel, départ du payeur,
   confidentialité, multi-clubs, tests RLS spécifiques.
-- **Lot 7 — Passage du même club vers l'offre Club** : activation de l'offre Club sur le
-  club existant, arrêt idempotent des souscriptions Équipe, absence de changement de
-  `club_id`, maintien continu de la couverture, contrôles Stripe.
-- **Lot 8 — Transfert d'une équipe vers un autre club** : invitation, validation,
-  conflits d'équipes (blocage, pas de fusion), changement éventuel de `club_id`, impact
-  RLS, conservation des données.
+- **Lot 7 — Passage du même club vers l'offre Club** : activation sur le club existant,
+  arrêt idempotent des souscriptions Équipe, absence de changement de `club_id`,
+  continuité de couverture, contrôles Stripe.
+- **Lot 8 — Rattachement d'une équipe à un autre club** (périmètre réduit) : demande de
+  rattachement, validation, détection et **blocage** des conflits d'équipes, changement
+  de `club_id`, impact RLS, conservation des données. **Aucune fusion de clubs ni de
+  données ; le rapprochement de clubs est un chantier ultérieur indépendant.**
