@@ -15,6 +15,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const AudienceInput = z.discriminatedUnion("audience_type", [
   z.object({ audience_type: z.literal("joueurs_equipe"), team_id: z.string().uuid() }),
   z.object({ audience_type: z.literal("parents_equipe"), team_id: z.string().uuid() }),
+  z.object({ audience_type: z.literal("staff_equipe"), team_id: z.string().uuid() }),
   z.object({
     audience_type: z.literal("joueurs_categorie"),
     category_label: z.string().min(1).max(60),
@@ -32,6 +33,7 @@ const AudienceInput = z.discriminatedUnion("audience_type", [
   z.object({ audience_type: z.literal("groupe_personnalise"), group_id: z.string().uuid() }),
   z.object({ audience_type: z.literal("selection_manuelle") }),
 ]);
+
 
 const CreateInput = z
   .object({
