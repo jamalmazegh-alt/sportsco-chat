@@ -310,8 +310,15 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         } else {
           failed += 1;
           if (enqueued?.reason === "suppressed") {
-            suppressedEmails.push(normalizeEmail(target.email));
+            const em = normalizeEmail(target.email);
+            suppressedEmails.push(em);
+            suppressedDetails.push({
+              email: em,
+              reason:
+                (enqueued as { suppressionReason?: string | null }).suppressionReason ?? null,
+            });
           }
+
         }
       } catch (error) {
         await supabaseAdmin
