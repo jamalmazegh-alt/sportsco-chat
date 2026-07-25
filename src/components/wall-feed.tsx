@@ -66,6 +66,13 @@ type Post = {
   reads?: { user_id: string; read_at: string }[];
 };
 type PollOptionResult = { id: string; label: string; votes: number };
+type PollAudience = {
+  audience_type: string;
+  team_id: string | null;
+  group_id: string | null;
+  category_label: string | null;
+  event_id: string | null;
+};
 type PollItem = {
   id: string;
   publication_type: string;
@@ -76,6 +83,7 @@ type PollItem = {
   closed_at: string | null;
   voter_count?: number;
   options?: PollOptionResult[];
+  audiences?: PollAudience[];
 };
 
 const SOURCE_META: Record<
