@@ -68,6 +68,21 @@ type KindKey = Audience["audience_type"];
 
 type ManualPlayer = { id: string; first_name: string | null; last_name: string | null };
 
+const UUID_RE =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+
+function extractPublicationId(res: unknown) {
+  if (!res || typeof res !== "object") return null;
+  const direct = "publicationId" in res ? (res as { publicationId?: unknown }).publicationId : null;
+  const nested =
+    "data" in res && res.data && typeof res.data === "object" && "publicationId" in res.data
+      ? (res.data as { publicationId?: unknown }).publicationId
+      : null;
+  const publicationId =
+    typeof direct === "string" ? direct : typeof nested === "string" ? nested : null;
+  return publicationId && UUID_RE.test(publicationId) ? publicationId : null;
+}
+
 const KIND_META: Record<KindKey, { Icon: LucideIcon }> = {
   educateurs: { Icon: GraduationCap },
   dirigeants: { Icon: Shield },
@@ -220,9 +235,16 @@ function NewPublicationPage() {
         },
       });
     },
-    onSuccess: (res: any) => {
+    onSuccess: (res: unknown) => {
+      const publicationId = extractPublicationId(res);
+      if (!publicationId) {
+        toast.error(
+          t("publications:new.publishError", "Publication créée, mais ouverture impossible"),
+        );
+        return;
+      }
       toast.success(t("publications:new.published", "Publication publiée"));
-      nav({ to: "/publications/$publicationId", params: { publicationId: res.publicationId } });
+      nav({ to: "/publications/$publicationId", params: { publicationId } });
     },
     onError: (e: any) => {
       toast.error(e?.message || t("common.error", "Erreur"));

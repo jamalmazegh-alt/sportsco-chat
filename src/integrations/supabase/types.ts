@@ -7916,6 +7916,31 @@ export type Database = {
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
       }
+      create_publication_atomic: {
+        Args: {
+          _audiences: Json
+          _closes_at: string
+          _club_id: string
+          _content: string
+          _document_ids: Json
+          _email_body: string
+          _event_id: string
+          _manual_member_ids: Json
+          _media_paths: Json
+          _poll_options: Json
+          _poll_visibility: Database["public"]["Enums"]["poll_visibility"]
+          _publication_type: Database["public"]["Enums"]["publication_type"]
+          _publish_to_wall: boolean
+          _send_email: boolean
+          _title: string
+        }
+        Returns: {
+          dispatch_row_id: string
+          new_recipient_count: number
+          publication_id: string
+          recipients_count: number
+        }[]
+      }
       create_support_view_session: {
         Args: {
           _club_id: string
