@@ -166,7 +166,7 @@ function EmailsTab() {
                       </td>
                     </tr>
                     {isOpen && (
-                      <tr key={`${r.id}-detail`} className="bg-muted/20">
+                      <tr className="bg-muted/20">
                         <td colSpan={5} className="px-3 py-3">
                           <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
                             <div>
@@ -187,7 +187,7 @@ function EmailsTab() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
