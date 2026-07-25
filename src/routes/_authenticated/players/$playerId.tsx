@@ -303,8 +303,29 @@ function PlayerProfile() {
     (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
   );
   const failedEmailsMap = new Map(
-    (parentInviteStatuses?.failedEmails ?? []).map((f) => [f.email.toLowerCase(), f.error]),
+    (parentInviteStatuses?.failedEmails ?? []).map((f) => [
+      f.email.toLowerCase(),
+      { error: f.error, reason: f.reason ?? null },
+    ]),
   );
+
+  function formatSuppressionReason(reason: string | null): string {
+    const r = (reason ?? "").toLowerCase();
+    if (r.includes("bounce"))
+      return t("players.suppressionBounce", {
+        defaultValue: "rebond permanent (adresse invalide ou boîte inexistante)",
+      });
+    if (r.includes("complaint") || r.includes("spam"))
+      return t("players.suppressionComplaint", { defaultValue: "plainte pour spam" });
+    if (r.includes("unsubscribe"))
+      return t("players.suppressionUnsubscribe", {
+        defaultValue: "désinscription du destinataire",
+      });
+    if (r.includes("manual"))
+      return t("players.suppressionManual", { defaultValue: "blocage manuel" });
+    if (reason && reason.trim().length > 0) return reason;
+    return t("players.suppressionUnknown", { defaultValue: "raison inconnue" });
+  }
 
   // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
