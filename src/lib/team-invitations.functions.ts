@@ -334,7 +334,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       }
     }
 
-    return { sent, failed, skipped: skippedExisting, suppressedEmails };
+    return { sent, failed, skipped: skippedExisting, suppressedEmails, suppressedDetails };
   });
 
 /**
