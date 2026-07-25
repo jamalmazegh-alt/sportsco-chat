@@ -27,11 +27,14 @@ import {
   Ban,
   X,
   Building2,
+  Send,
+  MailX,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type EventTypeKey = "training" | "match" | "tournament" | "meeting" | "other";
 export type HomeAwayKey = "all" | "home" | "away";
+export type ConvocationsSentKey = "all" | "sent" | "not_sent";
 
 export type EventsFilters = {
   types: Set<EventTypeKey>; // empty = all
@@ -40,6 +43,7 @@ export type EventsFilters = {
   includeInternal: boolean;
   showPast: boolean;
   showCancelled: boolean;
+  convocationsSent: ConvocationsSentKey;
   dateFrom?: Date;
   dateTo?: Date;
 };
@@ -51,6 +55,7 @@ export const DEFAULT_EVENTS_FILTERS: EventsFilters = {
   includeInternal: true,
   showPast: false,
   showCancelled: false,
+  convocationsSent: "all",
   dateFrom: undefined,
   dateTo: undefined,
 };
@@ -63,6 +68,7 @@ export function countActiveFilters(f: EventsFilters): number {
   if (!f.includeInternal) n++;
   if (f.showPast) n++;
   if (f.showCancelled) n++;
+  if (f.convocationsSent !== "all") n++;
   if (f.dateFrom || f.dateTo) n++;
   return n;
 }
@@ -308,7 +314,38 @@ export function EventsFilterSheet({
               )}
             </div>
           </Section>
+
+          {/* Convocations sent */}
+          {isCoach && (
+            <Section
+              title={t("events.filterConvocations", { defaultValue: "Convocations" })}
+            >
+              <div className="flex flex-wrap gap-2">
+                <ChipButton
+                  active={draft.convocationsSent === "all"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "all" })}
+                >
+                  {t("events.convocAll", { defaultValue: "Tous" })}
+                </ChipButton>
+                <ChipButton
+                  active={draft.convocationsSent === "sent"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "sent" })}
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  {t("events.convocSent", { defaultValue: "Envoyées" })}
+                </ChipButton>
+                <ChipButton
+                  active={draft.convocationsSent === "not_sent"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "not_sent" })}
+                >
+                  <MailX className="h-3.5 w-3.5" />
+                  {t("events.convocNotSent", { defaultValue: "Non envoyées" })}
+                </ChipButton>
+              </div>
+            </Section>
+          )}
         </div>
+
 
         <SheetFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="ghost" onClick={reset} className="flex-1 sm:flex-none">

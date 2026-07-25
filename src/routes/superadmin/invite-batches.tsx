@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listInviteBatches, getInviteBatchRows } from "@/lib/superadmin/observability.functions";
@@ -111,33 +111,49 @@ function BatchRow({
             <div className="flex justify-center py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
+          ) : (data?.rows ?? []).length === 0 ? (
+            <div className="px-6 py-4 text-xs text-muted-foreground">
+              Aucune ligne trouvée pour ce batch.
+            </div>
           ) : (
             <div className="divide-y divide-border">
               {(data?.rows ?? []).map((r) => (
-                <div key={r.id} className="px-6 py-2 flex items-center gap-3 text-sm">
-                  <div className="min-w-0 flex-1 truncate">{r.recipient_email}</div>
-                  <div className="text-xs text-muted-foreground">{fmt(r.created_at)}</div>
-                  <StatusBadge
-                    tone={
-                      r.status === "sent" || r.status === "delivered"
-                        ? "success"
-                        : r.status === "pending" || r.status === "processing"
-                          ? "info"
-                          : r.status === "suppressed"
-                            ? "warn"
-                            : "danger"
-                    }
-                  >
-                    {r.status}
-                  </StatusBadge>
-                  {r.error_message && (
-                    <span
-                      className="text-xs text-destructive truncate max-w-[240px]"
-                      title={r.error_message}
+                <div key={r.id} className="px-6 py-2.5 text-sm space-y-1">
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1 truncate">{r.recipient_email}</div>
+                    <div className="text-xs text-muted-foreground">{fmt(r.created_at)}</div>
+                    <StatusBadge
+                      tone={
+                        r.status === "sent" || r.status === "delivered"
+                          ? "success"
+                          : r.status === "pending" || r.status === "processing"
+                            ? "info"
+                            : r.status === "suppressed"
+                              ? "warn"
+                              : "danger"
+                      }
                     >
-                      {r.error_message}
+                      {r.status}
+                    </StatusBadge>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+                    <span>
+                      msg&nbsp;
+                      <span className="font-mono">{r.message_id.slice(0, 12)}…</span>
                     </span>
-                  )}
+                    <span>tentatives&nbsp;: {r.attempt_count}</span>
+                    {r.dispatch_id && (
+                      <span>
+                        dispatch&nbsp;
+                        <span className="font-mono">{r.dispatch_id.slice(0, 8)}</span>
+                      </span>
+                    )}
+                    {r.error_message && (
+                      <span className="text-destructive" title={r.error_message}>
+                        {r.error_message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

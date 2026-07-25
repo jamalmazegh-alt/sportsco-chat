@@ -169,7 +169,7 @@ function EventsPage() {
   );
   const hasInternalTeam = internalTeamIds.size > 0;
 
-  const visibleEvents = useMemo(() => {
+  const baseVisibleEvents = useMemo(() => {
     if (!events) return [];
     const q = searchQuery.trim().toLowerCase();
     const fromTs = filters.dateFrom ? startOfDay(filters.dateFrom).getTime() : null;
@@ -296,6 +296,15 @@ function EventsPage() {
     },
     staleTime: 30_000,
   });
+
+  const visibleEvents = useMemo(() => {
+    if (filters.convocationsSent === "all" || !convocSentSet) return baseVisibleEvents;
+    return baseVisibleEvents.filter((e) => {
+      const sent = convocSentSet.has(e.id);
+      return filters.convocationsSent === "sent" ? sent : !sent;
+    });
+  }, [baseVisibleEvents, convocSentSet, filters.convocationsSent]);
+
 
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
