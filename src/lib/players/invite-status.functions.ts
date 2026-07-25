@@ -104,8 +104,26 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
       }
     }
 
+    // Enrich with suppression reason from suppressed_emails when available
+    const failedList = Array.from(failed.keys());
+    const suppressionByEmail = new Map<string, string | null>();
+    if (failedList.length > 0) {
+      const { data: suppRows } = await supabaseAdmin
+        .from("suppressed_emails")
+        .select("email, reason")
+        .in("email", failedList);
+      for (const s of suppRows ?? []) {
+        const row = s as { email: string | null; reason: string | null };
+        if (row.email) suppressionByEmail.set(row.email.toLowerCase(), row.reason);
+      }
+    }
+
     return {
       sentEmails: Array.from(sent),
-      failedEmails: Array.from(failed.entries()).map(([email, error]) => ({ email, error })),
+      failedEmails: Array.from(failed.entries()).map(([email, error]) => ({
+        email,
+        error,
+        reason: suppressionByEmail.get(email) ?? null,
+      })),
     };
   });
