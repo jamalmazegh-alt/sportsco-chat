@@ -74,12 +74,10 @@ export const dispatchStaffAssignmentEmail = createServerFn({ method: "POST" })
 
     const { data: suppressed } = await supabaseAdmin
       .from("suppressed_emails")
-      .select("email, reason, bounce_count")
+      .select("email")
       .eq("email", recipientEmail.toLowerCase())
       .maybeSingle();
-    if (suppressed && (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3)) {
-      return { sent: false, reason: "suppressed" as const };
-    }
+    if (suppressed) return { sent: false, reason: "suppressed" as const };
 
     const dt = new Date((ev as any).starts_at);
     const locale = (profile?.preferred_language ?? "fr").slice(0, 2).toLowerCase();

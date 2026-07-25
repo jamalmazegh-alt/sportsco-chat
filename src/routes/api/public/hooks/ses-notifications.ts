@@ -139,24 +139,9 @@ export const Route = createFileRoute("/api/public/hooks/ses-notifications")({
             ...detail,
           } as unknown as Json;
 
-          // Incrémente bounce_count sur bounce (tolérance de 3), bloque d'emblée sur complaint.
-          const { data: existing } = await supabaseAdmin
+          const { error: supErr } = await supabaseAdmin
             .from("suppressed_emails")
-            .select("id, bounce_count")
-            .eq("email", email)
-            .maybeSingle();
-          const nextBounceCount = reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
-
-          const { error: supErr } = await supabaseAdmin.from("suppressed_emails").upsert(
-            {
-              email,
-              reason,
-              metadata,
-              bounce_count: nextBounceCount,
-              last_bounce_at: reason === "bounce" ? new Date().toISOString() : null,
-            },
-            { onConflict: "email" },
-          );
+            .upsert({ email, reason, metadata }, { onConflict: "email" });
           if (supErr) {
             console.error("ses_notifications.suppress_failed", {
               email_redacted: redact(email),
@@ -172,16 +157,12 @@ export const Route = createFileRoute("/api/public/hooks/ses-notifications")({
             status: reason === "bounce" ? "bounced" : "complained",
             error_message:
               reason === "bounce"
-                ? `SES permanent bounce (${nextBounceCount}/3) — address invalid or rejected`
+                ? "SES permanent bounce — address invalid or rejected"
                 : "SES complaint — recipient marked email as spam",
             metadata,
           });
           suppressed += 1;
-          console.log("ses_notifications.suppressed", {
-            email_redacted: redact(email),
-            reason,
-            bounce_count: nextBounceCount,
-          });
+          console.log("ses_notifications.suppressed", { email_redacted: redact(email), reason });
         }
 
         return Response.json({ ok: true, suppressed });

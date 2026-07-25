@@ -103,24 +103,12 @@ export const Route = createFileRoute("/lovable/email/suppression")({
         const metadata = toJsonMetadata(payload.metadata);
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        // 1. Upsert to suppressed_emails.
-        // Pour un bounce, on incrémente bounce_count (tolérance de 3 tentatives).
-        // Pour complaint/unsubscribe, on bloque immédiatement.
-        const { data: existing } = await supabaseAdmin
-          .from("suppressed_emails")
-          .select("id, bounce_count")
-          .eq("email", normalizedEmail)
-          .maybeSingle();
-
-        const nextBounceCount = payload.reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
-
+        // 1. Upsert to suppressed_emails (idempotent — safe for retries)
         const { error: suppressError } = await supabaseAdmin.from("suppressed_emails").upsert(
           {
             email: normalizedEmail,
             reason: payload.reason,
             metadata,
-            bounce_count: nextBounceCount,
-            last_bounce_at: payload.reason === "bounce" ? new Date().toISOString() : null,
           },
           { onConflict: "email" },
         );

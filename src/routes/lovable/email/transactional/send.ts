@@ -234,11 +234,10 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           );
         }
 
-        // 2. Check suppression list (fail-closed: if we can't verify, don't send).
-        // Bounces tolérés jusqu'à 3 tentatives ; plaintes/désinscriptions bloquent d'emblée.
+        // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabaseAdmin
           .from("suppressed_emails")
-          .select("id, reason, bounce_count")
+          .select("id")
           .eq("email", effectiveRecipient.toLowerCase())
           .maybeSingle();
 
@@ -250,9 +249,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: "Failed to verify suppression status" }, { status: 500 });
         }
 
-        const isBlocked =
-          !!suppressed && (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
-        if (isBlocked) {
+        if (suppressed) {
           // Log the suppressed attempt
           await supabaseAdmin.from("email_send_log").insert({
             message_id: messageId,
@@ -265,8 +262,6 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           console.log("Email suppressed", {
             templateName,
             recipient_redacted: redactEmail(effectiveRecipient),
-            reason: suppressed?.reason,
-            bounce_count: suppressed?.bounce_count,
           });
           return Response.json({ success: false, reason: "email_suppressed" });
         }
