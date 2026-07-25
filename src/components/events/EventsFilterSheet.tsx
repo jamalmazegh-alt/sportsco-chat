@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 
 export type EventTypeKey = "training" | "match" | "tournament" | "meeting" | "other";
 export type HomeAwayKey = "all" | "home" | "away";
+export type ConvocationsSentKey = "all" | "sent" | "not_sent";
 
 export type EventsFilters = {
   types: Set<EventTypeKey>; // empty = all
@@ -40,6 +41,7 @@ export type EventsFilters = {
   includeInternal: boolean;
   showPast: boolean;
   showCancelled: boolean;
+  convocationsSent: ConvocationsSentKey;
   dateFrom?: Date;
   dateTo?: Date;
 };
@@ -51,6 +53,7 @@ export const DEFAULT_EVENTS_FILTERS: EventsFilters = {
   includeInternal: true,
   showPast: false,
   showCancelled: false,
+  convocationsSent: "all",
   dateFrom: undefined,
   dateTo: undefined,
 };
@@ -63,6 +66,7 @@ export function countActiveFilters(f: EventsFilters): number {
   if (!f.includeInternal) n++;
   if (f.showPast) n++;
   if (f.showCancelled) n++;
+  if (f.convocationsSent !== "all") n++;
   if (f.dateFrom || f.dateTo) n++;
   return n;
 }
