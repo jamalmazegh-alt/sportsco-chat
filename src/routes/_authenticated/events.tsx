@@ -30,6 +30,7 @@ import {
   Ban,
   Clock,
   Search,
+  Send,
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
