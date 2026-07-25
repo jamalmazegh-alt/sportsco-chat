@@ -201,7 +201,6 @@ function EmailsTab() {
   );
 }
 
-
 function PushTab() {
   const [kind, setKind] = useState("");
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -276,4 +275,3 @@ function PushTab() {
     </div>
   );
 }
-

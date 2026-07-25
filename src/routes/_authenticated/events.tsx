@@ -305,7 +305,6 @@ function EventsPage() {
     });
   }, [baseVisibleEvents, convocSentSet, filters.convocationsSent]);
 
-
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();

@@ -317,9 +317,7 @@ export function EventsFilterSheet({
 
           {/* Convocations sent */}
           {isCoach && (
-            <Section
-              title={t("events.filterConvocations", { defaultValue: "Convocations" })}
-            >
+            <Section title={t("events.filterConvocations", { defaultValue: "Convocations" })}>
               <div className="flex flex-wrap gap-2">
                 <ChipButton
                   active={draft.convocationsSent === "all"}
@@ -345,7 +343,6 @@ export function EventsFilterSheet({
             </Section>
           )}
         </div>
-
 
         <SheetFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="ghost" onClick={reset} className="flex-1 sm:flex-none">
