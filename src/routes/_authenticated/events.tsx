@@ -297,6 +297,15 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
+  const visibleEvents = useMemo(() => {
+    if (filters.convocationsSent === "all" || !convocSentSet) return baseVisibleEvents;
+    return baseVisibleEvents.filter((e) => {
+      const sent = convocSentSet.has(e.id);
+      return filters.convocationsSent === "sent" ? sent : !sent;
+    });
+  }, [baseVisibleEvents, convocSentSet, filters.convocationsSent]);
+
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
