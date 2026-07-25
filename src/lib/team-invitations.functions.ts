@@ -12,7 +12,6 @@ type InviteSendResult = {
   suppressedDetails?: SuppressedEntry[];
 };
 
-
 const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
 
 export const sendPlayerInvitations = createServerFn({ method: "POST" })
@@ -252,7 +251,6 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     const suppressedEmails: string[] = [];
     const suppressedDetails: SuppressedEntry[] = [];
 
-
     for (const target of filtered) {
       const token = makeToken();
       const { data: invite, error: inviteError } = await supabaseAdmin
@@ -314,11 +312,9 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
             suppressedEmails.push(em);
             suppressedDetails.push({
               email: em,
-              reason:
-                (enqueued as { suppressionReason?: string | null }).suppressionReason ?? null,
+              reason: (enqueued as { suppressionReason?: string | null }).suppressionReason ?? null,
             });
           }
-
         }
       } catch (error) {
         await supabaseAdmin

@@ -93,7 +93,6 @@ export async function enqueueTransactionalEmailServer(
     };
   }
 
-
   // Idempotence côté serveur : si un envoi 'sent'/'delivered' existe déjà pour
   // cette clé métier, on ne renqueue pas. L'index unique en base est la
   // vraie ceinture, ce test est la bretelle qui évite d'enfiler inutilement.
