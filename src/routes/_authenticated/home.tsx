@@ -150,7 +150,19 @@ function HomePage() {
     },
   });
 
-  // My convocations only (player or parent)
+  // Coach view: which of the "next events" already have convocations dispatched.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["home-convocs-sent", activeClubId, (upcoming ?? []).map((e) => e.id).join(",")],
+    enabled: !!upcoming && upcoming.length > 0,
+    queryFn: async () => {
+      const ids = (upcoming ?? []).map((e) => e.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase.from("convocations").select("event_id").in("event_id", ids);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
   const { data: myConvocs } = useQuery({
     queryKey: ["my-convocs-home", user?.id, activeClubId],
     enabled: !!user && !!activeClubId,
