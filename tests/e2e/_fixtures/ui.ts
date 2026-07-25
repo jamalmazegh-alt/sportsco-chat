@@ -114,26 +114,6 @@ export async function dismissBlockingOverlays(page: Page): Promise<void> {
  * Connexion via le VRAI formulaire `/login` (smoke uniquement).
  * login.tsx fait `window.location.replace("/home")` en cas de succès.
  */
-/** Fill a React-controlled <input> when Playwright fill/pressSequentially is a no-op. */
-async function fillControlledInput(page: Page, selector: string, value: string): Promise<void> {
-  const loc = page.locator(selector);
-  await loc.waitFor({ state: "visible" });
-  await loc.evaluate((el, v) => {
-    const input = el as HTMLInputElement;
-    const last = input.value;
-    const proto = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
-    proto?.set?.call(input, v);
-    // React 17+ controlled inputs track the previous value; without this,
-    // onChange may ignore the DOM update and leave component state empty.
-    const tracker = (input as unknown as { _valueTracker?: { setValue: (x: string) => void } })
-      ._valueTracker;
-    tracker?.setValue(last);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  }, value);
-  await expect(loc).toHaveValue(value, { timeout: 5_000 });
-}
-
 export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<void> {
   const { email, password } = credsFor(role);
   // loginAs is not used here — still pre-accept cookies so the banner does not
@@ -219,10 +199,22 @@ export async function fillEventStartDateTime(
   const dateBtn = root.getByTestId("event-start-date");
   await expect(dateBtn).toBeVisible({ timeout: 10_000 });
   await dateBtn.click();
+  // Prefer next month so the event is always in the future (default list filters).
+  const nextMonth = page
+    .getByRole("button", { name: /Go to the Next Month|Mois suivant|Next month/i })
+    .or(page.locator("button").filter({ has: page.locator("svg.lucide-chevron-right") }));
+  if (
+    await nextMonth
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await nextMonth.first().click();
+  }
   const day = page.getByRole("gridcell").getByRole("button").filter({ hasText: /^\d+$/ });
   const count = await day.count();
   if (count === 0) throw new Error("fillEventStartDateTime: no calendar day buttons");
-  await day.nth(Math.min(14, count - 1)).click();
+  await day.nth(Math.min(10, count - 1)).click();
 
   // Match/meeting use event-start-time; training uses the same id on TimeField.
   const timeBtn = root.getByTestId("event-start-time");

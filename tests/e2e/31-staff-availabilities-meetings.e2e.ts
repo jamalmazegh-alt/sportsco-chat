@@ -134,9 +134,12 @@ test.describe("réunions", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
-    await expect(page.getByRole("dialog")).toBeHidden({ timeout: 15_000 });
+    await expect(
+      page.getByRole("dialog").filter({ has: page.getByRole("heading", { level: 2 }) }),
+    ).toBeHidden({ timeout: 15_000 });
 
-    await expect(page.getByText(title)).toBeVisible({ timeout: 15_000 });
+    await page.goto("/events");
+    await expect(page.getByText(title).first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("une réunion seedée est visible dans la liste des événements", async ({ page }) => {

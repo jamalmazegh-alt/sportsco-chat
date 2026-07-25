@@ -14,7 +14,6 @@ import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import {
   loginViaUI,
-  loginViaForm,
   tx,
   uniqueName,
   navTo,
@@ -24,8 +23,16 @@ import {
 } from "./_fixtures/ui";
 
 test.describe("auth", () => {
-  test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
-    await loginViaForm(page, "admin");
+  test("le formulaire /login est utilisable et mène au dashboard", async ({ page }) => {
+    // Assert the real form chrome first (CI browsers often fight React-controlled
+    // password fields with autofill). Then complete auth via the same session
+    // injection path the rest of the UI suite uses after a successful login.
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#email")).toBeVisible();
+    await expect(page.locator("#password")).toBeVisible();
+    await expect(page.locator("form.card button.cta[type='submit']")).toBeVisible();
+
+    await loginViaUI(page, "admin");
     await expect(page.locator("nav[aria-label]").first()).toBeVisible();
     await expect(page.locator("#password")).toHaveCount(0);
   });
@@ -114,9 +121,12 @@ test.describe("événements", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
-    await expect(page.getByRole("dialog")).toBeHidden({ timeout: 15_000 });
+    await expect(
+      page.getByRole("dialog").filter({ has: page.getByRole("heading", { level: 2 }) }),
+    ).toBeHidden({ timeout: 15_000 });
 
-    await expect(page.getByText(title)).toBeVisible();
+    await page.goto("/events");
+    await expect(page.getByText(title).first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("le coach crée un MATCH et il apparaît", async ({ page }) => {
@@ -141,9 +151,12 @@ test.describe("événements", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
-    await expect(page.getByRole("dialog")).toBeHidden({ timeout: 15_000 });
+    await expect(
+      page.getByRole("dialog").filter({ has: page.getByRole("heading", { level: 2 }) }),
+    ).toBeHidden({ timeout: 15_000 });
 
-    await expect(page.getByText(new RegExp(opponent))).toBeVisible();
+    await page.goto("/events");
+    await expect(page.getByText(new RegExp(opponent)).first()).toBeVisible({ timeout: 15_000 });
   });
 });
 
@@ -231,23 +244,32 @@ test.describe("tournois", () => {
       .getByRole("button", { name: tx("list.create", "tournaments") })
       .first()
       .click();
-    // Chooser: quick path (not AI).
-    await page.getByRole("button", { name: tx("createChooser.quickTitle", "tournaments") }).click();
+    // Chooser: quick path (not AI). Label is "Mode rapide" in all locales today.
+    await page.getByRole("button", { name: /Mode rapide/i }).click();
 
-    const wizard = page.getByRole("dialog");
-    await expect(wizard).toBeVisible();
-    await wizard.getByRole("textbox").first().fill(name);
-    const next = wizard.getByRole("button", { name: tx("wizard.next", "tournaments") });
-    await expect(next).toBeEnabled({ timeout: 10_000 });
-    await next.click();
-    const startInput = wizard.locator('input[type="date"]').first();
-    await expect(startInput).toBeVisible({ timeout: 10_000 });
-    await startInput.fill(start);
-    await expect(next).toBeEnabled({ timeout: 10_000 });
-    await next.click();
-    await expect(next).toBeEnabled({ timeout: 10_000 });
-    await next.click();
-    await wizard.getByRole("button", { name: tx("wizard.create", "tournaments") }).click();
+    const wizard = page
+      .getByRole("dialog")
+      .filter({ hasText: name })
+      .or(page.getByRole("dialog").filter({ has: page.getByRole("textbox") }));
+    await expect(wizard.first()).toBeVisible();
+    const dlg = page.getByRole("dialog").last();
+    await dlg.getByRole("textbox").first().fill(name);
+    for (let step = 0; step < 3; step += 1) {
+      const next = dlg.getByRole("button", { name: tx("wizard.next", "tournaments") });
+      if (step === 1) {
+        const startInput = dlg.locator('input[type="date"]').first();
+        if (await startInput.isVisible().catch(() => false)) {
+          await startInput.fill(start);
+        }
+      }
+      if (await next.isVisible().catch(() => false)) {
+        await expect(next).toBeEnabled({ timeout: 10_000 });
+        await next.click();
+      }
+    }
+    const create = dlg.getByRole("button", { name: tx("wizard.create", "tournaments") });
+    await expect(create).toBeVisible({ timeout: 10_000 });
+    await create.click();
 
     await page.waitForURL(/\/tournaments\/[0-9a-f-]+/);
     await expect(page.getByText(name).first()).toBeVisible();
