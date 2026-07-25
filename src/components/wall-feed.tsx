@@ -66,6 +66,13 @@ type Post = {
   reads?: { user_id: string; read_at: string }[];
 };
 type PollOptionResult = { id: string; label: string; votes: number };
+type PollAudience = {
+  audience_type: string;
+  team_id: string | null;
+  group_id: string | null;
+  category_label: string | null;
+  event_id: string | null;
+};
 type PollItem = {
   id: string;
   publication_type: string;
@@ -76,6 +83,7 @@ type PollItem = {
   closed_at: string | null;
   voter_count?: number;
   options?: PollOptionResult[];
+  audiences?: PollAudience[];
 };
 
 const SOURCE_META: Record<
@@ -251,17 +259,21 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
   useEffect(() => {
-    if (staffTeamId) {
-      setPolls([]);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
         const r = await listPublicationsFn({ data: { clubId, limit: 50 } });
-        const list = ((r?.publications ?? []) as any[]).filter(
+        let list = ((r?.publications ?? []) as any[]).filter(
           (p) => p.publication_type === "poll",
         ) as PollItem[];
+        // Staff team wall: only polls scoped to that team's staff.
+        if (staffTeamId) {
+          list = list.filter((p) =>
+            (p.audiences ?? []).some(
+              (a) => a.audience_type === "staff_equipe" && a.team_id === staffTeamId,
+            ),
+          );
+        }
         if (list.length === 0) {
           if (!cancelled) setPolls([]);
           return;
@@ -323,7 +335,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       cancelled = true;
     };
     // eslint-disable-next-line
-  }, [clubId]);
+  }, [clubId, staffTeamId]);
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
@@ -1483,7 +1495,7 @@ function WallGrouped({
               entry.kind === "post" ? (
                 renderItem(entry.post)
               ) : (
-                <PollCard key={entry.poll.id} poll={entry.poll} />
+                <PollCard key={entry.poll.id} poll={entry.poll} teamsById={teamsById} />
               ),
             )}
           </ul>
@@ -1500,11 +1512,27 @@ function WallGrouped({
   );
 }
 
-function PollCard({ poll }: { poll: PollItem }) {
+function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, Team> }) {
   const { t } = useTranslation();
   const d = new Date(poll.published_at ?? Date.now());
   const isClosed = !!poll.closed_at;
   const isAnonymous = poll.poll_visibility === "anonymous";
+  const staffTeams = (poll.audiences ?? [])
+    .filter((a) => a.audience_type === "staff_equipe" && a.team_id)
+    .map((a) => teamsById.get(a.team_id as string))
+    .filter((x): x is Team => !!x);
+  const staffLabel =
+    staffTeams.length === 0
+      ? null
+      : staffTeams.length === 1
+        ? t("wall.staff.badgeWithTeam", {
+            defaultValue: "Staff {{team}}",
+            team: staffTeams[0].name,
+          })
+        : t("wall.staff.badgeWithTeam", {
+            defaultValue: "Staff {{team}}",
+            team: `${staffTeams[0].name} +${staffTeams.length - 1}`,
+          });
   return (
     <li
       className={cn(
@@ -1526,6 +1554,17 @@ function PollCard({ poll }: { poll: PollItem }) {
             <BarChart3 className="h-3 w-3" />
             {t("publications:card.tagPoll", { defaultValue: "Sondage" })}
           </span>
+          {staffLabel && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
+              title={t("wall.staff.badgeTitle", {
+                defaultValue: "Message privé au staff de l'équipe",
+              })}
+            >
+              <Lock className="h-2.5 w-2.5" />
+              {staffLabel}
+            </span>
+          )}
           {isAnonymous && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
               {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
