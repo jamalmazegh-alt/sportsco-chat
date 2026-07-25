@@ -64,7 +64,7 @@ function EmailsTab() {
   const [search, setSearch] = useState("");
   const [template, setTemplate] = useState("");
   const [status, setStatus] = useState("");
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "notif-emails", search, template, status],
     queryFn: () =>
       listNotificationEmails({
@@ -77,6 +77,7 @@ function EmailsTab() {
       }),
   });
   const rows = data?.rows ?? [];
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
     <div>
@@ -111,7 +112,11 @@ function EmailsTab() {
           <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
         </Button>
       </div>
-      {isLoading ? (
+      {error ? (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          Erreur de chargement : {(error as Error).message}
+        </div>
+      ) : isLoading ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-5 w-5 animate-spin" />
         </div>
@@ -128,33 +133,64 @@ function EmailsTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/20">
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
-                    {fmt(r.created_at)}
-                  </td>
-                  <td className="px-3 py-2">{r.template_name}</td>
-                  <td className="px-3 py-2 truncate max-w-[240px]">{r.recipient_email}</td>
-                  <td className="px-3 py-2">
-                    <StatusBadge
-                      tone={
-                        r.status === "sent" || r.status === "delivered"
-                          ? "success"
-                          : r.status === "pending" || r.status === "processing"
-                            ? "info"
-                            : r.status === "suppressed"
-                              ? "warn"
-                              : "danger"
-                      }
+              {rows.map((r) => {
+                const isOpen = expanded === r.id;
+                return (
+                  <>
+                    <tr
+                      key={r.id}
+                      className="hover:bg-muted/20 cursor-pointer"
+                      onClick={() => setExpanded(isOpen ? null : r.id)}
                     >
-                      {r.status}
-                    </StatusBadge>
-                  </td>
-                  <td className="px-3 py-2 text-xs text-destructive truncate max-w-[240px]">
-                    {r.error_message}
-                  </td>
-                </tr>
-              ))}
+                      <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
+                        {fmt(r.created_at)}
+                      </td>
+                      <td className="px-3 py-2">{r.template_name}</td>
+                      <td className="px-3 py-2 truncate max-w-[240px]">{r.recipient_email}</td>
+                      <td className="px-3 py-2">
+                        <StatusBadge
+                          tone={
+                            r.status === "sent" || r.status === "delivered"
+                              ? "success"
+                              : r.status === "pending" || r.status === "processing"
+                                ? "info"
+                                : r.status === "suppressed"
+                                  ? "warn"
+                                  : "danger"
+                          }
+                        >
+                          {r.status}
+                        </StatusBadge>
+                      </td>
+                      <td className="px-3 py-2 text-xs text-destructive truncate max-w-[240px]">
+                        {r.error_message}
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr key={`${r.id}-detail`} className="bg-muted/20">
+                        <td colSpan={5} className="px-3 py-3">
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                            <div>
+                              <span className="text-muted-foreground">message_id :</span>{" "}
+                              <span className="font-mono">{r.message_id}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">tentatives :</span>{" "}
+                              {r.attempt_count}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-muted-foreground">metadata :</span>
+                              <pre className="mt-1 rounded bg-background border border-border p-2 overflow-x-auto text-[11px]">
+                                {JSON.stringify(r.metadata, null, 2)}
+                              </pre>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
             </tbody>
           </table>
           {rows.length === 0 && (
@@ -165,6 +201,7 @@ function EmailsTab() {
     </div>
   );
 }
+
 
 function PushTab() {
   const [kind, setKind] = useState("");
