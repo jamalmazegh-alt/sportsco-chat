@@ -259,17 +259,21 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
   useEffect(() => {
-    if (staffTeamId) {
-      setPolls([]);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
         const r = await listPublicationsFn({ data: { clubId, limit: 50 } });
-        const list = ((r?.publications ?? []) as any[]).filter(
+        let list = ((r?.publications ?? []) as any[]).filter(
           (p) => p.publication_type === "poll",
         ) as PollItem[];
+        // Staff team wall: only polls scoped to that team's staff.
+        if (staffTeamId) {
+          list = list.filter((p) =>
+            (p.audiences ?? []).some(
+              (a) => a.audience_type === "staff_equipe" && a.team_id === staffTeamId,
+            ),
+          );
+        }
         if (list.length === 0) {
           if (!cancelled) setPolls([]);
           return;
