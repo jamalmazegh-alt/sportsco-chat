@@ -446,13 +446,14 @@ function HomePage() {
                             </p>
                             {isCoach && convocSentSet?.has(e.id) && (
                               <span
-                                className="inline-flex items-center justify-center rounded-full bg-secondary/60 p-1 text-muted-foreground/80"
+                                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
                                 title={t("events.convocsSentTitle", {
                                   defaultValue:
                                     "Les convocations ont été envoyées pour cet événement",
                                 })}
                               >
                                 <Send className="h-3 w-3" />
+                                {t("events.convocationsSentShort")}
                               </span>
                             )}
                           </div>
