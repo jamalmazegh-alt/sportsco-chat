@@ -27,6 +27,8 @@ import {
   Ban,
   X,
   Building2,
+  Send,
+  MailX,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
