@@ -997,7 +997,7 @@ function AudiencePicker({
             className={cn(
               "text-xs px-2.5 py-1 rounded-full border transition-colors",
               isClubWide
-                ? "bg-primary text-primary-foreground border-primary"
+                ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
                 : "bg-background text-foreground border-border hover:bg-accent",
             )}
           >
