@@ -337,7 +337,26 @@ export const listPublications = createServerFn({ method: "POST" })
       .order("published_at", { ascending: false })
       .limit(data.limit);
     if (error) throw new Response(`list_failed: ${error.message}`, { status: 500 });
-    return { publications: rows ?? [] };
+    const list = rows ?? [];
+    if (list.length === 0) return { publications: list };
+
+    // Attach audiences so the wall can show scope badges (e.g. "Staff <team>")
+    // and filter polls in the team-staff wall view. RLS on
+    // club_publication_audiences mirrors publications visibility.
+    const ids = list.map((p) => p.id);
+    const { data: auds } = await context.supabase
+      .from("club_publication_audiences")
+      .select("publication_id, audience_type, team_id, group_id, category_label, event_id")
+      .in("publication_id", ids);
+    const byPub = new Map<string, any[]>();
+    for (const a of (auds ?? []) as any[]) {
+      const arr = byPub.get(a.publication_id) ?? [];
+      arr.push(a);
+      byPub.set(a.publication_id, arr);
+    }
+    return {
+      publications: list.map((p) => ({ ...p, audiences: byPub.get(p.id) ?? [] })),
+    };
   });
 
 // ---------------------------------------------------------------------------
