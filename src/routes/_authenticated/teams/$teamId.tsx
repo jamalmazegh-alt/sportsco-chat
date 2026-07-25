@@ -539,6 +539,7 @@ function TeamDetail() {
     skipped: number;
     reason?: "no_contact" | "already_active";
     suppressedEmails?: string[];
+    suppressedDetails?: { email: string; reason: string | null }[];
   }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
     try {
@@ -548,6 +549,7 @@ function TeamDetail() {
       return { sent: 0, failed: 1, skipped: 0 };
     }
   }
+
 
   async function inviteOne(playerId: string) {
     if (!user) return;
