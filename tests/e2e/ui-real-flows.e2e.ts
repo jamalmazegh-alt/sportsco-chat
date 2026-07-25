@@ -20,6 +20,7 @@ import {
   navTo,
   openClassicEventForm,
   fillEventStartDateTime,
+  expectToast,
   MOBILE_VIEWPORT,
 } from "./_fixtures/ui";
 
@@ -111,7 +112,10 @@ test.describe("événements", () => {
     await page.getByRole("button", { name: tx("events.series.modeSingle") }).click();
     await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 1 });
 
-    await page.getByRole("button", { name: tx("events.publish") }).click();
+    const publish = page.getByRole("button", { name: tx("events.publish") });
+    await expect(publish).toBeEnabled({ timeout: 10_000 });
+    await publish.click();
+    await expectToast(page, tx("events.published"));
 
     await expect(page.getByText(title)).toBeVisible();
   });
@@ -138,6 +142,7 @@ test.describe("événements", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
+    await expectToast(page, tx("events.published"));
 
     await expect(page.getByText(new RegExp(opponent))).toBeVisible();
   });
@@ -216,6 +221,7 @@ test.describe("convocations — réponse", () => {
 test.describe("tournois", () => {
   test("l'admin crée un tournoi et atteint sa page de détail", async ({ page }) => {
     const name = uniqueName("Tournoi");
+    const start = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
     await loginViaUI(page, "admin");
     // Bottom nav has no Tournaments item in regular club mode — deep-link.
@@ -226,27 +232,18 @@ test.describe("tournois", () => {
       .getByRole("button", { name: tx("list.create", "tournaments") })
       .first()
       .click();
+    // Chooser: quick path (not AI).
+    await page.getByRole("button", { name: tx("createChooser.quickTitle", "tournaments") }).click();
 
-    await page.getByRole("textbox").first().fill(name);
-    await page
-      .getByRole("button", { name: tx("common.next") })
-      .click()
-      .catch(() => {});
-
-    await page
-      .getByText(tx("wizard.formatGroup", "tournaments"))
-      .first()
-      .click()
-      .catch(() => {});
-    for (let i = 0; i < 3; i++) {
-      const next = page.getByRole("button", { name: tx("common.next") });
-      if (await next.count()) await next.click().catch(() => {});
-      else break;
-    }
-    await page.getByRole("button", { name: tx("common.create") }).click();
+    await page.getByLabel(tx("wizard.name", "tournaments")).fill(name);
+    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
+    await page.getByLabel(tx("wizard.start", "tournaments")).fill(start);
+    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
+    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
+    await page.getByRole("button", { name: tx("wizard.create", "tournaments") }).click();
 
     await page.waitForURL(/\/tournaments\/[0-9a-f-]+/);
-    await expect(page.getByText(name)).toBeVisible();
+    await expect(page.getByText(name).first()).toBeVisible();
 
     await admin.from("tournaments").delete().eq("name", name);
   });

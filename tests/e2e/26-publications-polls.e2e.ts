@@ -41,9 +41,11 @@ test.describe("publications — sondages", () => {
     await optionInputs.nth(2).fill("Peu importe");
 
     await page.locator("#v-anon").click();
-    await page.getByRole("button", { name: tx("common.next") }).click();
+    const next = page.getByRole("button", { name: tx("common.next") });
+    await expect(next).toBeEnabled();
+    await next.click();
 
-    await expect(publicationAudienceLabel(page)).toBeVisible();
+    await expect(publicationAudienceLabel(page)).toBeVisible({ timeout: 15_000 });
     await selectSeededTeamAudience(page);
 
     await page.getByRole("button", { name: tx("new.publish", "publications") }).click();

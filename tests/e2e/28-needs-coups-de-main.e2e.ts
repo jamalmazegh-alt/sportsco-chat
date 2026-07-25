@@ -119,11 +119,14 @@ test.describe("besoins — couverture", () => {
     await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(label)).toBeVisible();
 
+    const needCard = page.locator("#needs").locator("div").filter({ hasText: label }).first();
+    await expect(needCard).toBeVisible();
+    await needCard.getByRole("button", { name: tx("card.menuLabel", "needs") }).click();
     await page
-      .getByRole("button", { name: tx("card.menuLabel", "needs") })
+      .getByRole("menuitem", { name: tx("menu.closeNeed", "needs") })
+      .or(page.getByRole("menu").getByText(tx("menu.closeNeed", "needs")))
       .first()
       .click();
-    await page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") }).click();
     // Menu opens a confirm alertdialog — must confirm before the toast fires.
     const confirm = page.getByRole("alertdialog");
     await expect(confirm).toBeVisible();

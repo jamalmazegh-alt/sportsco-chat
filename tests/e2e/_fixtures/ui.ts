@@ -114,6 +114,20 @@ export async function dismissBlockingOverlays(page: Page): Promise<void> {
  * Connexion via le VRAI formulaire `/login` (smoke uniquement).
  * login.tsx fait `window.location.replace("/home")` en cas de succès.
  */
+/** Fill a React-controlled <input> when Playwright fill/pressSequentially is a no-op. */
+async function fillControlledInput(page: Page, selector: string, value: string): Promise<void> {
+  const loc = page.locator(selector);
+  await loc.waitFor({ state: "visible" });
+  await loc.evaluate((el, v) => {
+    const input = el as HTMLInputElement;
+    const proto = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+    proto?.set?.call(input, v);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+  await expect(loc).toHaveValue(value, { timeout: 5_000 });
+}
+
 export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<void> {
   const { email, password } = credsFor(role);
   // loginAs is not used here — still pre-accept cookies so the banner does not
@@ -132,22 +146,16 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await dismissBlockingOverlays(page);
   await expect(page.locator("#email")).toBeVisible();
 
-  // Floating-label layout: click then pressSequentially so controlled inputs keep values.
-  await page.locator("#email").click();
-  await page.locator("#email").fill("");
-  await page.locator("#email").pressSequentially(email, { delay: 10 });
-  await expect(page.locator("#email")).toHaveValue(email);
-  await page.locator("#password").click();
-  await page.locator("#password").fill("");
-  await page.locator("#password").pressSequentially(password, { delay: 10 });
-  await expect(page.locator("#password")).toHaveValue(password);
+  await fillControlledInput(page, "#email", email);
+  // Reveal password so browsers/extensions are less likely to swallow keystrokes.
+  const showPw = page.getByRole("button", { name: /Afficher le mot de passe|Show password/i });
+  if (await showPw.isVisible().catch(() => false)) await showPw.click();
+  await fillControlledInput(page, "#password", password);
 
   await dismissBlockingOverlays(page);
-  const submit = page
-    .locator("form.card button.cta[type='submit']")
-    .or(page.getByRole("button", { name: /Se connecter|Log in|Sign in/i }));
-  await expect(submit.first()).toBeEnabled();
-  await submit.first().click();
+  const submit = page.locator("form.card button.cta[type='submit']");
+  await expect(submit).toBeEnabled();
+  await submit.click();
   await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
     timeout: 45_000,
   });
@@ -212,21 +220,19 @@ export async function fillEventStartDateTime(
   await clockButtons.nth(timeIndex).click();
   const hhmm = page.locator('input[placeholder="HH:MM"]');
   await expect(hhmm).toBeVisible({ timeout: 5_000 });
-  await hhmm.fill(time);
+  await hhmm.click();
+  await hhmm.fill("");
+  // Type digits so TimePicker's formatter emits HH:MM via onChange.
+  await page.keyboard.type(time.replace(":", ""), { delay: 20 });
   await page.keyboard.press("Enter");
+  await expect(clockButtons.nth(timeIndex)).toContainText(time);
 }
 
 /**
- * Audience step marker on publication create.
- * Radix Label is not always exposed as role=label; "Recipients" also appears
- * inside delivery helper copy — prefer the step chrome / exact label node.
+ * Audience step marker on publication create (exact <label> text).
  */
 export function publicationAudienceLabel(page: Page) {
-  return page
-    .locator("label")
-    .filter({ hasText: tx("new.audienceLabel", "publications") })
-    .first()
-    .or(page.getByText(/Step\s*2\s*\/\s*2|Étape\s*2\s*\/\s*2/i));
+  return page.locator("label").filter({ hasText: /^(Destinataires|Recipients)$/ });
 }
 
 /**

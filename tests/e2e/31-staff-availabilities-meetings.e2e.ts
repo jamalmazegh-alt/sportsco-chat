@@ -10,6 +10,7 @@ import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import {
+  expectToast,
   fillEventStartDateTime,
   loginViaUI,
   openClassicEventForm,
@@ -131,7 +132,10 @@ test.describe("réunions", () => {
 
     await page.getByTestId("event-name-input").fill(title);
     await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 0 });
-    await page.getByRole("button", { name: tx("events.publish") }).click();
+    const publish = page.getByRole("button", { name: tx("events.publish") });
+    await expect(publish).toBeEnabled({ timeout: 10_000 });
+    await publish.click();
+    await expectToast(page, tx("events.published"));
 
     await expect(page.getByText(title)).toBeVisible({ timeout: 15_000 });
   });
