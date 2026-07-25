@@ -181,8 +181,12 @@ export const createPublication = createServerFn({ method: "POST" })
     );
     if (rpcErr) {
       console.error("[createPublication] publish_atomic failed", rpcErr);
+      // Rollback the orphan publication row so the user isn't left with a
+      // ghost publication they can't reach via the detail page.
+      await supabase.from("club_publications").delete().eq("id", publicationId);
       throw new Response(`publish_failed: ${rpcErr.message}`, { status: 500 });
     }
+
 
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
     const dispatchRowId = row?.dispatch_row_id as string;
