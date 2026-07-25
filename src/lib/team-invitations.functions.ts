@@ -246,6 +246,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     const clubLogoUrl = club?.logo_url ?? undefined;
     let sent = 0;
     let failed = 0;
+    const suppressedEmails: string[] = [];
 
     for (const target of filtered) {
       const token = makeToken();
@@ -299,8 +300,14 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
             .update({ email_message_id: enqueued.messageId } as never)
             .eq("id", (invite as { id: string }).id);
         }
-        if (enqueued?.success) sent += 1;
-        else failed += 1;
+        if (enqueued?.success) {
+          sent += 1;
+        } else {
+          failed += 1;
+          if (enqueued?.reason === "suppressed") {
+            suppressedEmails.push(normalizeEmail(target.email));
+          }
+        }
       } catch (error) {
         await supabaseAdmin
           .from("member_invites")
@@ -315,7 +322,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       }
     }
 
-    return { sent, failed, skipped: skippedExisting };
+    return { sent, failed, skipped: skippedExisting, suppressedEmails };
   });
 
 /**
