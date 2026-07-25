@@ -956,9 +956,32 @@ function AudiencePicker({
     }
   }
   if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
+
+  // Team pill helpers — clicking under "Joueurs" or "Staff" implicitly sets the mode.
+  function selectTeamAsPlayers(id: string) {
+    if (groupsActive) onGroupChange([]);
+    if (staffMode) onStaffModeChange(false);
+    const base = value === null ? [] : value;
+    if (base.includes(id) && !staffMode) {
+      onChange(base.filter((x) => x !== id));
+    } else {
+      onChange([...base.filter((x) => x !== id), id]);
+    }
+  }
+  function selectTeamAsStaff(id: string) {
+    if (groupsActive) onGroupChange([]);
+    if (!staffMode) onStaffModeChange(true);
+    const base = value === null ? [] : value;
+    if (base.includes(id) && staffMode) {
+      onChange(base.filter((x) => x !== id));
+    } else {
+      onChange([...base.filter((x) => x !== id), id]);
+    }
+  }
+
   return (
     <div className="space-y-2">
-      {/* Mode selector */}
+      {/* "Tout le club" quick toggle at the top */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-xs font-medium text-muted-foreground mr-1">
           {t("wall.audienceTo", { defaultValue: "À :" })}
@@ -981,85 +1004,102 @@ function AudiencePicker({
             {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
           </button>
         )}
-        {teams.length > 0 && (
-          <button
-            type="button"
-            onClick={() => {
-              onGroupChange([]);
-              onStaffModeChange(false);
-              if (value === null) onChange([]);
-            }}
-            className={cn(
-              "text-xs px-2.5 py-1 rounded-full border transition-colors",
-              !groupsActive && !isClubWide && !staffMode
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-border hover:bg-accent",
-            )}
-          >
-            {t("wall.scope.teams", { defaultValue: "Équipes (joueurs+parents)" })}
-          </button>
-        )}
-        {canPickStaff && (
-          <button
-            type="button"
-            onClick={() => {
-              onGroupChange([]);
-              if (value === null) onChange([]);
-              onStaffModeChange(true);
-            }}
-            className={cn(
-              "text-xs px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1",
-              staffMode
-                ? "bg-violet-600 text-white border-violet-600"
-                : "bg-background text-violet-700 dark:text-violet-300 border-violet-500/40 hover:bg-violet-500/10",
-            )}
-            title={t("wall.scope.staffTeamsHint", {
-              defaultValue: "Coachs et dirigeants des équipes sélectionnées uniquement",
-            })}
-          >
-            <Lock className="h-3 w-3" />
-            {t("wall.scope.staffTeams", { defaultValue: "Staff d'équipes" })}
-          </button>
-        )}
       </div>
 
-      {/* Team pills (shown for both "teams" and "staff of teams" modes) */}
-      {!isClubWide && !groupsActive && (
-        <div className="flex flex-wrap items-center gap-1.5 pl-2 border-l-2 border-border">
-          {teams.map((tt) => {
-            const active = (value ?? []).includes(tt.id);
-            return (
-              <button
-                key={tt.id}
-                type="button"
-                onClick={() => toggleTeam(tt.id)}
-                className={cn(
-                  "text-xs px-2.5 py-1 rounded-full border transition-colors",
-                  active
-                    ? staffMode
-                      ? "bg-violet-500 text-white border-violet-500"
-                      : "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-foreground border-border hover:bg-accent",
-                )}
-              >
-                {tt.name}
-              </button>
-            );
-          })}
-          {staffMode && (
-            <span className="text-[11px] text-violet-700 dark:text-violet-300 inline-flex items-center gap-1 ml-1">
-              <Lock className="h-3 w-3" />
-              {t("wall.scope.staffTeamsShort", {
-                defaultValue: "→ coachs + dirigeants uniquement",
-              })}
-            </span>
+      {/* Joueurs & parents (équipes) — block */}
+      {teams.length > 0 && (
+        <div
+          className={cn(
+            "rounded-lg border p-2.5",
+            !staffMode && !groupsActive && !isClubWide
+              ? "border-sky-500/60 bg-sky-500/10"
+              : "border-sky-500/30 bg-sky-500/5",
           )}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Users className="h-3 w-3 text-sky-700 dark:text-sky-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-sky-700 dark:text-sky-300">
+              {t("wall.scope.teamsBlock", { defaultValue: "Équipes (joueurs + parents)" })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {teams.map((tt) => {
+              const active = !staffMode && (value ?? []).includes(tt.id);
+              return (
+                <button
+                  key={tt.id}
+                  type="button"
+                  onClick={() => selectTeamAsPlayers(tt.id)}
+                  className={cn(
+                    "text-xs px-2.5 py-1 rounded-full border transition-colors",
+                    active
+                      ? "bg-sky-600 text-white border-sky-600"
+                      : "bg-background text-foreground border-border hover:bg-accent",
+                  )}
+                >
+                  {tt.name}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      {/* Groups block — clearly separated below teams */}
+      {/* Staff d'équipes — block */}
+      {canPickStaff && teams.length > 0 && (
+        <div
+          className={cn(
+            "rounded-lg border p-2.5",
+            staffMode
+              ? "border-violet-500/60 bg-violet-500/10"
+              : "border-violet-500/30 bg-violet-500/5",
+          )}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Lock className="h-3 w-3 text-violet-700 dark:text-violet-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-violet-700 dark:text-violet-300">
+              {t("wall.scope.staffTeamsBlock", { defaultValue: "Staff d'équipes" })}
+            </span>
+            <span className="text-[10px] text-violet-700/80 dark:text-violet-300/80">
+              {t("wall.scope.staffTeamsHint", {
+                defaultValue: "Coachs et dirigeants uniquement",
+              })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {teams.map((tt) => {
+              const active = staffMode && (value ?? []).includes(tt.id);
+              return (
+                <button
+                  key={tt.id}
+                  type="button"
+                  onClick={() => selectTeamAsStaff(tt.id)}
+                  className={cn(
+                    "text-xs px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1",
+                    active
+                      ? "bg-violet-600 text-white border-violet-600"
+                      : "bg-background text-violet-700 dark:text-violet-300 border-violet-500/40 hover:bg-violet-500/10",
+                  )}
+                >
+                  <Lock className="h-3 w-3" />
+                  {tt.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Groupes — block */}
       {groups.length > 0 && (
-        <div className="rounded-lg border border-dashed border-amber-500/40 bg-amber-500/5 p-2">
+        <div
+          className={cn(
+            "rounded-lg border border-dashed p-2.5",
+            groupsActive
+              ? "border-amber-500/60 bg-amber-500/10"
+              : "border-amber-500/40 bg-amber-500/5",
+          )}
+        >
           <div className="flex items-center gap-1.5 mb-1.5">
             <Users className="h-3 w-3 text-amber-700 dark:text-amber-300" />
             <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-300">
@@ -1092,6 +1132,7 @@ function AudiencePicker({
     </div>
   );
 }
+
 
 // Reusable audience badge — used on each post in the feed.
 // Mirrors push scopeLabel logic; "Tout le club" is the only translated label,
