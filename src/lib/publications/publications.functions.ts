@@ -81,113 +81,39 @@ export const createPublication = createServerFn({ method: "POST" })
       throw new Response("delivery_required", { status: 400 });
     }
 
-    // Insert publication
-    const { data: pub, error: pubErr } = await supabase
-      .from("club_publications")
-      .insert({
-        club_id: data.clubId,
-        author_id: userId,
-        publication_type: data.publicationType,
-        title: data.title,
-        content: data.content,
-        poll_visibility: data.publicationType === "poll" ? data.pollVisibility : null,
-        publish_to_wall: data.publishToWall,
-        send_email: !data.publishToWall ? true : data.sendEmail, // email-only mode forces send_email
-        email_body: data.emailBody,
-        closes_at: data.closesAt,
-        event_id: data.eventId,
-      })
-      .select("id")
-      .single();
-    if (pubErr || !pub) {
-      console.error("[createPublication] insert failed", pubErr);
-      throw new Response("insert_failed", { status: 500 });
-    }
-    const publicationId = pub.id as string;
-
-    // Audiences — always insert the selection_manuelle marker when manual members
-    // are present, so _resolve_audience_subjects picks them up (parity with preview).
-    const audRows = data.audiences.map((a) => ({
-      publication_id: publicationId,
-      audience_type: a.audience_type,
-      team_id: (a as any).team_id ?? null,
-      group_id: (a as any).group_id ?? null,
-      category_label: (a as any).category_label ?? null,
-      season_id: (a as any).season_id ?? null,
-      event_id: (a as any).event_id ?? null,
-    }));
-    const hasManualMarker = audRows.some((r) => r.audience_type === "selection_manuelle");
-    if (data.manualMemberIds.length > 0 && !hasManualMarker) {
-      audRows.push({
-        publication_id: publicationId,
-        audience_type: "selection_manuelle",
-        team_id: null,
-        group_id: null,
-        category_label: null,
-        season_id: null,
-        event_id: null,
-      });
-    }
-    if (audRows.length) {
-      const { error } = await supabase.from("club_publication_audiences").insert(audRows);
-      if (error) throw new Response(`audience_insert_failed: ${error.message}`, { status: 500 });
-    }
-    if (data.manualMemberIds.length) {
-      const { error } = await supabase
-        .from("club_publication_manual_members")
-        .insert(data.manualMemberIds.map((m) => ({ publication_id: publicationId, member_id: m })));
-      if (error) throw new Response(`manual_insert_failed: ${error.message}`, { status: 500 });
-    }
-    if (data.pollOptions.length) {
-      const { error } = await supabase.from("club_poll_options").insert(
-        data.pollOptions.map((label, i) => ({
-          publication_id: publicationId,
-          label,
-          sort_order: i,
-        })),
-      );
-      if (error) throw new Response(`option_insert_failed: ${error.message}`, { status: 500 });
-    }
-    if (data.documentIds.length) {
-      const { error } = await supabase.from("club_publication_documents").insert(
-        data.documentIds.map((document_id, i) => ({
-          publication_id: publicationId,
-          document_id,
-          sort_order: i,
-        })),
-      );
-      if (error) throw new Response(`doc_insert_failed: ${error.message}`, { status: 500 });
-    }
-    if (data.mediaPaths.length) {
-      const { error } = await supabase.from("club_publication_media").insert(
-        data.mediaPaths.map((storage_path, i) => ({
-          publication_id: publicationId,
-          storage_path,
-          sort_order: i,
-        })),
-      );
-      if (error) throw new Response(`media_insert_failed: ${error.message}`, { status: 500 });
-    }
-
-    // Snapshot recipients + create dispatch row
-    const { data: pubRes, error: rpcErr } = await supabase.rpc(
-      "publish_publication_atomic" as any,
-      {
-        _publication_id: publicationId,
-        _kind: "publish",
-        _dispatch_id: null,
-      },
-    );
+    // Persist the whole publication in a single database transaction. This
+    // prevents "ghost" polls where the publication row exists but options,
+    // audiences or recipients failed to be created.
+    const { data: pubRes, error: rpcErr } = await supabase.rpc("create_publication_atomic" as any, {
+      _club_id: data.clubId,
+      _publication_type: data.publicationType,
+      _title: data.title,
+      _content: data.content,
+      _poll_visibility: data.publicationType === "poll" ? data.pollVisibility : null,
+      _publish_to_wall: data.publishToWall,
+      _send_email: data.sendEmail,
+      _email_body: data.emailBody,
+      _closes_at: data.closesAt,
+      _event_id: data.eventId,
+      _audiences: data.audiences,
+      _manual_member_ids: data.manualMemberIds,
+      _poll_options: data.pollOptions,
+      _document_ids: data.documentIds,
+      _media_paths: data.mediaPaths,
+    });
     if (rpcErr) {
-      console.error("[createPublication] publish_atomic failed", rpcErr);
-      // Rollback the orphan publication row so the user isn't left with a
-      // ghost publication they can't reach via the detail page.
-      await supabase.from("club_publications").delete().eq("id", publicationId);
+      console.error("[createPublication] create_publication_atomic failed", rpcErr);
       throw new Response(`publish_failed: ${rpcErr.message}`, { status: 500 });
     }
 
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
+    const publicationId = row?.publication_id as string | undefined;
     const dispatchRowId = row?.dispatch_row_id as string;
+
+    if (!publicationId) {
+      console.error("[createPublication] create_publication_atomic returned no publication id", row);
+      throw new Response("publish_failed", { status: 500 });
+    }
 
     // Best-effort : e-mail interactif de sondage
     if (data.publicationType === "poll" && data.sendEmail && dispatchRowId) {
