@@ -251,8 +251,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         }
 
         const isBlocked =
-          !!suppressed &&
-          (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
+          !!suppressed && (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
         if (isBlocked) {
           // Log the suppressed attempt
           await supabaseAdmin.from("email_send_log").insert({

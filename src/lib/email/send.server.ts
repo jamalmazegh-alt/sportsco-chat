@@ -79,8 +79,7 @@ export async function enqueueTransactionalEmailServer(
       .maybeSingle(),
   );
   const isBlocked =
-    !!suppressed &&
-    (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
+    !!suppressed && (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3);
   if (isBlocked) {
     await supabaseAdmin.from("email_send_log").insert({
       message_id: messageId,

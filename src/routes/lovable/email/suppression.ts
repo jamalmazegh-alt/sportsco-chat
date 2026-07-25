@@ -112,8 +112,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
           .eq("email", normalizedEmail)
           .maybeSingle();
 
-        const nextBounceCount =
-          payload.reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
+        const nextBounceCount = payload.reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
 
         const { error: suppressError } = await supabaseAdmin.from("suppressed_emails").upsert(
           {

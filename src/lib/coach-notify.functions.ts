@@ -67,10 +67,7 @@ export const notifyCoachAssigned = createServerFn({ method: "POST" })
       .select("email, reason, bounce_count")
       .eq("email", recipientEmail.toLowerCase())
       .maybeSingle();
-    if (
-      suppressed &&
-      (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3)
-    ) {
+    if (suppressed && (suppressed.reason !== "bounce" || (suppressed.bounce_count ?? 1) >= 3)) {
       return { sent: false, reason: "suppressed" as const };
     }
 

@@ -145,21 +145,18 @@ export const Route = createFileRoute("/api/public/hooks/ses-notifications")({
             .select("id, bounce_count")
             .eq("email", email)
             .maybeSingle();
-          const nextBounceCount =
-            reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
+          const nextBounceCount = reason === "bounce" ? (existing?.bounce_count ?? 0) + 1 : 3;
 
-          const { error: supErr } = await supabaseAdmin
-            .from("suppressed_emails")
-            .upsert(
-              {
-                email,
-                reason,
-                metadata,
-                bounce_count: nextBounceCount,
-                last_bounce_at: reason === "bounce" ? new Date().toISOString() : null,
-              },
-              { onConflict: "email" },
-            );
+          const { error: supErr } = await supabaseAdmin.from("suppressed_emails").upsert(
+            {
+              email,
+              reason,
+              metadata,
+              bounce_count: nextBounceCount,
+              last_bounce_at: reason === "bounce" ? new Date().toISOString() : null,
+            },
+            { onConflict: "email" },
+          );
           if (supErr) {
             console.error("ses_notifications.suppress_failed", {
               email_redacted: redact(email),
