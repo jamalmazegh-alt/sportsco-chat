@@ -503,6 +503,17 @@ function EventsPage() {
                 if (!resp) return null;
                 return <ConvocationResponseBadge response={resp} />;
               })()}
+              {isCoach && convocSentSet?.has(e.id) && !isCancelled && (
+                <span
+                  className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                  title={t("events.convocsSentTitle", {
+                    defaultValue: "Les convocations ont été envoyées pour cet événement",
+                  })}
+                >
+                  <Send className="h-3 w-3" />
+                  {t("events.convocsSent", { defaultValue: "Convocations envoyées" })}
+                </span>
+              )}
             </div>
             <p
               className={cn(
