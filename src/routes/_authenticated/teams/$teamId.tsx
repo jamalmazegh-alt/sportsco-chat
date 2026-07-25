@@ -708,6 +708,7 @@ function TeamDetail() {
     let alreadyActiveSkipped = 0;
     let noContactSkipped = 0;
     const allSuppressed: string[] = [];
+    const allSuppressedDetails: { email: string; reason: string | null }[] = [];
     for (const id of invitableIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
@@ -716,17 +717,13 @@ function TeamDetail() {
       if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
       if (r.reason === "no_contact") noContactSkipped += r.skipped;
       if (r.suppressedEmails?.length) allSuppressed.push(...r.suppressedEmails);
+      if (r.suppressedDetails?.length) allSuppressedDetails.push(...r.suppressedDetails);
     }
     setInviting(false);
     if (allSuppressed.length > 0) {
-      toast.error(
-        t("players.inviteSuppressed", {
-          defaultValue:
-            "Impossible d'envoyer l'invitation à {{emails}} : cette adresse a rebondi précédemment (bounce permanent) et est bloquée. Corrigez l'adresse ou contactez le support pour la débloquer.",
-          emails: allSuppressed.join(", "),
-        }),
-      );
+      toastSuppressed(allSuppressedDetails, allSuppressed);
     }
+
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
         t(
