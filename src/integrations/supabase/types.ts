@@ -6058,23 +6058,29 @@ export type Database = {
       }
       suppressed_emails: {
         Row: {
+          bounce_count: number
           created_at: string
           email: string
           id: string
+          last_bounce_at: string | null
           metadata: Json | null
           reason: string
         }
         Insert: {
+          bounce_count?: number
           created_at?: string
           email: string
           id?: string
+          last_bounce_at?: string | null
           metadata?: Json | null
           reason: string
         }
         Update: {
+          bounce_count?: number
           created_at?: string
           email?: string
           id?: string
+          last_bounce_at?: string | null
           metadata?: Json | null
           reason?: string
         }

@@ -539,6 +539,7 @@ function TeamDetail() {
     skipped: number;
     reason?: "no_contact" | "already_active";
     suppressedEmails?: string[];
+    suppressedDetails?: { email: string; reason: string | null }[];
   }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
     try {
@@ -549,6 +550,30 @@ function TeamDetail() {
     }
   }
 
+
+  function formatSuppressionReason(reason: string | null): string {
+    const r = (reason ?? "").toLowerCase();
+    if (r.includes("bounce")) return t("players.suppressionBounce", { defaultValue: "rebond permanent (adresse invalide ou boîte inexistante)" });
+    if (r.includes("complaint") || r.includes("spam")) return t("players.suppressionComplaint", { defaultValue: "plainte pour spam" });
+    if (r.includes("unsubscribe")) return t("players.suppressionUnsubscribe", { defaultValue: "désinscription du destinataire" });
+    if (r.includes("manual")) return t("players.suppressionManual", { defaultValue: "blocage manuel" });
+    if (reason && reason.trim().length > 0) return reason;
+    return t("players.suppressionUnknown", { defaultValue: "raison inconnue" });
+  }
+
+  function toastSuppressed(details: { email: string; reason: string | null }[], fallbackEmails: string[]) {
+    const lines = (details.length ? details : fallbackEmails.map((e) => ({ email: e, reason: null })))
+      .map((d) => `${d.email} — ${formatSuppressionReason(d.reason)}`)
+      .join("\n");
+    toast.error(
+      t("players.inviteSuppressedDetailed", {
+        defaultValue:
+          "Impossible d'envoyer l'invitation. Adresses bloquées :\n{{lines}}\nCorrigez l'adresse ou contactez le support pour la débloquer.",
+        lines,
+      }),
+    );
+  }
+
   async function inviteOne(playerId: string) {
     if (!user) return;
     setInviting(true);
@@ -556,13 +581,7 @@ function TeamDetail() {
     setInviting(false);
     const suppressed = r.suppressedEmails ?? [];
     if (suppressed.length > 0 && !r.sent) {
-      toast.error(
-        t("players.inviteSuppressed", {
-          defaultValue:
-            "Impossible d'envoyer l'invitation à {{emails}} : cette adresse a rebondi précédemment (bounce permanent) et est bloquée. Corrigez l'adresse ou contactez le support pour la débloquer.",
-          emails: suppressed.join(", "),
-        }),
-      );
+      toastSuppressed(r.suppressedDetails ?? [], suppressed);
     } else if (r.skipped)
       toast.warning(
         t(
@@ -576,6 +595,7 @@ function TeamDetail() {
     qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
     qc.invalidateQueries({ queryKey: ["team-invite-failures", teamId] });
   }
+
 
   async function removeFromTeam(playerId: string, fullName: string) {
     if (
@@ -610,6 +630,7 @@ function TeamDetail() {
     let alreadyActiveSkipped = 0;
     let noContactSkipped = 0;
     const allSuppressed: string[] = [];
+    const allSuppressedDetails: { email: string; reason: string | null }[] = [];
     for (const id of selectedIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
@@ -618,19 +639,15 @@ function TeamDetail() {
       if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
       if (r.reason === "no_contact") noContactSkipped += r.skipped;
       if (r.suppressedEmails?.length) allSuppressed.push(...r.suppressedEmails);
+      if (r.suppressedDetails?.length) allSuppressedDetails.push(...r.suppressedDetails);
     }
     setInviting(false);
     setSelectMode(false);
     setSelectedIds(new Set());
     if (allSuppressed.length > 0) {
-      toast.error(
-        t("players.inviteSuppressed", {
-          defaultValue:
-            "Impossible d'envoyer l'invitation à {{emails}} : cette adresse a rebondi précédemment (bounce permanent) et est bloquée. Corrigez l'adresse ou contactez le support pour la débloquer.",
-          emails: allSuppressed.join(", "),
-        }),
-      );
+      toastSuppressed(allSuppressedDetails, allSuppressed);
     }
+
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
         t(
@@ -691,6 +708,7 @@ function TeamDetail() {
     let alreadyActiveSkipped = 0;
     let noContactSkipped = 0;
     const allSuppressed: string[] = [];
+    const allSuppressedDetails: { email: string; reason: string | null }[] = [];
     for (const id of invitableIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
@@ -699,17 +717,13 @@ function TeamDetail() {
       if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
       if (r.reason === "no_contact") noContactSkipped += r.skipped;
       if (r.suppressedEmails?.length) allSuppressed.push(...r.suppressedEmails);
+      if (r.suppressedDetails?.length) allSuppressedDetails.push(...r.suppressedDetails);
     }
     setInviting(false);
     if (allSuppressed.length > 0) {
-      toast.error(
-        t("players.inviteSuppressed", {
-          defaultValue:
-            "Impossible d'envoyer l'invitation à {{emails}} : cette adresse a rebondi précédemment (bounce permanent) et est bloquée. Corrigez l'adresse ou contactez le support pour la débloquer.",
-          emails: allSuppressed.join(", "),
-        }),
-      );
+      toastSuppressed(allSuppressedDetails, allSuppressed);
     }
+
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
         t(

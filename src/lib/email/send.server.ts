@@ -71,7 +71,11 @@ export async function enqueueTransactionalEmailServer(
 
   // Suppression check
   const { data: suppressed } = await runStep("suppression_check", async () =>
-    supabaseAdmin.from("suppressed_emails").select("id").eq("email", normalized).maybeSingle(),
+    supabaseAdmin
+      .from("suppressed_emails")
+      .select("id, reason")
+      .eq("email", normalized)
+      .maybeSingle(),
   );
   if (suppressed) {
     await supabaseAdmin.from("email_send_log").insert({
@@ -81,8 +85,14 @@ export async function enqueueTransactionalEmailServer(
       status: "suppressed",
       ...baseMeta,
     });
-    return { success: false, reason: "suppressed" as const, messageId };
+    return {
+      success: false,
+      reason: "suppressed" as const,
+      messageId,
+      suppressionReason: (suppressed as { reason: string | null }).reason ?? null,
+    };
   }
+
 
   // Idempotence côté serveur : si un envoi 'sent'/'delivered' existe déjà pour
   // cette clé métier, on ne renqueue pas. L'index unique en base est la

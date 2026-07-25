@@ -2,13 +2,16 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type SuppressedEntry = { email: string; reason: string | null };
 type InviteSendResult = {
   sent: number;
   failed: number;
   skipped: number;
   reason?: "no_contact" | "already_active";
   suppressedEmails?: string[];
+  suppressedDetails?: SuppressedEntry[];
 };
+
 
 const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
 
@@ -247,6 +250,8 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     let sent = 0;
     let failed = 0;
     const suppressedEmails: string[] = [];
+    const suppressedDetails: SuppressedEntry[] = [];
+
 
     for (const target of filtered) {
       const token = makeToken();
@@ -305,8 +310,15 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         } else {
           failed += 1;
           if (enqueued?.reason === "suppressed") {
-            suppressedEmails.push(normalizeEmail(target.email));
+            const em = normalizeEmail(target.email);
+            suppressedEmails.push(em);
+            suppressedDetails.push({
+              email: em,
+              reason:
+                (enqueued as { suppressionReason?: string | null }).suppressionReason ?? null,
+            });
           }
+
         }
       } catch (error) {
         await supabaseAdmin
@@ -322,7 +334,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       }
     }
 
-    return { sent, failed, skipped: skippedExisting, suppressedEmails };
+    return { sent, failed, skipped: skippedExisting, suppressedEmails, suppressedDetails };
   });
 
 /**
