@@ -250,6 +250,8 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     let sent = 0;
     let failed = 0;
     const suppressedEmails: string[] = [];
+    const suppressedDetails: SuppressedEntry[] = [];
+
 
     for (const target of filtered) {
       const token = makeToken();
