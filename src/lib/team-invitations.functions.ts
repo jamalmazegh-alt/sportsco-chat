@@ -7,6 +7,7 @@ type InviteSendResult = {
   failed: number;
   skipped: number;
   reason?: "no_contact" | "already_active";
+  suppressedEmails?: string[];
 };
 
 const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
