@@ -2,13 +2,16 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type SuppressedEntry = { email: string; reason: string | null };
 type InviteSendResult = {
   sent: number;
   failed: number;
   skipped: number;
   reason?: "no_contact" | "already_active";
   suppressedEmails?: string[];
+  suppressedDetails?: SuppressedEntry[];
 };
+
 
 const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
 
