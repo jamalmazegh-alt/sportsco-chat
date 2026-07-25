@@ -1129,9 +1129,7 @@ function PlayerProfile() {
                     : null;
                   const inviteFailedReasonLabel =
                     inviteFailedEntry && (inviteFailedEntry.reason || inviteFailedEntry.error)
-                      ? formatSuppressionReason(
-                          inviteFailedEntry.reason ?? inviteFailedEntry.error,
-                        )
+                      ? formatSuppressionReason(inviteFailedEntry.reason ?? inviteFailedEntry.error)
                       : null;
                   return (
                     <li
