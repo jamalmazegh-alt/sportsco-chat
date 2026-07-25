@@ -335,7 +335,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       cancelled = true;
     };
     // eslint-disable-next-line
-  }, [clubId]);
+  }, [clubId, staffTeamId]);
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
