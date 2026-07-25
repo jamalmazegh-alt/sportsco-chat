@@ -27,7 +27,7 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
     if (error || !parents) {
       return {
         sentEmails: [] as string[],
-        failedEmails: [] as { email: string; error: string | null }[],
+        failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
       };
     }
 
@@ -37,7 +37,7 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
     if (emails.length === 0) {
       return {
         sentEmails: [] as string[],
-        failedEmails: [] as { email: string; error: string | null }[],
+        failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
       };
     }
 
