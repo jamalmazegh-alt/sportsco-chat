@@ -746,6 +746,7 @@
     "published": "Event published",
     "sendConvocations": "Send call-ups",
     "convocationsSent": "Call-ups sent",
+    "convocationsSentShort": "Sent",
     "noEvents": "No events scheduled.",
     "searchPlaceholder": "Search an event…",
     "noSearchResults": "No results",
