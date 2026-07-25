@@ -1111,7 +1111,6 @@ function AudiencePicker({
   );
 }
 
-
 // Reusable audience badge — used on each post in the feed.
 // Mirrors push scopeLabel logic; "Tout le club" is the only translated label,
 // team names are data (not translated). Deleted/unknown teams are filtered out;
