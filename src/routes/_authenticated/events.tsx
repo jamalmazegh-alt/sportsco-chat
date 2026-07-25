@@ -505,13 +505,12 @@ function EventsPage() {
               })()}
               {isCoach && convocSentSet?.has(e.id) && !isCancelled && (
                 <span
-                  className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                  className="inline-flex items-center justify-center rounded-full bg-secondary/60 p-1 text-muted-foreground/80"
                   title={t("events.convocsSentTitle", {
                     defaultValue: "Les convocations ont été envoyées pour cet événement",
                   })}
                 >
                   <Send className="h-3 w-3" />
-                  {t("events.convocsSent", { defaultValue: "Convocations envoyées" })}
                 </span>
               )}
             </div>
