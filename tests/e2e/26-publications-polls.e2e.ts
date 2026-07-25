@@ -179,5 +179,6 @@ async function selectSeededTeamAudience(page: Page) {
     .first();
   await teamRow
     .getByRole("button", { name: tx("audience.types.joueurs_equipe", "publications") })
+    .first()
     .click();
 }

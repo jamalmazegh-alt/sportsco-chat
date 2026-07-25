@@ -152,19 +152,29 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await dismissBlockingOverlays(page);
   await expect(page.locator("#email")).toBeVisible();
 
-  await fillControlledInput(page, "#email", email);
-  // Reveal password so browsers/extensions are less likely to swallow keystrokes.
+  // Focus + insertText: updates React controlled state more reliably than
+  // DOM value setter alone (toHaveValue can pass while React state stays "").
+  await page.locator("#email").click();
+  await page.locator("#email").fill("");
+  await page.keyboard.insertText(email);
+  await expect(page.locator("#email")).toHaveValue(email);
+
   const showPw = page.getByRole("button", { name: /Afficher le mot de passe|Show password/i });
   if (await showPw.isVisible().catch(() => false)) await showPw.click();
-  await fillControlledInput(page, "#password", password);
+  await page.locator("#password").click();
+  await page.locator("#password").fill("");
+  await page.keyboard.insertText(password);
+  await expect(page.locator("#password")).toHaveValue(password);
 
   await dismissBlockingOverlays(page);
   const submit = page.locator("form.card button.cta[type='submit']");
   await expect(submit).toBeEnabled();
-  await submit.click();
-  await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
-    timeout: 45_000,
-  });
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
+      timeout: 45_000,
+    }),
+    submit.click(),
+  ]);
   await waitForAppShell(page);
 }
 

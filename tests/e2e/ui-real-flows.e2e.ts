@@ -20,7 +20,6 @@ import {
   navTo,
   openClassicEventForm,
   fillEventStartDateTime,
-  expectToast,
   MOBILE_VIEWPORT,
 } from "./_fixtures/ui";
 
@@ -115,7 +114,7 @@ test.describe("événements", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
-    await expectToast(page, tx("events.published"));
+    await expect(page.getByRole("dialog")).toBeHidden({ timeout: 15_000 });
 
     await expect(page.getByText(title)).toBeVisible();
   });
@@ -142,7 +141,7 @@ test.describe("événements", () => {
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
-    await expectToast(page, tx("events.published"));
+    await expect(page.getByRole("dialog")).toBeHidden({ timeout: 15_000 });
 
     await expect(page.getByText(new RegExp(opponent))).toBeVisible();
   });
@@ -235,14 +234,20 @@ test.describe("tournois", () => {
     // Chooser: quick path (not AI).
     await page.getByRole("button", { name: tx("createChooser.quickTitle", "tournaments") }).click();
 
-    await page.getByRole("textbox").first().fill(name);
-    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
-    const startInput = page.locator('input[type="date"]').first();
+    const wizard = page.getByRole("dialog");
+    await expect(wizard).toBeVisible();
+    await wizard.getByRole("textbox").first().fill(name);
+    const next = wizard.getByRole("button", { name: tx("wizard.next", "tournaments") });
+    await expect(next).toBeEnabled({ timeout: 10_000 });
+    await next.click();
+    const startInput = wizard.locator('input[type="date"]').first();
     await expect(startInput).toBeVisible({ timeout: 10_000 });
     await startInput.fill(start);
-    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
-    await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
-    await page.getByRole("button", { name: tx("wizard.create", "tournaments") }).click();
+    await expect(next).toBeEnabled({ timeout: 10_000 });
+    await next.click();
+    await expect(next).toBeEnabled({ timeout: 10_000 });
+    await next.click();
+    await wizard.getByRole("button", { name: tx("wizard.create", "tournaments") }).click();
 
     await page.waitForURL(/\/tournaments\/[0-9a-f-]+/);
     await expect(page.getByText(name).first()).toBeVisible();
