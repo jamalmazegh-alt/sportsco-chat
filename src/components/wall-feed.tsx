@@ -970,7 +970,7 @@ function AudiencePicker({
           className={cn(
             "w-full text-sm px-3 py-2 rounded-lg border transition-colors inline-flex items-center justify-center gap-2 font-medium",
             isClubWide
-              ? "bg-primary text-primary-foreground border-primary"
+              ? "bg-secondary text-secondary-foreground border-secondary ring-1 ring-inset ring-border"
               : "bg-background text-foreground border-border hover:bg-accent",
           )}
         >
