@@ -169,6 +169,8 @@ function EventsPage() {
   );
   const hasInternalTeam = internalTeamIds.size > 0;
 
+  // convocSentSet is declared below; forward-declare via a ref through useMemo dep.
+  const convocSentSetRef = useConvocSentSet();
   const visibleEvents = useMemo(() => {
     if (!events) return [];
     const q = searchQuery.trim().toLowerCase();
@@ -187,6 +189,11 @@ function EventsPage() {
         if (filters.homeAway === "home" && e.is_home === false) return false;
         if (filters.homeAway === "away" && e.is_home !== false) return false;
       }
+      if (filters.convocationsSent !== "all" && convocSentSetRef.current) {
+        const sent = convocSentSetRef.current.has(e.id);
+        if (filters.convocationsSent === "sent" && !sent) return false;
+        if (filters.convocationsSent === "not_sent" && sent) return false;
+      }
       const d = new Date(e.starts_at);
       if (!filters.showPast) {
         if (isPast(d) && !isToday(d)) return false;
@@ -202,7 +209,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, filters, internalTeamIds, searchQuery, hideTrainings]);
+  }, [events, filters, internalTeamIds, searchQuery, hideTrainings, convocSentSetRef]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
