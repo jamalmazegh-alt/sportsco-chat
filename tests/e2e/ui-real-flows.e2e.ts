@@ -272,17 +272,15 @@ test.describe("tournois", () => {
     await expect(next()).toBeEnabled();
     await next().click();
 
-    // Step 3 — Create. Same bottom-right slot as Next: mousedown/mouseup can submit
-    // the form during the last Next click, so accept either Create or already-navigated.
+    // Step 3 — Create. Last Next can already have submitted (Create lands disabled /
+    // isPending); do not click a pending button — just wait for navigation.
     const detailUrl = /\/tournaments\/[0-9a-f-]+/;
-    if (!detailUrl.test(new URL(page.url()).pathname)) {
-      const create = dlg.getByTestId("tournament-wizard-create");
-      if (await create.isVisible().catch(() => false)) {
-        await Promise.all([page.waitForURL(detailUrl, { timeout: 20_000 }), create.click()]);
-      } else {
-        await page.waitForURL(detailUrl, { timeout: 20_000 });
-      }
+    const create = dlg.getByTestId("tournament-wizard-create");
+    await expect(create).toBeVisible({ timeout: 10_000 });
+    if (await create.isEnabled()) {
+      await create.click();
     }
+    await page.waitForURL(detailUrl, { timeout: 20_000 });
 
     await expect(page.getByRole("heading", { name }).first()).toBeVisible({ timeout: 15_000 });
 

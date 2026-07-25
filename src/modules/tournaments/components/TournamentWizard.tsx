@@ -176,8 +176,10 @@ export function TournamentWizard({
   }
 
   function onSubmit(e: FormEvent) {
+    // Prevent implicit Enter-submit; creation is explicit via the step-3 button
+    // (avoids Next→Create slot races submitting the form mid-click).
     e.preventDefault();
-    create.mutate();
+    if (step === 3 && !create.isPending) create.mutate();
   }
 
   const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
@@ -439,9 +441,10 @@ export function TournamentWizard({
             </Button>
           ) : (
             <Button
-              type="submit"
+              type="button"
               data-testid="tournament-wizard-create"
               disabled={create.isPending}
+              onClick={() => create.mutate()}
             >
               {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("wizard.create")}
             </Button>
