@@ -34,7 +34,6 @@ const AudienceInput = z.discriminatedUnion("audience_type", [
   z.object({ audience_type: z.literal("selection_manuelle") }),
 ]);
 
-
 const CreateInput = z
   .object({
     clubId: z.string().uuid(),
@@ -186,7 +185,6 @@ export const createPublication = createServerFn({ method: "POST" })
       await supabase.from("club_publications").delete().eq("id", publicationId);
       throw new Response(`publish_failed: ${rpcErr.message}`, { status: 500 });
     }
-
 
     const row = Array.isArray(pubRes) ? pubRes[0] : pubRes;
     const dispatchRowId = row?.dispatch_row_id as string;
