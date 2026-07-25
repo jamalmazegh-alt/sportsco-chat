@@ -550,38 +550,17 @@ function TeamDetail() {
     }
   }
 
-  function formatSuppressionReason(reason: string | null): string {
-    const r = (reason ?? "").toLowerCase();
-    if (r.includes("bounce"))
-      return t("players.suppressionBounce", {
-        defaultValue: "rebond permanent (adresse invalide ou boîte inexistante)",
-      });
-    if (r.includes("complaint") || r.includes("spam"))
-      return t("players.suppressionComplaint", { defaultValue: "plainte pour spam" });
-    if (r.includes("unsubscribe"))
-      return t("players.suppressionUnsubscribe", {
-        defaultValue: "désinscription du destinataire",
-      });
-    if (r.includes("manual"))
-      return t("players.suppressionManual", { defaultValue: "blocage manuel" });
-    if (reason && reason.trim().length > 0) return reason;
-    return t("players.suppressionUnknown", { defaultValue: "raison inconnue" });
-  }
-
   function toastSuppressed(
     details: { email: string; reason: string | null }[],
     fallbackEmails: string[],
   ) {
-    const lines = (
-      details.length ? details : fallbackEmails.map((e) => ({ email: e, reason: null }))
-    )
-      .map((d) => `${d.email} — ${formatSuppressionReason(d.reason)}`)
-      .join("\n");
+    const emails = details.length ? details.map((d) => d.email) : fallbackEmails;
+    const count = emails.length;
     toast.error(
-      t("players.inviteSuppressedDetailed", {
+      t("players.inviteSuppressedSimple", {
         defaultValue:
-          "Impossible d'envoyer l'invitation. Adresses bloquées :\n{{lines}}\nCorrigez l'adresse ou contactez le support pour la débloquer.",
-        lines,
+          "{{count}} invitation(s) bloquée(s) : l'adresse est en suppression (bounce, spam ou désinscription). Corrigez l'e-mail ou contactez le support.",
+        count,
       }),
     );
   }
