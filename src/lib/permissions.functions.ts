@@ -2,28 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  CLUB_STAFF_ROLES,
+  mergeStaffWithNonStaffRoles,
+  oldRolesForClubMemberUpsert,
+  type ClubStaffRole,
+} from "@/lib/club-member-roles";
 
 // ============================================================
 // Constants
 // ============================================================
-const CLUB_ROLES = ["admin", "coach", "assistant_coach", "staff", "tournament_manager"] as const;
-type ClubRole = (typeof CLUB_ROLES)[number];
+const CLUB_ROLES = CLUB_STAFF_ROLES;
+type ClubRole = ClubStaffRole;
 
 const TOURNAMENT_ROLES = ["tournament_admin", "staff", "referee"] as const;
 type TournamentRole = (typeof TOURNAMENT_ROLES)[number];
 
 const rolesSchema = z.array(z.enum(CLUB_ROLES)).min(1, "At least one role required");
-
-/** Non-staff roles kept on club_members.roles when staff roles are edited. */
-const NON_STAFF_CLUB_ROLES = new Set(["player", "parent", "dirigeant"]);
-
-function mergeStaffWithNonStaffRoles(
-  staffRoles: ClubRole[],
-  existingRoles: string[] | null | undefined,
-): string[] {
-  const preserved = (existingRoles ?? []).filter((r) => NON_STAFF_CLUB_ROLES.has(r));
-  return Array.from(new Set([...staffRoles, ...preserved]));
-}
 
 // ============================================================
 // Helpers
@@ -120,7 +115,7 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       });
     }
 
-    // Read current roles
+    // Read current roles (may be missing for player_parents-only parents).
     const { data: current, error: curErr } = await supabaseAdmin
       .from("club_members")
       .select("roles")
@@ -128,9 +123,9 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       .eq("user_id", data.user_id)
       .maybeSingle();
     if (curErr) throw new Response(curErr.message, { status: 500 });
-    if (!current) throw new Response("Member not found", { status: 404 });
 
-    const oldRoles: string[] = current.roles ?? [];
+    const creating = !current;
+    const oldRoles = oldRolesForClubMemberUpsert(current?.roles ?? null, creating);
 
     // Prevent removing last admin
     if (oldRoles.includes("admin") && !data.roles.includes("admin")) {
@@ -156,16 +151,16 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
         ? "coach"
         : "dirigeant";
 
-    const updatePayload: { roles: string[]; role: "admin" | "coach" | "dirigeant" } = {
-      roles: mergedRoles,
-      role: primary,
-    };
-
-    const { error: upErr } = await supabaseAdmin
-      .from("club_members")
-      .update(updatePayload)
-      .eq("club_id", data.club_id)
-      .eq("user_id", data.user_id);
+    // UNIQUE (club_id, user_id) — create or update in one upsert.
+    const { error: upErr } = await supabaseAdmin.from("club_members").upsert(
+      {
+        club_id: data.club_id,
+        user_id: data.user_id,
+        roles: mergedRoles,
+        role: primary,
+      },
+      { onConflict: "club_id,user_id" },
+    );
     if (upErr) throw new Response(upErr.message, { status: 500 });
 
     await logPermissionChange({
@@ -174,12 +169,12 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       targetEmail: null,
       scope: "club",
       scopeId: data.club_id,
-      oldRoles,
+      oldRoles: creating ? null : oldRoles,
       newRoles: mergedRoles,
-      action: "update_roles",
+      action: creating ? "create_roles" : "update_roles",
     });
 
-    return { ok: true, roles: mergedRoles };
+    return { ok: true, roles: mergedRoles, created: creating };
   });
 
 // ============================================================

@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus, Search, X } from "lucide-react";
 import { listClubUsers } from "@/lib/admin.functions";
+import {
+  ADMIN_STAFF_ROLES,
+  splitClubUsersForAdminTabs,
+  type ClubUserListItem,
+} from "@/lib/admin-club-users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -348,15 +353,8 @@ function AdminUsersPage() {
         </div>
       ) : (
         (() => {
-          const STAFF_ROLES = new Set([
-            "admin",
-            "coach",
-            "assistant_coach",
-            "staff",
-            "tournament_manager",
-          ]);
           const q = search.trim().toLowerCase();
-          const allUsersRaw = (data ?? []) as any[];
+          const allUsersRaw: ClubUserListItem[] = data ?? [];
           const allUsers = q
             ? allUsersRaw.filter((u) => {
                 const fn = u.profile?.first_name ?? "";
@@ -371,23 +369,17 @@ function AdminUsersPage() {
                 );
               })
             : allUsersRaw;
-          const staff = allUsers.filter((u) =>
-            (u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)),
-          );
-          const playersParents = allUsers.filter(
-            (u) =>
-              !(u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)) &&
-              ((u.roles ?? []).includes("player") || (u.roles ?? []).includes("parent")),
-          );
+          // isClubMember gates staff: player_parents-only parents never land here.
+          const { staff, playersParents } = splitClubUsersForAdminTabs(allUsers);
 
-          const renderList = (users: any[], emptyKey: string) =>
+          const renderList = (users: ClubUserListItem[], emptyKey: string) =>
             users.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
                 {t(emptyKey, { defaultValue: t("admin.usersEmpty") })}
               </div>
             ) : (
               <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-                {users.map((u: any) => {
+                {users.map((u) => {
                   const name =
                     u.profile?.full_name ??
                     [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
@@ -395,7 +387,8 @@ function AdminUsersPage() {
                     "—";
                   const userRoles: string[] = u.roles ?? [];
                   const isParentOnly =
-                    userRoles.includes("parent") && !userRoles.some((r) => STAFF_ROLES.has(r));
+                    userRoles.includes("parent") &&
+                    !userRoles.some((r) => ADMIN_STAFF_ROLES.has(r));
                   return (
                     <li key={u.user_id}>
                       <div

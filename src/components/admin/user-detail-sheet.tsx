@@ -93,7 +93,11 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     (p?.full_name ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ")) || data?.email || "—";
   const isSelf = user?.id === userId;
 
-  const clubMemberships = (data?.memberships ?? []).filter((m: any) => m.club_id === activeClubId);
+  const clubMemberships = (data?.memberships ?? []).filter((m) => m.club_id === activeClubId);
+  const parentLinksInClub = (data?.parentLinks ?? []).filter((pp) => {
+    const clubId = pp.players?.club_id ?? null;
+    return !!activeClubId && clubId === activeClubId;
+  });
   const allClubRoles: Set<string> = (() => {
     const set = new Set<string>();
     for (const m of clubMemberships) {
@@ -103,6 +107,10 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
         set.add(m.role);
       }
     }
+    // Orphan parent (player_parents only): treat as parent for promote UI.
+    if (clubMemberships.length === 0 && parentLinksInClub.length > 0) {
+      set.add("parent");
+    }
     return set;
   })();
   const currentRoles: ClubRoleKey[] = CLUB_ROLE_KEYS.filter((r) => allClubRoles.has(r));
@@ -110,6 +118,8 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const hasStaffRole = currentRoles.length > 0;
   const isParentOrPlayerOnly = !hasStaffRole && nonStaffRoles.length > 0;
   const isMember = clubMemberships.length > 0;
+  /** Show roles editor for members OR parents linked only via player_parents. */
+  const showRolesEditor = isMember || parentLinksInClub.length > 0;
 
   async function toggleDisabled(disabled: boolean) {
     if (!activeClubId || !userId) return;
@@ -274,7 +284,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
               </section>
 
               {/* Roles editor */}
-              {isMember && (
+              {showRolesEditor && (
                 <section className="rounded-xl border border-border bg-card p-4 space-y-3">
                   <div>
                     <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
