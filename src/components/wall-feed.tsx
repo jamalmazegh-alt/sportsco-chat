@@ -825,10 +825,9 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
                 }
               }}
               canPickClubWide={
-                !staffAudienceMode &&
-                (roles.includes("admin") ||
-                  roles.includes("dirigeant") ||
-                  targetableTeams.length === allTeams.length)
+                roles.includes("admin") ||
+                roles.includes("dirigeant") ||
+                targetableTeams.length === allTeams.length
               }
               staffMode={staffAudienceMode}
               onStaffModeChange={(next) => {
