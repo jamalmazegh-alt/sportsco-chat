@@ -78,7 +78,8 @@ function extractPublicationId(res: unknown) {
     "data" in res && res.data && typeof res.data === "object" && "publicationId" in res.data
       ? (res.data as { publicationId?: unknown }).publicationId
       : null;
-  const publicationId = typeof direct === "string" ? direct : typeof nested === "string" ? nested : null;
+  const publicationId =
+    typeof direct === "string" ? direct : typeof nested === "string" ? nested : null;
   return publicationId && UUID_RE.test(publicationId) ? publicationId : null;
 }
 
@@ -237,7 +238,9 @@ function NewPublicationPage() {
     onSuccess: (res: unknown) => {
       const publicationId = extractPublicationId(res);
       if (!publicationId) {
-        toast.error(t("publications:new.publishError", "Publication créée, mais ouverture impossible"));
+        toast.error(
+          t("publications:new.publishError", "Publication créée, mais ouverture impossible"),
+        );
         return;
       }
       toast.success(t("publications:new.published", "Publication publiée"));

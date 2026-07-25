@@ -111,7 +111,10 @@ export const createPublication = createServerFn({ method: "POST" })
     const dispatchRowId = row?.dispatch_row_id as string;
 
     if (!publicationId) {
-      console.error("[createPublication] create_publication_atomic returned no publication id", row);
+      console.error(
+        "[createPublication] create_publication_atomic returned no publication id",
+        row,
+      );
       throw new Response("publish_failed", { status: 500 });
     }
 
