@@ -119,14 +119,19 @@ test.describe("besoins — couverture", () => {
     await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(label)).toBeVisible();
 
-    const needCard = page.locator("#needs").locator("div").filter({ hasText: label }).first();
+    // Scope to the card root (rounded-lg border) — a bare `div` filter matches
+    // ancestors that contain every need, so `.first()` ⋯ opened the wrong draft.
+    const needCard = page
+      .locator("#needs div.rounded-lg.border")
+      .filter({ hasText: label })
+      .first();
     await expect(needCard).toBeVisible();
-    await needCard
-      .locator("button")
-      .filter({ has: page.locator("svg.lucide-more-horizontal, svg.lucide-ellipsis") })
-      .first()
-      .click();
-    await page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") }).click();
+    // Close is only in the menu for published/open needs.
+    await expect(needCard.getByText(tx("badge.unpublished", "needs"))).toHaveCount(0);
+    await needCard.getByRole("button", { name: tx("card.menuLabel", "needs") }).click();
+    const closeItem = page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") });
+    await expect(closeItem).toBeVisible({ timeout: 10_000 });
+    await closeItem.click();
     // Menu opens a confirm alertdialog — must confirm before the toast fires.
     const confirm = page.getByRole("alertdialog");
     await expect(confirm).toBeVisible();

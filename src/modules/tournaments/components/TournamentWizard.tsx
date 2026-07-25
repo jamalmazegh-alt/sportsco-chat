@@ -428,6 +428,7 @@ export function TournamentWizard({
           {step < 3 ? (
             <Button
               type="button"
+              data-testid="tournament-wizard-next"
               onClick={() => setStep((s) => s + 1)}
               disabled={
                 (step === 0 && !canNext0) || (step === 1 && !canNext1) || (step === 2 && !canNext2)
@@ -437,7 +438,11 @@ export function TournamentWizard({
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button type="submit" disabled={create.isPending}>
+            <Button
+              type="submit"
+              data-testid="tournament-wizard-create"
+              disabled={create.isPending}
+            >
               {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("wizard.create")}
             </Button>
           )}

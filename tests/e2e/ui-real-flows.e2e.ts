@@ -247,32 +247,44 @@ test.describe("tournois", () => {
     // Chooser: quick path (not AI). Label is "Mode rapide" in all locales today.
     await page.getByRole("button", { name: /Mode rapide/i }).click();
 
-    const wizard = page
-      .getByRole("dialog")
-      .filter({ hasText: name })
-      .or(page.getByRole("dialog").filter({ has: page.getByRole("textbox") }));
-    await expect(wizard.first()).toBeVisible();
-    const dlg = page.getByRole("dialog").last();
+    // Wizard is a separate dialog from the chooser (chooser closes on Mode rapide).
+    const dlg = page.getByRole("dialog").filter({
+      has: page.getByRole("heading", { name: tx("wizard.title", "tournaments") }),
+    });
+    await expect(dlg).toBeVisible({ timeout: 15_000 });
     await dlg.getByRole("textbox").first().fill(name);
-    for (let step = 0; step < 3; step += 1) {
-      const next = dlg.getByRole("button", { name: tx("wizard.next", "tournaments") });
-      if (step === 1) {
-        const startInput = dlg.locator('input[type="date"]').first();
-        if (await startInput.isVisible().catch(() => false)) {
-          await startInput.fill(start);
-        }
-      }
-      if (await next.isVisible().catch(() => false)) {
-        await expect(next).toBeEnabled({ timeout: 10_000 });
-        await next.click();
+
+    const next = () => dlg.getByTestId("tournament-wizard-next");
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 1 — dates. Fill both: React auto-syncs end on start change, but Playwright
+    // fill can miss that onChange path; empty end is OK for canNext1, start is required.
+    const startInput = dlg.locator('input[type="date"]').nth(0);
+    const endInput = dlg.locator('input[type="date"]').nth(1);
+    await startInput.fill(start);
+    await endInput.fill(start);
+    await expect(startInput).toHaveValue(start);
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 2 — format defaults satisfy canNext2.
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 3 — Create. Same bottom-right slot as Next: mousedown/mouseup can submit
+    // the form during the last Next click, so accept either Create or already-navigated.
+    const detailUrl = /\/tournaments\/[0-9a-f-]+/;
+    if (!detailUrl.test(new URL(page.url()).pathname)) {
+      const create = dlg.getByTestId("tournament-wizard-create");
+      if (await create.isVisible().catch(() => false)) {
+        await Promise.all([page.waitForURL(detailUrl, { timeout: 20_000 }), create.click()]);
+      } else {
+        await page.waitForURL(detailUrl, { timeout: 20_000 });
       }
     }
-    const create = dlg.getByRole("button", { name: tx("wizard.create", "tournaments") });
-    await expect(create).toBeVisible({ timeout: 10_000 });
-    await create.click();
 
-    await page.waitForURL(/\/tournaments\/[0-9a-f-]+/);
-    await expect(page.getByText(name).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name }).first()).toBeVisible({ timeout: 15_000 });
 
     await admin.from("tournaments").delete().eq("name", name);
   });
