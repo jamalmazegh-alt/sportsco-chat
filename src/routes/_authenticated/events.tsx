@@ -280,6 +280,23 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
+  // Coach view: which events already have convocations dispatched.
+  // Rendered as a small "Convocations envoyées" chip on each event row.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["convocs-sent-by-event", activeClubId, (events ?? []).length],
+    enabled: isCoach && !!events && events.length > 0,
+    queryFn: async () => {
+      const eventIds = (events ?? []).map((e) => e.id);
+      if (eventIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id")
+        .in("event_id", eventIds);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
