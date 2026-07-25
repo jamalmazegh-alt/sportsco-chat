@@ -136,9 +136,8 @@ function EmailsTab() {
               {rows.map((r) => {
                 const isOpen = expanded === r.id;
                 return (
-                  <>
+                  <Fragment key={r.id}>
                     <tr
-                      key={r.id}
                       className="hover:bg-muted/20 cursor-pointer"
                       onClick={() => setExpanded(isOpen ? null : r.id)}
                     >
