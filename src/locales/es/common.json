@@ -746,6 +746,7 @@
     "published": "Evento publicado",
     "sendConvocations": "Enviar convocatorias",
     "convocationsSent": "Convocatorias enviadas",
+    "convocationsSentShort": "Enviadas",
     "noEvents": "No hay eventos programados.",
     "searchPlaceholder": "Buscar un evento…",
     "noSearchResults": "Sin resultados",
