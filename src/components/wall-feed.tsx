@@ -1495,7 +1495,7 @@ function WallGrouped({
               entry.kind === "post" ? (
                 renderItem(entry.post)
               ) : (
-                <PollCard key={entry.poll.id} poll={entry.poll} />
+                <PollCard key={entry.poll.id} poll={entry.poll} teamsById={teamsById} />
               ),
             )}
           </ul>
