@@ -71,9 +71,17 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
+          set -euo pipefail
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
           # --yes: non-interactive CI (avoids hanging on the push confirmation prompt)
-          supabase db push --include-all --yes
+          if ! out="$(supabase db push --include-all --yes 2>&1)"; then
+            echo "$out"
+            if echo "$out" | grep -q "Remote migration versions not found"; then
+              echo "::error::Bughunt has migration version(s) missing from this commit's supabase/migrations/. Common causes: (1) Lovable merge deleted an already-applied migration file — restore it from git history; (2) schema ahead of this SHA — rebase/re-run on latest main. Do NOT run 'supabase migration repair' from CI."
+            fi
+            exit 1
+          fi
+          echo "$out"
 
       - name: Run RLS tests
         env:
