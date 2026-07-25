@@ -110,7 +110,7 @@ test.describe("événements", () => {
     await page.getByTestId("event-name-input").fill(title);
     // Default mode is recurring (hides Publish) — switch to single session.
     await page.getByRole("button", { name: tx("events.series.modeSingle") }).click();
-    await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 1 });
+    await fillEventStartDateTime(page);
 
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
@@ -137,7 +137,7 @@ test.describe("événements", () => {
     await page.getByTestId("event-opponent-input").fill(opponent);
     // Home matches require a venue — Away keeps Publish enabled without one.
     await page.getByRole("button", { name: tx("events.away") }).click();
-    await fillEventStartDateTime(page, { dateIndex: 1, timeIndex: 1 });
+    await fillEventStartDateTime(page);
 
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
@@ -235,9 +235,11 @@ test.describe("tournois", () => {
     // Chooser: quick path (not AI).
     await page.getByRole("button", { name: tx("createChooser.quickTitle", "tournaments") }).click();
 
-    await page.getByLabel(tx("wizard.name", "tournaments")).fill(name);
+    await page.getByRole("textbox").first().fill(name);
     await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
-    await page.getByLabel(tx("wizard.start", "tournaments")).fill(start);
+    const startInput = page.locator('input[type="date"]').first();
+    await expect(startInput).toBeVisible({ timeout: 10_000 });
+    await startInput.fill(start);
     await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
     await page.getByRole("button", { name: tx("wizard.next", "tournaments") }).click();
     await page.getByRole("button", { name: tx("wizard.create", "tournaments") }).click();

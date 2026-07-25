@@ -120,8 +120,14 @@ async function fillControlledInput(page: Page, selector: string, value: string):
   await loc.waitFor({ state: "visible" });
   await loc.evaluate((el, v) => {
     const input = el as HTMLInputElement;
+    const last = input.value;
     const proto = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
     proto?.set?.call(input, v);
+    // React 17+ controlled inputs track the previous value; without this,
+    // onChange may ignore the DOM update and leave component state empty.
+    const tracker = (input as unknown as { _valueTracker?: { setValue: (x: string) => void } })
+      ._valueTracker;
+    tracker?.setValue(last);
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }, value);
@@ -187,45 +193,38 @@ export async function openClassicEventForm(page: Page): Promise<void> {
 }
 
 /**
- * Remplit date + heure de début dans `EventFormSheet`.
- *
- * Indices (0-based) within the open event dialog:
- * - meeting: dateIndex 0, timeIndex 0
- * - match:   dateIndex 1 (match date), timeIndex 1
- * - training (single session): dateIndex 0, timeIndex 1 (start, after convoc)
+ * Remplit date + heure de début via testids `event-start-date` / `event-start-time`
+ * (EventFormSheet — match, meeting, training single-session).
  */
 export async function fillEventStartDateTime(
   page: Page,
-  opts: { time?: string; dateIndex?: number; timeIndex?: number } = {},
+  opts: { time?: string } = {},
 ): Promise<void> {
   const time = opts.time ?? "18:00";
-  const dateIndex = opts.dateIndex ?? 0;
-  const timeIndex = opts.timeIndex ?? 0;
   const root = page
     .getByRole("dialog")
     .filter({ has: page.getByRole("heading", { level: 2 }) })
     .first();
 
-  // Class segment match — lucide may emit lucide-calendar / lucide-Calendar.
-  const dateButtons = root.locator("button:has(svg[class*='calendar'])");
-  await expect(dateButtons.nth(dateIndex)).toBeVisible({ timeout: 10_000 });
-  await dateButtons.nth(dateIndex).click();
+  const dateBtn = root.getByTestId("event-start-date");
+  await expect(dateBtn).toBeVisible({ timeout: 10_000 });
+  await dateBtn.click();
   const day = page.getByRole("gridcell").getByRole("button").filter({ hasText: /^\d+$/ });
   const count = await day.count();
   if (count === 0) throw new Error("fillEventStartDateTime: no calendar day buttons");
   await day.nth(Math.min(14, count - 1)).click();
 
-  const clockButtons = root.locator("button:has(svg[class*='clock'])");
-  await expect(clockButtons.nth(timeIndex)).toBeVisible({ timeout: 10_000 });
-  await clockButtons.nth(timeIndex).click();
+  // Match/meeting use event-start-time; training uses the same id on TimeField.
+  const timeBtn = root.getByTestId("event-start-time");
+  await expect(timeBtn).toBeVisible({ timeout: 10_000 });
+  await timeBtn.click();
   const hhmm = page.locator('input[placeholder="HH:MM"]');
   await expect(hhmm).toBeVisible({ timeout: 5_000 });
   await hhmm.click();
   await hhmm.fill("");
-  // Type digits so TimePicker's formatter emits HH:MM via onChange.
   await page.keyboard.type(time.replace(":", ""), { delay: 20 });
   await page.keyboard.press("Enter");
-  await expect(clockButtons.nth(timeIndex)).toContainText(time);
+  await expect(timeBtn).toContainText(time);
 }
 
 /**

@@ -131,7 +131,7 @@ test.describe("réunions", () => {
     await page.getByRole("option", { name: tx("events.types.meeting") }).click();
 
     await page.getByTestId("event-name-input").fill(title);
-    await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 0 });
+    await fillEventStartDateTime(page);
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();

@@ -121,12 +121,12 @@ test.describe("besoins — couverture", () => {
 
     const needCard = page.locator("#needs").locator("div").filter({ hasText: label }).first();
     await expect(needCard).toBeVisible();
-    await needCard.getByRole("button", { name: tx("card.menuLabel", "needs") }).click();
-    await page
-      .getByRole("menuitem", { name: tx("menu.closeNeed", "needs") })
-      .or(page.getByRole("menu").getByText(tx("menu.closeNeed", "needs")))
+    await needCard
+      .locator("button")
+      .filter({ has: page.locator("svg.lucide-more-horizontal, svg.lucide-ellipsis") })
       .first()
       .click();
+    await page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") }).click();
     // Menu opens a confirm alertdialog — must confirm before the toast fires.
     const confirm = page.getByRole("alertdialog");
     await expect(confirm).toBeVisible();

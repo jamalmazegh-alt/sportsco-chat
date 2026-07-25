@@ -167,11 +167,16 @@ async function seedPoll(
 
 /** Audience step uses team chips (+ Joueurs / + Parents), not comboboxes. */
 async function selectSeededTeamAudience(page: Page) {
+  const teamName = page.getByText(new RegExp(club.prefix, "i")).first();
+  await expect(teamName).toBeVisible({ timeout: 15_000 });
+  await teamName.scrollIntoViewIfNeeded();
   const teamRow = page
-    .locator("div.flex.items-center.justify-between")
+    .locator("div")
     .filter({ hasText: new RegExp(club.prefix, "i") })
+    .filter({
+      has: page.getByRole("button", { name: tx("audience.types.joueurs_equipe", "publications") }),
+    })
     .first();
-  await expect(teamRow).toBeVisible({ timeout: 15_000 });
   await teamRow
     .getByRole("button", { name: tx("audience.types.joueurs_equipe", "publications") })
     .click();
