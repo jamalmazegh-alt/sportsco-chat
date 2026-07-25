@@ -204,7 +204,7 @@ function EmailsTab() {
 
 function PushTab() {
   const [kind, setKind] = useState("");
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "notif-push", kind],
     queryFn: () => listNotificationPush({ data: { kind: kind || null, limit: 200 } }),
   });
@@ -223,7 +223,11 @@ function PushTab() {
           <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
         </Button>
       </div>
-      {isLoading ? (
+      {error ? (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          Erreur de chargement : {(error as Error).message}
+        </div>
+      ) : isLoading ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-5 w-5 animate-spin" />
         </div>
@@ -234,6 +238,7 @@ function PushTab() {
               <tr>
                 <th className="text-left px-3 py-2">Date</th>
                 <th className="text-left px-3 py-2">Type</th>
+                <th className="text-left px-3 py-2">Réf.</th>
                 <th className="text-left px-3 py-2">Cibles</th>
                 <th className="text-left px-3 py-2">Envoyées</th>
                 <th className="text-left px-3 py-2">Ouvertes</th>
@@ -247,6 +252,12 @@ function PushTab() {
                     {fmt(r.dispatched_at)}
                   </td>
                   <td className="px-3 py-2">{r.kind}</td>
+                  <td
+                    className="px-3 py-2 text-xs font-mono text-muted-foreground truncate max-w-[160px]"
+                    title={r.ref_id}
+                  >
+                    {r.ref_id ? r.ref_id.slice(0, 8) : "—"}
+                  </td>
                   <td className="px-3 py-2">{r.targets_count}</td>
                   <td className="px-3 py-2">{r.sent_count}</td>
                   <td className="px-3 py-2">{r.opened_count}</td>
@@ -265,3 +276,4 @@ function PushTab() {
     </div>
   );
 }
+
