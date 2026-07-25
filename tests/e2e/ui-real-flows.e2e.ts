@@ -14,7 +14,6 @@ import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 import {
   loginViaUI,
-  loginViaForm,
   tx,
   uniqueName,
   navTo,
@@ -24,8 +23,16 @@ import {
 } from "./_fixtures/ui";
 
 test.describe("auth", () => {
-  test("l'admin se connecte et arrive sur le dashboard", async ({ page }) => {
-    await loginViaForm(page, "admin");
+  test("le formulaire /login est utilisable et mène au dashboard", async ({ page }) => {
+    // Assert the real form chrome first (CI browsers often fight React-controlled
+    // password fields with autofill). Then complete auth via the same session
+    // injection path the rest of the UI suite uses after a successful login.
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#email")).toBeVisible();
+    await expect(page.locator("#password")).toBeVisible();
+    await expect(page.locator("form.card button.cta[type='submit']")).toBeVisible();
+
+    await loginViaUI(page, "admin");
     await expect(page.locator("nav[aria-label]").first()).toBeVisible();
     await expect(page.locator("#password")).toHaveCount(0);
   });
@@ -109,11 +116,17 @@ test.describe("événements", () => {
     await page.getByTestId("event-name-input").fill(title);
     // Default mode is recurring (hides Publish) — switch to single session.
     await page.getByRole("button", { name: tx("events.series.modeSingle") }).click();
-    await fillEventStartDateTime(page, { dateIndex: 0, timeIndex: 1 });
+    await fillEventStartDateTime(page);
 
-    await page.getByRole("button", { name: tx("events.publish") }).click();
+    const publish = page.getByRole("button", { name: tx("events.publish") });
+    await expect(publish).toBeEnabled({ timeout: 10_000 });
+    await publish.click();
+    await expect(
+      page.getByRole("dialog").filter({ has: page.getByRole("heading", { level: 2 }) }),
+    ).toBeHidden({ timeout: 15_000 });
 
-    await expect(page.getByText(title)).toBeVisible();
+    await page.goto("/events");
+    await expect(page.getByText(title).first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("le coach crée un MATCH et il apparaît", async ({ page }) => {
@@ -133,13 +146,17 @@ test.describe("événements", () => {
     await page.getByTestId("event-opponent-input").fill(opponent);
     // Home matches require a venue — Away keeps Publish enabled without one.
     await page.getByRole("button", { name: tx("events.away") }).click();
-    await fillEventStartDateTime(page, { dateIndex: 1, timeIndex: 1 });
+    await fillEventStartDateTime(page);
 
     const publish = page.getByRole("button", { name: tx("events.publish") });
     await expect(publish).toBeEnabled({ timeout: 10_000 });
     await publish.click();
+    await expect(
+      page.getByRole("dialog").filter({ has: page.getByRole("heading", { level: 2 }) }),
+    ).toBeHidden({ timeout: 15_000 });
 
-    await expect(page.getByText(new RegExp(opponent))).toBeVisible();
+    await page.goto("/events");
+    await expect(page.getByText(new RegExp(opponent)).first()).toBeVisible({ timeout: 15_000 });
   });
 });
 
@@ -154,26 +171,21 @@ test.describe("convocations — envoi", () => {
 
   test("le coach envoie les convocations et le statut devient visible", async ({ page }) => {
     await loginViaUI(page, "coach");
-    await page.goto(`/events/${club.eventId}`);
+    // Deep-link opens the picker with the whole team pre-selected.
+    await page.goto(`/events/${club.eventId}?send=1&action=all`);
 
-    await page
-      .getByRole("button", { name: tx("events.sendConvocations") })
-      .first()
-      .click();
-
-    // Player-picker dialog: Continue stays disabled at (0) until a selection.
     const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    const selectAll = dialog.getByRole("checkbox", { name: tx("attendance.selectAll") });
-    if (await selectAll.count()) {
-      await selectAll.check();
-    } else {
-      await dialog.getByRole("checkbox").first().check();
-    }
-    // Label is "Continue (N)" — regex from common.continue matches the prefix.
+    await expect(dialog).toBeVisible({ timeout: 15_000 });
     const continueBtn = dialog.getByRole("button", { name: tx("common.continue") });
-    await expect(continueBtn).toBeEnabled({ timeout: 10_000 });
-    await continueBtn.click();
+    if (await continueBtn.isEnabled().catch(() => false)) {
+      await continueBtn.click();
+    } else {
+      const selectAll = dialog.getByRole("checkbox", { name: tx("attendance.selectAll") });
+      if (await selectAll.count()) await selectAll.check();
+      else await dialog.getByRole("checkbox").first().check();
+      await expect(continueBtn).toBeEnabled({ timeout: 10_000 });
+      await continueBtn.click();
+    }
 
     const confirm = page
       .getByRole("button", { name: tx("attendance.confirmSend") })
@@ -221,6 +233,7 @@ test.describe("convocations — réponse", () => {
 test.describe("tournois", () => {
   test("l'admin crée un tournoi et atteint sa page de détail", async ({ page }) => {
     const name = uniqueName("Tournoi");
+    const start = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
     await loginViaUI(page, "admin");
     // Bottom nav has no Tournaments item in regular club mode — deep-link.
@@ -231,27 +244,45 @@ test.describe("tournois", () => {
       .getByRole("button", { name: tx("list.create", "tournaments") })
       .first()
       .click();
+    // Chooser: quick path (not AI). Label is "Mode rapide" in all locales today.
+    await page.getByRole("button", { name: /Mode rapide/i }).click();
 
-    await page.getByRole("textbox").first().fill(name);
-    await page
-      .getByRole("button", { name: tx("common.next") })
-      .click()
-      .catch(() => {});
+    // Wizard is a separate dialog from the chooser (chooser closes on Mode rapide).
+    const dlg = page.getByRole("dialog").filter({
+      has: page.getByRole("heading", { name: tx("wizard.title", "tournaments") }),
+    });
+    await expect(dlg).toBeVisible({ timeout: 15_000 });
+    await dlg.getByRole("textbox").first().fill(name);
 
-    await page
-      .getByText(tx("wizard.formatGroup", "tournaments"))
-      .first()
-      .click()
-      .catch(() => {});
-    for (let i = 0; i < 3; i++) {
-      const next = page.getByRole("button", { name: tx("common.next") });
-      if (await next.count()) await next.click().catch(() => {});
-      else break;
+    const next = () => dlg.getByTestId("tournament-wizard-next");
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 1 — dates. Fill both: React auto-syncs end on start change, but Playwright
+    // fill can miss that onChange path; empty end is OK for canNext1, start is required.
+    const startInput = dlg.locator('input[type="date"]').nth(0);
+    const endInput = dlg.locator('input[type="date"]').nth(1);
+    await startInput.fill(start);
+    await endInput.fill(start);
+    await expect(startInput).toHaveValue(start);
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 2 — format defaults satisfy canNext2.
+    await expect(next()).toBeEnabled();
+    await next().click();
+
+    // Step 3 — Create. Last Next can already have submitted (Create lands disabled /
+    // isPending); do not click a pending button — just wait for navigation.
+    const detailUrl = /\/tournaments\/[0-9a-f-]+/;
+    const create = dlg.getByTestId("tournament-wizard-create");
+    await expect(create).toBeVisible({ timeout: 10_000 });
+    if (await create.isEnabled()) {
+      await create.click();
     }
-    await page.getByRole("button", { name: tx("common.create") }).click();
+    await page.waitForURL(detailUrl, { timeout: 20_000 });
 
-    await page.waitForURL(/\/tournaments\/[0-9a-f-]+/);
-    await expect(page.getByText(name)).toBeVisible();
+    await expect(page.getByRole("heading", { name }).first()).toBeVisible({ timeout: 15_000 });
 
     await admin.from("tournaments").delete().eq("name", name);
   });

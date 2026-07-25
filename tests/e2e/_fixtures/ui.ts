@@ -132,21 +132,29 @@ export async function loginViaForm(page: Page, role: UiRole = "admin"): Promise<
   await dismissBlockingOverlays(page);
   await expect(page.locator("#email")).toBeVisible();
 
-  // Click + fill: plus fiable que getByLabel sur le layout floating-label.
-  // `#password` — getByLabel(auth.password) matche aussi le toggle show/hide.
+  // Focus + insertText: updates React controlled state more reliably than
+  // DOM value setter alone (toHaveValue can pass while React state stays "").
   await page.locator("#email").click();
-  await page.locator("#email").fill(email);
+  await page.locator("#email").fill("");
+  await page.keyboard.insertText(email);
   await expect(page.locator("#email")).toHaveValue(email);
+
+  const showPw = page.getByRole("button", { name: /Afficher le mot de passe|Show password/i });
+  if (await showPw.isVisible().catch(() => false)) await showPw.click();
   await page.locator("#password").click();
-  await page.locator("#password").fill(password);
+  await page.locator("#password").fill("");
+  await page.keyboard.insertText(password);
   await expect(page.locator("#password")).toHaveValue(password);
 
+  await dismissBlockingOverlays(page);
   const submit = page.locator("form.card button.cta[type='submit']");
   await expect(submit).toBeEnabled();
-  await submit.click();
-  await page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
-    timeout: 45_000,
-  });
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === "/home" || url.pathname.startsWith("/home/"), {
+      timeout: 45_000,
+    }),
+    submit.click(),
+  ]);
   await waitForAppShell(page);
 }
 
@@ -175,47 +183,57 @@ export async function openClassicEventForm(page: Page): Promise<void> {
 }
 
 /**
- * Remplit date + heure de début dans `EventFormSheet`.
- * Les champs n'ont pas de testid — on scope au dialog et on cible le
- * TimePicker (`placeholder=HH:MM`) plutôt que le premier `—` (convoc avant start).
- *
- * Indices (0-based) within the open dialog:
- * - meeting: dateIndex 0, timeIndex 0
- * - match:   dateIndex 1 (match date), timeIndex 1
- * - training (single session): dateIndex 0, timeIndex 1 (start, after convoc)
+ * Remplit date + heure de début via testids `event-start-date` / `event-start-time`
+ * (EventFormSheet — match, meeting, training single-session).
  */
 export async function fillEventStartDateTime(
   page: Page,
-  opts: { time?: string; dateIndex?: number; timeIndex?: number } = {},
+  opts: { time?: string } = {},
 ): Promise<void> {
   const time = opts.time ?? "18:00";
-  const dateIndex = opts.dateIndex ?? 0;
-  const timeIndex = opts.timeIndex ?? 0;
-  const root = page.getByRole("dialog").last();
+  const root = page
+    .getByRole("dialog")
+    .filter({ has: page.getByRole("heading", { level: 2 }) })
+    .first();
 
-  const dateButtons = root.locator("button").filter({ has: page.locator("svg.lucide-calendar") });
-  await expect(dateButtons.nth(dateIndex)).toBeVisible({ timeout: 10_000 });
-  await dateButtons.nth(dateIndex).click();
+  const dateBtn = root.getByTestId("event-start-date");
+  await expect(dateBtn).toBeVisible({ timeout: 10_000 });
+  await dateBtn.click();
+  // Prefer next month so the event is always in the future (default list filters).
+  const nextMonth = page
+    .getByRole("button", { name: /Go to the Next Month|Mois suivant|Next month/i })
+    .or(page.locator("button").filter({ has: page.locator("svg.lucide-chevron-right") }));
+  if (
+    await nextMonth
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await nextMonth.first().click();
+  }
   const day = page.getByRole("gridcell").getByRole("button").filter({ hasText: /^\d+$/ });
   const count = await day.count();
   if (count === 0) throw new Error("fillEventStartDateTime: no calendar day buttons");
-  await day.nth(Math.min(14, count - 1)).click();
+  await day.nth(Math.min(10, count - 1)).click();
 
-  const clockButtons = root.locator("button").filter({ has: page.locator("svg.lucide-clock") });
-  await expect(clockButtons.nth(timeIndex)).toBeVisible({ timeout: 10_000 });
-  await clockButtons.nth(timeIndex).click();
+  // Match/meeting use event-start-time; training uses the same id on TimeField.
+  const timeBtn = root.getByTestId("event-start-time");
+  await expect(timeBtn).toBeVisible({ timeout: 10_000 });
+  await timeBtn.click();
   const hhmm = page.locator('input[placeholder="HH:MM"]');
   await expect(hhmm).toBeVisible({ timeout: 5_000 });
-  await hhmm.fill(time);
+  await hhmm.click();
+  await hhmm.fill("");
+  await page.keyboard.type(time.replace(":", ""), { delay: 20 });
   await page.keyboard.press("Enter");
+  await expect(timeBtn).toContainText(time);
 }
 
 /**
- * Label « Destinataires / Recipients » on the publication audience step.
- * Plain getByText() also matches helper copy containing "recipients".
+ * Audience step marker on publication create (exact <label> text).
  */
 export function publicationAudienceLabel(page: Page) {
-  return page.getByRole("label", { name: tx("new.audienceLabel", "publications") });
+  return page.locator("label").filter({ hasText: /^(Destinataires|Recipients)$/ });
 }
 
 /**

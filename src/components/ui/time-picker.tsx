@@ -12,6 +12,8 @@ type Props = {
   className?: string;
   minuteStep?: number;
   placeholder?: string;
+  /** Stable selector for Playwright (event create form). */
+  "data-testid"?: string;
 };
 
 const pad = (n: number) => n.toString().padStart(2, "0");
@@ -23,6 +25,7 @@ export function TimePicker({
   className,
   minuteStep = 5,
   placeholder = "—",
+  "data-testid": dataTestId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [h, m] = value ? value.split(":").map((s) => parseInt(s, 10)) : [NaN, NaN];
@@ -55,6 +58,7 @@ export function TimePicker({
           type="button"
           variant="outline"
           aria-required={required}
+          data-testid={dataTestId}
           className={cn(
             "h-10 justify-start font-normal tabular-nums",
             !value && "text-muted-foreground",

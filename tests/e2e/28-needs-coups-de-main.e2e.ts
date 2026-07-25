@@ -103,9 +103,8 @@ test.describe("besoins — parcours destinataire", () => {
     await loginViaUI(page, "player");
     await page.goto("/needs");
 
-    await expect(
-      page.getByText(tx("feed.empty", "needs")).or(page.getByText(tx("feed.title", "needs"))),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: tx("feed.title", "needs") })).toBeVisible();
+    await expect(page.getByText(tx("feed.empty", "needs")).first()).toBeVisible();
   });
 });
 
@@ -120,11 +119,19 @@ test.describe("besoins — couverture", () => {
     await expect(page.locator("#needs")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(label)).toBeVisible();
 
-    await page
-      .getByRole("button", { name: tx("card.menuLabel", "needs") })
-      .first()
-      .click();
-    await page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") }).click();
+    // Scope to the card root (rounded-lg border) — a bare `div` filter matches
+    // ancestors that contain every need, so `.first()` ⋯ opened the wrong draft.
+    const needCard = page
+      .locator("#needs div.rounded-lg.border")
+      .filter({ hasText: label })
+      .first();
+    await expect(needCard).toBeVisible();
+    // Close is only in the menu for published/open needs.
+    await expect(needCard.getByText(tx("badge.unpublished", "needs"))).toHaveCount(0);
+    await needCard.getByRole("button", { name: tx("card.menuLabel", "needs") }).click();
+    const closeItem = page.getByRole("menuitem", { name: tx("menu.closeNeed", "needs") });
+    await expect(closeItem).toBeVisible({ timeout: 10_000 });
+    await closeItem.click();
     // Menu opens a confirm alertdialog — must confirm before the toast fires.
     const confirm = page.getByRole("alertdialog");
     await expect(confirm).toBeVisible();
@@ -154,9 +161,10 @@ async function seedNeed(label: string, opts: { published: boolean }): Promise<st
   if (opts.published) {
     // RLS feed visibility uses event_need_publication_recipients via
     // user_is_need_recipient — audiences alone are not enough.
+    // `admin` is the E2E admin JWT (not service_role): RPC requires auth.uid()=_actor.
     const { error: pubErr } = await admin.rpc("publish_event_need_atomic" as any, {
       _need_id: data.id,
-      _actor: club.coach.userId,
+      _actor: club.admin.userId,
       _audiences: [{ type: "team_parents", team_id: club.teamId }],
     });
     if (pubErr) throw new Error(`seedNeed publish: ${pubErr.message}`);
