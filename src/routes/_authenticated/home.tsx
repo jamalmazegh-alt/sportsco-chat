@@ -5,7 +5,16 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, CreditCard } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  ChevronRight,
+  Plus,
+  Users,
+  BarChart3,
+  CreditCard,
+  Send,
+} from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -141,7 +150,19 @@ function HomePage() {
     },
   });
 
-  // My convocations only (player or parent)
+  // Coach view: which of the "next events" already have convocations dispatched.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["home-convocs-sent", activeClubId, (upcoming ?? []).map((e) => e.id).join(",")],
+    enabled: !!upcoming && upcoming.length > 0,
+    queryFn: async () => {
+      const ids = (upcoming ?? []).map((e) => e.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase.from("convocations").select("event_id").in("event_id", ids);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
   const { data: myConvocs } = useQuery({
     queryKey: ["my-convocs-home", user?.id, activeClubId],
     enabled: !!user && !!activeClubId,
@@ -423,6 +444,18 @@ function HomePage() {
                             >
                               {formatHomeEventTitle(e as any)}
                             </p>
+                            {isCoach && convocSentSet?.has(e.id) && (
+                              <span
+                                className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                                title={t("events.convocsSentTitle", {
+                                  defaultValue:
+                                    "Les convocations ont été envoyées pour cet événement",
+                                })}
+                              >
+                                <Send className="h-3 w-3" />
+                                {t("events.convocsSent", { defaultValue: "Convocations envoyées" })}
+                              </span>
+                            )}
                           </div>
                           <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />

@@ -30,6 +30,7 @@ import {
   Ban,
   Clock,
   Search,
+  Send,
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
@@ -279,6 +280,23 @@ function EventsPage() {
     staleTime: 30_000,
   });
 
+  // Coach view: which events already have convocations dispatched.
+  // Rendered as a small "Convocations envoyées" chip on each event row.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["convocs-sent-by-event", activeClubId, (events ?? []).length],
+    enabled: isCoach && !!events && events.length > 0,
+    queryFn: async () => {
+      const eventIds = (events ?? []).map((e) => e.id);
+      if (eventIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id")
+        .in("event_id", eventIds);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
@@ -485,6 +503,17 @@ function EventsPage() {
                 if (!resp) return null;
                 return <ConvocationResponseBadge response={resp} />;
               })()}
+              {isCoach && convocSentSet?.has(e.id) && !isCancelled && (
+                <span
+                  className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                  title={t("events.convocsSentTitle", {
+                    defaultValue: "Les convocations ont été envoyées pour cet événement",
+                  })}
+                >
+                  <Send className="h-3 w-3" />
+                  {t("events.convocsSent", { defaultValue: "Convocations envoyées" })}
+                </span>
+              )}
             </div>
             <p
               className={cn(
