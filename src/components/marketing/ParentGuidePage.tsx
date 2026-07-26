@@ -14,6 +14,7 @@ import {
   Smartphone,
   ArrowRight,
   ImageIcon,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -89,6 +90,14 @@ function scrollToId(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
   const el = typeof document !== "undefined" ? document.getElementById(id) : null;
   if (!el) return;
   e.preventDefault();
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.history.replaceState(null, "", `#${id}`);
+}
+
+function scrollToSection(id: string) {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById(id);
+  if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "start" });
   window.history.replaceState(null, "", `#${id}`);
 }
@@ -173,7 +182,34 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
         className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
       >
         <div className="mx-auto max-w-6xl px-5 lg:px-8">
-          <ul className="flex snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* Mobile: compact native select so the nav never overflows the viewport */}
+          <div className="relative py-3 sm:hidden">
+            <label htmlFor="parent-guide-sections" className="sr-only">
+              {t("parentGuide.tutorialsTitle")}
+            </label>
+            <select
+              id="parent-guide-sections"
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value) scrollToSection(e.target.value);
+              }}
+              className="w-full appearance-none rounded-full border border-border bg-card px-4 py-2.5 pr-10 text-sm font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+            >
+              <option value="" disabled>
+                {t("parentGuide.tutorialsTitle")}
+              </option>
+              {tutorials.map((tuto, i) => (
+                <option key={`mobile-opt-${tuto.t}`} value={`tuto-${i + 1}`}>
+                  {i + 1}. {tuto.t}
+                </option>
+              ))}
+              <option value="faq">{t("parentGuide.ctaFaq")}</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          </div>
+
+          {/* Desktop: horizontal scrollable pills */}
+          <ul className="hidden snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] sm:flex [&::-webkit-scrollbar]:hidden">
             {tutorials.map((tuto, i) => {
               const Icon = TUTORIAL_ICONS[i] ?? CheckCircle2;
               return (
