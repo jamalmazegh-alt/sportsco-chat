@@ -569,7 +569,9 @@ function ReserveDialog({
   const [busy, setBusy] = useState(false);
 
   async function submit() {
-    if (!user || selected.length === 0) return;
+    if (!user) return;
+    if (selectablePlayers.length > 0 && selected.length === 0) return;
+
     setBusy(true);
     const { error } = await supabase.from("carpool_passengers").insert({
       carpool_id: carpool.id,
