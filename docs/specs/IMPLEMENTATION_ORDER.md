@@ -1,312 +1,365 @@
-# Offre Équipe — Ordre d'implémentation imposé
+# Offre Équipe — Ordre d'implémentation et stratégie de déploiement
 
 > Document d'exécution. Il ne décrit **pas** quoi construire (voir
 > `offre-equipe-team-plan.md`) ni comment le concevoir (voir
-> `offre-equipe-architecture-plan.md`), mais **dans quel ordre écrire le code**.
+> `offre-equipe-architecture-plan.md`), mais **dans quel ordre écrire et déployer le
+> code** sur une application déjà en production et stable.
 >
-> **Règle absolue : ne jamais développer « par fonctionnalité ».** Sur un chantier de
-> cette taille, développer une fonctionnalité de bout en bout (SQL + serveur + UI) avant
-> la suivante produit des couches incohérentes, des RLS rétro-ajoutées et des tests
-> écrits après coup. Chaque étape ci-dessous s'appuie sur les précédentes et ne démarre
-> qu'une fois la précédente terminée et vérifiée.
+> **Règle fondatrice :**
+>
+> ```text
+> Ajouter d'abord sans remplacer.
+> Observer avant d'activer.
+> Activer sur des clubs pilotes.
+> Ne modifier les RLS et fonctions historiques qu'en dernier.
+> ```
+>
+> Ce document remplace une version antérieure dont l'ordre était trop agressif : le
+> feature flag y arrivait en avant-dernière étape, ce qui ne protégeait ni les triggers,
+> ni les policies, ni les fonctions SQL remplacées.
 
 ---
 
-## Séquence globale
+## 0. Pourquoi un feature flag en fin de lot ne suffit pas
+
+Un flag posé après la migration masque l'interface. Il ne protège **pas** contre :
+
+- un trigger SQL incorrect ;
+- une fonction SQL existante remplacée ;
+- une policy RLS modifiée ;
+- un webhook qui route mal un événement ;
+- une migration qui fait échouer une requête existante ;
+- une colonne ou un index qui change le comportement de production.
+
+Ces changements sont actifs **dès le déploiement de la migration**, indépendamment de
+l'UI. Il faut donc un **flag de comportement serveur, posé avant les migrations
+sensibles**, et une stratégie de déploiement sombre pour tout ce qui touche à des objets
+SQL existants.
+
+---
+
+## 1. Séquence par phases
+
+Les huit lots fonctionnels sont regroupés en cinq phases de déploiement. **La phase est
+l'unité de décision**, pas le lot : on ne passe pas à la suivante sans examen des
+résultats de la précédente.
 
 ```text
-Lot 0 bis  (inventaires + régularisation exempt_until + dette CI)
-   ↓
-Lot 1 → Lot 2 → Lot 3 → Lot 4 → Lot 5 → Lot 6 → Lot 7 → Lot 8
+Phase A — Sans impact utilisateur          (additif pur)
+   ↓  ← point d'arrêt et revue
+Phase B — Mode sombre                      (calcul parallèle, aucune décision)
+   ↓  ← point d'arrêt et revue des divergences
+Phase C — Nouveau parcours uniquement      (clubs per_team neufs, bêta restreinte)
+   ↓  ← point d'arrêt et revue
+Phase D — Enforcement                      (quotas, lecture seule, policies A)
+   ↓  ← point d'arrêt et revue
+Phase E — Migration Équipe → Club          (après semaines de stabilité)
 ```
 
-**À l'intérieur de chaque lot, l'ordre des 8 étapes est le même :**
+### Phase A — Sans impact sur les utilisateurs
+
+Autorisé : inventaires ; correction de la dette CI ; **nouvelles** tables ; **nouvelles**
+colonnes avec DEFAULT ; fonctions suffixées `_v2` **jamais appelées** ; tests.
+
+Interdit : modifier une policy existante ; modifier un trigger existant ; remplacer une
+fonction SQL existante ; créer une contrainte ou un index unique sur une table existante
+sans la procédure du §3.1.
+
+Le trigger `auto_create_trial_subscription` et `can_create_tournament` font l'objet de
+**releases dédiées et isolées**, jamais mêlées au reste (§3.2 et §3.3).
+
+### Phase B — Mode sombre
+
+Les nouvelles fonctions de couverture sont **calculées mais ne décident rien** :
 
 ```text
-1. migration SQL
-   ↓
-2. server functions
-   ↓
-3. webhook
-   ↓
-4. RLS
-   ↓
-5. UI
-   ↓
-6. tests
-   ↓
-7. feature flag
-   ↓
-8. merge
+ancien_droit  = logique actuelle          → DÉCIDE
+nouveau_droit = get_team_coverage etc.    → calculé, journalisé, ne décide pas
+divergence    → journalisée, jamais bloquante
 ```
 
-Un lot n'est pas « fini » tant que les 8 étapes ne sont pas franchies. On ne démarre pas
-le lot N+1 avec des étapes du lot N en suspens.
+Aucun utilisateur n'est bloqué par la nouvelle logique. On bascule seulement après
+analyse des écarts et explication de **chaque** divergence — une divergence non expliquée
+est un bug, pas un cas particulier.
+
+### Phase C — Nouveau parcours uniquement
+
+Activation pour les **nouveaux** clubs `coverage_mode='per_team'` seulement. **Aucun
+changement de comportement pour les clubs existants.** Quelques bêta-testeurs.
+
+### Phase D — Enforcement
+
+Quotas, lecture seule, policies de catégorie A. **Activation club par club**, jamais
+globale d'un coup.
+
+### Phase E — Migration Équipe → Club
+
+Seulement après plusieurs semaines de stabilité du modèle Équipe en réel. Ne pas
+développer ce flux avant d'avoir validé en production le checkout Équipe, les webhooks et
+la réconciliation. La saga est bien conçue, mais elle manipule des abonnements réels : sa
+correction ne se démontre pas sur un environnement de test.
 
 ---
 
-## Pourquoi cet ordre
+## 2. Ordre à l'intérieur de chaque lot
 
-| Étape | Pourquoi à cette place |
-|---|---|
-| 1. SQL | Le schéma est le contrat. Tout le reste en dépend ; le changer après avoir écrit du serveur et de l'UI oblige à tout reprendre. |
-| 2. Server functions | Elles s'appuient sur le schéma et définissent la surface d'appel dont l'UI aura besoin. Écrites avant l'UI, elles ne sont pas déformées par des contraintes d'affichage. |
-| 3. Webhook | Il écrit dans les mêmes tables que les server functions et doit partager leurs helpers. Écrit après, il les réutilise ; écrit avant, il les duplique. |
-| 4. RLS | Se pose **après** que tous les chemins d'écriture existent (serveur + webhook), sinon on écrit des policies pour des chemins qu'on n'a pas encore identifiés. |
-| 5. UI | Consomme une surface serveur déjà stable et déjà sécurisée. L'UI ne doit jamais être ce qui révèle un manque de garde serveur. |
-| 6. Tests | Après l'UI, ils couvrent la chaîne complète. Les tests de concurrence et de RLS, eux, sont écrits **avec** leurs étapes (1 et 4) — voir ci-dessous. |
-| 7. Feature flag | Posé en dernier avant merge, une fois qu'il y a quelque chose à masquer. |
-| 8. Merge | Rien ne part sur la branche principale à moitié. |
-
-**Exception à l'étape 6.** Trois familles de tests ne sont pas repoussées à la fin :
-
-- les **tests de concurrence** (quotas, imports) s'écrivent avec l'étape 1 — ils valident
-  la migration elle-même ;
-- les **tests RLS** s'écrivent avec l'étape 4 — une policy sans son test n'est pas
-  livrée ;
-- les **tests d'idempotence webhook** s'écrivent avec l'étape 3.
-
-L'étape 6 couvre le reste : unitaires métier, intégration, E2E, non-régression.
-
----
-
-## Lot 0 bis — prérequis bloquant
-
-Aucune étape SQL/serveur/UI. Trois travaux, dans cet ordre :
+Remplace l'ancienne séquence en 8 étapes :
 
 ```text
-1. Inventaires
-   1a. mutations directes Supabase (56 fichiers) → classification A / A′ / B / C / D
-   1b. lecteurs de subscriptions (39 sites) → comportement si aucune ligne
-   ↓
-2. Régularisation exempt_until
-   2a. inventaire des exemptions expirées
-   2b. analyse d'impact club par club
-   2c. régularisation manuelle des données
-   2d. communication éventuelle aux clubs
-   2e. correction SQL de club_has_active_subscription
-   2f. tests de non-régression
-   ↓
-3. Dette CI
-   3a. correction des contrôles bloquants (dont check:i18n)
-   3b. baseline chiffrée de la dette indépendante restante
+1.  Tests de référence de l'existant       ← capture le comportement AVANT
+2.  Feature flag serveur, inactif           ← posé AVANT toute migration sensible
+3.  Migration additive compatible           ← rien de remplacé, rien de contraint
+4.  Déploiement en mode sombre              ← nouvelles fonctions calculées, non décisives
+5.  Vérification en production              ← divergences analysées
+6.  Server functions, non appelées
+7.  Tests
+8.  Activation interne uniquement           ← équipe Clubero
+9.  Activation bêta progressive             ← clubs pilotes nommés
+10. Activation générale
 ```
 
-L'ordre 1 → 2 → 3 n'est pas indifférent : l'inventaire des lecteurs de `subscriptions`
-(1b) éclaire l'analyse d'impact du correctif `exempt_until` (2b).
+L'étape 1 est la plus souvent oubliée : **avant de modifier quoi que ce soit, écrire les
+tests qui capturent le comportement actuel**, y compris ses bizarreries. Sans eux, on ne
+peut pas distinguer une régression d'un changement voulu.
 
-**Le Lot 1 ne démarre pas avant 2f et 3a.** Corriger `exempt_until` pendant le Lot 1
-mélangerait une correction d'accès en production avec un nouveau modèle de facturation.
+La RLS existante n'est modifiée qu'après validation du nouveau modèle en mode sombre.
+
+Trois familles de tests restent écrites avec l'étape qu'elles valident : concurrence
+(avec la migration), RLS (avec la policy), idempotence webhook (avec le webhook).
 
 ---
 
-## Lot 1 — Modèle de couverture
+## 3. Procédures pour les changements à haut risque
 
-Le lot le plus structurant. Tout le reste en dépend.
+### 3.1 Index unique sur `team_members (team_id, player_id)`
+
+Un index unique sur une table de production peut échouer au déploiement, révéler des
+doublons fonctionnellement légitimes, ou bloquer une opération existante qui recrée
+aujourd'hui une ligne d'appartenance.
+
+Vérifier l'absence de doublons ne suffit pas. Procédure imposée :
 
 ```text
-1. SQL
-   1a. clubs.coverage_mode (+ city, postal_code si absentes)
-   1b. ajustement du trigger auto_create_trial_subscription (early return per_team)
-   1c. teams.created_by_user_id
-   1d. team_members.status + index (après vérification des doublons team_id/player_id)
-   1e. team_subscriptions + index partiels
-   1f. team_discovery_coverage + index partiels
-   1g. club_plan_migrations, team_billing_events
-   1h. fonctions de couverture (get_team_coverage, get_team_access_state,
-       team_has_paid_access, team_can_manage_content, team_can_operate_events,
-       team_can_respond, count_active_players, can_manage_team_billing…)
-   1i. helpers d'exemption (club_ / team_billing_exemption_is_active)
-   1j. garde-fous DB (anti-abonnement Club sur per_team, cohérence club_id,
-       quota joueurs, quota Découverte club)
-   1k. can_create_tournament avec contrôle explicite de coverage_mode
-   → tests de concurrence + tests de régression tournoi écrits ICI
-
-2. Server functions
-   2a. team-coverage.server.ts (couverture, état, entitlements)
-   2b. hook client useTeamEntitlements
-
-3. Webhook — aucun changement dans ce lot
-
-4. RLS
-   4a. policies des nouvelles tables + REVOKE colonnes Stripe
-   → tests RLS écrits ICI
-
-5. UI — aucune dans ce lot (modèle uniquement)
-
-6. Tests — unitaires de dérivation d'état et d'entitlements
-
-7. Feature flag — création de team_plan_v1 (inactif)
-
-8. Merge
+1. inventaire exact des doublons (nombre, clubs, équipes, ancienneté)
+2. détermination de leur CAUSE (bug ? parcours légitime ? import ? reprise de données ?)
+3. vérification des références associées — laquelle des lignes porte l'historique
+   attendu (convocations, présences, compositions) ?
+4. correction dans une migration DISTINCTE, déployée seule
+5. surveillance pendant plusieurs jours — les doublons réapparaissent-ils ?
+6. création de l'index en dernier, seulement si (5) est propre
 ```
 
-**Point de contrôle avant le Lot 2 :** un club `coverage_mode='per_team'` avec N équipes
-couvertes ne doit débloquer ni les fonctionnalités Club ni la création de tournois, y
-compris si une ligne `subscriptions` est injectée manuellement.
+**Ne jamais supprimer automatiquement « la ligne en trop »** sans savoir laquelle porte
+l'historique. Si les doublons se recréent après l'étape 4, c'est qu'un parcours applicatif
+les produit : l'index le ferait échouer en production.
 
----
+Si l'étape 2 révèle des doublons légitimes, **renoncer à l'index unique** et compter les
+joueurs distincts autrement. La contrainte est un confort, pas une exigence produit.
 
-## Lot 2 — Onboarding et rattachement simple
+### 3.2 Trigger `auto_create_trial_subscription`
+
+Release **dédiée**, jamais mêlée à d'autres changements.
+
+Tester les créations de club provenant de **tous** les chemins existants : onboarding
+Club ; parcours organisateur de tournoi ; superadmin ; scripts et tests ; toute RPC créant
+un club ; invitations et parcours indirects.
+
+**Protection supplémentaire imposée.** Le trigger est déployé avant le nouvel onboarding,
+mais **aucun code existant ne doit pouvoir écrire `coverage_mode='per_team'`** :
+
+- la valeur n'est settable que par une **RPC dédiée**, elle-même derrière un flag ;
+- un trigger `BEFORE UPDATE` refuse tout passage à `per_team` hors de cette RPC ;
+- sinon, un bug front ou un appel direct créerait un club sans essai Club, donc verrouillé
+  immédiatement pour son propriétaire.
+
+### 3.3 `can_create_tournament`
+
+Cette fonction est utilisée en production. **Ne pas la remplacer directement.**
 
 ```text
-1. SQL — club_attach_requests, RPC search_public_clubs (projection stricte)
-2. Server functions — club-search.functions.ts (rate limit fail-closed dédié),
-                      discovery.server.ts, création club + première équipe
-3. Webhook — aucun
-4. RLS — policies club_attach_requests
-5. UI — 4 choix d'onboarding, recherche de club, formulaire club, première équipe,
-        annonce des quotas avant la fin du wizard
-6. Tests — sécurité de la recherche (fail-closed sous erreur DB simulée), E2E onboarding
-7. Feature flag — le nouveau parcours passe derrière team_plan_v1
-8. Merge
+1. créer can_create_tournament_v2 (avec le contrôle coverage_mode)
+2. laisser can_create_tournament INCHANGÉE et décisive
+3. comparer les deux sur des cas réels ou un snapshot anonymisé :
+     - tous les clubs abonnés
+     - les clubs exemptés
+     - les organisateurs de tournoi (entitlements single et annual)
+     - les superadmins
+     - les clubs personnels (is_personal)
+     - les comptes sans abonnement
+     - les clubs anciens aux données atypiques
+4. expliquer CHAQUE divergence
+5. remplacer la fonction publique seulement ensuite
+6. conserver le SQL de l'ancienne définition pour la migration de retour
 ```
+
+Les clubs personnels sont le cas le plus susceptible de diverger : ils n'ont pas de
+souscription et leur `coverage_mode` par défaut sera `'club'`.
+
+### 3.4 Fonctions centrales de couverture
+
+`get_team_coverage`, `get_team_access_state`, `team_has_paid_access`,
+`team_can_manage_content`, `team_can_operate_events`, `team_can_respond` **ne remplacent
+aucun contrôle existant à leur mise en service**.
+
+Mode sombre obligatoire (Phase B) : l'ancien droit décide, le nouveau est calculé et
+journalisé, toute divergence est tracée sans bloquer personne. C'est le garde-fou le plus
+important de tout le chantier, parce que ces fonctions finiront par gouverner l'accès de
+**tous** les clubs, y compris ceux qui n'utiliseront jamais l'offre Équipe.
+
+### 3.5 Correctif `exempt_until` — chantier distinct
+
+**Ce correctif n'est plus un prérequis du chantier Offre Équipe.** C'est un chantier
+correctif **indépendant**, avec sa **propre release**, observé avant le démarrage du
+Lot 1.
+
+Commits distincts ne suffisent pas : **déploiements distincts**. Ne jamais livrer le
+correctif `exempt_until` et les fondations de l'offre Équipe dans la même release — sinon,
+en cas d'incident, on ne saura pas lequel des deux l'a causé, et le rollback de l'un
+emportera l'autre.
+
+Séquence inchangée par ailleurs : inventaire → analyse club par club → régularisation →
+communication éventuelle → correction SQL → observation → puis, séparément, Lot 1.
+
+Les nouvelles fonctions de couverture honorent `exempt_until` dès leur écriture, quel que
+soit l'état de l'ancienne.
 
 ---
 
-## Lot 3 — Stripe et facturation Équipe
+## 4. Fail-open commercial sur les clubs historiques
+
+Au démarrage de la Phase D, en cas d'incertitude sur le statut d'une équipe existante :
+**conserver les droits actuels et journaliser l'anomalie**.
 
 ```text
-1. SQL — colonnes de grâce si non posées au Lot 1 (grace_started_at, grace_end)
-2. Server functions — team-billing.functions.ts : réconciliation Stripe AVANT checkout
-                      (traite le blocage incomplete), portail, périodicité, annulation,
-                      réactivation, exemptions
-3. Webhook — branche metadata.purpose="team_plan" ; écriture conditionnelle de
-             grace_started_at (posé une seule fois) ; réconciliation par
-             stripe_subscription_id
-   → tests d'idempotence + « 3 échecs successifs → grace_end inchangé » écrits ICI
-4. RLS — get_team_billing_status pour les membres non-payeurs
-5. UI — page Facturation et abonnements, bannières par état
-6. Tests — checkout, abandon, reprise, incomplete_expired, échec, annulation, rejeu
-7. Feature flag
-8. Merge
+get_team_coverage(équipe historique) retourne 'none' de façon inattendue
+→ NE PAS bloquer
+→ journaliser, alerter, conserver les droits actuels
 ```
+
+Le risque commercial d'une équipe gratuite qui publie un message de trop pendant quelques
+jours est négligeable. Le risque fonctionnel de bloquer des réponses aux convocations, des
+déclarations d'indisponibilité, des parents, l'annulation d'un événement ou les coaches
+d'un club abonné est, lui, immédiat et visible.
+
+**Fail-open commercial plutôt que fail-closed fonctionnel** sur les clubs antérieurs au
+chantier. Cette tolérance est temporaire et se retire club par club, une fois le statut
+vérifié.
+
+> Cette règle ne s'applique **pas** aux nouveaux clubs `per_team`, ni aux garde-fous de
+> sécurité (accès aux données d'un autre club, exposition d'identifiants Stripe, création
+> de tournoi), qui restent fail-closed en toutes circonstances.
 
 ---
 
-## Lot 4 — Équipes supplémentaires
+## 5. Contrat de rollback par couche
+
+Le rollback n'est pas « flag off ». Un flag ne ramène en arrière ni un trigger, ni une
+policy, ni une fonction remplacée, ni un index, ni des données déjà écrites par un
+webhook, ni une opération Stripe.
+
+**Chaque changement sensible doit être livré avec les sept éléments suivants :**
 
 ```text
-1. SQL — aucune (le modèle du Lot 1 suffit)
-2. Server functions — ajout d'équipe dans le club courant, calcul de l'upsell normalisé
-3. Webhook — aucun
-4. RLS — aucune
-5. UI — bouton Ajouter une équipe, écran de synthèse, upsell Club (seuils 3 / 4 / 5)
-6. Tests — multi-équipes, périodicités mixtes, quotas Découverte par créateur et par club
-7. Feature flag
-8. Merge
+1. Migration aller
+2. Migration de retour (écrite ET testée, pas seulement envisagée)
+3. Requête de vérification AVANT déploiement
+4. Requête de vérification APRÈS déploiement
+5. Condition d'arrêt du déploiement
+6. Métrique d'alerte
+7. Procédure de restauration
 ```
+
+Pour les changements SQL :
+
+- conserver le SQL de l'ancienne définition de chaque fonction remplacée ;
+- conserver la définition des anciennes policies ;
+- prévoir une migration de restauration **testée**, pas supposée ;
+- **ne jamais supprimer immédiatement** une ancienne colonne ou fonction — la suppression
+  est un chantier ultérieur, après période d'observation.
+
+Pour Stripe :
+
+- **ne pas compter sur un rollback logiciel pour annuler une opération financière** ;
+- toute action irréversible (annulation d'abonnement, facturation, prorata) est derrière
+  un flag séparé et une activation volontaire ;
+- un webhook ayant déjà écrit ne se « dé-écrit » pas : prévoir la réconciliation, pas
+  l'annulation.
 
 ---
 
-## Lot 5 — Enforcement transverse (lot à haut risque)
+## 6. Lot 5 — zone rouge, procédure renforcée
 
-**Le lot le plus dangereux du chantier.** Il modifie des policies existantes sur des
-chemins déjà utilisés en production.
-
-Ordre imposé, plus strict que le schéma général :
+« Une policy par commit avec son test » reste nécessaire, mais **insuffisant si chaque
+commit est déployé à tout le monde immédiatement**.
 
 ```text
-1. Reprendre l'inventaire du Lot 0 bis §28.2 et figer la classification
-   au NIVEAU DE L'ACTION, pas de l'écran
-   ↓
-2. Traiter table par table, pas écran par écran
-   ↓
-3. Pour CHAQUE table :
-   3a. écrire le test RLS (cas autorisé + refusé + cross-club) — AVANT la policy
-   3b. modifier la policy (team_can_manage_content sur la catégorie A uniquement)
-   3c. exécuter le test
-   3d. vérifier explicitement que A′ et B passent toujours
-   ↓
-4. UI — écrans de blocage, upsell tournoi, limite de joueurs
-5. i18n — 7 locales
-6. Tests E2E — état restricted : réponse à convocation OK, annulation d'événement OK,
-              création bloquée
-7. Feature flag
-8. Merge
+policy actuelle CONSERVÉE
+  +
+nouvelle fonction évaluée en shadow mode
+  +
+tests sur copie de production anonymisée
+  +
+activation sur UN club pilote
+  +
+activation sur quelques clubs bêta
+  +
+activation générale
 ```
 
-**Ne jamais modifier plusieurs policies dans un même commit.** Une policy par commit, avec
-son test. C'est le seul lot où cette contrainte s'applique, parce que c'est le seul où une
-erreur bloque silencieusement des utilisateurs légitimes.
+Traiter **table par table**, jamais écran par écran. Pour chaque table : test RLS écrit
+avant la policy, modification, exécution du test, puis vérification **explicite** que les
+catégories A′ et B passent toujours.
+
+La classification A / A′ / B doit être figée au **niveau de l'action**, pas de l'écran :
+« modifier un événement » relève de A (changer le lieu) ou de A′ (annuler), et ces deux
+chemins cohabitent aujourd'hui dans les mêmes fichiers.
 
 ---
 
-## Lot 6 — Billing owner et RGPD
+## 7. Périmètre autorisé à ce stade
 
-```text
-1. SQL — user_has_active_billing_responsibilities
-2. Server functions — transfer_team_billing_owner (transactionnel, journalisé, notifié),
-                      modification de privacy.functions (contrôle avant suppression),
-                      constantes de durée de conservation
-3. Webhook — aucun
-4. RLS — vérification que can_manage_team_billing reste le SEUL point de décision
-         (aucune comparaison directe à billing_owner_user_id — prépare billing_delegates)
-5. UI — transfert, blocage du départ, message RGPD
-6. Tests — 6 cas de suppression du §27.5
-7. Feature flag
-8. Merge
-```
+**Autorisé maintenant :**
 
----
+1. Lot 0 bis — inventaires (mutations directes, lecteurs de `subscriptions`) ;
+2. correction de la dette CI bloquante ;
+3. création des **nouvelles** tables et des fonctions suffixées `_v2`, **sans aucune
+   utilisation** ;
+4. tests et mise en place du mode sombre.
 
-## Lot 7 — Passage vers l'offre Club
+**Puis arrêt et examen des résultats.**
 
-```text
-1. SQL — états de club_plan_migrations si non posés au Lot 1
-2. Server functions — saga en 11 étapes, idempotente, reprenable
-3. Webhook — déclenchement de la saga sur customer.subscription.created Club
-             pour un club per_team
-4. RLS — visibilité superadmin des sagas bloquées
-5. UI — écran de passage, affichage des dates et montants Stripe
-6. Tests — 8 scénarios Stripe, échec partiel, reprise manuelle, rejeu
-7. Feature flag séparé
-8. Merge
-```
+**Non autorisé sans nouvelle validation explicite :**
 
-**Invariant à vérifier explicitement en test :** la couverture Club est active **avant**
-tout arrêt d'abonnement Équipe. Aucune fenêtre sans couverture.
+- toute modification d'une policy RLS existante ;
+- toute modification d'un trigger existant ;
+- tout remplacement d'une fonction SQL existante ;
+- toute création d'index unique ou de contrainte sur une table existante ;
+- tout changement de droits effectif en production ;
+- le correctif `exempt_until` (chantier et release distincts) ;
+- les lots 5, 7 et 8.
 
 ---
 
-## Lot 8 — Rattachement d'une équipe à un autre club
+## 8. Règles transverses
 
-```text
-1. SQL — mise à jour en cascade de team_subscriptions.club_id
-2. Server functions — invitation, acceptation, détection et BLOCAGE des conflits
-3. Webhook — aucun
-4. RLS — impact du changement de club_id sur toutes les tables filles
-5. UI — invitation, écran de conséquences, message de conflit
-6. Tests — cross-club, conservation des données, conflit bloqué
-7. Feature flag séparé
-8. Merge
-```
-
-**Rappel de périmètre : aucune fusion de clubs.** Le rapprochement de deux clubs est un
-chantier ultérieur indépendant.
-
----
-
-## Règles transverses, valables à chaque étape
-
-1. **Une migration par objet logique**, jamais un fichier fourre-tout — le rollback doit
-   pouvoir être partiel.
+1. **Une migration par objet logique** — le rollback doit pouvoir être partiel.
 2. **Aucune policy sans son test** dans le même commit.
 3. **`bun run check:guards`** après chaque ajout de server function.
 4. **`bun run check:i18n`** vert avant tout merge touchant l'UI.
 5. **Ne jamais comparer directement `billing_owner_user_id` à l'utilisateur courant** :
-   toujours passer par `can_manage_team_billing()`. C'est ce qui rendra les délégués de
+   toujours passer par `can_manage_team_billing()` — c'est ce qui rendra les délégués de
    facturation possibles sans refonte.
-6. **Ne jamais écrire `if plan === "team"` dans le front** : toujours consommer les
-   entitlements.
+6. **Ne jamais écrire `if plan === "team"` dans le front** : consommer les entitlements.
 7. **Résoudre le quota avant de prendre un verrou** — la contention n'est justifiée que
    là où une limite existe.
-8. À la fin de chaque lot, relire les critères d'acceptation du §31 de la spec qui
-   concernent ce lot, et cocher explicitement.
+8. **Ajouter avant de remplacer** : toute fonction existante touchée passe par une
+   version `_v2` comparée en parallèle.
+9. À la fin de chaque phase, relire les critères d'acceptation concernés et cocher
+   explicitement.
 
 ---
 
-## Ce qui doit faire arrêter le développement
+## 9. Signaux d'arrêt
 
 Interrompre et remonter le point plutôt que de contourner :
 
@@ -316,7 +369,26 @@ Interrompre et remonter le point plutôt que de contourner :
 - une policy de catégorie B ou A′ semble devoir être bloquée ;
 - un test de concurrence échoue de manière intermittente ;
 - un écran affiche une erreur brute Stripe ou SQL à l'utilisateur ;
-- la seule façon de faire passer un test est de désactiver une RLS.
+- la seule façon de faire passer un test est de désactiver une RLS ;
+- **une divergence du mode sombre ne s'explique pas** ;
+- **des doublons `(team_id, player_id)` réapparaissent après correction** ;
+- **une migration de retour n'a pas été écrite ou n'a pas été testée**.
 
 Chacun de ces signaux indique que la spécification est en train d'être contournée, pas
 appliquée.
+
+---
+
+## 10. Ce que ce document ne garantit pas
+
+Aucun document ne garantit qu'une application en production ne cassera pas. Ce qui est
+garanti ici est plus modeste et plus utile :
+
+- **rien n'est remplacé avant d'avoir été comparé** ;
+- **rien n'est activé avant d'avoir été observé** ;
+- **rien n'est généralisé avant d'avoir été piloté** ;
+- **tout changement sensible dispose d'un chemin de retour testé**.
+
+Le reste relève de la vigilance à l'exécution : lire les journaux de divergence, arrêter
+au premier signal, et refuser de considérer une phase comme franchie parce que le
+calendrier le voudrait.

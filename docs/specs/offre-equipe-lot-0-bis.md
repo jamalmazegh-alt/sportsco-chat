@@ -24,7 +24,13 @@ service role et `supabaseAdmin`**, qui contournent la RLS.
 
 ### A. Anti-abonnement Club sur un club `per_team`
 
-Interdire qu'une ligne `subscriptions` active, en essai ou exemptée soit associée
+**Garde-fou symétrique préalable : nul ne doit pouvoir écrire `coverage_mode='per_team'`
+par accident.** La valeur n'est settable que par une **RPC dédiée, elle-même derrière un
+flag** ; un trigger `BEFORE UPDATE` refuse tout passage à `per_team` hors de cette RPC.
+Sans cela, un bug front ou un appel direct créerait un club sans essai Club, donc
+immédiatement verrouillé pour son propriétaire.
+
+Interdire ensuite qu'une ligne `subscriptions` active, en essai ou exemptée soit associée
 durablement à un club `coverage_mode='per_team'`.
 
 Un `CHECK` inter-tables étant impossible en Postgres, retenir un **trigger
@@ -36,15 +42,31 @@ paramètre de session `SET LOCAL`), jamais par une heuristique.
 À spécifier : le mécanisme d'exception exact, sa portée transactionnelle, et son
 comportement si la migration échoue en cours de route.
 
-### B. Contrôle tournoi explicite
+### B. Contrôle tournoi explicite — par comparaison, pas par remplacement
 
 `can_create_tournament` doit tester `clubs.coverage_mode = 'club'` **en plus de**
 `club_has_active_subscription(club_id)`. Ne pas déduire le mode commercial de la seule
 existence d'une souscription.
 
-Livrable : la nouvelle définition de la fonction, et la vérification que les clubs
-existants (`coverage_mode='club'` par défaut) conservent un comportement strictement
-identique.
+**Cette fonction est utilisée en production : ne pas la remplacer directement.**
+
+```text
+1. créer can_create_tournament_v2
+2. laisser can_create_tournament INCHANGÉE et décisive
+3. comparer les deux sur des cas réels ou un snapshot anonymisé :
+   clubs abonnés · clubs exemptés · organisateurs (entitlements single et annual) ·
+   superadmins · clubs personnels (is_personal) · comptes sans abonnement ·
+   clubs anciens aux données atypiques
+4. expliquer CHAQUE divergence
+5. remplacer la fonction publique seulement ensuite
+6. conserver le SQL de l'ancienne définition pour la migration de retour
+```
+
+Les **clubs personnels** sont le cas le plus susceptible de diverger : ils n'ont pas de
+souscription et leur `coverage_mode` par défaut sera `'club'`.
+
+Livrable : `_v2`, le rapport de comparaison, la liste des divergences expliquées, et la
+migration de retour.
 
 ### C. Cohérence `team_subscriptions.club_id`
 
@@ -437,9 +459,19 @@ pour distinguer les clubs réellement actifs des comptes dormants : un club dorm
 1. produire l'inventaire (lecture seule) ;
 2. décider club par club de l'action de régularisation ;
 3. appliquer les régularisations (prolongation, souscription, préavis) ;
-4. **seulement ensuite** déployer le correctif SQL ;
+4. **seulement ensuite** déployer le correctif SQL, **dans une release qui lui est
+   propre** ;
 5. vérifier que la liste des clubs ayant perdu l'accès correspond exactement à la liste
-   attendue.
+   attendue ;
+6. observer plusieurs jours avant d'enchaîner sur le Lot 1.
+
+**Chantier distinct, pas un prérequis interne au chantier Offre Équipe.** Commits séparés
+ne suffisent pas : **déploiements séparés**. Livrer ce correctif et les fondations de
+l'offre Équipe ensemble rendrait tout incident indiagnosticable et forcerait un rollback
+groupé.
+
+Conserver le SQL de l'ancienne définition de `club_has_active_subscription` et écrire la
+migration de retour **avant** de déployer l'aller.
 
 ### Dette CI
 
@@ -552,8 +584,28 @@ Les joueurs temporairement inactifs (blessure, saison suspendue) **comptent** : 
 occupent une place dans l'effectif, sinon la limite serait contournable par un simple
 marquage.
 
-**Vérification pré-migration** : absence de doublons `(team_id, player_id)` existants, qui
-feraient échouer l'index unique prévu au plan d'architecture.
+**Index unique `(team_id, player_id)` — procédure imposée, pas une simple vérification.**
+Un index unique sur une table de production peut échouer au déploiement, révéler des
+doublons fonctionnellement légitimes, ou bloquer un parcours existant qui recrée
+aujourd'hui une ligne d'appartenance :
+
+```text
+1. inventaire exact des doublons (nombre, clubs, équipes, ancienneté)
+2. détermination de leur CAUSE — bug, parcours légitime, import, reprise de données ?
+3. vérification des références : laquelle des lignes porte l'historique attendu
+   (convocations, présences, compositions) ?
+4. correction dans une migration DISTINCTE, déployée seule
+5. surveillance plusieurs jours — les doublons réapparaissent-ils ?
+6. création de l'index en dernier, seulement si (5) est propre
+```
+
+**Ne jamais supprimer automatiquement « la ligne en trop »** sans savoir laquelle porte
+l'historique. Si les doublons se recréent après l'étape 4, un parcours applicatif les
+produit et l'index échouerait en production.
+
+Si l'étape 2 révèle des doublons **légitimes**, renoncer à l'index unique et compter les
+joueurs distincts autrement : la contrainte est un confort d'implémentation, pas une
+exigence produit.
 
 ### B. Porteur du quota Découverte — décision tranchée
 
@@ -711,5 +763,13 @@ suppression d'un billing owner — ne bloque pas : le flux produit est arrêté,
 durées et le périmètre d'archivage restent à confirmer, et ce sont des constantes de
 configuration.
 
-Le Lot 1 démarre après validation de l'ensemble, et **après** la correction d'`exempt_until`
-(§28.7) qui en est le prérequis strict.
+## Enchaînement vers le Lot 1
+
+Le correctif `exempt_until` (§28.7) est un **chantier distinct avec sa propre release**,
+observé avant le Lot 1 — pas un prérequis interne à livrer avec lui.
+
+Le Lot 1 lui-même ne démarre qu'en **Phase A** au sens de
+`docs/specs/IMPLEMENTATION_ORDER.md` : nouvelles tables, nouvelles colonnes à DEFAULT,
+fonctions `_v2` jamais appelées, tests. Aucune policy existante, aucun trigger existant,
+aucune fonction existante n'est modifié à ce stade — ces changements passent par des
+releases dédiées et une comparaison en mode sombre.

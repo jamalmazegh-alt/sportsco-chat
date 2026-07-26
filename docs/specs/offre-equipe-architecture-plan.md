@@ -488,24 +488,49 @@ suppression) ; sécurité recherche de club ; E2E (onboarding, ajout d'équipe, 
 
 ## 14. Déploiement et rollback
 
-Feature flag `team_plan_v1` (table `app_flags`) masquant onboarding, pricing, CTA,
-checkout, pages de facturation, ajout d'équipes payantes. **Le flag ne désactive jamais**
-les webhooks, la synchronisation Stripe, les tâches cron, la lecture des souscriptions
-existantes ni la gestion des utilisateurs déjà engagés — sinon un utilisateur ayant payé
-se retrouverait sans couverture au rollback. Flags séparés pour les lots 7 et 8.
+> Stratégie complète dans `docs/specs/IMPLEMENTATION_ORDER.md`. Ce paragraphe n'en donne
+> que les invariants techniques.
 
-Prix Stripe créés en amont (test puis live), IDs injectés par env. Migrations additives :
-rollback = flag off, les données restent cohérentes.
+**Deux flags, pas un.** Un flag UI `team_plan_v1` (table `app_flags`) masquant onboarding,
+pricing, CTA, checkout, pages de facturation, ajout d'équipes payantes — **et** un flag de
+**comportement serveur** posé *avant* toute migration sensible, car un flag UI ne protège
+ni un trigger, ni une policy, ni une fonction SQL remplacée.
+
+Le flag ne désactive jamais les webhooks, la synchronisation Stripe, les tâches cron, la
+lecture des souscriptions existantes ni la gestion des utilisateurs déjà engagés — sinon
+un utilisateur ayant payé se retrouverait sans couverture au rollback. Flags séparés pour
+les lots 5, 7 et 8.
+
+**Le rollback n'est PAS « flag off ».** C'est vrai pour l'UI et pour les tables neuves,
+faux pour tout le reste : un trigger modifié, une policy remplacée, `can_create_tournament`
+réécrite, un index créé, des données déjà écrites par un webhook et une opération Stripe
+déjà exécutée ne reviennent pas en arrière avec un flag.
+
+Chaque changement sensible est donc livré avec **sept éléments** : migration aller,
+migration de retour écrite *et testée*, requête de vérification avant, requête de
+vérification après, condition d'arrêt du déploiement, métrique d'alerte, procédure de
+restauration.
+
+**Ajouter avant de remplacer.** Toute fonction SQL existante touchée passe par une version
+`_v2` comparée en parallèle sur des cas réels avant substitution ; l'ancienne définition
+est conservée pour la migration de retour ; aucune colonne ni fonction ancienne n'est
+supprimée dans le même chantier.
+
+**Stripe.** Aucune opération financière ne se rattrape par un rollback logiciel. Toute
+action irréversible (annulation d'abonnement, facturation, prorata) est derrière un flag
+séparé et une activation volontaire. Prix créés en amont (test puis live), IDs injectés
+par env.
 
 ## Prérequis avant le Lot 1
 
 Toutes les décisions produit et techniques sont tranchées (§32 du prompt). Restent des
 **travaux d'exécution**, pas des arbitrages :
 
-1. **Correctif `exempt_until`** — prérequis bloquant, en 7 étapes : inventaire des
-   exemptions expirées → analyse d'impact → régularisation manuelle → communication
-   éventuelle → correction SQL → tests de non-régression → démarrage du Lot 1. Ne jamais
-   modifier silencieusement l'accès des clubs existants.
+1. **Correctif `exempt_until`** — **chantier correctif distinct, avec sa propre release**,
+   observé avant le démarrage du Lot 1. Séquence : inventaire des exemptions expirées →
+   analyse d'impact → régularisation manuelle → communication éventuelle → correction SQL
+   → observation. Ne jamais le livrer dans la même release que les fondations de l'offre
+   Équipe : en cas d'incident, on ne saurait pas lequel des deux l'a causé.
 2. **Dette CI** — corriger les contrôles bloquants (dont `check:i18n`) avant le Lot 1 ;
    baseline chiffrée uniquement pour la dette réellement indépendante et risquée à
    corriger. Aucune nouvelle erreur autorisée par rapport à cette baseline.

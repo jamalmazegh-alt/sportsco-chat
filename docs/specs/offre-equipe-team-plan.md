@@ -7,10 +7,18 @@
 > Documents liés :
 > - `docs/specs/offre-equipe-architecture-plan.md` — plan d'architecture technique
 > - `docs/specs/offre-equipe-lot-0-bis.md` — durcissement, inventaires et prérequis
-> - `docs/specs/IMPLEMENTATION_ORDER.md` — **ordre de développement imposé, à suivre
->   étape par étape ; ne jamais développer par fonctionnalité**
+> - `docs/specs/IMPLEMENTATION_ORDER.md` — **ordre de développement et stratégie de
+>   déploiement ; ne jamais développer par fonctionnalité, ni remplacer avant d'avoir
+>   comparé**
 >
 > **Aucun développement fonctionnel ne commence avant validation du Lot 0 bis.**
+>
+> **Cette spécification décrit la cible fonctionnelle, pas le rythme de déploiement.**
+> Sur une application déjà en production, la cible s'atteint par phases : additif pur,
+> puis mode sombre, puis nouveaux clubs seulement, puis enforcement club par club. Toute
+> modification d'une policy, d'un trigger ou d'une fonction SQL existante relève d'une
+> release dédiée — voir `IMPLEMENTATION_ORDER.md`, qui prévaut sur toute lecture de ce
+> document qui suggérerait un déploiement direct.
 
 ---
 
@@ -1287,7 +1295,7 @@ Période de grâce : TEAM_BILLING_GRACE_DAYS = 14, configurable, non réinitiali
 Grâce : usage complet conservé (pas d'état intermédiaire)
 Joueur actif : porté par team_members.status, pas par players.deleted_at seul
 Quota Découverte : libéré immédiatement, réactivation sur demande explicite uniquement
-Correctif exempt_until : prérequis bloquant au Lot 1, en 7 étapes
+Correctif exempt_until : chantier et RELEASE distincts, observés avant le Lot 1
 Dette CI : contrôles bloquants corrigés avant Lot 1, baseline pour la dette indépendante
 Import CSV : refus atomique du lot entier
 Entitlements : 3 niveaux (canManageTeamContent / canOperateExistingEvents /
