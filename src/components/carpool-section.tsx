@@ -627,7 +627,11 @@ function ReserveDialog({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          <Button onClick={submit} disabled={busy || selected.length === 0}>
+          <Button
+            onClick={submit}
+            disabled={busy || (selectablePlayers.length > 0 && selected.length === 0)}
+          >
+
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("carpool.confirm")}
           </Button>
