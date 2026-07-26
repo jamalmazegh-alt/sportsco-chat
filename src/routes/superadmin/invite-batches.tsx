@@ -76,14 +76,16 @@ function BatchRow({
   row: NonNullable<Awaited<ReturnType<typeof listInviteBatches>>["rows"]>[number];
 }) {
   const [open, setOpen] = useState(false);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "invite-batch-rows", row.batch_id],
     queryFn: () => getInviteBatchRows({ data: { batchId: row.batch_id } }),
     enabled: open,
+    retry: 1,
   });
   return (
     <div className="bg-card">
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/40 text-left"
       >
@@ -111,6 +113,22 @@ function BatchRow({
             <div className="flex justify-center py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
+          ) : isError ? (
+            <div className="px-6 py-4 space-y-2">
+              <p className="text-sm text-destructive">
+                Erreur de chargement : {error instanceof Error ? error.message : "échec inconnu"}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => refetch()}
+                disabled={isFetching}
+              >
+                <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
+                Réessayer
+              </Button>
+            </div>
           ) : (data?.rows ?? []).length === 0 ? (
             <div className="px-6 py-4 text-xs text-muted-foreground">
               Aucune ligne trouvée pour ce batch.
@@ -137,10 +155,12 @@ function BatchRow({
                     </StatusBadge>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
-                    <span>
-                      msg&nbsp;
-                      <span className="font-mono">{r.message_id.slice(0, 12)}…</span>
-                    </span>
+                    {r.message_id ? (
+                      <span>
+                        msg&nbsp;
+                        <span className="font-mono">{r.message_id.slice(0, 12)}…</span>
+                      </span>
+                    ) : null}
                     <span>tentatives&nbsp;: {r.attempt_count}</span>
                     {r.dispatch_id && (
                       <span>
