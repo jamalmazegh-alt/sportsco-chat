@@ -308,6 +308,7 @@ function PlayerProfile() {
       { error: f.error, reason: f.reason ?? null },
     ]),
   );
+  const unconfirmedParentIds = new Set(parentInviteStatuses?.unconfirmedUserIds ?? []);
 
   function formatSuppressionReason(reason: string | null): string {
     const r = (reason ?? "").toLowerCase();
