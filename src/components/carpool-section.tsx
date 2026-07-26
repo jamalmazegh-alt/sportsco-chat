@@ -199,6 +199,8 @@ export function CarpoolSection({
     [myChildConvocations],
   );
 
+  const canParticipate = isCoach || bookableConvocations.length > 0;
+
   const [offerOpen, setOfferOpen] = useState(false);
   const [reserveCarpool, setReserveCarpool] = useState<Carpool | null>(null);
   const [needOpen, setNeedOpen] = useState(false);
@@ -360,10 +362,8 @@ export function CarpoolSection({
                         {t("carpool.cancel")}
                       </Button>
                     ) : (
-                      // Toute personne pouvant voir l'événement peut réserver
-                      // (parent d'un convoqué, joueur, ou accompagnant sans
-                      // enfant convoqué → réservation d'une place pour soi).
-                      !isMine && (
+                      !isMine &&
+                      canParticipate && (
                         <Button
                           size="sm"
                           className="w-full"
@@ -567,7 +567,7 @@ function ReserveDialog({
 
   async function submit() {
     if (!user) return;
-    if (selectablePlayers.length > 0 && selected.length === 0) return;
+    if (selected.length === 0) return;
 
     setBusy(true);
     const { error } = await supabase.from("carpool_passengers").insert({
@@ -597,10 +597,7 @@ function ReserveDialog({
         </DialogHeader>
         <div className="space-y-2 max-h-[50vh] overflow-y-auto">
           {selectablePlayers.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Aucun joueur rattaché à votre compte pour cet événement — vous réservez une place pour
-              vous-même.
-            </p>
+            <p className="text-sm text-muted-foreground italic">{t("carpool.noTransport")}</p>
           )}
 
           {selectablePlayers.map((c) => (
@@ -624,10 +621,7 @@ function ReserveDialog({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          <Button
-            onClick={submit}
-            disabled={busy || (selectablePlayers.length > 0 && selected.length === 0)}
-          >
+          <Button onClick={submit} disabled={busy || selected.length === 0}>
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("carpool.confirm")}
           </Button>
