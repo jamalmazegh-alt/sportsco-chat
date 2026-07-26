@@ -1300,7 +1300,7 @@
     "previewLabel": "Aperçu à venir",
     "reassure": ["Depuis l'appli mobile", "Notifications en temps réel", "Données protégées"],
     "tutorialsTitle": "Les gestes essentiels, pas à pas.",
-    "tutorialsSubtitle": "Sept procédures détaillées, étape par étape et capture à l'appui.",
+    "tutorialsSubtitle": "Huit procédures détaillées, étape par étape et capture à l'appui.",
     "tutorials": [
       {
         "t": "Ouvrir votre compte parent",
@@ -1388,6 +1388,19 @@
           "Pour un sondage, appuyez sur « Voter », sélectionnez votre réponse et confirmez.",
           "Votre vote est enregistré : consultez les résultats en direct.",
           "Vous pouvez changer votre vote à tout moment (sauf si le sondage est anonyme)."
+        ]
+      },
+      {
+        "t": "Répondre aux besoins du club",
+        "b": "Proposez votre aide pour la buvette, l'arbitrage, le transport ou toute autre mission organisée par le club.",
+        "steps": [
+          "Lorsqu'un coach publie un besoin, les parents, les joueurs ou les deux reçoivent un email selon le public ciblé.",
+          "Ouvrez l'événement puis l'onglet « Coups de main » pour voir le détail. Indiquez si vous êtes disponible ou non.",
+          "Si vous êtes disponible, appuyez sur « Je me propose ». Votre participation est confirmée immédiatement ou placée en attente de validation du coach, puis apparaît comme « Confirmée ».",
+          "Depuis le bas de la page d'accueil, accédez à « Mes coups de main » pour retrouver les besoins auxquels vous avez été invité, quelle que soit votre réponse.",
+          "Cette page récapitule tous vos besoins : vous pouvez y répondre directement et distinguer ceux qui sont confirmés.",
+          "Vous retrouvez également les besoins pour lesquels vous avez indiqué ne pas être disponible.",
+          "Lorsque le coach accepte une candidature en attente, vous recevez un email de confirmation."
         ]
       }
     ],
@@ -2053,6 +2066,21 @@
       "updated_now": "Mis à jour à l'instant",
       "new_record": "★ Nouveau record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Pour les parents",
+      "title": "Bien démarrer avec Clubero.",
+      "subtitle": "Retrouvez les procédures essentielles et installez l'app sur votre téléphone en quelques minutes.",
+      "guide": {
+        "title": "Guide parents pas à pas",
+        "body": "Compte, enfant, convocations, absences, notifications, covoiturage, Mur et coups de main : chaque procédure est expliquée avec de vraies captures.",
+        "cta": "Voir les tutoriels"
+      },
+      "install": {
+        "title": "Installer l'app Clubero",
+        "body": "Ajoutez Clubero à votre écran d'accueil sur iPhone, iPad ou Android et recevez vos notifications en temps réel.",
+        "cta": "Voir le guide d'installation"
+      }
     }
   }
 }

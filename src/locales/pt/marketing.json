@@ -1300,7 +1300,7 @@
     "previewLabel": "Pré-visualização em breve",
     "reassure": ["A partir da app móvel", "Notificações em tempo real", "Dados protegidos"],
     "tutorialsTitle": "O essencial, passo a passo.",
-    "tutorialsSubtitle": "Sete procedimentos detalhados, passo a passo e com uma captura por passo.",
+    "tutorialsSubtitle": "Oito procedimentos detalhados, passo a passo e com uma captura por passo.",
     "tutorials": [
       {
         "t": "Abrir a sua conta de pai ou mãe",
@@ -1388,6 +1388,19 @@
           "Numa sondagem, toque em «Votar», selecione a sua resposta e confirme.",
           "O seu voto fica guardado: veja os resultados em direto.",
           "Pode alterar o seu voto a qualquer momento (exceto se a sondagem for anónima)."
+        ]
+      },
+      {
+        "t": "Responder às necessidades do clube",
+        "b": "Ofereça a sua ajuda no bar, na arbitragem, no transporte ou em qualquer outra tarefa organizada pelo clube.",
+        "steps": [
+          "Quando um treinador publica uma necessidade, os pais, os jogadores ou ambos recebem um email, consoante o público-alvo.",
+          "Abra o evento e depois o separador «Dar uma ajuda» para ver os detalhes. Indique se está ou não disponível.",
+          "Se estiver disponível, toque em «Ofereço-me». A sua participação é confirmada imediatamente ou fica a aguardar a validação do treinador e depois aparece como «Confirmada».",
+          "Na parte inferior da página inicial, aceda a «Minhas ajudas» para encontrar as necessidades para as quais foi convidado, independentemente da sua resposta.",
+          "Esta página reúne todas as suas necessidades: pode responder diretamente e distinguir as que estão confirmadas.",
+          "Também encontra as necessidades para as quais indicou que não estava disponível.",
+          "Quando o treinador aceita uma candidatura pendente, recebe um email de confirmação."
         ]
       }
     ],
@@ -2049,6 +2062,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Para os pais",
+      "title": "Comece bem com o Clubero.",
+      "subtitle": "Consulte os procedimentos essenciais e instale a app no seu telemóvel em poucos minutos.",
+      "guide": {
+        "title": "Guia passo a passo para pais",
+        "body": "Conta, filho, convocatórias, ausências, notificações, boleias, Mural e ajudas: cada procedimento é explicado com capturas reais.",
+        "cta": "Ver os tutoriais"
+      },
+      "install": {
+        "title": "Instalar a app Clubero",
+        "body": "Adicione o Clubero ao ecrã principal do seu iPhone, iPad ou Android e receba as suas notificações em tempo real.",
+        "cta": "Ver o guia de instalação"
+      }
     }
   }
 }

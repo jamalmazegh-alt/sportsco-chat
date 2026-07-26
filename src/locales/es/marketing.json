@@ -1300,7 +1300,7 @@
     "previewLabel": "Vista previa próximamente",
     "reassure": ["Desde la app móvil", "Notificaciones en tiempo real", "Datos protegidos"],
     "tutorialsTitle": "Lo esencial, paso a paso.",
-    "tutorialsSubtitle": "Siete procedimientos detallados, paso a paso y con una captura por paso.",
+    "tutorialsSubtitle": "Ocho procedimientos detallados, paso a paso y con una captura por paso.",
     "tutorials": [
       {
         "t": "Abrir tu cuenta de padre o madre",
@@ -1388,6 +1388,19 @@
           "Para una encuesta, pulsa «Votar», selecciona tu respuesta y confirma.",
           "Tu voto queda guardado: consulta los resultados en directo.",
           "Puedes cambiar tu voto cuando quieras (salvo si la encuesta es anónima)."
+        ]
+      },
+      {
+        "t": "Responder a las necesidades del club",
+        "b": "Ofrece tu ayuda para el bar, el arbitraje, el transporte o cualquier otra tarea organizada por el club.",
+        "steps": [
+          "Cuando un entrenador publica una necesidad, los padres, los jugadores o ambos reciben un correo según el público destinatario.",
+          "Abre el evento y después la pestaña «Echar una mano» para ver los detalles. Indica si estás disponible o no.",
+          "Si estás disponible, pulsa «Me ofrezco». Tu participación se confirma inmediatamente o queda pendiente de validación por el entrenador y después aparece como «Confirmada».",
+          "Desde la parte inferior de la página de inicio, entra en «Mis manos amigas» para ver las necesidades a las que te han invitado, sea cual sea tu respuesta.",
+          "Esta página reúne todas tus necesidades: puedes responder directamente y distinguir las que están confirmadas.",
+          "También encontrarás las necesidades para las que has indicado que no estás disponible.",
+          "Cuando el entrenador acepta una candidatura pendiente, recibes un correo de confirmación."
         ]
       }
     ],
@@ -2053,6 +2066,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Para padres y madres",
+      "title": "Empieza con buen pie en Clubero.",
+      "subtitle": "Consulta los procedimientos esenciales e instala la app en tu teléfono en unos minutos.",
+      "guide": {
+        "title": "Guía paso a paso para padres y madres",
+        "body": "Cuenta, hijo, convocatorias, ausencias, notificaciones, coche compartido, Muro y necesidades: cada procedimiento se explica con capturas reales.",
+        "cta": "Ver los tutoriales"
+      },
+      "install": {
+        "title": "Instalar la app Clubero",
+        "body": "Añade Clubero a la pantalla de inicio de tu iPhone, iPad o Android y recibe tus notificaciones en tiempo real.",
+        "cta": "Ver la guía de instalación"
+      }
     }
   }
 }

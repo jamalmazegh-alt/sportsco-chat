@@ -9,9 +9,9 @@ import {
   CalendarX2,
   Car,
   Megaphone,
+  HandHeart,
   CheckCircle2,
   Smartphone,
-  HandHeart,
   ArrowRight,
   ImageIcon,
 } from "lucide-react";
@@ -28,6 +28,7 @@ const TUTORIAL_ICONS = [
   CalendarX2, // Déclarer une absence
   Car, // Covoiturage
   Megaphone, // Le Mur du club
+  HandHeart, // Coups de main / besoins
 ];
 
 // Screenshot slug per tutorial, in the same order as `parentGuide.tutorials`.
@@ -43,6 +44,7 @@ const TUTORIAL_SLUGS = [
   "absence", // Déclarer une absence
   "carpool", // Covoiturage
   "wall", // Le Mur du club
+  "needs", // Coups de main / besoins
 ];
 
 const REASSURE_ICONS = [Smartphone, Bell, ShieldCheck];

@@ -1300,7 +1300,7 @@
     "previewLabel": "Preview coming soon",
     "reassure": ["From the mobile app", "Real-time notifications", "Data protected"],
     "tutorialsTitle": "The essentials, step by step.",
-    "tutorialsSubtitle": "Seven detailed, step-by-step procedures with a screenshot for each step.",
+    "tutorialsSubtitle": "Eight detailed, step-by-step procedures with a screenshot for each step.",
     "tutorials": [
       {
         "t": "Open your parent account",
@@ -1388,6 +1388,19 @@
           "For a poll, tap \"Vote\", select your answer and confirm.",
           "Your vote is saved: see the live results.",
           "You can change your vote anytime (unless the poll is anonymous)."
+        ]
+      },
+      {
+        "t": "Respond to the club's needs",
+        "b": "Offer your help with refreshments, refereeing, transport or any other task organised by the club.",
+        "steps": [
+          "When a coach posts a need, parents, players or both receive an email, depending on the target audience.",
+          "Open the event, then the \"Helping hands\" tab to see the details. Indicate whether or not you are available.",
+          "If you are available, tap \"Volunteer\". Your participation is confirmed immediately or placed on hold for the coach's approval, then appears as \"Confirmed\".",
+          "From the bottom of the home page, open \"My helping hands\" to find the needs you were invited to, regardless of your response.",
+          "This page lists all your needs: you can respond directly and see which ones are confirmed.",
+          "You will also find the needs for which you indicated that you were unavailable.",
+          "When the coach accepts a pending offer, you receive a confirmation email."
         ]
       }
     ],
@@ -2049,6 +2062,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "For parents",
+      "title": "Get started with Clubero.",
+      "subtitle": "Find the essential procedures and install the app on your phone in just a few minutes.",
+      "guide": {
+        "title": "Step-by-step guide for parents",
+        "body": "Account, child, call-ups, absences, notifications, carpooling, Wall and helping hands: every procedure is explained with real screenshots.",
+        "cta": "View the tutorials"
+      },
+      "install": {
+        "title": "Install the Clubero app",
+        "body": "Add Clubero to your home screen on iPhone, iPad or Android and receive your notifications in real time.",
+        "cta": "View the installation guide"
+      }
     }
   }
 }

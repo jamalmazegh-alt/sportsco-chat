@@ -1300,7 +1300,7 @@
     "previewLabel": "Anteprima in arrivo",
     "reassure": ["Dall'app mobile", "Notifiche in tempo reale", "Dati protetti"],
     "tutorialsTitle": "L'essenziale, passo dopo passo.",
-    "tutorialsSubtitle": "Sette procedure dettagliate, passo dopo passo e con uno screenshot per ogni passaggio.",
+    "tutorialsSubtitle": "Otto procedure dettagliate, passo dopo passo e con uno screenshot per ogni passaggio.",
     "tutorials": [
       {
         "t": "Aprire il tuo account genitore",
@@ -1388,6 +1388,19 @@
           "Per un sondaggio, tocca «Vota», seleziona la tua risposta e conferma.",
           "Il tuo voto viene salvato: guarda i risultati in tempo reale.",
           "Puoi cambiare il tuo voto in qualsiasi momento (tranne se il sondaggio è anonimo)."
+        ]
+      },
+      {
+        "t": "Rispondere alle esigenze del club",
+        "b": "Offri il tuo aiuto per il punto ristoro, l'arbitraggio, il trasporto o qualsiasi altro incarico organizzato dal club.",
+        "steps": [
+          "Quando un allenatore pubblica un'esigenza, i genitori, i giocatori o entrambi ricevono un'email in base al pubblico destinatario.",
+          "Apri l'evento e poi la scheda «Dare una mano» per vedere i dettagli. Indica se sei disponibile o meno.",
+          "Se sei disponibile, tocca «Mi propongo». La tua partecipazione viene confermata subito o resta in attesa dell'approvazione dell'allenatore, quindi appare come «Confermata».",
+          "Dalla parte inferiore della home, accedi a «Le mie disponibilità» per ritrovare le esigenze per cui sei stato invitato, indipendentemente dalla tua risposta.",
+          "Questa pagina riepiloga tutte le tue esigenze: puoi rispondere direttamente e distinguere quelle confermate.",
+          "Trovi anche le esigenze per cui hai indicato di non essere disponibile.",
+          "Quando l'allenatore accetta una candidatura in attesa, ricevi un'email di conferma."
         ]
       }
     ],
@@ -2053,6 +2066,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Per i genitori",
+      "title": "Inizia al meglio con Clubero.",
+      "subtitle": "Consulta le procedure essenziali e installa l'app sul telefono in pochi minuti.",
+      "guide": {
+        "title": "Guida passo passo per i genitori",
+        "body": "Account, figlio, convocazioni, assenze, notifiche, passaggi in auto, Bacheca e disponibilità: ogni procedura è spiegata con schermate reali.",
+        "cta": "Vedi i tutorial"
+      },
+      "install": {
+        "title": "Installa l'app Clubero",
+        "body": "Aggiungi Clubero alla schermata Home del tuo iPhone, iPad o Android e ricevi le notifiche in tempo reale.",
+        "cta": "Vedi la guida all'installazione"
+      }
     }
   }
 }

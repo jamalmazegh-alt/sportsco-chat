@@ -1300,7 +1300,7 @@
     "previewLabel": "Voorbeeld binnenkort",
     "reassure": ["Vanuit de mobiele app", "Meldingen in realtime", "Gegevens beschermd"],
     "tutorialsTitle": "Het belangrijkste, stap voor stap.",
-    "tutorialsSubtitle": "Zeven gedetailleerde procedures, stap voor stap en met een screenshot per stap.",
+    "tutorialsSubtitle": "Acht gedetailleerde procedures, stap voor stap en met een screenshot per stap.",
     "tutorials": [
       {
         "t": "Je ouderaccount aanmaken",
@@ -1388,6 +1388,19 @@
           "Tik bij een poll op «Stemmen», kies je antwoord en bevestig.",
           "Je stem wordt opgeslagen: bekijk de actuele resultaten.",
           "Je kunt je stem altijd wijzigen (behalve bij een anonieme poll)."
+        ]
+      },
+      {
+        "t": "Reageren op hulpvragen van de club",
+        "b": "Bied je hulp aan voor de kantine, arbitrage, vervoer of een andere taak die de club organiseert.",
+        "steps": [
+          "Wanneer een coach een hulpvraag plaatst, ontvangen de ouders, de spelers of beide een e-mail, afhankelijk van de doelgroep.",
+          "Open het evenement en daarna het tabblad «Helpende handen» om de details te bekijken. Geef aan of je beschikbaar bent.",
+          "Ben je beschikbaar, tik dan op «Ik meld me aan». Je deelname wordt direct bevestigd of wacht op goedkeuring van de coach en verschijnt daarna als «Bevestigd».",
+          "Open onderaan de startpagina «Mijn hulp» om de hulpvragen terug te vinden waarvoor je bent uitgenodigd, ongeacht je antwoord.",
+          "Deze pagina geeft een overzicht van al je hulpvragen: je kunt er direct reageren en zien welke bevestigd zijn.",
+          "Je vindt er ook de hulpvragen waarvoor je hebt aangegeven dat je niet beschikbaar bent.",
+          "Wanneer de coach een aanmelding in afwachting accepteert, ontvang je een bevestigingsmail."
         ]
       }
     ],
@@ -2049,6 +2062,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Voor ouders",
+      "title": "Ga goed van start met Clubero.",
+      "subtitle": "Bekijk de belangrijkste procedures en installeer de app binnen enkele minuten op je telefoon.",
+      "guide": {
+        "title": "Stapsgewijze gids voor ouders",
+        "body": "Account, kind, oproepen, afwezigheden, meldingen, meerijden, Prikbord en hulpvragen: elke procedure wordt uitgelegd met echte screenshots.",
+        "cta": "Bekijk de tutorials"
+      },
+      "install": {
+        "title": "Installeer de Clubero-app",
+        "body": "Voeg Clubero toe aan het beginscherm van je iPhone, iPad of Android en ontvang je meldingen in realtime.",
+        "cta": "Bekijk de installatiegids"
+      }
     }
   }
 }

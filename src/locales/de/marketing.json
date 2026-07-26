@@ -1300,7 +1300,7 @@
     "previewLabel": "Vorschau folgt",
     "reassure": ["Über die mobile App", "Benachrichtigungen in Echtzeit", "Daten geschützt"],
     "tutorialsTitle": "Das Wichtigste, Schritt für Schritt.",
-    "tutorialsSubtitle": "Sieben detaillierte Schritt-für-Schritt-Anleitungen mit einem Screenshot pro Schritt.",
+    "tutorialsSubtitle": "Acht detaillierte Schritt-für-Schritt-Anleitungen mit einem Screenshot pro Schritt.",
     "tutorials": [
       {
         "t": "Ihr Elternkonto eröffnen",
@@ -1388,6 +1388,19 @@
           "Für eine Umfrage tippen Sie auf „Abstimmen“, wählen Ihre Antwort und bestätigen.",
           "Ihre Stimme wird gespeichert: Sehen Sie die aktuellen Ergebnisse.",
           "Sie können Ihre Stimme jederzeit ändern (außer bei anonymen Umfragen)."
+        ]
+      },
+      {
+        "t": "Auf den Unterstützungsbedarf des Vereins reagieren",
+        "b": "Helfen Sie bei der Bewirtung, beim Schiedsrichtern, beim Transport oder bei anderen vom Verein organisierten Aufgaben.",
+        "steps": [
+          "Wenn ein Trainer einen Bedarf veröffentlicht, erhalten je nach Zielgruppe die Eltern, die Spieler oder beide eine E-Mail.",
+          "Öffnen Sie das Event und dann den Reiter „Mithilfe“, um die Details zu sehen. Geben Sie an, ob Sie verfügbar sind.",
+          "Wenn Sie verfügbar sind, tippen Sie auf „Ich helfe mit“. Ihre Teilnahme wird sofort bestätigt oder bis zur Bestätigung durch den Trainer zurückgestellt und erscheint anschließend als „Bestätigt“.",
+          "Öffnen Sie unten auf der Startseite „Meine Aushilfen“, um alle Bedarfe zu finden, zu denen Sie eingeladen wurden — unabhängig von Ihrer Antwort.",
+          "Diese Seite fasst alle Ihre Bedarfe zusammen: Sie können direkt antworten und sehen, welche bestätigt sind.",
+          "Dort finden Sie auch die Bedarfe, für die Sie angegeben haben, nicht verfügbar zu sein.",
+          "Wenn der Trainer eine ausstehende Meldung annimmt, erhalten Sie eine Bestätigungs-E-Mail."
         ]
       }
     ],
@@ -2053,6 +2066,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Für Eltern",
+      "title": "Gut starten mit Clubero.",
+      "subtitle": "Finden Sie die wichtigsten Anleitungen und installieren Sie die App in wenigen Minuten auf Ihrem Handy.",
+      "guide": {
+        "title": "Schritt-für-Schritt-Leitfaden für Eltern",
+        "body": "Konto, Kind, Aufgebote, Abwesenheiten, Benachrichtigungen, Mitfahrgelegenheiten, Pinnwand und Mithilfe: Jede Anleitung wird mit echten Screenshots erklärt.",
+        "cta": "Tutorials ansehen"
+      },
+      "install": {
+        "title": "Clubero-App installieren",
+        "body": "Fügen Sie Clubero auf iPhone, iPad oder Android zu Ihrem Startbildschirm hinzu und erhalten Sie Ihre Benachrichtigungen in Echtzeit.",
+        "cta": "Installationsanleitung ansehen"
+      }
     }
   }
 }
