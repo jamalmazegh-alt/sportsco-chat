@@ -1,0 +1,217 @@
+# Audit 2b — Inventaire des writes `supabaseAdmin` (couverture + câblage)
+
+**Date :** 2026-07-10  
+**Type :** investigation READ-ONLY  
+**Périmètre :** toutes les mutations via `supabaseAdmin` (`.insert` / `.update` / `.upsert` / `.delete` / RPC écrivante / `auth.admin.*` / `storage.upload`) dans `src/**/*.functions.ts`, `src/**/*.server.ts`, `src/routes/**`.
+
+**Modèle de menace :** IDOR cross-club — guard live sur `clubId` A, write sur ressource du club B.
+
+**Légende verdict :**
+- **SAFE-S1** — guard porte sur le `clubId` / scope **dérivé de la ressource** (fetch puis garde)
+- **SAFE-S2** — guard sur `clubId` fourni + write filtré `.eq("club_id", clubId)` ou vérif explicite `resource.club_id === clubId`
+- **SAFE-S3** — write intrinsèquement scopé `user_id` / acteur, sans paramètre cross-club
+- **IDOR-RISK** — lien guard↔write non prouvé
+- **NO-GUARD** — aucun guard d'autorisation tenant avant le write
+- **ORDERING** — guard présent mais **après** le write, ou effet admin sans guard sur le scope effectif
+- **NEEDS-HUMAN** — non tranchable statiquement
+
+---
+
+## Notes transverses (§2.4)
+
+### Ambiguïté `role` / `roles[]`
+
+`assertClubRole` (`authz.server.ts:64-67`) fusionne **les deux colonnes** DB. En revanche, plusieurs guards inline ne lisent qu'une seule :
+
+| Guard | Colonne lue | Fichier |
+|-------|-------------|---------|
+| `assertCallerAdmin` | `role` = `"admin"` uniquement | `admin.functions.ts:168-174` |
+| `createCheckoutSession` / billing | `membership.role !== "admin"` | `billing.functions.ts:76-84` |
+| `triggerInsightsDetection` / `dismissInsight` | `roles[]` uniquement | `insights.functions.ts:28-39, 63-74` |
+
+**Risque :** admin présent seulement dans `roles[]` mais pas dans `role` → guard inline 403 (fail-closed), pas escalade. Admin seulement dans `role` legacy → `triggerInsightsDetection` 403 alors que billing passe.
+
+### Dépendance RLS du guard `assertClubRole`
+
+Lecture `club_members` via `context.supabase` (JWT utilisateur). Policy :
+
+```273:274:supabase/migrations/20260514070719_3f7e478e-f8ce-42e1-ac78-577a200ea55d.sql
+CREATE POLICY "club_members_select_member" ON public.club_members FOR SELECT TO authenticated
+USING (public.is_club_member(auth.uid(), club_id));
+```
+
+Requête `.eq("club_id", clubId).eq("user_id", userId)` : après retrait membre, `is_club_member` → false → pas de ligne → **403 fail-closed** (footgun dispo, pas faille). Plusieurs chemins allowlistés utilisent `supabaseAdmin` pour lire `club_members` (bypass RLS) — fraîcheur garantie mais hors modèle defense-in-depth.
+
+### `check:guards` — ce qu'il vérifie réellement
+
+`scripts/check-server-fn-guards.mjs` : présence d'un **token string** (`assertClubRole`, `assertCanManage`, etc.) dans le fichier `*.functions.ts` qui importe `supabaseAdmin`. **Ne vérifie pas** : ordre d'appel, bon `clubId`, guard avant chaque write, câblage ressource↔club. Helpers `.server.ts` **exclus**.
+
+---
+
+## Table principale
+
+### Allowlist — priorité 1
+
+| Fichier:ligne | Fonction | Table/RPC | Guard (ligne) | Avant write ? | Guard porte sur | Write cible | Lien | Inputs client ? | Verdict |
+|---|---|---|---|---|---|---|---|---|---|
+| `billing.functions.ts:139-149` | `createCheckoutSession` | `subscriptions` upsert | inline admin L76-85 | Oui | `data.clubId` | `club_id: club.id` (fetch L88-92) | S2 | `clubId`, `plan` | **SAFE-S2** |
+| `billing.functions.ts:163-179` | `createCheckoutSession` | `subscriptions` upsert | L76-85 | Oui | `data.clubId` | `onConflict: club_id` | S2 | idem | **SAFE-S2** |
+| `billing.functions.ts:323` | `syncClubSubscriptionFromStripe` | `subscriptions` upsert | inline admin L265-274 | Oui | `data.clubId` | `patch.club_id = data.clubId` | S2 | `clubId` | **SAFE-S2** |
+| `billing.functions.ts:403-409` | `cancelSubscriptionAtPeriodEnd` | `subscriptions` update | `getAdminClubStripeIds` L397 → L368-376 | Oui | `data.clubId` | `.eq("club_id", data.clubId)` | S2 | `clubId` | **SAFE-S2** |
+| `billing.functions.ts:433-436` | `reactivateSubscription` | `subscriptions` update | L427 → L368-376 | Oui | `data.clubId` | `.eq("club_id", data.clubId)` | S2 | `clubId` | **SAFE-S2** |
+| `payment-family.functions.ts` | — | — | — | — | — | — | — | — | *(aucun write `supabaseAdmin`)* |
+| `insights.functions.ts:80-83` | `dismissInsight` | `coach_insights` update | membership L63-76 sur `row.club_id` | Oui (après fetch L56-61) | `row.club_id` (DB) | `.eq("id", data.insightId)` | S1 | `insightId` | **SAFE-S1** |
+| `insights.server.ts:424-428` | `detectAndGenerateInsightsForClub` | `coach_insights` update | caller (`triggerInsightsDetection` L28-41 / cron) | Oui | arg `clubId` du caller | **sans filtre `club_id`** — expire global | AUCUN | N/A | **NEEDS-HUMAN** — scope mismatch bénin (résolution insights expirés tous clubs) |
+| `insights.server.ts:465-477` | `detectAndGenerateInsightsForClub` | `coach_insights` insert | idem | Oui | `clubId` arg | `club_id` sur chaque row | S2 | `clubId` (client dans trigger) | **SAFE-S2** |
+| `admin.functions.ts:213-216` | `setUserDisabled` | `auth.admin.updateUserById` | `assertCallerAdmin` L200 + cible vérifiée L203-211 | Oui | `data.club_id` | `data.user_id` (membre prouvé du club) | S2 | `club_id`, `user_id` | **SAFE-S2** |
+| `admin.functions.ts:238-242` | `removeUserFromClub` | `club_members` delete | `assertCallerAdmin` L237 | Oui | `data.club_id` | `.eq("club_id").eq("user_id")` | S2 | `club_id`, `user_id` | **SAFE-S2** |
+| `admin.functions.ts:263-266` | `sendUserPasswordReset` | `auth.admin.generateLink` | `assertCallerAdmin` L259 **seulement** | Oui | `data.club_id` (caller) | `data.user_id` — **pas de vérif appartenance au club** | AUCUN | `club_id`, `user_id` | **IDOR-RISK** |
+| `admin.functions.ts:307-313` | `setUserClubStaffRoles` | `club_members` delete | `assertCallerAdmin` L292 | Oui | `data.club_id` | filtres club+user | S2 | `club_id`, `user_id` | **SAFE-S2** |
+| `admin.functions.ts:323-325` | `setUserClubStaffRoles` | `club_members` upsert | `assertCallerAdmin` L292 — **pas de vérif cible ∈ club** | Oui | `data.club_id` | insert rows `{club_id, user_id, role}` — **ajoute user arbitraire** | AUCUN | `club_id`, `user_id`, flags | **IDOR-RISK** |
+| `legal.functions.ts` | — | — | — | — | — | — | — | — | *(lecture seule)* |
+| `invite.functions.ts:119-122` | `confirmInvitedUserEmail` | `auth.admin.updateUserById` | token RPC L88-100 (public) | Oui | email+token | `user.id` via `listUsers` | NEEDS-HUMAN | `token`, `email` | **NEEDS-HUMAN** — flux public intentionnel ; surface `listUsers` |
+| `coach-notify.functions.ts:105-108` | `notifyCoachAssigned` | `enqueue_email` RPC | `requireSupabaseAuth` L32 **uniquement** | Oui | aucun | payload depuis `teamId`/`coachUserId` client | AUCUN | `teamId`, `coachUserId` | **NO-GUARD** |
+| `coach-notify.functions.ts:109-114` | `notifyCoachAssigned` | `email_send_log` insert | idem | Oui | aucun | log idempotent | AUCUN | idem | **NO-GUARD** |
+
+**Allowlist — lecture `club_members` via admin (non-mutant mais note fraîcheur) :** `insights.functions.ts:28-33` (`triggerInsightsDetection`) lit membership via `supabaseAdmin` (bypass RLS) — frais, mais incohérent avec `assertClubRole`.
+
+---
+
+### `tournaments.functions.ts` — priorité 2
+
+| Fichier:ligne | Fonction | Table/RPC | Guard (ligne) | Avant write ? | Guard porte sur | Write cible | Lien | Inputs client ? | Verdict |
+|---|---|---|---|---|---|---|---|---|---|
+| `tournaments.functions.ts:34-42` | `applyBracketProgression` ← `recordMatchScore` | `tournament_matches` update | `assertCanManage` L783 | Oui | `data.tournament_id` | `.eq("tournament_id", tournamentId)` | S2 | `tournament_id`, `match_id` | **SAFE-S2** |
+| `tournaments.functions.ts:34-42` | `applyBracketProgression` ← `validateMatch` | `tournament_matches` update | `can_validate_match` L1414 sur **`match_id` seulement** | Oui | match autorisé | **`data.tournament_id` client** — non lié au match guardé | AUCUN | `tournament_id`, `match_id` | **IDOR-RISK** |
+| `tournaments.functions.ts:34-42` | `applyBracketProgression` ← `setMatchStatus` | `tournament_matches` update | `assertCanManage` L1512 | Oui | `data.tournament_id` | idem | S2 | idem | **SAFE-S2** |
+| `tournaments.functions.ts:1634-1647` | `generateRulesPdf` | `tournament_documents` insert | `assertCanManage` L1627 | Oui | `data.tournament_id` | `tournament.id` du fetch guardé | S1 | `tournament_id` | **SAFE-S1** |
+| `tournaments.functions.ts:1687-1689` | `generateRulesPdf` | storage upload | L1627 | Oui | `tournament.id` | path `${tournament.id}/…` | S1 | idem | **SAFE-S1** |
+| `tournaments.functions.ts:1693-1704` | `generateRulesPdf` | `tournament_documents` insert | L1627 | Oui | idem | idem | S1 | idem | **SAFE-S1** |
+
+**Note :** ~46 autres mutations dans ce fichier passent par `context.supabase` (RLS), hors périmètre admin — mais `validateMatch` montre qu'un effet admin peut être déclenché avec un guard match-scoped incomplet.
+
+---
+
+### Autres `*.functions.ts` (hors allowlist)
+
+| Fichier:ligne | Fonction | Table/RPC | Guard (ligne) | Avant write ? | Guard porte sur | Write cible | Lien | Inputs client ? | Verdict |
+|---|---|---|---|---|---|---|---|---|---|
+| `permissions.functions.ts:80` | `logPermissionChange` | `permission_changes_log` insert | caller guard | Oui | `scopeId` du caller | audit | S2 | N/A | **SAFE-S2** |
+| `permissions.functions.ts:172-176` | `setClubMemberRoles` | `club_members` update | `assertClubAdmin` L120 | Oui | `data.club_id` | `.eq("club_id").eq("user_id")` | S2 | `club_id`, `user_id`, `roles` | **SAFE-S2** |
+| `permissions.functions.ts:255-264` | `inviteClubMember` | `club_members` insert | L218 | Oui | `data.club_id` | insert même club | S2 | `club_id` | **SAFE-S2** |
+| `permissions.functions.ts:284-297` | `inviteClubMember` | `member_invites` insert | L218 | Oui | `data.club_id` | idem | S2 | idem | **SAFE-S2** |
+| `permissions.functions.ts:356-360` | `removeClubMember` | `club_members` delete | L330 | Oui | `data.club_id` | filtres club+user | S2 | `club_id`, `user_id` | **SAFE-S2** |
+| `permissions.functions.ts:410-423` | `inviteTournamentMember` | `tournament_members` insert | `assertTournamentAdmin` L404 | Oui | `data.tournament_id` | insert même tournament | S2 | `tournament_id` | **SAFE-S2** |
+| `permissions.functions.ts:481-491` | `convertOfflineMember` | `tournament_members` update | L476 | Oui | `data.tournament_id` | `.eq("id", member_id).eq("tournament_id")` | S2 | idem | **SAFE-S2** |
+| `permissions.functions.ts:558-575` | `assignRefereeToMatch` | `tournament_members` + `tournament_matches` update | L536 | Oui | `data.tournament_id` | match `.eq("tournament_id")` | S2 | `tournament_id`, `match_id` | **SAFE-S2** |
+| `permissions.functions.ts:633-636` | `removeTournamentMember` | `tournament_members` delete | L609 + fetch L611-618 | Oui | `data.tournament_id` | member pré-filtré tournament | S1 | `tournament_id`, `member_id` | **SAFE-S1** |
+| `payment-items.functions.ts:211-228` | `createPaymentItem` | `payment_items` insert | `assertFinAdmin` L199 | Oui | `data.clubId` | `club_id: data.clubId` | S2 | `clubId`, `target` | **SAFE-S2** *(item OK ; target voir applyTarget)* |
+| `payment-items.functions.ts:372-395` | `applyTarget` | `payment_assignments` insert | via create/reassign L199/L333 | Oui | `clubId` param | `target.team_ids` / `player_ids` **non validés ∈ club** | AUCUN | `team_ids`, `player_ids` | **IDOR-RISK** |
+| `payment-items.functions.ts:449-454` | `applyTarget` | `payment_obligations` upsert | idem | Oui | `clubId` | obligations `club_id` OK mais **joueurs cross-club** | AUCUN | idem | **IDOR-RISK** |
+| `payment-items.functions.ts:271-275` | `updatePaymentItem` | `payment_items` update | L266 | Oui | `data.clubId` | `.eq("id", itemId).eq("club_id")` — patch `season_id`/`team_id` **non re-validés** | AUCUN | `clubId`, `itemId`, patch | **IDOR-RISK** (intégrité FK) |
+| `payment-items.functions.ts:310-314` | `deletePaymentItem` | `payment_items` delete | L290 | Oui | `data.clubId` | double filtre | S2 | `clubId`, `itemId` | **SAFE-S2** |
+| `payment-items.functions.ts:345-353` | `reassignPaymentItem` | assignments + obligations | L333 | Oui | `data.clubId` | item pré-fetch club ; target via `applyTarget` | AUCUN | `target` | **IDOR-RISK** |
+| `payment-checkout.functions.ts:513-530` | `recordManualPayment` | `payment_transactions` insert | `assertFinAdmin` L492 | Oui | `data.clubId` | obl fetch `.eq("club_id", data.clubId)` | S2 | `clubId`, `obligationId` | **SAFE-S2** |
+| `payment-checkout.functions.ts:536-547` | `recordManualPayment` | `payment_audit_logs` insert | L492 | Oui | `obl.club_id` | audit aligné | S2 | idem | **SAFE-S2** |
+| `payment-checkout.functions.ts:662-673` | `finalizeStripeTransactionByPI` | audit log | webhook/Stripe | N/A | `tx.club_id` DB | audit | S1 | Stripe metadata | **SAFE-S2** |
+| `payment-refunds.functions.ts:155-192` | `refundTransaction` | `payment_transactions` update | `assertFinAdmin` **après** load L100 sur `tx.club_id` | Oui | `tx.club_id` (DB) | tx par id | S1 | `transactionId` | **SAFE-S1** |
+| `payment-refunds.functions.ts:242-251` | `exemptObligation` | `payment_obligations` update | guard sur `obl.club_id` L237 | Oui | obl club (DB) | `.eq("id", obl.id)` | S1 | `obligationId` | **SAFE-S1** |
+| `payment-refunds.functions.ts:196,253,302,348` | divers | `payment_audit_logs` | fin-admin / obl club | Oui | club de la tx/obl | audit | S2 | — | **SAFE-S2** |
+| `payment-reminders.functions.ts:197-204` | `sendItemRemindersNow` | `payment_reminder_log` insert | `assertAdminOrFinancialAdmin` sur **`item.club_id`** L122 | Oui | item club (DB) | `club_id: item.club_id` | S1 | `paymentItemId` | **SAFE-S1** |
+| `payment-settings.functions.ts:78-83` | `updatePaymentSettings` | `club_payment_settings` upsert | `assertClubAdmin` L77 | Oui | `data.clubId` | upsert même club | S2 | `clubId` | **SAFE-S2** |
+| `seasons.functions.ts:72-75` | `createSeason` | `seasons` insert | `assertClubAdmin` L60 | Oui | `data.clubId` | `club_id` | S2 | `clubId` | **SAFE-S2** |
+| `seasons.functions.ts:95-106` | `updateSeason` | `seasons` update | L93 | Oui | `data.clubId` | `.eq("id", seasonId).eq("club_id")` | S2 | idem | **SAFE-S2** |
+| `seasons.functions.ts:120-129` | `setCurrentSeason` | `seasons` update ×2 | L119 | Oui | `data.clubId` | filtres club | S2 | idem | **SAFE-S2** |
+| `seasons.functions.ts:143-147` | `deleteSeason` | `seasons` delete | L142 | Oui | `data.clubId` | filtres club | S2 | idem | **SAFE-S2** |
+| `club-logo.functions.ts:102-105` | `updateClubLogoFromUpload` | `clubs` update | `assertClubRole` L94 + path L90-92 | Oui | `data.clubId` | `.eq("id", data.clubId)` | S2 | `clubId`, `path` | **SAFE-S2** |
+| `stripe-connect.functions.ts:135-144` | `createStripeConnectAccount` | `clubs` update | `assertClubAdmin` L109 | Oui | `data.clubId` | `.eq("id", club.id)` post-fetch | S2 | `clubId` | **SAFE-S2** |
+| `stripe-connect.functions.ts:148-154` | `createStripeConnectAccount` | `permission_changes_log` | L109 | Oui | club.id | audit | S2 | idem | **SAFE-S2** |
+| `billing-exemption.functions.ts:63-73` | `grantBillingExemption` | `subscriptions` upsert | `assertSuperAdmin` L43 | Oui | platform | `club_id: data.clubId` | S2 | `clubId` | **SAFE-S2** |
+| `billing-exemption.functions.ts:101-109` | `revokeBillingExemption` | `subscriptions` update | L89 | Oui | platform | `.eq("club_id", data.clubId)` | S2 | `clubId` | **SAFE-S2** |
+| `superadmin.functions.ts:321-324` | `disableUser` | auth admin | `assertSuperAdmin` L317 | Oui | platform | `data.user_id` | S3 | `user_id` | **SAFE-S3** |
+| `superadmin.functions.ts:402-405` | `archiveClub` | `clubs` update | L401 | Oui | platform | `.eq("id", data.club_id)` | S2 | `club_id` | **SAFE-S2** |
+| `superadmin-import/import.functions.ts:382-603` | `runImport` | players, teams, events, etc. | `assertSuperAdmin` L332 | Oui | `data.clubId` | toutes rows `club_id: data.clubId` ; teams validés L551-557 | S2 | `clubId` | **SAFE-S2** |
+| `passes.functions.ts:95` | `createTournamentPassCheckout` | `tournament_passes` insert | aucun (checkout public) | — | email session | pending pass | S3 | `email` | **NEEDS-HUMAN** — commerce public |
+| `passes.functions.ts:302-346` | `createTournamentFromPass` | `tournaments` + passes | pass ownership L279-284 | Oui | pass owner | consume pass | S3 | `pass_id` | **SAFE-S3** |
+| `entitlements.functions.ts:179-227` | `confirmEntitlementSession` | `tournament_entitlements` | auth + metadata `organizer_id` L148-153 | Oui | `userId` | entitlements caller | S3 | `session_id` | **SAFE-S3** |
+| `flights.functions.ts:115-408` | bracket ops | `tournament_matches`, `tournament_flights` | `assertManager` L96+ | Oui | `data.tournament_id` | filtres tournament | S2 | `tournament_id` | **SAFE-S2** |
+| `tournament-payments.functions.ts:76-744` | divers | registrations, tournaments | `assertCanManage` + load reg | Oui | `reg.tournament_id` / `data.tournament_id` | aligné | S2 | ids | **SAFE-S2** |
+| `conversion-tracking.functions.ts:41-46` | `logConversionEvent` | `conversion_events` insert | aucun | — | — | append-only analytics | S3 | event props | **NEEDS-HUMAN** — pas de cible tenant |
+| `convocation-reminder.functions.ts:264-268` | `sendManualConvocationReminder` | `reminders` insert | coach/admin convocation L71-96 | Oui | convocation team/club | `convocation_id` chargé | S1 | `convocationId` | **SAFE-S1** |
+| `support.functions.ts:23-31` | `notifySuperAdmins` | `notifications` insert | side-effect ticket create | Oui | broadcast superadmins | S3 | ticket | **SAFE-S3** |
+| `support.functions.ts:249-255` | `replyToSupportTicket` | `notifications` insert | owner/superadmin L220-247 | Oui | ticket.user_id | notify owner | S3 | `ticket_id` | **SAFE-S3** |
+| `privacy-admin.functions.ts:77-101` | approve/reject deletion | `account_deletion_requests` | `ensureSuperAdmin` | Oui | platform | par request id | S2 | `id` | **SAFE-S2** |
+
+---
+
+### Helpers `*.server.ts` + routes API
+
+| Fichier:ligne | Fonction | Table/RPC | Guard amont | Write cible | Lien | Verdict |
+|---|---|---|---|---|---|---|
+| `stripe-webhook-handler.server.ts:88-661` | `handleStripeWebhookPost` | subscriptions, entitlements, passes, audit… | Stripe HMAC L171+ | metadata / lookup DB | S1/S2 | **SAFE-S2** |
+| `tournament-payments.server.ts:108-236` | checkout/refund handlers | `tournament_registrations` | Stripe sig ou registration UUID / admin RPC | registration id | S2 | **SAFE-S2** |
+| `tournament-payment-events.server.ts:16-24` | `logPaymentEvent` | insert events | callers payment (auth+manage) | tournament/reg ids serveur | S2 | **SAFE-S2** |
+| `privacy-worker.server.ts:129-246` | export/deletion | storage, RPC, auth.admin | superadmin OU cron | `req.user_id` from row | S1 | **SAFE-S2** / cron auth **NEEDS-HUMAN** |
+| `privacy-worker.ts:11-14` | cron hook | — | **anon key** vs dedicated secret | all pending | WEAK | **NEEDS-HUMAN** |
+| `push-send.server.ts:399` | `sendPushToUser` | `push_subscriptions` delete | caller-dependent | endpoints de l'user query | S3 | **SAFE-S3** |
+| `push-dispatch.functions.ts:18-169` | dispatch push | via push-send | auth only — **pas coach check** | not admin write | N/A | **NEEDS-HUMAN** (abus notif, pas IDOR DB) |
+| `social/sync.server.ts:40-92` | `syncConnection` | connections, wall_posts | OAuth state / admin / cron | `conn.club_id` | S2 | **SAFE-S2** |
+| `email/send.server.ts:44-108` | `enqueueTransactionalEmailServer` | logs + `enqueue_email` | trusted callers | recipient du caller | NEEDS-HUMAN | **NEEDS-HUMAN** |
+| `llm/core.server.ts:40-200` | rate limits, cache | `llm_usage`, `public_rate_limits` | auth entry fns | `userId` bucket | S3 | **SAFE-S3** |
+| `routes/api/public/waitlist.ts:74` | POST waitlist | `waitlist_interest` insert | rate limit | email | S3 | **SAFE-S3** |
+| `routes/api/public/social/callback.ts:74` | OAuth callback | `club_social_connections` insert | encrypted state | payload from OAuth | NEEDS-HUMAN | **NEEDS-HUMAN** |
+| `routes/api/public/hooks/data-retention.ts:20` | cron | multi-table delete | cron secret | age-based | S3 | **NEEDS-HUMAN** |
+| `routes/api/public/hooks/payment-reminders.ts:214` | cron | `payment_reminder_log` | cron secret | item club from query | S2 | **SAFE-S2** |
+| `routes/api/public/hooks/event-reminders.ts:250` | cron | `reminders` insert | cron secret | event-derived | S2 | **SAFE-S2** |
+
+---
+
+## Exploitables en priorité
+
+Tri : (argent ∨ cross-club) × inputs client.
+
+| # | Verdict | Fichier | Scénario (2 lignes) |
+|---|---------|---------|---------------------|
+| **P0** | **IDOR-RISK** | `payment-items.functions.ts` `applyTarget` | Fin-admin du club A crée/réassigne un item avec `team_ids` ou `player_ids` du club B. Obligations et assignments sont matérialisées sous `club_id=A` avec des joueurs étrangers — pollution données + potentiellement mauvais payeurs/notifications. |
+| **P0** | **IDOR-RISK** | `tournaments.functions.ts` `validateMatch` → `applyBracketProgression` | Arbitre autorisé sur match du tournoi A envoie `tournament_id=B` (autre club). `can_validate_match` passe sur `match_id` ; progression admin réécrit les brackets du tournoi B sans auth sur B. |
+| **P1** | **IDOR-RISK** | `admin.functions.ts` `setUserClubStaffRoles` upsert | Admin club A upsert `club_members` `{club_id:A, user_id:<attacker-chosen>, role:admin}` sans que la cible soit membre — élévation arbitraire dans le club. |
+| **P1** | **IDOR-RISK** | `admin.functions.ts` `sendUserPasswordReset` | Admin club A déclenche `generateLink(recovery)` pour tout `user_id` global — pas de vérif que la cible appartient au club (spam reset / énumération). |
+| **P2** | **NO-GUARD** | `coach-notify.functions.ts` `notifyCoachAssigned` | Utilisateur authentifié quelconque appelle la server fn avec `teamId`/`coachUserId` arbitraires → email transactionnel enqueued (spam / phishing interne). |
+| **P2** | **IDOR-RISK** | `payment-items.functions.ts` `updatePaymentItem` | Fin-admin met à jour `season_id`/`team_id` du patch sans re-validation club — FK cross-club sur item restant dans club A. |
+
+---
+
+## Allowlist — verdict (§2.3)
+
+| Fichier | Justification CI | Tient §1 ? | Recommandation |
+|---------|-------------------|------------|----------------|
+| `billing.functions.ts` | inline admin, scoped `userId` | **Oui** — writes `.eq`/`onConflict` sur `club_id` guardé | **Garder** allowlist ; migrer vers `assertClubRole` pour cohérence `roles[]` |
+| `payment-family.functions.ts` | scoped `userId` only | **Oui** — pas de write admin | **Garder** |
+| `insights.functions.ts` | inline membership | **Partiel** — `dismissInsight` OK (S1) ; `triggerInsightsDetection` délègue insert OK mais lit membership via **admin** ; server helper expire global | **Garder** avec réserve ; sortir si `check:guards` durci |
+| `admin.functions.ts` | inline `assertCallerAdmin` | **Non** — 2 IDOR (`sendUserPasswordReset`, `setUserClubStaffRoles` upsert) | **À sortir de l'allowlist** + fix câblage |
+| `legal.functions.ts` | public read | **Oui** | **Garder** |
+| `invite.functions.ts` | public token flow | **NEEDS-HUMAN** — intentionnel | **Garder** ; documenter threat model |
+| `coach-notify.functions.ts` | event handler, scoped coach/team | **Non** — aucun guard tenant ; fn client-callable | **À sortir de l'allowlist** + ajouter guard coach/admin sur `teamId` |
+
+---
+
+## Questions NEEDS-HUMAN
+
+1. **`can_validate_match` RPC** — retourne-t-il le `tournament_id` canonique du match ? Si oui, fix trivial = ignorer `data.tournament_id` client. *(lire def SQL)*
+2. **`payment-items` `applyTarget`** — existe-t-il une contrainte DB `payment_assignments.target_team_id → teams.club_id = payment_assignments.club_id` ? Sinon IDOR est exploitable, pas seulement intégrité. *(lire migrations)*
+3. **`setUserClubStaffRoles` upsert** — `onConflict: club_id,user_id,role` — l'intention est-elle d'**inviter** des users hors club (feature) ou bug ? *(produit)*
+4. **`invite.confirmInvitedUserEmail`** — `listUsers` paginé est-il acceptable en prod (latence/énumération) ? *(ops)*
+5. **`privacy-worker` cron** — anon key comme secret est-il déployé avec rotation / IP restrict ? *(infra)*
+6. **`insights.server.ts:424`** — expiration globale des insights expirés est-elle voulue multi-tenant ? *(produit — basse gravité)*
+7. **Question 1 (auth session)** — compte tenu de fraîcheur DB sur chemins guardés : retrait membre → prochain appel 403 **sans signOut**. Reste à cartographier les chemins **sans** guard live (ce rapport) vs chemins UI-only.
+
+---
+
+## Synthèse calibration 2a / 2b
+
+| Axe | Conclusion |
+|-----|------------|
+| **(2a) Fraîcheur** | `assertClubRole` / `assertCanManage` / RPCs `has_club_role_text`, `can_manage_tournament` lisent la DB **à chaque appel**. Pas de cache JWT rôle. **Question 1 devient secondaire** sur les chemins guardés. |
+| **(2b) Couverture / câblage** | `check:guards` = **présence textuelle**. Trouvé **6 sites IDOR-RISK/N0-GUARD** exploitables, dont **2 P0** (paiements + bracket tournoi). Allowlist **masque 2 fichiers** (`admin`, `coach-notify`) avec écarts réels. |
+
+**Prochaine étape suggérée :** un patch par classe — (1) `applyTarget` + `validateMatch`, (2) `admin.functions` câblage, (3) `coach-notify` guard — sans méga-refactor `check:guards`.

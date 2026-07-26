@@ -8,6 +8,7 @@
     "players": "Spelers",
     "tournaments": "Toernooien",
     "onboarding": "Installatie",
+    "parentGuide": "Oudergids",
     "pricing": "Prijzen",
     "faq": "Veelgestelde vragen",
     "contact": "Contact",
@@ -1289,6 +1290,124 @@
       "resendSent": "Bevestigings-e-mail opnieuw verzonden. Controleer je inbox."
     }
   },
+  "parentGuide": {
+    "kicker": "Oudergids",
+    "title": "Ga in enkele minuten aan de slag met Clubero.",
+    "subtitle": "Alles wat een ouder moet weten om zijn of haar kind te volgen: oproepen, afwezigheden, meldingen en het clubprikbord.",
+    "ctaStart": "Bekijk de tutorials",
+    "ctaFaq": "Veelgestelde vragen",
+    "previewLabel": "Voorbeeld binnenkort",
+    "reassure": [
+      "Vanuit de mobiele app",
+      "Meldingen naar keuze",
+      "Gegevens beschermd"
+    ],
+    "tutorialsTitle": "Het belangrijkste, stap voor stap.",
+    "tutorialsSubtitle": "Zeven gedetailleerde procedures, stap voor stap en met een screenshot per stap.",
+    "tutorials": [
+      {
+        "t": "Je ouderaccount aanmaken",
+        "b": "Alles begint met de uitnodiging van je club. Maak je toegang in een paar minuten aan.",
+        "steps": [
+          "Open de uitnodigingsmail van je club en tik op «Lid worden van de club».",
+          "Vul je e-mailadres in en maak je wachtwoord aan.",
+          "Bevestig je e-mailadres via de ontvangen bevestigingslink.",
+          "Log voor de eerste keer in met je gegevens.",
+          "Vul je ouderprofiel aan (naam, telefoon) — klaar."
+        ]
+      },
+      {
+        "t": "Toestemming en toegang voor je kind geven",
+        "b": "Als ouder koppel je je kind aan je account en geef je toestemming voor de toegang. Jij houdt de controle.",
+        "steps": [
+          "Open het gedeelte «Mijn gezin» of het toestemmingsverzoek van de club.",
+          "Selecteer het door de club voorgestelde profiel van je kind.",
+          "Controleer de gegevens (naam, geboortedatum, team).",
+          "Lees en aanvaard de vereiste ouderlijke toestemming voor een minderjarige.",
+          "De toegang van je kind is geactiveerd — het kan indien nodig een eigen login aanmaken."
+        ]
+      },
+      {
+        "t": "Evenementen bekijken en op een oproep reageren",
+        "b": "Bekijk de wedstrijden en trainingen van je kind en bevestig de aanwezigheid met één tik.",
+        "steps": [
+          "Open het tabblad «Kalender» of «Start» om de komende evenementen te zien.",
+          "Tik op een wedstrijd of training om de details te openen.",
+          "Controleer de locatie, het tijdstip en het verzameltijdstip.",
+          "Tik op «Aanwezig» (of «Afwezig») om op de oproep te reageren.",
+          "Een vraag? Open de «Evenementchat» om de staf te schrijven (als de club dit heeft ingeschakeld)."
+        ]
+      },
+      {
+        "t": "Meldingen instellen",
+        "b": "Kies hoe je op de hoogte wordt gebracht: app, e-mail of WhatsApp, naar jouw voorkeur.",
+        "steps": [
+          "Open je profiel en daarna «Meldingen».",
+          "Kies je kanalen: app, e-mail en/of WhatsApp.",
+          "Schakel de meldingstypes in (oproepen, herinneringen, prikbordberichten).",
+          "Stel in hoe lang vóór evenementen de herinneringen worden verstuurd."
+        ]
+      },
+      {
+        "t": "Een afwezigheid melden",
+        "b": "Laat de staf op tijd weten wanneer je kind niet kan komen, met een reden indien nodig.",
+        "steps": [
+          "Open het betreffende evenement in het tabblad «Kalender» of «Oproepen».",
+          "Tik op «Afwezig».",
+          "Voeg een reden toe (optioneel) om de coach te informeren.",
+          "Bevestig — je antwoord wordt opgeslagen en de staf wordt op de hoogte gebracht."
+        ]
+      },
+      {
+        "t": "Meerijden organiseren",
+        "b": "Voor wedstrijden en trainingen bied je een plaats aan of vind je er een — rechtstreeks vanaf het evenement.",
+        "steps": [
+          "Open een wedstrijd of training waar meerijden is ingeschakeld.",
+          "Zoek de kaart «Meerijden» (met de verantwoordelijkheidsmelding).",
+          "Om te rijden: «Ik kan rijden →», geef het voertuig, het aantal plaatsen en een vertrekpunt op.",
+          "Voor een plaats: «Plaats reserveren» bij een chauffeur en kies het kind of de kinderen.",
+          "Nog geen chauffeur? «Vervoer aanvragen» — de coach wordt op de hoogte gebracht."
+        ]
+      },
+      {
+        "t": "Het clubprikbord volgen",
+        "b": "Het prikbord is de nieuwsfeed van je club: de coach en de club plaatsen er belangrijke info, jij leest die en kunt reageren.",
+        "steps": [
+          "Tik onderaan op het tabblad «Prikbord» (megafoonpictogram).",
+          "Blader door de aankondigingen van de club en het team van je kind.",
+          "Open een bericht om de details en bijlagen te zien.",
+          "Reageer met «Reageren» als de club reacties heeft ingeschakeld."
+        ]
+      }
+    ],
+    "faqTitle": "Veelgestelde vragen van ouders",
+    "faq": [
+      {
+        "q": "Heb ik een account nodig los van dat van mijn kind?",
+        "a": "Ja. Elke ouder heeft een eigen toegang, gekoppeld aan het profiel van het kind. Je beheert oproepen en toestemming vanuit je account."
+      },
+      {
+        "q": "Kan mijn kind een eigen account hebben?",
+        "a": "Een minderjarig kind kan een account hebben zodra je ouderlijke toestemming hebt gegeven. Je blijft gekoppeld aan zijn of haar profiel."
+      },
+      {
+        "q": "Krijg ik te veel meldingen?",
+        "a": "Nee: je kiest precies welke kanalen (app, e-mail, WhatsApp) en herinneringen je ontvangt in je meldingsinstellingen."
+      },
+      {
+        "q": "Kan ik meerdere kinderen beheren?",
+        "a": "Ja. Al je kinderen verschijnen in één gezinskalender, ook als ze in verschillende teams spelen."
+      },
+      {
+        "q": "Ziet de club mijn telefoonnummer?",
+        "a": "Communicatie verloopt via Clubero — het clubprikbord en meldingen. Je hoeft je persoonlijke nummer niet te delen."
+      }
+    ],
+    "ctaTitle": "Nog een vraag?",
+    "ctaBody": "Ons team en jouw club staan klaar om je rustig op weg te helpen.",
+    "ctaPrimary": "Contacteer het team",
+    "ctaSecondary": "Inloggen"
+  },
   "onboarding": {
     "kicker": "Installatie",
     "title": "Overstappen naar Clubero — heel eenvoudig.",
@@ -1554,7 +1673,11 @@
         "b": "Finalerondes na een regulier seizoen."
       }
     ],
-    "formatsExtras": ["Automatische planning", "Veldtoewijzing", "Beheer van kwalificaties"],
+    "formatsExtras": [
+      "Automatische planning",
+      "Veldtoewijzing",
+      "Beheer van kwalificaties"
+    ],
     "mobileTitle": "Mobile first, direct op het veld.",
     "mobileSubtitle": "Gemaakt om met één hand te bedienen, tussen twee wedstrijden door.",
     "mobilePoints": [

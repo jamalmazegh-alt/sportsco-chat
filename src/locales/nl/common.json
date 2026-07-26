@@ -1771,6 +1771,11 @@
       "description": "We helpen je om je Club, je Teams en je gegevens in enkele dagen naar Clubero te migreren. Persoonlijke begeleiding, Excel-import en bestaande tools.",
       "ogDescription": "Stap eenvoudig over naar Clubero. Wij migreren je Club voor je."
     },
+    "parentGuide": {
+      "title": "Oudergids — aan de slag met Clubero",
+      "description": "Stapsgewijze tutorials voor ouders: reageren op een oproep, een afwezigheid melden, toestemming geven, meldingen instellen en de gezinskalender volgen.",
+      "ogDescription": "Oproepen, afwezigheden, meldingen: de oudergids om te starten met Clubero."
+    },
     "tournamentsPage": {
       "title": "Toernooien — Live uitslagen, openbare standen, TV-modus | Clubero",
       "description": "Organiseer moderne Toernooien met live uitslagen, openbare standen, mobiele Scheidsrechter-modus en TV-modus. Bedoeld voor organisatoren, Spelers, Ouders en fans.",

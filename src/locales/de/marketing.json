@@ -8,6 +8,7 @@
     "players": "Spieler",
     "tournaments": "Turniere",
     "onboarding": "Einrichtung",
+    "parentGuide": "Eltern-Guide",
     "pricing": "Preise",
     "faq": "FAQ",
     "contact": "Kontakt",
@@ -1288,6 +1289,124 @@
       "resendCta": "Renvoyer",
       "resendSent": "Bestätigungs-E-Mail erneut gesendet. Prüfe deinen Posteingang."
     }
+  },
+  "parentGuide": {
+    "kicker": "Eltern-Guide",
+    "title": "In wenigen Minuten mit Clubero startklar.",
+    "subtitle": "Alles, was Eltern wissen müssen, um ihr Kind zu begleiten: Aufgebote, Abwesenheiten, Benachrichtigungen und die Vereinspinnwand.",
+    "ctaStart": "Zu den Tutorials",
+    "ctaFaq": "Häufige Fragen",
+    "previewLabel": "Vorschau folgt",
+    "reassure": [
+      "Über die mobile App",
+      "Benachrichtigungen nach Wahl",
+      "Daten geschützt"
+    ],
+    "tutorialsTitle": "Das Wichtigste, Schritt für Schritt.",
+    "tutorialsSubtitle": "Sieben detaillierte Schritt-für-Schritt-Anleitungen mit einem Screenshot pro Schritt.",
+    "tutorials": [
+      {
+        "t": "Ihr Elternkonto eröffnen",
+        "b": "Alles beginnt mit der Einladung Ihres Vereins. Richten Sie Ihren Zugang in wenigen Minuten ein.",
+        "steps": [
+          "Öffnen Sie die Einladungs-E-Mail Ihres Vereins und tippen Sie auf „Verein beitreten“.",
+          "Geben Sie Ihre E-Mail-Adresse ein und erstellen Sie Ihr Passwort.",
+          "Bestätigen Sie Ihre E-Mail-Adresse über den erhaltenen Bestätigungslink.",
+          "Melden Sie sich zum ersten Mal mit Ihren Zugangsdaten an.",
+          "Vervollständigen Sie Ihr Elternprofil (Name, Telefon) — fertig."
+        ]
+      },
+      {
+        "t": "Einwilligung und Zugang für Ihr Kind geben",
+        "b": "Als Elternteil verknüpfen Sie Ihr Kind mit Ihrem Konto und genehmigen seinen Zugang. Sie behalten die Kontrolle.",
+        "steps": [
+          "Öffnen Sie den Bereich „Meine Familie“ oder die Einwilligungsanfrage des Vereins.",
+          "Wählen Sie das vom Verein vorgeschlagene Profil Ihres Kindes.",
+          "Prüfen Sie die Daten (Name, Geburtsdatum, Team).",
+          "Lesen und akzeptieren Sie die für Minderjährige erforderliche elterliche Einwilligung.",
+          "Der Zugang Ihres Kindes ist aktiviert — es kann bei Bedarf einen eigenen Login erstellen."
+        ]
+      },
+      {
+        "t": "Termine sehen und auf ein Aufgebot antworten",
+        "b": "Sehen Sie die Spiele und Trainings Ihres Kindes und bestätigen Sie die Teilnahme mit einem Tippen.",
+        "steps": [
+          "Öffnen Sie den Reiter „Kalender“ oder „Start“, um die nächsten Termine zu sehen.",
+          "Tippen Sie auf ein Spiel oder Training, um die Details zu öffnen.",
+          "Prüfen Sie Ort, Uhrzeit und Treffpunktzeit.",
+          "Tippen Sie auf „Anwesend“ (oder „Abwesend“), um auf das Aufgebot zu antworten.",
+          "Eine Frage? Öffnen Sie den „Event-Chat“, um dem Team zu schreiben (wenn der Verein ihn aktiviert hat)."
+        ]
+      },
+      {
+        "t": "Benachrichtigungen einrichten",
+        "b": "Wählen Sie, wie Sie informiert werden: App, E-Mail oder WhatsApp, ganz nach Wunsch.",
+        "steps": [
+          "Öffnen Sie Ihr Profil und dann „Benachrichtigungen“.",
+          "Wählen Sie Ihre Kanäle: App, E-Mail und/oder WhatsApp.",
+          "Aktivieren Sie die Benachrichtigungstypen (Aufgebote, Erinnerungen, Pinnwand-Nachrichten).",
+          "Legen Sie fest, wie lange vor Terminen die Erinnerungen gesendet werden."
+        ]
+      },
+      {
+        "t": "Eine Abwesenheit melden",
+        "b": "Informieren Sie das Team frühzeitig, wenn Ihr Kind nicht kommen kann, bei Bedarf mit Grund.",
+        "steps": [
+          "Öffnen Sie das betreffende Ereignis im Reiter „Kalender“ oder „Aufgebote“.",
+          "Tippen Sie auf „Abwesend“.",
+          "Fügen Sie einen Grund hinzu (optional), um den Trainer zu informieren.",
+          "Bestätigen Sie — Ihre Antwort wird gespeichert und das Team informiert."
+        ]
+      },
+      {
+        "t": "Fahrgemeinschaft organisieren",
+        "b": "Bei Spielen und Trainings bieten Sie einen Platz an oder finden einen — direkt vom Ereignis aus.",
+        "steps": [
+          "Öffnen Sie ein Spiel oder Training, bei dem die Mitfahrgelegenheit aktiviert ist.",
+          "Suchen Sie die Karte „Mitfahrgelegenheit“ (mit dem Verantwortungshinweis).",
+          "Zum Fahren: „Ich kann fahren →“, geben Sie Fahrzeug, Anzahl der Plätze und einen Treffpunkt an.",
+          "Für einen Platz: „Platz reservieren“ bei einem Fahrer und wählen Sie das/die Kind(er).",
+          "Noch kein Fahrer? „Transport anfragen“ — der Trainer wird informiert."
+        ]
+      },
+      {
+        "t": "Der Vereinspinnwand folgen",
+        "b": "Die Pinnwand ist der Neuigkeiten-Feed Ihres Vereins: Trainer und Verein veröffentlichen dort wichtige Infos, Sie lesen sie und können antworten.",
+        "steps": [
+          "Tippen Sie unten auf den Reiter „Pinnwand“ (Megafon-Symbol).",
+          "Durchstöbern Sie die Ankündigungen des Vereins und des Teams Ihres Kindes.",
+          "Öffnen Sie einen Beitrag, um Details und Anhänge zu sehen.",
+          "Antworten Sie mit „Antworten“, wenn der Verein Kommentare aktiviert hat."
+        ]
+      }
+    ],
+    "faqTitle": "Häufige Fragen von Eltern",
+    "faq": [
+      {
+        "q": "Brauche ich ein eigenes Konto getrennt von dem meines Kindes?",
+        "a": "Ja. Jedes Elternteil hat einen eigenen Zugang, der mit dem Profil des Kindes verknüpft ist. Aufgebote und Einwilligung verwalten Sie über Ihr Konto."
+      },
+      {
+        "q": "Kann mein Kind ein eigenes Konto haben?",
+        "a": "Ein minderjähriges Kind kann ein Konto haben, sobald Sie die elterliche Einwilligung erteilt haben. Sie bleiben mit seinem Profil verbunden."
+      },
+      {
+        "q": "Bekomme ich zu viele Benachrichtigungen?",
+        "a": "Nein: Sie wählen in Ihren Benachrichtigungseinstellungen genau die Kanäle (App, E-Mail, WhatsApp) und Erinnerungen aus."
+      },
+      {
+        "q": "Kann ich mehrere Kinder verwalten?",
+        "a": "Ja. Alle Ihre Kinder erscheinen in einem einzigen Familienkalender, auch wenn sie in verschiedenen Teams spielen."
+      },
+      {
+        "q": "Sieht der Verein meine Telefonnummer?",
+        "a": "Die Kommunikation läuft über Clubero — die Vereinspinnwand und Benachrichtigungen. Sie müssen Ihre private Nummer nicht teilen."
+      }
+    ],
+    "ctaTitle": "Noch eine offene Frage?",
+    "ctaBody": "Unser Team und Ihr Verein helfen Ihnen gerne bei einem entspannten Start.",
+    "ctaPrimary": "Team kontaktieren",
+    "ctaSecondary": "Anmelden"
   },
   "onboarding": {
     "kicker": "Einrichtung",

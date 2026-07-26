@@ -1771,6 +1771,11 @@
       "description": "Nous vous aidons à migrer votre club, vos équipes et vos données vers Clubero en quelques jours. Accompagnement humain, import Excel et outils existants.",
       "ogDescription": "Passez à Clubero simplement. Nous migrons votre club pour vous."
     },
+    "parentGuide": {
+      "title": "Guide des parents — bien démarrer sur Clubero",
+      "description": "Tutos pas à pas pour les parents : répondre à une convocation, déclarer une absence, donner son consentement, régler les notifications et suivre le calendrier familial.",
+      "ogDescription": "Convocations, absences, notifications : le guide des parents pour bien démarrer sur Clubero."
+    },
     "tournamentsPage": {
       "title": "Tournois — Scores live, classements publics, mode TV | Clubero",
       "description": "Organisez des tournois modernes avec scores en direct, classements publics, arbitrage mobile et mode TV. Pensé pour les organisateurs, joueurs, parents et supporters.",

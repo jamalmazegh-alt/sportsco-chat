@@ -8,6 +8,7 @@
     "players": "Jogadores",
     "tournaments": "Torneios",
     "onboarding": "Configuração",
+    "parentGuide": "Guia para pais",
     "pricing": "Preços",
     "faq": "FAQ",
     "contact": "Contacto",
@@ -1289,6 +1290,124 @@
       "resendSent": "E-mail de confirmação reenviado. Verifique a sua caixa de entrada."
     }
   },
+  "parentGuide": {
+    "kicker": "Guia para pais",
+    "title": "Comece a usar o Clubero em minutos.",
+    "subtitle": "Tudo o que um pai ou mãe precisa para acompanhar o seu filho: convocatórias, ausências, notificações e o mural do clube.",
+    "ctaStart": "Ver os tutoriais",
+    "ctaFaq": "Perguntas frequentes",
+    "previewLabel": "Pré-visualização em breve",
+    "reassure": [
+      "A partir da app móvel",
+      "Notificações à sua medida",
+      "Dados protegidos"
+    ],
+    "tutorialsTitle": "O essencial, passo a passo.",
+    "tutorialsSubtitle": "Sete procedimentos detalhados, passo a passo e com uma captura por passo.",
+    "tutorials": [
+      {
+        "t": "Abrir a sua conta de pai ou mãe",
+        "b": "Tudo começa com o convite do seu clube. Crie o seu acesso em poucos minutos.",
+        "steps": [
+          "Abra o email de convite do seu clube e toque em «Juntar-me ao clube».",
+          "Introduza o seu endereço de email e crie a sua palavra-passe.",
+          "Valide o seu endereço de email com o link de confirmação recebido.",
+          "Inicie sessão pela primeira vez com as suas credenciais.",
+          "Complete o seu perfil de pai ou mãe (nome, telefone) — pronto."
+        ]
+      },
+      {
+        "t": "Dar o consentimento e o acesso ao seu filho",
+        "b": "Enquanto pai ou mãe, associa o seu filho à sua conta e autoriza o seu acesso. Mantém o controlo.",
+        "steps": [
+          "Abra a secção «A minha família» ou o pedido de consentimento enviado pelo clube.",
+          "Selecione o perfil do seu filho proposto pelo clube.",
+          "Verifique os dados (nome, data de nascimento, equipa).",
+          "Leia e aceite o consentimento parental exigido para um menor.",
+          "O acesso do seu filho é ativado — ele pode criar o seu próprio início de sessão se precisar."
+        ]
+      },
+      {
+        "t": "Ver os eventos e responder a uma convocatória",
+        "b": "Consulte os jogos e treinos do seu filho e confirme a presença com um toque.",
+        "steps": [
+          "Abra o separador «Calendário» ou «Início» para ver os próximos eventos.",
+          "Toque num jogo ou treino para abrir o detalhe.",
+          "Verifique o local, a hora e a hora de encontro.",
+          "Toque em «Presente» (ou «Ausente») para responder à convocatória.",
+          "Alguma dúvida? Abra o «Chat do Evento» para escrever à equipa técnica (se o clube o tiver ativado)."
+        ]
+      },
+      {
+        "t": "Configurar as notificações",
+        "b": "Escolha como quer ser avisado: app, email ou WhatsApp, conforme a sua preferência.",
+        "steps": [
+          "Abra o seu perfil e depois «Notificações».",
+          "Escolha os seus canais: app, email e/ou WhatsApp.",
+          "Ative os tipos de aviso (convocatórias, lembretes, mensagens do Mural).",
+          "Defina com quanta antecedência os lembretes são enviados antes dos eventos."
+        ]
+      },
+      {
+        "t": "Declarar uma ausência",
+        "b": "Avise a equipa técnica com antecedência quando o seu filho não puder ir, com um motivo se necessário.",
+        "steps": [
+          "Abra o evento em questão no separador «Calendário» ou «Convocatórias».",
+          "Toque em «Ausente».",
+          "Adicione um motivo (opcional) para informar o treinador.",
+          "Confirme — a sua resposta é guardada e a equipa é avisada."
+        ]
+      },
+      {
+        "t": "Organizar as boleias",
+        "b": "Para jogos e treinos, ofereça ou encontre um lugar diretamente a partir do evento.",
+        "steps": [
+          "Abra um jogo ou treino onde as boleias estejam ativadas.",
+          "Localize o cartão «Boleias» (com o aviso de responsabilidade).",
+          "Para conduzir: «Eu posso conduzir →», indique o veículo, o número de lugares e um ponto de partida.",
+          "Para ter boleia: «Reservar lugar» com um condutor e escolha a(s) criança(s).",
+          "Sem condutor? «Pedir boleia» — o treinador é avisado."
+        ]
+      },
+      {
+        "t": "Acompanhar o mural do clube",
+        "b": "O mural é o feed de anúncios do seu clube: o treinador e o clube publicam as informações importantes, você lê-as e pode responder.",
+        "steps": [
+          "Toque no separador «Mural» (ícone de megafone) na parte inferior.",
+          "Consulte os anúncios do clube e da equipa do seu filho.",
+          "Abra uma publicação para ver o detalhe e os anexos.",
+          "Responda com «Responder» se o clube tiver ativado os comentários."
+        ]
+      }
+    ],
+    "faqTitle": "Perguntas frequentes dos pais",
+    "faq": [
+      {
+        "q": "Preciso de uma conta separada da do meu filho?",
+        "a": "Sim. Cada pai ou mãe tem o seu próprio acesso, ligado ao perfil do filho. Gere as convocatórias e o consentimento a partir da sua conta."
+      },
+      {
+        "q": "O meu filho pode ter a sua própria conta?",
+        "a": "Uma criança menor pode ter uma conta depois de dar o consentimento parental. Continua ligado ao perfil dela."
+      },
+      {
+        "q": "Vou receber notificações a mais?",
+        "a": "Não: escolhe com precisão os canais (app, email, WhatsApp) e os lembretes nas suas definições de notificações."
+      },
+      {
+        "q": "Posso gerir vários filhos?",
+        "a": "Sim. Todos os seus filhos aparecem num único calendário familiar, mesmo que joguem em equipas diferentes."
+      },
+      {
+        "q": "O clube vê o meu número de telefone?",
+        "a": "A comunicação passa pelo Clubero — o mural do clube e as notificações. Não precisa de partilhar o seu número pessoal."
+      }
+    ],
+    "ctaTitle": "Ainda tem alguma questão?",
+    "ctaBody": "A nossa equipa e o seu clube estão aqui para o ajudar a começar com tranquilidade.",
+    "ctaPrimary": "Contactar a equipa",
+    "ctaSecondary": "Iniciar sessão"
+  },
   "onboarding": {
     "kicker": "Configuração",
     "title": "Mudar para o Clubero — é fácil.",
@@ -1554,7 +1673,11 @@
         "b": "Fases finais após uma temporada regular."
       }
     ],
-    "formatsExtras": ["Programação automática", "Atribuição de campos", "Gestão de qualificações"],
+    "formatsExtras": [
+      "Programação automática",
+      "Atribuição de campos",
+      "Gestão de qualificações"
+    ],
     "mobileTitle": "Mobile first, diretamente no campo.",
     "mobileSubtitle": "Feito para ser usado com uma mão, entre dois jogos.",
     "mobilePoints": [

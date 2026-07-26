@@ -1771,6 +1771,11 @@
       "description": "Wir helfen dir, deinen Verein, deine Teams und deine Daten in wenigen Tagen zu Clubero zu migrieren. Persönliche Begleitung, Excel-Import und bestehende Tools.",
       "ogDescription": "Wechsle einfach zu Clubero. Wir migrieren deinen Verein für dich."
     },
+    "parentGuide": {
+      "title": "Eltern-Guide — mit Clubero starten",
+      "description": "Schritt-für-Schritt-Tutorials für Eltern: auf ein Aufgebot antworten, Abwesenheit melden, Einwilligung geben, Benachrichtigungen einrichten und den Familienkalender verfolgen.",
+      "ogDescription": "Aufgebote, Abwesenheiten, Benachrichtigungen: der Eltern-Guide für den Start mit Clubero."
+    },
     "tournamentsPage": {
       "title": "Turniere — Live-Ergebnisse, öffentliche Tabellen, TV-Modus | Clubero",
       "description": "Organisiere moderne Turniere mit Live-Ergebnissen, öffentlichen Tabellen, mobilem Schiedsrichter-Modus und TV-Modus. Gedacht für Organisatoren, Spieler, Eltern und Fans.",

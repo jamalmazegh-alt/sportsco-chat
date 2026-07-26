@@ -1771,6 +1771,11 @@
       "description": "Ajudamo-lo a migrar o seu Clube, as suas Equipas e os seus dados para o Clubero em poucos dias. Acompanhamento pessoal, importação de Excel e ferramentas existentes.",
       "ogDescription": "Mude facilmente para o Clubero. Migramos o seu Clube por si."
     },
+    "parentGuide": {
+      "title": "Guia para pais — começar com o Clubero",
+      "description": "Tutoriais passo a passo para pais: responder a uma convocatória, declarar uma ausência, dar o consentimento, configurar as notificações e acompanhar o calendário familiar.",
+      "ogDescription": "Convocatórias, ausências, notificações: o guia para pais para começar com o Clubero."
+    },
     "tournamentsPage": {
       "title": "Torneios — Resultados ao vivo, tabelas públicas, modo TV | Clubero",
       "description": "Organize Torneios modernos com resultados ao vivo, tabelas públicas, modo de Árbitro móvel e modo TV. Pensado para organizadores, Jogadores, Encarregados de educação e fãs.",

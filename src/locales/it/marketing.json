@@ -8,6 +8,7 @@
     "players": "Giocatori",
     "tournaments": "Tornei",
     "onboarding": "Configurazione",
+    "parentGuide": "Guida per genitori",
     "pricing": "Prezzi",
     "faq": "FAQ",
     "contact": "Contatti",
@@ -1288,6 +1289,124 @@
       "resendCta": "Invia di nuovo",
       "resendSent": "Email di conferma inviata di nuovo. Controlla la tua casella di posta."
     }
+  },
+  "parentGuide": {
+    "kicker": "Guida per i genitori",
+    "title": "Inizia con Clubero in pochi minuti.",
+    "subtitle": "Tutto ciò che un genitore deve sapere per seguire il proprio figlio: convocazioni, assenze, notifiche e la bacheca del club.",
+    "ctaStart": "Vedi i tutorial",
+    "ctaFaq": "Domande frequenti",
+    "previewLabel": "Anteprima in arrivo",
+    "reassure": [
+      "Dall'app mobile",
+      "Notifiche su misura",
+      "Dati protetti"
+    ],
+    "tutorialsTitle": "L'essenziale, passo dopo passo.",
+    "tutorialsSubtitle": "Sette procedure dettagliate, passo dopo passo e con uno screenshot per ogni passaggio.",
+    "tutorials": [
+      {
+        "t": "Aprire il tuo account genitore",
+        "b": "Tutto inizia con l'invito del tuo club. Crea il tuo accesso in pochi minuti.",
+        "steps": [
+          "Apri l'email di invito del tuo club e tocca «Unisciti al club».",
+          "Inserisci il tuo indirizzo email e crea la tua password.",
+          "Conferma il tuo indirizzo email tramite il link di conferma ricevuto.",
+          "Accedi per la prima volta con le tue credenziali.",
+          "Completa il tuo profilo genitore (nome, telefono) — è tutto pronto."
+        ]
+      },
+      {
+        "t": "Dare il consenso e l'accesso a tuo figlio",
+        "b": "Come genitore, colleghi tuo figlio al tuo account e autorizzi il suo accesso. Mantieni il controllo.",
+        "steps": [
+          "Apri la sezione «La mia famiglia» o la richiesta di consenso inviata dal club.",
+          "Seleziona il profilo di tuo figlio proposto dal club.",
+          "Verifica i dati (nome, data di nascita, squadra).",
+          "Leggi e accetta il consenso dei genitori richiesto per un minore.",
+          "L'accesso di tuo figlio è attivato — se necessario, può creare le proprie credenziali."
+        ]
+      },
+      {
+        "t": "Vedere gli eventi e rispondere a una convocazione",
+        "b": "Consulta le partite e gli allenamenti di tuo figlio e conferma la presenza con un tocco.",
+        "steps": [
+          "Apri la scheda «Calendario» o «Home» per vedere i prossimi eventi.",
+          "Tocca una partita o un allenamento per aprire il dettaglio.",
+          "Verifica luogo, orario e orario di ritrovo.",
+          "Tocca «Presente» (o «Assente») per rispondere alla convocazione.",
+          "Una domanda? Apri la «Chat evento» per scrivere allo staff (se il club l'ha attivata)."
+        ]
+      },
+      {
+        "t": "Impostare le notifiche",
+        "b": "Scegli come essere avvisato: app, email o WhatsApp, secondo le tue preferenze.",
+        "steps": [
+          "Apri il tuo profilo, poi «Notifiche».",
+          "Scegli i tuoi canali: app, email e/o WhatsApp.",
+          "Attiva i tipi di avviso (convocazioni, promemoria, messaggi della Bacheca).",
+          "Imposta con quanto anticipo vengono inviati i promemoria prima degli eventi."
+        ]
+      },
+      {
+        "t": "Segnalare un'assenza",
+        "b": "Avvisa lo staff in anticipo quando tuo figlio non può venire, con un motivo se necessario.",
+        "steps": [
+          "Apri l'evento interessato nella scheda «Calendario» o «Convocazioni».",
+          "Tocca «Assente».",
+          "Aggiungi un motivo (facoltativo) per informare l'allenatore.",
+          "Conferma — la tua risposta viene salvata e lo staff viene avvisato."
+        ]
+      },
+      {
+        "t": "Organizzare il passaggio in auto",
+        "b": "Per partite e allenamenti, offri o trova un posto direttamente dall'evento.",
+        "steps": [
+          "Apri una partita o un allenamento in cui il passaggio in auto è attivato.",
+          "Individua la scheda «Passaggio in auto» (con l'avviso di responsabilità).",
+          "Per guidare: «Posso guidare →», indica il veicolo, il numero di posti e un punto di partenza.",
+          "Per un passaggio: «Prenota un posto» da un conducente e scegli il/i figlio/i.",
+          "Nessun conducente? «Richiedi un passaggio» — l'allenatore viene avvisato."
+        ]
+      },
+      {
+        "t": "Seguire la bacheca del club",
+        "b": "La bacheca è il feed di annunci del tuo club: l'allenatore e il club pubblicano le informazioni importanti, tu le leggi e puoi rispondere.",
+        "steps": [
+          "Tocca la scheda «Bacheca» (icona megafono) in basso.",
+          "Sfoglia gli annunci del club e della squadra di tuo figlio.",
+          "Apri un post per vedere il dettaglio e gli allegati.",
+          "Rispondi con «Rispondi» se il club ha attivato i commenti."
+        ]
+      }
+    ],
+    "faqTitle": "Domande frequenti dei genitori",
+    "faq": [
+      {
+        "q": "Devo avere un account separato da quello di mio figlio?",
+        "a": "Sì. Ogni genitore ha il proprio accesso, collegato al profilo del figlio. Gestisci convocazioni e consenso dal tuo account."
+      },
+      {
+        "q": "Mio figlio può avere un proprio account?",
+        "a": "Un figlio minorenne può avere un account una volta dato il consenso dei genitori. Rimani collegato al suo profilo."
+      },
+      {
+        "q": "Riceverò troppe notifiche?",
+        "a": "No: scegli con precisione i canali (app, email, WhatsApp) e i promemoria nelle impostazioni delle notifiche."
+      },
+      {
+        "q": "Posso gestire più figli?",
+        "a": "Sì. Tutti i tuoi figli compaiono in un unico calendario di famiglia, anche se giocano in squadre diverse."
+      },
+      {
+        "q": "Il club vede il mio numero di telefono?",
+        "a": "La comunicazione passa da Clubero — la bacheca del club e le notifiche. Non devi condividere il tuo numero personale."
+      }
+    ],
+    "ctaTitle": "Hai ancora una domanda?",
+    "ctaBody": "Il nostro team e il tuo club sono qui per aiutarti a iniziare con serenità.",
+    "ctaPrimary": "Contatta il team",
+    "ctaSecondary": "Accedi"
   },
   "onboarding": {
     "kicker": "Configurazione",
