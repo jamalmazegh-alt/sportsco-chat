@@ -975,6 +975,43 @@ export const getClubSupportSummary = createServerFn({ method: "POST" })
 // Phase 5: rich operational endpoints
 // ============================================================================
 
+const AUTH_SCAN_PAGE_SIZE = 200;
+const AUTH_SCAN_MAX_PAGES = 50;
+
+type AuthUser = Awaited<
+  ReturnType<typeof supabaseAdmin.auth.admin.listUsers>
+>["data"]["users"][number];
+
+/**
+ * Every auth user, paginating through `listUsers` (a single page silently caps
+ * at 200). A search has to span the whole directory: filtering a single page
+ * only ever matched users who happened to sit on the page being viewed, so a
+ * user on page 2 was invisible from page 1.
+ */
+async function scanAllAuthUsers(): Promise<AuthUser[]> {
+  const all: AuthUser[] = [];
+  for (let page = 1; page <= AUTH_SCAN_MAX_PAGES; page++) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page,
+      perPage: AUTH_SCAN_PAGE_SIZE,
+    });
+    if (error) throw new Error(error.message);
+    const users = data?.users ?? [];
+    all.push(...users);
+    if (users.length < AUTH_SCAN_PAGE_SIZE) return all;
+  }
+  log.warn("listAllUsers: auth scan hit the page cap", {
+    scanned: all.length,
+    cap: AUTH_SCAN_PAGE_SIZE * AUTH_SCAN_MAX_PAGES,
+  });
+  return all;
+}
+
+/** PostgREST `or()` splits on commas and parens — quote the value and escape it. */
+function ilikePattern(term: string) {
+  return `"%${term.replace(/[\\"]/g, "\\$&")}%"`;
+}
+
 /** Rich user list: profile + email + last sign-in + clubs + roles + subscriptions. */
 export const listAllUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -990,33 +1027,50 @@ export const listAllUsers = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
 
-    // Pull a page of auth users (we need email + last_sign_in_at + banned_until).
-    const { data: authPage, error: authErr } = await supabaseAdmin.auth.admin.listUsers({
-      page: data.page,
-      perPage: data.limit,
-    });
-    if (authErr) throw new Error(authErr.message);
-    const authUsers = authPage?.users ?? [];
+    const term = data.search?.toLowerCase() ?? "";
+    // We need email + last_sign_in_at + banned_until, which only auth holds.
+    let authUsers: AuthUser[];
+    let total: number;
 
-    let candidateIds = authUsers.map((u) => u.id);
-
-    // Optional search: filter via profiles (name/phone) OR auth email match.
-    if (data.search) {
-      const s = `%${data.search}%`;
-      const { data: matches } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .or(`full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`)
-        .limit(200);
+    if (term) {
+      // Search the whole directory (profiles for name/phone, auth for
+      // email/phone), then paginate the matches — never the other way round.
+      const pattern = ilikePattern(term);
+      const [allAuthUsers, { data: matches }] = await Promise.all([
+        scanAllAuthUsers(),
+        supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .or(
+            `full_name.ilike.${pattern},first_name.ilike.${pattern},last_name.ilike.${pattern},phone.ilike.${pattern}`,
+          )
+          .limit(1000),
+      ]);
       const matchIds = new Set((matches ?? []).map((m) => m.id));
-      const emailMatch = data.search.toLowerCase();
-      candidateIds = authUsers
-        .filter((u) => matchIds.has(u.id) || (u.email ?? "").toLowerCase().includes(emailMatch))
-        .map((u) => u.id);
+      const matched = allAuthUsers.filter(
+        (u) =>
+          matchIds.has(u.id) ||
+          (u.email ?? "").toLowerCase().includes(term) ||
+          (u.phone ?? "").toLowerCase().includes(term),
+      );
+      total = matched.length;
+      const start = (data.page - 1) * data.limit;
+      authUsers = matched.slice(start, start + data.limit);
+    } else {
+      const { data: authPage, error: authErr } = await supabaseAdmin.auth.admin.listUsers({
+        page: data.page,
+        perPage: data.limit,
+      });
+      if (authErr) throw new Error(authErr.message);
+      authUsers = authPage?.users ?? [];
+      total = authPage?.total ?? authUsers.length;
     }
 
+    const hasMore = data.page * data.limit < total;
+    const candidateIds = authUsers.map((u) => u.id);
+
     if (candidateIds.length === 0) {
-      return { items: [], total: authPage?.total ?? 0, page: data.page };
+      return { items: [], total, page: data.page, hasMore: false };
     }
 
     const [{ data: profiles }, { data: memberships }, { data: teamMembers }] = await Promise.all([
@@ -1076,51 +1130,49 @@ export const listAllUsers = createServerFn({ method: "POST" })
       teamsByUser.set(tm.user_id, arr);
     });
 
-    const items = authUsers
-      .filter((u) => candidateIds.includes(u.id))
-      .map((u) => {
-        const profile = profileMap.get(u.id) ?? null;
-        const memberRows = membershipsByUser.get(u.id) ?? [];
-        const teamRows = teamsByUser.get(u.id) ?? [];
-        const clubsForUser = memberRows.map((m) => {
-          const s = subByClub.get(m.club_id);
-          return {
-            club_id: m.club_id,
-            role: m.role,
-            name: clubMap.get(m.club_id)?.name ?? null,
-            logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
-            subscription_status: s?.status ?? null,
-            subscription_exempt_from_billing: s?.exempt_from_billing ?? null,
-            subscription_exempt_until: s?.exempt_until ?? null,
-          };
-        });
-
-        const teamsForUser = teamRows.map((t) => ({
-          team_id: t.team_id,
-          role: t.role,
-          name: teamMap.get(t.team_id)?.name ?? null,
-          club_id: teamMap.get(t.team_id)?.club_id ?? null,
-        }));
-        const banned_until = (u as { banned_until?: string | null }).banned_until ?? null;
+    const items = authUsers.map((u) => {
+      const profile = profileMap.get(u.id) ?? null;
+      const memberRows = membershipsByUser.get(u.id) ?? [];
+      const teamRows = teamsByUser.get(u.id) ?? [];
+      const clubsForUser = memberRows.map((m) => {
+        const s = subByClub.get(m.club_id);
         return {
-          id: u.id,
-          email: u.email ?? null,
-          phone: profile?.phone ?? null,
-          full_name: profile?.full_name ?? null,
-          avatar_url: profile?.avatar_url ?? null,
-          preferred_language: profile?.preferred_language ?? null,
-          created_at: u.created_at,
-          last_sign_in_at: u.last_sign_in_at ?? null,
-          email_confirmed_at: u.email_confirmed_at ?? null,
-          is_banned: banned_until ? new Date(banned_until).getTime() > Date.now() : false,
-          clubs: clubsForUser,
-          teams: teamsForUser,
-          primary_role: clubsForUser[0]?.role ?? teamsForUser[0]?.role ?? null,
-          primary_club_name: clubsForUser[0]?.name ?? null,
+          club_id: m.club_id,
+          role: m.role,
+          name: clubMap.get(m.club_id)?.name ?? null,
+          logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
+          subscription_status: s?.status ?? null,
+          subscription_exempt_from_billing: s?.exempt_from_billing ?? null,
+          subscription_exempt_until: s?.exempt_until ?? null,
         };
       });
 
-    return { items, total: authPage?.total ?? items.length, page: data.page };
+      const teamsForUser = teamRows.map((t) => ({
+        team_id: t.team_id,
+        role: t.role,
+        name: teamMap.get(t.team_id)?.name ?? null,
+        club_id: teamMap.get(t.team_id)?.club_id ?? null,
+      }));
+      const banned_until = (u as { banned_until?: string | null }).banned_until ?? null;
+      return {
+        id: u.id,
+        email: u.email ?? null,
+        phone: profile?.phone ?? null,
+        full_name: profile?.full_name ?? null,
+        avatar_url: profile?.avatar_url ?? null,
+        preferred_language: profile?.preferred_language ?? null,
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at ?? null,
+        email_confirmed_at: u.email_confirmed_at ?? null,
+        is_banned: banned_until ? new Date(banned_until).getTime() > Date.now() : false,
+        clubs: clubsForUser,
+        teams: teamsForUser,
+        primary_role: clubsForUser[0]?.role ?? teamsForUser[0]?.role ?? null,
+        primary_club_name: clubsForUser[0]?.name ?? null,
+      };
+    });
+
+    return { items, total, page: data.page, hasMore };
   });
 
 /** Detailed view of a single user: profile, auth, clubs, teams, players, recent activity. */

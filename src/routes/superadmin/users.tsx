@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   listAllUsers,
   sendPasswordResetEmail,
@@ -41,18 +41,34 @@ type UserRow = Awaited<ReturnType<typeof listAllUsers>>["items"][number];
 function SuperAdminUsers() {
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<UserRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Searching scans the whole auth directory, so responses can land out of
+  // order while typing — only the newest one is allowed to render.
+  const reqId = useRef(0);
 
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => {
+      const id = ++reqId.current;
       listAllUsers({ data: { search: search || undefined, limit: 50, page } })
-        .then((r) => setItems(r.items))
-        .catch((e) => toast.error(e instanceof Error ? e.message : "Failed"))
-        .finally(() => setLoading(false));
-    }, 250);
+        .then((r) => {
+          if (id !== reqId.current) return;
+          setItems(r.items);
+          setTotal(r.total);
+          setHasMore(r.hasMore);
+        })
+        .catch((e) => {
+          if (id !== reqId.current) return;
+          toast.error(e instanceof Error ? e.message : "Failed");
+        })
+        .finally(() => {
+          if (id === reqId.current) setLoading(false);
+        });
+    }, 350);
     return () => clearTimeout(t);
   }, [search, page]);
 
@@ -72,6 +88,8 @@ function SuperAdminUsers() {
         data: { search: search || undefined, limit: 50, page },
       });
       setItems(r.items);
+      setTotal(r.total);
+      setHasMore(r.hasMore);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Action failed");
     } finally {
@@ -115,7 +133,7 @@ function SuperAdminUsers() {
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <Mini label="In page" value={stats.total} />
+        <Mini label={search ? "Matches" : "In page"} value={search ? total : stats.total} />
         <Mini label="Active" value={stats.active} tone="success" />
         <Mini label="Dormant 60d+" value={stats.dormant} tone="warn" />
         <Mini label="Disabled" value={stats.banned} tone="danger" />
@@ -344,11 +362,13 @@ function SuperAdminUsers() {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-xs text-muted-foreground">Page {page}</span>
+        <span className="text-xs text-muted-foreground">
+          Page {page} · {total} user{total === 1 ? "" : "s"}
+        </span>
         <Button
           size="sm"
           variant="outline"
-          disabled={items.length < 50 || loading}
+          disabled={!hasMore || loading}
           onClick={() => setPage((p) => p + 1)}
         >
           <ChevronRight className="h-4 w-4" />
