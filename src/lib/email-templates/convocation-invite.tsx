@@ -28,6 +28,7 @@ interface Props {
   meetingPointMapsUrl?: string;
   competitionName?: string;
   coachName?: string;
+  coachNames?: string[];
   squadList?: string[];
   teamName?: string;
   clubName?: string;
@@ -341,6 +342,7 @@ const ConvocationInviteEmail = ({
   meetingPointMapsUrl,
   competitionName,
   coachName,
+  coachNames,
   squadList,
   teamName,
   clubName,
@@ -460,7 +462,12 @@ const ConvocationInviteEmail = ({
             </a>
           </Text>
         ) : null}
-        {coachName ? (
+        {coachNames && coachNames.length > 0 ? (
+          <Text style={cardMeta}>
+            👤 {t.coachLabel}
+            {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
+          </Text>
+        ) : coachName ? (
           <Text style={cardMeta}>
             👤 {t.coachLabel}: {coachName}
           </Text>

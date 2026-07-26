@@ -1,0 +1,206 @@
+{
+  "list": {
+    "title": "Publications",
+    "new": "New publication",
+    "empty": "No publications yet.",
+    "anonymous": "Anonymous",
+    "closed": "Closed"
+  },
+  "new": {
+    "title": "New publication",
+    "step": "Step",
+    "typeMessage": "Message",
+    "typePoll": "Poll",
+    "pollOptions": "Options",
+    "option": "Option",
+    "addOption": "Add an option",
+    "visibility": "Result visibility",
+    "visibilityAnon": "Anonymous",
+    "visibilityAnonDesc": "Nobody, including staff, sees who voted what. Results hidden while < 3 votes per option.",
+    "visibilityStaff": "Visible to staff",
+    "visibilityStaffDesc": "Staff sees who voted what. Voters see only totals.",
+    "audienceLabel": "Recipients",
+    "audienceEmpty": "No recipient selected",
+    "chooseTeam": "Choose a team…",
+    "chooseGroup": "Choose a group…",
+    "deliveryLabel": "Delivery mode",
+    "wall": "Wall + push notification",
+    "wallDesc": "Appears on the club feed and sends a push to recipients.",
+    "email": "Email",
+    "emailDesc": "Sends an email to each recipient.",
+    "publish": "Publish",
+    "published": "Publication sent",
+    "pickCategory": "Elegir una categoría…",
+    "pickEvent": "Elegir un evento…",
+    "pickMembers": "Selección manual (jugadores)",
+    "searchPlaceholder": "Buscar un jugador…",
+    "addPlayersBtn": "+ Jugadores",
+    "addParentsBtn": "+ Padres",
+    "pollTitle": "Nueva encuesta"
+  },
+  "detail": {
+    "notFound": "Publication not found",
+    "vote": "Vote",
+    "changeVote": "Cambiar mi voto",
+    "voted": "Vote recorded",
+    "masked": "—",
+    "thresholdNotice": "Results hidden to preserve anonymity (< 3 votes per option).",
+    "recipients": "See recipients",
+    "recipientsTitle": "Recipients",
+    "userSubject": "User",
+    "unknown": "Unknown",
+    "close": "Close poll",
+    "closed": "Publication closed",
+    "delete": "Delete",
+    "deleted": "Publication deleted",
+    "confirmDelete": "Delete this publication?",
+    "votingAs": "I am voting as:",
+    "votingAsSelf": "Me",
+    "votingForChild": "You are voting for {{name}}",
+    "player": "Player",
+    "confirmVote": "Confirmar: {{option}}",
+    "pollClosed": "Encuesta cerrada"
+  },
+  "type": {
+    "message": "Message",
+    "poll": "Poll"
+  },
+  "delivery": {
+    "wallPush": "Publish (wall + push)",
+    "emailOnly": "Email only",
+    "alsoSendEmail": "Also send an email",
+    "emailBodyLabel": "Email body (optional)",
+    "emailBodyHelp": "Leave blank to reuse the publication content."
+  },
+  "actions": {
+    "publish": "Publish",
+    "publishing": "Publishing…",
+    "notifyNew": "Notify new members",
+    "resendAll": "Resend to everyone",
+    "seeResults": "See results",
+    "seeVoters": "See voters",
+    "closePoll": "Close poll",
+    "edit": "Edit",
+    "delete": "Delete",
+    "reply": "Reply",
+    "seeRecipients": "See recipients"
+  },
+  "poll": {
+    "visibilityLabel": "Vote visibility",
+    "staffVisible": "Named vote",
+    "anonymous": "Anonymous vote",
+    "isAnonymous": "This poll is anonymous",
+    "isStaffVisible": "This poll is named",
+    "youVoted": "You voted \"{{option}}\"",
+    "closed": "Poll closed",
+    "closedAt": "Closed on {{date}}",
+    "closesAt": "Closes on {{date}}",
+    "belowThreshold": "Not enough responses to show the results",
+    "votesCount_one": "{{count}} vote",
+    "votesCount_other": "{{count}} votes",
+    "optionLabel": "Option {{n}}",
+    "optionsHint": "2 options minimum",
+    "addOption": "Add an option",
+    "removeOption": "Remove",
+    "minTwoOptions": "Add at least two options."
+  },
+  "state": {
+    "deleted": "Publication deleted",
+    "sent": "Sent to {{count}} members.",
+    "sentDelta": "{{new}} new members notified.",
+    "sentAll": "Sent to everyone ({{count}})."
+  },
+  "confirm": {
+    "close": {
+      "title": "Close the poll?",
+      "body": "Members will no longer be able to vote."
+    },
+    "delete": {
+      "title": "Delete this publication?",
+      "body": "Votes are kept, but the publication disappears from the wall. Email links will show \"Publication deleted\"."
+    },
+    "resend": {
+      "title": "Resend to everyone?",
+      "body": "All current recipients will get a reminder."
+    },
+    "refresh": {
+      "title": "Notify new members?",
+      "body": "Only members added to the audience since the last publish will be notified."
+    },
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "audience": {
+    "picker": "Who to notify?",
+    "recipientsCount_one": "{{count}} destinatario",
+    "recipientsCount_other": "{{count}} destinatarios",
+    "empty": "No audience selected — add at least one criterion below.",
+    "convocationsMissing": "No line-up yet for this event — audience empty.",
+    "categoryLabel": "Category",
+    "seasonLabel": "Season",
+    "types": {
+      "joueurs_convoques": "Called-up players",
+      "parents_convoques": "Parents of called-up players",
+      "joueurs_equipe": "Team players",
+      "parents_equipe": "Team parents",
+      "joueurs_categorie": "Category players",
+      "parents_categorie": "Category parents",
+      "educateurs": "Coaches",
+      "dirigeants": "Board members",
+      "groupe_personnalise": "Custom group",
+      "selection_manuelle": "Manual selection",
+      "staff_equipe": "Staff del equipo"
+    },
+    "recipientsBreakdown": "({{players}} jugadores · {{users}} usuarios)",
+    "none": "0 destinatarios",
+    "previewError": "Vista previa no disponible"
+  },
+  "form": {
+    "titleLabel": "Title",
+    "titlePlaceholder": "Board meeting, summer camp, schedule change…",
+    "contentLabel": "Message",
+    "contentPlaceholder": "Write your message. Images and documents can be added below.",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Available Saturday? Slot A or B?",
+    "descriptionLabel": "Description (optional)",
+    "closesAtLabel": "End date (optional)",
+    "typeLabel": "Publication type"
+  },
+  "email": {
+    "pollSubject": "{{title}}",
+    "pollIntro": "Hi, please answer this poll.",
+    "pollClosedNotice": "This poll is closed.",
+    "messageSubject": "{{title}}",
+    "openInApp": "Open in Clubero",
+    "deletedFallback": "This publication has been deleted.",
+    "poll": {
+      "subject": "{{title}}",
+      "intro": "Responde a esta encuesta — un toque es suficiente.",
+      "viewResults": "Ver resultados"
+    }
+  },
+  "push": {
+    "messageTitle": "{{club}} — {{title}}",
+    "pollTitle": "Poll: {{title}}",
+    "voteChanged": "Thanks, your vote has been updated."
+  },
+  "errors": {
+    "pollClosed": "This poll is closed.",
+    "forbidden": "You are not allowed to do this.",
+    "deliveryRequired": "Pick at least one delivery channel.",
+    "audienceEmpty": "Add at least one audience.",
+    "optionsMin": "A poll requires at least 2 options.",
+    "optionHasVotes": "You cannot edit an option that has already received votes.",
+    "visibilityLocked": "Vote visibility can no longer change once a vote has been cast.",
+    "voteIntentInvalid": "Esta opción ya no existe."
+  },
+  "card": {
+    "tagPoll": "Encuesta",
+    "voters": "{{count}} votantes",
+    "vote": "Votar",
+    "viewResults": "Ver resultados",
+    "anonymous": "Anónimo",
+    "closed": "Cerrada"
+  },
+  "seeAllPolls": "Ver todas las encuestas"
+}

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isAuthEmailUnconfirmed } from "@/lib/players/parent-account-status";
 
 /**
  * Returns per-parent-email delivery status for a given player, computed as
@@ -8,6 +9,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  *  - sentEmails: latest status is 'sent' or 'pending'
  *  - failedEmails: latest status is 'failed', 'dlq', 'bounced', 'complained',
  *    or 'suppressed', with an optional error message.
+ *  - unconfirmedUserIds: linked parent_user_ids whose auth email is not confirmed.
  *
  * Access control: caller must be able to read the player's player_parents
  * rows under RLS. Unauthorized callers simply get empty lists.
@@ -22,31 +24,50 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
 
     const { data: parents, error } = await supabase
       .from("player_parents")
-      .select("email")
+      .select("email, parent_user_id")
       .eq("player_id", data.playerId);
     if (error || !parents) {
       return {
         sentEmails: [] as string[],
-        failedEmails: [] as { email: string; error: string | null }[],
+        failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
+        unconfirmedUserIds: [] as string[],
       };
     }
 
     const emails = Array.from(
       new Set(parents.map((p) => (p.email ?? "").trim().toLowerCase()).filter((e) => e.length > 0)),
     );
-    if (emails.length === 0) {
+    const parentUserIds = Array.from(
+      new Set(parents.map((p) => p.parent_user_id).filter((v): v is string => !!v)),
+    );
+    if (emails.length === 0 && parentUserIds.length === 0) {
       return {
         sentEmails: [] as string[],
-        failedEmails: [] as { email: string; error: string | null }[],
+        failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
+        unconfirmedUserIds: [] as string[],
       };
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
-      .from("email_send_log")
-      .select("recipient_email, status, error_message, message_id, created_at")
-      .in("recipient_email", emails)
-      .order("created_at", { ascending: false });
+
+    // Detect linked parents whose auth email is not yet confirmed
+    const unconfirmedUserIds = (
+      await Promise.all(
+        parentUserIds.map(async (uid) => {
+          const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(uid);
+          return isAuthEmailUnconfirmed(authUser?.user) ? uid : null;
+        }),
+      )
+    ).filter((uid): uid is string => !!uid);
+
+    const { data: rows } = emails.length
+      ? await supabaseAdmin
+          .from("email_send_log")
+          .select("recipient_email, status, error_message, message_id, created_at")
+          .eq("template_name", "player-invite")
+          .in("recipient_email", emails)
+          .order("created_at", { ascending: false })
+      : { data: [] as any[] };
 
     // Latest status per message_id
     const latestByMessage = new Map<
@@ -103,8 +124,27 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
       }
     }
 
+    // Enrich with suppression reason from suppressed_emails when available
+    const failedList = Array.from(failed.keys());
+    const suppressionByEmail = new Map<string, string | null>();
+    if (failedList.length > 0) {
+      const { data: suppRows } = await supabaseAdmin
+        .from("suppressed_emails")
+        .select("email, reason")
+        .in("email", failedList);
+      for (const s of suppRows ?? []) {
+        const row = s as { email: string | null; reason: string | null };
+        if (row.email) suppressionByEmail.set(row.email.toLowerCase(), row.reason);
+      }
+    }
+
     return {
       sentEmails: Array.from(sent),
-      failedEmails: Array.from(failed.entries()).map(([email, error]) => ({ email, error })),
+      failedEmails: Array.from(failed.entries()).map(([email, error]) => ({
+        email,
+        error,
+        reason: suppressionByEmail.get(email) ?? null,
+      })),
+      unconfirmedUserIds,
     };
   });

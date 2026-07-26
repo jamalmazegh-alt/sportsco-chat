@@ -54,7 +54,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))",
+        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)), event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name)))",
       )
       .eq("id", data.convocationId)
       .maybeSingle();
@@ -155,6 +155,24 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       : undefined;
     const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
 
+    // Assigned coaches — sourced from the same event embed (single source of truth).
+    const coachNames: string[] | undefined = (() => {
+      const rows = ((ev as any).event_staff_assignments ?? []) as Array<{
+        profiles?: {
+          first_name?: string | null;
+          last_name?: string | null;
+          full_name?: string | null;
+        } | null;
+      }>;
+      const names = rows
+        .map((r) => {
+          const p = r.profiles ?? {};
+          return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+        })
+        .filter(Boolean);
+      return names.length > 0 ? names : undefined;
+    })();
+
     // 6. Build recipients + send emails (fire-and-forget per recipient).
     const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
     if ((player as any).email) {
@@ -198,6 +216,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             meetingPoint: ev.meeting_point ?? undefined,
             meetingPointMapsUrl,
             competitionName: ev.competition_name ?? ev.competition_type ?? undefined,
+            coachNames,
             teamName: ev.teams?.name ?? undefined,
             clubName: ev.teams?.clubs?.name ?? undefined,
             clubLogoUrl: ev.teams?.clubs?.logo_url ?? undefined,

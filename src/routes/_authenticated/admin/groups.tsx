@@ -8,8 +8,7 @@ import { toast } from "sonner";
 import {
   Loader2,
   Plus,
-  Pencil,
-  Trash2,
+  MoreHorizontal,
   UsersRound,
   UserPlus,
   X,
@@ -27,6 +26,23 @@ import {
   Tag,
   type LucideIcon,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -67,20 +83,16 @@ import {
   type ClubGroupRuleType,
   type AudienceSelector,
 } from "@/modules/groups/groups.functions";
+import { listClubMembersWithContext } from "@/lib/needs/needs.functions";
+import { formatMemberContextSubline, type MemberContext } from "@/lib/needs/member-context";
+import { PersonRow } from "@/components/shared/person-row";
 
 export const Route = createFileRoute("/_authenticated/admin/groups")({
   component: GroupsPage,
   head: () => ({
     meta: [
-      {
-        title: i18nInstance.t("groups.title", { defaultValue: "Groupes du club" }),
-      },
-      {
-        name: "description",
-        content: i18nInstance.t("groups.subtitle", {
-          defaultValue: "Créez des groupes personnalisés pour cibler vos communications.",
-        }),
-      },
+      { title: i18nInstance.t("groups.title") },
+      { name: "description", content: i18nInstance.t("groups.subtitle") },
     ],
   }),
 });
@@ -93,6 +105,7 @@ type ClubMemberRow = {
   full_name: string | null;
   first_name: string | null;
   last_name: string | null;
+  context: MemberContext | null;
   children_names?: string[];
 };
 
@@ -125,7 +138,7 @@ function useRoleLabel() {
   const { t } = useTranslation();
   return (role: string | null) => {
     if (!role) return null;
-    return t(`roles.${role}`, { defaultValue: role });
+    return t(`roles.${role}`);
   };
 }
 
@@ -170,7 +183,7 @@ function RoleBadges({
           variant="outline"
           className={`text-[10px] border ${ROLE_COLORS[r] ?? "bg-muted text-muted-foreground border-border"}`}
         >
-          {t(`roles.${r}`, { defaultValue: r })}
+          {t(`roles.${r}`)}
         </Badge>
       ))}
     </div>
@@ -182,10 +195,7 @@ function ParentSubtitle({ children_names }: { children_names?: string[] | null }
   if (!children_names || children_names.length === 0) return null;
   return (
     <span className="text-xs text-muted-foreground truncate">
-      {t("groups.parentOf", {
-        defaultValue: "Parent de {{names}}",
-        names: children_names.join(", "),
-      })}
+      {t("groups.parentOf", { names: children_names.join(", ") })}
     </span>
   );
 }
@@ -204,6 +214,7 @@ function GroupsPage() {
   const [editing, setEditing] = useState<GroupRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<GroupRow | null>(null);
 
   const groupsQ = useQuery({
     queryKey: ["club-groups", activeClubId],
@@ -211,70 +222,25 @@ function GroupsPage() {
     enabled: !!activeClubId,
   });
 
-  // Load all club members for the picker (RLS: staff can read).
+  // Load all club members for the picker via server fn (staff-gated, enriched
+  // avec le contexte rôle : catégorie joueur, enfants+catégorie, équipes coachées).
+  const listMembersWithCtx = useServerFn(listClubMembersWithContext);
   const membersQ = useQuery({
     queryKey: ["club-members-for-groups", activeClubId],
     enabled: !!activeClubId,
     queryFn: async (): Promise<ClubMemberRow[]> => {
-      const { data: members, error } = await supabase
-        .from("club_members")
-        .select("id, user_id, role, roles")
-        .eq("club_id", activeClubId!);
-      if (error) throw error;
-      const userIds = Array.from(new Set((members ?? []).map((m) => m.user_id).filter(Boolean)));
-      const { data: profiles } = userIds.length
-        ? await supabase
-            .from("profiles")
-            .select("id, full_name, first_name, last_name")
-            .in("id", userIds)
-        : {
-            data: [] as {
-              id: string;
-              full_name: string | null;
-              first_name: string | null;
-              last_name: string | null;
-            }[],
-          };
-      const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
-      // For parents, fetch the children names
-      const { data: pp } = userIds.length
-        ? await supabase
-            .from("player_parents")
-            .select("parent_user_id, players:player_id(first_name, last_name)")
-            .in("parent_user_id", userIds)
-        : {
-            data: [] as Array<{
-              parent_user_id: string;
-              players: { first_name: string | null; last_name: string | null } | null;
-            }>,
-          };
-      const childrenByParent = new Map<string, string[]>();
-      for (const row of (pp ?? []) as Array<{
-        parent_user_id: string;
-        players: { first_name: string | null; last_name: string | null } | null;
-      }>) {
-        const name = [row.players?.first_name, row.players?.last_name]
-          .filter(Boolean)
-          .join(" ")
-          .trim();
-        if (!name) continue;
-        const arr = childrenByParent.get(row.parent_user_id) ?? [];
-        arr.push(name);
-        childrenByParent.set(row.parent_user_id, arr);
-      }
-      return (members ?? []).map((m) => {
-        const p = byId.get(m.user_id);
-        return {
-          id: m.id,
-          user_id: m.user_id,
-          role: m.role ?? null,
-          roles: (m.roles ?? []) as string[],
-          full_name: p?.full_name ?? null,
-          first_name: p?.first_name ?? null,
-          last_name: p?.last_name ?? null,
-          children_names: childrenByParent.get(m.user_id) ?? [],
-        };
-      });
+      const res = await listMembersWithCtx({ data: { club_id: activeClubId! } });
+      return res.members.map((m) => ({
+        id: m.id,
+        user_id: m.user_id,
+        role: m.role ?? null,
+        roles: m.roles ?? [],
+        full_name: m.full_name ?? null,
+        first_name: m.first_name ?? null,
+        last_name: m.last_name ?? null,
+        context: m.context ?? null,
+        children_names: (m.context?.children ?? []).map((c) => c.name),
+      }));
     },
   });
 
@@ -304,7 +270,8 @@ function GroupsPage() {
       setCreating(false);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) =>
+      toast.error(e.message === "group_name_taken" ? t("groups.errors.nameTaken") : e.message),
   });
 
   const updateMut = useMutation({
@@ -319,7 +286,8 @@ function GroupsPage() {
       setEditing(null);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) =>
+      toast.error(e.message === "group_name_taken" ? t("groups.errors.nameTaken") : e.message),
   });
 
   const deleteMut = useMutation({
@@ -363,7 +331,7 @@ function GroupsPage() {
       ) : (
         <div className="space-y-2">
           {allGroups.map((g) => {
-            const count = groupsQ.data?.counts[g.id] ?? 0;
+            const resolvedCount = groupsQ.data?.resolved_counts?.[g.id] ?? 0;
             const expanded = expandedId === g.id;
             return (
               <div key={g.id} className="rounded-lg border border-border bg-card overflow-hidden">
@@ -388,7 +356,7 @@ function GroupsPage() {
                         </Badge>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        · {t("groups.membersCount", { count })}
+                        {t("groups.personsToday", { count: resolvedCount })}
                       </span>
                     </div>
                     {g.description && (
@@ -397,26 +365,42 @@ function GroupsPage() {
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditing(g)}
-                    aria-label={t("groups.edit")}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      if (window.confirm(t("groups.deleteConfirm"))) {
-                        deleteMut.mutate(g.id);
-                      }
-                    }}
-                    aria-label={t("groups.delete")}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" aria-label={t("common.actions")}>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => setEditing(g)}>
+                        {t("groups.actions.rename")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (
+                            window.confirm(
+                              g.is_active
+                                ? t("groups.confirmDeactivate")
+                                : t("groups.confirmActivate"),
+                            )
+                          ) {
+                            updateMut.mutate({ id: g.id, is_active: !g.is_active });
+                          }
+                        }}
+                      >
+                        {g.is_active
+                          ? t("groups.actions.deactivate")
+                          : t("groups.actions.activate")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onSelect={() => setConfirmDelete(g)}
+                      >
+                        {t("groups.actions.delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 {expanded && (
                   <GroupMembersPanel
@@ -431,6 +415,27 @@ function GroupsPage() {
           })}
         </div>
       )}
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("groups.delete")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("groups.deleteConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (confirmDelete) deleteMut.mutate(confirmDelete.id);
+                setConfirmDelete(null);
+              }}
+            >
+              {t("groups.actions.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <GroupFormDialog
         open={creating}
@@ -515,7 +520,7 @@ function GroupFormDialog(props: {
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={props.onClose}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button
             disabled={!name.trim() || props.submitting}
@@ -528,7 +533,7 @@ function GroupFormDialog(props: {
             }
           >
             {props.submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {t("common.save", { defaultValue: "Enregistrer" })}
+            {t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -618,15 +623,22 @@ function GroupMembersPanel({
     [membersQ.data],
   );
 
-  const childrenByUserId = useMemo(() => {
-    const m = new Map<string, string[]>();
+  const contextByUserId = useMemo(() => {
+    const m = new Map<string, MemberContext>();
     for (const cm of allMembers) {
-      if (cm.user_id && cm.children_names && cm.children_names.length > 0) {
-        m.set(cm.user_id, cm.children_names);
-      }
+      if (cm.user_id && cm.context) m.set(cm.user_id, cm.context);
     }
     return m;
   }, [allMembers]);
+
+  const sublineLabels = useMemo(
+    () => ({
+      playerSubline: (c: string) => t("common:person.playerSubline", { category: c }),
+      playerSublineMulti: (c: string) => t("common:person.playerSublineMulti", { categories: c }),
+      parentSubline: (c: string) => t("common:person.parentSubline", { children: c }),
+    }),
+    [t],
+  );
 
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["club-group-members", groupId] });
@@ -659,7 +671,7 @@ function GroupMembersPanel({
       category: string | null;
     }) => addRuleFn({ data: { group_id: groupId, ...input } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleAdded", { defaultValue: "Règle ajoutée" }));
+      toast.success(t("groups.subgroupAdded"));
       setRuleType("");
       setRuleParam("");
       invalidateAll();
@@ -670,7 +682,7 @@ function GroupMembersPanel({
   const removeRuleMut = useMutation({
     mutationFn: (id: string) => removeRuleFn({ data: { id } }),
     onSuccess: () => {
-      toast.success(t("groups.ruleRemoved", { defaultValue: "Règle retirée" }));
+      toast.success(t("groups.subgroupRemoved"));
       invalidateAll();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -693,7 +705,7 @@ function GroupMembersPanel({
   const teamNameById = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
 
   function ruleLabel(r: RuleRow) {
-    const base = t(`groups.bulk.${r.rule_type}`, { defaultValue: r.rule_type });
+    const base = t(`groups.bulk.${r.rule_type}`);
     if (needsTeam(r.rule_type) && r.team_id) {
       const tm = teamNameById.get(r.team_id);
       return `${base} · ${tm?.name ?? r.team_id}`;
@@ -777,28 +789,16 @@ function GroupMembersPanel({
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {t("groups.manageMembers")}
         </Label>
-        {resolvedQ.data && (
-          <span className="text-xs text-muted-foreground">
-            {t("groups.resolvedTotal", {
-              defaultValue: "Total résolu : {{count}}",
-              count: resolvedQ.data.count,
-            })}
-          </span>
-        )}
       </div>
 
-      {/* Dynamic rules (chips) */}
+      {/* Dynamic sub-groups (chips) */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
           <Layers className="h-3.5 w-3.5" />
-          {t("groups.dynamicRules", { defaultValue: "Sous-groupes dynamiques" })}
+          {t("groups.dynamicSubgroups")}
         </Label>
         {rules.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">
-            {t("groups.noRules", {
-              defaultValue: "Aucune règle. La composition se met à jour automatiquement.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground italic">{t("groups.noSubgroups")}</p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
             {rules.map((r) => {
@@ -810,17 +810,18 @@ function GroupMembersPanel({
                     type="button"
                     className="text-xs hover:underline"
                     onClick={() => setPreviewRule(r)}
-                    aria-label={t("groups.rulePreview", {
-                      defaultValue: "Voir les membres",
-                    })}
+                    aria-label={t("groups.subgroupPreview")}
                   >
                     {ruleLabel(r)}
                   </button>
+                  <span className="text-[9px] font-semibold tracking-wider opacity-70 px-1 rounded bg-background/40">
+                    {t("groups.dynamicBadge")}
+                  </span>
                   <button
                     type="button"
                     className="ml-0.5 rounded hover:bg-muted p-0.5"
                     onClick={() => removeRuleMut.mutate(r.id)}
-                    aria-label={t("groups.ruleRemove", { defaultValue: "Retirer la règle" })}
+                    aria-label={t("groups.subgroupRemove")}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -839,16 +840,12 @@ function GroupMembersPanel({
             }}
           >
             <SelectTrigger>
-              <SelectValue
-                placeholder={t("groups.bulkPickKind", {
-                  defaultValue: "Choisir un type…",
-                })}
-              />
+              <SelectValue placeholder={t("groups.pickAudienceKind")} />
             </SelectTrigger>
             <SelectContent>
               {RULE_TYPES.map((rt) => (
                 <SelectItem key={rt} value={rt}>
-                  {t(`groups.bulk.${rt}`, { defaultValue: rt })}
+                  {t(`groups.bulk.${rt}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -857,9 +854,7 @@ function GroupMembersPanel({
           {ruleType && (needsTeam(ruleType) || needsCategory(ruleType)) ? (
             <Select value={ruleParam} onValueChange={setRuleParam}>
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("groups.bulkPickParam", { defaultValue: "Choisir…" })}
-                />
+                <SelectValue placeholder={t("groups.pickAudienceParam")} />
               </SelectTrigger>
               <SelectContent>
                 {needsTeam(ruleType) &&
@@ -888,7 +883,7 @@ function GroupMembersPanel({
           >
             {addRuleMut.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
             <Plus className="h-4 w-4 mr-1" />
-            {t("groups.addRule", { defaultValue: "Ajouter la règle" })}
+            {t("groups.addSubgroup")}
           </Button>
         </div>
       </div>
@@ -896,7 +891,7 @@ function GroupMembersPanel({
       {/* Individual members */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {t("groups.individualMembers", { defaultValue: "Membres individuels" })}
+          {t("groups.individualMembers")}
         </Label>
         {membersQ.isLoading ? (
           <div className="flex justify-center py-4">
@@ -905,37 +900,35 @@ function GroupMembersPanel({
         ) : (membersQ.data?.members ?? []).length === 0 ? (
           <div className="text-sm text-muted-foreground italic">{t("groups.noMembers")}</div>
         ) : (
-          <ul className="space-y-1">
+          <ul className="divide-y divide-border/60 rounded-md border border-border bg-background">
             {(membersQ.data?.members ?? []).map((m) => {
+              const name = displayName({
+                full_name: m.profile?.full_name,
+                first_name: m.profile?.first_name,
+                last_name: m.profile?.last_name,
+              });
+              const roleList = (
+                m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : []
+              ).filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const ctx = m.user_id ? (contextByUserId.get(m.user_id) ?? null) : null;
+              const subline = formatMemberContextSubline(ctx, sublineLabels);
               return (
-                <li
-                  key={m.id}
-                  className="flex items-center justify-between gap-2 rounded-md bg-background border border-border px-3 py-2"
-                >
-                  <div className="flex flex-col gap-1 min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">
-                      {displayName({
-                        full_name: m.profile?.full_name,
-                        first_name: m.profile?.first_name,
-                        last_name: m.profile?.last_name,
-                      })}
-                    </span>
-                    <ParentSubtitle
-                      children_names={m.user_id ? childrenByUserId.get(m.user_id) : undefined}
-                    />
-                    <div className="flex flex-wrap gap-1">
-                      <RoleBadges roles={m.roles} fallback={m.role} />
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeMut.mutate(m.member_id)}
-                    aria-label={t("groups.remove")}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                <li key={m.id} className="px-3">
+                  <PersonRow
+                    name={name}
+                    roles={roleList}
+                    subline={subline}
+                    action={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeMut.mutate(m.member_id)}
+                        aria-label={t("groups.remove")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
                 </li>
               );
             })}
@@ -946,7 +939,7 @@ function GroupMembersPanel({
       {/* Individual add */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {t("groups.addIndividual", { defaultValue: "Ajouter individuellement" })}
+          {t("groups.addIndividual")}
         </Label>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -960,27 +953,30 @@ function GroupMembersPanel({
         {search.trim() && candidates.length > 0 && (
           <ul className="rounded-md border border-border bg-background divide-y divide-border max-h-64 overflow-auto">
             {candidates.map((m) => {
+              const roleList = (
+                m.roles && m.roles.length > 0 ? m.roles : m.role ? [m.role] : []
+              ).filter((r, i, arr) => r && arr.indexOf(r) === i);
+              const subline = formatMemberContextSubline(m.context, sublineLabels);
               return (
-                <li key={m.id} className="flex items-center justify-between gap-2 px-3 py-2">
-                  <div className="flex flex-col gap-1 min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate">{displayName(m)}</span>
-                    <ParentSubtitle children_names={m.children_names} />
-                    <div className="flex flex-wrap gap-1">
-                      <RoleBadges roles={m.roles} fallback={m.role} />
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      addMut.mutate(m.id);
-                      setSearch("");
-                    }}
-                  >
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    {t("groups.addMember")}
-                  </Button>
+                <li key={m.id} className="px-3">
+                  <PersonRow
+                    name={displayName(m)}
+                    roles={roleList}
+                    subline={subline}
+                    action={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          addMut.mutate(m.id);
+                          setSearch("");
+                        }}
+                      >
+                        <UserPlus className="h-4 w-4 mr-1" />
+                        {t("groups.addMember")}
+                      </Button>
+                    }
+                  />
                 </li>
               );
             })}
@@ -1068,12 +1064,7 @@ function RulePreviewDialog({
             <Layers className="h-4 w-4 text-primary" />
             {ruleLabel}
           </DialogTitle>
-          <DialogDescription>
-            {t("groups.rulePreviewDescription", {
-              defaultValue:
-                "Liste résolue à l'instant. La composition se met à jour automatiquement.",
-            })}
-          </DialogDescription>
+          <DialogDescription>{t("groups.subgroupPreviewDescription")}</DialogDescription>
         </DialogHeader>
 
         {previewQ.isLoading ? (
@@ -1082,7 +1073,7 @@ function RulePreviewDialog({
           </div>
         ) : rows.length === 0 ? (
           <p className="text-sm text-muted-foreground italic py-4">
-            {t("groups.rulePreviewEmpty", { defaultValue: "Aucun membre résolu." })}
+            {t("groups.subgroupPreviewEmpty")}
           </p>
         ) : (
           <ul className="max-h-80 overflow-auto divide-y divide-border rounded-md border border-border">
@@ -1107,7 +1098,7 @@ function RulePreviewDialog({
                       variant="outline"
                       className="text-[10px] py-0 h-4 border-amber-300 text-amber-700 dark:text-amber-300 dark:border-amber-700/60"
                     >
-                      {t("groups.emailOnly", { defaultValue: "email uniquement" })}
+                      {t("groups.emailOnly")}
                     </Badge>
                   ) : null}
                 </div>
@@ -1117,8 +1108,7 @@ function RulePreviewDialog({
         )}
 
         <DialogFooter className="text-xs text-muted-foreground">
-          {t("groups.rulePreviewCount", {
-            defaultValue: "{{count}} membre(s)",
+          {t("groups.subgroupPreviewCount", {
             count: rows.length,
           })}
         </DialogFooter>

@@ -43,16 +43,17 @@ Tous les masquages sont gérés via `src/config/features.ts` (`isV2(...)`).
 
 ## 3. Groupe A — Réseau social ouvert (MASQUÉ)
 
-| Feature                                           | État | Flag                     |
-| ------------------------------------------------- | ---- | ------------------------ |
-| Feed global cross-club                            | 🔒   | `social_network_v2`      |
-| Découverte joueurs (`/players`)                   | 🔒   | `public_player_profiles` |
-| Profil public joueur (`/p/:slug`)                 | 🔒   | `public_player_profiles` |
-| Profil public coach (`/coach/:slug`)              | 🔒   | `public_player_profiles` |
-| Suivre / Following (`/following`, `/follow-ups`)  | 🔒   | `social_network_v2`      |
-| Réseau interclubs · mise en relation · networking | 🔒   | `social_network_v2`      |
-| Recommandations · suggestions de profils          | 🔒   | `social_network_v2`      |
-| LinkedIn du joueur (profil enrichi)               | 🔒   | `public_player_profiles` |
+| Feature                                           | État | Flag                         |
+| ------------------------------------------------- | ---- | ---------------------------- |
+| Feed global cross-club                            | 🔒   | `social_network_v2`          |
+| Découverte joueurs (`/players`)                   | 🔒   | `public_player_profiles`     |
+| Profil public joueur (`/p/:slug`)                 | 🔒   | `public_player_profiles`     |
+| Profil public coach (`/coach/:slug`)              | 🔒   | `public_player_profiles`     |
+| Suivre / Following (`/following`)                 | 🔒   | `social_network_v2`          |
+| Relances convocations (`/follow-ups`)             | ✅   | — (V1, pas le réseau social) |
+| Réseau interclubs · mise en relation · networking | 🔒   | `social_network_v2`          |
+| Recommandations · suggestions de profils          | 🔒   | `social_network_v2`          |
+| LinkedIn du joueur (profil enrichi)               | 🔒   | `public_player_profiles`     |
 
 ## 4. Groupe B — Paiements & collectes (MASQUÉ)
 

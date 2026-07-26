@@ -4,7 +4,10 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { RouteNotFound } from "@/components/route-not-found";
 import { AuthProvider } from "@/lib/auth-context";
+import { installDomTranslationGuard } from "@/lib/dom-translation-guard";
 import i18n from "@/lib/i18n";
+
+installDomTranslationGuard();
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
 import { initSentry } from "@/lib/sentry";
@@ -119,10 +122,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
   const { i18n: i18nInstance } = useTranslation();
   const lang = (i18nInstance.language || i18n.language || "en").slice(0, 2);
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang} translate="no" className="notranslate" suppressHydrationWarning>
       <head>
+        <meta name="google" content="notranslate" />
         <HeadContent />
       </head>
+
       <body>
         {children}
         <Scripts />

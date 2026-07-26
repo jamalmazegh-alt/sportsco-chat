@@ -267,7 +267,11 @@
     "clear": "Leeren",
     "listen": "Anhören",
     "stop": "Stoppen",
-    "errorOccurred": "Ein Fehler ist aufgetreten"
+    "errorOccurred": "Ein Fehler ist aufgetreten",
+    "unknown": "Kein Name",
+    "deselectAll": "Alle abwählen",
+    "actions": "Aktionen",
+    "add": "Hinzufügen"
   },
   "notFound": {
     "code": "404",
@@ -636,6 +640,8 @@
     "respondBoth": "Beide",
     "accountActive": "Konto aktiv",
     "accountInactive": "Kein Konto",
+    "accountUnconfirmed": "E-Mail nicht bestätigt",
+    "accountUnconfirmedHint": "Das Konto existiert, aber die E-Mail wurde noch nicht bestätigt. Der Elternteil muss auf den Bestätigungslink in der E-Mail klicken.",
     "inviteNotSent": "Einladung nicht gesendet",
     "inviteSentLabel": "Einladung gesendet",
     "inviteSentAction": "Einladen",
@@ -696,7 +702,8 @@
       "done": "{{inserted}} Spieler importiert",
       "failed": "{{failed}} Zeile(n) mit Fehlern"
     },
-    "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig."
+    "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig.",
+    "parentActivationPending": "Warten auf Aktivierung des Elternkontos"
   },
   "events": {
     "isOfficial": "Pflichtspiel",
@@ -741,6 +748,7 @@
     "published": "Veranstaltung veröffentlicht",
     "sendConvocations": "Einladungen senden",
     "convocationsSent": "Einladungen gesendet",
+    "convocationsSentShort": "Einladung gesendet",
     "noEvents": "Keine Events geplant.",
     "searchPlaceholder": "Event suchen…",
     "noSearchResults": "Keine Ergebnisse",
@@ -955,7 +963,8 @@
     "pendingCount_one": "{{count}} Spieler hat noch nicht geantwortet",
     "pendingCount_other": "{{count}} Spieler haben noch nicht geantwortet",
     "remindAllSent_one": "{{count}} Erinnerung gesendet",
-    "remindAllSent_other": "{{count}} Erinnerungen gesendet"
+    "remindAllSent_other": "{{count}} Erinnerungen gesendet",
+    "errorPastEventLocked": "Das Event ist vorbei — Antworten können nicht mehr geändert werden."
   },
   "stats": {
     "title": "Statistiken",
@@ -1272,7 +1281,16 @@
       "plusOthers": "{{first}} + {{n}} weitere"
     },
     "audienceTo": "An:",
-    "audienceRequired": "Wähle mindestens ein Team."
+    "audienceRequired": "Wähle mindestens ein Team.",
+    "compose": {
+      "targetGroup": "Gruppe(n)",
+      "alsoEmail": "Kopie per E-Mail senden",
+      "newPoll": "Neue Umfrage"
+    },
+    "email": {
+      "subject": "Neue Nachricht von {{club}}",
+      "viewOnWall": "Zur Pinnwand"
+    }
   },
   "chat": {
     "title": "Event-Chat",
@@ -1280,7 +1298,9 @@
     "placeholder": "Nachricht schreiben…",
     "disabled": "Der Chat ist für dieses Event deaktiviert.",
     "you": "Du",
-    "loadMore": "Mehr laden"
+    "loadMore": "Mehr laden",
+    "noAccess": "Der Chat dieses Termins ist dem Staff vorbehalten. Bitte dein Verein, ihn für Eltern oder Spieler zu öffnen.",
+    "sendFailed": "Nachricht nicht gesendet: Du hast keinen Zugriff auf diesen Chat."
   },
   "assistant": {
     "title": "Clubero-Assistent",
@@ -1764,11 +1784,6 @@
       "description": "Wir helfen dir, deinen Verein, deine Teams und deine Daten in wenigen Tagen zu Clubero zu migrieren. Persönliche Begleitung, Excel-Import und bestehende Tools.",
       "ogDescription": "Wechsle einfach zu Clubero. Wir migrieren deinen Verein für dich."
     },
-    "parentGuide": {
-      "title": "Eltern-Guide — mit Clubero starten",
-      "description": "Schritt-für-Schritt-Tutorials für Eltern: auf ein Aufgebot antworten, Abwesenheit melden, Einwilligung geben, Benachrichtigungen einrichten und den Familienkalender verfolgen.",
-      "ogDescription": "Aufgebote, Abwesenheiten, Benachrichtigungen: der Eltern-Guide für den Start mit Clubero."
-    },
     "tournamentsPage": {
       "title": "Turniere — Live-Ergebnisse, öffentliche Tabellen, TV-Modus | Clubero",
       "description": "Organisiere moderne Turniere mit Live-Ergebnissen, öffentlichen Tabellen, mobilem Schiedsrichter-Modus und TV-Modus. Gedacht für Organisatoren, Spieler, Eltern und Fans.",
@@ -1777,6 +1792,11 @@
     "adminVenues": {
       "title": "Anlagen & Plätze – Clubero",
       "description": "Konfiguriere Standorte und Plätze deines Vereins."
+    },
+    "parentGuide": {
+      "title": "Eltern-Guide — mit Clubero starten",
+      "description": "Schritt-für-Schritt-Tutorials für Eltern: auf ein Aufgebot antworten, Abwesenheit melden, Einwilligung geben, Benachrichtigungen einrichten und den Familienkalender verfolgen.",
+      "ogDescription": "Aufgebote, Abwesenheiten, Benachrichtigungen: der Eltern-Guide für den Start mit Clubero."
     }
   },
   "trial": {
@@ -1848,7 +1868,12 @@
     "confirm": "Bestätigen",
     "noDriversYet": "Noch kein Fahrer.",
     "iNeedRide": "Transport anfragen",
-    "needRideRegistered": "Anfrage an den Trainer gesendet"
+    "needRideRegistered": "Anfrage an den Trainer gesendet",
+    "disabledHint": "Aktiviere Mitfahrgelegenheiten, damit Eltern Plätze anbieten und buchen können.",
+    "needsTitle": "Transportanfragen",
+    "cancelNeed": "Meine Anfrage zurückziehen",
+    "noNeeds": "Keine Transportanfragen.",
+    "notifyFailed": "Anfrage gespeichert, aber die E-Mail an das Team konnte nicht gesendet werden."
   },
   "journey": {
     "tab": {
@@ -2189,6 +2214,10 @@
       "checkFailed": "Warnungen konnten nicht geprüft werden"
     },
     "partialError": "Einige Quellen sind nicht verfügbar, die Liste kann unvollständig sein.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Antworten",
       "open": "Öffnen"
@@ -2333,7 +2362,56 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Es existiert bereits eine Gruppe mit diesem Namen."
+    },
+    "personsToday_one": "{{count}} Person heute",
+    "personsToday_other": "{{count}} Personen heute",
+    "dynamicSubgroups": "Untergruppen",
+    "dynamicBadge": "DYNAMISCH",
+    "noSubgroups": "Keine Untergruppe. Die Zusammensetzung wird automatisch aktualisiert.",
+    "addSubgroup": "Hinzufügen",
+    "subgroupAdded": "Untergruppe hinzugefügt",
+    "subgroupRemoved": "Untergruppe entfernt",
+    "subgroupRemove": "Entfernen",
+    "subgroupPreview": "Mitglieder anzeigen",
+    "subgroupPreviewDescription": "Aktuell aufgelöste Liste. Die Zusammensetzung wird automatisch aktualisiert.",
+    "subgroupPreviewEmpty": "Kein aufgelöstes Mitglied.",
+    "subgroupPreviewCount_one": "{{count}} Mitglied",
+    "subgroupPreviewCount_other": "{{count}} Mitglieder",
+    "pickAudienceKind": "Zielgruppe wählen…",
+    "pickAudienceParam": "Wählen…",
+    "selectedAudiencesTitle": "Ausgewählte Zielgruppen",
+    "selectedAudiencesEmpty": "Keine Zielgruppe ausgewählt. Füge unten eine hinzu.",
+    "otherAudiences": "Weitere Zielgruppen",
+    "parentOf": "Elternteil von {{names}}",
+    "emailOnly": "nur E-Mail",
+    "individualMembers": "Einzelne Mitglieder",
+    "addIndividual": "Einzeln hinzufügen",
+    "confirmDeactivate": "Diese Gruppe deaktivieren?",
+    "confirmActivate": "Diese Gruppe reaktivieren?",
+    "activated": "Gruppe reaktiviert",
+    "deactivated": "Gruppe deaktiviert",
+    "actions": {
+      "rename": "Umbenennen",
+      "deactivate": "Deaktivieren",
+      "activate": "Aktivieren",
+      "delete": "Löschen"
+    },
+    "bulk": {
+      "club_members": "Alle Vereinsmitglieder",
+      "club_staff": "Gesamtes Team",
+      "club_admins": "Administratoren",
+      "club_educators": "Alle Trainer",
+      "club_tournament_managers": "Turnierverantwortliche",
+      "team_players": "Spieler einer Mannschaft",
+      "team_parents": "Eltern einer Mannschaft",
+      "team_educators": "Trainer einer Mannschaft",
+      "category_educators": "Trainer einer Kategorie"
+    },
+    "bulkPickKind": "Typ wählen…",
+    "bulkPickParam": "Wählen…"
   },
   "install": {
     "meta": {
@@ -2380,5 +2458,10 @@
     "androidStep2": "Wählen Sie „App installieren“ (oder „Zum Startbildschirm hinzufügen“).",
     "androidStep3": "Bestätigen Sie: Das Clubero-Symbol erscheint auf Ihrem Startbildschirm.",
     "ctaHint": "Auf Android startet dieser Button die Installation direkt. Auf dem iPhone folgen Sie den Safari-Schritten unten."
+  },
+  "person": {
+    "playerSubline": "Spieler · {{category}}",
+    "playerSublineMulti": "Spieler · {{categories}}",
+    "parentSubline": "Elternteil von {{children}}"
   }
 }

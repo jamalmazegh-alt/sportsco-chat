@@ -1,14 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   getEmailDispatchDetail,
   type DispatchRecipientRow,
 } from "@/lib/superadmin/email-dispatches.functions";
+import {
+  superadminRetryDispatch,
+  type SuperadminRetryReport,
+} from "@/lib/superadmin/email-retry.functions";
 import { StatusBadge } from "@/lib/superadmin/ui";
-import { ArrowLeft, Loader2, Mail, RefreshCw } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, RefreshCw, RotateCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/superadmin/email-dispatches_/$dispatchId")({
   component: DispatchDetailPage,
@@ -76,6 +82,8 @@ function DispatchDetailPage() {
 
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  const retryFn = useServerFn(superadminRetryDispatch);
 
   const recipients: DispatchRecipientRow[] = data?.recipients ?? [];
   const filtered = useMemo(() => {
@@ -89,6 +97,51 @@ function DispatchDetailPage() {
       );
     });
   }, [recipients, q, statusFilter]);
+
+  const failuresCount = data ? data.counts.failed + data.counts.dlq : 0;
+  const templateSupportsRetry = data?.dispatch.template_name === "convocation-invite";
+
+  function summarize(r: SuperadminRetryReport, label: string) {
+    if (!r.ok) {
+      toast.error(`${label} : ${r.reason ?? "erreur"}`);
+      return;
+    }
+    const parts = [
+      `${r.replayed} renfilé(s)`,
+      r.skippedAlreadyDelivered > 0 && `${r.skippedAlreadyDelivered} déjà délivré(s)`,
+      r.skippedInFlight > 0 && `${r.skippedInFlight} en cours`,
+      r.skippedNotRetryable > 0 && `${r.skippedNotRetryable} non-relançable(s)`,
+      r.errors > 0 && `${r.errors} erreur(s)`,
+    ].filter(Boolean);
+    toast.success(`${label} — ${parts.join(" · ")}`);
+  }
+
+  async function retryAll() {
+    if (!data) return;
+    setBusyKey("batch");
+    try {
+      const r = await retryFn({ data: { dispatchId } });
+      summarize(r, "Batch");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusyKey(null);
+    }
+  }
+
+  async function retryOne(rowId: string) {
+    setBusyKey(rowId);
+    try {
+      const r = await retryFn({ data: { dispatchId, logRowIds: [rowId] } });
+      summarize(r, "Envoi");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusyKey(null);
+    }
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
@@ -126,6 +179,21 @@ function DispatchDetailPage() {
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
             Rafraîchir
           </Button>
+          {templateSupportsRetry && failuresCount > 0 && (
+            <Button
+              size="sm"
+              onClick={retryAll}
+              disabled={busyKey !== null}
+              title="Renfiler les envois failed/DLQ sans dupliquer les envois déjà délivrés"
+            >
+              {busyKey === "batch" ? (
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <RotateCw className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Relancer les échecs ({failuresCount})
+            </Button>
+          )}
         </div>
       </header>
 
@@ -211,37 +279,64 @@ function DispatchDetailPage() {
                     <th className="text-left px-3 py-2 font-medium">Tentatives</th>
                     <th className="text-left px-3 py-2 font-medium">Dernier événement</th>
                     <th className="text-left px-3 py-2 font-medium">Erreur</th>
+                    <th className="text-right px-3 py-2 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((r) => (
-                    <tr key={r.id} className="border-t border-border">
-                      <td className="px-3 py-2 font-mono text-xs break-all">{r.recipient_email}</td>
-                      <td className="px-3 py-2">
-                        <StatusBadge tone={statusTone(r.status)}>
-                          {statusLabel(r.status)}
-                        </StatusBadge>
-                      </td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground">
-                        {r.notification_type ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-xs">
-                        {r.attempt_count}
-                        {r.mismatch_count > 0 && (
-                          <span className="text-destructive"> · mismatch {r.mismatch_count}</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
-                        {fmtDate(r.created_at)}
-                      </td>
-                      <td
-                        className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate"
-                        title={r.error_message ?? undefined}
-                      >
-                        {r.error_message ?? ""}
-                      </td>
-                    </tr>
-                  ))}
+                  {filtered.map((r) => {
+                    const canRetry =
+                      templateSupportsRetry &&
+                      (r.status === "failed" || r.status === "dlq") &&
+                      !!r.message_id;
+                    return (
+                      <tr key={r.id} className="border-t border-border">
+                        <td className="px-3 py-2 font-mono text-xs break-all">
+                          {r.recipient_email}
+                        </td>
+                        <td className="px-3 py-2">
+                          <StatusBadge tone={statusTone(r.status)}>
+                            {statusLabel(r.status)}
+                          </StatusBadge>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          {r.notification_type ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-xs">
+                          {r.attempt_count}
+                          {r.mismatch_count > 0 && (
+                            <span className="text-destructive"> · mismatch {r.mismatch_count}</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                          {fmtDate(r.created_at)}
+                        </td>
+                        <td
+                          className="px-3 py-2 text-xs text-destructive max-w-[24rem] truncate"
+                          title={r.error_message ?? undefined}
+                        >
+                          {r.error_message ?? ""}
+                        </td>
+                        <td className="px-3 py-2 text-right">
+                          {canRetry ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs"
+                              onClick={() => retryOne(r.id)}
+                              disabled={busyKey !== null}
+                            >
+                              {busyKey === r.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RotateCw className="h-3 w-3 mr-1" />
+                              )}
+                              Relancer
+                            </Button>
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

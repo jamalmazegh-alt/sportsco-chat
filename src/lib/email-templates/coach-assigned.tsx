@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Heading, Img, Section, Text } from "@react-email/components";
+import { Button, Heading, Text } from "@react-email/components";
 import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
@@ -138,17 +138,7 @@ const CoachAssignedEmail = ({ displayName, teamName, clubName, teamUrl, locale }
   const team = teamName ?? "";
   const club = clubName ?? "";
   return (
-    <EmailShell preview={c.preview(team, club)} locale={"fr"}>
-      <Section style={header}>
-        <Img
-          src="https://www.clubero.app/clubero-logo.png"
-          alt="Clubero"
-          width="56"
-          height="56"
-          style={logo}
-        />
-        <Text style={brand}>{c.brand}</Text>
-      </Section>
+    <EmailShell preview={c.preview(team, club)} locale={locale}>
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(team, club)}</Text>
@@ -180,15 +170,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const header = { textAlign: "center" as const, margin: "0 0 20px" };
-const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
-const brand = {
-  fontSize: "13px",
-  fontWeight: "bold" as const,
-  color: "#0f172a",
-  margin: "8px 0 0",
-  textAlign: "center" as const,
-};
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 8px" };
 const h2 = { fontSize: "16px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };

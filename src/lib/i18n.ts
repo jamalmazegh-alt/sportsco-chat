@@ -65,6 +65,14 @@ import ptNeeds from "@/locales/pt/needs.json";
 import itNeeds from "@/locales/it/needs.json";
 import nlNeeds from "@/locales/nl/needs.json";
 
+import enPublications from "@/locales/en/publications.json";
+import frPublications from "@/locales/fr/publications.json";
+import dePublications from "@/locales/de/publications.json";
+import esPublications from "@/locales/es/publications.json";
+import ptPublications from "@/locales/pt/publications.json";
+import itPublications from "@/locales/it/publications.json";
+import nlPublications from "@/locales/nl/publications.json";
+
 export const SUPPORTED_LANGS = ["en", "fr", "de", "es", "pt", "it", "nl"] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
@@ -80,6 +88,21 @@ function detectBrowserLang(): SupportedLang {
   return "en";
 }
 
+function resolveInitialLang(): SupportedLang {
+  if (typeof window === "undefined") return "en";
+  try {
+    const stored = window.localStorage.getItem("i18nextLng");
+    if (stored && (SUPPORTED_LANGS as readonly string[]).includes(stored)) {
+      return stored as SupportedLang;
+    }
+  } catch {
+    /* ignore storage errors */
+  }
+  return detectBrowserLang();
+}
+
+const initialLang = resolveInitialLang();
+
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
@@ -92,6 +115,7 @@ if (!i18n.isInitialized) {
         buildClubero: enBuildClubero,
         camps: enCamps,
         needs: enNeeds,
+        publications: enPublications,
       },
       fr: {
         common: frCommon,
@@ -102,6 +126,7 @@ if (!i18n.isInitialized) {
         buildClubero: frBuildClubero,
         camps: frCamps,
         needs: frNeeds,
+        publications: frPublications,
       },
       de: {
         common: deCommon,
@@ -112,6 +137,7 @@ if (!i18n.isInitialized) {
         buildClubero: deBuildClubero,
         camps: deCamps,
         needs: deNeeds,
+        publications: dePublications,
       },
       es: {
         common: esCommon,
@@ -122,6 +148,7 @@ if (!i18n.isInitialized) {
         buildClubero: esBuildClubero,
         camps: esCamps,
         needs: esNeeds,
+        publications: esPublications,
       },
       pt: {
         common: ptCommon,
@@ -132,6 +159,7 @@ if (!i18n.isInitialized) {
         buildClubero: ptBuildClubero,
         camps: ptCamps,
         needs: ptNeeds,
+        publications: ptPublications,
       },
       it: {
         common: itCommon,
@@ -142,6 +170,7 @@ if (!i18n.isInitialized) {
         buildClubero: itBuildClubero,
         camps: itCamps,
         needs: itNeeds,
+        publications: itPublications,
       },
       nl: {
         common: nlCommon,
@@ -152,9 +181,10 @@ if (!i18n.isInitialized) {
         buildClubero: nlBuildClubero,
         camps: nlCamps,
         needs: nlNeeds,
+        publications: nlPublications,
       },
     },
-    lng: "en",
+    lng: initialLang,
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     defaultNS: "common",
@@ -167,19 +197,16 @@ if (!i18n.isInitialized) {
       "buildClubero",
       "camps",
       "needs",
+      "publications",
     ],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
 }
 
-// After hydration: prefer stored language, else browser detection.
+// Client-only: reconcile if init ran before storage was readable (rare).
 if (typeof window !== "undefined") {
-  const stored = window.localStorage.getItem("i18nextLng") as SupportedLang | null;
-  const target: SupportedLang =
-    stored && (SUPPORTED_LANGS as readonly string[]).includes(stored)
-      ? stored
-      : detectBrowserLang();
+  const target = resolveInitialLang();
   if (target !== i18n.language) {
     queueMicrotask(() => {
       i18n.changeLanguage(target);

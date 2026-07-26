@@ -12,9 +12,11 @@ import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getParentInviteStatuses } from "@/lib/players/invite-status.functions";
+import { resolveParentAccountBadge } from "@/lib/players/parent-account-status";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
+import { computeFffCategory } from "@/lib/fff-category";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -302,8 +304,30 @@ function PlayerProfile() {
     (parentInviteStatuses?.sentEmails ?? []).map((e) => e.toLowerCase()),
   );
   const failedEmailsMap = new Map(
-    (parentInviteStatuses?.failedEmails ?? []).map((f) => [f.email.toLowerCase(), f.error]),
+    (parentInviteStatuses?.failedEmails ?? []).map((f) => [
+      f.email.toLowerCase(),
+      { error: f.error, reason: f.reason ?? null },
+    ]),
   );
+  const unconfirmedParentIds = new Set(parentInviteStatuses?.unconfirmedUserIds ?? []);
+
+  function formatSuppressionReason(reason: string | null): string {
+    const r = (reason ?? "").toLowerCase();
+    if (r.includes("bounce"))
+      return t("players.suppressionBounce", {
+        defaultValue: "rebond permanent (adresse invalide ou boîte inexistante)",
+      });
+    if (r.includes("complaint") || r.includes("spam"))
+      return t("players.suppressionComplaint", { defaultValue: "plainte pour spam" });
+    if (r.includes("unsubscribe"))
+      return t("players.suppressionUnsubscribe", {
+        defaultValue: "désinscription du destinataire",
+      });
+    if (r.includes("manual"))
+      return t("players.suppressionManual", { defaultValue: "blocage manuel" });
+    if (reason && reason.trim().length > 0) return reason;
+    return t("players.suppressionUnknown", { defaultValue: "raison inconnue" });
+  }
 
   // Used for sport-aware position suggestions. Falls back to free text when
   // the player isn't on any team yet.
@@ -644,6 +668,16 @@ function PlayerProfile() {
                 {t("players.minor")}
               </span>
             )}
+            {(() => {
+              const now = new Date();
+              const seasonEndYear = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+              const cat = computeFffCategory(player.birth_date ?? null, seasonEndYear);
+              return cat ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {cat}
+                </span>
+              ) : null;
+            })()}
           </div>
           {playerTeams && playerTeams.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-1">
@@ -1086,15 +1120,23 @@ function PlayerProfile() {
               <ul className="space-y-2">
                 {(parents ?? []).map((pp) => {
                   const linked = !!pp.parent_user_id;
+                  const accountBadge = resolveParentAccountBadge({
+                    parentUserId: pp.parent_user_id,
+                    unconfirmedUserIds: unconfirmedParentIds,
+                  });
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
                   const emailKey = pp.email?.trim().toLowerCase() ?? "";
                   const inviteSent = !linked && !!emailKey && invitedEmails.has(emailKey);
-                  const inviteFailedError =
-                    !linked && !!emailKey && !inviteSent
-                      ? (failedEmailsMap.get(emailKey) ?? null)
-                      : undefined;
-                  const inviteFailed = inviteFailedError !== undefined;
+                  const inviteFailed =
+                    !linked && !!emailKey && !inviteSent && failedEmailsMap.has(emailKey);
+                  const inviteFailedEntry = inviteFailed
+                    ? (failedEmailsMap.get(emailKey) ?? null)
+                    : null;
+                  const inviteFailedReasonLabel =
+                    inviteFailedEntry && (inviteFailedEntry.reason || inviteFailedEntry.error)
+                      ? formatSuppressionReason(inviteFailedEntry.reason ?? inviteFailedEntry.error)
+                      : null;
                   return (
                     <li
                       key={pp.id}
@@ -1111,12 +1153,23 @@ function PlayerProfile() {
                           <span
                             className={cn(
                               "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                              linked
+                              accountBadge === "active"
                                 ? "bg-present/15 text-present"
-                                : "bg-muted text-muted-foreground",
+                                : accountBadge === "unconfirmed"
+                                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                  : "bg-muted text-muted-foreground",
                             )}
+                            title={
+                              accountBadge === "unconfirmed"
+                                ? t("players.accountUnconfirmedHint")
+                                : undefined
+                            }
                           >
-                            {linked ? t("players.accountActive") : t("players.accountInactive")}
+                            {accountBadge === "unconfirmed"
+                              ? t("players.accountUnconfirmed")
+                              : accountBadge === "active"
+                                ? t("players.accountActive")
+                                : t("players.accountInactive")}
                           </span>
                           {inviteSent && (
                             <span
@@ -1135,7 +1188,7 @@ function PlayerProfile() {
                             <span
                               className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive"
                               title={
-                                inviteFailedError ??
+                                inviteFailedReasonLabel ??
                                 t("players.inviteFailedHint", {
                                   defaultValue: "L'email d'invitation n'a pas pu être délivré",
                                 })
@@ -1148,6 +1201,14 @@ function PlayerProfile() {
                             </span>
                           )}
                         </div>
+                        {inviteFailed && inviteFailedReasonLabel && (
+                          <p className="text-[11px] text-destructive mt-1 leading-snug">
+                            {t("players.inviteFailedReason", {
+                              defaultValue: "Raison : {{reason}}",
+                              reason: inviteFailedReasonLabel,
+                            })}
+                          </p>
+                        )}
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                           {[contactLine, pp.can_respond ? t("players.canRespond") : null]
                             .filter(Boolean)

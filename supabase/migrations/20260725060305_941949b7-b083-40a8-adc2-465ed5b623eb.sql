@@ -1,0 +1,2 @@
+GRANT USAGE ON SCHEMA public TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_publication_atomic(uuid, public.publication_type, text, text, public.poll_visibility, boolean, boolean, text, timestamptz, uuid, jsonb, jsonb, jsonb, jsonb, jsonb) TO authenticated;

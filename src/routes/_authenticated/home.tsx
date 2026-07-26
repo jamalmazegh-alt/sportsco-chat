@@ -5,7 +5,16 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, CreditCard } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  ChevronRight,
+  Plus,
+  Users,
+  BarChart3,
+  CreditCard,
+  Send,
+} from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -48,6 +57,26 @@ function formatWhen(d: Date) {
   return `${label} · ${fmt(d, "HH:mm")}`;
 }
 
+function formatHomeEventTitle(event: {
+  type?: string | null;
+  title: string;
+  team_name?: string | null;
+  opponent?: string | null;
+  is_home?: boolean | null;
+}) {
+  const teamName = event.team_name?.trim();
+  if (event.type !== "match" || !teamName) return event.title;
+  if (event.title.toLowerCase().includes(teamName.toLowerCase())) return event.title;
+
+  const opponent = event.opponent?.trim();
+  if (opponent)
+    return event.is_home === false ? `${opponent} vs ${teamName}` : `${teamName} vs ${opponent}`;
+
+  const title = event.title.trim();
+  if (/^(vs|contre)\b/i.test(title)) return `${teamName} ${title}`;
+  return `${teamName} · ${event.title}`;
+}
+
 function formatPaymentAmount(cents: number, currency: string | null | undefined, locale: string) {
   const code = (currency || "eur").toUpperCase();
   try {
@@ -79,12 +108,12 @@ function HomePage() {
   const hasSponsor = (sponsorsForHome?.length ?? 0) > 0;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
-    queryKey: ["teams", activeClubId],
+    queryKey: ["teams", activeClubId, "with-internal"],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, sport, championship, competitions")
+        .select("id, name, sport, championship, competitions, is_internal")
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .is("archived_at", null)
@@ -102,7 +131,7 @@ function HomePage() {
       const teamIds = teams.map((t) => t.id);
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id")
+        .select("id, title, starts_at, location, type, status, team_id, opponent, is_home")
         .in("team_id", teamIds)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -110,14 +139,30 @@ function HomePage() {
         .order("starts_at", { ascending: true })
         .limit(3);
       if (error) throw error;
-      return (data ?? []).map((e) => ({
-        ...e,
-        team_name: teams.find((t) => t.id === e.team_id)?.name ?? "",
-      }));
+      return (data ?? []).map((e) => {
+        const team = teams.find((t) => t.id === e.team_id);
+        const isInternal = Boolean((team as { is_internal?: boolean } | undefined)?.is_internal);
+        return {
+          ...e,
+          team_name: isInternal ? "" : (team?.name ?? ""),
+        };
+      });
     },
   });
 
-  // My convocations only (player or parent)
+  // Coach view: which of the "next events" already have convocations dispatched.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["home-convocs-sent", activeClubId, (upcoming ?? []).map((e) => e.id).join(",")],
+    enabled: !!upcoming && upcoming.length > 0,
+    queryFn: async () => {
+      const ids = (upcoming ?? []).map((e) => e.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase.from("convocations").select("event_id").in("event_id", ids);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
   const { data: myConvocs } = useQuery({
     queryKey: ["my-convocs-home", user?.id, activeClubId],
     enabled: !!user && !!activeClubId,
@@ -143,7 +188,7 @@ function HomePage() {
       const { data } = await supabase
         .from("convocations")
         .select(
-          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id)",
+          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id, opponent, is_home)",
         )
         .in("player_id", playerIds)
         .order("created_at", { ascending: false });
@@ -329,11 +374,10 @@ function HomePage() {
         />
       )}
 
-      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit.
+      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit
+          + besoins ouverts non répondus (déplacés depuis HomeNeedsCard).
           UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
       {activeClubId && <UrgencyCenter />}
-
-      {activeClubId && <HomeNeedsCard />}
 
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
@@ -398,12 +442,25 @@ function HomePage() {
                                 isFirst ? "text-[15px]" : "text-sm",
                               )}
                             >
-                              {e.title}
+                              {formatHomeEventTitle(e as any)}
                             </p>
+                            {isCoach && convocSentSet?.has(e.id) && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
+                                title={t("events.convocsSentTitle", {
+                                  defaultValue:
+                                    "Les convocations ont été envoyées pour cet événement",
+                                })}
+                              >
+                                <Send className="h-3 w-3" />
+                                {t("events.convocationsSentShort")}
+                              </span>
+                            )}
                           </div>
-                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
+                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                            {formatWhen(new Date(e.starts_at))}
+                            <span>{formatWhen(new Date(e.starts_at))}</span>
+                            {(e as any).team_name && <span>· {(e as any).team_name}</span>}
                             {e.location && (
                               <>
                                 <span>·</span>
@@ -431,6 +488,8 @@ function HomePage() {
           )}
         </section>
       )}
+
+      {/* Mes coups de main : rendu en bas de page (sous les prochains events). */}
 
       {/* KPIs (admins/coaches) — insights are now unified in UrgencyCenter deck above */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
@@ -465,7 +524,7 @@ function HomePage() {
               </button>
               <EventCreateChooser
                 clubId={activeClubId}
-                teams={teams ?? []}
+                teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)}
                 userId={user.id}
                 open={createOpen}
                 onOpenChange={setCreateOpen}
@@ -476,7 +535,12 @@ function HomePage() {
               />
             </>
           )}
-          {activeClubId && <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />}
+          {activeClubId && (
+            <HomeQuickCards
+              clubId={activeClubId}
+              teams={(teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal)}
+            />
+          )}
         </div>
       )}
 
@@ -670,7 +734,7 @@ function HomePage() {
                                     isCancelled && "line-through text-red-700 dark:text-red-300",
                                   )}
                                 >
-                                  {e.title}
+                                  {formatHomeEventTitle(e as any)}
                                 </p>
                                 {isCancelled ? (
                                   <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
@@ -718,6 +782,10 @@ function HomePage() {
             </section>
           );
         })()}
+
+      {/* Mes coups de main : engagements en cours + récemment complétés.
+          Placé en bas pour rester sous les prochains events. */}
+      {activeClubId && <HomeNeedsCard />}
     </div>
   );
 }

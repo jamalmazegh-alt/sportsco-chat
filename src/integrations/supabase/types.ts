@@ -14,6 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
+      _backup_u15_merge_20260719_convocations: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          event_id: string | null
+          id: string | null
+          player_id: string | null
+          responded_at: string | null
+          response_token: string | null
+          status: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          player_id?: string | null
+          responded_at?: string | null
+          response_token?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          player_id?: string | null
+          responded_at?: string | null
+          response_token?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_guardians: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          id: string | null
+          is_primary_payer: boolean | null
+          player_id: string | null
+          relation: string | null
+          user_id: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_primary_payer?: boolean | null
+          player_id?: string | null
+          relation?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_primary_payer?: boolean | null
+          player_id?: string | null
+          relation?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_parents: {
+        Row: {
+          can_respond: boolean | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          parent_user_id: string | null
+          phone: string | null
+          player_id: string | null
+        }
+        Insert: {
+          can_respond?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          parent_user_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+        }
+        Update: {
+          can_respond?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          parent_user_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_players: {
+        Row: {
+          birth_date: string | null
+          can_respond: boolean | null
+          child_platform_access: boolean | null
+          claim_requested_at: string | null
+          claim_requested_by: string | null
+          claim_status: string | null
+          club_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          jersey_number: number | null
+          last_name: string | null
+          license_number: string | null
+          media_consent_status:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone: string | null
+          photo_url: string | null
+          position: string | null
+          preferred_position: string | null
+          public_profile_enabled: boolean | null
+          public_slug: string | null
+          user_id: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          can_respond?: boolean | null
+          child_platform_access?: boolean | null
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          jersey_number?: number | null
+          last_name?: string | null
+          license_number?: string | null
+          media_consent_status?:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          preferred_position?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          can_respond?: boolean | null
+          child_platform_access?: boolean | null
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          jersey_number?: number | null
+          last_name?: string | null
+          license_number?: string | null
+          media_consent_status?:
+            | Database["public"]["Enums"]["media_consent_status"]
+            | null
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          preferred_position?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_team_members: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          player_id: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          team_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _backup_u15_merge_20260719_timeline: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          created_by: string | null
+          dedup_key: string | null
+          description: string | null
+          event_date: string | null
+          event_type: string | null
+          id: string | null
+          player_id: string | null
+          related_achievement_id: string | null
+          related_event_id: string | null
+          source: string | null
+          team_id: string | null
+          title: string | null
+          visibility: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date?: string | null
+          event_type?: string | null
+          id?: string | null
+          player_id?: string | null
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string | null
+          team_id?: string | null
+          title?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date?: string | null
+          event_type?: string | null
+          id?: string | null
+          player_id?: string | null
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string | null
+          team_id?: string | null
+          title?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       account_deletion_requests: {
         Row: {
           approved_at: string | null
@@ -1271,6 +1532,437 @@ export type Database = {
           },
         ]
       }
+      club_poll_options: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          publication_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          publication_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          publication_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_poll_options_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_poll_votes: {
+        Row: {
+          cast_by_user_id: string
+          created_at: string
+          id: string
+          member_id: string | null
+          option_id: string
+          publication_id: string
+          subject_kind: string
+          subject_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          cast_by_user_id: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          option_id: string
+          publication_id: string
+          subject_kind?: string
+          subject_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cast_by_user_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          option_id?: string
+          publication_id?: string
+          subject_kind?: string
+          subject_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_poll_votes_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "club_poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_poll_votes_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_audiences: {
+        Row: {
+          audience_type: Database["public"]["Enums"]["publication_audience_type"]
+          category_label: string | null
+          created_at: string
+          event_id: string | null
+          group_id: string | null
+          id: string
+          publication_id: string
+          season_id: string | null
+          team_id: string | null
+        }
+        Insert: {
+          audience_type: Database["public"]["Enums"]["publication_audience_type"]
+          category_label?: string | null
+          created_at?: string
+          event_id?: string | null
+          group_id?: string | null
+          id?: string
+          publication_id: string
+          season_id?: string | null
+          team_id?: string | null
+        }
+        Update: {
+          audience_type?: Database["public"]["Enums"]["publication_audience_type"]
+          category_label?: string | null
+          created_at?: string
+          event_id?: string | null
+          group_id?: string | null
+          id?: string
+          publication_id?: string
+          season_id?: string | null
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_audiences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_audiences_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_dispatches: {
+        Row: {
+          created_at: string
+          created_by: string
+          dispatch_id: string
+          id: string
+          kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id: string
+          recipients_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          dispatch_id: string
+          id?: string
+          kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id: string
+          recipients_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          dispatch_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["publication_dispatch_kind"]
+          publication_id?: string
+          recipients_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_dispatches_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_documents: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          publication_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          publication_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          publication_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_documents_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_manual_members: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          publication_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          publication_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          publication_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_manual_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_manual_members_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_media: {
+        Row: {
+          created_at: string
+          id: string
+          publication_id: string
+          sort_order: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          publication_id: string
+          sort_order?: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          publication_id?: string
+          sort_order?: number
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_media_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publication_recipients: {
+        Row: {
+          created_at: string
+          first_dispatch_id: string | null
+          id: string
+          member_id: string | null
+          publication_id: string
+          subject_kind: string
+          subject_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_dispatch_id?: string | null
+          id?: string
+          member_id?: string | null
+          publication_id: string
+          subject_kind?: string
+          subject_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_dispatch_id?: string | null
+          id?: string
+          member_id?: string | null
+          publication_id?: string
+          subject_kind?: string
+          subject_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publication_recipients_first_dispatch_id_fkey"
+            columns: ["first_dispatch_id"]
+            isOneToOne: false
+            referencedRelation: "club_publication_dispatches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_recipients_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publication_recipients_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "club_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_publications: {
+        Row: {
+          author_id: string
+          closed_at: string | null
+          closes_at: string | null
+          club_id: string
+          content: string
+          created_at: string
+          deleted_at: string | null
+          email_body: string | null
+          event_id: string | null
+          id: string
+          poll_visibility: Database["public"]["Enums"]["poll_visibility"] | null
+          publication_type: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall: boolean
+          published_at: string
+          send_email: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          closed_at?: string | null
+          closes_at?: string | null
+          club_id: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          email_body?: string | null
+          event_id?: string | null
+          id?: string
+          poll_visibility?:
+            | Database["public"]["Enums"]["poll_visibility"]
+            | null
+          publication_type: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall?: boolean
+          published_at?: string
+          send_email?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          closed_at?: string | null
+          closes_at?: string | null
+          club_id?: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          email_body?: string | null
+          event_id?: string | null
+          id?: string
+          poll_visibility?:
+            | Database["public"]["Enums"]["poll_visibility"]
+            | null
+          publication_type?: Database["public"]["Enums"]["publication_type"]
+          publish_to_wall?: boolean
+          published_at?: string
+          send_email?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_publications_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_publications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_receipt_counters: {
         Row: {
           club_id: string
@@ -2478,6 +3170,45 @@ export type Database = {
           },
         ]
       }
+      event_staff_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_staff_assignments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_staff_assignments_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attachments: Json
@@ -3000,6 +3731,79 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_attendees: {
+        Row: {
+          added_manually: boolean
+          club_id: string
+          comment: string | null
+          created_at: string
+          event_id: string
+          id: string
+          invited_at: string
+          member_id: string | null
+          responded_at: string | null
+          response_token: string
+          sources: Json
+          status: Database["public"]["Enums"]["attendance_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_manually?: boolean
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          invited_at?: string
+          member_id?: string | null
+          responded_at?: string | null
+          response_token?: string
+          sources?: Json
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_manually?: boolean
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          invited_at?: string
+          member_id?: string | null
+          responded_at?: string | null
+          response_token?: string
+          sources?: Json
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_attendees_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "club_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       member_invites: {
         Row: {
           club_id: string
@@ -3118,6 +3922,32 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      parent_link_notifications: {
+        Row: {
+          notified_at: string
+          parent_user_id: string
+          player_id: string
+        }
+        Insert: {
+          notified_at?: string
+          parent_user_id: string
+          player_id: string
+        }
+        Update: {
+          notified_at?: string
+          parent_user_id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_link_notifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_assignments: {
         Row: {
@@ -4727,6 +5557,62 @@ export type Database = {
           },
         ]
       }
+      staff_availabilities: {
+        Row: {
+          certainty: string
+          club_id: string
+          comment: string | null
+          created_at: string
+          created_by_user_id: string
+          end_date: string
+          id: string
+          reason: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          certainty?: string
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          created_by_user_id: string
+          end_date: string
+          id?: string
+          reason: string
+          start_date: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          certainty?: string
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          end_date?: string
+          id?: string
+          reason?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_availabilities_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_webhook_events: {
         Row: {
           event_id: string
@@ -5172,23 +6058,29 @@ export type Database = {
       }
       suppressed_emails: {
         Row: {
+          bounce_count: number
           created_at: string
           email: string
           id: string
+          last_bounce_at: string | null
           metadata: Json | null
           reason: string
         }
         Insert: {
+          bounce_count?: number
           created_at?: string
           email: string
           id?: string
+          last_bounce_at?: string | null
           metadata?: Json | null
           reason: string
         }
         Update: {
+          bounce_count?: number
           created_at?: string
           email?: string
           id?: string
+          last_bounce_at?: string | null
           metadata?: Json | null
           reason?: string
         }
@@ -5296,6 +6188,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           image_url: string | null
+          is_internal: boolean
           name: string
           season: string | null
           show_called_up_players_override: boolean | null
@@ -5313,6 +6206,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           image_url?: string | null
+          is_internal?: boolean
           name: string
           season?: string | null
           show_called_up_players_override?: boolean | null
@@ -5330,6 +6224,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           image_url?: string | null
+          is_internal?: boolean
           name?: string
           season?: string | null
           show_called_up_players_override?: boolean | null
@@ -6682,6 +7577,7 @@ export type Database = {
       wall_posts: {
         Row: {
           attachments: Json
+          audience_group_ids: string[] | null
           audience_team_ids: string[] | null
           audience_type: string
           author_user_id: string | null
@@ -6694,10 +7590,12 @@ export type Database = {
           external_url: string | null
           id: string
           is_pinned: boolean
+          send_email: boolean
           source: string
         }
         Insert: {
           attachments?: Json
+          audience_group_ids?: string[] | null
           audience_team_ids?: string[] | null
           audience_type?: string
           author_user_id?: string | null
@@ -6710,10 +7608,12 @@ export type Database = {
           external_url?: string | null
           id?: string
           is_pinned?: boolean
+          send_email?: boolean
           source?: string
         }
         Update: {
           attachments?: Json
+          audience_group_ids?: string[] | null
           audience_team_ids?: string[] | null
           audience_type?: string
           author_user_id?: string | null
@@ -6726,6 +7626,7 @@ export type Database = {
           external_url?: string | null
           id?: string
           is_pinned?: boolean
+          send_email?: boolean
           source?: string
         }
         Relationships: []
@@ -6860,6 +7761,18 @@ export type Database = {
       }
     }
     Functions: {
+      _resolve_audience_subjects: {
+        Args: {
+          _audiences: Json
+          _club_id: string
+          _manual_member_ids: string[]
+        }
+        Returns: {
+          member_id: string
+          subject_kind: string
+          subject_user_id: string
+        }[]
+      }
       accept_tournament_invite: { Args: { _token: string }; Returns: Json }
       accept_tournament_member_invite: {
         Args: { _token: string; _user_id: string }
@@ -6947,6 +7860,19 @@ export type Database = {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
+      cast_poll_vote: {
+        Args: {
+          _option_id: string
+          _publication_id: string
+          _subject_id: string
+          _subject_kind: string
+        }
+        Returns: string
+      }
+      close_publication: {
+        Args: { _publication_id: string }
+        Returns: undefined
+      }
       club_camp_is_published: { Args: { _camp_id: string }; Returns: boolean }
       club_has_active_subscription: {
         Args: { _club_id: string }
@@ -6994,6 +7920,31 @@ export type Database = {
           period_end: string
           period_start: string
           visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }[]
+      }
+      create_publication_atomic: {
+        Args: {
+          _audiences: Json
+          _closes_at: string
+          _club_id: string
+          _content: string
+          _document_ids: Json
+          _email_body: string
+          _event_id: string
+          _manual_member_ids: Json
+          _media_paths: Json
+          _poll_options: Json
+          _poll_visibility: Database["public"]["Enums"]["poll_visibility"]
+          _publication_type: Database["public"]["Enums"]["publication_type"]
+          _publish_to_wall: boolean
+          _send_email: boolean
+          _title: string
+        }
+        Returns: {
+          dispatch_row_id: string
+          new_recipient_count: number
+          publication_id: string
+          recipients_count: number
         }[]
       }
       create_support_view_session: {
@@ -7110,6 +8061,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_assignable_staff: {
+        Args: { p_event_id: string }
+        Returns: {
+          full_name: string
+          is_event_team_staff: boolean
+          role: string
+          user_id: string
+          usual_team_name: string
+        }[]
+      }
       get_call_up_visibility_config: {
         Args: { _id: string; _scope: string }
         Returns: {
@@ -7161,6 +8122,27 @@ export type Database = {
           team_name: string
         }[]
       }
+      get_eligible_vote_subjects: {
+        Args: { _publication_id: string }
+        Returns: {
+          current_option_id: string
+          label: string
+          relation: string
+          subject_id: string
+          subject_kind: string
+        }[]
+      }
+      get_meeting_response_by_token: {
+        Args: { _token: string }
+        Returns: {
+          event_id: string
+          location: string
+          meeting_title: string
+          responded_at: string
+          starts_at: string
+          status: Database["public"]["Enums"]["attendance_status"]
+        }[]
+      }
       get_member_invite_info: {
         Args: { _token: string }
         Returns: {
@@ -7172,6 +8154,10 @@ export type Database = {
           suggested_last_name: string
           used: boolean
         }[]
+      }
+      get_or_create_internal_team: {
+        Args: { _club_id: string }
+        Returns: string
       }
       get_or_create_personal_club: {
         Args: { _user_id: string }
@@ -7186,6 +8172,19 @@ export type Database = {
           id: string
         }[]
       }
+      get_poll_results: {
+        Args: { _publication_id: string }
+        Returns: {
+          below_threshold: boolean
+          is_anonymous: boolean
+          is_closed: boolean
+          label: string
+          option_id: string
+          sort_order: number
+          total_voters: number
+          vote_count: number
+        }[]
+      }
       get_public_camp_by_slug: {
         Args: { _camp_slug: string; _club_slug: string }
         Returns: Json
@@ -7195,6 +8194,28 @@ export type Database = {
       get_registration_by_roster_token: {
         Args: { _token: string }
         Returns: Json
+      }
+      get_staff_availabilities: {
+        Args: {
+          p_club_id?: string
+          p_end?: string
+          p_start?: string
+          p_team_id?: string
+          p_user_id?: string
+        }
+        Returns: {
+          can_view_reason: boolean
+          certainty: string
+          club_id: string
+          comment: string
+          end_date: string
+          id: string
+          reason: string
+          start_date: string
+          status: string
+          user_id: string
+          visibility: string
+        }[]
       }
       get_tournament_invite_by_token: {
         Args: { _token: string }
@@ -7239,6 +8260,10 @@ export type Database = {
         Args: { _ip: string; _limit: number; _route: string; _window: string }
         Returns: boolean
       }
+      is_assignable_staff: {
+        Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_club_member: {
         Args: { _club_id: string; _user_id: string }
         Returns: boolean
@@ -7268,6 +8293,10 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      is_team_staff: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_team_staff_of_event: {
         Args: { p_event_id: string; p_user_id: string }
         Returns: boolean
@@ -7293,6 +8322,7 @@ export type Database = {
         Returns: boolean
       }
       is_v2: { Args: { _key: string }; Returns: boolean }
+      jsonb_diff: { Args: { _new: Json; _old: Json }; Returns: Json }
       link_parent_memberships: { Args: never; Returns: number }
       list_public_players: {
         Args: {
@@ -7328,6 +8358,10 @@ export type Database = {
         Returns: undefined
       }
       mark_expired_availabilities_completed: { Args: never; Returns: number }
+      mark_expired_staff_availabilities_completed: {
+        Args: never
+        Returns: number
+      }
       mark_support_ticket_read: {
         Args: { _ticket_id: string }
         Returns: undefined
@@ -7359,6 +8393,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      preview_publication_audience: {
+        Args: {
+          _audiences: Json
+          _club_id: string
+          _event_id: string
+          _manual_member_ids: string[]
+        }
+        Returns: {
+          count: number
+          player_count: number
+          user_count: number
+        }[]
+      }
       privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }
       publish_event_need_atomic: {
         Args: { _actor: string; _audiences: Json; _need_id: string }
@@ -7368,6 +8415,18 @@ export type Database = {
           recipients_count: number
           status: string
           was_idempotent_skip: boolean
+        }[]
+      }
+      publish_publication_atomic: {
+        Args: {
+          _dispatch_id?: string
+          _kind: Database["public"]["Enums"]["publication_dispatch_kind"]
+          _publication_id: string
+        }
+        Returns: {
+          dispatch_row_id: string
+          new_recipient_count: number
+          recipients_count: number
         }[]
       }
       purge_soft_deleted: { Args: never; Returns: undefined }
@@ -7411,6 +8470,21 @@ export type Database = {
       resolve_camp_registration_for_upload: {
         Args: { _required_document_id: string; _token: string }
         Returns: Json
+      }
+      resolve_publication_audience: {
+        Args: { _publication_id: string }
+        Returns: {
+          member_id: string
+          subject_kind: string
+          subject_user_id: string
+        }[]
+      }
+      respond_meeting_via_token: {
+        Args: {
+          _status: Database["public"]["Enums"]["attendance_status"]
+          _token: string
+        }
+        Returns: boolean
       }
       respond_via_token: {
         Args: {
@@ -7458,6 +8532,19 @@ export type Database = {
       set_call_up_visibility: {
         Args: { _choice: string; _id: string; _scope: string }
         Returns: undefined
+      }
+      set_meeting_attendees_atomic: {
+        Args: {
+          _actor: string
+          _audiences?: Json
+          _event_id: string
+          _manual_user_ids?: string[]
+        }
+        Returns: {
+          attendees_count: number
+          inserted_count: number
+          inserted_user_ids: string[]
+        }[]
       }
       set_player_public_profile: {
         Args: { _enabled: boolean; _player_id: string }
@@ -7510,6 +8597,10 @@ export type Database = {
         Args: { _id: string; _kind: string }
         Returns: undefined
       }
+      soft_delete_publication: {
+        Args: { _publication_id: string }
+        Returns: undefined
+      }
       staff_owns_need_signup: {
         Args: { _need_id: string; _user_id: string }
         Returns: boolean
@@ -7531,6 +8622,113 @@ export type Database = {
           count_7d: number
           last_action_type: string
           last_activity_at: string
+        }[]
+      }
+      superadmin_club_roster: {
+        Args: { _club_id: string }
+        Returns: {
+          parents: Json
+          player_birth_date: string
+          player_child_platform_access: boolean
+          player_email: string
+          player_first_name: string
+          player_id: string
+          player_last_invite_at: string
+          player_last_name: string
+          player_last_sign_in_at: string
+          player_phone: string
+          player_user_id: string
+          team_age_group: string
+          team_id: string
+          team_name: string
+        }[]
+      }
+      superadmin_invite_batch_rows: {
+        Args: { _batch_id: string }
+        Returns: {
+          attempt_count: number
+          created_at: string
+          dispatch_id: string
+          error_message: string
+          id: string
+          message_id: string
+          metadata: Json
+          recipient_email: string
+          status: string
+          template_name: string
+        }[]
+      }
+      superadmin_invite_batches: {
+        Args: {
+          _club_id?: string
+          _from?: string
+          _limit?: number
+          _template?: string
+          _to?: string
+        }
+        Returns: {
+          batch_id: string
+          bucket_start: string
+          club_id: string
+          club_name: string
+          failed: number
+          pending: number
+          sent: number
+          suppressed: number
+          template_name: string
+          total: number
+        }[]
+      }
+      superadmin_notifications_emails: {
+        Args: {
+          _from?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _status?: string
+          _template?: string
+          _to?: string
+        }
+        Returns: {
+          attempt_count: number
+          created_at: string
+          error_message: string
+          id: string
+          message_id: string
+          metadata: Json
+          recipient_email: string
+          status: string
+          template_name: string
+        }[]
+      }
+      superadmin_notifications_push: {
+        Args: {
+          _from?: string
+          _kind?: string
+          _limit?: number
+          _offset?: number
+          _to?: string
+        }
+        Returns: {
+          dispatched_at: string
+          first_opened_at: string
+          id: string
+          kind: string
+          opened_count: number
+          ref_id: string
+          sent_count: number
+          targets_count: number
+        }[]
+      }
+      superadmin_player_audit: {
+        Args: { _limit?: number; _player_id: string }
+        Returns: {
+          action: string
+          actor_name: string
+          actor_user_id: string
+          details: Json
+          occurred_at: string
+          source: string
         }[]
       }
       superadmin_product_activity: {
@@ -7603,6 +8801,22 @@ export type Database = {
           since: string
         }[]
       }
+      sync_meeting_attendees_atomic: {
+        Args: {
+          _actor: string
+          _audiences?: Json
+          _confirm_remove?: string[]
+          _dry_run?: boolean
+          _event_id: string
+          _manual_user_ids?: string[]
+        }
+        Returns: {
+          added_user_ids: string[]
+          kept_count: number
+          removed_user_ids: string[]
+          requires_confirmation_user_ids: string[]
+        }[]
+      }
       team_has_history: { Args: { _id: string }; Returns: boolean }
       unaccent_compat: { Args: { t: string }; Returns: string }
       unarchive_team: { Args: { _id: string }; Returns: undefined }
@@ -7672,6 +8886,10 @@ export type Database = {
         Returns: boolean
       }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
+      viewer_is_publication_recipient: {
+        Args: { _publication_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
@@ -7737,12 +8955,31 @@ export type Database = {
         | "manual"
       payment_target_kind: "player" | "team" | "club"
       payment_tx_status: "pending" | "succeeded" | "failed" | "refunded"
+      poll_visibility: "staff_visible" | "anonymous"
+      poll_vote_action: "vote" | "change" | "retrait"
       privacy_request_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "cancelled"
+      publication_audience_type:
+        | "joueurs_convoques"
+        | "parents_convoques"
+        | "joueurs_equipe"
+        | "parents_equipe"
+        | "joueurs_categorie"
+        | "parents_categorie"
+        | "educateurs"
+        | "dirigeants"
+        | "groupe_personnalise"
+        | "selection_manuelle"
+        | "staff_equipe"
+      publication_dispatch_kind:
+        | "publish"
+        | "audience_refresh"
+        | "manual_resend"
+      publication_type: "message" | "poll"
       receipt_kind: "official" | "confirmation"
       reminder_channel: "in_app" | "email" | "push"
       subscription_plan: "monthly" | "yearly"
@@ -8022,6 +9259,8 @@ export const Constants = {
       ],
       payment_target_kind: ["player", "team", "club"],
       payment_tx_status: ["pending", "succeeded", "failed", "refunded"],
+      poll_visibility: ["staff_visible", "anonymous"],
+      poll_vote_action: ["vote", "change", "retrait"],
       privacy_request_status: [
         "pending",
         "processing",
@@ -8029,6 +9268,25 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      publication_audience_type: [
+        "joueurs_convoques",
+        "parents_convoques",
+        "joueurs_equipe",
+        "parents_equipe",
+        "joueurs_categorie",
+        "parents_categorie",
+        "educateurs",
+        "dirigeants",
+        "groupe_personnalise",
+        "selection_manuelle",
+        "staff_equipe",
+      ],
+      publication_dispatch_kind: [
+        "publish",
+        "audience_refresh",
+        "manual_resend",
+      ],
+      publication_type: ["message", "poll"],
       receipt_kind: ["official", "confirmation"],
       reminder_channel: ["in_app", "email", "push"],
       subscription_plan: ["monthly", "yearly"],

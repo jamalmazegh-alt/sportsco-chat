@@ -23,7 +23,8 @@
     "draft": "Draft",
     "open": "Open",
     "closed": "Closed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "reopened": "Need reopened"
   },
   "validationMode": {
     "auto": "Auto-confirmation",
@@ -32,8 +33,9 @@
   "signup": {
     "applied": "Application sent",
     "confirmed": "Confirmed",
-    "declined": "Declined",
-    "withdrawn": "Withdrawn"
+    "declined": "Application declined",
+    "withdrawn": "Withdrawn",
+    "unavailable": "Unavailable"
   },
   "seats": {
     "remaining_one": "{{count}} seat left",
@@ -49,7 +51,9 @@
     "cancel": "Cancel need",
     "publish": "Publish",
     "republish": "Republish",
-    "assign": "Assign"
+    "assign": "Assign",
+    "resend": "Notify everyone again",
+    "notifyNew": "Notify new recipients"
   },
   "errors": {
     "forbidden": "Action not allowed.",
@@ -102,6 +106,24 @@
   "audiences": {
     "convoked_players": "Called-up players",
     "convoked_parents": "Parents of called-up players",
+    "clubAudiences": "Club audiences",
+    "customGroups": "Custom groups",
+    "eventRelevant": "Suggested for this event",
+    "otherAudiences": "Other audiences",
+    "add": "Add",
+    "pickKind": "Pick a type…",
+    "pickParam": "Pick one…",
+    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "selected": {
+      "title": "Selected audience",
+      "empty": "No audience selected — add at least one criterion below.",
+      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
+      "loading": "Computing…",
+      "count_one": "{{count}} person will be notified",
+      "count_other": "{{count}} people will be notified",
+      "removeAria": "Remove {{label}}",
+      "takenAria": "Already selected"
+    },
     "club_members": "All club members",
     "club_educators": "Club educators",
     "club_staff": "Club staff / volunteers",
@@ -111,13 +133,37 @@
     "team_players": "Players of a team",
     "team_parents": "Parents of a team",
     "team_educators": "Educators of a team",
-    "category_educators": "Educators of a category"
+    "category_educators": "Educators of a category",
+    "preassign": {
+      "title": "Pre-assign people",
+      "hint": "Find a club member to confirm directly (they will be notified as confirmed).",
+      "searchPlaceholder": "Search a member…",
+      "noResults": "No result",
+      "capacityReached": "Capacity reached.",
+      "confirmed_one": "{{count}} person pre-assigned and confirmed.",
+      "confirmed_other": "{{count}} people pre-assigned and confirmed."
+    }
   },
   "staff": {
     "title": "Applications",
     "empty": "No applications yet.",
     "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "license": "Licence #{{n}}",
+    "alreadyConfirmed": "Already confirmed",
+    "manualAdded": "Person added",
+    "bulkConfirmed_one": "{{count}} applicant confirmed",
+    "bulkConfirmed_other": "{{count}} applicants confirmed",
+    "bulkDeclined_one": "{{count}} applicant declined",
+    "bulkDeclined_other": "{{count}} applicants declined",
+    "selectAllPending": "Select all ({{count}})",
+    "confirmSelection": "Confirm",
+    "noMembers": "No members found",
+    "editNeed": "Edit need",
+    "createDraft": "Save as draft",
+    "unassigned": "Assignment cancelled",
+    "fullTitle": "Capacity reached",
+    "unassignCta": "Remove",
+    "fullBlock": "Capacity reached. Remove a confirmed person first to assign someone else."
   },
   "pendingApplications_one": "{{count}} pending",
   "pendingApplications_other": "{{count}} pending",
@@ -126,5 +172,212 @@
     "description": "This action is final. Pending applicants and confirmed volunteers will be notified.",
     "confirm": "Yes, cancel",
     "abort": "No, keep it"
+  },
+  "card": {
+    "publishedAt_one": "Published {{time}} ago · {{count}} recipient",
+    "publishedAt_other": "Published {{time}} ago · {{count}} recipients",
+    "unpublishedMeta": "Not published — nobody has been notified yet",
+    "seatsRemaining_one": "{{count}} spot left",
+    "seatsRemaining_other": "{{count}} spots left",
+    "seatsFullConfirmed_one": "Full ✓ · {{count}} confirmed",
+    "seatsFullConfirmed_other": "Full ✓ · {{count}} confirmed",
+    "applicationsCta": "Applications",
+    "republish": "Re-notify",
+    "menuLabel": "Options"
+  },
+  "badge": {
+    "unpublished": "Not published",
+    "closed": "Closed",
+    "cancelled": "Cancelled"
+  },
+  "wizard": {
+    "step": "Step {{current}}/{{total}}",
+    "step1Title": "Add a need",
+    "step2Title": "Who should we notify?",
+    "commentLabel": "Comment or instructions (optional)",
+    "commentPlaceholder": "e.g. Please arrive 30 minutes before the match",
+    "minorReminder": "🛡️ A minor applicant always requires staff approval, even in auto-confirm mode.",
+    "continueToRecipients": "Continue → Recipients",
+    "back": "Back",
+    "cancel": "Cancel"
+  },
+  "audiencePicker": {
+    "forThisMatch": "For this match",
+    "clubGroups": "Club groups",
+    "teamsCategories": "Teams & categories",
+    "otherOption": "Other…",
+    "otherOptionMenu": "Other audiences",
+    "chipConvokedPlayers": "Called-up players",
+    "chipConvokedParents": "Parents of called-up players",
+    "chipTeamPlayers": "Players · {{team}}",
+    "chipTeamParents": "Parents · {{team}}",
+    "chipTeamEducators": "Coaches · {{team}}",
+    "chipCategoryEducators": "Coaches · {{category}}",
+    "chipClubMembers": "All members",
+    "chipClubStaff": "Staff / volunteers",
+    "chipClubAdmins": "Administrators",
+    "chipClubEducators": "Club coaches",
+    "chipClubTournamentManagers": "Tournament managers"
+  },
+  "publishStep": {
+    "title": "Who should we notify?",
+    "recipientsCount_one": "{{count}} person will be notified",
+    "recipientsCount_other": "{{count}} people will be notified",
+    "recipientsLoading": "Calculating…",
+    "needSummaryLabel": "{{label}}",
+    "needSummarySeats_one": "{{count}} spot",
+    "needSummarySeats_other": "{{count}} spots",
+    "publishCta": "Publish and notify",
+    "republishCta_one": "Re-notify ({{count}} person)",
+    "republishCta_other": "Re-notify ({{count}} people)",
+    "emptyConvocation": "Nobody to notify right now — the call-up hasn't been sent yet. Send call-ups first, or choose a different audience.",
+    "emptyGeneric": "Nobody to notify with this selection. Choose a different audience."
+  },
+  "applications": {
+    "title": "Applications — {{label}}",
+    "summary_one": "{{pending}} pending · {{confirmed}} confirmed · {{seats}} spot",
+    "summary_other": "{{pending}} pending · {{confirmed}} confirmed · {{seats}} spots",
+    "pendingSection": "Pending",
+    "confirmedSection": "Confirmed",
+    "unavailableSection_one": "Unavailable ({{count}})",
+    "unavailableSection_other": "Unavailable ({{count}})",
+    "confirmedEmpty": "Nobody yet.",
+    "assignSection": "Assign directly",
+    "assignHelp": "Already agreed with someone? Assign them: they'll be confirmed and notified, and can still withdraw.",
+    "searchPlaceholder": "Search a member…",
+    "assignCta": "Assign",
+    "removeConfirmed": "Remove",
+    "licenseMissing": "License not provided",
+    "licenseLabel": "License {{n}}",
+    "minorTag": "Minor — adult approval required",
+    "emptyStateActive_one": "No applications yet. {{recipients}} recipient was notified {{ago}} — you can re-notify or directly assign someone below.",
+    "emptyStateActive_other": "No applications yet. {{recipients}} recipients were notified {{ago}} — you can re-notify or directly assign someone below.",
+    "emptyStateNotPublished": "This need hasn't been published yet. Publish it to reach volunteers.",
+    "close": "Close"
+  },
+  "memberCard": {
+    "applyCta": "I'll help",
+    "unavailableCta": "Not available",
+    "pending": "Application sent — waiting for approval",
+    "confirmed": "Confirmed ✓ — reminder the day before",
+    "cancelledByClub": "Cancelled by the club",
+    "expandComment": "Show note",
+    "collapseComment": "Hide",
+    "commentApplyPlaceholder": "A word for the staff (optional)",
+    "applyDialogTitle": "I'll help",
+    "applyDialogConfirm": "Send my application"
+  },
+  "unavailable": {
+    "sectionTitle": "Unavailable",
+    "sectionTitleCount_one": "Unavailable ({{count}})",
+    "sectionTitleCount_other": "Unavailable ({{count}})",
+    "backToApply": "Actually, I'll help",
+    "confirmed": "Marked unavailable"
+  },
+  "editDialog": {
+    "title": "Edit need",
+    "labelLabel": "Label",
+    "capacityLabel": "Spots",
+    "modeLabel": "Approval",
+    "commentLabel": "Comment or instructions",
+    "audienceNote": "👥 The audience is edited via \"Re-notify\" (the selection is editable before sending).",
+    "save": "Save",
+    "cancel": "Cancel",
+    "capacityBelowConfirmed_one": "Can't reduce to {{capacity}} spot: {{confirmed}} person is already confirmed. Remove a confirmed volunteer first.",
+    "capacityBelowConfirmed_other": "Can't reduce to {{capacity}} spots: {{confirmed}} people are already confirmed. Remove a confirmed volunteer first."
+  },
+  "deleteDraft": {
+    "title": "Delete this draft?",
+    "description": "The draft will be permanently deleted. Nobody will be notified.",
+    "confirm": "Delete",
+    "abort": "Back",
+    "success": "Draft deleted."
+  },
+  "closeDialog2": {
+    "title": "Close this need?",
+    "description_one": "No more volunteers needed (spot filled otherwise). Applications stop; the {{confirmed}} confirmed volunteer is still expected and keeps their reminder.",
+    "description_other": "No more volunteers needed (spot filled otherwise). The {{confirmed}} confirmed volunteers are still expected and keep their reminders.",
+    "descriptionEmpty": "No more volunteers needed (spot filled otherwise). Applications stop.",
+    "confirm": "Close need",
+    "abort": "Back"
+  },
+  "cancelDialog2": {
+    "title": "Cancel this need?",
+    "descriptionMany": "This need won't happen. {{confirmed}} confirmed and {{pending}} pending applicants will be notified they're no longer expected.",
+    "descriptionOnlyConfirmed_one": "This need won't happen. {{confirmed}} confirmed person will be notified they're no longer expected.",
+    "descriptionOnlyConfirmed_other": "This need won't happen. {{confirmed}} confirmed people will be notified they're no longer expected.",
+    "descriptionOnlyPending_one": "This need won't happen. {{pending}} pending applicant will be notified.",
+    "descriptionOnlyPending_other": "This need won't happen. {{pending}} pending applicants will be notified.",
+    "descriptionNone": "This need won't happen. Nobody applied, so no notification will be sent.",
+    "confirm": "Cancel need",
+    "abort": "Back"
+  },
+  "menu": {
+    "edit": "Edit",
+    "closeNeed": "Close need",
+    "cancelNeed": "Cancel need",
+    "delete": "Delete",
+    "editAudience": "Edit recipients",
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Reopen need"
+  },
+  "assignNotification": {
+    "assignedAs": "You've been assigned as {{role}}"
+  },
+  "feed": {
+    "title": "Volunteer needs",
+    "empty": "No open needs for you right now."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} declined",
+    "sectionTitleCount_other": "{{count}} declined"
+  },
+  "recentlyFilled": {
+    "title": "Recently filled"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} seat",
+    "seatsRemaining_other": "{{count}} seats",
+    "fallbackTitle": "Helping hand"
+  },
+  "myFeed": {
+    "title": "My helping hands",
+    "engagementsCount_one": "{{count}} commitment",
+    "engagementsCount_other": "{{count}} commitments",
+    "nextLabel": "Next",
+    "plusOthers_one": "+ {{count}} other commitment",
+    "plusOthers_other": "+ {{count}} other commitments"
+  },
+  "resend": {
+    "title": "Re-notify recipients",
+    "success_one": "{{count}} recipient re-notified",
+    "success_other": "{{count}} recipients re-notified"
+  },
+  "editAudience": {
+    "title": "Edit recipients",
+    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
+    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
+    "success_one": "{{count}} new recipient notified",
+    "success_other": "{{count}} new recipients notified",
+    "successNoDelta": "Selection updated — nobody new to notify."
+  },
+  "recipients": {
+    "title": "Notified recipients",
+    "desc": "People who received a notification for \"{{need}}\".",
+    "empty": "No notification has been sent for this need yet.",
+    "count_one": "{{count}} person notified",
+    "count_other": "{{count}} people notified"
+  },
+  "withdrawDialog": {
+    "title": "Withdraw?",
+    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
+    "confirm": "Withdraw",
+    "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "appliedToast": "Application sent",
+    "unavailableToast": "Marked unavailable"
   }
 }

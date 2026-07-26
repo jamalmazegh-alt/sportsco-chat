@@ -14,30 +14,18 @@
  * deep links.
  */
 import { test, expect } from "@playwright/test";
+import { assertNoV2Ctas } from "./_fixtures/beta-closure";
 
 const BASE = process.env.E2E_BASE_URL || "http://localhost:8080";
 
 test.use({ viewport: { width: 375, height: 812 } });
-
-const FORBIDDEN_LABELS = [
-  /Suivre\b/i,
-  /Following/i,
-  /Mettre en relation/i,
-  /Connecter Stripe/i,
-  /Payer/i,
-  /Cotisation/i,
-  /Acheter un pack/i,
-];
 
 test.describe("Beta closure — role matrix (mobile, public surface)", () => {
   for (const path of ["/", "/features", "/pricing", "/faq", "/login", "/register"]) {
     test(`public page ${path} surfaces no V2 CTA on mobile`, async ({ page }) => {
       const res = await page.goto(BASE + path, { waitUntil: "domcontentloaded" });
       expect(res?.status() ?? 0).toBeLessThan(400);
-      const html = await page.content();
-      for (const re of FORBIDDEN_LABELS) {
-        expect(html, `forbidden CTA matched ${re} on ${path}`).not.toMatch(re);
-      }
+      await assertNoV2Ctas(page, `public ${path}`);
     });
   }
 

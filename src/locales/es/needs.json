@@ -23,7 +23,8 @@
     "draft": "Borrador",
     "open": "Abierto",
     "closed": "Cerrado",
-    "cancelled": "Anulado"
+    "cancelled": "Anulado",
+    "reopened": "Necesidad reabierta"
   },
   "validationMode": {
     "auto": "Confirmación automática",
@@ -32,8 +33,9 @@
   "signup": {
     "applied": "Solicitud enviada",
     "confirmed": "Confirmado",
-    "declined": "Rechazado",
-    "withdrawn": "Retirado"
+    "declined": "Candidatura rechazada",
+    "withdrawn": "Retirado",
+    "unavailable": "No disponible"
   },
   "seats": {
     "full": "Completo",
@@ -49,7 +51,9 @@
     "cancel": "Anular la necesidad",
     "publish": "Publicar",
     "republish": "Volver a publicar",
-    "assign": "Asignar"
+    "assign": "Asignar",
+    "resend": "Notify everyone again",
+    "notifyNew": "Notify new recipients"
   },
   "errors": {
     "forbidden": "Acción no autorizada.",
@@ -60,71 +64,320 @@
     "already_applied": "Ya te has ofrecido."
   },
   "section": {
-    "title": "Volunteer needs",
-    "add": "Add a need",
-    "emptyStaff": "Create a need (referee, concession, timekeeper…) to call for volunteers.",
-    "created": "Need created",
-    "createDesc": "Create the need, then publish it to the audience of your choice.",
-    "coverageAll": "All covered ✓",
-    "coverageMissing_one": "{{count}} need to fill",
-    "coverageMissing_other": "{{count}} needs to fill"
+    "title": "Echar una mano",
+    "add": "Añadir una necesidad",
+    "emptyStaff": "Crea una necesidad (árbitro, cantina, cronometrador…) para pedir voluntarios.",
+    "created": "Necesidad creada",
+    "createDesc": "Crea la necesidad y publícala después al público que elijas.",
+    "coverageAll": "Todo cubierto ✓",
+    "coverageMissing_one": "{{count}} necesidad por cubrir",
+    "coverageMissing_other": "{{count}} necesidades por cubrir"
   },
   "field": {
-    "template": "Type",
-    "label": "Label",
-    "capacity": "Number of seats",
-    "mode": "Validation",
-    "description": "Details (optional)"
+    "template": "Tipo",
+    "label": "Nombre",
+    "capacity": "Número de plazas",
+    "mode": "Validación",
+    "description": "Detalles (opcional)"
   },
   "publish": {
-    "title": "Publish the need",
-    "desc": "Choose who will receive the notification.",
-    "audienceHeader": "Audiences",
-    "chooseGroup": "Pick a group",
-    "chooseTeam": "Pick a team",
-    "chooseCategory": "Pick a category (U11, U12…)",
-    "categoryPlaceholder": "e.g. U11",
-    "preview_one": "{{count}} unique person will be notified",
-    "preview_other": "{{count}} unique people will be notified",
-    "previewNone": "No recipients — pick at least one audience.",
-    "previewLoading": "Computing recipients…",
-    "success": "Need published · {{count}} recipient(s)",
-    "successIdempotent": "Already published (no new notifications sent)."
+    "title": "Publicar la necesidad",
+    "desc": "Selecciona quién recibirá la notificación.",
+    "audienceHeader": "Destinatarios",
+    "chooseGroup": "Elegir un grupo",
+    "chooseTeam": "Elegir un equipo",
+    "chooseCategory": "Elegir una categoría (U11, U12…)",
+    "categoryPlaceholder": "Ej. U11",
+    "preview_one": "Se avisará a {{count}} persona",
+    "preview_other": "Se avisará a {{count}} personas",
+    "previewNone": "Ningún destinatario: selecciona al menos un público.",
+    "previewLoading": "Calculando el número de destinatarios…",
+    "success": "Necesidad publicada · {{count}} destinatario(s)",
+    "successIdempotent": "Ya se había publicado (no se ha enviado nada nuevo)."
   },
   "edit": {
-    "templateLocked": "The need type cannot be changed after publication."
+    "templateLocked": "El tipo de necesidad no se puede cambiar después de publicarla."
   },
   "publishedBadge": {
-    "at_one": "Published {{time}} · {{count}} recipient",
-    "at_other": "Published {{time}} · {{count}} recipients",
-    "unpublished": "Not published"
+    "at_one": "Publicada {{time}} · {{count}} destinatario",
+    "at_other": "Publicada {{time}} · {{count}} destinatarios",
+    "unpublished": "Sin publicar"
   },
   "audiences": {
-    "convoked_players": "Called-up players",
-    "convoked_parents": "Parents of called-up players",
-    "club_members": "All club members",
-    "club_educators": "Club educators",
-    "club_staff": "Club staff / volunteers",
-    "club_admins": "Club administrators",
-    "club_tournament_managers": "Tournament managers",
-    "club_group": "Custom group",
-    "team_players": "Players of a team",
-    "team_parents": "Parents of a team",
-    "team_educators": "Educators of a team",
-    "category_educators": "Educators of a category"
+    "convoked_players": "Jugadores convocados",
+    "convoked_parents": "Padres de los jugadores convocados",
+    "clubAudiences": "Públicos del club",
+    "club_members": "Todos los miembros del club",
+    "club_educators": "Entrenadores del club",
+    "club_staff": "Staff / voluntarios del club",
+    "club_admins": "Administradores del club",
+    "club_tournament_managers": "Responsables de torneos",
+    "club_group": "Grupo personalizado",
+    "team_players": "Jugadores de un equipo",
+    "team_parents": "Padres de un equipo",
+    "team_educators": "Entrenadores de un equipo",
+    "category_educators": "Entrenadores de una categoría",
+    "customGroups": "Custom groups",
+    "eventRelevant": "Suggested for this event",
+    "otherAudiences": "Other audiences",
+    "add": "Añadir",
+    "pickKind": "Pick a type…",
+    "pickParam": "Pick one…",
+    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "selected": {
+      "title": "Selected audience",
+      "empty": "No audience selected — add at least one criterion below.",
+      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
+      "loading": "Computing…",
+      "count_one": "{{count}} person will be notified",
+      "count_other": "{{count}} people will be notified",
+      "removeAria": "Remove {{label}}",
+      "takenAria": "Already selected"
+    },
+    "preassign": {
+      "title": "Preasignar personas",
+      "hint": "Busca un miembro del club para confirmarlo directamente (se le notificará como confirmado).",
+      "searchPlaceholder": "Buscar un miembro…",
+      "noResults": "Sin resultados",
+      "capacityReached": "Capacidad alcanzada.",
+      "confirmed_one": "{{count}} persona preasignada y confirmada.",
+      "confirmed_other": "{{count}} personas preasignadas y confirmadas."
+    }
   },
   "staff": {
-    "title": "Applications",
-    "empty": "No applications yet.",
-    "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "title": "Ofrecimientos",
+    "empty": "Todavía no hay ofrecimientos.",
+    "minorPending": "Menor de edad: se requiere validación de un adulto",
+    "license": "Licencia n.º {{n}}",
+    "alreadyConfirmed": "Ya confirmado",
+    "manualAdded": "Persona añadida",
+    "bulkConfirmed_one": "{{count}} ofrecimiento confirmado",
+    "bulkConfirmed_other": "{{count}} ofrecimientos confirmados",
+    "bulkDeclined_one": "{{count}} ofrecimiento rechazado",
+    "bulkDeclined_other": "{{count}} ofrecimientos rechazados",
+    "selectAllPending": "Seleccionar todo ({{count}})",
+    "confirmSelection": "Confirmar",
+    "noMembers": "No se ha encontrado ningún miembro",
+    "editNeed": "Editar la necesidad",
+    "createDraft": "Crear como borrador",
+    "unassigned": "Asignación cancelada",
+    "fullTitle": "Capacidad alcanzada",
+    "unassignCta": "Retirar",
+    "fullBlock": "Capacidad alcanzada. Retire primero a una persona confirmada para asignar a otra."
   },
-  "pendingApplications_one": "{{count}} pending",
-  "pendingApplications_other": "{{count}} pending",
+  "pendingApplications_one": "{{count}} pendiente",
+  "pendingApplications_other": "{{count}} pendientes",
   "cancelDialog": {
-    "title": "¿Anular la necesidad?",
-    "description": "Esta acción es definitiva. Se informará a los candidatos pendientes y a las personas confirmadas.",
+    "title": "¿Anular esta necesidad?",
+    "description": "Esta acción es definitiva. Se avisará a los ofrecimientos pendientes y a las personas confirmadas.",
     "confirm": "Sí, anular",
-    "abort": "No, conservar"
+    "abort": "No, mantener"
+  },
+  "card": {
+    "publishedAt_one": "Publicada hace {{time}} · {{count}} destinatario",
+    "publishedAt_other": "Publicada hace {{time}} · {{count}} destinatarios",
+    "unpublishedMeta": "Sin publicar: todavía no se ha avisado a nadie",
+    "seatsRemaining_one": "{{count}} plaza libre",
+    "seatsRemaining_other": "{{count}} plazas libres",
+    "seatsFullConfirmed_one": "Completo ✓ · {{count}} confirmado",
+    "seatsFullConfirmed_other": "Completo ✓ · {{count}} confirmados",
+    "applicationsCta": "Ofrecimientos",
+    "republish": "Reenviar",
+    "menuLabel": "Opciones"
+  },
+  "badge": {
+    "unpublished": "Sin publicar",
+    "closed": "Cerrada",
+    "cancelled": "Anulada"
+  },
+  "wizard": {
+    "step": "Paso {{current}}/{{total}}",
+    "step1Title": "Añadir una necesidad",
+    "step2Title": "¿A quién avisamos?",
+    "commentLabel": "Comentario o instrucciones (opcional)",
+    "commentPlaceholder": "Ej.: Llegar 30 minutos antes del partido",
+    "minorReminder": "🛡️ Un menor siempre lo valida el cuerpo técnico, incluso con confirmación automática.",
+    "continueToRecipients": "Continuar → Destinatarios",
+    "back": "Atrás",
+    "cancel": "Cancelar"
+  },
+  "audiencePicker": {
+    "forThisMatch": "Para este partido",
+    "clubGroups": "Grupos del club",
+    "teamsCategories": "Equipos y categorías",
+    "otherOption": "Otros…",
+    "otherOptionMenu": "Otros públicos",
+    "chipConvokedPlayers": "Jugadores convocados",
+    "chipConvokedParents": "Padres de los convocados",
+    "chipTeamPlayers": "Jugadores · {{team}}",
+    "chipTeamParents": "Padres · {{team}}",
+    "chipTeamEducators": "Entrenadores · {{team}}",
+    "chipCategoryEducators": "Entrenadores · {{category}}",
+    "chipClubMembers": "Todos los miembros",
+    "chipClubStaff": "Staff / voluntarios",
+    "chipClubAdmins": "Administradores",
+    "chipClubEducators": "Entrenadores del club",
+    "chipClubTournamentManagers": "Responsables de torneos"
+  },
+  "publishStep": {
+    "title": "¿A quién avisamos?",
+    "recipientsCount_one": "Se avisará a {{count}} persona",
+    "recipientsCount_other": "Se avisará a {{count}} personas",
+    "recipientsLoading": "Calculando…",
+    "needSummaryLabel": "{{label}}",
+    "needSummarySeats_one": "{{count}} plaza",
+    "needSummarySeats_other": "{{count}} plazas",
+    "publishCta": "Publicar y avisar",
+    "republishCta_one": "Reenviar ({{count}} persona)",
+    "republishCta_other": "Reenviar ({{count}} personas)",
+    "emptyConvocation": "Por ahora no hay a quién avisar: la convocatoria aún no está hecha. Convoca primero o elige otro público.",
+    "emptyGeneric": "No hay a quién avisar con esta selección. Elige otro público."
+  },
+  "applications": {
+    "title": "Ofrecimientos — {{label}}",
+    "summary_one": "{{pending}} pendiente · {{confirmed}} confirmado · {{seats}} plaza",
+    "summary_other": "{{pending}} pendientes · {{confirmed}} confirmados · {{seats}} plazas",
+    "pendingSection": "Pendientes",
+    "confirmedSection": "Confirmados",
+    "unavailableSection_one": "No disponibles ({{count}})",
+    "unavailableSection_other": "No disponibles ({{count}})",
+    "confirmedEmpty": "Nadie por ahora.",
+    "assignSection": "Asignar directamente",
+    "assignHelp": "¿Ya lo has hablado con alguien? Asígnalo: quedará confirmado y avisado, y podrá darse de baja.",
+    "searchPlaceholder": "Buscar un miembro…",
+    "assignCta": "Asignar",
+    "removeConfirmed": "Quitar",
+    "licenseMissing": "Licencia no indicada",
+    "licenseLabel": "Licencia {{n}}",
+    "minorTag": "Menor: se requiere validación de un adulto",
+    "emptyStateActive_one": "Todavía no hay ofrecimientos. Se avisó a {{recipients}} destinatario {{ago}}: puedes reenviar o asignar directamente a alguien abajo.",
+    "emptyStateActive_other": "Todavía no hay ofrecimientos. Se avisó a {{recipients}} destinatarios {{ago}}: puedes reenviar o asignar directamente a alguien abajo.",
+    "emptyStateNotPublished": "Esta necesidad aún no se ha publicado. Publícala para avisar a los voluntarios.",
+    "close": "Cerrar"
+  },
+  "memberCard": {
+    "applyCta": "Me ofrezco",
+    "unavailableCta": "No puedo",
+    "pending": "Ofrecimiento enviado — pendiente de validación",
+    "confirmed": "Confirmado ✓ — recordatorio la víspera",
+    "cancelledByClub": "Anulado por el club",
+    "expandComment": "Ver las instrucciones",
+    "collapseComment": "Ver menos",
+    "commentApplyPlaceholder": "Un mensaje para el staff (opcional)",
+    "applyDialogTitle": "Me ofrezco",
+    "applyDialogConfirm": "Enviar mi ofrecimiento"
+  },
+  "unavailable": {
+    "sectionTitle": "No disponibles",
+    "sectionTitleCount_one": "No disponibles ({{count}})",
+    "sectionTitleCount_other": "No disponibles ({{count}})",
+    "backToApply": "Al final me ofrezco",
+    "confirmed": "Marcado como no disponible"
+  },
+  "editDialog": {
+    "title": "Editar la necesidad",
+    "labelLabel": "Nombre",
+    "capacityLabel": "Plazas",
+    "modeLabel": "Validación",
+    "commentLabel": "Comentario o instrucciones",
+    "audienceNote": "👥 El público se cambia desde «Reenviar» (allí puedes editar la selección antes del envío).",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "capacityBelowConfirmed_one": "No se puede bajar a {{capacity}} plaza: {{confirmed}} persona ya está confirmada. Quita antes a un confirmado.",
+    "capacityBelowConfirmed_other": "No se puede bajar a {{capacity}} plazas: {{confirmed}} personas ya están confirmadas. Quita antes a un confirmado."
+  },
+  "deleteDraft": {
+    "title": "¿Eliminar este borrador?",
+    "description": "El borrador se eliminará definitivamente. No se avisará a nadie.",
+    "confirm": "Eliminar",
+    "abort": "Atrás",
+    "success": "Borrador eliminado."
+  },
+  "closeDialog2": {
+    "title": "¿Cerrar la necesidad?",
+    "description_one": "Ya no hacen falta voluntarios (cubierto de otra forma). Se dejan de aceptar ofrecimientos; la {{confirmed}} persona confirmada sigue esperada y mantiene su recordatorio.",
+    "description_other": "Ya no hacen falta voluntarios (cubierto de otra forma). Las {{confirmed}} personas confirmadas siguen esperadas y mantienen su recordatorio.",
+    "descriptionEmpty": "Ya no hacen falta voluntarios (cubierto de otra forma). Se dejan de aceptar ofrecimientos.",
+    "confirm": "Cerrar la necesidad",
+    "abort": "Atrás"
+  },
+  "cancelDialog2": {
+    "title": "¿Anular la necesidad?",
+    "descriptionMany": "Esta necesidad ya no tendrá lugar. Se avisará a {{confirmed}} personas confirmadas y a {{pending}} ofrecimientos pendientes de que ya no se les espera.",
+    "descriptionOnlyConfirmed_one": "Esta necesidad ya no tendrá lugar. Se avisará a {{confirmed}} persona confirmada de que ya no se le espera.",
+    "descriptionOnlyConfirmed_other": "Esta necesidad ya no tendrá lugar. Se avisará a {{confirmed}} personas confirmadas de que ya no se les espera.",
+    "descriptionOnlyPending_one": "Esta necesidad ya no tendrá lugar. Se avisará a {{pending}} ofrecimiento pendiente.",
+    "descriptionOnlyPending_other": "Esta necesidad ya no tendrá lugar. Se avisará a {{pending}} ofrecimientos pendientes.",
+    "descriptionNone": "Esta necesidad ya no tendrá lugar. Nadie se ha ofrecido, no se enviará ninguna notificación.",
+    "confirm": "Anular la necesidad",
+    "abort": "Atrás"
+  },
+  "menu": {
+    "edit": "Editar",
+    "closeNeed": "Cerrar la necesidad",
+    "cancelNeed": "Anular la necesidad",
+    "delete": "Eliminar",
+    "editAudience": "Edit recipients",
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Reabrir necesidad"
+  },
+  "assignNotification": {
+    "assignedAs": "Te han inscrito como {{role}}"
+  },
+  "feed": {
+    "title": "Echar una mano",
+    "empty": "Ahora mismo no hay ninguna necesidad abierta para ti."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} rechazado",
+    "sectionTitleCount_other": "{{count}} rechazados"
+  },
+  "recentlyFilled": {
+    "title": "Cubiertas recientemente"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} plaza",
+    "seatsRemaining_other": "{{count}} plazas",
+    "fallbackTitle": "Un cable"
+  },
+  "myFeed": {
+    "title": "Mis manos amigas",
+    "engagementsCount_one": "{{count}} commitment",
+    "engagementsCount_other": "{{count}} commitments",
+    "nextLabel": "Next",
+    "plusOthers_one": "+ {{count}} other commitment",
+    "plusOthers_other": "+ {{count}} other commitments"
+  },
+  "resend": {
+    "title": "Re-notify recipients",
+    "success_one": "{{count}} recipient re-notified",
+    "success_other": "{{count}} recipients re-notified"
+  },
+  "editAudience": {
+    "title": "Edit recipients",
+    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
+    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
+    "success_one": "{{count}} new recipient notified",
+    "success_other": "{{count}} new recipients notified",
+    "successNoDelta": "Selection updated — nobody new to notify."
+  },
+  "recipients": {
+    "title": "Notified recipients",
+    "desc": "People who received a notification for \"{{need}}\".",
+    "empty": "No notification has been sent for this need yet.",
+    "count_one": "{{count}} person notified",
+    "count_other": "{{count}} people notified"
+  },
+  "withdrawDialog": {
+    "title": "Withdraw?",
+    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
+    "confirm": "Withdraw",
+    "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Disponible",
+    "unavailable": "No disponible",
+    "appliedToast": "Candidatura enviada",
+    "unavailableToast": "Marcado como no disponible"
   }
 }

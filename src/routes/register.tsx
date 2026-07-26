@@ -6,9 +6,11 @@ import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import {
   validateInviteToken,
-  confirmInvitedUserEmail,
+  createInvitedAccount,
   type InviteValidationResult,
 } from "@/lib/invite.functions";
+import { resolveSignupPath } from "@/lib/invite-signup";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,7 +64,7 @@ function RegisterPage() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
-  const confirmInvitedEmail = useServerFn(confirmInvitedUserEmail);
+  const createAccount = useServerFn(createInvitedAccount);
 
   useEffect(() => {
     if (!hasInvite) return;
@@ -117,6 +119,50 @@ function RegisterPage() {
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
+    // NOMINATIVE invite (member_invites): the token is bound to this exact
+    // e-mail, so receiving it already proves ownership. Create the account
+    // server-side, pre-confirmed → Supabase sends NO verification e-mail.
+    // Club link invites (QR / shared URL) keep the standard signUp() flow.
+    if (
+      hasInvite &&
+      resolveSignupPath(inviteKind === "club" ? "club" : "member") === "server_create"
+    ) {
+      try {
+        await createAccount({
+          data: {
+            token: inviteToken,
+            email,
+            password,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            language: i18n.language?.slice(0, 2) || "en",
+            signupRole,
+          },
+        });
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          setBusy(false);
+          toast.error(localizeAuthError(signInErr, t));
+          return;
+        }
+        const { error: rErr } = await supabase.rpc("redeem_member_invite", { _token: inviteToken });
+        if (rErr) {
+          setBusy(false);
+          toast.error(rErr.message || t("auth.inviteInvalid"));
+          return;
+        }
+        setBusy(false);
+        toast.success(t("auth.signupSuccess"));
+        (navigate as any)({ to: nextPath });
+        return;
+      } catch (err: any) {
+        setBusy(false);
+        toast.error(err?.message || t("auth.inviteInvalid"));
+        return;
+      }
+    }
+
     const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
@@ -134,6 +180,7 @@ function RegisterPage() {
         },
       },
     });
+
     if (error) {
       setBusy(false);
       toast.error(localizeAuthError(error, t));
@@ -156,37 +203,10 @@ function RegisterPage() {
       (navigate as any)({ to: nextPath });
       return;
     }
-    // No session: email confirmation is required.
-    // Only MEMBER invites (email-bound, sent directly to a known address) are
-    // proof of email ownership → we can auto-confirm + sign in.
-    // CLUB invites are link-based (QR / shared URL, anyone can use them) and
-    // are NOT proof of ownership → go through the standard email-confirmation
-    // flow like a regular signup.
-    if (hasInvite && inviteKind !== "club") {
-      try {
-        await confirmInvitedEmail({ data: { token: inviteToken, email } });
-        const { error: signInErr } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (signInErr) throw signInErr;
-        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
-        if (rErr) {
-          setBusy(false);
-          toast.error(rErr.message || t("auth.inviteInvalid"));
-          return;
-        }
-        setBusy(false);
-        toast.success(t("auth.signupSuccess"));
-        (navigate as any)({ to: nextPath });
-        return;
-      } catch (err: any) {
-        setBusy(false);
-        toast.error(err?.message || t("auth.inviteInvalid"));
-        return;
-      }
-    }
+    // No session: email confirmation is required. Only club link invites (or
+    // plain signups) reach this point — nominative invites were handled above
+    // by the server-side pre-confirmed creation path.
+
     // Club invite (or no invite): standard email-confirmation flow.
     // The redeem step will run automatically after the user confirms and lands
     // back on /register with the token still in the URL (emailRedirectTo above).

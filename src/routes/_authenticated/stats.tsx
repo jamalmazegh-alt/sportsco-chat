@@ -322,6 +322,7 @@ function StaffStats({
           .from("teams")
           .select("id, name, sport")
           .eq("club_id", clubId)
+          .eq("is_internal", false)
           .is("deleted_at", null)
           .order("name");
         return data ?? [];

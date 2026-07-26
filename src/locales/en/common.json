@@ -267,7 +267,11 @@
     "clear": "Clear",
     "listen": "Listen",
     "stop": "Stop",
-    "errorOccurred": "An error occurred"
+    "errorOccurred": "An error occurred",
+    "unknown": "No name",
+    "deselectAll": "Deselect all",
+    "actions": "Actions",
+    "add": "Add"
   },
   "notFound": {
     "code": "404",
@@ -636,6 +640,8 @@
     "respondBoth": "Both",
     "accountActive": "Account active",
     "accountInactive": "No account yet",
+    "accountUnconfirmed": "Email not confirmed",
+    "accountUnconfirmedHint": "The account exists but the email has not been confirmed yet. The parent must click the confirmation link they received by email.",
     "inviteNotSent": "Invitation not sent",
     "inviteSentLabel": "Invitation sent",
     "inviteSentAction": "Invite",
@@ -696,7 +702,8 @@
       "done": "{{inserted}} player(s) imported",
       "failed": "{{failed}} row(s) with errors"
     },
-    "inviteAlreadyActive": "Account already active — no need to resend."
+    "inviteAlreadyActive": "Account already active — no need to resend.",
+    "parentActivationPending": "Waiting for parent account activation"
   },
   "events": {
     "isOfficial": "Official match",
@@ -741,6 +748,7 @@
     "published": "Event published",
     "sendConvocations": "Send call-ups",
     "convocationsSent": "Call-ups sent",
+    "convocationsSentShort": "Call-up sent",
     "noEvents": "No events scheduled.",
     "searchPlaceholder": "Search an event…",
     "noSearchResults": "No results",
@@ -950,7 +958,8 @@
     "pendingCount_one": "{{count}} player hasn't replied yet",
     "pendingCount_other": "{{count}} players haven't replied yet",
     "remindAllSent_one": "{{count}} reminder sent",
-    "remindAllSent_other": "{{count}} reminders sent"
+    "remindAllSent_other": "{{count}} reminders sent",
+    "errorPastEventLocked": "This event is in the past — responses can no longer be changed."
   },
   "stats": {
     "title": "Stats",
@@ -1267,7 +1276,16 @@
       "plusOthers": "{{first}} + {{n}} more"
     },
     "audienceTo": "To:",
-    "audienceRequired": "Pick at least one team."
+    "audienceRequired": "Pick at least one team.",
+    "compose": {
+      "targetGroup": "Group(s)",
+      "alsoEmail": "Send a copy by email",
+      "newPoll": "New poll"
+    },
+    "email": {
+      "subject": "New message from {{club}}",
+      "viewOnWall": "View on the wall"
+    }
   },
   "chat": {
     "title": "Event chat",
@@ -1275,7 +1293,9 @@
     "placeholder": "Type a message…",
     "disabled": "Chat is disabled for this event.",
     "you": "You",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "noAccess": "This event chat is limited to staff. Ask your club to open it to parents or players.",
+    "sendFailed": "Message not sent: you don't have access to this chat."
   },
   "assistant": {
     "title": "Clubero Assistant",
@@ -1759,11 +1779,6 @@
       "description": "We help you migrate your club, teams and data to Clubero in just a few days. Human support, import from Excel and existing tools.",
       "ogDescription": "Switch to Clubero with ease. We migrate your club for you."
     },
-    "parentGuide": {
-      "title": "Parent guide — getting started with Clubero",
-      "description": "Step-by-step tutorials for parents: respond to a call-up, report an absence, give consent, set up notifications and follow the family calendar.",
-      "ogDescription": "Call-ups, absences, notifications: the parent guide to getting started with Clubero."
-    },
     "tournamentsPage": {
       "title": "Tournaments — Live scores, public standings, TV mode | Clubero",
       "description": "Run modern tournaments with live scores, public standings, mobile referees and TV mode. Built for organizers, players, parents and fans.",
@@ -1772,6 +1787,11 @@
     "adminVenues": {
       "title": "Venues – Clubero",
       "description": "Configure your club sites and fields."
+    },
+    "parentGuide": {
+      "title": "Parent guide — getting started with Clubero",
+      "description": "Step-by-step tutorials for parents: respond to a call-up, report an absence, give consent, set up notifications and follow the family calendar.",
+      "ogDescription": "Call-ups, absences, notifications: the parent guide to getting started with Clubero."
     }
   },
   "trial": {
@@ -1843,7 +1863,12 @@
     "confirm": "Confirm",
     "noDriversYet": "No drivers yet.",
     "iNeedRide": "Request a ride",
-    "needRideRegistered": "Request sent to coach"
+    "needRideRegistered": "Request sent to coach",
+    "disabledHint": "Enable carpooling to let parents offer and book seats.",
+    "needsTitle": "Ride requests",
+    "cancelNeed": "Withdraw my request",
+    "noNeeds": "No ride requests.",
+    "notifyFailed": "Request saved but the email to staff could not be sent."
   },
   "journey": {
     "tab": {
@@ -2184,6 +2209,10 @@
       "checkFailed": "Unable to check alerts"
     },
     "partialError": "Some sources are unavailable, the list may be incomplete.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Respond",
       "open": "Open"
@@ -2328,7 +2357,56 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "A group with this name already exists."
+    },
+    "personsToday_one": "{{count}} person today",
+    "personsToday_other": "{{count}} people today",
+    "dynamicSubgroups": "Sub-groups",
+    "dynamicBadge": "DYNAMIC",
+    "noSubgroups": "No sub-group. Composition updates automatically.",
+    "addSubgroup": "Add",
+    "subgroupAdded": "Sub-group added",
+    "subgroupRemoved": "Sub-group removed",
+    "subgroupRemove": "Remove",
+    "subgroupPreview": "View members",
+    "subgroupPreviewDescription": "Resolved list at this moment. Composition updates automatically.",
+    "subgroupPreviewEmpty": "No resolved member.",
+    "subgroupPreviewCount_one": "{{count}} member",
+    "subgroupPreviewCount_other": "{{count}} members",
+    "pickAudienceKind": "Choose an audience…",
+    "pickAudienceParam": "Choose…",
+    "selectedAudiencesTitle": "Selected audiences",
+    "selectedAudiencesEmpty": "No audience selected. Add one below.",
+    "otherAudiences": "Other audiences",
+    "parentOf": "Parent of {{names}}",
+    "emailOnly": "email only",
+    "individualMembers": "Individual members",
+    "addIndividual": "Add individually",
+    "confirmDeactivate": "Deactivate this group?",
+    "confirmActivate": "Reactivate this group?",
+    "activated": "Group reactivated",
+    "deactivated": "Group deactivated",
+    "actions": {
+      "rename": "Rename",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "delete": "Delete"
+    },
+    "bulk": {
+      "club_members": "All club members",
+      "club_staff": "All staff",
+      "club_admins": "Administrators",
+      "club_educators": "All coaches",
+      "club_tournament_managers": "Tournament managers",
+      "team_players": "Players of a team",
+      "team_parents": "Parents of a team",
+      "team_educators": "Coaches of a team",
+      "category_educators": "Coaches of a category"
+    },
+    "bulkPickKind": "Choose a type…",
+    "bulkPickParam": "Choose…"
   },
   "install": {
     "meta": {
@@ -2375,5 +2453,10 @@
     "androidStep2": "Choose \"Install app\" (or \"Add to Home screen\").",
     "androidStep3": "Confirm: the Clubero icon appears on your home screen.",
     "ctaHint": "On Android, this button installs Clubero directly. On iPhone, follow the Safari steps below."
+  },
+  "person": {
+    "playerSubline": "Player · {{category}}",
+    "playerSublineMulti": "Player · {{categories}}",
+    "parentSubline": "Parent of {{children}}"
   }
 }

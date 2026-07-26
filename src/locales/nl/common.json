@@ -267,7 +267,11 @@
     "clear": "Wissen",
     "listen": "Luisteren",
     "stop": "Stoppen",
-    "errorOccurred": "Er is een fout opgetreden"
+    "errorOccurred": "Er is een fout opgetreden",
+    "unknown": "Geen naam",
+    "deselectAll": "Alles deselecteren",
+    "actions": "Acties",
+    "add": "Toevoegen"
   },
   "notFound": {
     "code": "404",
@@ -636,6 +640,8 @@
     "respondBoth": "Beide",
     "accountActive": "Account actief",
     "accountInactive": "Geen account",
+    "accountUnconfirmed": "E-mail niet bevestigd",
+    "accountUnconfirmedHint": "Het account bestaat, maar de e-mail is nog niet bevestigd. De ouder moet op de bevestigingslink in de e-mail klikken.",
     "inviteNotSent": "Uitnodiging niet verzonden",
     "inviteSentLabel": "Uitnodiging verzonden",
     "inviteSentAction": "Uitnodigen",
@@ -696,7 +702,8 @@
       "done": "{{inserted}} speler(s) geïmporteerd",
       "failed": "{{failed}} regel(s) met fouten"
     },
-    "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig."
+    "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig.",
+    "parentActivationPending": "Wacht op activering van ouderaccount"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -741,6 +748,7 @@
     "published": "Evenement gepubliceerd",
     "sendConvocations": "Uitnodigingen versturen",
     "convocationsSent": "Uitnodigingen verstuurd",
+    "convocationsSentShort": "Oproep verstuurd",
     "noEvents": "Geen evenementen gepland.",
     "searchPlaceholder": "Zoek een evenement…",
     "noSearchResults": "Geen resultaten",
@@ -950,7 +958,8 @@
     "pendingCount_one": "{{count}} Speler heeft nog niet geantwoord",
     "pendingCount_other": "{{count}} Spelers hebben nog niet geantwoord",
     "remindAllSent_one": "{{count}} herinnering verzonden",
-    "remindAllSent_other": "{{count}} herinneringen verzonden"
+    "remindAllSent_other": "{{count}} herinneringen verzonden",
+    "errorPastEventLocked": "Dit evenement is voorbij — antwoorden kunnen niet meer worden gewijzigd."
   },
   "stats": {
     "title": "Statistieken",
@@ -1267,7 +1276,16 @@
       "plusOthers": "{{first}} + {{n}} andere"
     },
     "audienceTo": "Aan:",
-    "audienceRequired": "Kies minstens één team."
+    "audienceRequired": "Kies minstens één team.",
+    "compose": {
+      "targetGroup": "Groep(en)",
+      "alsoEmail": "Stuur ook een kopie per e-mail",
+      "newPoll": "Nieuwe peiling"
+    },
+    "email": {
+      "subject": "Nieuw bericht van {{club}}",
+      "viewOnWall": "Bekijk op het prikbord"
+    }
   },
   "chat": {
     "title": "Evenementchat",
@@ -1275,7 +1293,9 @@
     "placeholder": "Bericht typen…",
     "disabled": "De chat is uitgeschakeld voor dit evenement.",
     "you": "Jij",
-    "loadMore": "Meer laden"
+    "loadMore": "Meer laden",
+    "noAccess": "De chat van dit evenement is alleen voor staf. Vraag je club om deze open te stellen voor ouders of spelers.",
+    "sendFailed": "Bericht niet verzonden: je hebt geen toegang tot deze chat."
   },
   "assistant": {
     "title": "Clubero Assistent",
@@ -1759,11 +1779,6 @@
       "description": "We helpen je om je Club, je Teams en je gegevens in enkele dagen naar Clubero te migreren. Persoonlijke begeleiding, Excel-import en bestaande tools.",
       "ogDescription": "Stap eenvoudig over naar Clubero. Wij migreren je Club voor je."
     },
-    "parentGuide": {
-      "title": "Oudergids — aan de slag met Clubero",
-      "description": "Stapsgewijze tutorials voor ouders: reageren op een oproep, een afwezigheid melden, toestemming geven, meldingen instellen en de gezinskalender volgen.",
-      "ogDescription": "Oproepen, afwezigheden, meldingen: de oudergids om te starten met Clubero."
-    },
     "tournamentsPage": {
       "title": "Toernooien — Live uitslagen, openbare standen, TV-modus | Clubero",
       "description": "Organiseer moderne Toernooien met live uitslagen, openbare standen, mobiele Scheidsrechter-modus en TV-modus. Bedoeld voor organisatoren, Spelers, Ouders en fans.",
@@ -1772,6 +1787,11 @@
     "adminVenues": {
       "title": "Locaties en velden – Clubero",
       "description": "Configureer locaties en velden van je club."
+    },
+    "parentGuide": {
+      "title": "Oudergids — aan de slag met Clubero",
+      "description": "Stapsgewijze tutorials voor ouders: reageren op een oproep, een afwezigheid melden, toestemming geven, meldingen instellen en de gezinskalender volgen.",
+      "ogDescription": "Oproepen, afwezigheden, meldingen: de oudergids om te starten met Clubero."
     }
   },
   "trial": {
@@ -1830,8 +1850,8 @@
     "toggleTitle": "Meerijden",
     "toggleOn": "Geactiveerd voor dit evenement",
     "toggleOff": "Gedeactiveerd voor dit evenement",
-    "enable": "Activeren",
-    "disable": "Deactiveren",
+    "enable": "Inschakelen",
+    "disable": "Uitschakelen",
     "seats": "Beschikbare plaatsen",
     "note": "Notitie (vertreklocatie, tijd...)",
     "edit": "Bewerken",
@@ -1843,7 +1863,12 @@
     "confirm": "Bevestigen",
     "noDriversYet": "Nog geen chauffeur.",
     "iNeedRide": "Vervoer aanvragen",
-    "needRideRegistered": "Aanvraag naar de Coach gestuurd"
+    "needRideRegistered": "Aanvraag naar de Coach gestuurd",
+    "disabledHint": "Schakel meerijden in zodat ouders plaatsen kunnen aanbieden en reserveren.",
+    "needsTitle": "Vervoersaanvragen",
+    "cancelNeed": "Mijn aanvraag intrekken",
+    "noNeeds": "Geen vervoersaanvragen.",
+    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden."
   },
   "journey": {
     "tab": {
@@ -2184,6 +2209,10 @@
       "checkFailed": "Kan meldingen niet controleren"
     },
     "partialError": "Sommige bronnen zijn niet beschikbaar, de lijst kan onvolledig zijn.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Reageren",
       "open": "Openen"
@@ -2328,7 +2357,56 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Er bestaat al een groep met deze naam."
+    },
+    "personsToday_one": "{{count}} persoon vandaag",
+    "personsToday_other": "{{count}} personen vandaag",
+    "dynamicSubgroups": "Subgroepen",
+    "dynamicBadge": "DYNAMISCH",
+    "noSubgroups": "Geen subgroep. De samenstelling wordt automatisch bijgewerkt.",
+    "addSubgroup": "Toevoegen",
+    "subgroupAdded": "Subgroep toegevoegd",
+    "subgroupRemoved": "Subgroep verwijderd",
+    "subgroupRemove": "Verwijderen",
+    "subgroupPreview": "Leden bekijken",
+    "subgroupPreviewDescription": "Nu opgeloste lijst. De samenstelling wordt automatisch bijgewerkt.",
+    "subgroupPreviewEmpty": "Geen opgelost lid.",
+    "subgroupPreviewCount_one": "{{count}} lid",
+    "subgroupPreviewCount_other": "{{count}} leden",
+    "pickAudienceKind": "Kies een doelgroep…",
+    "pickAudienceParam": "Kies…",
+    "selectedAudiencesTitle": "Geselecteerde doelgroepen",
+    "selectedAudiencesEmpty": "Geen doelgroep geselecteerd. Voeg er hieronder een toe.",
+    "otherAudiences": "Andere doelgroepen",
+    "parentOf": "Ouder van {{names}}",
+    "emailOnly": "alleen e-mail",
+    "individualMembers": "Individuele leden",
+    "addIndividual": "Individueel toevoegen",
+    "confirmDeactivate": "Deze groep deactiveren?",
+    "confirmActivate": "Deze groep reactiveren?",
+    "activated": "Groep gereactiveerd",
+    "deactivated": "Groep gedeactiveerd",
+    "actions": {
+      "rename": "Hernoemen",
+      "deactivate": "Deactiveren",
+      "activate": "Reactiveren",
+      "delete": "Verwijderen"
+    },
+    "bulk": {
+      "club_members": "Alle clubleden",
+      "club_staff": "Alle staf",
+      "club_admins": "Beheerders",
+      "club_educators": "Alle trainers",
+      "club_tournament_managers": "Toernooiverantwoordelijken",
+      "team_players": "Spelers van een team",
+      "team_parents": "Ouders van een team",
+      "team_educators": "Trainers van een team",
+      "category_educators": "Trainers van een categorie"
+    },
+    "bulkPickKind": "Kies een type…",
+    "bulkPickParam": "Kies…"
   },
   "install": {
     "meta": {
@@ -2375,5 +2453,10 @@
     "androidStep2": "Kies «App installeren» (of «Toevoegen aan startscherm»).",
     "androidStep3": "Bevestig: het Clubero-pictogram verschijnt op je startscherm.",
     "ctaHint": "Op Android start deze knop de installatie meteen. Op iPhone volg je de Safari-stappen hieronder."
+  },
+  "person": {
+    "playerSubline": "Speler · {{category}}",
+    "playerSublineMulti": "Speler · {{categories}}",
+    "parentSubline": "Ouder van {{children}}"
   }
 }

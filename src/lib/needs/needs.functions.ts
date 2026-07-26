@@ -20,6 +20,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { AudienceSpecSchema } from "@/modules/groups/groups.functions";
 import { findNeedTemplate } from "./templates";
+import { projectConfirmedSignups } from "./confirmed-signups-visibility";
 
 /* ------------------------------------------------------------------------ */
 /* Schemas                                                                  */
@@ -46,6 +47,17 @@ const UpdateNeedInput = z.object({
 const PublishInput = z.object({
   need_id: z.string().uuid(),
   audiences: AudienceSpecSchema,
+});
+
+const RepublishInput = z.object({
+  need_id: z.string().uuid(),
+  audiences: AudienceSpecSchema,
+  // "delta"  : notify only user_ids not present in any prior publication
+  //            → intent "Modifier les destinataires" (correct an audience mistake
+  //            without re-spamming those already reached).
+  // "resend" : notify the full new snapshot (may re-notify prior recipients)
+  //            → intent "Relancer" (nudge everyone again).
+  mode: z.enum(["delta", "resend"]).default("resend"),
 });
 
 const ApplyInput = z.object({
@@ -241,7 +253,7 @@ export const deleteEventNeed = createServerFn({ method: "POST" })
 
 export const republishEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => PublishInput.parse(input))
+  .inputValidator((input) => RepublishInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -272,13 +284,31 @@ export const republishEventNeed = createServerFn({ method: "POST" })
     } | null;
     if (!row) throw new Error("republish_failed");
 
-    if (!row.was_idempotent_skip && (row.recipient_user_ids?.length ?? 0) > 0) {
+    // Décide qui recevra vraiment la notification :
+    //  - "delta"  → only user_ids never notified in a prior publication of this need
+    //  - "resend" → the full new snapshot (may re-notify prior recipients)
+    let toNotify: string[] = row.recipient_user_ids ?? [];
+    if (!row.was_idempotent_skip && data.mode === "delta" && toNotify.length > 0) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: prior } = await supabaseAdmin
+        .from("event_need_publication_recipients")
+        .select("user_id, publication_id, event_need_publications!inner(need_id)")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq("event_need_publications.need_id" as any, data.need_id)
+        .neq("publication_id", row.publication_id);
+      const alreadyNotified = new Set(
+        (prior ?? []).map((r: { user_id: string | null }) => r.user_id).filter(Boolean) as string[],
+      );
+      toNotify = toNotify.filter((uid) => !alreadyNotified.has(uid));
+    }
+
+    if (!row.was_idempotent_skip && toNotify.length > 0) {
       const { dispatchEventNeedPublication } = await import("./dispatch.server");
       try {
         await dispatchEventNeedPublication({
           needId: data.need_id,
           publicationId: row.publication_id,
-          recipientUserIds: row.recipient_user_ids ?? [],
+          recipientUserIds: toNotify,
         });
       } catch (e) {
         console.error("[republishEventNeed] dispatch failed", e);
@@ -289,8 +319,10 @@ export const republishEventNeed = createServerFn({ method: "POST" })
     return {
       publication_id: row.publication_id,
       recipients_count: row.recipients_count,
+      notified_count: toNotify.length,
       status: row.status,
       was_idempotent_skip: row.was_idempotent_skip,
+      mode: data.mode,
     };
   });
 
@@ -391,13 +423,23 @@ export const applyToEventNeed = createServerFn({ method: "POST" })
     // terminaison prématurée du Worker (les promesses orphelines peuvent être
     // tuées quand la réponse part). Erreur non bloquante pour l'apply.
     try {
-      const { notifyStaffOfSignup } = await import("./dispatch.server");
+      const { notifyStaffOfSignup, notifyApplicantOfDecision } = await import("./dispatch.server");
       await notifyStaffOfSignup({
         needId: data.need_id,
         signupId: row.signup_id,
         status: row.status,
         applicantUserId: userId,
       });
+      // Auto-confirmed apply → confirm the applicant too (push + email).
+      // Sans ça, l'utilisateur ne reçoit aucun accusé de son inscription.
+      if (row.auto_confirmed) {
+        await notifyApplicantOfDecision({
+          needId: data.need_id,
+          signupId: row.signup_id,
+          decision: "confirm",
+          applicantUserId: userId,
+        });
+      }
     } catch (e) {
       console.error("[applyToEventNeed] notify failed", e);
     }
@@ -554,6 +596,34 @@ export const closeEventNeed = createServerFn({ method: "POST" })
     }
 
     return { ok: true, declined_count: pendingApplied?.length ?? 0 };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 6bis. reopenEventNeed — rouvre un besoin fermé (sans cascade decline)     */
+/* ------------------------------------------------------------------------ */
+
+export const reopenEventNeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => NeedIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+    if (need.status !== "closed") throw new Error("need_not_closed");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("event_needs")
+      .update({ status: "open" })
+      .eq("id", data.need_id);
+    if (error) throw new Error(error.message);
+
+    await recomputeCoverageServiceRole(need.event_id);
+    return { ok: true };
   });
 
 export const cancelEventNeed = createServerFn({ method: "POST" })
@@ -730,9 +800,19 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       }
     }
 
-    // Résoudre les noms des confirmés (pour afficher qui a été accepté).
-    const allConfirmedUserIds = Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()));
+    // Staff view ? (déterminé tôt : gate la résolution des noms de confirmés)
+    const clubId = rows[0]?.club_id;
+    const { data: isStaff } = clubId
+      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
+      : { data: false };
+
+    // Résoudre les noms des confirmés — STAFF UNIQUEMENT (invariant 2 : les
+    // membres ne doivent pas voir les noms des autres volontaires).
+    const allConfirmedUserIds = isStaff
+      ? Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()))
+      : [];
     const nameByUser: Record<string, string | null> = {};
+    let contextByUser: Map<string, import("./member-context").MemberContext> | undefined;
     if (allConfirmedUserIds.length > 0) {
       const { data: profs } = await supabaseAdmin
         .from("profiles")
@@ -741,6 +821,24 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       for (const p of profs ?? []) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+      }
+      // Enrichissement rôle + catégorie (staff-only).
+      if (clubId) {
+        const { data: cm } = await supabaseAdmin
+          .from("club_members")
+          .select("user_id, roles, role")
+          .eq("club_id", clubId)
+          .in("user_id", allConfirmedUserIds);
+        const { buildMemberContextByUser } = await import("./member-context.server");
+        contextByUser = await buildMemberContextByUser(
+          supabaseAdmin,
+          clubId,
+          (cm ?? []).map((m) => ({
+            user_id: (m as { user_id: string | null }).user_id ?? null,
+            roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+            role: (m as unknown as { role: string | null }).role ?? null,
+          })),
+        );
       }
     }
 
@@ -774,12 +872,6 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     const mySignupByNeed: Record<string, MySignup> = {};
     for (const s of (mySignups ?? []) as MySignup[]) mySignupByNeed[s.need_id] = s;
 
-    // Staff view ?
-    const clubId = rows[0]?.club_id;
-    const { data: isStaff } = clubId
-      ? await supabase.rpc("is_club_staff", { _user_id: userId, _club_id: clubId })
-      : { data: false };
-
     // Dernière publication par besoin (recipients_count + published_at).
     const { data: pubs } = await supabaseAdmin
       .from("event_need_publications")
@@ -802,10 +894,12 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       needs: rows.map((n) => ({
         ...n,
         confirmed_count: confirmedByNeed[n.id] ?? 0,
-        confirmed_signups: (confirmedUserIdsByNeed[n.id] ?? []).map((uid) => ({
-          user_id: uid,
-          full_name: nameByUser[uid] ?? null,
-        })),
+        confirmed_signups: projectConfirmedSignups(
+          Boolean(isStaff),
+          confirmedUserIdsByNeed[n.id] ?? [],
+          nameByUser,
+          contextByUser,
+        ),
         applied_count: appliedByNeed[n.id] ?? 0,
         remaining_seats: Math.max(n.capacity - (confirmedByNeed[n.id] ?? 0), 0),
         my_signup: (mySignupByNeed[n.id] ?? null) as MySignup | null,
@@ -860,17 +954,35 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
 
     // Rôles club pour chaque candidat.
     const rolesByUser: Record<string, string[]> = {};
+    const memberRowsForCtx: Array<{
+      user_id: string | null;
+      roles: string[] | null;
+      role: string | null;
+    }> = [];
     if (userIds.length > 0) {
       const { data: memberRows } = await supabaseAdmin
         .from("club_members")
-        .select("user_id, roles")
+        .select("user_id, roles, role")
         .eq("club_id", need.club_id)
         .in("user_id", userIds);
       for (const m of memberRows ?? []) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         rolesByUser[m.user_id] = ((m as any).roles as string[] | null) ?? [];
+        memberRowsForCtx.push({
+          user_id: (m as { user_id: string | null }).user_id ?? null,
+          roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+          role: (m as unknown as { role: string | null }).role ?? null,
+        });
       }
     }
+
+    // Contexte joueur (catégorie) / parent (enfants) — pour subline.
+    const { buildMemberContextByUser } = await import("./member-context.server");
+    const contextByUser = await buildMemberContextByUser(
+      supabaseAdmin,
+      need.club_id,
+      memberRowsForCtx,
+    );
 
     // Licence + date de naissance (via players.user_id).
     const licenseByUser: Record<string, string | null> = {};
@@ -916,6 +1028,7 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
           roles: (s.user_id && rolesByUser[s.user_id]) || [],
           license_number: (s.user_id && licenseByUser[s.user_id]) || null,
           is_minor: isMinor(dob),
+          context: (s.user_id && contextByUser.get(s.user_id)) || null,
         };
       }),
     };
@@ -987,6 +1100,7 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
         .from("teams")
         .select("id, name, age_group")
         .eq("club_id", need.club_id)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name", { ascending: true }),
       supabaseAdmin
@@ -1053,6 +1167,7 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
         .from("teams")
         .select("id, name, age_group")
         .eq("club_id", clubId)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name", { ascending: true }),
       supabaseAdmin
@@ -1167,6 +1282,7 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
     if (!isStaff) throw new Error("forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { buildMemberContextByUser } = await import("./member-context.server");
 
     // Exclude members already signed up (any active status).
     const { data: existing } = await supabaseAdmin
@@ -1181,12 +1297,13 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
 
     const { data: members, error } = await supabaseAdmin
       .from("club_members")
-      .select("id, user_id, roles")
+      .select("id, user_id, roles, role")
       .eq("club_id", need.club_id)
       .limit(500);
     if (error) throw new Error(error.message);
 
-    const userIds = (members ?? []).map((m) => m.user_id).filter(Boolean);
+    const rawMembers = (members ?? []).filter((m) => !excludedMemberIds.has(m.id));
+    const userIds = rawMembers.map((m) => m.user_id).filter(Boolean);
     const { data: profs } = userIds.length
       ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
       : { data: [] as { id: string; full_name: string | null }[] };
@@ -1196,18 +1313,222 @@ export const searchClubMembersForNeed = createServerFn({ method: "POST" })
       nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
     }
 
+    const ctxMap = await buildMemberContextByUser(
+      supabaseAdmin,
+      need.club_id,
+      rawMembers.map((m) => ({
+        user_id: (m.user_id as string) ?? null,
+        roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+        role: (m as unknown as { role: string | null }).role ?? null,
+      })),
+    );
+
     const q = (data.search ?? "").toLowerCase().trim();
-    const rows = (members ?? [])
-      .filter((m) => !excludedMemberIds.has(m.id))
-      .map((m) => ({
-        member_id: m.id as string,
-        user_id: m.user_id as string,
-        full_name: nameByUser[m.user_id] ?? null,
-        roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
-      }))
+    const rows = rawMembers
+      .map((m) => {
+        const uid = m.user_id as string;
+        const ctx = ctxMap.get(uid) ?? null;
+        return {
+          member_id: m.id as string,
+          user_id: uid,
+          full_name: nameByUser[uid] ?? null,
+          roles: ((m as unknown as { roles: string[] }).roles ?? []) as string[],
+          primary_role: ctx?.primary_role ?? null,
+          player_category: ctx?.player_category ?? null,
+          player_categories: ctx?.player_categories ?? [],
+          children: ctx?.children ?? [],
+          coached_teams: ctx?.coached_teams ?? [],
+          context: ctx,
+        };
+      })
       .filter((r) => (q ? (r.full_name ?? "").toLowerCase().includes(q) : true))
       .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""))
       .slice(0, 30);
+
+    return { members: rows };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 12quater-bis. searchClubMembersForAssignment — pré-assignation (avant   */
+/* création du need). Basé sur club_id, exclut des user_ids si demandé.    */
+/* ------------------------------------------------------------------------ */
+
+export const searchClubMembersForAssignment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        search: z.string().trim().max(80).optional(),
+        exclude_user_ids: z.array(z.string().uuid()).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: data.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { buildMemberContextByUser } = await import("./member-context.server");
+
+    const { data: members, error } = await supabaseAdmin
+      .from("club_members")
+      .select("id, user_id, roles, role")
+      .eq("club_id", data.club_id)
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const excluded = new Set(data.exclude_user_ids ?? []);
+    const rawMembers = (members ?? []).filter(
+      (m) => m.user_id && !excluded.has(m.user_id as string),
+    );
+    const userIds = rawMembers.map((m) => m.user_id as string);
+
+    const { data: profs } = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+    const nameByUser: Record<string, string | null> = {};
+    for (const p of profs ?? []) {
+      nameByUser[(p as { id: string }).id] =
+        ((p as { full_name: string | null }).full_name as string | null) ?? null;
+    }
+
+    const ctxMap = await buildMemberContextByUser(
+      supabaseAdmin,
+      data.club_id,
+      rawMembers.map((m) => ({
+        user_id: (m.user_id as string) ?? null,
+        roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+        role: (m as unknown as { role: string | null }).role ?? null,
+      })),
+    );
+
+    const q = (data.search ?? "").toLowerCase().trim();
+    const rows = rawMembers
+      .map((m) => {
+        const uid = m.user_id as string;
+        const ctx = ctxMap.get(uid) ?? null;
+        const uniqRoles = Array.from(
+          new Set(
+            [
+              ...(((m as unknown as { roles: string[] | null }).roles ?? []) as string[]),
+              ...((m as unknown as { role: string | null }).role
+                ? [(m as unknown as { role: string }).role]
+                : []),
+            ].filter(Boolean),
+          ),
+        );
+        return {
+          member_id: m.id as string,
+          user_id: uid,
+          full_name: nameByUser[uid] ?? null,
+          roles: uniqRoles,
+          primary_role: ctx?.primary_role ?? null,
+          player_category: ctx?.player_category ?? null,
+          player_categories: ctx?.player_categories ?? [],
+          children: ctx?.children ?? [],
+          coached_teams: ctx?.coached_teams ?? [],
+          context: ctx,
+        };
+      })
+      .filter((r) => (q ? (r.full_name ?? "").toLowerCase().includes(q) : true))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""))
+      .slice(0, 30);
+
+    return { members: rows };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 12sexies. listClubMembersWithContext — liste enrichie pour /admin/groups */
+/* ------------------------------------------------------------------------ */
+
+export const listClubMembersWithContext = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: data.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { buildMemberContextByUser } = await import("./member-context.server");
+
+    const { data: members, error } = await supabaseAdmin
+      .from("club_members")
+      .select("id, user_id, roles, role")
+      .eq("club_id", data.club_id);
+    if (error) throw new Error(error.message);
+
+    const rawMembers = (members ?? []).filter((m) => m.user_id);
+    const userIds = rawMembers.map((m) => m.user_id as string);
+
+    const { data: profs } = userIds.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, first_name, last_name")
+          .in("id", userIds)
+      : {
+          data: [] as Array<{
+            id: string;
+            full_name: string | null;
+            first_name: string | null;
+            last_name: string | null;
+          }>,
+        };
+    const profileById = new Map(
+      (profs ?? []).map((p) => [
+        (p as { id: string }).id,
+        p as {
+          id: string;
+          full_name: string | null;
+          first_name: string | null;
+          last_name: string | null;
+        },
+      ]),
+    );
+
+    const ctxMap = await buildMemberContextByUser(
+      supabaseAdmin,
+      data.club_id,
+      rawMembers.map((m) => ({
+        user_id: (m.user_id as string) ?? null,
+        roles: (m as unknown as { roles: string[] | null }).roles ?? null,
+        role: (m as unknown as { role: string | null }).role ?? null,
+      })),
+    );
+
+    const rows = rawMembers.map((m) => {
+      const uid = m.user_id as string;
+      const p = profileById.get(uid);
+      const ctx = ctxMap.get(uid) ?? null;
+      const rolesArr = Array.from(
+        new Set(
+          [
+            ...(((m as unknown as { roles: string[] | null }).roles ?? []) as string[]),
+            ...((m as unknown as { role: string | null }).role
+              ? [(m as unknown as { role: string }).role]
+              : []),
+          ].filter(Boolean),
+        ),
+      );
+      return {
+        id: m.id as string,
+        user_id: uid,
+        role: (m as unknown as { role: string | null }).role ?? null,
+        roles: rolesArr,
+        full_name: p?.full_name ?? null,
+        first_name: p?.first_name ?? null,
+        last_name: p?.last_name ?? null,
+        context: ctx,
+      };
+    });
 
     return { members: rows };
   });
@@ -1267,6 +1588,7 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const nowIso = new Date().toISOString();
+    let signupId: string | null = null;
     if (existing) {
       if (existing.status === "confirmed") return { ok: true, already: true };
       const { error: upErr } = await supabaseAdmin
@@ -1280,20 +1602,138 @@ export const staffAddManualSignup = createServerFn({ method: "POST" })
         })
         .eq("id", existing.id);
       if (upErr) throw new Error(upErr.message);
+      signupId = existing.id;
     } else {
-      const { error: insErr } = await supabaseAdmin.from("event_need_signups").insert({
-        need_id: data.need_id,
-        member_id: member.id,
-        user_id: data.user_id,
-        status: "confirmed",
-        confirmed_at: nowIso,
-        decided_by: userId,
-      });
+      const { data: inserted, error: insErr } = await supabaseAdmin
+        .from("event_need_signups")
+        .insert({
+          need_id: data.need_id,
+          member_id: member.id,
+          user_id: data.user_id,
+          status: "confirmed",
+          confirmed_at: nowIso,
+          decided_by: userId,
+        })
+        .select("id")
+        .single();
       if (insErr) throw new Error(insErr.message);
+      signupId = inserted?.id ?? null;
     }
 
     await recomputeCoverageServiceRole(need.event_id);
+
+    // Notifier la personne assignée manuellement : même parcours que la
+    // confirmation d'une candidature (push + email "confirm").
+    if (signupId) {
+      try {
+        const { notifyApplicantOfDecision } = await import("./dispatch.server");
+        await notifyApplicantOfDecision({
+          needId: data.need_id,
+          signupId,
+          decision: "confirm",
+          applicantUserId: data.user_id,
+        });
+      } catch (e) {
+        console.error("[staffAddManualSignup] notify failed", e);
+      }
+    }
+
     return { ok: true, already: false };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 9c. staffUnassignSignup — staff retire une candidature confirmée         */
+/* ------------------------------------------------------------------------ */
+
+// Exported for unit testing — pure orchestration around injected deps.
+// The real server-fn handler wires supabase/admin/dispatch below.
+export async function _staffUnassignSignupImpl(deps: {
+  signupId: string;
+  actorUserId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabaseAdmin: any;
+  recomputeCoverage: (eventId: string) => Promise<unknown>;
+  notify: (params: {
+    needId: string;
+    signupId: string;
+    decision: "unassign";
+    applicantUserId: string;
+  }) => Promise<void>;
+  now?: () => string;
+}) {
+  const now = deps.now ?? (() => new Date().toISOString());
+  const { data: signup, error: sErr } = await deps.supabaseAdmin
+    .from("event_need_signups")
+    .select("id, need_id, user_id, status, event_needs:need_id(club_id, event_id)")
+    .eq("id", deps.signupId)
+    .maybeSingle();
+  if (sErr) throw new Error(sErr.message);
+  if (!signup) throw new Error("signup_not_found");
+
+  const clubId = signup.event_needs?.club_id ?? null;
+  const eventId = signup.event_needs?.event_id ?? null;
+  if (!clubId) throw new Error("club_not_found");
+
+  const { data: isStaff } = await deps.supabase.rpc("is_club_staff", {
+    _user_id: deps.actorUserId,
+    _club_id: clubId,
+  });
+  if (!isStaff) throw new Error("forbidden");
+
+  if (signup.status !== "confirmed") return { ok: true, already: true };
+
+  // Le retrait par le staff = decline serveur (maquette S4-2), pas withdraw.
+  // withdrawn = « s'est désisté soi-même » ; ici c'est le staff qui retire.
+  // decided_by porte l'ID du staff pour tracer qui a fait quoi.
+  const { error: upErr } = await deps.supabaseAdmin
+    .from("event_need_signups")
+    .update({
+      status: "declined",
+      declined_at: now(),
+      confirmed_at: null,
+      withdrawn_at: null,
+      decided_by: deps.actorUserId,
+    })
+    .eq("id", deps.signupId);
+  if (upErr) throw new Error(upErr.message);
+
+  if (eventId) await deps.recomputeCoverage(eventId);
+
+  // Notification obligatoire au retiré (push + email). Sans ça la personne
+  // se présente au match. Routage mineur → parent via le pipeline habituel.
+  if (signup.user_id) {
+    try {
+      await deps.notify({
+        needId: signup.need_id,
+        signupId: signup.id,
+        decision: "unassign",
+        applicantUserId: signup.user_id,
+      });
+    } catch (e) {
+      console.error("[staffUnassignSignup] notify failed", e);
+    }
+  }
+
+  return { ok: true, already: false };
+}
+
+export const staffUnassignSignup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ signup_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { notifyApplicantOfDecision } = await import("./dispatch.server");
+    return _staffUnassignSignupImpl({
+      signupId: data.signup_id,
+      actorUserId: userId,
+      supabase,
+      supabaseAdmin,
+      recomputeCoverage: recomputeCoverageServiceRole,
+      notify: notifyApplicantOfDecision,
+    });
   });
 
 /* ------------------------------------------------------------------------ */
@@ -1311,7 +1751,7 @@ export const listMyOpenNeeds = createServerFn({ method: "POST" })
     const { data: needs, error } = await supabase
       .from("event_needs")
       .select(
-        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, events:event_id(id, title, starts_at, location, type)",
+        "id, event_id, club_id, team_id, role_key, label, description, capacity, validation_mode, status, last_published_at, updated_at, events:event_id(id, title, starts_at, location, type)",
       )
       .eq("status", "open")
       .order("last_published_at", { ascending: false })
@@ -1347,4 +1787,75 @@ export const listMyOpenNeeds = createServerFn({ method: "POST" })
         my_signup: mySignupByNeed[n.id] ?? null,
       })),
     };
+  });
+
+/* ------------------------------------------------------------------------ */
+/* 14. listNeedRecipients — staff: everyone notified for a given need       */
+/* ------------------------------------------------------------------------ */
+
+export const listNeedRecipients = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ need_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const need = await loadNeedCore(data.need_id);
+    const { data: isStaff } = await supabase.rpc("is_club_staff", {
+      _user_id: userId,
+      _club_id: need.club_id,
+    });
+    if (!isStaff) throw new Error("forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Union of every user_id ever notified across all publications of this need.
+    const { data: pubRows } = await supabaseAdmin
+      .from("event_need_publication_recipients")
+      .select("user_id, publication_id, event_need_publications!inner(need_id, published_at)")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq("event_need_publications.need_id" as any, data.need_id);
+
+    const uniqUserIds = Array.from(
+      new Set(
+        (pubRows ?? [])
+          .map((r: { user_id: string | null }) => r.user_id)
+          .filter(Boolean) as string[],
+      ),
+    );
+
+    if (uniqUserIds.length === 0) {
+      return {
+        recipients: [] as Array<{ user_id: string; full_name: string | null; roles: string[] }>,
+      };
+    }
+
+    const [{ data: profs }, { data: members }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id, full_name").in("id", uniqUserIds),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id, roles")
+        .eq("club_id", need.club_id)
+        .in("user_id", uniqUserIds),
+    ]);
+
+    const nameByUser: Record<string, string | null> = {};
+    for (const p of profs ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      nameByUser[(p as any).id] = ((p as any).full_name as string | null) ?? null;
+    }
+    const rolesByUser: Record<string, string[]> = {};
+    for (const m of members ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mm = m as any;
+      if (mm.user_id) rolesByUser[mm.user_id as string] = (mm.roles as string[]) ?? [];
+    }
+
+    const recipients = uniqUserIds
+      .map((uid) => ({
+        user_id: uid,
+        full_name: nameByUser[uid] ?? null,
+        roles: rolesByUser[uid] ?? [],
+      }))
+      .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
+
+    return { recipients };
   });

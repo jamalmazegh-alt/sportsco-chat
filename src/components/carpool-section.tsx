@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { notifyCoachesOfCarpoolNeed } from "@/lib/carpool-notify.functions";
 import { useTranslation } from "react-i18next";
 import { Car, Users, Plus, Trash2, Loader2, HandHelping } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,9 +57,18 @@ interface Props {
   isCoach: boolean;
   convocations: Convocation[];
   childrenLinks: string[]; // player_ids the current user is parent of
+  carpoolEnabled: boolean;
+  onToggleEnabled?: () => void | Promise<void>;
 }
 
-export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }: Props) {
+export function CarpoolSection({
+  eventId,
+  isCoach,
+  convocations,
+  childrenLinks,
+  carpoolEnabled,
+  onToggleEnabled,
+}: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -75,16 +86,16 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
     },
   });
 
+  const carpoolIds = useMemo(() => carpools.map((c) => c.id).sort(), [carpools]);
+
   const { data: passengers = [] } = useQuery({
-    queryKey: ["carpool-passengers", eventId],
-    enabled: carpools.length >= 0,
+    queryKey: ["carpool-passengers", eventId, carpoolIds],
     queryFn: async () => {
-      const ids = carpools.map((c) => c.id);
-      if (ids.length === 0) return [] as Passenger[];
+      if (carpoolIds.length === 0) return [] as Passenger[];
       const { data, error } = await supabase
         .from("carpool_passengers")
         .select("*")
-        .in("carpool_id", ids);
+        .in("carpool_id", carpoolIds);
       if (error) throw error;
       return (data ?? []) as Passenger[];
     },
@@ -190,183 +201,269 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
     [myChildConvocations],
   );
 
+  const canParticipate = isCoach || bookableConvocations.length > 0;
+
   const [offerOpen, setOfferOpen] = useState(false);
   const [reserveCarpool, setReserveCarpool] = useState<Carpool | null>(null);
   const [needOpen, setNeedOpen] = useState(false);
 
-  const canParticipate = isCoach || bookableConvocations.length > 0;
-
   return (
     <>
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-          <Car className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold text-sm">{t("carpool.tab")}</h3>
-        </div>
-
-        <div className="p-4 space-y-3">
-          <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
-            {t("carpool.disclaimer")}
-          </p>
-
-          {isCoach && total > 0 && (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">
-                  {t("carpool.coverage", { n: covered, total })}
-                </span>
-                <span className="font-semibold tabular-nums">{pct}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className={cn("h-full transition-all", coverageColor)}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              {withoutTransport.length > 0 && (
-                <p className="text-xs text-muted-foreground pt-1">
-                  <span className="font-medium text-foreground">{t("carpool.noTransport")} :</span>{" "}
-                  {withoutTransport
-                    .map(
-                      (c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`,
-                    )
-                    .join(", ")}
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <Car className="h-4 w-4 text-primary shrink-0" />
+            <div className="min-w-0">
+              <h3 className="font-semibold text-sm leading-tight">{t("carpool.tab")}</h3>
+              {isCoach && (
+                <p className="text-[11px] text-muted-foreground leading-tight">
+                  {carpoolEnabled
+                    ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
+                    : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
                 </p>
               )}
             </div>
+          </div>
+          {isCoach && onToggleEnabled && (
+            <Button
+              size="sm"
+              variant={carpoolEnabled ? "outline" : "default"}
+              onClick={() => onToggleEnabled()}
+              className="shrink-0"
+            >
+              {carpoolEnabled
+                ? t("carpool.disable" as any) || "Désactiver"
+                : t("carpool.enable" as any) || "Activer"}
+            </Button>
           )}
+        </div>
 
-          {/* Drivers list */}
-          <div className="space-y-2">
-            {carpools.length === 0 && (
-              <p className="text-xs text-muted-foreground italic">{t("carpool.noDriversYet")}</p>
+        {!carpoolEnabled ? (
+          <div className="p-4">
+            <p className="text-xs text-muted-foreground italic">
+              {t("carpool.disabledHint" as any) ||
+                "Activez le covoiturage pour permettre aux parents de proposer et réserver des places."}
+            </p>
+          </div>
+        ) : (
+          <div className="p-4 space-y-3">
+            <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
+              {t("carpool.disclaimer")}
+            </p>
+
+            {isCoach && total > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">
+                    {t("carpool.coverage", { n: covered, total })}
+                  </span>
+                  <span className="font-semibold tabular-nums">{pct}%</span>
+                </div>
+
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={cn("h-full transition-all", coverageColor)}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                {withoutTransport.length > 0 && (
+                  <p className="text-xs text-muted-foreground pt-1">
+                    <span className="font-medium text-foreground">
+                      {t("carpool.noTransport")} :
+                    </span>{" "}
+                    {withoutTransport
+                      .map(
+                        (c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`,
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
             )}
-            {carpools.map((cp) => {
-              const ridersForThisCarpool = passengers.filter((p) => p.carpool_id === cp.id);
-              const takenSeats = ridersForThisCarpool.length;
-              const seatsLeft = Math.max(0, cp.total_seats - takenSeats);
-              const isMine = cp.driver_user_id === user?.id;
-              const iAmBookedHere = myBooking?.carpool_id === cp.id;
-              const passengerPlayerNames = ridersForThisCarpool
-                .flatMap((p) => p.player_ids ?? [])
-                .map((pid) => playerById.get(pid))
-                .filter(Boolean)
-                .map((pl) => pl!.first_name)
-                .join(", ");
 
-              return (
-                <div key={cp.id} className="rounded-xl border border-border p-3 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-sm font-semibold">
-                        <Car className="h-3.5 w-3.5" /> {cp.driver_name}
-                        <span className="text-muted-foreground font-normal">
-                          · {t(`carpool.vehicleType.${cp.vehicle_type}`)}
-                        </span>
+            {/* Drivers list */}
+            <div className="space-y-2">
+              {carpools.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">{t("carpool.noDriversYet")}</p>
+              )}
+              {carpools.map((cp) => {
+                const ridersForThisCarpool = passengers.filter((p) => p.carpool_id === cp.id);
+                const takenSeats = ridersForThisCarpool.length;
+                const seatsLeft = Math.max(0, cp.total_seats - takenSeats);
+                const isMine = cp.driver_user_id === user?.id;
+                const iAmBookedHere = myBooking?.carpool_id === cp.id;
+                const passengerPlayerNames = ridersForThisCarpool
+                  .flatMap((p) => p.player_ids ?? [])
+                  .map((pid) => playerById.get(pid))
+                  .filter(Boolean)
+                  .map((pl) => pl!.first_name)
+                  .join(", ");
+
+                return (
+                  <div key={cp.id} className="rounded-xl border border-border p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 text-sm font-semibold">
+                          <Car className="h-3.5 w-3.5" /> {cp.driver_name}
+                          <span className="text-muted-foreground font-normal">
+                            · {t(`carpool.vehicleType.${cp.vehicle_type}`)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {seatsLeft === 0
+                            ? t("carpool.full")
+                            : t("carpool.seatsLeft", { count: seatsLeft })}
+                        </p>
+                        {cp.departure_note && (
+                          <p className="text-xs text-foreground/80 italic mt-1">
+                            "{cp.departure_note}"
+                          </p>
+                        )}
+                        {passengerPlayerNames && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            <span className="font-medium text-foreground">
+                              {t("carpool.takes")} :
+                            </span>{" "}
+                            {passengerPlayerNames}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {seatsLeft === 0
-                          ? t("carpool.full")
-                          : t("carpool.seatsLeft", { count: seatsLeft })}
-                      </p>
-                      {cp.departure_note && (
-                        <p className="text-xs text-foreground/80 italic mt-1">
-                          "{cp.departure_note}"
-                        </p>
-                      )}
-                      {passengerPlayerNames && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium text-foreground">
-                            {t("carpool.takes")} :
-                          </span>{" "}
-                          {passengerPlayerNames}
-                        </p>
+                      {(isMine || isCoach) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 shrink-0"
+                          onClick={async () => {
+                            if (!confirm(t("carpool.remove") + " ?")) return;
+                            const { error } = await supabase
+                              .from("carpools")
+                              .delete()
+                              .eq("id", cp.id);
+                            if (error) toast.error(error.message);
+                            else qc.invalidateQueries({ queryKey: ["carpools", eventId] });
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
                       )}
                     </div>
-                    {(isMine || isCoach) && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 shrink-0"
-                        onClick={async () => {
-                          if (!confirm(t("carpool.remove") + " ?")) return;
-                          const { error } = await supabase
-                            .from("carpools")
-                            .delete()
-                            .eq("id", cp.id);
-                          if (error) toast.error(error.message);
-                          else qc.invalidateQueries({ queryKey: ["carpools", eventId] });
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    )}
-                  </div>
-                  {iAmBookedHere ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full"
-                      onClick={async () => {
-                        const { error } = await supabase
-                          .from("carpool_passengers")
-                          .delete()
-                          .eq("id", myBooking!.id);
-                        if (error) toast.error(error.message);
-                        else qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
-                      }}
-                    >
-                      {t("carpool.cancel")}
-                    </Button>
-                  ) : (
-                    !isMine &&
-                    canParticipate && (
+                    {iAmBookedHere ? (
                       <Button
                         size="sm"
+                        variant="outline"
                         className="w-full"
-                        disabled={seatsLeft === 0 || !!myBooking}
-                        onClick={() => setReserveCarpool(cp)}
+                        onClick={async () => {
+                          const { error } = await supabase
+                            .from("carpool_passengers")
+                            .delete()
+                            .eq("id", myBooking!.id);
+                          if (error) toast.error(error.message);
+                          else qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
+                        }}
                       >
-                        {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
+                        {t("carpool.cancel")}
                       </Button>
-                    )
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {myBookingCarpool && (
-            <div className="rounded-lg bg-primary/10 border border-primary/30 p-2.5 text-xs">
-              ✅ {t("carpool.youTravelWith", { name: myBookingCarpool.driver_name })}
+                    ) : (
+                      !isMine &&
+                      canParticipate && (
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          disabled={seatsLeft === 0 || !!myBooking}
+                          onClick={() => setReserveCarpool(cp)}
+                        >
+                          {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          )}
 
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2 pt-1">
-            {!myCarpool && (
-              <Button
-                size="sm"
-                variant={isCoach ? "default" : "ghost"}
-                onClick={() => setOfferOpen(true)}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
-              </Button>
+            {/* Ride requests */}
+            {needs.length > 0 && (
+              <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold">
+                  <HandHelping className="h-3.5 w-3.5 text-primary" />
+                  {t("carpool.needsTitle" as any) || "Demandes de transport"}
+                  <span className="text-muted-foreground font-normal">({needs.length})</span>
+                </div>
+                {needs.map((n) => {
+                  const names =
+                    (n.player_ids ?? [])
+                      .map((pid) => playerById.get(pid))
+                      .filter(Boolean)
+                      .map((pl) => `${pl!.first_name} ${pl!.last_name?.[0] ?? ""}.`)
+                      .join(", ") || "—";
+                  const isMineNeed = n.parent_user_id === user?.id;
+                  return (
+                    <div key={n.id} className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium truncate">{names}</p>
+                        {n.note && (
+                          <p className="text-xs text-muted-foreground italic">"{n.note}"</p>
+                        )}
+                      </div>
+                      {(isMineNeed || isCoach) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6 shrink-0"
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from("carpool_needs")
+                              .delete()
+                              .eq("id", n.id);
+                            if (error) toast.error(error.message);
+                            else qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] });
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
-            {!isCoach && !myBooking && !myCarpool && bookableConvocations.length > 0 && !myNeed && (
-              <Button size="sm" variant="outline" onClick={() => setNeedOpen(true)}>
-                <HandHelping className="h-3.5 w-3.5" />
-                {t("carpool.iNeedRide")}
-              </Button>
+
+            {myBookingCarpool && (
+              <div className="rounded-lg bg-primary/10 border border-primary/30 p-2.5 text-xs">
+                ✅ {t("carpool.youTravelWith", { name: myBookingCarpool.driver_name })}
+              </div>
             )}
-            {myNeed && (
-              <span className="text-xs text-muted-foreground italic self-center">
-                ✓ {t("carpool.needRideRegistered")}
-              </span>
-            )}
+
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {!myCarpool && (
+                <Button
+                  size="sm"
+                  variant={isCoach ? "default" : "ghost"}
+                  onClick={() => setOfferOpen(true)}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
+                </Button>
+              )}
+              {!isCoach &&
+                !myBooking &&
+                !myCarpool &&
+                bookableConvocations.length > 0 &&
+                !myNeed && (
+                  <Button size="sm" variant="outline" onClick={() => setNeedOpen(true)}>
+                    <HandHelping className="h-3.5 w-3.5" />
+                    {t("carpool.iNeedRide")}
+                  </Button>
+                )}
+              {myNeed && (
+                <span className="text-xs text-muted-foreground italic self-center">
+                  ✓ {t("carpool.needRideRegistered")}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {offerOpen && (
@@ -411,7 +508,9 @@ function OfferDialog({
   const { user } = useAuth();
   const qc = useQueryClient();
   const [vehicle, setVehicle] = useState<"car" | "van">("car");
-  const [seats, setSeats] = useState(3);
+  const [seatsInput, setSeatsInput] = useState("3");
+  const seats = Math.min(8, Math.max(1, Number(seatsInput) || 1));
+
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -464,10 +563,14 @@ function OfferDialog({
             <label className="text-xs font-medium">{t("carpool.seats")}</label>
             <input
               type="number"
+              inputMode="numeric"
               min={1}
               max={8}
-              value={seats}
-              onChange={(e) => setSeats(Math.min(8, Math.max(1, Number(e.target.value) || 1)))}
+              value={seatsInput}
+              onChange={(e) => setSeatsInput(e.target.value.replace(/[^0-9]/g, ""))}
+              onBlur={() =>
+                setSeatsInput(String(Math.min(8, Math.max(1, Number(seatsInput) || 1))))
+              }
               className="mt-1 w-full rounded-lg border border-border px-3 py-2"
             />
           </div>
@@ -512,7 +615,9 @@ function ReserveDialog({
   const [busy, setBusy] = useState(false);
 
   async function submit() {
-    if (!user || selected.length === 0) return;
+    if (!user) return;
+    if (selected.length === 0) return;
+
     setBusy(true);
     const { error } = await supabase.from("carpool_passengers").insert({
       carpool_id: carpool.id,
@@ -520,7 +625,16 @@ function ReserveDialog({
       player_ids: selected,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message || "";
+      if (msg.includes("already_booked_in_another_carpool"))
+        return toast.error(
+          "Vous avez déjà réservé une place dans un autre véhicule pour cet événement.",
+        );
+      if (msg.includes("driver_cannot_book_own_car"))
+        return toast.error("Vous êtes le conducteur de ce véhicule.");
+      return toast.error(msg);
+    }
     onDone();
   }
 
@@ -534,6 +648,7 @@ function ReserveDialog({
           {selectablePlayers.length === 0 && (
             <p className="text-sm text-muted-foreground italic">{t("carpool.noTransport")}</p>
           )}
+
           {selectablePlayers.map((c) => (
             <label
               key={c.player_id}
@@ -578,6 +693,7 @@ function NeedDialog({
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const notifyStaff = useServerFn(notifyCoachesOfCarpoolNeed);
   const [selected, setSelected] = useState<string[]>(myConvokedChildren.map((c) => c.player_id));
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -585,14 +701,29 @@ function NeedDialog({
   async function submit() {
     if (!user || selected.length === 0) return;
     setBusy(true);
-    const { error } = await supabase.from("carpool_needs").insert({
-      event_id: eventId,
-      parent_user_id: user.id,
-      player_ids: selected,
-      note: note.trim() || null,
-    });
+    const { data: inserted, error } = await supabase
+      .from("carpool_needs")
+      .insert({
+        event_id: eventId,
+        parent_user_id: user.id,
+        player_ids: selected,
+        note: note.trim() || null,
+      })
+      .select("id")
+      .maybeSingle();
+    if (error) {
+      setBusy(false);
+      return toast.error(error.message);
+    }
+    if (inserted?.id) {
+      try {
+        await notifyStaff({ data: { needId: inserted.id } });
+      } catch (e) {
+        console.error("[carpool] notifyStaff failed", e);
+        toast.error(t("carpool.notifyFailed"));
+      }
+    }
     setBusy(false);
-    if (error) return toast.error(error.message);
     onDone();
   }
 

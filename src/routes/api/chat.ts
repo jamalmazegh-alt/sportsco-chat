@@ -29,6 +29,7 @@ Règles importantes :
 - **Notifications push** : une fois l'app installée (ou même dans le navigateur sur Android/desktop), Clubero peut envoyer des notifications push natives — sans email. Une bannière propose d'activer les notifications à l'ouverture. ⚠️ Sur **iOS, les push ne fonctionnent QUE si l'app a été ajoutée à l'écran d'accueil** (iOS 16.4+) — depuis le navigateur Safari classique, c'est impossible. Notifications déclenchées : nouvelle convocation, rappel de convocation, réponse d'un joueur (pour les coachs), équipe complète, score saisi, nouveau message sur le mur, report ou annulation d'événement, rappel de match tournoi 30 min avant, publication d'un tirage au sort.
 - **Activer les notifications push après coup** : si l'utilisateur a refusé ou fermé la bannière, il peut toujours activer les push depuis **Profil → carte "Cet appareil" → bouton "Activer les notifications"** (disponible pour TOUS les profils, y compris organisateurs de tournoi et arbitres invités sans club). La carte gère automatiquement les états : non supporté, iOS hors PWA (instructions Partager → Sur l'écran d'accueil), permission refusée (instructions cadenas du navigateur), déjà activée.
 - **Paramètres notifications du club** (admins/dirigeants) : page /admin/settings/notifications, chaque type de notification push peut être activé ou désactivé pour tout le club (convocations, réponses joueurs, mur, rappels tournoi, etc.). Sauvegarde automatique.
+- **Réunions (équipe ou interne au club)** : au wizard de création, choisir le type "Réunion" propose soit une **équipe réelle** (convocations joueurs classiques), soit une **réunion interne** (staff/bureau/CA, sans joueurs). Pour une réunion interne, une étape "Qui participe ?" permet de mixer **groupes du club**, **équipes** et **ajouts manuels** — la provenance (groupe / équipe / manuel / organisateur) reste tracée. Les convoqués reçoivent in-app + push + e-mail avec 3 boutons **Présent / Incertain / Absent** en 1 tap depuis l'e-mail (sans connexion), comme les convocations joueurs. Retirer un participant déclenche une notification dédiée ; retirer un groupe ne retire que les personnes qui n'ont plus d'autre source. Les réunions internes ne sont visibles que par les admins/dirigeants du club et les invités. On peut rouvrir le dialog "Gérer les convoqués" à tout moment pour ajouter/retirer des personnes ; seuls les nouveaux convoqués sont notifiés.
 - Module **Tournois** : Clubero permet d'organiser des tournois (poules, élimination directe, double élimination, système Suisse, mixte) avec inscription d'équipes (formulaire public + import CSV), paiement d'inscription en ligne (Stripe), tirage au sort animé, génération automatique du calendrier et des terrains, saisie de scores en direct, gestion des tirs au but (penalty) pour les matchs à élimination directe en cas d'égalité, classements et brackets en temps réel, mode diaporama TV, page publique partageable (filtrable par équipe), règlement PDF, co-organisateurs et arbitres invités par email. On peut aussi créer un tournoi sans club (orga libre) puis le rattacher à un vrai club plus tard. Utilise \`listMyTournaments\` pour lister les tournois de l'utilisateur et \`getTournamentDetails\` pour obtenir équipes, classements, matchs à venir et bracket d'un tournoi précis.
 - Module **Paiements & Cagnottes club** (cotisations, licences, collectes) : bientôt
   disponible — ne le présente jamais comme actif aujourd'hui (voir connaissance produit).
@@ -136,39 +137,91 @@ export const Route = createFileRoute("/api/chat")({
 
           getMyUpcomingEvents: tool({
             description:
-              "Liste les prochains événements (entraînements, matchs) auxquels l'utilisateur ou ses enfants sont convoqués, avec leur statut de réponse.",
+              "Liste les prochains événements (entraînements, matchs, réunions) : convocations du user/de ses enfants + événements des équipes qu'il coache/admin + événements du club s'il est admin/dirigeant.",
             inputSchema: z.object({
-              limit: z.number().int().min(1).max(20).optional(),
+              limit: z.number().int().min(1).max(30).optional(),
             }),
-            execute: async ({ limit = 10 }) => {
-              const playerIds = await getMyPlayerIds();
-              if (playerIds.length === 0) return { events: [] };
-              const { data } = await supabase
-                .from("convocations")
-                .select(
-                  "status, player_id, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))",
-                )
-                .in("player_id", playerIds)
-                .order("created_at", { ascending: false });
-              const now = new Date();
-              const events = (data ?? [])
-                .filter(
-                  (c: any) =>
-                    c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now,
-                )
-                .map((c: any) => ({
-                  id: c.event.id,
-                  title: c.event.title,
-                  type: c.event.type,
-                  starts_at: c.event.starts_at,
-                  location: c.event.location,
-                  opponent: c.event.opponent,
-                  team: c.event.team?.name,
-                  my_status: c.status,
-                }))
+            execute: async ({ limit = 15 }) => {
+              const nowIso = new Date().toISOString();
+              const [playerIds, teamIds] = await Promise.all([
+                getMyPlayerIds(),
+                getManagedTeamIds(),
+              ]);
+
+              type Row = {
+                id: string;
+                title: string;
+                type: string;
+                starts_at: string;
+                location: string | null;
+                opponent: string | null;
+                team: string | null;
+                my_status?: string | null;
+                source: "convocation" | "managed_team";
+              };
+              const byId = new Map<string, Row>();
+
+              // From convocations
+              if (playerIds.length > 0) {
+                const { data } = await supabase
+                  .from("convocations")
+                  .select(
+                    "status, event:event_id(id, title, type, starts_at, location, opponent, status, team:team_id(name))",
+                  )
+                  .in("player_id", playerIds);
+                for (const c of (data ?? []) as any[]) {
+                  const ev = c.event;
+                  if (!ev || ev.status !== "published") continue;
+                  if (new Date(ev.starts_at).toISOString() < nowIso) continue;
+                  if (!byId.has(ev.id)) {
+                    byId.set(ev.id, {
+                      id: ev.id,
+                      title: ev.title,
+                      type: ev.type,
+                      starts_at: ev.starts_at,
+                      location: ev.location,
+                      opponent: ev.opponent,
+                      team: ev.team?.name ?? null,
+                      my_status: c.status,
+                      source: "convocation",
+                    });
+                  }
+                }
+              }
+
+              // From managed teams (coach/admin/dirigeant)
+              if (teamIds.length > 0) {
+                const { data } = await supabase
+                  .from("events")
+                  .select(
+                    "id, title, type, starts_at, location, opponent, status, team:team_id(name)",
+                  )
+                  .in("team_id", teamIds)
+                  .eq("status", "published")
+                  .gte("starts_at", nowIso)
+                  .order("starts_at", { ascending: true })
+                  .limit(50);
+                for (const ev of (data ?? []) as any[]) {
+                  if (!byId.has(ev.id)) {
+                    byId.set(ev.id, {
+                      id: ev.id,
+                      title: ev.title,
+                      type: ev.type,
+                      starts_at: ev.starts_at,
+                      location: ev.location,
+                      opponent: ev.opponent,
+                      team: ev.team?.name ?? null,
+                      my_status: null,
+                      source: "managed_team",
+                    });
+                  }
+                }
+              }
+
+              const events = Array.from(byId.values())
                 .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
                 .slice(0, limit);
-              return { events };
+              return { events, counts: { total: events.length } };
             },
           }),
 
@@ -1050,6 +1103,20 @@ export const Route = createFileRoute("/api/chat")({
         const abortController = new AbortController();
         const timeoutId = setTimeout(() => abortController.abort(), 60_000);
         try {
+          const rawLang = (request.headers.get("x-user-language") || "fr")
+            .toLowerCase()
+            .split("-")[0];
+          const ctxLang: "fr" | "en" = rawLang === "en" ? "en" : "fr";
+          const langNames: Record<string, string> = {
+            fr: "français",
+            en: "English",
+            es: "español",
+            de: "Deutsch",
+            it: "italiano",
+            pt: "português",
+            nl: "Nederlands",
+          };
+          const userLangName = langNames[rawLang] || rawLang;
           const result = streamText({
             model,
             system: (() => {
@@ -1067,7 +1134,7 @@ export const Route = createFileRoute("/api/chat")({
               // reflects the actual V1 beta state today (see src/config/features.ts).
               const featureContext = buildFeatureContext({
                 audience: "member",
-                lang: "fr",
+                lang: ctxLang,
                 flags: {
                   payments_v2: false,
                   fundraising_v2: false,
@@ -1075,8 +1142,10 @@ export const Route = createFileRoute("/api/chat")({
                   public_player_profiles: false,
                 },
               });
-              return `Date et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}\n\n---\n\n${featureContext}`;
+              const langDirective = `LANGUE DE RÉPONSE OBLIGATOIRE : réponds TOUJOURS en ${userLangName} (code BCP-47 : ${rawLang}), quelle que soit la langue du prompt système, des tools ou du contexte ci-dessous. Traduis naturellement les libellés, messages d'erreur et récapitulatifs. Si l'utilisateur t'écrit dans une autre langue, adapte-toi à sa langue.`;
+              return `${langDirective}\n\nDate et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}\n\n---\n\n${featureContext}`;
             })(),
+
             tools,
             stopWhen: stepCountIs(50),
             messages: await convertToModelMessages(messages as UIMessage[]),

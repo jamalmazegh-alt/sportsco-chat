@@ -1,0 +1,705 @@
+/**
+ * MeetingAttendeesSection — Bloc "Convocations réunion" sur la page événement.
+ * Réservé aux événements de type "meeting". Réutilise AudiencePickerBody.
+ */
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import {
+  Users,
+  Loader2,
+  UserPlus,
+  Check,
+  X,
+  HelpCircle,
+  MoreVertical,
+  Send,
+  UserMinus,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AttendancePill } from "@/components/attendance-pill";
+import {
+  AudiencePickerBody,
+  useAudienceState,
+  type AudienceState,
+} from "@/components/needs/audience-picker";
+import { sourcesToSelection } from "@/lib/meetings/sources-to-selection";
+import { getEventAudienceContext } from "@/lib/needs/needs.functions";
+import {
+  listMeetingAttendees,
+  previewMeetingAudience,
+  removeMeetingAttendees,
+  resendMeetingConvocation,
+  syncMeetingAttendees,
+  updateMeetingAttendanceStatus,
+  type MeetingAttendeeRow,
+} from "@/lib/meetings/meetings.functions";
+import { summarizeSources } from "@/lib/meetings/attendee-sources";
+
+type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
+type RequiresConfirmationEntry = {
+  user_id: string;
+  full_name: string | null;
+  status: string | null;
+};
+
+function initials(name: string | null): string {
+  if (!name) return "?";
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+export function MeetingAttendeesSection({
+  eventId,
+  eventType,
+}: {
+  eventId: string;
+  eventType: string | null | undefined;
+}) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+
+  const listFn = useServerFn(listMeetingAttendees);
+  const listQuery = useQuery({
+    queryKey: ["meeting-attendees", eventId],
+    queryFn: () => listFn({ data: { event_id: eventId } }),
+    enabled: eventType === "meeting",
+  });
+
+  const refresh = () => qc.invalidateQueries({ queryKey: ["meeting-attendees", eventId] });
+
+  const updateFn = useServerFn(updateMeetingAttendanceStatus);
+  const updateStatus = useMutation({
+    mutationFn: (vars: { user_id: string; status: AttendanceStatus }) =>
+      updateFn({
+        data: { event_id: eventId, user_id: vars.user_id, status: vars.status },
+      }),
+    onSuccess: () => refresh(),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const resendFn = useServerFn(resendMeetingConvocation);
+  const resendOne = useMutation({
+    mutationFn: (userId: string) => resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () =>
+      toast.success(
+        t("meetings:row.resend.success", {
+          defaultValue: "Convocation renvoyée",
+        }),
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removeFn = useServerFn(removeMeetingAttendees);
+  const [removeTarget, setRemoveTarget] = useState<MeetingAttendeeRow | null>(null);
+  const removeOne = useMutation({
+    mutationFn: (userId: string) => removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
+    onSuccess: () => {
+      toast.success(
+        t("meetings:row.remove.success", {
+          defaultValue: "Convocation annulée",
+        }),
+      );
+      setRemoveTarget(null);
+      refresh();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setRemoveTarget(null);
+    },
+  });
+
+  if (eventType !== "meeting") return null;
+
+  const data = listQuery.data;
+  const isStaff = data?.is_staff ?? false;
+  const attendees: MeetingAttendeeRow[] = data?.attendees ?? [];
+  const counts = data?.counts ?? { present: 0, absent: 0, uncertain: 0, pending: 0 };
+  const total = attendees.length;
+
+  return (
+    <section className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
+      {(() => {
+        const totalP = counts.present + counts.uncertain + counts.absent + counts.pending;
+        const respondedP = totalP - counts.pending;
+        const rate = totalP === 0 ? 0 : Math.round((respondedP / totalP) * 100);
+        const pct = (n: number) => (totalP === 0 ? 0 : (n / totalP) * 100);
+
+        if (total === 0) {
+          return (
+            <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/70">
+              <div className="min-w-0 flex items-center gap-2">
+                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <h2 className="text-base font-extrabold tracking-tight text-foreground">
+                  {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                </h2>
+              </div>
+              {isStaff && (
+                <ManageAttendeesDialog
+                  eventId={eventId}
+                  onDone={refresh}
+                  initialSelection={sourcesToSelection(attendees)}
+                  hasExistingAttendees={total > 0}
+                />
+              )}
+            </header>
+          );
+        }
+
+        return (
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
+            <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
+            <div className="relative px-4 pt-3 pb-3.5">
+              <div className="flex items-start justify-between gap-3 mb-2.5">
+                <div className="min-w-0 flex items-center gap-2 flex-wrap">
+                  <Users className="h-4 w-4 shrink-0" />
+                  <h2 className="text-sm font-extrabold tracking-tight">
+                    {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                  </h2>
+                  <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
+                    {t("meetings:section.count", {
+                      defaultValue: "{{count}} convoqué(s)",
+                      count: total,
+                    })}
+                  </span>
+                </div>
+                {isStaff && (
+                  <ManageAttendeesDialog
+                    eventId={eventId}
+                    onDone={refresh}
+                    initialSelection={sourcesToSelection(attendees)}
+                    hasExistingAttendees={total > 0}
+                  />
+                )}
+              </div>
+
+              <div className="flex items-end justify-between gap-3 mb-2">
+                <div className="leading-none">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
+                      {rate}
+                    </span>
+                    <span className="text-lg font-bold text-white/80">%</span>
+                  </div>
+                  <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
+                    {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                  </p>
+                </div>
+                <div className="text-right leading-tight">
+                  <p className="text-xs font-bold tabular-nums">
+                    {respondedP}
+                    <span className="text-white/65 font-medium">/{totalP}</span>{" "}
+                    <span className="text-white/85 font-semibold">
+                      {t("attendance.responded", { defaultValue: "réponses" })}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
+                {counts.present > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.present)}%` }}
+                    className="bg-gradient-to-r from-emerald-300 to-emerald-200"
+                  />
+                )}
+                {counts.uncertain > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.uncertain)}%` }}
+                    className="bg-gradient-to-r from-amber-300 to-amber-200"
+                  />
+                )}
+                {counts.absent > 0 && (
+                  <div
+                    style={{ width: `${pct(counts.absent)}%` }}
+                    className="bg-gradient-to-r from-rose-300 to-rose-200"
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5 mt-2.5">
+                {[
+                  {
+                    key: "present",
+                    val: counts.present,
+                    label: t("attendance.present"),
+                    tone: "bg-emerald-300",
+                  },
+                  {
+                    key: "uncertain",
+                    val: counts.uncertain,
+                    label: t("attendance.uncertain"),
+                    tone: "bg-amber-300",
+                  },
+                  {
+                    key: "absent",
+                    val: counts.absent,
+                    label: t("attendance.absent"),
+                    tone: "bg-rose-300",
+                  },
+                  {
+                    key: "pending",
+                    val: counts.pending,
+                    label: t("attendance.pending"),
+                    tone: "bg-white/60",
+                  },
+                ].map((b) => (
+                  <div
+                    key={b.key}
+                    className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
+                      <span className="text-sm font-extrabold tabular-nums leading-none">
+                        {b.val}
+                      </span>
+                    </div>
+                    <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
+                      {b.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      <div className="p-4 space-y-4">
+        {listQuery.isLoading && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t("common.loading", { defaultValue: "Chargement…" })}
+          </div>
+        )}
+
+        {!listQuery.isLoading && total === 0 && (
+          <p className="text-sm text-muted-foreground">
+            {isStaff
+              ? t("meetings:empty.staff", {
+                  defaultValue:
+                    "Aucun convoqué — utilisez « Gérer les convoqués » pour inviter des groupes ou des personnes.",
+                })
+              : t("meetings:empty.member", {
+                  defaultValue: "Vous n'êtes pas convoqué à cette réunion.",
+                })}
+          </p>
+        )}
+
+        {!isStaff && data?.my_attendance && (
+          <div className="flex items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/30 p-3">
+            <span className="text-sm font-medium">
+              {t("meetings:self.prompt", { defaultValue: "Votre présence :" })}
+            </span>
+            <StatusButtons
+              value={data.my_attendance.status as AttendanceStatus}
+              onChange={(status) =>
+                updateStatus.mutate({
+                  user_id: data.my_attendance!.user_id,
+                  status,
+                })
+              }
+              disabled={updateStatus.isPending}
+            />
+          </div>
+        )}
+
+        {isStaff && attendees.length > 0 && (
+          <>
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground px-1">
+              <span>{t("attendance.convokedHeader", { defaultValue: "Convoqués" })}</span>
+              <span>{t("attendance.responseHeader", { defaultValue: "Réponse" })}</span>
+            </div>
+            <ul className="divide-y divide-border/70">
+              {attendees.map((a) => {
+                const chips = summarizeSources(a.sources);
+                return (
+                  <li key={a.id} className="flex items-center gap-3 py-2.5">
+                    <Avatar className="h-9 w-9 shrink-0">
+                      {a.avatar_url && <AvatarImage src={a.avatar_url} alt="" />}
+                      <AvatarFallback>{initials(a.full_name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold">
+                        {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                      </div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                        {chips.map((chip) => (
+                          <Badge
+                            key={chip.key}
+                            variant="outline"
+                            className="text-[10px] font-normal"
+                          >
+                            {chip.kind === "manual"
+                              ? t("meetings:source.manual", {
+                                  defaultValue: "ajouté manuellement",
+                                })
+                              : chip.label}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <StatusButtons
+                      value={a.status}
+                      onChange={(status) => updateStatus.mutate({ user_id: a.user_id, status })}
+                      disabled={updateStatus.isPending}
+                    />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          aria-label={t("meetings:row.actions", {
+                            defaultValue: "Actions",
+                          })}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => resendOne.mutate(a.user_id)}
+                          disabled={resendOne.isPending}
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          {t("meetings:row.resend.cta", {
+                            defaultValue: "Relancer la convocation",
+                          })}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => setRemoveTarget(a)}
+                        >
+                          <UserMinus className="mr-2 h-4 w-4" />
+                          {t("meetings:row.remove.cta", {
+                            defaultValue: "Annuler la convocation",
+                          })}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </div>
+
+      <AlertDialog
+        open={!!removeTarget}
+        onOpenChange={(o) => !o && !removeOne.isPending && setRemoveTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("meetings:row.remove.confirmTitle", {
+                defaultValue: "Annuler la convocation ?",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("meetings:row.remove.confirmDesc", {
+                defaultValue:
+                  "{{name}} sera retiré(e) de la réunion et recevra une notification de retrait.",
+                name: removeTarget?.full_name ?? t("common.unknown", { defaultValue: "Inconnu" }),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeOne.isPending}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeOne.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (removeTarget) removeOne.mutate(removeTarget.user_id);
+              }}
+            >
+              {removeOne.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:row.remove.confirmCta", {
+                defaultValue: "Retirer",
+              })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </section>
+  );
+}
+
+function StatusButtons({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: AttendanceStatus;
+  onChange: (s: AttendanceStatus) => void;
+  disabled?: boolean;
+}) {
+  const btn = (s: AttendanceStatus, Icon: typeof Check, activeCls: string, label: string) => (
+    <Button
+      key={s}
+      type="button"
+      size="icon"
+      variant={value === s ? "default" : "outline"}
+      className={value === s ? `h-8 w-8 ${activeCls}` : "h-8 w-8"}
+      disabled={disabled}
+      aria-label={label}
+      onClick={() => onChange(s)}
+    >
+      <Icon className="h-4 w-4" />
+    </Button>
+  );
+  return (
+    <div className="flex items-center gap-1">
+      {btn("present", Check, "bg-emerald-600 hover:bg-emerald-700 text-white", "présent")}
+      {btn("uncertain", HelpCircle, "bg-amber-500 hover:bg-amber-600 text-white", "incertain")}
+      {btn("absent", X, "bg-red-600 hover:bg-red-700 text-white", "absent")}
+    </div>
+  );
+}
+
+function ManageAttendeesDialog({
+  eventId,
+  onDone,
+  initialSelection,
+  hasExistingAttendees,
+}: {
+  eventId: string;
+  onDone: () => void;
+  initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
+}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <UserPlus className="mr-2 h-4 w-4" />
+          {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
+          </DialogTitle>
+          <DialogDescription>
+            {t("meetings:manage.desc", {
+              defaultValue:
+                "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
+            })}
+          </DialogDescription>
+        </DialogHeader>
+
+        {open && (
+          <AttendeesEditor
+            key={eventId}
+            eventId={eventId}
+            initialSelection={initialSelection}
+            hasExistingAttendees={hasExistingAttendees}
+            onClose={() => setOpen(false)}
+            onDone={onDone}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AttendeesEditor({
+  eventId,
+  initialSelection,
+  hasExistingAttendees,
+  onClose,
+  onDone,
+}: {
+  eventId: string;
+  initialSelection: Partial<AudienceState>;
+  hasExistingAttendees: boolean;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const [pendingConfirm, setPendingConfirm] = useState<RequiresConfirmationEntry[]>([]);
+
+  const ctxFn = useServerFn(getEventAudienceContext);
+  const ctxQuery = useQuery({
+    queryKey: ["meeting-audience-ctx", eventId],
+    queryFn: () => ctxFn({ data: { event_id: eventId } }),
+  });
+
+  const { state, controls, buildAudiences } = useAudienceState(initialSelection);
+
+  const audiences = useMemo(() => buildAudiences(eventId), [buildAudiences, eventId]);
+  const manualUserIds = useMemo(() => state.preassigned.map((p) => p.user_id), [state.preassigned]);
+
+  const previewFn = useServerFn(previewMeetingAudience);
+  const previewQuery = useQuery({
+    queryKey: ["meeting-preview", eventId, audiences, manualUserIds],
+    queryFn: () =>
+      previewFn({
+        data: { event_id: eventId, audiences, manual_user_ids: manualUserIds },
+      }),
+    enabled: audiences.length > 0 || manualUserIds.length > 0,
+  });
+
+  const syncFn = useServerFn(syncMeetingAttendees);
+  const sync = useMutation({
+    mutationFn: (confirmIds: string[]) =>
+      syncFn({
+        data: {
+          event_id: eventId,
+          audiences,
+          manual_user_ids: manualUserIds,
+          confirm_remove_user_ids: confirmIds,
+          dry_run: false,
+        },
+      }),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ["meeting-attendees", eventId] });
+      toast.success(
+        t("meetings:sync.success", {
+          defaultValue: "{{added}} ajouté(s), {{removed}} retiré(s)",
+          added: r.added_count,
+          removed: r.removed_count,
+        }),
+      );
+      if (r.requires_confirmation.length > 0) {
+        setPendingConfirm(r.requires_confirmation);
+      } else {
+        setPendingConfirm([]);
+        onClose();
+        onDone();
+      }
+    },
+    onError: (e: Error) =>
+      toast.error(t(`meetings:errors.${e.message}`, { defaultValue: e.message })),
+  });
+
+  const hasSelection = audiences.length > 0 || manualUserIds.length > 0;
+
+  return (
+    <>
+      {ctxQuery.isLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {t("common.loading", { defaultValue: "Chargement…" })}
+        </div>
+      ) : (
+        <AudiencePickerBody
+          ctx={ctxQuery.data ?? null}
+          state={state}
+          controls={controls}
+          preview={{
+            count: previewQuery.data?.count ?? null,
+            loading: previewQuery.isFetching,
+          }}
+          enablePreassign
+        />
+      )}
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose} disabled={sync.isPending}>
+          {t("common.cancel", { defaultValue: "Annuler" })}
+        </Button>
+        <Button onClick={() => sync.mutate([])} disabled={!hasSelection || sync.isPending}>
+          {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {hasExistingAttendees
+            ? t("meetings:manage.save", { defaultValue: "Enregistrer" })
+            : t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+        </Button>
+      </DialogFooter>
+
+      <Dialog
+        open={pendingConfirm.length > 0}
+        onOpenChange={(o) => {
+          if (!o) setPendingConfirm([]);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {t("meetings:confirmRemove.title", {
+                defaultValue: "Retirer des personnes ayant déjà répondu ?",
+              })}
+            </DialogTitle>
+            <DialogDescription>
+              {t("meetings:confirmRemove.desc", {
+                defaultValue:
+                  "Ces personnes ont déjà répondu ou été pointées. Les retirer supprimera aussi leur réponse et leur présence enregistrées. Elles restent convoquées tant que vous ne confirmez pas.",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+
+          <ul className="divide-y">
+            {pendingConfirm.map((p) => (
+              <li key={p.user_id} className="flex items-center justify-between gap-2 py-2">
+                <span className="text-sm">
+                  {p.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                </span>
+                {p.status && <AttendancePill status={p.status as AttendanceStatus} />}
+              </li>
+            ))}
+          </ul>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPendingConfirm([])}
+              disabled={sync.isPending}
+            >
+              {t("meetings:confirmRemove.keep", { defaultValue: "Les conserver" })}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => sync.mutate(pendingConfirm.map((p) => p.user_id))}
+              disabled={sync.isPending}
+            >
+              {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("meetings:confirmRemove.confirm", { defaultValue: "Retirer quand même" })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

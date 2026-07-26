@@ -32,8 +32,20 @@
       "description": "De lat raken — seizoenstotaal."
     },
     "juggling": {
-      "name": "Hooghouden",
+      "name": "Vrij hooghouden",
       "description": "Meeste keer hooghouden op rij — record."
+    },
+    "jugglingLeftFoot": {
+      "name": "Hooghouden linkervoet",
+      "description": "Meeste opeenvolgende hooghoud-acties met de linkervoet — record."
+    },
+    "jugglingRightFoot": {
+      "name": "Hooghouden rechtervoet",
+      "description": "Meeste opeenvolgende hooghoud-acties met de rechtervoet — record."
+    },
+    "jugglingHead": {
+      "name": "Hooghouden hoofd",
+      "description": "Meeste opeenvolgende hooghoud-acties met het hoofd — record."
     },
     "leger": {
       "name": "Luc Léger",

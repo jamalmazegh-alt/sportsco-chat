@@ -23,6 +23,7 @@ import {
   normalizeHeader,
 } from "./schemas";
 import { parseTemplate } from "./template-parse";
+import { computeFffCategory, parseSeasonEndYear, seasonLabelFromEndYear } from "@/lib/fff-category";
 
 const log = createLogger("superadmin-import");
 
@@ -716,6 +717,24 @@ export const runImport = createServerFn({ method: "POST" })
           teamsByNorm.set(normTeamKey(t.name, t.sport, t.age_group), t.id);
         }
 
+        // Preload the club's current season (used as a fallback when the row
+        // omits `saison`). Import doesn't create seasons — if none is current,
+        // we derive a label from today so `player_seasons.season_label`
+        // (NOT NULL) always has a sensible value.
+        const { data: currentSeasonRow } = await supabaseAdmin
+          .from("seasons")
+          .select("label")
+          .eq("club_id", data.clubId)
+          .eq("is_current", true)
+          .maybeSingle();
+        const fallbackSeasonEndYear = (() => {
+          const today = new Date();
+          const y = today.getUTCFullYear();
+          return today.getUTCMonth() >= 6 ? y + 1 : y;
+        })();
+        const fallbackSeasonLabel =
+          currentSeasonRow?.label ?? seasonLabelFromEndYear(fallbackSeasonEndYear);
+
         // Load full club roster (active + soft-deleted) once — identity index.
         type ExistingPlayer = {
           id: string;
@@ -738,6 +757,11 @@ export const runImport = createServerFn({ method: "POST" })
         if (rosterErr) throw new Error(rosterErr.message);
 
         const playersByIdentity = new Map<string, ExistingPlayer>();
+        // Fallback dedup: same club + normalized (first_name, last_name, jersey_number).
+        // Rattrape les cas où la date de naissance diffère entre imports
+        // (format JJ/MM vs MM/JJ, valeur manquante...) qui produiraient sinon
+        // des fiches en double pour le même joueur.
+        const playersByNameJersey = new Map<string, ExistingPlayer>();
         const identityKey = (
           first: string | null | undefined,
           last: string | null | undefined,
@@ -749,11 +773,28 @@ export const runImport = createServerFn({ method: "POST" })
           if (!f || !l) return null;
           return `${f}|${l}|${birth}`;
         };
+        const nameJerseyKey = (
+          first: string | null | undefined,
+          last: string | null | undefined,
+          jersey: number | null | undefined,
+        ): string | null => {
+          if (jersey == null) return null;
+          const f = normalizeName(first);
+          const l = normalizeName(last);
+          if (!f || !l) return null;
+          return `${f}|${l}|#${jersey}`;
+        };
         for (const p of (clubPlayers ?? []) as ExistingPlayer[]) {
           const k = identityKey(p.first_name, p.last_name, p.birth_date);
-          if (!k) continue;
-          const prev = playersByIdentity.get(k);
-          if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+          if (k) {
+            const prev = playersByIdentity.get(k);
+            if (!prev || (prev.deleted_at && !p.deleted_at)) playersByIdentity.set(k, p);
+          }
+          const nk = nameJerseyKey(p.first_name, p.last_name, p.jersey_number);
+          if (nk) {
+            const prev = playersByNameJersey.get(nk);
+            if (!prev || (prev.deleted_at && !p.deleted_at)) playersByNameJersey.set(nk, p);
+          }
         }
 
         for (let i = 0; i < data.rows.length; i++) {
@@ -821,8 +862,16 @@ export const runImport = createServerFn({ method: "POST" })
             const firstName = titleCase(r.prenom_joueur!);
             const lastName = titleCase(r.nom_joueur!);
             const idKey = identityKey(firstName, lastName, r.date_naissance)!;
+            const jerseyNum = r.numero_maillot ? parseInt(r.numero_maillot, 10) : null;
 
             let existing = playersByIdentity.get(idKey) ?? null;
+            // Fallback: same name + jersey in the same club → treat as the same
+            // player (override), même si la date de naissance a été parsée
+            // différemment entre deux imports.
+            if (!existing) {
+              const nk = nameJerseyKey(firstName, lastName, jerseyNum);
+              if (nk) existing = playersByNameJersey.get(nk) ?? null;
+            }
             let playerId: string;
 
             if (existing && existing.deleted_at) {
@@ -862,7 +911,7 @@ export const runImport = createServerFn({ method: "POST" })
                 },
                 {
                   col: "jersey_number",
-                  incoming: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  incoming: jerseyNum,
                   current: existing.jersey_number,
                   allowBlankFill: true,
                 },
@@ -920,7 +969,7 @@ export const runImport = createServerFn({ method: "POST" })
                   first_name: firstName,
                   last_name: lastName,
                   birth_date: r.date_naissance,
-                  jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                  jersey_number: jerseyNum,
                   license_number: r.numero_licence || null,
                   preferred_position: r.poste || null,
                   phone: r.telephone_joueur || null,
@@ -938,6 +987,8 @@ export const runImport = createServerFn({ method: "POST" })
               }
               playersCreated++;
               playersByIdentity.set(idKey, inserted as ExistingPlayer);
+              const nk = nameJerseyKey(firstName, lastName, jerseyNum);
+              if (nk) playersByNameJersey.set(nk, inserted as ExistingPlayer);
               playerId = inserted.id;
             }
 
@@ -956,6 +1007,60 @@ export const runImport = createServerFn({ method: "POST" })
             }
 
             const player = { id: playerId };
+
+            // Upsert `player_seasons` avec la catégorie FFF calculée.
+            // Non-destructif : si une ligne existe déjà pour (player, club,
+            // saison), on ne touche PAS à `category` (surclassement manuel
+            // saisi via l'UI /players/$playerId/seasons est préservé).
+            try {
+              const seasonLabelRaw = r.saison || fallbackSeasonLabel;
+              const endYear = parseSeasonEndYear(seasonLabelRaw) ?? fallbackSeasonEndYear;
+              const normalizedSeasonLabel =
+                parseSeasonEndYear(seasonLabelRaw) != null
+                  ? seasonLabelFromEndYear(endYear)
+                  : fallbackSeasonLabel;
+              const computedCategory = computeFffCategory(r.date_naissance, endYear);
+              const sportForSeason = (fixedTeam?.sport ?? r.sport ?? null) as string | null;
+              const { data: existingSeason } = await supabaseAdmin
+                .from("player_seasons")
+                .select("id, category, team_id, sport")
+                .eq("player_id", playerId)
+                .eq("club_id", data.clubId)
+                .eq("season_label", normalizedSeasonLabel)
+                .maybeSingle();
+              if (!existingSeason) {
+                await supabaseAdmin.from("player_seasons").insert({
+                  player_id: playerId,
+                  club_id: data.clubId,
+                  team_id: teamId,
+                  season_label: normalizedSeasonLabel,
+                  sport: sportForSeason,
+                  category: computedCategory,
+                } as never);
+              } else {
+                // Blank-fill uniquement : jamais d'écrasement d'une valeur
+                // déjà saisie manuellement (protège les surclassements).
+                const patch: Record<string, unknown> = {};
+                if (!existingSeason.category && computedCategory) {
+                  patch.category = computedCategory;
+                }
+                if (!existingSeason.team_id && teamId) patch.team_id = teamId;
+                if (!existingSeason.sport && sportForSeason) patch.sport = sportForSeason;
+                if (Object.keys(patch).length > 0) {
+                  await supabaseAdmin
+                    .from("player_seasons")
+                    .update(patch as never)
+                    .eq("id", existingSeason.id);
+                }
+              }
+            } catch (e) {
+              // Non-bloquant : l'échec du calcul de catégorie ne doit pas
+              // faire échouer l'import du joueur (backfill possible ensuite).
+              log.warn("player_seasons upsert failed", {
+                playerId,
+                error: e instanceof Error ? e.message : String(e),
+              });
+            }
 
             const playerFullName =
               `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();

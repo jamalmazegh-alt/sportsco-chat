@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
+import { StaffAvailabilityForTeamMonth } from "@/components/staff-availability";
 import {
   Select,
   SelectContent,
@@ -37,6 +38,22 @@ function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId/availability")({
   component: TeamAvailabilityCalendar,
+  head: () => ({
+    meta: [
+      { title: "Calendrier des absences — Clubero" },
+      {
+        name: "description",
+        content: "Suivi mensuel des absences joueurs et staff d’une équipe dans Clubero.",
+      },
+      { property: "og:title", content: "Calendrier des absences — Clubero" },
+      {
+        property: "og:description",
+        content: "Suivi mensuel des absences joueurs et staff d’une équipe dans Clubero.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   errorComponent: ErrorBoundary,
 
   notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
@@ -99,7 +116,7 @@ function TeamAvailabilityCalendar() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teams")
-        .select("id, name")
+        .select("id, name, club_id")
         .eq("id", teamId)
         .single();
       if (error) throw error;
@@ -391,6 +408,15 @@ function TeamAvailabilityCalendar() {
           )}
         </CardContent>
       </Card>
+
+      {team?.club_id && (
+        <StaffAvailabilityForTeamMonth
+          teamId={teamId}
+          clubId={team.club_id}
+          cursor={cursor}
+          days={days}
+        />
+      )}
 
       {/* Legend */}
       <div className="flex flex-wrap gap-2 items-center text-xs">

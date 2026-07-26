@@ -29,6 +29,16 @@ export interface RecurrenceState {
 
 export interface EventWizardState {
   type: WizardEventType | "";
+  /** Meeting scope: real team or internal (transverse) club team. */
+  meetingScope?: "team" | "internal";
+  /** Serialized audience picker state for meetings (Set → Array for storage). */
+  meetingAudience?: {
+    scalar: string[];
+    groupIds: string[];
+    teamPicks: Array<{ team_id: string; kind: string }>;
+    category: string;
+    preassigned: Array<{ user_id: string; full_name: string | null }>;
+  };
   teamId: string;
   startDate?: string; // yyyy-mm-dd
   /** Optional end date for multi-day "other" events (e.g. team camp). */

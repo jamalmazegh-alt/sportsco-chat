@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>): { invite?: string; next?: string } => {
@@ -200,6 +201,10 @@ function LoginPage() {
         <p className="signup">
           {t("auth.noAccount")} <Link to="/register">{t("auth.register")}</Link>
         </p>
+
+        <div className="install-cta">
+          <InstallAppButton label="Installer l'app sur mon téléphone" />
+        </div>
       </main>
     </div>
   );
@@ -327,6 +332,7 @@ const LOGIN_CSS = `
   animation:cl-fadeUp .6s 1s ease both}
 .clubero-login .signup a{color:var(--green);font-weight:600;text-decoration:none}
 .clubero-login .signup a:hover{text-decoration:underline}
+.clubero-login .install-cta{display:flex;justify-content:center;margin-top:18px;position:relative;z-index:2}
 
 @keyframes cl-fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes cl-fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}

@@ -42,10 +42,13 @@ import { Route as SupportViewSessionIdRouteImport } from './routes/support-view.
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
+import { Route as SuperadminNotificationsRouteImport } from './routes/superadmin/notifications'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
+import { Route as SuperadminInviteBatchesRouteImport } from './routes/superadmin/invite-batches'
 import { Route as SuperadminEmailDispatchesRouteImport } from './routes/superadmin/email-dispatches'
 import { Route as SuperadminBuildCluberoRouteImport } from './routes/superadmin/build-clubero'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
+import { Route as RmTokenRouteImport } from './routes/rm.$token'
 import { Route as RegisterPlayerRouteImport } from './routes/register_.player'
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -80,6 +83,7 @@ import { Route as SupportViewSessionIdIndexRouteImport } from './routes/support-
 import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
+import { Route as AuthenticatedPublicationsIndexRouteImport } from './routes/_authenticated/publications.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedNeedsIndexRouteImport } from './routes/_authenticated/needs.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -111,8 +115,11 @@ import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './route
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
+import { Route as AuthenticatedPublicationsNewRouteImport } from './routes/_authenticated/publications.new'
+import { Route as AuthenticatedPublicationsPublicationIdRouteImport } from './routes/_authenticated/publications.$publicationId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
+import { Route as AuthenticatedProfileAvailabilitiesRouteImport } from './routes/_authenticated/profile/availabilities'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_authenticated/payments.receipts'
 import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
@@ -127,6 +134,8 @@ import { Route as AuthenticatedAdminCampsIndexRouteImport } from './routes/_auth
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
 import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
+import { Route as SuperadminPlayersPlayerIdAuditRouteImport } from './routes/superadmin/players.$playerId.audit'
+import { Route as SuperadminClubsClubIdRosterRouteImport } from './routes/superadmin/clubs.$clubId_.roster'
 import { Route as SuperadminClubsClubIdInvitesRouteImport } from './routes/superadmin/clubs.$clubId_.invites'
 import { Route as StagesClubSlugCampSlugInscriptionRouteImport } from './routes/stages.$clubSlug.$campSlug.inscription'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -139,6 +148,7 @@ import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public
 import { Route as ApiPublicPushConvocationResponseRouteImport } from './routes/api/public/push/convocation-response'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
 import { Route as ApiPublicHooksTournamentMatchRemindersRouteImport } from './routes/api/public/hooks/tournament-match-reminders'
+import { Route as ApiPublicHooksSesNotificationsRouteImport } from './routes/api/public/hooks/ses-notifications'
 import { Route as ApiPublicHooksPrivacyWorkerRouteImport } from './routes/api/public/hooks/privacy-worker'
 import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api/public/hooks/payment-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
@@ -149,6 +159,7 @@ import { Route as ApiPublicBuildCluberoStartRouteImport } from './routes/api/pub
 import { Route as ApiPublicBuildCluberoSaveRouteImport } from './routes/api/public/build-clubero/save'
 import { Route as ApiPublicBuildCluberoCompleteRouteImport } from './routes/api/public/build-clubero/complete'
 import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
+import { Route as AuthenticatedTeamsTeamIdStaffRouteImport } from './routes/_authenticated/teams/$teamId_.staff'
 import { Route as AuthenticatedTeamsTeamIdStatsRouteImport } from './routes/_authenticated/teams/$teamId.stats'
 import { Route as AuthenticatedTeamsTeamIdAvailabilityRouteImport } from './routes/_authenticated/teams/$teamId.availability'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
@@ -340,9 +351,19 @@ const SuperadminSettingsRoute = SuperadminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => SuperadminRoute,
 } as any)
+const SuperadminNotificationsRoute = SuperadminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SuperadminRoute,
+} as any)
 const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminInviteBatchesRoute = SuperadminInviteBatchesRouteImport.update({
+  id: '/invite-batches',
+  path: '/invite-batches',
   getParentRoute: () => SuperadminRoute,
 } as any)
 const SuperadminEmailDispatchesRoute =
@@ -360,6 +381,11 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const RmTokenRoute = RmTokenRouteImport.update({
+  id: '/rm/$token',
+  path: '/rm/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterPlayerRoute = RegisterPlayerRouteImport.update({
   id: '/register_/player',
@@ -537,6 +563,12 @@ const AuthenticatedSupportIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSupportRoute,
   } as any)
+const AuthenticatedPublicationsIndexRoute =
+  AuthenticatedPublicationsIndexRouteImport.update({
+    id: '/publications/',
+    path: '/publications/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProfileIndexRoute =
   AuthenticatedProfileIndexRouteImport.update({
     id: '/',
@@ -708,6 +740,18 @@ const AuthenticatedSupportTicketIdRoute =
     path: '/$ticketId',
     getParentRoute: () => AuthenticatedSupportRoute,
   } as any)
+const AuthenticatedPublicationsNewRoute =
+  AuthenticatedPublicationsNewRouteImport.update({
+    id: '/publications/new',
+    path: '/publications/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPublicationsPublicationIdRoute =
+  AuthenticatedPublicationsPublicationIdRouteImport.update({
+    id: '/publications/$publicationId',
+    path: '/publications/$publicationId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
     id: '/privacy',
@@ -718,6 +762,12 @@ const AuthenticatedProfilePasswordRoute =
   AuthenticatedProfilePasswordRouteImport.update({
     id: '/password',
     path: '/password',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedProfileAvailabilitiesRoute =
+  AuthenticatedProfileAvailabilitiesRouteImport.update({
+    id: '/availabilities',
+    path: '/availabilities',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
 const AuthenticatedPlayersPlayerIdRoute =
@@ -803,6 +853,18 @@ const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
   path: '/pay/$registrationId',
   getParentRoute: () => TSlugRoute,
 } as any)
+const SuperadminPlayersPlayerIdAuditRoute =
+  SuperadminPlayersPlayerIdAuditRouteImport.update({
+    id: '/players/$playerId/audit',
+    path: '/players/$playerId/audit',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
+const SuperadminClubsClubIdRosterRoute =
+  SuperadminClubsClubIdRosterRouteImport.update({
+    id: '/clubs/$clubId_/roster',
+    path: '/clubs/$clubId/roster',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
 const SuperadminClubsClubIdInvitesRoute =
   SuperadminClubsClubIdInvitesRouteImport.update({
     id: '/clubs/$clubId_/invites',
@@ -871,6 +933,12 @@ const ApiPublicHooksTournamentMatchRemindersRoute =
     path: '/api/public/hooks/tournament-match-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSesNotificationsRoute =
+  ApiPublicHooksSesNotificationsRouteImport.update({
+    id: '/api/public/hooks/ses-notifications',
+    path: '/api/public/hooks/ses-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPrivacyWorkerRoute =
   ApiPublicHooksPrivacyWorkerRouteImport.update({
     id: '/api/public/hooks/privacy-worker',
@@ -930,6 +998,12 @@ const AuthenticatedTournamentsPricingSuccessRoute =
     id: '/success',
     path: '/success',
     getParentRoute: () => AuthenticatedTournamentsPricingRoute,
+  } as any)
+const AuthenticatedTeamsTeamIdStaffRoute =
+  AuthenticatedTeamsTeamIdStaffRouteImport.update({
+    id: '/$teamId_/staff',
+    path: '/$teamId/staff',
+    getParentRoute: () => AuthenticatedTeamsRoute,
   } as any)
 const AuthenticatedTeamsTeamIdStatsRoute =
   AuthenticatedTeamsTeamIdStatsRouteImport.update({
@@ -1140,10 +1214,13 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1163,8 +1240,11 @@ export interface FileRoutesByFullPath {
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1196,6 +1276,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/needs/': typeof AuthenticatedNeedsIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/publications/': typeof AuthenticatedPublicationsIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
@@ -1224,6 +1305,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
+  '/teams/$teamId/staff': typeof AuthenticatedTeamsTeamIdStaffRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
@@ -1234,6 +1316,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/ses-notifications': typeof ApiPublicHooksSesNotificationsRoute
   '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
@@ -1246,6 +1329,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1303,10 +1388,13 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1325,8 +1413,11 @@ export interface FileRoutesByTo {
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1358,6 +1449,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/needs': typeof AuthenticatedNeedsIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
+  '/publications': typeof AuthenticatedPublicationsIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
@@ -1386,6 +1478,7 @@ export interface FileRoutesByTo {
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
+  '/teams/$teamId/staff': typeof AuthenticatedTeamsTeamIdStaffRoute
   '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
@@ -1396,6 +1489,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/ses-notifications': typeof ApiPublicHooksSesNotificationsRoute
   '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
@@ -1408,6 +1502,8 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1471,10 +1567,13 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/register_/player': typeof RegisterPlayerRoute
+  '/rm/$token': typeof RmTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/build-clubero': typeof SuperadminBuildCluberoRoute
   '/superadmin/email-dispatches': typeof SuperadminEmailDispatchesRoute
+  '/superadmin/invite-batches': typeof SuperadminInviteBatchesRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/notifications': typeof SuperadminNotificationsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRoute
@@ -1494,8 +1593,11 @@ export interface FileRoutesById {
   '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/_authenticated/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/_authenticated/profile/availabilities': typeof AuthenticatedProfileAvailabilitiesRoute
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/_authenticated/publications/$publicationId': typeof AuthenticatedPublicationsPublicationIdRoute
+  '/_authenticated/publications/new': typeof AuthenticatedPublicationsNewRoute
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRouteWithChildren
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
@@ -1527,6 +1629,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/needs/': typeof AuthenticatedNeedsIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/_authenticated/publications/': typeof AuthenticatedPublicationsIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
@@ -1555,6 +1658,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/_authenticated/teams/$teamId/availability': typeof AuthenticatedTeamsTeamIdAvailabilityRoute
   '/_authenticated/teams/$teamId/stats': typeof AuthenticatedTeamsTeamIdStatsRoute
+  '/_authenticated/teams/$teamId_/staff': typeof AuthenticatedTeamsTeamIdStaffRoute
   '/_authenticated/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/build-clubero/complete': typeof ApiPublicBuildCluberoCompleteRoute
   '/api/public/build-clubero/save': typeof ApiPublicBuildCluberoSaveRoute
@@ -1565,6 +1669,7 @@ export interface FileRoutesById {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/ses-notifications': typeof ApiPublicHooksSesNotificationsRoute
   '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
@@ -1577,6 +1682,8 @@ export interface FileRoutesById {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/stages/$clubSlug/$campSlug/inscription': typeof StagesClubSlugCampSlugInscriptionRoute
   '/superadmin/clubs/$clubId_/invites': typeof SuperadminClubsClubIdInvitesRoute
+  '/superadmin/clubs/$clubId_/roster': typeof SuperadminClubsClubIdRosterRoute
+  '/superadmin/players/$playerId/audit': typeof SuperadminPlayersPlayerIdAuditRoute
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/tournament/$slug_/roster/$token': typeof TournamentSlugRosterTokenRoute
@@ -1640,10 +1747,13 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1663,8 +1773,11 @@ export interface FileRouteTypes {
     | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/availabilities'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
+    | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
@@ -1696,6 +1809,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/needs/'
     | '/profile/'
+    | '/publications/'
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
@@ -1724,6 +1838,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/timeline'
     | '/teams/$teamId/availability'
     | '/teams/$teamId/stats'
+    | '/teams/$teamId/staff'
     | '/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
@@ -1734,6 +1849,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/ses-notifications'
     | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
@@ -1746,6 +1862,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId/invites'
+    | '/superadmin/clubs/$clubId/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -1803,10 +1921,13 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1825,8 +1946,11 @@ export interface FileRouteTypes {
     | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/availabilities'
     | '/profile/password'
     | '/profile/privacy'
+    | '/publications/$publicationId'
+    | '/publications/new'
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
@@ -1858,6 +1982,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/needs'
     | '/profile'
+    | '/publications'
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
@@ -1886,6 +2011,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/timeline'
     | '/teams/$teamId/availability'
     | '/teams/$teamId/stats'
+    | '/teams/$teamId/staff'
     | '/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
@@ -1896,6 +2022,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/ses-notifications'
     | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
@@ -1908,6 +2035,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId/invites'
+    | '/superadmin/clubs/$clubId/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/tournament/$slug/roster/$token'
@@ -1970,10 +2099,13 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/r/$token'
     | '/register_/player'
+    | '/rm/$token'
     | '/superadmin/billing'
     | '/superadmin/build-clubero'
     | '/superadmin/email-dispatches'
+    | '/superadmin/invite-batches'
     | '/superadmin/logs'
+    | '/superadmin/notifications'
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
@@ -1993,8 +2125,11 @@ export interface FileRouteTypes {
     | '/_authenticated/payments/family'
     | '/_authenticated/payments/receipts'
     | '/_authenticated/players/$playerId'
+    | '/_authenticated/profile/availabilities'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
+    | '/_authenticated/publications/$publicationId'
+    | '/_authenticated/publications/new'
     | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/tournaments/$tournamentId'
@@ -2026,6 +2161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/needs/'
     | '/_authenticated/profile/'
+    | '/_authenticated/publications/'
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
@@ -2054,6 +2190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId/timeline'
     | '/_authenticated/teams/$teamId/availability'
     | '/_authenticated/teams/$teamId/stats'
+    | '/_authenticated/teams/$teamId_/staff'
     | '/_authenticated/tournaments/pricing/success'
     | '/api/public/build-clubero/complete'
     | '/api/public/build-clubero/save'
@@ -2064,6 +2201,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/ses-notifications'
     | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
@@ -2076,6 +2214,8 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/stages/$clubSlug/$campSlug/inscription'
     | '/superadmin/clubs/$clubId_/invites'
+    | '/superadmin/clubs/$clubId_/roster'
+    | '/superadmin/players/$playerId/audit'
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/tournament/$slug_/roster/$token'
@@ -2126,6 +2266,7 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   RTokenRoute: typeof RTokenRoute
   RegisterPlayerRoute: typeof RegisterPlayerRoute
+  RmTokenRoute: typeof RmTokenRoute
   SupportViewSessionIdRoute: typeof SupportViewSessionIdRouteWithChildren
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
@@ -2159,6 +2300,7 @@ export interface RootRouteChildren {
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksPaymentRemindersRoute: typeof ApiPublicHooksPaymentRemindersRoute
   ApiPublicHooksPrivacyWorkerRoute: typeof ApiPublicHooksPrivacyWorkerRoute
+  ApiPublicHooksSesNotificationsRoute: typeof ApiPublicHooksSesNotificationsRoute
   ApiPublicHooksTournamentMatchRemindersRoute: typeof ApiPublicHooksTournamentMatchRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicPushConvocationResponseRoute: typeof ApiPublicPushConvocationResponseRoute
@@ -2409,11 +2551,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminSettingsRouteImport
       parentRoute: typeof SuperadminRoute
     }
+    '/superadmin/notifications': {
+      id: '/superadmin/notifications'
+      path: '/notifications'
+      fullPath: '/superadmin/notifications'
+      preLoaderRoute: typeof SuperadminNotificationsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/superadmin/logs': {
       id: '/superadmin/logs'
       path: '/logs'
       fullPath: '/superadmin/logs'
       preLoaderRoute: typeof SuperadminLogsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/invite-batches': {
+      id: '/superadmin/invite-batches'
+      path: '/invite-batches'
+      fullPath: '/superadmin/invite-batches'
+      preLoaderRoute: typeof SuperadminInviteBatchesRouteImport
       parentRoute: typeof SuperadminRoute
     }
     '/superadmin/email-dispatches': {
@@ -2436,6 +2592,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/billing'
       preLoaderRoute: typeof SuperadminBillingRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/rm/$token': {
+      id: '/rm/$token'
+      path: '/rm/$token'
+      fullPath: '/rm/$token'
+      preLoaderRoute: typeof RmTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/register_/player': {
       id: '/register_/player'
@@ -2675,6 +2838,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportIndexRouteImport
       parentRoute: typeof AuthenticatedSupportRoute
     }
+    '/_authenticated/publications/': {
+      id: '/_authenticated/publications/'
+      path: '/publications'
+      fullPath: '/publications/'
+      preLoaderRoute: typeof AuthenticatedPublicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile/': {
       id: '/_authenticated/profile/'
       path: '/'
@@ -2892,6 +3062,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportTicketIdRouteImport
       parentRoute: typeof AuthenticatedSupportRoute
     }
+    '/_authenticated/publications/new': {
+      id: '/_authenticated/publications/new'
+      path: '/publications/new'
+      fullPath: '/publications/new'
+      preLoaderRoute: typeof AuthenticatedPublicationsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/publications/$publicationId': {
+      id: '/_authenticated/publications/$publicationId'
+      path: '/publications/$publicationId'
+      fullPath: '/publications/$publicationId'
+      preLoaderRoute: typeof AuthenticatedPublicationsPublicationIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
       path: '/privacy'
@@ -2904,6 +3088,13 @@ declare module '@tanstack/react-router' {
       path: '/password'
       fullPath: '/profile/password'
       preLoaderRoute: typeof AuthenticatedProfilePasswordRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/profile/availabilities': {
+      id: '/_authenticated/profile/availabilities'
+      path: '/availabilities'
+      fullPath: '/profile/availabilities'
+      preLoaderRoute: typeof AuthenticatedProfileAvailabilitiesRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
     '/_authenticated/players/$playerId': {
@@ -3004,6 +3195,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
       parentRoute: typeof TSlugRoute
     }
+    '/superadmin/players/$playerId/audit': {
+      id: '/superadmin/players/$playerId/audit'
+      path: '/players/$playerId/audit'
+      fullPath: '/superadmin/players/$playerId/audit'
+      preLoaderRoute: typeof SuperadminPlayersPlayerIdAuditRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/clubs/$clubId_/roster': {
+      id: '/superadmin/clubs/$clubId_/roster'
+      path: '/clubs/$clubId/roster'
+      fullPath: '/superadmin/clubs/$clubId/roster'
+      preLoaderRoute: typeof SuperadminClubsClubIdRosterRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/superadmin/clubs/$clubId_/invites': {
       id: '/superadmin/clubs/$clubId_/invites'
       path: '/clubs/$clubId/invites'
@@ -3088,6 +3293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTournamentMatchRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/ses-notifications': {
+      id: '/api/public/hooks/ses-notifications'
+      path: '/api/public/hooks/ses-notifications'
+      fullPath: '/api/public/hooks/ses-notifications'
+      preLoaderRoute: typeof ApiPublicHooksSesNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/privacy-worker': {
       id: '/api/public/hooks/privacy-worker'
       path: '/api/public/hooks/privacy-worker'
@@ -3157,6 +3369,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tournaments/pricing/success'
       preLoaderRoute: typeof AuthenticatedTournamentsPricingSuccessRouteImport
       parentRoute: typeof AuthenticatedTournamentsPricingRoute
+    }
+    '/_authenticated/teams/$teamId_/staff': {
+      id: '/_authenticated/teams/$teamId_/staff'
+      path: '/$teamId/staff'
+      fullPath: '/teams/$teamId/staff'
+      preLoaderRoute: typeof AuthenticatedTeamsTeamIdStaffRouteImport
+      parentRoute: typeof AuthenticatedTeamsRoute
     }
     '/_authenticated/teams/$teamId/stats': {
       id: '/_authenticated/teams/$teamId/stats'
@@ -3444,12 +3663,15 @@ const AuthenticatedPaymentsRouteWithChildren =
   )
 
 interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfileAvailabilitiesRoute: typeof AuthenticatedProfileAvailabilitiesRoute
   AuthenticatedProfilePasswordRoute: typeof AuthenticatedProfilePasswordRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfileAvailabilitiesRoute:
+    AuthenticatedProfileAvailabilitiesRoute,
   AuthenticatedProfilePasswordRoute: AuthenticatedProfilePasswordRoute,
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
@@ -3490,10 +3712,12 @@ const AuthenticatedTeamsTeamIdRouteWithChildren =
 
 interface AuthenticatedTeamsRouteChildren {
   AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRouteWithChildren
+  AuthenticatedTeamsTeamIdStaffRoute: typeof AuthenticatedTeamsTeamIdStaffRoute
 }
 
 const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
   AuthenticatedTeamsTeamIdRoute: AuthenticatedTeamsTeamIdRouteWithChildren,
+  AuthenticatedTeamsTeamIdStaffRoute: AuthenticatedTeamsTeamIdStaffRoute,
 }
 
 const AuthenticatedTeamsRouteWithChildren =
@@ -3581,7 +3805,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
   AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  AuthenticatedPublicationsPublicationIdRoute: typeof AuthenticatedPublicationsPublicationIdRoute
+  AuthenticatedPublicationsNewRoute: typeof AuthenticatedPublicationsNewRoute
   AuthenticatedNeedsIndexRoute: typeof AuthenticatedNeedsIndexRoute
+  AuthenticatedPublicationsIndexRoute: typeof AuthenticatedPublicationsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -3601,7 +3828,11 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
+  AuthenticatedPublicationsPublicationIdRoute:
+    AuthenticatedPublicationsPublicationIdRoute,
+  AuthenticatedPublicationsNewRoute: AuthenticatedPublicationsNewRoute,
   AuthenticatedNeedsIndexRoute: AuthenticatedNeedsIndexRoute,
+  AuthenticatedPublicationsIndexRoute: AuthenticatedPublicationsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -3612,7 +3843,9 @@ interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
   SuperadminBuildCluberoRoute: typeof SuperadminBuildCluberoRoute
   SuperadminEmailDispatchesRoute: typeof SuperadminEmailDispatchesRoute
+  SuperadminInviteBatchesRoute: typeof SuperadminInviteBatchesRoute
   SuperadminLogsRoute: typeof SuperadminLogsRoute
+  SuperadminNotificationsRoute: typeof SuperadminNotificationsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRoute
@@ -3625,13 +3858,17 @@ interface SuperadminRouteChildren {
   SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
   SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
   SuperadminClubsClubIdInvitesRoute: typeof SuperadminClubsClubIdInvitesRoute
+  SuperadminClubsClubIdRosterRoute: typeof SuperadminClubsClubIdRosterRoute
+  SuperadminPlayersPlayerIdAuditRoute: typeof SuperadminPlayersPlayerIdAuditRoute
 }
 
 const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminBillingRoute: SuperadminBillingRoute,
   SuperadminBuildCluberoRoute: SuperadminBuildCluberoRoute,
   SuperadminEmailDispatchesRoute: SuperadminEmailDispatchesRoute,
+  SuperadminInviteBatchesRoute: SuperadminInviteBatchesRoute,
   SuperadminLogsRoute: SuperadminLogsRoute,
+  SuperadminNotificationsRoute: SuperadminNotificationsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRoute,
@@ -3645,6 +3882,8 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
   SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
   SuperadminClubsClubIdInvitesRoute: SuperadminClubsClubIdInvitesRoute,
+  SuperadminClubsClubIdRosterRoute: SuperadminClubsClubIdRosterRoute,
+  SuperadminPlayersPlayerIdAuditRoute: SuperadminPlayersPlayerIdAuditRoute,
 }
 
 const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
@@ -3731,6 +3970,7 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   RTokenRoute: RTokenRoute,
   RegisterPlayerRoute: RegisterPlayerRoute,
+  RmTokenRoute: RmTokenRoute,
   SupportViewSessionIdRoute: SupportViewSessionIdRouteWithChildren,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
@@ -3764,6 +4004,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksPaymentRemindersRoute: ApiPublicHooksPaymentRemindersRoute,
   ApiPublicHooksPrivacyWorkerRoute: ApiPublicHooksPrivacyWorkerRoute,
+  ApiPublicHooksSesNotificationsRoute: ApiPublicHooksSesNotificationsRoute,
   ApiPublicHooksTournamentMatchRemindersRoute:
     ApiPublicHooksTournamentMatchRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,

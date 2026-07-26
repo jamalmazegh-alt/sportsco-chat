@@ -10,17 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
+import { severityForStart } from "./pure";
 import type { UrgencyCollectorResult, UrgencyItem, UrgencyRole } from "./types";
-
-const DAY_MS = 86_400_000;
-
-function severityForStart(startsAt: string): "critical" | "high" | null {
-  const delta = new Date(startsAt).getTime() - Date.now();
-  if (delta <= 0) return null;
-  if (delta <= 1 * DAY_MS) return "critical"; // J-1
-  if (delta <= 3 * DAY_MS) return "high"; // J-2 / J-3
-  return null;
-}
 
 export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending: boolean } {
   const { t } = useTranslation();
@@ -31,7 +22,6 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
   const isPlayer = roles.includes("player");
   const isParent = roles.includes("parent");
 
-  const horizonIso = new Date(Date.now() + 3 * DAY_MS).toISOString();
   const nowIso = new Date().toISOString();
 
   const q = useQuery({
@@ -62,7 +52,6 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         .in("team_id", teamIds)
         .eq("status", "published")
         .gte("starts_at", nowIso)
-        .lte("starts_at", horizonIso)
         .order("starts_at", { ascending: true });
       if (eventsErr) throw eventsErr;
       if (!events || events.length === 0) return [];
@@ -88,8 +77,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         }
         for (const [eventId, count] of byEvent) {
           const ev = eventById.get(eventId)!;
-          const sev = severityForStart(ev.starts_at);
-          if (!sev) continue;
+          const sev = severityForStart(ev.starts_at) ?? "medium";
           items.push({
             id: `convocation-silence:${eventId}:coach`,
             source: "convocation-silence",
@@ -127,15 +115,18 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
         if (myPlayerIds.size > 0) {
           // Dedup parent multi-enfants : un item par event où ≥1 de mes
           // joueurs n'a pas répondu. sourceId = eventId.
-          const eventsForMe = new Set<string>();
+          const convocIdsByEvent = new Map<string, string[]>();
           for (const c of convocs) {
-            if (myPlayerIds.has(c.player_id)) eventsForMe.add(c.event_id);
+            if (myPlayerIds.has(c.player_id)) {
+              const list = convocIdsByEvent.get(c.event_id) ?? [];
+              list.push(c.id);
+              convocIdsByEvent.set(c.event_id, list);
+            }
           }
           const role: UrgencyRole = isPlayer ? "player" : "parent";
-          for (const eventId of eventsForMe) {
+          for (const [eventId, convocIds] of convocIdsByEvent) {
             const ev = eventById.get(eventId)!;
-            const sev = severityForStart(ev.starts_at);
-            if (!sev) continue;
+            const sev = severityForStart(ev.starts_at) ?? "medium";
             items.push({
               id: `convocation-silence:${eventId}:${role}`,
               source: "convocation-silence",
@@ -148,6 +139,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
               }),
               anchorAt: ev.starts_at,
               primaryAction: { kind: "respond", eventId },
+              quickRespondConvocationId: convocIds.length === 1 ? convocIds[0] : undefined,
             });
           }
         }

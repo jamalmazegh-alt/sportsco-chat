@@ -85,3 +85,100 @@ newly-added staff-rated template.
 Once the value-system extension lands, register the template in
 `src/lib/challenges/templates.ts` with the correct `sport` scope and remove
 the corresponding row from this file.
+
+## needs.json — Phase 2 UI (Coups de main v2)
+
+Clones EN → DE/ES/IT/NL/PT pour les namespaces ajoutés :
+`card`, `badge`, `wizard`, `audiencePicker`, `publishStep`, `applications`, `memberCard`, `unavailable`, `editDialog`, `deleteDraft`, `closeDialog2`, `cancelDialog2`, `menu`, `assignNotification`.
+
+→ Traductions natives DE/ES/IT/NL/PT à fournir.
+
+## common.json — urgency.deck (Lot 0)
+
+Clones EN → DE/ES/IT/NL/PT pour :
+`urgency.deck.showMore_one`, `urgency.deck.showMore_other`.
+
+→ Traductions natives DE/ES/IT/NL/PT à fournir.
+
+## `needs.json` — Modifier destinataires vs Relancer (DE/ES/IT/NL/PT)
+
+Added the following keys to distinguish two staff intents on a published need:
+
+- `actions.resend`, `actions.notifyNew`
+- `menu.editAudience`
+- `resend.title`, `resend.success_one`, `resend.success_other`
+- `editAudience.title`, `editAudience.desc`, `editAudience.deltaHint`,
+  `editAudience.success_one`, `editAudience.success_other`,
+  `editAudience.successNoDelta`
+
+FR and EN are final. DE/ES/IT/NL/PT are **clones of EN** and need native
+translations.
+
+## `common.json` — groups defaultValue removal (DE/ES/IT/NL/PT)
+
+Added `common.actions` scalar. All groups.\* keys referenced in
+`src/routes/_authenticated/admin/groups.tsx` (parentOf, emailOnly,
+individualMembers, addIndividual, errors.nameTaken, common.cancel/save)
+already existed with native translations. `common.actions` was added
+natively (Aktionen/Acciones/Azioni/Acties/Ações) — no clone tracking needed.
+
+Removed dead keys from every locale (FR + EN + DE/ES/IT/NL/PT):
+`groups.dynamicRules`, `groups.noRules`, `groups.resolvedTotal` (leftover
+from the rules → subgroups rename).
+
+## `needs.json` — Audience picker v4 (DE/ES/IT/NL/PT)
+
+Sélection d'audience mise en avant (dialog « Qui prévenir ? »). Nouvelles clés
+sous `audiences.*` :
+
+- `customGroups`, `eventRelevant`, `otherAudiences`, `pickKind`, `pickParam`, `noGroups`
+- `selected.title`, `selected.empty`, `selected.emptyConvocation`,
+  `selected.loading`, `selected.count_one`, `selected.count_other`,
+  `selected.removeAria`, `selected.takenAria`
+
+FR et EN sont finaux. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par
+des traductions natives.
+
+## `needs.json` — Voir les destinataires d'un besoin (DE/ES/IT/NL/PT)
+
+Nouvelles clés `menu.viewRecipients` et bloc `recipients.*` (title, desc,
+empty, count_one/other). FR et EN sont finaux. DE/ES/IT/NL/PT sont des
+**clones EN** — à remplacer par des traductions natives.
+
+## needs.myFeed._ + needs.withdrawDialog._ (2026-07-19)
+
+Clones EN → DE/ES/IT/NL/PT pour :
+
+- needs.myFeed.engagementsCount_one/other
+- needs.myFeed.nextLabel
+- needs.myFeed.plusOthers_one/other
+- needs.withdrawDialog.title/description/confirm/abort
+
+## publications.json — Communications & sondages de groupe (2026-07-19)
+
+Nouveau namespace `publications` (Phase A backend). FR et EN sont finaux et
+soignés. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par des
+traductions natives lors de Phase B.
+
+Blocs concernés :
+
+- `type.*`, `delivery.*`, `actions.*`, `poll.*`, `state.*`
+- `confirm.close/delete/resend/refresh.*`, `confirm.confirm/cancel`
+- `audience.*` (dont `audience.types.*` pour les 10 audiences)
+- `form.*`, `email.*`, `push.*`, `errors.*`
+
+## `publications.json` — Phase B UI (DE/ES/IT/NL/PT)
+
+Phase B added `list.*`, `new.*`, and `detail.*` sections to publications.json.
+FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
+
+## publications.detail.votingAs\*, votingForChild, player (2026-07-20)
+
+- FR: traduit
+- EN: traduit
+- DE/ES/IT/NL/PT: clone EN, à traduire
+
+## publications.new.pickCategory/pickEvent/pickMembers/searchPlaceholder/addPlayersBtn/addParentsBtn + publications.audience.recipientsCount/recipientsBreakdown/none/previewError (2026-07-20 wizard audiences)
+
+- FR/EN: traduit
+- DE/ES/IT/NL/PT: traductions natives fournies pour ces clés (bloc wizard categories/convocations/manual + compteur preview)

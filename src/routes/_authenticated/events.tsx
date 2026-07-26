@@ -11,6 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
+  EventsFilterSheet,
+  DEFAULT_EVENTS_FILTERS,
+  type EventsFilters,
+} from "@/components/events/EventsFilterSheet";
+
+import {
   Calendar,
   Plus,
   Users,
@@ -22,10 +28,9 @@ import {
   List,
   CalendarDays,
   Ban,
-  Eye,
-  EyeOff,
   Clock,
   Search,
+  Send,
 } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
@@ -70,12 +75,11 @@ function EventsPage() {
     roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [showPast, setShowPast] = useState(false);
-  const [showCancelled, setShowCancelled] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<EventsFilters>(DEFAULT_EVENTS_FILTERS);
   const [hideTrainings, setHideTrainings] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
@@ -93,12 +97,12 @@ function EventsPage() {
   });
 
   const { data: teams } = useQuery({
-    queryKey: ["teams", activeClubId],
+    queryKey: ["teams", activeClubId, "with-internal"],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, sport, championship, competitions")
+        .select("id, name, sport, championship, competitions, is_internal")
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .is("archived_at", null)
@@ -106,6 +110,12 @@ function EventsPage() {
       return data ?? [];
     },
   });
+
+  // Teams shown in filter chips / new-event picker exclude the internal team.
+  const visibleTeams = useMemo(
+    () => (teams ?? []).filter((t) => !(t as { is_internal?: boolean }).is_internal),
+    [teams],
+  );
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["events", activeClubId, isCoach],
@@ -138,24 +148,51 @@ function EventsPage() {
           ]),
         );
       }
-      return list.map((e) => ({
-        ...e,
-        team_name: teams!.find((t) => t.id === e.team_id)?.name ?? "",
-        result: resultsById.get(e.id) ?? null,
-      }));
+      return list.map((e) => {
+        const team = teams!.find((t) => t.id === e.team_id);
+        const isInternal = Boolean((team as { is_internal?: boolean } | undefined)?.is_internal);
+        return {
+          ...e,
+          team_name: isInternal ? "" : (team?.name ?? ""),
+          result: resultsById.get(e.id) ?? null,
+        };
+      });
     },
   });
 
-  const visibleEvents = useMemo(() => {
+  const internalTeamIds = useMemo(
+    () =>
+      new Set(
+        (teams ?? []).filter((t) => (t as { is_internal?: boolean }).is_internal).map((t) => t.id),
+      ),
+    [teams],
+  );
+  const hasInternalTeam = internalTeamIds.size > 0;
+
+  const baseVisibleEvents = useMemo(() => {
     if (!events) return [];
     const q = searchQuery.trim().toLowerCase();
+    const fromTs = filters.dateFrom ? startOfDay(filters.dateFrom).getTime() : null;
+    const toTs = filters.dateTo
+      ? startOfDay(filters.dateTo).getTime() + 24 * 60 * 60 * 1000 - 1
+      : null;
     return events.filter((e) => {
-      if (!showCancelled && e.status === "cancelled") return false;
+      if (!filters.showCancelled && e.status === "cancelled") return false;
       if (hideTrainings && e.type === "training") return false;
-      if (!showPast) {
-        const d = new Date(e.starts_at);
+      if (filters.types.size > 0 && !filters.types.has(e.type as any)) return false;
+      if (filters.teamIds.size > 0 && !filters.teamIds.has(e.team_id)) return false;
+      if (!filters.includeInternal && internalTeamIds.has(e.team_id)) return false;
+      if (filters.homeAway !== "all") {
+        if (e.type !== "match" && e.type !== "tournament") return false;
+        if (filters.homeAway === "home" && e.is_home === false) return false;
+        if (filters.homeAway === "away" && e.is_home !== false) return false;
+      }
+      const d = new Date(e.starts_at);
+      if (!filters.showPast) {
         if (isPast(d) && !isToday(d)) return false;
       }
+      if (fromTs !== null && d.getTime() < fromTs) return false;
+      if (toTs !== null && d.getTime() > toTs) return false;
       if (q) {
         const haystack = [e.title, e.opponent, e.team_name, e.competition_name, e.location]
           .filter(Boolean)
@@ -165,7 +202,7 @@ function EventsPage() {
       }
       return true;
     });
-  }, [events, showPast, showCancelled, hideTrainings, searchQuery]);
+  }, [events, filters, internalTeamIds, searchQuery, hideTrainings]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
@@ -242,6 +279,31 @@ function EventsPage() {
     },
     staleTime: 30_000,
   });
+
+  // Coach view: which events already have convocations dispatched.
+  // Rendered as a small "Convocations envoyées" chip on each event row.
+  const { data: convocSentSet } = useQuery({
+    queryKey: ["convocs-sent-by-event", activeClubId, (events ?? []).length],
+    enabled: isCoach && !!events && events.length > 0,
+    queryFn: async () => {
+      const eventIds = (events ?? []).map((e) => e.id);
+      if (eventIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id")
+        .in("event_id", eventIds);
+      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+    },
+    staleTime: 30_000,
+  });
+
+  const visibleEvents = useMemo(() => {
+    if (filters.convocationsSent === "all" || !convocSentSet) return baseVisibleEvents;
+    return baseVisibleEvents.filter((e) => {
+      const sent = convocSentSet.has(e.id);
+      return filters.convocationsSent === "sent" ? sent : !sent;
+    });
+  }, [baseVisibleEvents, convocSentSet, filters.convocationsSent]);
 
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
@@ -449,6 +511,17 @@ function EventsPage() {
                 if (!resp) return null;
                 return <ConvocationResponseBadge response={resp} />;
               })()}
+              {isCoach && convocSentSet?.has(e.id) && !isCancelled && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
+                  title={t("events.convocsSentTitle", {
+                    defaultValue: "Les convocations ont été envoyées pour cet événement",
+                  })}
+                >
+                  <Send className="h-3 w-3" />
+                  {t("events.convocationsSentShort")}
+                </span>
+              )}
             </div>
             <p
               className={cn(
@@ -516,7 +589,7 @@ function EventsPage() {
         {isCoach && user && activeClubId && (
           <EventCreateChooser
             clubId={activeClubId}
-            teams={teams ?? []}
+            teams={visibleTeams}
             userId={user.id}
             open={open}
             onOpenChange={setOpen}
@@ -534,7 +607,7 @@ function EventsPage() {
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
           <button
             type="button"
@@ -565,73 +638,51 @@ function EventsPage() {
             {t("events.viewCalendar", { defaultValue: "Calendrier" })}
           </button>
         </div>
-        <div className="flex items-center gap-2">
-          {view === "list" && pastCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowPast((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                showPast
-                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-            >
-              {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
-            </button>
-          )}
+        <div className="flex flex-wrap items-center gap-2">
           {view === "list" && (
-            <button
-              type="button"
-              onClick={() => setShowCancelled((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                showCancelled
-                  ? "border-red-500/40 bg-red-500/10 text-red-700 hover:bg-red-500/15 dark:text-red-300"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-              title={t("events.cancelledToggle", { defaultValue: "Annulés" })}
-            >
-              <Ban className="h-3.5 w-3.5" />
-              {showCancelled
-                ? t("events.hideCancelled", { defaultValue: "Masquer annulés" })
-                : t("events.showCancelled", { defaultValue: "Voir annulés" })}
-            </button>
-          )}
-          {view === "list" && (
-            <button
-              type="button"
-              onClick={() => setHideTrainings((s) => !s)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                hideTrainings
-                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-              title={t("events.trainingsToggle", { defaultValue: "Entraînements" })}
-            >
-              <Dumbbell className="h-3.5 w-3.5" />
-              {hideTrainings
-                ? t("events.showTrainings", { defaultValue: "Voir entraînements" })
-                : t("events.hideTrainings", { defaultValue: "Masquer entraînements" })}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => setHideTrainings((v) => !v)}
+                aria-pressed={hideTrainings}
+                className={cn(
+                  "inline-flex items-center gap-1.5 h-9 rounded-md border px-3 text-xs font-medium transition-colors",
+                  hideTrainings
+                    ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                )}
+                title={t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              >
+                <Dumbbell className="h-3.5 w-3.5" />
+                {t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+              </button>
+              <EventsFilterSheet
+                filters={filters}
+                onChange={setFilters}
+                teams={visibleTeams}
+                isCoach={isCoach}
+                hasInternalTeam={hasInternalTeam}
+                pastCount={pastCount}
+              />
+            </>
           )}
         </div>
       </div>
 
       {view === "list" && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("events.searchPlaceholder", {
-              defaultValue: "Rechercher un événement…",
-            })}
-            className="pl-9"
-          />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("events.searchPlaceholder", {
+                defaultValue: "Rechercher un événement…",
+              })}
+              className="pl-9"
+            />
+          </div>
         </div>
       )}
 

@@ -13,24 +13,19 @@ import {
 
 const normKey = normalizeHeader;
 
-function normalizeDate(v: string): string {
-  // Accept JJ/MM/AAAA, JJ-MM-AAAA, YYYY-MM-DD, Excel serial (number-as-string)
-  const trimmed = v.trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
-  const m = trimmed.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
-  if (m) {
-    const [, d, moRaw, yRaw] = m;
-    const y = yRaw.length === 2 ? (parseInt(yRaw, 10) > 30 ? "19" : "20") + yRaw : yRaw;
-    return `${y}-${moRaw.padStart(2, "0")}-${d.padStart(2, "0")}`;
-  }
+import { parseFlexibleDate } from "./sheet-date";
 
-  // Excel serial number
-  const n = Number(trimmed);
-  if (!isNaN(n) && n > 10000 && n < 80000) {
-    const date = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
-    return date.toISOString().slice(0, 10);
-  }
-  return trimmed;
+/**
+ * Renvoie l'ISO strict `YYYY-MM-DD` si la date est déductible et calendaire,
+ * sinon laisse la valeur inchangée pour que la validation `isIsoDate` la
+ * refuse (ambigu ou invalide). Les objets `Date` de SheetJS sont déjà
+ * convertis en ISO en amont par `normalizeSheetCell`.
+ */
+function normalizeDate(v: string): string {
+  const trimmed = v.trim();
+  if (!trimmed) return "";
+  const { iso } = parseFlexibleDate(trimmed);
+  return iso ?? trimmed;
 }
 
 function normalizeTime(v: string): string {

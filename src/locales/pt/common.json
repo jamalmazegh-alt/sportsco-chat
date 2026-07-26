@@ -267,7 +267,11 @@
     "clear": "Limpar",
     "listen": "Ouvir",
     "stop": "Parar",
-    "errorOccurred": "Ocorreu um erro"
+    "errorOccurred": "Ocorreu um erro",
+    "unknown": "Sem nome",
+    "deselectAll": "Desmarcar tudo",
+    "actions": "Ações",
+    "add": "Adicionar"
   },
   "notFound": {
     "code": "404",
@@ -636,6 +640,8 @@
     "respondBoth": "Ambos",
     "accountActive": "Conta ativa",
     "accountInactive": "Sem conta",
+    "accountUnconfirmed": "E-mail não confirmado",
+    "accountUnconfirmedHint": "A conta existe, mas o e-mail ainda não foi confirmado. O responsável deve clicar no link de confirmação recebido por e-mail.",
     "inviteNotSent": "Convite não enviado",
     "inviteSentLabel": "Convite enviado",
     "inviteSentAction": "Convidar",
@@ -696,7 +702,8 @@
       "done": "{{inserted}} jogador(es) importado(s)",
       "failed": "{{failed}} linha(s) com erros"
     },
-    "inviteAlreadyActive": "Conta já ativa — não é preciso reenviar."
+    "inviteAlreadyActive": "Conta já ativa — não é preciso reenviar.",
+    "parentActivationPending": "Aguardando ativação da conta do responsável"
   },
   "events": {
     "isOfficial": "Jogo oficial",
@@ -741,6 +748,7 @@
     "published": "Evento publicado",
     "sendConvocations": "Enviar Convocatórias",
     "convocationsSent": "Convocatórias enviadas",
+    "convocationsSentShort": "Convoc enviada",
     "noEvents": "Nenhum Evento agendado.",
     "searchPlaceholder": "Procurar um evento…",
     "noSearchResults": "Sem resultados",
@@ -950,7 +958,8 @@
     "pendingCount_one": "{{count}} Jogador ainda não respondeu",
     "pendingCount_other": "{{count}} Jogadores ainda não responderam",
     "remindAllSent_one": "{{count}} lembrete enviado",
-    "remindAllSent_other": "{{count}} lembretes enviados"
+    "remindAllSent_other": "{{count}} lembretes enviados",
+    "errorPastEventLocked": "Este evento já passou — as respostas já não podem ser alteradas."
   },
   "stats": {
     "title": "Estatísticas",
@@ -1267,7 +1276,16 @@
       "plusOthers": "{{first}} + {{n}} outras"
     },
     "audienceTo": "Para:",
-    "audienceRequired": "Escolha pelo menos uma equipa."
+    "audienceRequired": "Escolha pelo menos uma equipa.",
+    "compose": {
+      "targetGroup": "Grupo(s)",
+      "alsoEmail": "Enviar uma cópia por email",
+      "newPoll": "Nova sondagem"
+    },
+    "email": {
+      "subject": "Nova mensagem de {{club}}",
+      "viewOnWall": "Ver no mural"
+    }
   },
   "chat": {
     "title": "Chat do Evento",
@@ -1275,7 +1293,9 @@
     "placeholder": "Escrever mensagem…",
     "disabled": "O chat está desativado para este evento.",
     "you": "Tu",
-    "loadMore": "Carregar mais"
+    "loadMore": "Carregar mais",
+    "noAccess": "O chat deste evento é reservado ao staff. Peça ao seu clube para abri-lo a pais ou jogadores.",
+    "sendFailed": "Mensagem não enviada: não tem acesso a este chat."
   },
   "assistant": {
     "title": "Assistente Clubero",
@@ -1759,11 +1779,6 @@
       "description": "Ajudamo-lo a migrar o seu Clube, as suas Equipas e os seus dados para o Clubero em poucos dias. Acompanhamento pessoal, importação de Excel e ferramentas existentes.",
       "ogDescription": "Mude facilmente para o Clubero. Migramos o seu Clube por si."
     },
-    "parentGuide": {
-      "title": "Guia para pais — começar com o Clubero",
-      "description": "Tutoriais passo a passo para pais: responder a uma convocatória, declarar uma ausência, dar o consentimento, configurar as notificações e acompanhar o calendário familiar.",
-      "ogDescription": "Convocatórias, ausências, notificações: o guia para pais para começar com o Clubero."
-    },
     "tournamentsPage": {
       "title": "Torneios — Resultados ao vivo, tabelas públicas, modo TV | Clubero",
       "description": "Organize Torneios modernos com resultados ao vivo, tabelas públicas, modo de Árbitro móvel e modo TV. Pensado para organizadores, Jogadores, Encarregados de educação e fãs.",
@@ -1772,6 +1787,11 @@
     "adminVenues": {
       "title": "Locais e campos – Clubero",
       "description": "Configure locais e campos do seu clube."
+    },
+    "parentGuide": {
+      "title": "Guia para pais — começar com o Clubero",
+      "description": "Tutoriais passo a passo para pais: responder a uma convocatória, declarar uma ausência, dar o consentimento, configurar as notificações e acompanhar o calendário familiar.",
+      "ogDescription": "Convocatórias, ausências, notificações: o guia para pais para começar com o Clubero."
     }
   },
   "trial": {
@@ -1843,7 +1863,12 @@
     "confirm": "Confirmar",
     "noDriversYet": "Ainda sem condutores.",
     "iNeedRide": "Pedir boleia",
-    "needRideRegistered": "Pedido enviado ao treinador"
+    "needRideRegistered": "Pedido enviado ao treinador",
+    "disabledHint": "Ative as boleias para que os encarregados possam oferecer e reservar lugares.",
+    "needsTitle": "Pedidos de boleia",
+    "cancelNeed": "Retirar o meu pedido",
+    "noNeeds": "Sem pedidos de boleia.",
+    "notifyFailed": "Pedido guardado, mas o e-mail para a equipa não pôde ser enviado."
   },
   "journey": {
     "tab": {
@@ -2184,6 +2209,10 @@
       "checkFailed": "Não foi possível verificar os alertas"
     },
     "partialError": "Algumas fontes estão indisponíveis, a lista pode estar incompleta.",
+    "deck": {
+      "showMore_one": "+ {{count}} more item",
+      "showMore_other": "+ {{count}} more items"
+    },
     "cta": {
       "respond": "Responder",
       "open": "Abrir"
@@ -2328,7 +2357,56 @@
     "memberAdded": "Member added",
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
-    "openGroups": "Groups"
+    "openGroups": "Groups",
+    "errors": {
+      "nameTaken": "Já existe um grupo com este nome."
+    },
+    "personsToday_one": "{{count}} pessoa hoje",
+    "personsToday_other": "{{count}} pessoas hoje",
+    "dynamicSubgroups": "Subgrupos",
+    "dynamicBadge": "DINÂMICO",
+    "noSubgroups": "Sem subgrupo. A composição atualiza-se automaticamente.",
+    "addSubgroup": "Adicionar",
+    "subgroupAdded": "Subgrupo adicionado",
+    "subgroupRemoved": "Subgrupo removido",
+    "subgroupRemove": "Remover",
+    "subgroupPreview": "Ver membros",
+    "subgroupPreviewDescription": "Lista resolvida no momento. A composição atualiza-se automaticamente.",
+    "subgroupPreviewEmpty": "Nenhum membro resolvido.",
+    "subgroupPreviewCount_one": "{{count}} membro",
+    "subgroupPreviewCount_other": "{{count}} membros",
+    "pickAudienceKind": "Escolher um público…",
+    "pickAudienceParam": "Escolher…",
+    "selectedAudiencesTitle": "Públicos selecionados",
+    "selectedAudiencesEmpty": "Nenhum público selecionado. Adicione um abaixo.",
+    "otherAudiences": "Outros públicos",
+    "parentOf": "Pai/mãe de {{names}}",
+    "emailOnly": "apenas email",
+    "individualMembers": "Membros individuais",
+    "addIndividual": "Adicionar individualmente",
+    "confirmDeactivate": "Desativar este grupo?",
+    "confirmActivate": "Reativar este grupo?",
+    "activated": "Grupo reativado",
+    "deactivated": "Grupo desativado",
+    "actions": {
+      "rename": "Renomear",
+      "deactivate": "Desativar",
+      "activate": "Reativar",
+      "delete": "Eliminar"
+    },
+    "bulk": {
+      "club_members": "Todos os membros",
+      "club_staff": "Todo o staff",
+      "club_admins": "Administradores",
+      "club_educators": "Todos os treinadores",
+      "club_tournament_managers": "Responsáveis de torneios",
+      "team_players": "Jogadores de uma equipa",
+      "team_parents": "Pais de uma equipa",
+      "team_educators": "Treinadores de uma equipa",
+      "category_educators": "Treinadores de uma categoria"
+    },
+    "bulkPickKind": "Escolher um tipo…",
+    "bulkPickParam": "Escolher…"
   },
   "install": {
     "meta": {
@@ -2375,5 +2453,10 @@
     "androidStep2": "Escolha «Instalar aplicação» (ou «Adicionar ao ecrã principal»).",
     "androidStep3": "Confirme: o ícone do Clubero aparece no seu ecrã inicial.",
     "ctaHint": "No Android, este botão instala o Clubero diretamente. No iPhone, siga os passos do Safari abaixo."
+  },
+  "person": {
+    "playerSubline": "Jogador · {{category}}",
+    "playerSublineMulti": "Jogador · {{categories}}",
+    "parentSubline": "Pai/Mãe de {{children}}"
   }
 }

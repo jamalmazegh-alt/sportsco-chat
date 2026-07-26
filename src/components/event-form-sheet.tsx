@@ -176,6 +176,7 @@ function DateTimeField({
   onDate,
   onTime,
   required,
+  testId,
 }: {
   label: string;
   date: Date | undefined;
@@ -183,6 +184,7 @@ function DateTimeField({
   onDate: (d: Date | undefined) => void;
   onTime: (t: string) => void;
   required?: boolean;
+  testId?: string;
 }) {
   return (
     <div className="space-y-1.5">
@@ -193,6 +195,7 @@ function DateTimeField({
             <Button
               type="button"
               variant="outline"
+              data-testid={testId ? `${testId}-date` : undefined}
               className={cn("h-10 justify-start font-normal", !date && "text-muted-foreground")}
             >
               <CalendarIcon className="h-4 w-4" />
@@ -209,7 +212,13 @@ function DateTimeField({
             />
           </PopoverContent>
         </Popover>
-        <TimePicker value={time} onChange={onTime} required={required} className="w-full" />
+        <TimePicker
+          value={time}
+          onChange={onTime}
+          required={required}
+          className="w-full"
+          data-testid={testId ? `${testId}-time` : undefined}
+        />
       </div>
     </div>
   );
@@ -220,11 +229,13 @@ function DateOnlyField({
   date,
   onDate,
   required,
+  testId,
 }: {
   label: string;
   date: Date | undefined;
   onDate: (d: Date | undefined) => void;
   required?: boolean;
+  testId?: string;
 }) {
   return (
     <div className="space-y-1.5">
@@ -234,6 +245,7 @@ function DateOnlyField({
           <Button
             type="button"
             variant="outline"
+            data-testid={testId ? `${testId}-date` : undefined}
             className={cn(
               "h-10 w-full justify-start font-normal",
               !date && "text-muted-foreground",
@@ -263,16 +275,24 @@ function TimeField({
   time,
   onTime,
   required,
+  testId,
 }: {
   label: string;
   time: string;
   onTime: (t: string) => void;
   required?: boolean;
+  testId?: string;
 }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <TimePicker value={time} onChange={onTime} required={required} className="w-full" />
+      <TimePicker
+        value={time}
+        onChange={onTime}
+        required={required}
+        className="w-full"
+        data-testid={testId}
+      />
     </div>
   );
 }
@@ -785,6 +805,7 @@ export function EventFormSheet({
           <div className="space-y-1.5">
             <Label>{t("events.name")}</Label>
             <Input
+              data-testid="event-name-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={type === "training" ? t("events.types.training") : ""}
@@ -842,6 +863,7 @@ export function EventFormSheet({
             <div className="space-y-1.5">
               <Label>{t("events.opponent")}</Label>
               <Input
+                data-testid="event-opponent-input"
                 required
                 value={opponent ?? ""}
                 onChange={(e) => setOpponent(e.target.value)}
@@ -908,6 +930,7 @@ export function EventFormSheet({
               onDate={setStartDate}
               onTime={setStartTime}
               required
+              testId="event-start"
             />
           </>
         ) : type === "training" ? (
@@ -954,6 +977,7 @@ export function EventFormSheet({
                   date={startDate}
                   onDate={setStartDate}
                   required
+                  testId="event-start"
                 />
                 <div className="grid grid-cols-3 gap-2">
                   <TimeField
@@ -971,6 +995,7 @@ export function EventFormSheet({
                       }
                     }}
                     required
+                    testId="event-start-time"
                   />
                   <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
                 </div>
@@ -1011,6 +1036,7 @@ export function EventFormSheet({
               onDate={setStartDate}
               onTime={setStartTime}
               required
+              testId="event-start"
             />
             <DateTimeField
               label={t("events.convocationTime")}

@@ -2,11 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type SuppressedEntry = { email: string; reason: string | null };
 type InviteSendResult = {
   sent: number;
   failed: number;
   skipped: number;
   reason?: "no_contact" | "already_active";
+  suppressedEmails?: string[];
+  suppressedDetails?: SuppressedEntry[];
 };
 
 const ACTIVE_INVITE_STATUSES = new Set(["pending", "sent", "suppressed"]);
@@ -245,6 +248,8 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     const clubLogoUrl = club?.logo_url ?? undefined;
     let sent = 0;
     let failed = 0;
+    const suppressedEmails: string[] = [];
+    const suppressedDetails: SuppressedEntry[] = [];
 
     for (const target of filtered) {
       const token = makeToken();
@@ -298,8 +303,19 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
             .update({ email_message_id: enqueued.messageId } as never)
             .eq("id", (invite as { id: string }).id);
         }
-        if (enqueued?.success) sent += 1;
-        else failed += 1;
+        if (enqueued?.success) {
+          sent += 1;
+        } else {
+          failed += 1;
+          if (enqueued?.reason === "suppressed") {
+            const em = normalizeEmail(target.email);
+            suppressedEmails.push(em);
+            suppressedDetails.push({
+              email: em,
+              reason: (enqueued as { suppressionReason?: string | null }).suppressionReason ?? null,
+            });
+          }
+        }
       } catch (error) {
         await supabaseAdmin
           .from("member_invites")
@@ -314,7 +330,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
       }
     }
 
-    return { sent, failed, skipped: skippedExisting };
+    return { sent, failed, skipped: skippedExisting, suppressedEmails, suppressedDetails };
   });
 
 /**
@@ -433,8 +449,10 @@ export const listTeamInviteFailures = createServerFn({ method: "POST" })
         const { data: logs } = await supabaseAdmin
           .from("email_send_log")
           .select("message_id, recipient_email, status, error_message, created_at")
+          .eq("template_name", "player-invite")
           .in("message_id", messageIds)
           .order("created_at", { ascending: false });
+
         const seen = new Set<string>();
         for (const l of logs ?? []) {
           const mid = (l as any).message_id as string;

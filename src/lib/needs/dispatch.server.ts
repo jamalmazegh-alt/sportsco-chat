@@ -136,7 +136,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, club_id, event_id, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name))",
+      "id, label, club_id, event_id, created_by, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name, clubs:club_id(name)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -193,8 +193,11 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   }
 
   const { sendPushToUser } = await import("@/lib/push-send.server");
+  const roleLabel = (need.label as string | null) ?? "";
   const title =
-    params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
+    params.status === "confirmed"
+      ? `✅ Volontaire confirmé${roleLabel ? ` · ${roleLabel}` : ""}`
+      : `📝 Nouvelle candidature${roleLabel ? ` · ${roleLabel}` : ""}`;
   const startsAt = ev?.starts_at as string | null;
   const dateStr = startsAt
     ? new Date(startsAt).toLocaleDateString("fr-FR", {
@@ -219,6 +222,48 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
       }),
     ),
   );
+
+  // Email au créateur du besoin (le staff qui a publié) — garantit un canal
+  // sortant même sans PWA/push installée. Un seul email : le créateur, pas
+  // toute la liste staff (évite le spam).
+  try {
+    const creatorId = (need as { created_by: string | null }).created_by;
+    if (!creatorId) return;
+    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(creatorId);
+    const email = userData?.user?.email;
+    if (!email) return;
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("first_name, preferred_language")
+      .eq("id", creatorId)
+      .maybeSingle();
+    const locale = (profile?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr";
+    const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+    await enqueueTransactionalEmailServer({
+      templateName: "event-need-signup",
+      recipientEmail: email,
+      idempotencyKey: `need-signup-${params.signupId}-${params.status}`,
+      dispatchId: need.id,
+      eventId: need.event_id,
+      recipientId: creatorId,
+      notificationType: "event_need_signup",
+      fromName: clubName ? `${clubName} via Clubero` : undefined,
+      templateData: {
+        recipientFirstName: profile?.first_name ?? null,
+        locale,
+        status: params.status,
+        needLabel: need.label,
+        eventTitle,
+        eventStartsAt: startsAt,
+        clubName,
+        applicantFirstName,
+        applicantLastName: null,
+        eventUrl: `/events/${need.event_id}`,
+      },
+    });
+  } catch (e) {
+    console.error("[notifyStaffOfSignup] email failed", e);
+  }
 }
 
 /* ------------------------------------------------------------------------ */
@@ -228,27 +273,92 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
 export interface NotifyApplicantOfDecisionParams {
   needId: string;
   signupId: string;
-  decision: "confirm" | "decline";
+  decision: "confirm" | "decline" | "unassign";
   applicantUserId: string;
 }
 
 export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisionParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
-    .select("id, label, event_id")
+    .select(
+      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name)))",
+    )
     .eq("id", params.needId)
     .maybeSingle();
   if (!need) return;
 
-  const { sendPushToUser } = await import("@/lib/push-send.server");
-  const title = params.decision === "confirm" ? `Candidature confirmée` : `Candidature déclinée`;
-  const body = `${need.label}`;
-  await sendPushToUser(params.applicantUserId, {
-    title,
-    body,
-    url: `/events/${need.event_id}#need-${need.id}`,
-    tag: `event-need-decision-${need.id}`,
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ev = (need as any).events;
+  const eventTitle = (ev?.title as string) ?? "Événement";
+  const eventStartsAt = (ev?.starts_at as string | null) ?? null;
+  const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+  const isConfirm = params.decision === "confirm";
+  const isUnassign = params.decision === "unassign";
+
+  // Push
+  try {
+    const { sendPushToUser } = await import("@/lib/push-send.server");
+    const title = isUnassign
+      ? `Ce n'est plus nécessaire · ${need.label}`
+      : isConfirm
+        ? `Candidature confirmée 🎉`
+        : `Candidature déclinée`;
+    const dateStr = eventStartsAt
+      ? new Date(eventStartsAt).toLocaleString("fr-FR", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
+    const body = isUnassign
+      ? `${eventTitle}${dateStr ? ` · ${dateStr}` : ""} — finalement nous n'avons plus besoin de toi. Merci quand même !`
+      : [need.label, eventTitle, dateStr].filter(Boolean).join(" · ");
+    await sendPushToUser(params.applicantUserId, {
+      title,
+      body,
+      url: `/events/${need.event_id}#need-${need.id}`,
+      tag: `event-need-decision-${need.id}-${params.signupId}`,
+    });
+  } catch (e) {
+    console.error("[notifyApplicantOfDecision] push failed", e);
+  }
+
+  // Email
+  try {
+    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(params.applicantUserId);
+    const email = userData?.user?.email;
+    if (!email) return;
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("first_name, preferred_language")
+      .eq("id", params.applicantUserId)
+      .maybeSingle();
+    const locale = (profile?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr";
+    await enqueueTransactionalEmailServer({
+      templateName: "event-need-decision",
+      recipientEmail: email,
+      idempotencyKey: `need-decision-${params.signupId}-${params.decision}`,
+      dispatchId: need.id,
+      eventId: need.event_id,
+      recipientId: params.applicantUserId,
+      notificationType: "event_need_decision",
+      fromName: clubName ? `${clubName} via Clubero` : undefined,
+      templateData: {
+        recipientFirstName: profile?.first_name ?? null,
+        locale,
+        decision: params.decision,
+        needLabel: need.label,
+        eventTitle,
+        eventStartsAt,
+        clubName,
+        eventUrl: `/events/${need.event_id}`,
+      },
+    });
+  } catch (e) {
+    console.error("[notifyApplicantOfDecision] email failed", e);
+  }
 }
 
 /* ------------------------------------------------------------------------ */

@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
+  BarChart3,
   Eye,
   ExternalLink,
   Loader2,
+  Lock,
   MegaphoneIcon,
   MessageSquare,
   Pin,
   PinOff,
   Send,
   Trash2,
+  Users,
 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
@@ -24,6 +28,8 @@ import { MentionInput, RenderWithMentions, parseMentions } from "@/components/me
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
+import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
+import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
@@ -36,8 +42,9 @@ type Comment = {
   author?: Profile | null;
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
-type AudienceType = "club" | "team" | "multi_team";
+type AudienceType = "club" | "team" | "multi_team" | "group" | "team_staff";
 type Team = { id: string; name: string };
+type Group = { id: string; name: string };
 type Post = {
   id: string;
   club_id: string;
@@ -51,10 +58,32 @@ type Post = {
   external_url: string | null;
   external_media_url: string | null;
   audience_team_ids: string[] | null;
+  audience_group_ids: string[] | null;
   audience_type: AudienceType;
+  send_email: boolean;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
+};
+type PollOptionResult = { id: string; label: string; votes: number };
+type PollAudience = {
+  audience_type: string;
+  team_id: string | null;
+  group_id: string | null;
+  category_label: string | null;
+  event_id: string | null;
+};
+type PollItem = {
+  id: string;
+  publication_type: string;
+  title: string;
+  content: string | null;
+  poll_visibility: string | null;
+  published_at: string | null;
+  closed_at: string | null;
+  voter_count?: number;
+  options?: PollOptionResult[];
+  audiences?: PollAudience[];
 };
 
 const SOURCE_META: Record<
@@ -78,13 +107,16 @@ const SOURCE_META: Record<
   },
 };
 
-export function WallFeed({ clubId }: { clubId: string }) {
+export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?: string }) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
+  const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
+  const listPublicationsFn = useServerFn(listPublications);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [posting, setPosting] = useState(false);
@@ -94,8 +126,19 @@ export function WallFeed({ clubId }: { clubId: string }) {
   // Targetable teams for the audience picker; computed from club teams + user rights.
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
+  // Groups the current user can target from the composer (staff-visible via RLS).
+  const [targetableGroups, setTargetableGroups] = useState<Group[]>([]);
+  // Names of groups referenced by loaded posts (may include groups not in targetableGroups).
+  const [postGroups, setPostGroups] = useState<Group[]>([]);
+  // Group selection is disjoint from team selection: non-empty ⇒ audience_type='group'.
+  const [audienceGroups, setAudienceGroups] = useState<string[]>([]);
+  // "Aussi par e-mail" checkbox — triggers a best-effort outbox after the insert.
+  const [sendEmail, setSendEmail] = useState(false);
   // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
   const [audience, setAudience] = useState<string[] | null>(null);
+  // When true (and staffTeamId not set), the team pill selection publishes to
+  // `team_staff` — coaches+dirigeants of the selected teams, plus club admins.
+  const [staffAudienceMode, setStaffAudienceMode] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -106,13 +149,19 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .single();
     setCommentsEnabled(!!club?.wall_comments_enabled);
 
-    const { data: rawPosts } = await supabase
+    let postsQuery = supabase
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type",
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
       )
       .eq("club_id", clubId)
-      .is("deleted_at", null)
+      .is("deleted_at", null);
+    if (staffTeamId) {
+      postsQuery = postsQuery
+        .eq("audience_type", "team_staff")
+        .contains("audience_team_ids", [staffTeamId]);
+    }
+    const { data: rawPosts } = await postsQuery
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
@@ -179,6 +228,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       }
     }
+    // Fetch names for groups referenced by these posts (RLS-scoped).
+    const groupIdSet = new Set<string>();
+    for (const p of ps) {
+      if (p.audience_group_ids) for (const gid of p.audience_group_ids) groupIdSet.add(gid);
+    }
+    if (groupIdSet.size > 0) {
+      const { data: gRows } = await supabase
+        .from("club_groups")
+        .select("id, name")
+        .in("id", Array.from(groupIdSet));
+      setPostGroups((gRows ?? []) as Group[]);
+    } else {
+      setPostGroups([]);
+    }
     // Total club members (denominator for "Lu par X/Y")
     const { count } = await supabase
       .from("club_members")
@@ -192,6 +255,87 @@ export function WallFeed({ clubId }: { clubId: string }) {
   useEffect(() => {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
+
+  // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
+  // Filter to publication_type='poll' as a safety net; messages now live on the wall.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await listPublicationsFn({ data: { clubId, limit: 50 } });
+        let list = ((r?.publications ?? []) as any[]).filter(
+          (p) => p.publication_type === "poll",
+        ) as PollItem[];
+        // Staff team wall: only polls scoped to that team's staff.
+        if (staffTeamId) {
+          list = list.filter((p) =>
+            (p.audiences ?? []).some(
+              (a) => a.audience_type === "staff_equipe" && a.team_id === staffTeamId,
+            ),
+          );
+        }
+        if (list.length === 0) {
+          if (!cancelled) setPolls([]);
+          return;
+        }
+        // Best-effort voter count (RLS on club_poll_votes: voters are visible per policy).
+        const ids = list.map((p) => p.id);
+        const { data: votes } = await supabase
+          .from("club_poll_votes")
+          .select("publication_id, option_id")
+          .in("publication_id", ids);
+        const counts = new Map<string, number>();
+        const perOption = new Map<string, Map<string, number>>();
+        for (const v of (votes ?? []) as { publication_id: string; option_id: string }[]) {
+          counts.set(v.publication_id, (counts.get(v.publication_id) ?? 0) + 1);
+          let m = perOption.get(v.publication_id);
+          if (!m) {
+            m = new Map();
+            perOption.set(v.publication_id, m);
+          }
+          m.set(v.option_id, (m.get(v.option_id) ?? 0) + 1);
+        }
+        // Fetch options for closed polls so we can render inline results.
+        const closedIds = list.filter((p) => !!p.closed_at).map((p) => p.id);
+        const optionsByPoll = new Map<string, PollOptionResult[]>();
+        if (closedIds.length > 0) {
+          const { data: opts } = await supabase
+            .from("club_poll_options")
+            .select("id, publication_id, label, sort_order")
+            .in("publication_id", closedIds)
+            .order("sort_order", { ascending: true });
+          for (const o of (opts ?? []) as {
+            id: string;
+            publication_id: string;
+            label: string;
+          }[]) {
+            const arr = optionsByPoll.get(o.publication_id) ?? [];
+            arr.push({
+              id: o.id,
+              label: o.label,
+              votes: perOption.get(o.publication_id)?.get(o.id) ?? 0,
+            });
+            optionsByPoll.set(o.publication_id, arr);
+          }
+        }
+        if (!cancelled) {
+          setPolls(
+            list.map((p) => ({
+              ...p,
+              voter_count: counts.get(p.id) ?? 0,
+              options: optionsByPoll.get(p.id),
+            })),
+          );
+        }
+      } catch {
+        if (!cancelled) setPolls([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line
+  }, [clubId, staffTeamId]);
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
@@ -222,6 +366,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .from("teams")
         .select("id, name")
         .eq("club_id", clubId)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .is("archived_at", null)
         .order("name", { ascending: true });
@@ -250,6 +395,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
       if (cancelled) return;
       setTargetableTeams(targetable);
 
+      // Groups targetable from the composer — visibility is enforced by RLS on
+      // club_groups (staff-only). We do not fetch group members here; sending
+      // the email is done server-side after the insert.
+      let groups: Group[] = [];
+      if (isPriv || roles.includes("coach") || roles.includes("assistant_coach")) {
+        const { data: gRows } = await supabase
+          .from("club_groups")
+          .select("id, name")
+          .eq("club_id", clubId)
+          .order("name", { ascending: true });
+        if (!cancelled) groups = (gRows ?? []) as Group[];
+      }
+      if (cancelled) return;
+      setTargetableGroups(groups);
+
       // Preselection rules (nuancées) :
       // - admin / dirigeant → club-wide (null).
       // - coach with exactly one targetable team → preselect that team.
@@ -261,6 +421,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
       } else {
         setAudience([]);
       }
+      setAudienceGroups([]);
     })();
     return () => {
       cancelled = true;
@@ -293,13 +454,45 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if ((!body.trim() && atts.length === 0) || !user) return;
 
     // Resolve final audience for the insert.
-    //   null         → "Tout le club"
-    //   [] (forced)  → coach must pick at least one team
-    //   [ids]        → team-scoped (1 or many)
+    //   staffTeamId set  → audience_type='team_staff', audience_team_ids=[staffTeamId]
+    //   groups non-empty → audience_type='group', audience_group_ids=[…], team_ids=null
+    //   null             → "Tout le club"
+    //   [] (forced)      → coach must pick at least one team
+    //   [ids]            → team-scoped (1 or many)
     const isPriv = roles.includes("admin") || roles.includes("dirigeant");
-    const audienceForInsert: string[] | null =
-      audience === null ? null : audience.length === 0 ? null : audience;
-    if (!isPriv && audienceForInsert === null && audience !== null) {
+    const isStaffMode = !!staffTeamId;
+    // "Staff d'équipes" composer mode: team pill selection publishes as team_staff.
+    const isStaffPick = !isStaffMode && staffAudienceMode;
+    const hasGroups = !isStaffMode && !isStaffPick && audienceGroups.length > 0;
+    const audienceForInsert: string[] | null = isStaffMode
+      ? [staffTeamId!]
+      : isStaffPick
+        ? audience === null || audience.length === 0
+          ? null
+          : audience
+        : hasGroups
+          ? null
+          : audience === null
+            ? null
+            : audience.length === 0
+              ? null
+              : audience;
+    if (isStaffPick && (audienceForInsert === null || audienceForInsert.length === 0)) {
+      toast.error(
+        t("wall.staff.pickTeamRequired", {
+          defaultValue: "Choisis au moins une équipe pour cibler son staff.",
+        }),
+      );
+      return;
+    }
+    if (
+      !isStaffMode &&
+      !isStaffPick &&
+      !isPriv &&
+      !hasGroups &&
+      audienceForInsert === null &&
+      audience !== null
+    ) {
       toast.error(
         t("wall.audienceRequired", {
           defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
@@ -308,13 +501,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
       return;
     }
 
+    const audienceTypeForInsert: AudienceType =
+      isStaffMode || isStaffPick
+        ? "team_staff"
+        : hasGroups
+          ? "group"
+          : audienceForInsert === null
+            ? "club"
+            : audienceForInsert.length === 1
+              ? "team"
+              : "multi_team";
+
     setPosting(true);
     const insertPayload = {
       club_id: clubId,
       author_user_id: user.id,
       body: body.trim(),
       attachments: atts as unknown as never,
+      audience_type: audienceTypeForInsert as unknown as never,
       audience_team_ids: audienceForInsert as unknown as never,
+      audience_group_ids: (hasGroups ? audienceGroups : null) as unknown as never,
+      send_email: sendEmail as unknown as never,
     };
 
     // Pre-flight: confirm the JWT subject matches user.id and that the active
@@ -387,7 +594,50 @@ export function WallFeed({ clubId }: { clubId: string }) {
       // Recipient set for in-app notifications must mirror the post audience
       // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
       const recipientSet = new Set<string>();
-      if (audienceForInsert === null) {
+      if (isStaffMode || isStaffPick) {
+        // Staff wall: coaches + dirigeants of the target team(s), plus club admins/dirigeants.
+        const { data: priv } = await supabase
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        const staffTeamIds = isStaffMode ? [staffTeamId!] : (audienceForInsert ?? []);
+        if (staffTeamIds.length > 0) {
+          const { data: tm } = await supabase
+            .from("team_members")
+            .select("user_id, role")
+            .in("team_id", staffTeamIds)
+            .in("role", ["coach", "dirigeant"]);
+          for (const r of tm ?? []) {
+            const uid = (r as any).user_id as string | null;
+            if (uid) recipientSet.add(uid);
+          }
+        }
+      } else if (hasGroups) {
+        // Admins/dirigeants always see every post.
+        const { data: priv } = await supabase
+          .from("club_members")
+          .select("user_id, role")
+          .eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        // Members of the targeted group(s).
+        const { data: gm } = await supabase
+          .from("club_group_members")
+          .select("club_members:member_id(user_id)")
+          .in("group_id", audienceGroups);
+        for (const row of gm ?? []) {
+          const uid = ((row as any).club_members?.user_id as string | null) ?? null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else if (audienceForInsert === null) {
         const { data: members } = await supabase
           .from("club_members")
           .select("user_id")
@@ -468,8 +718,21 @@ export function WallFeed({ clubId }: { clubId: string }) {
         }
       })();
     }
+    // "Aussi par e-mail" — outbox best-effort ; les erreurs n'impactent pas le post.
+    if (data?.id && sendEmail) {
+      void (async () => {
+        try {
+          await sendWallPostEmailsFn({ data: { postId: data.id } });
+        } catch (e) {
+          console.warn("[email] wall dispatch failed", e);
+        }
+      })();
+    }
     setBody("");
     setAtts([]);
+    setAudienceGroups([]);
+    setSendEmail(false);
+    setStaffAudienceMode(false);
     // Reset audience to the per-role default for the next post.
     if (isPriv) setAudience(null);
     else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
@@ -507,14 +770,26 @@ export function WallFeed({ clubId }: { clubId: string }) {
     for (const tt of allTeams) m.set(tt.id, tt);
     return m;
   }, [allTeams]);
+  const groupsById = useMemo(() => {
+    const m = new Map<string, Group>();
+    for (const g of targetableGroups) m.set(g.id, g);
+    for (const g of postGroups) if (!m.has(g.id)) m.set(g.id, g);
+    return m;
+  }, [targetableGroups, postGroups]);
 
   if (loading) {
     return <WallFeedSkeleton />;
   }
 
-  const canPost =
-    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isStaffMode = !!staffTeamId;
+  const canPost = isStaffMode
+    ? roles.includes("admin") ||
+      roles.includes("dirigeant") ||
+      roles.includes("coach") ||
+      roles.includes("assistant_coach")
+    : roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const audienceMissing =
+    !isStaffMode &&
     canPost &&
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
     audience !== null &&
@@ -528,20 +803,81 @@ export function WallFeed({ clubId }: { clubId: string }) {
             clubId={clubId}
             value={body}
             onChange={setBody}
-            placeholder={t("wall.placeholder")}
+            placeholder={
+              isStaffMode
+                ? t("wall.staff.placeholder", {
+                    defaultValue: "Message privé au staff de cette équipe…",
+                  })
+                : t("wall.placeholder")
+            }
             rows={3}
           />
-          <AudiencePicker
-            teams={targetableTeams}
-            value={audience}
-            onChange={setAudience}
-            canPickClubWide={
-              roles.includes("admin") ||
-              roles.includes("dirigeant") ||
-              targetableTeams.length === allTeams.length
-            }
-          />
+          {isStaffMode ? (
+            <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("wall.staff.audienceLocked", {
+                defaultValue: "Visible uniquement par le staff de l'équipe et les admins du club.",
+              })}
+            </p>
+          ) : (
+            <AudiencePicker
+              teams={targetableTeams}
+              value={audience}
+              onChange={(next) => {
+                setAudience(next);
+                if (next !== null) setAudienceGroups([]);
+              }}
+              groups={targetableGroups}
+              groupValue={audienceGroups}
+              onGroupChange={(next) => {
+                setAudienceGroups(next);
+                if (next.length > 0) {
+                  setAudience([]);
+                  setStaffAudienceMode(false);
+                }
+              }}
+              canPickClubWide={
+                roles.includes("admin") ||
+                roles.includes("dirigeant") ||
+                targetableTeams.length === allTeams.length
+              }
+              staffMode={staffAudienceMode}
+              onStaffModeChange={(next) => {
+                setStaffAudienceMode(next);
+                if (next) {
+                  // Switching to Staff mode: clear groups & "Tout le club".
+                  setAudienceGroups([]);
+                  if (audience === null) setAudience([]);
+                }
+              }}
+              canPickStaff={targetableTeams.length > 0}
+            />
+          )}
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
+          <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-3.5 w-3.5 rounded border-border"
+              checked={sendEmail}
+              onChange={(e) => setSendEmail(e.target.checked)}
+            />
+            {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
+          </label>
+          {!isStaffMode && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/publications/new">
+                  <BarChart3 className="h-4 w-4 mr-1.5" />
+                  {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link to="/publications">
+                  {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+                </Link>
+              </Button>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
               <p className="text-xs text-destructive">
@@ -569,12 +905,14 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
       <WallGrouped
         posts={posts}
+        polls={polls}
         currentUserId={user?.id ?? null}
         role={role}
         commentsEnabled={commentsEnabled}
         canPin={canPost}
         memberCount={memberCount}
         teamsById={teamsById}
+        groupsById={groupsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
@@ -587,65 +925,221 @@ function AudiencePicker({
   teams,
   value,
   onChange,
+  groups,
+  groupValue,
+  onGroupChange,
   canPickClubWide,
+  staffMode,
+  onStaffModeChange,
+  canPickStaff,
 }: {
   teams: Team[];
   value: string[] | null;
   onChange: (next: string[] | null) => void;
+  groups: Group[];
+  groupValue: string[];
+  onGroupChange: (next: string[]) => void;
   canPickClubWide: boolean;
+  staffMode: boolean;
+  onStaffModeChange: (next: boolean) => void;
+  canPickStaff: boolean;
 }) {
   const { t } = useTranslation();
-  const isClubWide = value === null;
+  const groupsActive = groupValue.length > 0;
+  const isClubWide = !groupsActive && !staffMode && value === null;
   function toggleTeam(id: string) {
+    if (groupsActive) onGroupChange([]);
     if (value === null) {
       onChange([id]);
       return;
     }
     if (value.includes(id)) {
-      const next = value.filter((x) => x !== id);
-      onChange(next);
+      onChange(value.filter((x) => x !== id));
     } else {
       onChange([...value, id]);
     }
   }
-  if (teams.length === 0 && !canPickClubWide) return null;
+  function toggleGroup(id: string) {
+    if (groupValue.includes(id)) {
+      onGroupChange(groupValue.filter((x) => x !== id));
+    } else {
+      onGroupChange([...groupValue, id]);
+    }
+  }
+  if (teams.length === 0 && groups.length === 0 && !canPickClubWide) return null;
+
+  // Team pill helpers — clicking under "Joueurs" or "Staff" implicitly sets the mode.
+  function selectTeamAsPlayers(id: string) {
+    if (groupsActive) onGroupChange([]);
+    if (staffMode) onStaffModeChange(false);
+    const base = value === null ? [] : value;
+    if (base.includes(id) && !staffMode) {
+      onChange(base.filter((x) => x !== id));
+    } else {
+      onChange([...base.filter((x) => x !== id), id]);
+    }
+  }
+  function selectTeamAsStaff(id: string) {
+    if (groupsActive) onGroupChange([]);
+    if (!staffMode) onStaffModeChange(true);
+    const base = value === null ? [] : value;
+    if (base.includes(id) && staffMode) {
+      onChange(base.filter((x) => x !== id));
+    } else {
+      onChange([...base.filter((x) => x !== id), id]);
+    }
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-xs font-medium text-muted-foreground mr-1">
-        {t("wall.audienceTo", { defaultValue: "À :" })}
-      </span>
-      {canPickClubWide && (
-        <button
-          type="button"
-          onClick={() => onChange(null)}
-          className={cn(
-            "text-xs px-2.5 py-1 rounded-full border transition-colors",
-            isClubWide
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-background text-foreground border-border hover:bg-accent",
-          )}
-        >
-          {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
-        </button>
-      )}
-      {teams.map((tt) => {
-        const active = !isClubWide && (value ?? []).includes(tt.id);
-        return (
+    <div className="space-y-2">
+      {/* "Tout le club" quick toggle at the top */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs font-medium text-muted-foreground mr-1">
+          {t("wall.audienceTo", { defaultValue: "À :" })}
+        </span>
+        {canPickClubWide && (
           <button
-            key={tt.id}
             type="button"
-            onClick={() => toggleTeam(tt.id)}
+            onClick={() => {
+              onGroupChange([]);
+              onStaffModeChange(false);
+              onChange(null);
+            }}
             className={cn(
               "text-xs px-2.5 py-1 rounded-full border transition-colors",
-              active
-                ? "bg-primary text-primary-foreground border-primary"
+              isClubWide
+                ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
                 : "bg-background text-foreground border-border hover:bg-accent",
             )}
           >
-            {tt.name}
+            {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
           </button>
-        );
-      })}
+        )}
+      </div>
+
+      {/* Joueurs & parents (équipes) — block */}
+      {teams.length > 0 && (
+        <div
+          className={cn(
+            "rounded-lg border p-2.5",
+            !staffMode && !groupsActive && !isClubWide
+              ? "border-sky-500/60 bg-sky-500/10"
+              : "border-sky-500/30 bg-sky-500/5",
+          )}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Users className="h-3 w-3 text-sky-700 dark:text-sky-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-sky-700 dark:text-sky-300">
+              {t("wall.scope.teamsBlock", { defaultValue: "Équipes (joueurs + parents)" })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {teams.map((tt) => {
+              const active = !staffMode && (value ?? []).includes(tt.id);
+              return (
+                <button
+                  key={tt.id}
+                  type="button"
+                  onClick={() => selectTeamAsPlayers(tt.id)}
+                  className={cn(
+                    "text-xs px-2.5 py-1 rounded-full border transition-colors",
+                    active
+                      ? "bg-sky-600 text-white border-sky-600"
+                      : "bg-background text-foreground border-border hover:bg-accent",
+                  )}
+                >
+                  {tt.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Staff d'équipes — block */}
+      {canPickStaff && teams.length > 0 && (
+        <div
+          className={cn(
+            "rounded-lg border p-2.5",
+            staffMode
+              ? "border-violet-500/60 bg-violet-500/10"
+              : "border-violet-500/30 bg-violet-500/5",
+          )}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Lock className="h-3 w-3 text-violet-700 dark:text-violet-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-violet-700 dark:text-violet-300">
+              {t("wall.scope.staffTeamsBlock", { defaultValue: "Staff d'équipes" })}
+            </span>
+            <span className="text-[10px] text-violet-700/80 dark:text-violet-300/80">
+              {t("wall.scope.staffTeamsHint", {
+                defaultValue: "Coachs et dirigeants uniquement",
+              })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {teams.map((tt) => {
+              const active = staffMode && (value ?? []).includes(tt.id);
+              return (
+                <button
+                  key={tt.id}
+                  type="button"
+                  onClick={() => selectTeamAsStaff(tt.id)}
+                  className={cn(
+                    "text-xs px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1",
+                    active
+                      ? "bg-violet-600 text-white border-violet-600"
+                      : "bg-background text-violet-700 dark:text-violet-300 border-violet-500/40 hover:bg-violet-500/10",
+                  )}
+                >
+                  <Lock className="h-3 w-3" />
+                  {tt.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Groupes — block */}
+      {groups.length > 0 && (
+        <div
+          className={cn(
+            "rounded-lg border border-dashed p-2.5",
+            groupsActive
+              ? "border-amber-500/60 bg-amber-500/10"
+              : "border-amber-500/40 bg-amber-500/5",
+          )}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Users className="h-3 w-3 text-amber-700 dark:text-amber-300" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-300">
+              {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {groups.map((g) => {
+              const active = groupValue.includes(g.id);
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => toggleGroup(g.id)}
+                  className={cn(
+                    "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-dashed transition-colors",
+                    active
+                      ? "bg-amber-500 text-white border-amber-500"
+                      : "bg-background text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10",
+                  )}
+                >
+                  <Users className="h-3 w-3" />
+                  {g.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -655,8 +1149,77 @@ function AudiencePicker({
 // team names are data (not translated). Deleted/unknown teams are filtered out;
 // if none survive, we surface a discreet "Audience restreinte" hint so admins
 // understand why the post is now narrower than originally targeted.
-function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string, Team> }) {
+function AudienceBadge({
+  post,
+  teamsById,
+  groupsById,
+}: {
+  post: Post;
+  teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
+}) {
   const { t } = useTranslation();
+  // Group audience — visually distinct (amber palette + Users icon, dashed border)
+  // to make groups instantly recognizable next to team badges.
+  if (post.audience_group_ids && post.audience_group_ids.length > 0) {
+    const liveG = post.audience_group_ids
+      .map((id) => groupsById.get(id))
+      .filter((x): x is Group => !!x);
+    let gLabel: string;
+    if (liveG.length === 0) {
+      gLabel = t("wall.scope.group", { defaultValue: "Groupe" });
+    } else if (liveG.length === 1) {
+      gLabel = liveG[0].name;
+    } else if (liveG.length === 2) {
+      gLabel = `${liveG[0].name} + ${liveG[1].name}`;
+    } else {
+      gLabel = t("wall.scope.plusOthers", {
+        defaultValue: "{{first}} + {{n}} autres",
+        first: liveG[0].name,
+        n: liveG.length - 1,
+      });
+    }
+    const gTooltip = liveG.length
+      ? liveG.map((g) => g.name).join(" · ")
+      : t("wall.scope.groupTooltip", { defaultValue: "Audience : groupe personnalisé" });
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-dashed shrink-0 bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40"
+        title={gTooltip}
+      >
+        <Users className="h-2.5 w-2.5" />
+        {gLabel}
+      </span>
+    );
+  }
+  if (post.audience_type === "team_staff") {
+    const liveT = (post.audience_team_ids ?? [])
+      .map((id) => teamsById.get(id))
+      .filter((x): x is Team => !!x);
+    let teamLabel: string | null = null;
+    if (liveT.length === 1) teamLabel = liveT[0].name;
+    else if (liveT.length === 2) teamLabel = `${liveT[0].name} + ${liveT[1].name}`;
+    else if (liveT.length > 2)
+      teamLabel = t("wall.scope.plusOthers", {
+        defaultValue: "{{first}} + {{n}} autres",
+        first: liveT[0].name,
+        n: liveT.length - 1,
+      });
+    const tooltip = liveT.length
+      ? `${t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" })} · ${liveT.map((x) => x.name).join(" · ")}`
+      : t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" });
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
+        title={tooltip}
+      >
+        <Lock className="h-2.5 w-2.5" />
+        {teamLabel
+          ? t("wall.staff.badgeWithTeam", { defaultValue: "Staff {{team}}", team: teamLabel })
+          : t("wall.staff.badge", { defaultValue: "Staff équipe" })}
+      </span>
+    );
+  }
   if (post.audience_team_ids === null) {
     return (
       <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
@@ -698,24 +1261,32 @@ function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string,
   );
 }
 
+type TimelineEntry =
+  | { kind: "post"; date: Date; post: Post }
+  | { kind: "poll"; date: Date; poll: PollItem };
+
 function WallGrouped({
   posts,
+  polls,
   currentUserId,
   role,
   commentsEnabled,
   canPin,
   memberCount,
   teamsById,
+  groupsById,
   onDelete,
   onTogglePin,
 }: {
   posts: Post[];
+  polls: PollItem[];
   currentUserId: string | null;
   role: string | null;
   commentsEnabled: boolean;
   canPin: boolean;
   memberCount: number;
   teamsById: Map<string, Team>;
+  groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
@@ -724,18 +1295,26 @@ function WallGrouped({
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { label: string; items: Post[] }>();
-    for (const p of rest) {
-      const d = new Date(p.created_at);
-      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      const label = format(d, "MMMM yyyy", { locale: dateLocale() });
+    const entries: TimelineEntry[] = [
+      ...rest.map((p) => ({ kind: "post" as const, date: new Date(p.created_at), post: p })),
+      ...polls.map((pl) => ({
+        kind: "poll" as const,
+        date: new Date(pl.published_at ?? new Date().toISOString()),
+        poll: pl,
+      })),
+    ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    const map = new Map<string, { label: string; items: TimelineEntry[] }>();
+    for (const e of entries) {
+      const key = `${e.date.getFullYear()}-${String(e.date.getMonth()).padStart(2, "0")}`;
+      const label = format(e.date, "MMMM yyyy", { locale: dateLocale() });
       if (!map.has(key)) map.set(key, { label, items: [] });
-      map.get(key)!.items.push(p);
+      map.get(key)!.items.push(e);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [rest]);
+  }, [rest, polls]);
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && polls.length === 0) {
     return (
       <EmptyState
         icon={<MegaphoneIcon className="h-6 w-6" />}
@@ -803,7 +1382,7 @@ function WallGrouped({
                   {fmt(d, "d MMM yyyy, HH:mm")}
                 </span>
               )}
-              <AudienceBadge post={p} teamsById={teamsById} />
+              <AudienceBadge post={p} teamsById={teamsById} groupsById={groupsById} />
             </div>
 
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
@@ -911,10 +1490,162 @@ function WallGrouped({
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
             {group.label}
           </h2>
-          <ul className="space-y-2.5">{group.items.map(renderItem)}</ul>
+          <ul className="space-y-2.5">
+            {group.items.map((entry) =>
+              entry.kind === "post" ? (
+                renderItem(entry.post)
+              ) : (
+                <PollCard key={entry.poll.id} poll={entry.poll} teamsById={teamsById} />
+              ),
+            )}
+          </ul>
         </section>
       ))}
+      {(polls.length > 0 || posts.length > 0) && (
+        <div className="pt-2 text-center">
+          <Link to="/publications" className="text-xs text-primary hover:underline">
+            {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+          </Link>
+        </div>
+      )}
     </div>
+  );
+}
+
+function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, Team> }) {
+  const { t } = useTranslation();
+  const d = new Date(poll.published_at ?? Date.now());
+  const isClosed = !!poll.closed_at;
+  const isAnonymous = poll.poll_visibility === "anonymous";
+  const staffTeams = (poll.audiences ?? [])
+    .filter((a) => a.audience_type === "staff_equipe" && a.team_id)
+    .map((a) => teamsById.get(a.team_id as string))
+    .filter((x): x is Team => !!x);
+  const staffLabel =
+    staffTeams.length === 0
+      ? null
+      : staffTeams.length === 1
+        ? t("wall.staff.badgeWithTeam", {
+            defaultValue: "Staff {{team}}",
+            team: staffTeams[0].name,
+          })
+        : t("wall.staff.badgeWithTeam", {
+            defaultValue: "Staff {{team}}",
+            team: `${staffTeams[0].name} +${staffTeams.length - 1}`,
+          });
+  return (
+    <li
+      className={cn(
+        "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
+        "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
+        "animate-in fade-in-0 slide-in-from-bottom-1 duration-300",
+        "border-primary/30 bg-primary/[0.02]",
+      )}
+    >
+      <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/12">
+        <BarChart3 className="h-5 w-5 text-primary" />
+        <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">
+          {format(d, "d MMM")}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0 py-3 pr-3">
+        <header className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30 inline-flex items-center gap-1">
+            <BarChart3 className="h-3 w-3" />
+            {t("publications:card.tagPoll", { defaultValue: "Sondage" })}
+          </span>
+          {staffLabel && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
+              title={t("wall.staff.badgeTitle", {
+                defaultValue: "Message privé au staff de l'équipe",
+              })}
+            >
+              <Lock className="h-2.5 w-2.5" />
+              {staffLabel}
+            </span>
+          )}
+          {isAnonymous && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
+              {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
+            </span>
+          )}
+          {isClosed && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {t("publications:card.closed", { defaultValue: "Fermé" })}
+            </span>
+          )}
+        </header>
+        <p className="text-sm font-semibold">{poll.title}</p>
+        {poll.content && (
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{poll.content}</p>
+        )}
+        {isClosed &&
+          poll.options &&
+          poll.options.length > 0 &&
+          (() => {
+            const total = poll.options.reduce((s, o) => s + o.votes, 0);
+            const belowThreshold =
+              isAnonymous && poll.options.some((o) => o.votes > 0 && o.votes < 3);
+            if (belowThreshold) {
+              return (
+                <p className="text-[11px] text-muted-foreground mt-2 italic">
+                  {t("publications:poll.belowThreshold", {
+                    defaultValue: "Pas assez de réponses pour afficher les résultats",
+                  })}
+                </p>
+              );
+            }
+            const max = Math.max(1, ...poll.options.map((o) => o.votes));
+            const winner = poll.options.reduce((a, b) => (b.votes > a.votes ? b : a));
+            return (
+              <ul className="mt-2 space-y-1.5">
+                {poll.options.map((o) => {
+                  const pct = total === 0 ? 0 : Math.round((o.votes / total) * 100);
+                  const isWinner = total > 0 && o.id === winner.id && o.votes > 0;
+                  return (
+                    <li key={o.id} className="text-xs">
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <span className={cn("truncate", isWinner && "font-semibold")}>
+                          {o.label}
+                        </span>
+                        <span className="tabular-nums text-muted-foreground shrink-0">
+                          {o.votes} · {pct}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all",
+                            isWinner ? "bg-primary" : "bg-primary/40",
+                          )}
+                          style={{ width: `${total === 0 ? 0 : (o.votes / max) * 100}%` }}
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {t("publications:card.voters", {
+              defaultValue: "{{count}} votants",
+              count: poll.voter_count ?? 0,
+            })}
+          </span>
+          <Button asChild size="sm" variant={isClosed ? "outline" : "default"}>
+            <Link to="/publications/$publicationId" params={{ publicationId: poll.id }}>
+              {isClosed
+                ? t("publications:card.viewResults", { defaultValue: "Voir les résultats" })
+                : t("publications:card.vote", { defaultValue: "Voter" })}
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </li>
   );
 }
 

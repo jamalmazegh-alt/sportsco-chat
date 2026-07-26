@@ -23,7 +23,8 @@
     "draft": "Brouillon",
     "open": "Ouvert",
     "closed": "Fermé",
-    "cancelled": "Annulé"
+    "cancelled": "Annulé",
+    "reopened": "Besoin rouvert"
   },
   "validationMode": {
     "auto": "Confirmation automatique",
@@ -32,8 +33,9 @@
   "signup": {
     "applied": "Candidature envoyée",
     "confirmed": "Confirmé",
-    "declined": "Décliné",
-    "withdrawn": "Retiré"
+    "declined": "Candidature refusée",
+    "withdrawn": "Retiré",
+    "unavailable": "Indisponible"
   },
   "seats": {
     "remaining_one": "{{count}} place restante",
@@ -49,7 +51,9 @@
     "cancel": "Annuler le besoin",
     "publish": "Publier",
     "republish": "Republier",
-    "assign": "Assigner"
+    "assign": "Assigner",
+    "resend": "Relancer tout le monde",
+    "notifyNew": "Notifier les nouveaux"
   },
   "errors": {
     "forbidden": "Action non autorisée.",
@@ -102,6 +106,24 @@
   "audiences": {
     "convoked_players": "Joueurs convoqués",
     "convoked_parents": "Parents des joueurs convoqués",
+    "clubAudiences": "Audiences du club",
+    "customGroups": "Groupes personnalisés",
+    "eventRelevant": "Suggéré pour cet événement",
+    "otherAudiences": "Autres audiences",
+    "add": "Ajouter",
+    "pickKind": "Choisir un type…",
+    "pickParam": "Choisir…",
+    "noGroups": "Aucun groupe personnalisé actif. Crée-en dans Réglages → Groupes du club pour cibler une audience précise.",
+    "selected": {
+      "title": "Audience sélectionnée",
+      "empty": "Aucune audience sélectionnée — ajoutez au moins un critère ci-dessous.",
+      "emptyConvocation": "La convocation n'est pas encore faite — convoquez d'abord, ou choisissez une autre audience.",
+      "loading": "Calcul en cours…",
+      "count_one": "{{count}} personne sera prévenue",
+      "count_other": "{{count}} personnes seront prévenues",
+      "removeAria": "Retirer {{label}}",
+      "takenAria": "Déjà sélectionné"
+    },
     "club_members": "Tous les membres du club",
     "club_educators": "Éducateurs du club",
     "club_staff": "Staff / bénévoles du club",
@@ -111,13 +133,37 @@
     "team_players": "Joueurs d'une équipe",
     "team_parents": "Parents d'une équipe",
     "team_educators": "Éducateurs d'une équipe",
-    "category_educators": "Éducateurs d'une catégorie"
+    "category_educators": "Éducateurs d'une catégorie",
+    "preassign": {
+      "title": "Pré-assigner des personnes",
+      "hint": "Recherche un membre du club à confirmer immédiatement (il sera notifié comme confirmé).",
+      "searchPlaceholder": "Rechercher un membre…",
+      "noResults": "Aucun résultat",
+      "capacityReached": "Capacité atteinte.",
+      "confirmed_one": "{{count}} personne pré-assignée et confirmée.",
+      "confirmed_other": "{{count}} personnes pré-assignées et confirmées."
+    }
   },
   "staff": {
     "title": "Candidatures",
     "empty": "Aucune candidature pour le moment.",
     "minorPending": "Candidat mineur — validation adulte requise",
-    "license": "Licence n° {{n}}"
+    "license": "Licence n° {{n}}",
+    "alreadyConfirmed": "Déjà confirmé",
+    "manualAdded": "Personne ajoutée",
+    "bulkConfirmed_one": "{{count}} candidat confirmé",
+    "bulkConfirmed_other": "{{count}} candidats confirmés",
+    "bulkDeclined_one": "{{count}} candidat refusé",
+    "bulkDeclined_other": "{{count}} candidats refusés",
+    "selectAllPending": "Sélectionner tout ({{count}})",
+    "confirmSelection": "Confirmer",
+    "noMembers": "Aucun membre trouvé",
+    "editNeed": "Modifier le besoin",
+    "createDraft": "Créer en brouillon",
+    "unassigned": "Assignation annulée",
+    "fullTitle": "Capacité atteinte",
+    "unassignCta": "Retirer",
+    "fullBlock": "Capacité atteinte. Retirez d'abord une personne confirmée pour en assigner une autre."
   },
   "pendingApplications_one": "{{count}} en attente",
   "pendingApplications_other": "{{count}} en attente",
@@ -126,5 +172,212 @@
     "description": "Cette action est définitive. Les candidats en attente et les personnes confirmées seront informées.",
     "confirm": "Oui, annuler",
     "abort": "Non, garder"
+  },
+  "card": {
+    "publishedAt_one": "Publié il y a {{time}} · {{count}} destinataire",
+    "publishedAt_other": "Publié il y a {{time}} · {{count}} destinataires",
+    "unpublishedMeta": "Non publié — personne n'a encore été prévenu",
+    "seatsRemaining_one": "{{count}} place restante",
+    "seatsRemaining_other": "{{count}} places restantes",
+    "seatsFullConfirmed_one": "Complet ✓ · {{count}} confirmé",
+    "seatsFullConfirmed_other": "Complet ✓ · {{count}} confirmés",
+    "applicationsCta": "Candidatures",
+    "republish": "Relancer",
+    "menuLabel": "Options"
+  },
+  "badge": {
+    "unpublished": "Non publié",
+    "closed": "Fermé",
+    "cancelled": "Annulé"
+  },
+  "wizard": {
+    "step": "Étape {{current}}/{{total}}",
+    "step1Title": "Ajouter un besoin",
+    "step2Title": "Qui prévenir ?",
+    "commentLabel": "Commentaire ou consignes (optionnel)",
+    "commentPlaceholder": "Ex. : Merci d'arriver 30 minutes avant le match",
+    "minorReminder": "🛡️ Un candidat mineur est toujours validé par le staff, même en confirmation automatique.",
+    "continueToRecipients": "Continuer → Destinataires",
+    "back": "Retour",
+    "cancel": "Annuler"
+  },
+  "audiencePicker": {
+    "forThisMatch": "Pour ce match",
+    "clubGroups": "Groupes du club",
+    "teamsCategories": "Équipes & catégories",
+    "otherOption": "Autre…",
+    "otherOptionMenu": "Autres audiences",
+    "chipConvokedPlayers": "Joueurs convoqués",
+    "chipConvokedParents": "Parents des convoqués",
+    "chipTeamPlayers": "Joueurs · {{team}}",
+    "chipTeamParents": "Parents · {{team}}",
+    "chipTeamEducators": "Éducateurs · {{team}}",
+    "chipCategoryEducators": "Éducateurs · {{category}}",
+    "chipClubMembers": "Tous les membres",
+    "chipClubStaff": "Staff / bénévoles",
+    "chipClubAdmins": "Administrateurs",
+    "chipClubEducators": "Éducateurs du club",
+    "chipClubTournamentManagers": "Responsables tournois"
+  },
+  "publishStep": {
+    "title": "Qui prévenir ?",
+    "recipientsCount_one": "{{count}} personne sera prévenue",
+    "recipientsCount_other": "{{count}} personnes seront prévenues",
+    "recipientsLoading": "Calcul en cours…",
+    "needSummaryLabel": "{{label}}",
+    "needSummarySeats_one": "{{count}} place",
+    "needSummarySeats_other": "{{count}} places",
+    "publishCta": "Publier et prévenir",
+    "republishCta_one": "Relancer ({{count}} personne)",
+    "republishCta_other": "Relancer ({{count}} personnes)",
+    "emptyConvocation": "Personne à prévenir pour l'instant — la convocation n'est pas encore faite. Convoquez d'abord, ou choisissez une autre audience.",
+    "emptyGeneric": "Personne à prévenir avec cette sélection. Choisissez une autre audience."
+  },
+  "applications": {
+    "title": "Candidatures — {{label}}",
+    "summary_one": "{{pending}} en attente · {{confirmed}} confirmé · {{seats}} place",
+    "summary_other": "{{pending}} en attente · {{confirmed}} confirmés · {{seats}} places",
+    "pendingSection": "En attente",
+    "confirmedSection": "Confirmés",
+    "unavailableSection_one": "Indisponibles ({{count}})",
+    "unavailableSection_other": "Indisponibles ({{count}})",
+    "confirmedEmpty": "Personne pour l'instant.",
+    "assignSection": "Assigner directement",
+    "assignHelp": "Vous en avez déjà parlé avec quelqu'un ? Assignez-le : il sera confirmé et prévenu, et pourra se désister.",
+    "searchPlaceholder": "Rechercher un membre…",
+    "assignCta": "Assigner",
+    "removeConfirmed": "Retirer",
+    "licenseMissing": "Licence non renseignée",
+    "licenseLabel": "Licence {{n}}",
+    "minorTag": "Mineur — validation adulte requise",
+    "emptyStateActive_one": "Aucune candidature pour le moment. {{recipients}} destinataire prévenu {{ago}} — vous pouvez relancer ou assigner directement quelqu'un ci-dessous.",
+    "emptyStateActive_other": "Aucune candidature pour le moment. {{recipients}} destinataires prévenus {{ago}} — vous pouvez relancer ou assigner directement quelqu'un ci-dessous.",
+    "emptyStateNotPublished": "Ce besoin n'a pas encore été publié. Publiez-le pour prévenir des volontaires.",
+    "close": "Fermer"
+  },
+  "memberCard": {
+    "applyCta": "Je me propose",
+    "unavailableCta": "Pas dispo",
+    "pending": "Proposition envoyée — en attente de validation",
+    "confirmed": "Confirmé ✓ — rappel la veille",
+    "cancelledByClub": "Annulé par le club",
+    "expandComment": "Voir la consigne",
+    "collapseComment": "Réduire",
+    "commentApplyPlaceholder": "Un mot pour le staff (optionnel)",
+    "applyDialogTitle": "Je me propose",
+    "applyDialogConfirm": "Envoyer ma proposition"
+  },
+  "unavailable": {
+    "sectionTitle": "Indisponibles",
+    "sectionTitleCount_one": "Indisponibles ({{count}})",
+    "sectionTitleCount_other": "Indisponibles ({{count}})",
+    "backToApply": "Je me propose finalement",
+    "confirmed": "Marqué indisponible"
+  },
+  "editDialog": {
+    "title": "Modifier le besoin",
+    "labelLabel": "Libellé",
+    "capacityLabel": "Places",
+    "modeLabel": "Validation",
+    "commentLabel": "Commentaire ou consignes",
+    "audienceNote": "👥 L'audience se modifie via « Relancer » (la sélection y est rééditable avant l'envoi).",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "capacityBelowConfirmed_one": "Impossible de passer à {{capacity}} place : {{confirmed}} personne est déjà confirmée. Retirez d'abord un confirmé.",
+    "capacityBelowConfirmed_other": "Impossible de passer à {{capacity}} places : {{confirmed}} personnes sont déjà confirmées. Retirez d'abord un confirmé."
+  },
+  "deleteDraft": {
+    "title": "Supprimer ce brouillon ?",
+    "description": "Le brouillon sera supprimé définitivement. Aucun destinataire ne sera prévenu.",
+    "confirm": "Supprimer",
+    "abort": "Retour",
+    "success": "Brouillon supprimé."
+  },
+  "closeDialog2": {
+    "title": "Fermer le besoin ?",
+    "description_one": "Plus besoin de volontaires (poste pourvu autrement). Les candidatures s'arrêtent ; le {{confirmed}} confirmé reste attendu et garde son rappel.",
+    "description_other": "Plus besoin de volontaires (poste pourvu autrement). Les {{confirmed}} confirmés restent attendus et gardent leur rappel.",
+    "descriptionEmpty": "Plus besoin de volontaires (poste pourvu autrement). Les candidatures s'arrêtent.",
+    "confirm": "Fermer le besoin",
+    "abort": "Retour"
+  },
+  "cancelDialog2": {
+    "title": "Annuler le besoin ?",
+    "descriptionMany": "Ce besoin n'aura plus lieu. {{confirmed}} confirmés et {{pending}} candidatures en attente seront prévenus qu'ils ne sont plus attendus.",
+    "descriptionOnlyConfirmed_one": "Ce besoin n'aura plus lieu. {{confirmed}} personne confirmée sera prévenue qu'elle n'est plus attendue.",
+    "descriptionOnlyConfirmed_other": "Ce besoin n'aura plus lieu. {{confirmed}} personnes confirmées seront prévenues qu'elles ne sont plus attendues.",
+    "descriptionOnlyPending_one": "Ce besoin n'aura plus lieu. {{pending}} candidature en attente sera prévenue.",
+    "descriptionOnlyPending_other": "Ce besoin n'aura plus lieu. {{pending}} candidatures en attente seront prévenues.",
+    "descriptionNone": "Ce besoin n'aura plus lieu. Personne n'a candidaté, aucune notification ne sera envoyée.",
+    "confirm": "Annuler le besoin",
+    "abort": "Retour"
+  },
+  "menu": {
+    "edit": "Modifier",
+    "closeNeed": "Fermer le besoin",
+    "cancelNeed": "Annuler le besoin",
+    "delete": "Supprimer",
+    "editAudience": "Modifier les destinataires",
+    "viewRecipients": "Voir les destinataires",
+    "reopenNeed": "Rouvrir le besoin"
+  },
+  "assignNotification": {
+    "assignedAs": "Vous avez été inscrit comme {{role}}"
+  },
+  "feed": {
+    "title": "Coups de main",
+    "empty": "Aucun besoin ouvert pour vous en ce moment."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} refusée",
+    "sectionTitleCount_other": "{{count}} refusées"
+  },
+  "recentlyFilled": {
+    "title": "Récemment complétés"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} place",
+    "seatsRemaining_other": "{{count}} places",
+    "fallbackTitle": "Coup de main"
+  },
+  "myFeed": {
+    "title": "Mes coups de main",
+    "engagementsCount_one": "{{count}} engagement",
+    "engagementsCount_other": "{{count}} engagements",
+    "nextLabel": "Prochain",
+    "plusOthers_one": "+ {{count}} autre engagement",
+    "plusOthers_other": "+ {{count}} autres engagements"
+  },
+  "resend": {
+    "title": "Relancer le besoin",
+    "success_one": "{{count}} destinataire relancé",
+    "success_other": "{{count}} destinataires relancés"
+  },
+  "editAudience": {
+    "title": "Modifier les destinataires",
+    "desc": "Ajoutez ou remplacez des audiences. Seules les personnes qui n'ont jamais été prévenues recevront une notification.",
+    "deltaHint": "Seules les nouvelles personnes seront notifiées. Celles déjà prévenues ne recevront pas de nouvelle alerte.",
+    "success_one": "{{count}} nouveau destinataire notifié",
+    "success_other": "{{count}} nouveaux destinataires notifiés",
+    "successNoDelta": "Sélection mise à jour — personne à notifier en plus."
+  },
+  "recipients": {
+    "title": "Destinataires prévenus",
+    "desc": "Personnes qui ont reçu une notification pour « {{need}} ».",
+    "empty": "Aucune notification n'a encore été envoyée pour ce besoin.",
+    "count_one": "{{count}} personne prévenue",
+    "count_other": "{{count}} personnes prévenues"
+  },
+  "withdrawDialog": {
+    "title": "Vous désister ?",
+    "description": "Vous désister de {{need}} pour {{event}} ? Le staff en sera informé.",
+    "confirm": "Me désister",
+    "abort": "Annuler"
+  },
+  "insight": {
+    "available": "Dispo",
+    "unavailable": "Pas dispo",
+    "appliedToast": "Candidature envoyée",
+    "unavailableToast": "Indisponibilité enregistrée"
   }
 }

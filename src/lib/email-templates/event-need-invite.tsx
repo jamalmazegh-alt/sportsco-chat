@@ -29,8 +29,8 @@ const T = {
   fr: {
     preview: (label: string) => `Coup de main demandé : ${label}`,
     hello: (n?: string | null) => (n ? `Bonjour ${n},` : "Bonjour,"),
-    intro: (club: string | null | undefined, event: string) =>
-      `${club ?? "Le club"} recherche un coup de main pour ${event}.`,
+    intro: (club: string | null | undefined, event: string, role: string) =>
+      `${club ?? "Le club"} a besoin d'un coup de main sur l'événement « ${event} » — rôle recherché : ${role}.`,
     role: "Rôle demandé",
     seats: (n: number) => `${n} place${n > 1 ? "s" : ""} à pourvoir`,
     auto: "Ta candidature sera confirmée automatiquement (dans la limite des places).",
@@ -41,8 +41,8 @@ const T = {
   en: {
     preview: (label: string) => `Volunteer request: ${label}`,
     hello: (n?: string | null) => (n ? `Hi ${n},` : "Hi,"),
-    intro: (club: string | null | undefined, event: string) =>
-      `${club ?? "The club"} is looking for a volunteer for ${event}.`,
+    intro: (club: string | null | undefined, event: string, role: string) =>
+      `${club ?? "The club"} needs a hand for "${event}" — role needed: ${role}.`,
     role: "Requested role",
     seats: (n: number) => `${n} seat${n > 1 ? "s" : ""} to fill`,
     auto: "Your application will be auto-confirmed (up to capacity).",
@@ -72,7 +72,7 @@ const Email = ({
         <Container style={container}>
           <Heading style={h1}>{t.preview(needLabel)}</Heading>
           <Text style={text}>{t.hello(recipientFirstName)}</Text>
-          <Text style={text}>{t.intro(clubName ?? teamName, eventTitle)}</Text>
+          <Text style={text}>{t.intro(clubName ?? teamName, eventTitle, needLabel)}</Text>
           <Section style={card}>
             <Text style={cardLabel}>{t.role}</Text>
             <Text style={cardValue}>{needLabel}</Text>

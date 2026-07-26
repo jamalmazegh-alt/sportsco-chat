@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { inviteMatchesEmail, isEmailAlreadyExistsError } from "@/lib/invite-signup";
+import { findUserByEmail } from "@/lib/invite.server";
 
 export type InviteValidationResult =
   | { valid: false; reason: "invalid" | "expired" | "used" }
@@ -91,22 +93,9 @@ export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
 
     if (!ok) throw new Response("Invalid invite", { status: 400 });
 
-    // Paginate through users to find the exact email match (avoids the
-    // silent 200-user cap of a single listUsers page).
-    let user: { id: string; email_confirmed_at: string | null } | null = null;
-    for (let page = 1; page <= 50 && !user; page++) {
-      const { data: userList, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
-        page,
-        perPage: 200,
-      });
-      if (listErr) throw new Response(listErr.message, { status: 500 });
-      const found = userList.users.find((u) => (u.email ?? "").toLowerCase() === email);
-      if (found) {
-        user = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
-      }
-      if (userList.users.length < 200) break;
-    }
+    const user = await findUserByEmail(email);
     if (!user) throw new Response("User not found", { status: 404 });
+
     if (!user.email_confirmed_at) {
       const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
         email_confirm: true,
@@ -114,4 +103,101 @@ export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
       if (updErr) throw new Response(updErr.message, { status: 500 });
     }
     return { ok: true };
+  });
+
+/**
+ * Public: create an account for a NOMINATIVE (email-bound) invitation.
+ *
+ * The invite e-mail was delivered to one exact address, so opening its link is
+ * already proof of ownership. We therefore create the user server-side with
+ * `email_confirm: true`, which means Supabase never sends a (redundant)
+ * verification e-mail. The client then signs in with the password the user
+ * just chose.
+ *
+ * Security: the account is only created when the token is still valid AND
+ * bound to exactly the requested e-mail (see `inviteMatchesEmail`). Without
+ * that check anyone could mint a pre-confirmed account for an arbitrary
+ * address.
+ *
+ * Idempotence: if the address already has an account (parent already invited
+ * for another child/club), we do NOT recreate it and we never touch the
+ * existing password — we just make sure the e-mail is confirmed and let the
+ * client sign in normally.
+ */
+export const createInvitedAccount = createServerFn({ method: "POST" })
+  .inputValidator(
+    (input: {
+      token: string;
+      email: string;
+      password: string;
+      firstName?: string;
+      lastName?: string;
+      language?: string;
+      signupRole?: string;
+    }) =>
+      z
+        .object({
+          token: z.string().min(1),
+          email: z.string().email(),
+          password: z.string().min(8),
+          firstName: z.string().optional(),
+          lastName: z.string().optional(),
+          language: z.string().optional(),
+          signupRole: z.string().optional(),
+        })
+        .parse(input),
+  )
+  .handler(async ({ data }): Promise<{ ok: true; created: boolean; alreadyExisted: boolean }> => {
+    const token = data.token.trim();
+    const email = data.email.trim().toLowerCase();
+
+    const { data: memberRows, error: infoErr } = await supabaseAdmin.rpc("get_member_invite_info", {
+      _token: token,
+    });
+    if (infoErr) throw new Response(infoErr.message, { status: 500 });
+    const member = Array.isArray(memberRows) ? memberRows[0] : null;
+    if (!inviteMatchesEmail(member, email)) {
+      throw new Response("Invalid invite", { status: 400 });
+    }
+
+    const existing = await findUserByEmail(email);
+    if (existing) {
+      // Never recreate / never overwrite the password. Just make sure the
+      // account is usable, the client will sign in with its own credentials.
+      if (!existing.email_confirmed_at) {
+        const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
+          email_confirm: true,
+        });
+        if (updErr) throw new Response(updErr.message, { status: 500 });
+      }
+      return { ok: true, created: false, alreadyExisted: true };
+    }
+
+    const firstName = (data.firstName ?? "").trim();
+    const lastName = (data.lastName ?? "").trim();
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        first_name: firstName,
+        last_name: lastName,
+        preferred_language: (data.language ?? "en").slice(0, 2),
+        signup_role: data.signupRole ?? "player",
+        invite_token: token,
+      },
+    });
+
+    if (createErr) {
+      // Race: the account appeared between our lookup and the create call.
+      if (isEmailAlreadyExistsError(createErr.message)) {
+        return { ok: true, created: false, alreadyExisted: true };
+      }
+      throw new Response(createErr.message, { status: 400 });
+    }
+
+    return { ok: true, created: true, alreadyExisted: false };
   });

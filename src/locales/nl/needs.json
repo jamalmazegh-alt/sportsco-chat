@@ -23,7 +23,8 @@
     "draft": "Concept",
     "open": "Open",
     "closed": "Gesloten",
-    "cancelled": "Geannuleerd"
+    "cancelled": "Geannuleerd",
+    "reopened": "Behoefte heropend"
   },
   "validationMode": {
     "auto": "Automatische bevestiging",
@@ -32,8 +33,9 @@
   "signup": {
     "applied": "Aanmelding verzonden",
     "confirmed": "Bevestigd",
-    "declined": "Afgewezen",
-    "withdrawn": "Ingetrokken"
+    "declined": "Aanmelding geweigerd",
+    "withdrawn": "Ingetrokken",
+    "unavailable": "Niet beschikbaar"
   },
   "seats": {
     "full": "Volzet",
@@ -49,7 +51,9 @@
     "cancel": "Behoefte annuleren",
     "publish": "Publiceren",
     "republish": "Opnieuw publiceren",
-    "assign": "Asignar"
+    "assign": "Asignar",
+    "resend": "Notify everyone again",
+    "notifyNew": "Notify new recipients"
   },
   "errors": {
     "forbidden": "Actie niet toegestaan.",
@@ -60,71 +64,320 @@
     "already_applied": "Je hebt je al aangemeld."
   },
   "section": {
-    "title": "Volunteer needs",
-    "add": "Add a need",
-    "emptyStaff": "Create a need (referee, concession, timekeeper…) to call for volunteers.",
-    "created": "Need created",
-    "createDesc": "Create the need, then publish it to the audience of your choice.",
-    "coverageAll": "All covered ✓",
-    "coverageMissing_one": "{{count}} need to fill",
-    "coverageMissing_other": "{{count}} needs to fill"
+    "title": "Helpende handen",
+    "add": "Behoefte toevoegen",
+    "emptyStaff": "Maak een behoefte aan (scheidsrechter, kantine, tijdwaarnemer…) om vrijwilligers te vragen.",
+    "created": "Behoefte aangemaakt",
+    "createDesc": "Maak de behoefte aan en publiceer ze daarna naar de doelgroep van je keuze.",
+    "coverageAll": "Alles is gedekt ✓",
+    "coverageMissing_one": "{{count}} behoefte nog open",
+    "coverageMissing_other": "{{count}} behoeften nog open"
   },
   "field": {
     "template": "Type",
-    "label": "Label",
-    "capacity": "Number of seats",
-    "mode": "Validation",
-    "description": "Details (optional)"
+    "label": "Omschrijving",
+    "capacity": "Aantal plekken",
+    "mode": "Bevestiging",
+    "description": "Details (optioneel)"
   },
   "publish": {
-    "title": "Publish the need",
-    "desc": "Choose who will receive the notification.",
-    "audienceHeader": "Audiences",
-    "chooseGroup": "Pick a group",
-    "chooseTeam": "Pick a team",
-    "chooseCategory": "Pick a category (U11, U12…)",
-    "categoryPlaceholder": "e.g. U11",
-    "preview_one": "{{count}} unique person will be notified",
-    "preview_other": "{{count}} unique people will be notified",
-    "previewNone": "No recipients — pick at least one audience.",
-    "previewLoading": "Computing recipients…",
-    "success": "Need published · {{count}} recipient(s)",
-    "successIdempotent": "Already published (no new notifications sent)."
+    "title": "Behoefte publiceren",
+    "desc": "Kies wie de melding ontvangt.",
+    "audienceHeader": "Doelgroepen",
+    "chooseGroup": "Kies een groep",
+    "chooseTeam": "Kies een ploeg",
+    "chooseCategory": "Kies een categorie (U11, U12…)",
+    "categoryPlaceholder": "Bv. U11",
+    "preview_one": "{{count}} persoon wordt verwittigd",
+    "preview_other": "{{count}} personen worden verwittigd",
+    "previewNone": "Geen ontvangers — kies minstens één doelgroep.",
+    "previewLoading": "Aantal ontvangers berekenen…",
+    "success": "Behoefte gepubliceerd · {{count}} ontvanger(s)",
+    "successIdempotent": "Al gepubliceerd (niets opnieuw verstuurd)."
   },
   "edit": {
-    "templateLocked": "The need type cannot be changed after publication."
+    "templateLocked": "Het type behoefte kan na publicatie niet meer worden gewijzigd."
   },
   "publishedBadge": {
-    "at_one": "Published {{time}} · {{count}} recipient",
-    "at_other": "Published {{time}} · {{count}} recipients",
-    "unpublished": "Not published"
+    "at_one": "Gepubliceerd {{time}} · {{count}} ontvanger",
+    "at_other": "Gepubliceerd {{time}} · {{count}} ontvangers",
+    "unpublished": "Niet gepubliceerd"
   },
   "audiences": {
-    "convoked_players": "Called-up players",
-    "convoked_parents": "Parents of called-up players",
-    "club_members": "All club members",
-    "club_educators": "Club educators",
-    "club_staff": "Club staff / volunteers",
-    "club_admins": "Club administrators",
-    "club_tournament_managers": "Tournament managers",
-    "club_group": "Custom group",
-    "team_players": "Players of a team",
-    "team_parents": "Parents of a team",
-    "team_educators": "Educators of a team",
-    "category_educators": "Educators of a category"
+    "convoked_players": "Geselecteerde spelers",
+    "convoked_parents": "Ouders van de geselecteerde spelers",
+    "clubAudiences": "Doelgroepen van de club",
+    "club_members": "Alle clubleden",
+    "club_educators": "Trainers van de club",
+    "club_staff": "Staf / vrijwilligers van de club",
+    "club_admins": "Clubbeheerders",
+    "club_tournament_managers": "Toernooiverantwoordelijken",
+    "club_group": "Eigen groep",
+    "team_players": "Spelers van een ploeg",
+    "team_parents": "Ouders van een ploeg",
+    "team_educators": "Trainers van een ploeg",
+    "category_educators": "Trainers van een categorie",
+    "customGroups": "Custom groups",
+    "eventRelevant": "Suggested for this event",
+    "otherAudiences": "Other audiences",
+    "add": "Toevoegen",
+    "pickKind": "Pick a type…",
+    "pickParam": "Pick one…",
+    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "selected": {
+      "title": "Selected audience",
+      "empty": "No audience selected — add at least one criterion below.",
+      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
+      "loading": "Computing…",
+      "count_one": "{{count}} person will be notified",
+      "count_other": "{{count}} people will be notified",
+      "removeAria": "Remove {{label}}",
+      "takenAria": "Already selected"
+    },
+    "preassign": {
+      "title": "Personen vooraf toewijzen",
+      "hint": "Zoek een clublid om direct te bevestigen (het lid wordt als bevestigd genotificeerd).",
+      "searchPlaceholder": "Zoek een lid…",
+      "noResults": "Geen resultaat",
+      "capacityReached": "Capaciteit bereikt.",
+      "confirmed_one": "{{count}} persoon vooraf toegewezen en bevestigd.",
+      "confirmed_other": "{{count}} personen vooraf toegewezen en bevestigd."
+    }
   },
   "staff": {
-    "title": "Applications",
-    "empty": "No applications yet.",
-    "minorPending": "Minor applicant — adult confirmation required",
-    "license": "Licence #{{n}}"
+    "title": "Aanmeldingen",
+    "empty": "Nog geen aanmeldingen.",
+    "minorPending": "Minderjarig — bevestiging door een volwassene vereist",
+    "license": "Licentienr. {{n}}",
+    "alreadyConfirmed": "Al bevestigd",
+    "manualAdded": "Persoon toegevoegd",
+    "bulkConfirmed_one": "{{count}} aanmelding bevestigd",
+    "bulkConfirmed_other": "{{count}} aanmeldingen bevestigd",
+    "bulkDeclined_one": "{{count}} aanmelding geweigerd",
+    "bulkDeclined_other": "{{count}} aanmeldingen geweigerd",
+    "selectAllPending": "Alles selecteren ({{count}})",
+    "confirmSelection": "Bevestigen",
+    "noMembers": "Geen lid gevonden",
+    "editNeed": "Behoefte bewerken",
+    "createDraft": "Als concept aanmaken",
+    "unassigned": "Toewijzing geannuleerd",
+    "fullTitle": "Capaciteit bereikt",
+    "unassignCta": "Verwijderen",
+    "fullBlock": "Capaciteit bereikt. Verwijder eerst een bevestigde persoon om iemand anders toe te wijzen."
   },
-  "pendingApplications_one": "{{count}} pending",
-  "pendingApplications_other": "{{count}} pending",
+  "pendingApplications_one": "{{count}} in afwachting",
+  "pendingApplications_other": "{{count}} in afwachting",
   "cancelDialog": {
-    "title": "Behoefte annuleren?",
-    "description": "Deze actie is definitief. Wachtende kandidaten en bevestigde vrijwilligers worden op de hoogte gebracht.",
+    "title": "Deze behoefte annuleren?",
+    "description": "Deze actie is definitief. Aanmeldingen in afwachting en bevestigde personen worden verwittigd.",
     "confirm": "Ja, annuleren",
     "abort": "Nee, behouden"
+  },
+  "card": {
+    "publishedAt_one": "{{time}} geleden gepubliceerd · {{count}} ontvanger",
+    "publishedAt_other": "{{time}} geleden gepubliceerd · {{count}} ontvangers",
+    "unpublishedMeta": "Niet gepubliceerd — nog niemand verwittigd",
+    "seatsRemaining_one": "{{count}} plek vrij",
+    "seatsRemaining_other": "{{count}} plekken vrij",
+    "seatsFullConfirmed_one": "Volzet ✓ · {{count}} bevestigd",
+    "seatsFullConfirmed_other": "Volzet ✓ · {{count}} bevestigd",
+    "applicationsCta": "Aanmeldingen",
+    "republish": "Opnieuw vragen",
+    "menuLabel": "Opties"
+  },
+  "badge": {
+    "unpublished": "Niet gepubliceerd",
+    "closed": "Gesloten",
+    "cancelled": "Geannuleerd"
+  },
+  "wizard": {
+    "step": "Stap {{current}}/{{total}}",
+    "step1Title": "Behoefte toevoegen",
+    "step2Title": "Wie verwittigen?",
+    "commentLabel": "Opmerking of instructies (optioneel)",
+    "commentPlaceholder": "Bv.: Graag 30 minuten voor de wedstrijd aanwezig zijn",
+    "minorReminder": "🛡️ Een minderjarige wordt altijd door de staf bevestigd, ook bij automatische bevestiging.",
+    "continueToRecipients": "Verder → Ontvangers",
+    "back": "Terug",
+    "cancel": "Annuleren"
+  },
+  "audiencePicker": {
+    "forThisMatch": "Voor deze wedstrijd",
+    "clubGroups": "Groepen van de club",
+    "teamsCategories": "Ploegen & categorieën",
+    "otherOption": "Andere…",
+    "otherOptionMenu": "Andere doelgroepen",
+    "chipConvokedPlayers": "Geselecteerde spelers",
+    "chipConvokedParents": "Ouders van de selectie",
+    "chipTeamPlayers": "Spelers · {{team}}",
+    "chipTeamParents": "Ouders · {{team}}",
+    "chipTeamEducators": "Trainers · {{team}}",
+    "chipCategoryEducators": "Trainers · {{category}}",
+    "chipClubMembers": "Alle leden",
+    "chipClubStaff": "Staf / vrijwilligers",
+    "chipClubAdmins": "Beheerders",
+    "chipClubEducators": "Trainers van de club",
+    "chipClubTournamentManagers": "Toernooiverantwoordelijken"
+  },
+  "publishStep": {
+    "title": "Wie verwittigen?",
+    "recipientsCount_one": "{{count}} persoon wordt verwittigd",
+    "recipientsCount_other": "{{count}} personen worden verwittigd",
+    "recipientsLoading": "Berekenen…",
+    "needSummaryLabel": "{{label}}",
+    "needSummarySeats_one": "{{count}} plek",
+    "needSummarySeats_other": "{{count}} plekken",
+    "publishCta": "Publiceren en verwittigen",
+    "republishCta_one": "Opnieuw vragen ({{count}} persoon)",
+    "republishCta_other": "Opnieuw vragen ({{count}} personen)",
+    "emptyConvocation": "Voorlopig is er niemand om te verwittigen — de selectie is nog niet gemaakt. Selecteer eerst, of kies een andere doelgroep.",
+    "emptyGeneric": "Met deze keuze is er niemand om te verwittigen. Kies een andere doelgroep."
+  },
+  "applications": {
+    "title": "Aanmeldingen — {{label}}",
+    "summary_one": "{{pending}} in afwachting · {{confirmed}} bevestigd · {{seats}} plek",
+    "summary_other": "{{pending}} in afwachting · {{confirmed}} bevestigd · {{seats}} plekken",
+    "pendingSection": "In afwachting",
+    "confirmedSection": "Bevestigd",
+    "unavailableSection_one": "Niet beschikbaar ({{count}})",
+    "unavailableSection_other": "Niet beschikbaar ({{count}})",
+    "confirmedEmpty": "Voorlopig niemand.",
+    "assignSection": "Rechtstreeks toewijzen",
+    "assignHelp": "Al met iemand afgesproken? Wijs die persoon toe: ze wordt bevestigd en verwittigd, en kan zich nog afmelden.",
+    "searchPlaceholder": "Een lid zoeken…",
+    "assignCta": "Toewijzen",
+    "removeConfirmed": "Verwijderen",
+    "licenseMissing": "Geen licentienummer ingevuld",
+    "licenseLabel": "Licentie {{n}}",
+    "minorTag": "Minderjarig — bevestiging door een volwassene vereist",
+    "emptyStateActive_one": "Nog geen aanmeldingen. {{recipients}} ontvanger werd {{ago}} verwittigd — je kunt het opnieuw vragen of hieronder rechtstreeks iemand toewijzen.",
+    "emptyStateActive_other": "Nog geen aanmeldingen. {{recipients}} ontvangers werden {{ago}} verwittigd — je kunt het opnieuw vragen of hieronder rechtstreeks iemand toewijzen.",
+    "emptyStateNotPublished": "Deze behoefte is nog niet gepubliceerd. Publiceer ze om vrijwilligers te verwittigen.",
+    "close": "Sluiten"
+  },
+  "memberCard": {
+    "applyCta": "Ik help mee",
+    "unavailableCta": "Kan niet",
+    "pending": "Aanmelding verzonden — wacht op bevestiging",
+    "confirmed": "Bevestigd ✓ — herinnering de dag ervoor",
+    "cancelledByClub": "Geannuleerd door de club",
+    "expandComment": "Instructies tonen",
+    "collapseComment": "Minder tonen",
+    "commentApplyPlaceholder": "Een bericht voor de staf (optioneel)",
+    "applyDialogTitle": "Ik help mee",
+    "applyDialogConfirm": "Mijn aanmelding versturen"
+  },
+  "unavailable": {
+    "sectionTitle": "Niet beschikbaar",
+    "sectionTitleCount_one": "Niet beschikbaar ({{count}})",
+    "sectionTitleCount_other": "Niet beschikbaar ({{count}})",
+    "backToApply": "Ik help toch mee",
+    "confirmed": "Als niet beschikbaar gemarkeerd"
+  },
+  "editDialog": {
+    "title": "Behoefte bewerken",
+    "labelLabel": "Omschrijving",
+    "capacityLabel": "Plekken",
+    "modeLabel": "Bevestiging",
+    "commentLabel": "Opmerking of instructies",
+    "audienceNote": "👥 De doelgroep wijzig je via « Opnieuw vragen » (daar kun je de keuze aanpassen vóór het versturen).",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "capacityBelowConfirmed_one": "Kan niet naar {{capacity}} plek: {{confirmed}} persoon is al bevestigd. Verwijder eerst een bevestigde persoon.",
+    "capacityBelowConfirmed_other": "Kan niet naar {{capacity}} plekken: {{confirmed}} personen zijn al bevestigd. Verwijder eerst een bevestigde persoon."
+  },
+  "deleteDraft": {
+    "title": "Dit concept verwijderen?",
+    "description": "Het concept wordt definitief verwijderd. Er wordt niemand verwittigd.",
+    "confirm": "Verwijderen",
+    "abort": "Terug",
+    "success": "Concept verwijderd."
+  },
+  "closeDialog2": {
+    "title": "Behoefte sluiten?",
+    "description_one": "Er zijn geen vrijwilligers meer nodig (anders ingevuld). Aanmelden kan niet meer; de {{confirmed}} bevestigde persoon blijft verwacht en behoudt de herinnering.",
+    "description_other": "Er zijn geen vrijwilligers meer nodig (anders ingevuld). De {{confirmed}} bevestigde personen blijven verwacht en behouden hun herinnering.",
+    "descriptionEmpty": "Er zijn geen vrijwilligers meer nodig (anders ingevuld). Aanmelden kan niet meer.",
+    "confirm": "Behoefte sluiten",
+    "abort": "Terug"
+  },
+  "cancelDialog2": {
+    "title": "Behoefte annuleren?",
+    "descriptionMany": "Deze behoefte gaat niet door. {{confirmed}} bevestigde personen en {{pending}} aanmeldingen in afwachting worden verwittigd dat ze niet meer verwacht worden.",
+    "descriptionOnlyConfirmed_one": "Deze behoefte gaat niet door. {{confirmed}} bevestigde persoon wordt verwittigd dat die niet meer verwacht wordt.",
+    "descriptionOnlyConfirmed_other": "Deze behoefte gaat niet door. {{confirmed}} bevestigde personen worden verwittigd dat ze niet meer verwacht worden.",
+    "descriptionOnlyPending_one": "Deze behoefte gaat niet door. {{pending}} aanmelding in afwachting wordt verwittigd.",
+    "descriptionOnlyPending_other": "Deze behoefte gaat niet door. {{pending}} aanmeldingen in afwachting worden verwittigd.",
+    "descriptionNone": "Deze behoefte gaat niet door. Niemand heeft zich aangemeld, er wordt geen melding verstuurd.",
+    "confirm": "Behoefte annuleren",
+    "abort": "Terug"
+  },
+  "menu": {
+    "edit": "Bewerken",
+    "closeNeed": "Behoefte sluiten",
+    "cancelNeed": "Behoefte annuleren",
+    "delete": "Verwijderen",
+    "editAudience": "Edit recipients",
+    "viewRecipients": "View recipients",
+    "reopenNeed": "Behoefte heropenen"
+  },
+  "assignNotification": {
+    "assignedAs": "Je bent ingeschreven als {{role}}"
+  },
+  "feed": {
+    "title": "Helpende handen",
+    "empty": "Er is momenteel geen openstaande behoefte voor jou."
+  },
+  "declined": {
+    "sectionTitleCount_one": "{{count}} geweigerd",
+    "sectionTitleCount_other": "{{count}} geweigerd"
+  },
+  "recentlyFilled": {
+    "title": "Recent ingevuld"
+  },
+  "urgency": {
+    "seatsRemaining_one": "{{count}} plek",
+    "seatsRemaining_other": "{{count}} plekken",
+    "fallbackTitle": "Hulp"
+  },
+  "myFeed": {
+    "title": "Mijn hulp",
+    "engagementsCount_one": "{{count}} commitment",
+    "engagementsCount_other": "{{count}} commitments",
+    "nextLabel": "Next",
+    "plusOthers_one": "+ {{count}} other commitment",
+    "plusOthers_other": "+ {{count}} other commitments"
+  },
+  "resend": {
+    "title": "Re-notify recipients",
+    "success_one": "{{count}} recipient re-notified",
+    "success_other": "{{count}} recipients re-notified"
+  },
+  "editAudience": {
+    "title": "Edit recipients",
+    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
+    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
+    "success_one": "{{count}} new recipient notified",
+    "success_other": "{{count}} new recipients notified",
+    "successNoDelta": "Selection updated — nobody new to notify."
+  },
+  "recipients": {
+    "title": "Notified recipients",
+    "desc": "People who received a notification for \"{{need}}\".",
+    "empty": "No notification has been sent for this need yet.",
+    "count_one": "{{count}} person notified",
+    "count_other": "{{count}} people notified"
+  },
+  "withdrawDialog": {
+    "title": "Withdraw?",
+    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
+    "confirm": "Withdraw",
+    "abort": "Cancel"
+  },
+  "insight": {
+    "available": "Beschikbaar",
+    "unavailable": "Niet beschikbaar",
+    "appliedToast": "Aanmelding verstuurd",
+    "unavailableToast": "Als niet-beschikbaar gemarkeerd"
   }
 }

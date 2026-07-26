@@ -26,6 +26,36 @@ import {
 import { NewRecordBadge } from "@/components/challenge-badges";
 import i18n from "@/lib/i18n";
 
+/**
+ * Reorder a list so all items whose template_key starts with "juggling"
+ * appear consecutively, at the position of the first juggling item.
+ * Preserves relative order otherwise. Used in both the challenges list
+ * and the "add activity" picker so the 4 juggling variants stay grouped.
+ */
+function groupJugglingVariants<T>(items: T[], getKey: (item: T) => string | null): T[] {
+  const firstIdx = items.findIndex((it) => getKey(it)?.startsWith("juggling"));
+  if (firstIdx < 0) return items;
+  const juggling = items.filter((it) => getKey(it)?.startsWith("juggling"));
+  const others = items.filter((it) => !getKey(it)?.startsWith("juggling"));
+  const out = [...others];
+  out.splice(firstIdx, 0, ...juggling);
+  return out;
+}
+
+/** Display name for an existing challenge: prefer i18n template name so
+ * renames (e.g. "Jonglerie" → "Jonglerie libre") take effect for challenges
+ * created before the rename. Falls back to the stored DB name. */
+function challengeDisplayName(
+  c: { name: string; template_key?: string | null },
+  t: (k: string, opts?: any) => string,
+): string {
+  if (c.template_key) {
+    const translated = t(`templates.${c.template_key}.name`, { defaultValue: "" });
+    if (translated) return translated;
+  }
+  return c.name;
+}
+
 export const Route = createFileRoute("/_authenticated/events/$eventId/challenges")({
   component: EventChallengesPage,
   head: () => ({
@@ -197,11 +227,14 @@ function ChallengesList({
   const { t } = useTranslation("challenges");
 
   const sorted = useMemo(() => {
-    return [...challenges].sort((a, b) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0));
+    const base = [...challenges].sort(
+      (a: any, b: any) => (entryCounts[b.id] ?? 0) - (entryCounts[a.id] ?? 0),
+    );
+    return groupJugglingVariants(base, (c: any) => c.template_key ?? null);
   }, [challenges, entryCounts]);
 
   const displayed = useMemo(() => {
-    return showAll ? sorted : sorted.filter((c) => (entryCounts[c.id] ?? 0) > 0);
+    return showAll ? sorted : sorted.filter((c: any) => (entryCounts[c.id] ?? 0) > 0);
   }, [sorted, showAll, entryCounts]);
 
   const hasHidden = displayed.length < sorted.length;
@@ -257,14 +290,14 @@ function ChallengesList({
           </CardContent>
         </Card>
       )}
-      {displayed.map((c) => {
+      {displayed.map((c: any) => {
         const hasEntries = (entryCounts[c.id] ?? 0) > 0;
         return (
           <Card key={c.id}>
             <CardContent className="flex items-center gap-3 p-4">
               <div className="text-2xl">{c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯")}</div>
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{c.name}</div>
+                <div className="truncate font-medium">{challengeDisplayName(c, t)}</div>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <span>{t(`types.${c.kind}`)}</span>
                   <span>·</span>
@@ -361,7 +394,15 @@ function AddChallenge({
   // Unified list: reusable existing challenges first (marked "Populaire"),
   // then brand-new templates. One consistent card style, no section split.
   type Item =
-    | { kind: "existing"; id: string; name: string; icon: string; typeLabel: string; popular: true }
+    | {
+        kind: "existing";
+        id: string;
+        templateKey: string | null;
+        name: string;
+        icon: string;
+        typeLabel: string;
+        popular: true;
+      }
     | {
         kind: "template";
         key: string;
@@ -376,7 +417,8 @@ function AddChallenge({
     const existing: Item[] = reusable.map((c) => ({
       kind: "existing" as const,
       id: c.id,
-      name: c.name,
+      templateKey: c.template_key ?? null,
+      name: challengeDisplayName(c, t),
       icon: c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯"),
       typeLabel: t(`types.${c.kind}`),
       popular: true,
@@ -390,7 +432,9 @@ function AddChallenge({
       typeLabel: t(`types.${tpl.kind}`),
       popular: false,
     }));
-    return [...existing, ...tpls];
+    return groupJugglingVariants<Item>([...existing, ...tpls], (it) =>
+      it.kind === "existing" ? it.templateKey : it.key,
+    );
   }, [reusable, templates, t]);
 
   return (

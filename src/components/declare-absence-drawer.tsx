@@ -12,7 +12,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -22,6 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
+import { format } from "date-fns";
+import { fr as frLocale, enUS } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -34,7 +39,7 @@ import {
   Swords,
   Dumbbell,
   Trophy,
-  Calendar,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
 type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
@@ -50,6 +55,15 @@ const REASONS: Array<{ value: Reason; Icon: typeof Palmtree }> = [
   { value: "other", Icon: HelpCircle },
 ];
 
+export interface PlayerAvailabilityEditPayload {
+  id: string;
+  player_id: string;
+  start_date: string;
+  end_date: string;
+  reason: string;
+  comment: string | null;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -58,6 +72,8 @@ interface Props {
   /** When provided, the candidate list = all players of this team (coach/admin flow). */
   teamId?: string;
   onCreated?: () => void;
+  /** When provided, drawer runs in EDIT mode. */
+  availability?: PlayerAvailabilityEditPayload | null;
 }
 
 type Candidate = { id: string; first_name: string; last_name: string };
@@ -68,31 +84,54 @@ export function DeclareAbsenceDrawer({
   playerId: initialPlayerId,
   teamId,
   onCreated,
+  availability,
 }: Props) {
-  const { t } = useTranslation();
+  const editing = !!availability;
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
+
   const { user } = useAuth();
   const qc = useQueryClient();
 
   const today = new Date().toISOString().slice(0, 10);
+  const todayDate = new Date(`${today}T00:00:00`);
   const [playerId, setPlayerId] = useState<string>(initialPlayerId ?? "");
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  const [range, setRange] = useState<{ from?: Date; to?: Date }>({
+    from: todayDate,
+    to: todayDate,
+  });
+  const startDate = range.from ? format(range.from, "yyyy-MM-dd") : today;
+  const endDate = range.to
+    ? format(range.to, "yyyy-MM-dd")
+    : range.from
+      ? format(range.from, "yyyy-MM-dd")
+      : today;
   const [reason, setReason] = useState<Reason>("vacation");
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
   const [forceConfirm, setForceConfirm] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (availability) {
+      setPlayerId(availability.player_id);
+      setRange({
+        from: new Date(`${availability.start_date}T00:00:00`),
+        to: new Date(`${availability.end_date}T00:00:00`),
+      });
+      setReason((availability.reason as Reason) ?? "vacation");
+      setComment(availability.comment ?? "");
+      setForceConfirm(false);
+    } else {
+      const t0 = new Date(`${today}T00:00:00`);
       setPlayerId(initialPlayerId ?? "");
-      setStartDate(today);
-      setEndDate(today);
+      setRange({ from: t0, to: t0 });
       setReason("vacation");
       setComment("");
       setForceConfirm(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialPlayerId]);
+  }, [open, initialPlayerId, availability?.id]);
 
   // Candidates:
   // - if teamId provided → all players of the team (coach flow)
@@ -206,18 +245,20 @@ export function DeclareAbsenceDrawer({
       case "meeting":
         return Users;
       default:
-        return Calendar;
+        return CalendarIcon;
     }
   }
 
   async function checkOverlap(): Promise<boolean> {
-    const { count } = await supabase
+    let q = supabase
       .from("player_availabilities")
       .select("id", { count: "exact", head: true })
       .eq("player_id", playerId)
       .eq("status", "active")
       .lte("start_date", endDate)
       .gte("end_date", startDate);
+    if (editing) q = q.neq("id", availability!.id);
+    const { count } = await q;
     return (count ?? 0) > 0;
   }
 
@@ -318,78 +359,99 @@ export function DeclareAbsenceDrawer({
     }
     setBusy(true);
     try {
-      if (!forceConfirm) {
-        const overlap = await checkOverlap();
-        if (overlap) {
-          setBusy(false);
-          const ok = window.confirm(
-            t("availability.overlapWarning", {
-              defaultValue:
-                "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
-            }),
-          );
-          if (!ok) return;
-          setForceConfirm(true);
-          setBusy(true);
-        }
-      }
-      const { data: inserted, error } = await supabase
-        .from("player_availabilities")
-        .insert({
-          player_id: playerId,
-          created_by_user_id: user!.id,
-          start_date: startDate,
-          end_date: endDate,
-          reason,
-          comment: comment.trim() || null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-
-      // Notify coaches (best-effort): in-app + email (server fn handles per-coach locale)
-      try {
-        const [playerRes, declarerRes] = await Promise.all([
-          supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
-          supabase
-            .from("profiles")
-            .select("first_name, full_name")
-            .eq("id", user!.id)
-            .maybeSingle(),
-        ]);
-        const p = playerRes.data;
-        const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
-        const declaredByName =
-          (declarerRes.data as any)?.first_name ||
-          ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
-          null;
-        // Only attribute if declarer is NOT the player themselves
-        const isSelf =
-          !!p &&
-          (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
-            ?.user_id === user!.id;
-        const attribution = isSelf ? null : declaredByName;
-        const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
-        const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(
-          name,
-          fmt(startDate),
-          fmt(endDate),
-          reasonLabel,
-          impactedEvents,
-          attribution,
+      const overlap = await checkOverlap();
+      if (overlap) {
+        toast.error(
+          t("availability.errors.overlap", {
+            defaultValue:
+              "Une absence est déjà déclarée sur ces dates. Édite l'existante à la place.",
+          }),
         );
-
-        // Email coaches via server fn (per-coach language, excludes caller)
-        if (inserted?.id) {
-          const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
-          notifyCoachesOfAbsence({ data: { availabilityId: inserted.id } }).catch(() => undefined);
-        }
-      } catch {
-        /* ignore notify errors */
+        setBusy(false);
+        return;
       }
 
-      toast.success(t("availability.saved", { defaultValue: "Absence enregistrée" }));
+      let insertedId: string | null = null;
+      if (editing) {
+        const { error } = await supabase
+          .from("player_availabilities")
+          .update({
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .eq("id", availability!.id);
+        if (error) throw error;
+        insertedId = availability!.id;
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("player_availabilities")
+          .insert({
+            player_id: playerId,
+            created_by_user_id: user!.id,
+            start_date: startDate,
+            end_date: endDate,
+            reason,
+            comment: comment.trim() || null,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        insertedId = inserted?.id ?? null;
+      }
+
+      // Notify coaches on CREATE only (best-effort)
+      if (!editing) {
+        try {
+          const [playerRes, declarerRes] = await Promise.all([
+            supabase
+              .from("players")
+              .select("first_name, last_name")
+              .eq("id", playerId)
+              .maybeSingle(),
+            supabase
+              .from("profiles")
+              .select("first_name, full_name")
+              .eq("id", user!.id)
+              .maybeSingle(),
+          ]);
+          const p = playerRes.data;
+          const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
+          const declaredByName =
+            (declarerRes.data as any)?.first_name ||
+            ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
+            null;
+          const isSelf =
+            !!p &&
+            (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
+              ?.user_id === user!.id;
+          const attribution = isSelf ? null : declaredByName;
+          const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
+          const fmt = (d: string) => new Date(d).toLocaleDateString();
+          await notifyCoaches(
+            name,
+            fmt(startDate),
+            fmt(endDate),
+            reasonLabel,
+            impactedEvents,
+            attribution,
+          );
+
+          if (insertedId) {
+            const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
+            notifyCoachesOfAbsence({ data: { availabilityId: insertedId } }).catch(() => undefined);
+          }
+        } catch {
+          /* ignore notify errors */
+        }
+      }
+
+      toast.success(
+        editing
+          ? t("availability.updated", { defaultValue: "Absence mise à jour" })
+          : t("availability.saved", { defaultValue: "Absence enregistrée" }),
+      );
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
       qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
       qc.invalidateQueries({ queryKey: ["event-availabilities"] });
@@ -408,7 +470,7 @@ export function DeclareAbsenceDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
+        <SheetHeader className="pt-[env(safe-area-inset-top)]">
           <SheetTitle>
             {t("availability.declare", { defaultValue: "Déclarer une absence" })}
           </SheetTitle>
@@ -447,46 +509,68 @@ export function DeclareAbsenceDrawer({
             </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>{t("availability.startDate", { defaultValue: "Date de début" })}</Label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  if (endDate < e.target.value) setEndDate(e.target.value);
-                }}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("availability.endDate", { defaultValue: "Date de fin" })}</Label>
-              <Input
-                type="date"
-                min={startDate}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label>{t("availability.dates", { defaultValue: "Période d'absence" })}</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-11 w-full justify-start font-normal">
+                  <CalendarIcon className="h-4 w-4" />
+                  {startDate && endDate ? (
+                    startDate === endDate ? (
+                      <span>
+                        {format(new Date(`${startDate}T00:00:00`), "EEE d MMM", {
+                          locale: dateLocale,
+                        })}
+                      </span>
+                    ) : (
+                      <span>
+                        {format(new Date(`${startDate}T00:00:00`), "EEE d MMM", {
+                          locale: dateLocale,
+                        })}
+                        {" → "}
+                        {format(new Date(`${endDate}T00:00:00`), "EEE d MMM", {
+                          locale: dateLocale,
+                        })}
+                      </span>
+                    )
+                  ) : (
+                    t("availability.pickRange", { defaultValue: "Sélectionner une période" })
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="range"
+                  numberOfMonths={1}
+                  selected={range.from ? (range as { from: Date; to?: Date }) : undefined}
+                  onSelect={(next: { from?: Date; to?: Date } | undefined, clickedDay?: Date) => {
+                    // 3rd click: start a fresh range at the clicked day instead of extending.
+                    if (range.from && range.to && clickedDay) {
+                      setRange({ from: clickedDay, to: undefined });
+                      return;
+                    }
+                    setRange(next ?? {});
+                  }}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-1.5">
             <Label>{t("availability.reasonLabel", { defaultValue: "Motif" })}</Label>
-            <Select value={reason} onValueChange={(v) => setReason(v as Reason)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {REASONS.map(({ value, Icon }) => (
-                  <SelectItem key={value} value={value}>
-                    <span className="inline-flex items-center gap-2">
-                      <Icon className="h-3.5 w-3.5 opacity-70" />
-                      {t(`availability.reason.${value}`, { defaultValue: value })}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2">
+              {REASONS.map(({ value, Icon }) => (
+                <WizardOptionCard
+                  key={value}
+                  active={reason === value}
+                  onClick={() => setReason(value)}
+                  icon={<Icon className="h-4 w-4" />}
+                  title={t(`availability.reason.${value}`, { defaultValue: value })}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="space-y-1.5">

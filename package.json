@@ -16,9 +16,12 @@
     "test": "vitest run --config vitest.config.ts",
     "test:rls": "vitest run --config tests/rls/vitest.config.ts",
     "test:e2e": "playwright test",
+    "test:e2e:core": "E2E_SUITE=core playwright test --project=core",
+    "test:e2e:flows": "E2E_SUITE=ui E2E_UI=1 playwright test --project=ui",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "check:i18n": "node scripts/check-i18n-parity.mjs",
+    "seed:e2e": "bun run scripts/seed-e2e.ts",
+    "check:i18n": "node scripts/check-i18n-parity.mjs && node scripts/check-i18n-ns-separator.mjs",
     "check:guards": "node scripts/check-server-fn-guards.mjs",
     "prepare": "husky"
   },
@@ -77,6 +80,7 @@
     "@tanstack/react-start": "^1.167.50",
     "@tanstack/router-plugin": "^1.167.28",
     "ai": "^6.0.182",
+    "aws4fetch": "^1.0.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -118,7 +122,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@lovable.dev/vite-tanstack-config": "2.7.6",
+    "@lovable.dev/vite-tanstack-config": "2.7.7",
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.16.5",
     "@types/pg": "^8.20.0",
@@ -148,7 +152,11 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md,css}": [
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
       "prettier --write"
     ]
   }

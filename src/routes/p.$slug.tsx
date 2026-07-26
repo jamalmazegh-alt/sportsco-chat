@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Trophy, History, CalendarDays, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+import { displayLastName } from "@/lib/public-profile-visibility";
 import { cn } from "@/lib/utils";
 import { FollowButton } from "@/components/follow-button";
 import { isV2 } from "@/config/features";
@@ -64,20 +65,6 @@ const publicProfileQuery = (slug: string) =>
     },
     staleTime: 60_000,
   });
-
-function isMinorWithoutConsent(p: PublicProfile["player"]) {
-  if (!p.birth_date) return false;
-  const ageMs = Date.now() - new Date(p.birth_date).getTime();
-  const age = ageMs / (365.25 * 24 * 3600 * 1000);
-  return age < 18 && p.parental_public_consent !== true;
-}
-
-function displayLastName(p: PublicProfile["player"]) {
-  if (isMinorWithoutConsent(p) && p.last_name) {
-    return `${p.last_name.charAt(0).toUpperCase()}.`;
-  }
-  return p.last_name;
-}
 
 function buildMeta(slug: string, profile: PublicProfile | null) {
   const url = `${SITE_URL}/p/${slug}`;

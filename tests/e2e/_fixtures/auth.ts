@@ -35,6 +35,11 @@ export async function loginAs(page: Page, user: { email: string; password: strin
     ([key, value]) => {
       try {
         window.localStorage.setItem(key, value);
+        // Pre-accept cookie banner so it does not cover CTAs / ConsentGate.
+        window.localStorage.setItem(
+          "clubero_cookie_consent",
+          JSON.stringify({ necessary: true, analytics: true, marketing: true }),
+        );
       } catch {
         /* ignore */
       }

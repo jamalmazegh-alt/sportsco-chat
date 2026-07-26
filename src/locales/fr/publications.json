@@ -1,0 +1,206 @@
+{
+  "list": {
+    "title": "Publications",
+    "new": "Nouvelle publication",
+    "empty": "Aucune publication pour le moment.",
+    "anonymous": "Anonyme",
+    "closed": "Fermé"
+  },
+  "new": {
+    "title": "Nouvelle publication",
+    "step": "Étape",
+    "typeMessage": "Message",
+    "typePoll": "Sondage",
+    "pollOptions": "Options",
+    "option": "Option",
+    "addOption": "Ajouter une option",
+    "visibility": "Visibilité des résultats",
+    "visibilityAnon": "Anonyme",
+    "visibilityAnonDesc": "Personne, y compris le staff, ne voit qui a voté quoi. Résultats masqués tant que < 3 votes par option.",
+    "visibilityStaff": "Visible par le staff",
+    "visibilityStaffDesc": "Le staff voit qui a voté quoi. Les votants voient uniquement les totaux.",
+    "audienceLabel": "Destinataires",
+    "audienceEmpty": "Aucun destinataire sélectionné",
+    "chooseTeam": "Choisir une équipe…",
+    "chooseGroup": "Choisir un groupe…",
+    "deliveryLabel": "Mode de diffusion",
+    "wall": "Mur + notification push",
+    "wallDesc": "Apparaît sur le fil du club et envoie une push aux destinataires.",
+    "email": "E-mail",
+    "emailDesc": "Envoie un e-mail à chaque destinataire.",
+    "publish": "Publier",
+    "published": "Publication publiée",
+    "pickCategory": "Choisir une catégorie…",
+    "pickEvent": "Choisir un événement…",
+    "pickMembers": "Sélection manuelle (joueurs)",
+    "searchPlaceholder": "Rechercher un joueur…",
+    "addPlayersBtn": "+ Joueurs",
+    "addParentsBtn": "+ Parents",
+    "pollTitle": "Nouveau sondage"
+  },
+  "detail": {
+    "notFound": "Publication introuvable",
+    "vote": "Voter",
+    "changeVote": "Changer mon vote",
+    "voted": "Vote enregistré",
+    "masked": "—",
+    "thresholdNotice": "Résultats masqués pour préserver l'anonymat (< 3 votes par option).",
+    "recipients": "Voir les destinataires",
+    "recipientsTitle": "Destinataires",
+    "userSubject": "Utilisateur",
+    "unknown": "Inconnu",
+    "close": "Fermer le sondage",
+    "closed": "Publication fermée",
+    "delete": "Supprimer",
+    "deleted": "Publication supprimée",
+    "confirmDelete": "Supprimer cette publication ?",
+    "votingAs": "Je vote en tant que :",
+    "votingAsSelf": "Moi",
+    "votingForChild": "Vous votez pour {{name}}",
+    "player": "Joueur",
+    "confirmVote": "Confirmer : {{option}}",
+    "pollClosed": "Sondage fermé"
+  },
+  "type": {
+    "message": "Communication",
+    "poll": "Sondage"
+  },
+  "delivery": {
+    "wallPush": "Publier (mur + push)",
+    "emailOnly": "E-mail uniquement",
+    "alsoSendEmail": "Envoyer aussi un e-mail",
+    "emailBodyLabel": "Corps de l'e-mail (facultatif)",
+    "emailBodyHelp": "Laisser vide pour reprendre le contenu de la publication."
+  },
+  "actions": {
+    "publish": "Publier",
+    "publishing": "Publication…",
+    "notifyNew": "Notifier les nouveaux membres",
+    "resendAll": "Renvoyer à tous",
+    "seeResults": "Voir les résultats",
+    "seeVoters": "Voir les votants",
+    "closePoll": "Fermer le sondage",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "reply": "Répondre",
+    "seeRecipients": "Voir les destinataires"
+  },
+  "poll": {
+    "visibilityLabel": "Visibilité des votes",
+    "staffVisible": "Vote nominatif",
+    "anonymous": "Vote anonyme",
+    "isAnonymous": "Ce sondage est anonyme",
+    "isStaffVisible": "Ce sondage est nominatif",
+    "youVoted": "Vous avez voté « {{option}} »",
+    "closed": "Sondage fermé",
+    "closedAt": "Fermé le {{date}}",
+    "closesAt": "Se ferme le {{date}}",
+    "belowThreshold": "Pas assez de réponses pour afficher les résultats",
+    "votesCount_one": "{{count}} vote",
+    "votesCount_other": "{{count}} votes",
+    "optionLabel": "Option {{n}}",
+    "optionsHint": "2 options minimum",
+    "addOption": "Ajouter une option",
+    "removeOption": "Retirer",
+    "minTwoOptions": "Ajoutez au moins deux options."
+  },
+  "state": {
+    "deleted": "Publication supprimée",
+    "sent": "Envoyée à {{count}} membres.",
+    "sentDelta": "{{new}} nouveaux membres notifiés.",
+    "sentAll": "Envoyée à tous ({{count}})."
+  },
+  "confirm": {
+    "close": {
+      "title": "Fermer le sondage ?",
+      "body": "Les membres ne pourront plus voter."
+    },
+    "delete": {
+      "title": "Supprimer la publication ?",
+      "body": "Les votes sont conservés mais la publication disparaît du mur. Les liens d'e-mail afficheront « Publication supprimée »."
+    },
+    "resend": {
+      "title": "Renvoyer à tous ?",
+      "body": "Tous les destinataires actuels recevront un rappel."
+    },
+    "refresh": {
+      "title": "Notifier les nouveaux membres ?",
+      "body": "Seuls les membres ajoutés à l'audience depuis la dernière publication seront notifiés."
+    },
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  },
+  "audience": {
+    "picker": "Qui prévenir ?",
+    "recipientsCount_one": "{{count}} destinataire",
+    "recipientsCount_other": "{{count}} destinataires",
+    "empty": "Aucune audience sélectionnée — ajoutez au moins un critère ci-dessous.",
+    "convocationsMissing": "La convocation n'est pas faite pour cet événement — audience vide.",
+    "categoryLabel": "Catégorie",
+    "seasonLabel": "Saison",
+    "types": {
+      "joueurs_convoques": "Joueurs convoqués",
+      "parents_convoques": "Parents des convoqués",
+      "joueurs_equipe": "Joueurs de l'équipe",
+      "parents_equipe": "Parents de l'équipe",
+      "joueurs_categorie": "Joueurs de la catégorie",
+      "parents_categorie": "Parents de la catégorie",
+      "educateurs": "Éducateurs",
+      "dirigeants": "Dirigeants",
+      "groupe_personnalise": "Groupe personnalisé",
+      "selection_manuelle": "Sélection manuelle",
+      "staff_equipe": "Staff de l’équipe"
+    },
+    "recipientsBreakdown": "({{players}} joueurs · {{users}} utilisateurs)",
+    "none": "0 destinataire",
+    "previewError": "Aperçu indisponible"
+  },
+  "form": {
+    "titleLabel": "Titre",
+    "titlePlaceholder": "Réunion CODIR, stage d'été, changement d'horaire…",
+    "contentLabel": "Message",
+    "contentPlaceholder": "Écris ton message. Les images et documents peuvent être ajoutés ci-dessous.",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Disponible samedi ? Créneau A ou B ?",
+    "descriptionLabel": "Description (facultative)",
+    "closesAtLabel": "Date de fin (facultative)",
+    "typeLabel": "Type de publication"
+  },
+  "email": {
+    "pollSubject": "{{title}}",
+    "pollIntro": "Bonjour, merci de répondre à ce sondage.",
+    "pollClosedNotice": "Ce sondage est fermé.",
+    "messageSubject": "{{title}}",
+    "openInApp": "Ouvrir dans Clubero",
+    "deletedFallback": "Cette publication a été supprimée.",
+    "poll": {
+      "subject": "{{title}}",
+      "intro": "Merci de répondre à ce sondage — un clic suffit.",
+      "viewResults": "Voir les résultats"
+    }
+  },
+  "push": {
+    "messageTitle": "{{club}} — {{title}}",
+    "pollTitle": "Sondage : {{title}}",
+    "voteChanged": "Merci, votre vote a été mis à jour."
+  },
+  "errors": {
+    "pollClosed": "Ce sondage est fermé.",
+    "forbidden": "Vous n'avez pas les droits pour cette action.",
+    "deliveryRequired": "Choisis au moins un mode de diffusion.",
+    "audienceEmpty": "Ajoute au moins une audience.",
+    "optionsMin": "Un sondage requiert au moins 2 options.",
+    "optionHasVotes": "Impossible de modifier une option ayant déjà reçu des votes.",
+    "visibilityLocked": "La visibilité ne peut plus changer après le premier vote.",
+    "voteIntentInvalid": "Cette option n'existe pas ou plus."
+  },
+  "card": {
+    "tagPoll": "Sondage",
+    "voters": "{{count}} votants",
+    "vote": "Voter",
+    "viewResults": "Voir les résultats",
+    "anonymous": "Anonyme",
+    "closed": "Fermé"
+  },
+  "seeAllPolls": "Voir tous les sondages"
+}

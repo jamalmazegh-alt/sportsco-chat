@@ -1,7 +1,11 @@
 // Urgency model — single shape for the "Centre d'urgence" surface.
 // Pure types: no React, no Supabase. Sérialisable, testable en isolation.
 
-export type UrgencySource = "convocation-silence" | "reduced-squad";
+export type UrgencySource =
+  | "convocation-silence"
+  | "reduced-squad"
+  | "open-need"
+  | "staff-uncovered";
 
 export type UrgencyRole = "coach" | "player" | "parent";
 
@@ -15,7 +19,8 @@ export type UrgencyAction =
   | { kind: "respond"; eventId: string }
   | { kind: "open-event"; eventId: string }
   | { kind: "open-player"; playerId: string }
-  | { kind: "open-team-availability"; teamId: string };
+  | { kind: "open-team-availability"; teamId: string }
+  | { kind: "open-need"; needId: string; eventId: string };
 
 export type UrgencyItem = {
   // Clé stable, doit suffire au dedup inter-collecteurs.
@@ -35,6 +40,10 @@ export type UrgencyItem = {
   anchorAt: string;
   primaryAction: UrgencyAction;
   secondaryAction?: UrgencyAction;
+  // Optional shortcut for player/parent convocation-silence items with a single
+  // pending convocation: allows inline Yes/Maybe/No response from the card,
+  // without navigating to the event page.
+  quickRespondConvocationId?: string;
 };
 
 // Status à deux dimensions — encode indépendamment "ça charge encore"

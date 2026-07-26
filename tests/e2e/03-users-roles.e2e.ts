@@ -10,6 +10,9 @@ import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Users & roles", () => {
+  // Serial: shared club fixture; retries must re-run the whole group.
+  test.describe.configure({ mode: "serial" });
+
   let club: SeededClub;
   test.beforeAll(async () => {
     club = await createTestClub("roles");

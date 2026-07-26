@@ -1,11 +1,33 @@
 # E2E test fixtures — one-time setup
 
-The E2E suite runs without `SUPABASE_SERVICE_ROLE_KEY` (Lovable Cloud doesn't
-expose it to CI). Instead, every test acts as one of **4 pre-created E2E
-users** inside a **pre-created E2E club**, and all DB operations go through
-RLS.
+Every test acts as one of **4 E2E users** inside an **E2E club**, and all DB
+operations go through RLS (the Playwright `admin` client is **not**
+service_role).
 
-## What you need to create manually (once)
+## Preferred: auto-seed (CI + local)
+
+When `SUPABASE_SERVICE_ROLE_KEY` **and** `E2E_TARGET_PROJECT_REF` are set,
+`globalSetup` (or `bun run seed:e2e`) **idempotently** creates/repairs the
+4 users (password reset to match secrets), profiles, club, memberships, and
+the latest required `user_consents` (so `ConsentGate` does not block UI specs).
+
+```bash
+export SUPABASE_URL=https://<bughunt-ref>.supabase.co
+export SUPABASE_SERVICE_ROLE_KEY=...
+export E2E_TARGET_PROJECT_REF=<bughunt-ref>   # must match URL
+export E2E_ADMIN_EMAIL=e2e-admin@clubero.app
+export E2E_ADMIN_PASSWORD=...
+# + coach / player / parent emails & passwords
+bun run seed:e2e
+```
+
+The GitHub workflow wires these from repo secrets so nightly runs self-heal
+when bughunt auth drifts from the stored passwords.
+
+> **Safety:** ensure-seed aborts if `E2E_TARGET_PROJECT_REF` ≠ project ref in
+> `SUPABASE_URL` (same hard guard as the RLS suite). Never point this at prod.
+
+## Manual fallback (once, without service_role)
 
 ### 1. Create the 4 E2E users
 
@@ -88,25 +110,29 @@ on conflict (id) do nothing;
 
 Repo → **Settings** → **Secrets and variables** → **Actions** → **New secret**:
 
-| Secret name           | Value                                                 |
-| --------------------- | ----------------------------------------------------- |
-| `SUPABASE_URL`        | your `VITE_SUPABASE_URL`                              |
-| `SUPABASE_ANON_KEY`   | your `VITE_SUPABASE_PUBLISHABLE_KEY`                  |
-| `E2E_BASE_URL`        | preview URL, e.g. `https://sportsco-chat.lovable.app` |
-| `E2E_ADMIN_EMAIL`     | `e2e-admin@clubero.app`                               |
-| `E2E_ADMIN_PASSWORD`  | password from step 1                                  |
-| `E2E_COACH_EMAIL`     | `e2e-coach@clubero.app`                               |
-| `E2E_COACH_PASSWORD`  | password from step 1                                  |
-| `E2E_PLAYER_EMAIL`    | `e2e-player@clubero.app`                              |
-| `E2E_PLAYER_PASSWORD` | password from step 1                                  |
-| `E2E_PARENT_EMAIL`    | `e2e-parent@clubero.app`                              |
-| `E2E_PARENT_PASSWORD` | password from step 1                                  |
+| Secret name                 | Value                                                   |
+| --------------------------- | ------------------------------------------------------- |
+| `SUPABASE_URL`              | bughunt project URL                                     |
+| `SUPABASE_ANON_KEY`         | bughunt anon / publishable key                          |
+| `SUPABASE_SERVICE_ROLE_KEY` | bughunt service role (auto-seed / SSR)                  |
+| `SUPABASE_PROJECT_ID`       | bughunt ref → wired as `E2E_TARGET_PROJECT_REF` in CI   |
+| `E2E_ADMIN_EMAIL`           | `e2e-admin@clubero.app`                                 |
+| `E2E_ADMIN_PASSWORD`        | password from step 1 (or any; auto-seed resets to this) |
+| `E2E_COACH_EMAIL`           | `e2e-coach@clubero.app`                                 |
+| `E2E_COACH_PASSWORD`        | password from step 1                                    |
+| `E2E_PLAYER_EMAIL`          | `e2e-player@clubero.app`                                |
+| `E2E_PLAYER_PASSWORD`       | password from step 1                                    |
+| `E2E_PARENT_EMAIL`          | `e2e-parent@clubero.app`                                |
+| `E2E_PARENT_PASSWORD`       | password from step 1                                    |
 
-`SUPABASE_SERVICE_ROLE_KEY` is **not** required.
+CI starts the app locally (`E2E_BASE_URL=http://127.0.0.1:8080`) against
+bughunt — no separate preview URL secret is required for the nightly job.
 
 ## How it works
 
 - `playwright.config.ts` runs `_fixtures/global-setup.ts` once before any test.
+- When service_role + target ref are present, `ensure-seed.ts` creates/repairs
+  users + club before sign-in.
 - `global-setup.ts` signs in all 4 users in parallel, stores each user's
   access token + user id in `process.env.E2E_<ROLE>_*`, and resolves the
   club id.
@@ -139,6 +165,7 @@ test.describe("Coach permissions", () => {
 
 ## Known limitation
 
-`auth.admin.*` APIs (createUser / listUsers / deleteUser) still require
-`service_role`, so test `01-onboarding-club` (UI signup flow that asserts
-on `auth.users`) remains skipped via `HAS_ADMIN_PRIVILEGES`.
+The exported Playwright `admin` client is still RLS-scoped (not service_role),
+so test `01-onboarding-club` (UI signup flow that asserts on `auth.users`)
+remains skipped via `HAS_ADMIN_PRIVILEGES`. Service role is only used inside
+`ensure-seed` / `seed:e2e`.

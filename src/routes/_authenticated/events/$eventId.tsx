@@ -66,11 +66,16 @@ import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { EventNeedsSection } from "@/components/needs/event-needs-section";
+import { MeetingAttendeesSection } from "@/components/meetings/meeting-attendees-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
+// StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
+import { StaffAssignmentSection } from "@/components/staff-assignment-section";
+import { StaffAssignmentReadOnly } from "@/components/staff-assignment-readonly";
+
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -453,8 +458,9 @@ function EventDetail() {
       const { data, error } = await supabase
         .from("events")
         .select(
-          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id",
+          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, championship_id, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached, venue_id, facility_id, event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name))",
         )
+
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -476,7 +482,7 @@ function EventDetail() {
         const { data } = await supabase
           .from("teams")
           .select(
-            "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+            "id, name, club_id, is_internal, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
           )
           .eq("id", event!.team_id);
         return data ?? [];
@@ -485,7 +491,7 @@ function EventDetail() {
       const { data } = await supabase
         .from("teams")
         .select(
-          "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+          "id, name, club_id, is_internal, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
         )
         .eq("club_id", current.club_id)
         .is("deleted_at", null)
@@ -515,6 +521,7 @@ function EventDetail() {
     [teams, event?.team_id],
   );
   const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
+  const isInternalMeeting = event?.type === "meeting" && (eventTeam as any)?.is_internal === true;
   const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
@@ -523,11 +530,12 @@ function EventDetail() {
       const { data, error } = await supabase
         .from("convocations")
         .select(
-          "id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)",
+          "id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email, deleted_at)",
         )
         .eq("event_id", eventId);
       if (error) throw error;
-      return data ?? [];
+      // Filter out convocations attached to soft-deleted player records (ghost duplicates).
+      return (data ?? []).filter((c: any) => c.players && !c.players.deleted_at);
     },
   });
 
@@ -702,14 +710,16 @@ function EventDetail() {
   }, [convocations, user]);
 
   const { data: childrenLinks } = useQuery({
-    queryKey: ["my-children", user?.id],
+    // NB: clé distincte de ["my-children"] (profil/privacy) qui renvoie des
+    // objets joueur — une collision de cache vidait cette liste d'IDs.
+    queryKey: ["my-children-ids", user?.id],
     enabled: !!user && !isCoach,
     queryFn: async () => {
       const { data } = await supabase
         .from("player_parents")
         .select("player_id")
         .eq("parent_user_id", user!.id);
-      return (data ?? []).map((d) => d.player_id);
+      return (data ?? []).map((d) => d.player_id).filter((id): id is string => !!id);
     },
   });
 
@@ -1154,32 +1164,23 @@ function EventDetail() {
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
         const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-        // Coach (first admin/coach) for the team — best-effort
-        let coachName: string | undefined;
-        try {
-          const { data: coachRows } = await supabase
-            .from("team_members")
-            .select("user_id, role")
-            .eq("team_id", event.team_id)
-            .in("role", ["coach", "admin"])
-            .limit(1);
-          const coachUserId = coachRows?.[0]?.user_id;
-          if (coachUserId) {
-            const { data: coachProfile } = await supabase
-              .from("profiles")
-              .select("full_name, first_name, last_name")
-              .eq("id", coachUserId)
-              .maybeSingle();
-            coachName =
-              (coachProfile as any)?.full_name ||
-              [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
-                .filter(Boolean)
-                .join(" ") ||
-              undefined;
-          }
-        } catch {
-          // ignore
-        }
+        // Assigned coaches — sourced from the event embed (event_staff_assignments)
+        const coachNames: string[] | undefined = (() => {
+          const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+            profiles?: {
+              first_name?: string | null;
+              last_name?: string | null;
+              full_name?: string | null;
+            } | null;
+          }>;
+          const names = rows
+            .map((r) => {
+              const p = r.profiles ?? {};
+              return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+            })
+            .filter(Boolean);
+          return names.length > 0 ? names : undefined;
+        })();
 
         // Full squad list (names of ALL convoked players for this event:
         // already-existing convocations + newly inserted)
@@ -1260,7 +1261,7 @@ function EventDetail() {
               meetingPoint: (event as any).meeting_point ?? undefined,
               meetingPointMapsUrl,
               competitionName: competitionLabel,
-              coachName,
+              coachNames,
               squadList: emailSquadList,
               teamName,
               clubName,
@@ -1988,6 +1989,24 @@ function EventDetail() {
         ? await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined)
         : undefined;
 
+      // Assigned coaches — from event embed (single source).
+      const coachNamesUpd: string[] | undefined = (() => {
+        const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+          profiles?: {
+            first_name?: string | null;
+            last_name?: string | null;
+            full_name?: string | null;
+          } | null;
+        }>;
+        const names = rows
+          .map((r) => {
+            const p = r.profiles ?? {};
+            return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+          })
+          .filter(Boolean);
+        return names.length > 0 ? names : undefined;
+      })();
+
       const idemBase = Date.now();
 
       // Manual resend → NEW dispatch every time (never reuse the initial one).
@@ -2032,6 +2051,7 @@ function EventDetail() {
             meetingPoint: (event as any).meeting_point ?? undefined,
             meetingPointMapsUrl,
             competitionName: competitionLabel,
+            coachNames: coachNamesUpd,
             squadList,
             teamName,
             clubName,
@@ -2263,9 +2283,11 @@ function EventDetail() {
   const showFeedbackButton = isPastMatch && isCoach;
   // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
   // même si l'utilisateur n'a pas de réponse personnelle à donner.
-  const showConvocationSection = isCoach
-    ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
-    : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
+  const showConvocationSection = isInternalMeeting
+    ? false
+    : isCoach
+      ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
+      : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -2773,7 +2795,8 @@ function EventDetail() {
       </Dialog>
 
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
-      {isCoach &&
+      {!isInternalMeeting &&
+        isCoach &&
         (() => {
           const team = eventTeam as any;
           if (!team) return null;
@@ -2789,6 +2812,22 @@ function EventDetail() {
           const selectedPlayers = (convocations ?? [])
             .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
             .filter(Boolean);
+          const waCoachNames: string[] | undefined = (() => {
+            const rows = ((event as any).event_staff_assignments ?? []) as Array<{
+              profiles?: {
+                first_name?: string | null;
+                last_name?: string | null;
+                full_name?: string | null;
+              } | null;
+            }>;
+            const names = rows
+              .map((r) => {
+                const p = r.profiles ?? {};
+                return p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "";
+              })
+              .filter(Boolean);
+            return names.length > 0 ? names : undefined;
+          })();
           const base = {
             clubName,
             teamName,
@@ -2803,12 +2842,14 @@ function EventDetail() {
             location: event.location,
             locationUrl: (event as any).location_url,
             meetingPoint: (event as any).meeting_point,
+            coachNames: waCoachNames,
             description: event.description,
             attachments: (event.attachments as any) ?? [],
             selectedPlayers,
             cancellationReason: event.cancellation_reason,
             lineup: null,
           };
+
           const lineupBlock = lineupData
             ? {
                 formation: lineupData.formation,
@@ -3559,12 +3600,12 @@ function EventDetail() {
           <MatchResultCard
             eventId={event.id}
             teamId={event.team_id}
-            teamName={teams?.[0]?.name ?? null}
+            teamName={eventTeam?.name ?? null}
             isHome={event.is_home}
             opponent={event.opponent}
             isCoach={isCoach}
             startsAt={event.starts_at}
-            sport={teams?.[0]?.sport ?? null}
+            sport={eventTeam?.sport ?? null}
           />
         )}
 
@@ -3579,7 +3620,7 @@ function EventDetail() {
             const respondedP = totalP - counts.pending;
             const rate = totalP === 0 ? 0 : Math.round((respondedP / totalP) * 100);
             const pct = (n: number) => (totalP === 0 ? 0 : (n / totalP) * 100);
-            const teamName = teams?.[0]?.name ?? null;
+            const teamName = eventTeam?.name ?? null;
 
             // === A. HEADER ===
             if (event.convocations_sent) {
@@ -4244,6 +4285,18 @@ function EventDetail() {
         </section>
       )}
 
+      {!isInternalMeeting &&
+        (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+          <StaffAssignmentSection
+            eventId={event.id}
+            teamId={event.team_id}
+            clubId={eventTeam.club_id}
+            eventDate={eventDateStr}
+          />
+        ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
+          <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
+        ) : null)}
+
       <ConvocationDetailDialog
         open={!!detailConvocId}
         onOpenChange={(o) => !o && setDetailConvocId(null)}
@@ -4457,49 +4510,31 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {isCoach && eventSupportsCarpool(event.type) && event.status !== "cancelled" && (
-        <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">
-              {t("carpool.toggleTitle" as any) || "Covoiturage"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {event.carpool_enabled
-                ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
-                : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
-            </p>
-          </div>
-          <Button
-            variant={event.carpool_enabled ? "outline" : "default"}
-            size="sm"
-            onClick={async () => {
-              const { error } = await supabase
-                .from("events")
-                .update({ carpool_enabled: !event.carpool_enabled })
-                .eq("id", eventId);
-              if (error) {
-                toast.error(error.message);
-                return;
-              }
-              qc.invalidateQueries({ queryKey: ["event", eventId] });
-            }}
-          >
-            {event.carpool_enabled
-              ? t("carpool.disable" as any) || "Désactiver"
-              : t("carpool.enable" as any) || "Activer"}
-          </Button>
-        </div>
-      )}
-
       {eventSupportsCarpool(event.type) &&
-        event.carpool_enabled &&
-        event.status !== "cancelled" && (
+        event.status !== "cancelled" &&
+        (isCoach || event.carpool_enabled) && (
           <CarpoolSection
             eventId={eventId}
             teamId={event.team_id}
             isCoach={isCoach}
             convocations={(convocations ?? []) as any}
             childrenLinks={(childrenLinks ?? []) as string[]}
+            carpoolEnabled={!!event.carpool_enabled}
+            onToggleEnabled={
+              isCoach
+                ? async () => {
+                    const { error } = await supabase
+                      .from("events")
+                      .update({ carpool_enabled: !event.carpool_enabled })
+                      .eq("id", eventId);
+                    if (error) {
+                      toast.error(error.message);
+                      return;
+                    }
+                    qc.invalidateQueries({ queryKey: ["event", eventId] });
+                  }
+                : undefined
+            }
           />
         )}
 
@@ -4509,6 +4544,9 @@ function EventDetail() {
         sport={eventTeam?.sport ?? null}
         teamId={event.team_id ?? null}
       />
+
+      {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
+      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
 
       <EventChat eventId={eventId} />
 

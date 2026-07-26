@@ -32,8 +32,20 @@
       "description": "Acertar no travessão — total da época."
     },
     "juggling": {
-      "name": "Embaixadas",
-      "description": "Número máximo de embaixadas seguidas — recorde."
+      "name": "Embaixadinhas livres",
+      "description": "Maior sequência de embaixadinhas — recorde."
+    },
+    "jugglingLeftFoot": {
+      "name": "Embaixadinhas pé esquerdo",
+      "description": "Máximo de embaixadinhas seguidas com o pé esquerdo — recorde."
+    },
+    "jugglingRightFoot": {
+      "name": "Embaixadinhas pé direito",
+      "description": "Máximo de embaixadinhas seguidas com o pé direito — recorde."
+    },
+    "jugglingHead": {
+      "name": "Embaixadinhas de cabeça",
+      "description": "Máximo de embaixadinhas seguidas de cabeça — recorde."
     },
     "leger": {
       "name": "Luc Léger",

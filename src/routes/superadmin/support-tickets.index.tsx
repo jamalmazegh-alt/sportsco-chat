@@ -10,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Search, LifeBuoy, ChevronRight } from "lucide-react";
+import { Loader2, Search, LifeBuoy, ChevronRight, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CreateTicketOnBehalfDialog } from "@/components/superadmin/CreateTicketOnBehalfDialog";
 import {
   SUPPORT_STATUSES,
   SUPPORT_PRIORITIES,
@@ -35,6 +37,7 @@ function AdminTicketsPage() {
   const [priority, setPriority] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
   const [clubId, setClubId] = useState<string>("all");
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-support-tickets", { search, status, priority, category, clubId }],
@@ -64,15 +67,22 @@ function AdminTicketsPage() {
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
-      <header className="mb-6">
-        <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <LifeBuoy className="h-3.5 w-3.5" /> Support tickets
+      <header className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <LifeBuoy className="h-3.5 w-3.5" /> Support tickets
+          </div>
+          <h1 className="text-xl font-semibold mt-1">Inbox</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tickets utilisateurs · réponses, statuts, priorités.
+          </p>
         </div>
-        <h1 className="text-xl font-semibold mt-1">Inbox</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Tickets utilisateurs · réponses, statuts, priorités.
-        </p>
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Plus className="h-4 w-4 mr-1.5" /> Nouveau ticket
+        </Button>
       </header>
+
+      <CreateTicketOnBehalfDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <div className="grid sm:grid-cols-4 gap-2 mb-4">
         <div className="relative sm:col-span-2">

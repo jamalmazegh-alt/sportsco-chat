@@ -2,17 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  mergeClubUsersList,
+  type ClubUserListItem,
+  type ClubUserProfile,
+} from "@/lib/admin-club-users";
 
 /**
- * Admin-only: list all users that share at least one club with the caller,
- * AND where the caller is admin in that club. Includes auth email.
+ * Admin-only: list users of the club for the admin users page.
+ * Sources: club_members (real roles) ∪ parents linked via player_parents
+ * (even without a club_members row — lazy link_parent_memberships).
  */
 export const listClubUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { club_id: string }) =>
     z.object({ club_id: z.string().uuid() }).parse(input),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ users: ClubUserListItem[] }> => {
     const { supabase, userId } = context;
 
     // Verify caller is admin of this club (RLS-safe)
@@ -35,14 +41,47 @@ export const listClubUsers = createServerFn({ method: "POST" })
       .eq("club_id", data.club_id);
     if (error) throw error;
 
-    const ids = Array.from(new Set((members ?? []).map((m) => m.user_id)));
+    // Parents attached via player_parents but possibly missing club_members.
+    // Scoped via supabaseAdmin after admin gate — JWT can usually read these
+    // (admin policy on player_parents), but service-role avoids RLS edge cases
+    // without widening beyond the already-authorized club_id.
+    const { data: parentRows, error: parentErr } = await supabaseAdmin
+      .from("player_parents")
+      .select("parent_user_id, players!inner(club_id)")
+      .eq("players.club_id", data.club_id)
+      .not("parent_user_id", "is", null);
+    if (parentErr) throw parentErr;
+
+    const parentUserIds = Array.from(
+      new Set(
+        (parentRows ?? [])
+          .map((r) => r.parent_user_id as string | null)
+          .filter((id): id is string => typeof id === "string" && id.length > 0),
+      ),
+    );
+
+    const ids = Array.from(
+      new Set([...(members ?? []).map((m) => m.user_id as string), ...parentUserIds]),
+    );
     if (ids.length === 0) return { users: [] };
 
     const { data: profiles } = await supabase
       .from("profiles")
       .select("id, full_name, first_name, last_name, phone, avatar_url")
       .in("id", ids);
-    const profById = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+    const profById = new Map<string, ClubUserProfile | null>(
+      (profiles ?? []).map((p) => [
+        p.id as string,
+        {
+          id: p.id as string,
+          full_name: (p.full_name as string | null) ?? null,
+          first_name: (p.first_name as string | null) ?? null,
+          last_name: (p.last_name as string | null) ?? null,
+          phone: (p.phone as string | null) ?? null,
+          avatar_url: (p.avatar_url as string | null) ?? null,
+        },
+      ]),
+    );
 
     const emailById = new Map<string, string | null>();
     try {
@@ -51,38 +90,18 @@ export const listClubUsers = createServerFn({ method: "POST" })
         .from("users")
         .select("id, email")
         .in("id", ids);
-      for (const u of authRows ?? []) emailById.set(u.id, u.email ?? null);
+      for (const u of authRows ?? []) emailById.set(u.id as string, (u.email as string) ?? null);
     } catch {
       // Emails optional when service-role client is misconfigured
     }
 
-    const grouped = new Map<
-      string,
-      { user_id: string; roles: string[]; profile: any; email: string | null }
-    >();
-    for (const m of members ?? []) {
-      const rolesArr: string[] =
-        Array.isArray((m as any).roles) && (m as any).roles.length > 0
-          ? ((m as any).roles as string[])
-          : m.role
-            ? [m.role]
-            : [];
-      const g = grouped.get(m.user_id) ?? {
-        user_id: m.user_id,
-        roles: [],
-        profile: profById.get(m.user_id) ?? null,
-        email: emailById.get(m.user_id) ?? null,
-      };
-      for (const r of rolesArr) if (!g.roles.includes(r)) g.roles.push(r);
-      grouped.set(m.user_id, g);
-    }
-
     return {
-      users: Array.from(grouped.values()).sort((a, b) =>
-        (a.profile?.full_name ?? a.email ?? "").localeCompare(
-          b.profile?.full_name ?? b.email ?? "",
-        ),
-      ),
+      users: mergeClubUsersList({
+        members: members ?? [],
+        parentUserIds,
+        profilesById: profById,
+        emailsById: emailById,
+      }),
     };
   });
 
@@ -114,8 +133,21 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       .eq("club_id", data.club_id)
       .eq("user_id", data.user_id)
       .limit(1);
-    if (!targetMembership || targetMembership.length === 0) {
-      throw new Response("Not found", { status: 404 });
+    const isClubMember = !!(targetMembership && targetMembership.length > 0);
+
+    // Also accept parents linked via player_parents to a player of this club
+    // (no club_members row yet — lazy membership).
+    if (!isClubMember) {
+      const { data: parentLink, error: linkErr } = await supabaseAdmin
+        .from("player_parents")
+        .select("id, players!inner(club_id)")
+        .eq("parent_user_id", data.user_id)
+        .eq("players.club_id", data.club_id)
+        .limit(1);
+      if (linkErr) throw new Response(linkErr.message, { status: 500 });
+      if (!parentLink || parentLink.length === 0) {
+        throw new Response("Not found", { status: 404 });
+      }
     }
 
     const [
@@ -147,7 +179,11 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       supabaseAdmin.auth.admin.getUserById(data.user_id),
     ]);
 
-    const u = authUser.data.user as any;
+    const u = authUser.data.user as {
+      email?: string | null;
+      last_sign_in_at?: string | null;
+      banned_until?: string | null;
+    } | null;
     const bannedUntil: string | null = u?.banned_until ?? null;
     const isDisabled = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
 
@@ -155,13 +191,21 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       profile,
       email: u?.email ?? null,
       last_sign_in_at: u?.last_sign_in_at ?? null,
-      memberships: (memberships ?? []).map((m: { role?: string; roles?: string[] | null }) => ({
-        ...m,
-        roles: Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
-      })),
-
+      memberships: (memberships ?? []).map(
+        (m: {
+          club_id: string;
+          role?: string | null;
+          roles?: string[] | null;
+          created_at?: string | null;
+          clubs?: { name?: string | null } | null;
+        }) => ({
+          ...m,
+          roles: Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
+        }),
+      ),
       linkedPlayers: linkedPlayers ?? [],
       parentLinks: parentLinks ?? [],
+      isClubMember,
       is_disabled: isDisabled,
       banned_until: bannedUntil,
     };

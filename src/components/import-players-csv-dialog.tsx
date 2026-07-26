@@ -15,6 +15,7 @@ import {
   type PlayerImportPreview,
 } from "@/lib/superadmin-import/import.functions";
 import { type AnalysisResult, getFields } from "@/lib/superadmin-import/schemas";
+import { normalizeSheetCell } from "@/lib/superadmin-import/sheet-date";
 
 /**
  * Coach/admin import dialog. Thin wrapper on top of the unified superadmin
@@ -57,7 +58,7 @@ function cleanSheetRows(rows: Array<Record<string, unknown>>) {
       const out: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(row)) {
         if (k === "__rowNum__" || k.trim() === "") continue;
-        out[k] = typeof v === "string" ? v.trim() : v;
+        out[k] = normalizeSheetCell(v);
       }
       return out;
     })
@@ -87,6 +88,16 @@ function downloadTemplate() {
     "+33600000002",
   ];
   const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  // Force la colonne date en texte ISO pour empêcher un tableur de la
+  // reformater en JJ/MM ou MM/JJ selon la locale de l'utilisateur.
+  const dateColIndex = FIELD_KEYS.indexOf("date_naissance");
+  if (dateColIndex >= 0) {
+    const ref = XLSX.utils.encode_cell({ r: 1, c: dateColIndex });
+    if (ws[ref]) {
+      ws[ref].t = "s";
+      ws[ref].z = "@";
+    }
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Joueurs");
   XLSX.writeFile(wb, "clubero-import-joueurs.xlsx");
@@ -199,7 +210,7 @@ export function ImportPlayersCsvDialog({
         const rows = cleanSheetRows(
           XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
             defval: "",
-            raw: false,
+            raw: true,
             blankrows: false,
           }),
         );

@@ -6,10 +6,16 @@ Complètent les **226 tests unitaires** (`bun test`) et les **111 tests RLS** (`
 ## Lancer en local
 
 ```bash
-# Toute la suite
+# Toute la suite (core puis ui, projects Playwright)
 bun run test:e2e
 
-# UI interactive (debug, watch, replay)
+# Core seulement — 00→25 (API / RLS / beta-closure, ~5–15 min)
+bun run test:e2e:core
+
+# UI flows seulement — 26→31 + ui-real-flows (clics réels)
+bun run test:e2e:flows
+
+# UI interactive Playwright (debug, watch, replay)
 bun run test:e2e:ui
 
 # Mode headed (voir le navigateur)
@@ -19,25 +25,44 @@ bun run test:e2e:headed
 bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 ```
 
+En CI : deux jobs séquentiels (`E2E core` puis `E2E UI`), artifacts
+`playwright-report-core` / `playwright-report-ui`. Le
+`workflow_dispatch` accepte `suite=all|core|ui`.
+
 ## Variables d'env requises
 
-| Var                         | Source                                                            |
-| --------------------------- | ----------------------------------------------------------------- |
-| `SUPABASE_URL`              | `https://woawmhuntajpiezmmgzm.supabase.co`                        |
-| `SUPABASE_SERVICE_ROLE_KEY` | Lovable Cloud → Backend (secret)                                  |
-| `SUPABASE_PUBLISHABLE_KEY`  | `.env` (publique)                                                 |
-| `E2E_BASE_URL`              | **obligatoire** — URL preview Lovable                             |
-| `E2E_REAL_AI`               | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
-| `E2E_UI`                    | `1` pour passer le timeout global à 90s (sinon 30s)               |
+| Var                                                     | Source                                                            |
+| ------------------------------------------------------- | ----------------------------------------------------------------- |
+| `SUPABASE_URL`                                          | projet **bughunt** (même que RLS)                                 |
+| `SUPABASE_PUBLISHABLE_KEY`                              | anon key bughunt                                                  |
+| `SUPABASE_SERVICE_ROLE_KEY`                             | service role bughunt — auto-seed + SSR                            |
+| `E2E_TARGET_PROJECT_REF`                                | ref projet bughunt (doit matcher `SUPABASE_URL`)                  |
+| `E2E_BASE_URL`                                          | **obligatoire** — en CI `http://127.0.0.1:8080`                   |
+| `E2E_ADMIN_EMAIL` / `_PASSWORD` (+ coach/player/parent) | secrets E2E                                                       |
+| `E2E_REAL_AI`                                           | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
+| `E2E_UI`                                                | `1` pour timeout 90s (auto via `test:e2e:flows`)                  |
+| `E2E_SUITE`                                             | `core` \| `ui` — restreint le project Playwright (jobs CI)        |
+| `E2E_TOURNAMENT_ID`                                     | optionnel — classement tournoi (`ui-real-flows`)                  |
+| `E2E_CLUB_SLUG` / `E2E_CAMP_SLUG`                       | optionnel — pages publiques stages (`29-camps`)                   |
+
+Seed manuel : `bun run seed:e2e` (idempotent, réécrit les mots de passe pour
+matcher les secrets). Voir `tests/e2e/_fixtures/README.md`.
+
+Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`31`
+(= project Playwright `ui` / `bun run test:e2e:flows`). Le core `00`→`25`
+reste isolé (`bun run test:e2e:core`).
+Matrice et dettes : `docs/dev/e2e-coverage-gaps.md`.
 
 ## Stratégie
 
-Approche **hybride** : seed via service role + login programmatique + actions
-ciblées + vérif via client RLS. Plus rapide et moins flaky qu'une UI E2E pure,
-et ça teste réellement les flux (RLS, server functions, triggers, etc.).
+Approche **hybride** : seed via service role (users + club partagés) + login
+programmatique + actions ciblées + vérif via client RLS. Plus rapide et moins
+flaky qu'une UI E2E pure, et ça teste réellement les flux (RLS, server
+functions, triggers, etc.).
 
-Chaque test crée son propre club isolé via `createTestClub(suiteName)` et
-nettoie en `afterAll`. Aucune dépendance entre fichiers.
+Chaque suite crée son propre **team / players / event** isolé via
+`createTestClub(suiteName)` sur le club E2E partagé, et nettoie en `afterAll`.
+Aucune dépendance entre fichiers.
 
 ## Couverture
 
@@ -64,8 +89,17 @@ Workflow `.github/workflows/e2e-tests.yml` :
 
 - **Cron** : 4 AM UTC (après les RLS de 3 AM)
 - **Manuel** : Actions → E2E Tests → Run workflow
+- **Avant les tests** : `supabase db push --include-all --yes` sur bughunt
+  (même anti-dérive que le workflow RLS — le schéma QA suit `main`)
+- Démarre Vite localement contre bughunt, puis `bun run test:e2e`
+- `globalSetup` auto-répare les users E2E via `SUPABASE_SERVICE_ROLE_KEY`
+  (guard `E2E_TARGET_PROJECT_REF`)
 - Rapport HTML uploadé en artifact (14 jours)
 - Issue auto sur échec cron (labels `e2e` + `bug`)
+
+Pour forcer une sync immédiate de bughunt sans attendre le cron E2E :
+Actions → **RLS Security Tests** → Run workflow (branche `main`).
+Ce workflow pousse aussi les migrations, puis exécute la suite RLS.
 
 ## Ajouter un test
 

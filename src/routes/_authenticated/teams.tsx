@@ -57,6 +57,7 @@ function TeamsPage() {
           "id, name, season, sport, age_group, championship, competitions, image_url, archived_at",
         )
         .eq("club_id", activeClubId!)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .order("name");
       if (!isAdmin || !showArchived) q = q.is("archived_at", null);
@@ -165,7 +166,12 @@ function TeamsPage() {
             <form onSubmit={onCreate} className="space-y-4 mt-4 pb-6">
               <div className="space-y-1.5">
                 <Label>{t("teams.name")}</Label>
-                <Input required value={name} onChange={(e) => setName(e.target.value)} />
+                <Input
+                  data-testid="team-name-input"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.sport")}</Label>

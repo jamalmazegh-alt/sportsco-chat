@@ -38,7 +38,9 @@ import {
   Upload,
   BarChart3,
   Trophy,
+  Lock as LockIcon,
 } from "lucide-react";
+
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
@@ -297,7 +299,7 @@ function TeamDetail() {
   // Pending (unused) invites for the team's players, keyed by playerId, with
   // the contact points (email/phone) already invited so we can avoid blocking
   // a player when only *some* of its contacts have been invited/accepted.
-  const { data: pendingInvitesByPlayer } = useQuery({
+  const { data: pendingInvitesByPlayer, isPending: pendingInvitesLoading } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -322,7 +324,7 @@ function TeamDetail() {
   });
 
   // Failed invite emails per player (bounced/failed/dlq/complained/suppressed).
-  const { data: inviteFailuresByPlayer } = useQuery({
+  const { data: inviteFailuresByPlayer, isPending: inviteFailuresLoading } = useQuery({
     queryKey: ["team-invite-failures", teamId, activeClubId],
     enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -340,7 +342,7 @@ function TeamDetail() {
   });
 
   // Parents grouped by player — used to know which contacts remain to invite.
-  const { data: parentsByPlayer } = useQuery({
+  const { data: parentsByPlayer, isPending: parentsByPlayerLoading } = useQuery({
     queryKey: ["team-parents-by-player", teamId],
     enabled: !!players && players.length > 0 && isCoach,
     queryFn: async () => {
@@ -536,6 +538,8 @@ function TeamDetail() {
     failed: number;
     skipped: number;
     reason?: "no_contact" | "already_active";
+    suppressedEmails?: string[];
+    suppressedDetails?: { email: string; reason: string | null }[];
   }> {
     if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
     try {
@@ -546,12 +550,30 @@ function TeamDetail() {
     }
   }
 
+  function toastSuppressed(
+    details: { email: string; reason: string | null }[],
+    fallbackEmails: string[],
+  ) {
+    const emails = details.length ? details.map((d) => d.email) : fallbackEmails;
+    const count = emails.length;
+    toast.error(
+      t("players.inviteSuppressedSimple", {
+        defaultValue:
+          "{{count}} invitation(s) bloquée(s) : l'adresse est en suppression (bounce, spam ou désinscription). Corrigez l'e-mail ou contactez le support.",
+        count,
+      }),
+    );
+  }
+
   async function inviteOne(playerId: string) {
     if (!user) return;
     setInviting(true);
     const r = await sendInvitesForPlayer(playerId);
     setInviting(false);
-    if (r.skipped)
+    const suppressed = r.suppressedEmails ?? [];
+    if (suppressed.length > 0 && !r.sent) {
+      toastSuppressed(r.suppressedDetails ?? [], suppressed);
+    } else if (r.skipped)
       toast.warning(
         t(
           r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact",
@@ -597,6 +619,8 @@ function TeamDetail() {
     let totalSkipped = 0;
     let alreadyActiveSkipped = 0;
     let noContactSkipped = 0;
+    const allSuppressed: string[] = [];
+    const allSuppressedDetails: { email: string; reason: string | null }[] = [];
     for (const id of selectedIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
@@ -604,10 +628,16 @@ function TeamDetail() {
       totalSkipped += r.skipped;
       if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
       if (r.reason === "no_contact") noContactSkipped += r.skipped;
+      if (r.suppressedEmails?.length) allSuppressed.push(...r.suppressedEmails);
+      if (r.suppressedDetails?.length) allSuppressedDetails.push(...r.suppressedDetails);
     }
     setInviting(false);
     setSelectMode(false);
     setSelectedIds(new Set());
+    if (allSuppressed.length > 0) {
+      toastSuppressed(allSuppressedDetails, allSuppressed);
+    }
+
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
         t(
@@ -667,6 +697,8 @@ function TeamDetail() {
     let totalSkipped = 0;
     let alreadyActiveSkipped = 0;
     let noContactSkipped = 0;
+    const allSuppressed: string[] = [];
+    const allSuppressedDetails: { email: string; reason: string | null }[] = [];
     for (const id of invitableIds) {
       const r = await sendInvitesForPlayer(id);
       totalSent += r.sent;
@@ -674,8 +706,14 @@ function TeamDetail() {
       totalSkipped += r.skipped;
       if (r.reason === "already_active") alreadyActiveSkipped += r.skipped;
       if (r.reason === "no_contact") noContactSkipped += r.skipped;
+      if (r.suppressedEmails?.length) allSuppressed.push(...r.suppressedEmails);
+      if (r.suppressedDetails?.length) allSuppressedDetails.push(...r.suppressedDetails);
     }
     setInviting(false);
+    if (allSuppressed.length > 0) {
+      toastSuppressed(allSuppressedDetails, allSuppressed);
+    }
+
     if (totalSent === 0 && totalFailed === 0)
       toast.warning(
         t(
@@ -1061,6 +1099,32 @@ function TeamDetail() {
 
       {isCoach && team?.club_id && <UpcomingAbsencesWidget clubId={team.club_id} teamId={teamId} />}
 
+      {team?.club_id &&
+        (roles.includes("admin") ||
+          roles.includes("dirigeant") ||
+          roles.includes("coach") ||
+          roles.includes("assistant_coach")) && (
+          <Link
+            to="/teams/$teamId/staff"
+            params={{ teamId }}
+            className="flex items-center gap-3 rounded-lg border border-violet-200 dark:border-violet-900/60 bg-violet-50/50 dark:bg-violet-950/20 p-3 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors"
+          >
+            <LockIcon className="h-5 w-5 text-violet-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold">
+                {t("teams.staffWall", { defaultValue: "Mur Staff" })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("teams.staffWallHint", {
+                  defaultValue:
+                    "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
+                })}
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          </Link>
+        )}
+
       <TeamCoaches
         teamId={teamId}
         clubId={(team as any)?.club_id}
@@ -1273,6 +1337,7 @@ function TeamDetail() {
                           <div className="space-y-1.5">
                             <Label>{t("players.firstName")}</Label>
                             <Input
+                              data-testid="player-first-name-input"
                               required
                               value={first}
                               onChange={(e) => setFirst(e.target.value)}
@@ -1281,6 +1346,7 @@ function TeamDetail() {
                           <div className="space-y-1.5">
                             <Label>{t("players.lastName")}</Label>
                             <Input
+                              data-testid="player-last-name-input"
                               required
                               value={last}
                               onChange={(e) => setLast(e.target.value)}
@@ -1467,7 +1533,10 @@ function TeamDetail() {
               myPlayerIds.size > 0 &&
               !isMine &&
               idx === myPlayerIds.size;
+            const inviteStatusesLoading =
+              isCoach && (pendingInvitesLoading || inviteFailuresLoading || parentsByPlayerLoading);
             const hasContactHint = hasOpenContact(p);
+
             const parentsForP = parentsByPlayer?.get(p.id) ?? [];
             const isMinorP = (() => {
               if (!p.birth_date) return false;
@@ -1486,9 +1555,33 @@ function TeamDetail() {
             const coveredByParent = isMinorP && !p.child_platform_access && anyParentLinked;
             const linked = !!p.user_id || coveredByParent;
             const canInvite = !linked;
-            const hasPendingInvite = !linked && !!pendingInvitesByPlayer?.get(p.id);
-            const failures = inviteFailuresByPlayer?.[p.id] ?? [];
+            // Minor without direct platform access: only parent invites matter.
+            // Failures on the player's own (possibly bogus) email are hidden in
+            // favor of the parent-account activation status.
+            const minorParentMode = isMinorP && !p.child_platform_access;
+            const parentEmailsSet = new Set(
+              parentsForP
+                .map((pp: any) => (pp.email ?? "").toLowerCase().trim())
+                .filter((e: string) => !!e),
+            );
+            const pendingForP = pendingInvitesByPlayer?.get(p.id);
+            const hasParentPendingInvite =
+              !!pendingForP && [...pendingForP.emails].some((e) => parentEmailsSet.has(e));
+            const hasPendingInvite =
+              !linked && (minorParentMode ? hasParentPendingInvite : !!pendingForP);
+            const allFailures = inviteFailuresByPlayer?.[p.id] ?? [];
+            const failures = minorParentMode
+              ? allFailures.filter((f: any) =>
+                  parentEmailsSet.has((f.email ?? "").toLowerCase().trim()),
+                )
+              : allFailures;
             const hasFailedInvite = !linked && failures.length > 0;
+            const showParentActivationPending =
+              minorParentMode &&
+              !linked &&
+              parentsForP.length > 0 &&
+              !hasFailedInvite &&
+              !hasPendingInvite;
 
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
@@ -1550,10 +1643,21 @@ function TeamDetail() {
                   <p className="text-xs mt-0.5 truncate">
                     {linked ? (
                       <span className="text-muted-foreground">
-                        {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
+                        {isCoach ? (
+                          <>
+                            {t("players.accountActive")}
+                            {p.preferred_position ? (
+                              <span className="opacity-70"> · {p.preferred_position}</span>
+                            ) : null}
+                          </>
+                        ) : (
+                          (p.preferred_position ?? "")
+                        )}
                       </span>
                     ) : isCoach ? (
-                      hasFailedInvite ? (
+                      inviteStatusesLoading ? (
+                        <span className="text-muted-foreground opacity-60">…</span>
+                      ) : hasFailedInvite ? (
                         <span
                           className="inline-flex items-center gap-1 text-red-600"
                           title={failures
@@ -1572,6 +1676,13 @@ function TeamDetail() {
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                        </span>
+                      ) : showParentActivationPending ? (
+                        <span className="inline-flex items-center gap-1 text-amber-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          {t("players.parentActivationPending", {
+                            defaultValue: "En attente d'activation du compte parent",
+                          })}
                         </span>
                       ) : canInvite ? (
                         <span className="text-muted-foreground">
