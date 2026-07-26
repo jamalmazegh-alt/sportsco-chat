@@ -46,6 +46,8 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
+import { AddToCalendarButton } from "@/components/events/add-to-calendar-button";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
