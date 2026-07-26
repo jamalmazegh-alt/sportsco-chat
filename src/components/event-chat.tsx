@@ -61,6 +61,15 @@ export function EventChat({ eventId }: { eventId: string }) {
         ?.clubs?.event_chat_enabled;
       if (!active) return;
       setEnabled(ec === undefined ? true : !!ec);
+      // Access is governed by RLS (can_access_event_chat): staff always, players
+      // and parents only when the club opened the chat to them.
+      const { data: access } = await (supabase.rpc as any)("can_access_event_chat", {
+        _user_id: user?.id ?? null,
+        _event_id: eventId,
+      });
+      if (!active) return;
+      setCanPost(access === true);
+
       const { data } = await supabase
         .from("event_messages")
         .select("id, event_id, author_user_id, body, created_at, attachments")
