@@ -1298,9 +1298,9 @@
     "ctaStart": "Bekijk de tutorials",
     "ctaFaq": "Veelgestelde vragen",
     "previewLabel": "Voorbeeld binnenkort",
-    "reassure": ["Vanuit de mobiele app", "Meldingen naar keuze", "Gegevens beschermd"],
+    "reassure": ["Vanuit de mobiele app", "Meldingen in realtime", "Gegevens beschermd"],
     "tutorialsTitle": "Het belangrijkste, stap voor stap.",
-    "tutorialsSubtitle": "Zeven gedetailleerde procedures, stap voor stap en met een screenshot per stap.",
+    "tutorialsSubtitle": "Acht gedetailleerde procedures, stap voor stap en met een screenshot per stap.",
     "tutorials": [
       {
         "t": "Je ouderaccount aanmaken",
@@ -1311,7 +1311,7 @@
           "Bekijk en aanvaard de toestemmingen (privacy, voorwaarden, meldingen, gegevensverwerking) en tik daarna op «Accepteren en doorgaan».",
           "Je komt meteen op het startscherm van je club — je bent ingelogd.",
           "Open het tabblad «Profiel»: je ziet je gegevens, taal en meldingen.",
-          "Vul je voornaam, achternaam en telefoonnummer in en tik op «Opslaan»."
+          "Controleer je voornaam, achternaam en telefoonnummer. Wijzig indien nodig relevante gegevens en tik daarna op «Opslaan»."
         ]
       },
       {
@@ -1334,17 +1334,17 @@
         "steps": [
           "Ontvang de oproep per e-mail: bevestig de aanwezigheid (Aanwezig / Onzeker / Afwezig) rechtstreeks vanuit de e-mail.",
           "Je ontvangt ook een pushmelding die je meteen naar de app brengt.",
-          "Na je reactie vanuit de e-mail bevestigt een pagina je keuze — je kunt die altijd wijzigen.",
-          "Of reageer met één tik vanaf het startscherm van de app, via de kaart «Insights».",
-          "Open het tabblad «Evenementen» om alle wedstrijden en trainingen te zien.",
+          "Zonder in te loggen bij de app bevestigt de vanuit de e-mail geopende pagina je keuze. Je reactie wordt direct naar de coach gestuurd, zodat die het evenement met een gerust hart kan voorbereiden.",
+          "Op het startscherm herinnert de kaart «Insights» je aan acties die je nog moet uitvoeren. Het startscherm toont ook maximaal de drie volgende evenementen waarvoor je kind is opgeroepen.",
+          "De pagina «Evenementen» bevat alle geplande toekomstige evenementen van het team. Een groene badge markeert de evenementen waarvoor je kind is opgeroepen; gebruik «Filters» om alleen de gewenste evenementen te tonen.",
           "Open de details van het evenement: wedstrijdinfo en je reactie (Aanwezig / Onzeker / Afwezig).",
           "Bij afwezigheid of twijfel voeg je een reden toe (vooraf ingesteld of vrije tekst) die naar de coach wordt gestuurd.",
-          "Chat in de evenementchat (ouders, spelers, coach) en bekijk de opgeroepen spelers."
+          "Elk evenement heeft een eigen chat: bevoegde ouders, spelers en coaches kunnen er alles over de wedstrijd verduidelijken. Bij elk nieuw bericht ontvangen de bevoegde deelnemers een pushmelding."
         ]
       },
       {
         "t": "Meldingen instellen",
-        "b": "Zet pushmeldingen aan om oproepen, herinneringen en berichten rechtstreeks op je telefoon te ontvangen.",
+        "b": "Schakel pushmeldingen in om oproepen, herinneringen, annuleringen, verplaatsingen en nieuwe berichten op het Prikbord te ontvangen, volgens de instellingen van je club.",
         "steps": [
           "Ga in het menu «Profiel» naar de meldingen om ze in te schakelen.",
           "Tik op «Inschakelen»: er opent een venster — sta de meldingen toe.",
@@ -1389,29 +1389,169 @@
           "Je stem wordt opgeslagen: bekijk de actuele resultaten.",
           "Je kunt je stem altijd wijzigen (behalve bij een anonieme poll)."
         ]
+      },
+      {
+        "t": "Reageren op hulpvragen van de club",
+        "b": "Bied je hulp aan voor de kantine, arbitrage, vervoer of een andere taak die de club organiseert.",
+        "steps": [
+          "Wanneer een coach een hulpvraag plaatst, ontvangen de ouders, de spelers of beide een e-mail, afhankelijk van de doelgroep.",
+          "Open het evenement en daarna het tabblad «Helpende handen» om de details te bekijken. Geef aan of je beschikbaar bent.",
+          "Ben je beschikbaar, tik dan op «Ik meld me aan». Je deelname wordt direct bevestigd of wacht op goedkeuring van de coach en verschijnt daarna als «Bevestigd».",
+          "Open onderaan de startpagina «Mijn hulp» om de hulpvragen terug te vinden waarvoor je bent uitgenodigd, ongeacht je antwoord.",
+          "Deze pagina geeft een overzicht van al je hulpvragen: je kunt er direct reageren en zien welke bevestigd zijn.",
+          "Je vindt er ook de hulpvragen waarvoor je hebt aangegeven dat je niet beschikbaar bent.",
+          "Wanneer de coach een aanmelding in afwachting accepteert, ontvang je een bevestigingsmail."
+        ]
       }
     ],
-    "faqTitle": "Veelgestelde vragen van ouders",
-    "faq": [
+    "faqTitle": "Hulp en vragen voor ouders",
+    "faqSections": [
       {
-        "q": "Heb ik een account nodig los van dat van mijn kind?",
-        "a": "Ja. Elke ouder heeft een eigen toegang, gekoppeld aan het profiel van het kind. Je beheert oproepen en toestemming vanuit je account."
+        "title": "Account en aanmelden",
+        "items": [
+          {
+            "q": "Ik heb mijn uitnodiging niet ontvangen.",
+            "a": "Controleer eerst je spam- of ongewenste-e-mailmap. Kun je de uitnodiging nog steeds niet vinden, vraag je coach dan om je e-mailadres te controleren of de uitnodiging opnieuw te versturen."
+          },
+          {
+            "q": "Ik heb een nieuw e-mailadres.",
+            "a": "Je e-mailadres is zichtbaar in Profiel, maar kan niet in de app worden gewijzigd. Heb je geen toegang meer tot het oude adres, neem dan via de app contact op met support of mail naar support@clubero.app."
+          },
+          {
+            "q": "Ik ben mijn wachtwoord vergeten.",
+            "a": "Gebruik «Wachtwoord vergeten» op het aanmeldscherm. Je ontvangt een e-mail waarmee je een nieuw wachtwoord kunt instellen."
+          },
+          {
+            "q": "Kan mijn partner toegang krijgen tot het account van ons kind?",
+            "a": "Ja. Elke ouder kan een eigen account hebben en door de club aan hetzelfde kind worden gekoppeld."
+          },
+          {
+            "q": "We hebben meerdere kinderen bij de club.",
+            "a": "Je kunt vanuit één ouderaccount toegang krijgen tot meerdere kinderen, mits de club hun profielen correct heeft gekoppeld."
+          },
+          {
+            "q": "Kan mijn kind een eigen account hebben?",
+            "a": "Ja, als een ouder de platformtoegang inschakelt. Het kind heeft een eigen e-mailadres nodig om de uitnodiging te ontvangen en een wachtwoord aan te maken."
+          }
+        ]
       },
       {
-        "q": "Kan mijn kind een eigen account hebben?",
-        "a": "Een minderjarig kind kan een account hebben zodra je ouderlijke toestemming hebt gegeven. Je blijft gekoppeld aan zijn of haar profiel."
+        "title": "Oproepen",
+        "items": [
+          {
+            "q": "Hoe reageer ik op een oproep?",
+            "a": "Open de oproep en kies «Aanwezig», «Afwezig» of «Onzeker». Je kunt ook rechtstreeks vanuit bepaalde oproepmails reageren."
+          },
+          {
+            "q": "Ik heb de verkeerde reactie gekozen.",
+            "a": "Je kunt je reactie wijzigen zolang de coach de reacties niet heeft vergrendeld en het evenement niet voorbij of geannuleerd is."
+          },
+          {
+            "q": "Waarom is mijn kind niet opgeroepen?",
+            "a": "De coaches beheren de oproepen. Neem rechtstreeks contact op met de coach als je kind niet wordt vermeld."
+          },
+          {
+            "q": "Waarom zie ik de lijst met opgeroepen spelers niet?",
+            "a": "De club kan de volledige lijst met opgeroepen spelers verbergen voor ouders en spelers. In dat geval zie je vooral de oproep van je eigen kind."
+          },
+          {
+            "q": "Waarom moet ik snel reageren?",
+            "a": "Je reactie helpt de coach om de selectie voor te bereiden, het evenement te organiseren en rekening te houden met afwezigheden."
+          },
+          {
+            "q": "Kan ik rechtstreeks vanuit de ontvangen e-mail reageren?",
+            "a": "Ja. Als de e-mail antwoordknoppen bevat, volstaat één klik en hoef je niet in te loggen bij de app. De reactie wordt direct naar de coach gestuurd."
+          }
+        ]
       },
       {
-        "q": "Krijg ik te veel meldingen?",
-        "a": "Nee: je kiest precies welke kanalen (app, e-mail, WhatsApp) en herinneringen je ontvangt in je meldingsinstellingen."
+        "title": "Kalender en evenementen",
+        "items": [
+          {
+            "q": "Waar vind ik de volgende trainingen en wedstrijden?",
+            "a": "De pagina «Evenementen» bevat de geplande toekomstige evenementen van het team. Het startscherm toont ook maximaal de drie volgende oproepen van je kind."
+          },
+          {
+            "q": "Het tijdstip van een wedstrijd is gewijzigd.",
+            "a": "Wijzigingen worden automatisch bijgewerkt. Opgeroepen spelers en hun ouders ontvangen een melding in de app en een e-mail; de pushmelding hangt af van de clubinstellingen."
+          },
+          {
+            "q": "Kan ik evenementen aan mijn persoonlijke kalender toevoegen?",
+            "a": "Momenteel niet. Clubero biedt een kalender in de app, maar synchroniseert evenementen nog niet automatisch met de kalender van je telefoon."
+          },
+          {
+            "q": "Waarvoor dient de chat van een evenement?",
+            "a": "Bevoegde ouders, spelers en coaches kunnen er de logistiek van dat evenement bespreken. Bij elk nieuw bericht ontvangen de bevoegde deelnemers een pushmelding."
+          }
+        ]
       },
       {
-        "q": "Kan ik meerdere kinderen beheren?",
-        "a": "Ja. Al je kinderen verschijnen in één gezinskalender, ook als ze in verschillende teams spelen."
+        "title": "Meldingen",
+        "items": [
+          {
+            "q": "Ik ontvang geen meldingen.",
+            "a": "Controleer in Profiel of meldingen zijn ingeschakeld en kijk daarna of je telefoon Clubero toestaat om meldingen te sturen."
+          },
+          {
+            "q": "Krijg ik te veel meldingen?",
+            "a": "Pushmeldingen worden voor het hele apparaat in- of uitgeschakeld: je kunt in Profiel niet elk type afzonderlijk kiezen. De club bepaalt welke soorten pushmeldingen naar de leden worden gestuurd."
+          },
+          {
+            "q": "Krijg ik een melding als een evenement wordt geannuleerd of verplaatst?",
+            "a": "Ja. Opgeroepen spelers en hun ouders ontvangen een melding in de app en een e-mail. De pushmelding hangt af van de instellingen van de club."
+          },
+          {
+            "q": "Krijg ik een melding van een nieuw bericht op het Prikbord?",
+            "a": "Afhankelijk van de clubinstellingen kan een pushmelding worden verstuurd. De club kan er ook voor kiezen een e-mail te sturen."
+          }
+        ]
       },
       {
-        "q": "Ziet de club mijn telefoonnummer?",
-        "a": "Communicatie verloopt via Clubero — het clubprikbord en meldingen. Je hoeft je persoonlijke nummer niet te delen."
+        "title": "Hulpvragen van de club",
+        "items": [
+          {
+            "q": "Wat betekent «Hulpvragen voor het evenement»?",
+            "a": "De club kan vrijwilligers zoeken voor de kantine, arbitrage, vervoer of andere taken. Je kunt je rechtstreeks in de app aanmelden."
+          },
+          {
+            "q": "Hoe kan ik de club helpen?",
+            "a": "Als er een hulpvraag wordt geplaatst, open je die en tik je op «Ik meld me aan» om een rol of taak te kiezen."
+          },
+          {
+            "q": "Ik heb me aangemeld, maar ben niet meer beschikbaar.",
+            "a": "Je kunt je aanbod intrekken zolang de hulpvraag nog openstaat en je deelname in afwachting of bevestigd is."
+          }
+        ]
+      },
+      {
+        "title": "Privacy",
+        "items": [
+          {
+            "q": "Wie kan de gegevens van mijn kind zien?",
+            "a": "Alleen personen die door je club zijn bevoegd, zoals de betrokken beheerders en coaches, hebben toegang tot de gegevens die nodig zijn om activiteiten te organiseren."
+          },
+          {
+            "q": "Kunnen andere ouders mijn contactgegevens zien?",
+            "a": "Nee. Je contactgegevens worden niet aan andere ouders getoond; ze zijn toegankelijk via je account en voor bevoegde personen binnen de club."
+          },
+          {
+            "q": "Kan ik mijn account verwijderen?",
+            "a": "Ja. Vraag in Profiel → Privacy en gegevens om verwijdering van je account. Het Clubero-team plant en verwerkt de verwijdering; zolang de aanvraag loopt, kun je die annuleren."
+          }
+        ]
+      },
+      {
+        "title": "Communicatie en support",
+        "items": [
+          {
+            "q": "Waarvoor dient het Prikbord van de club?",
+            "a": "Via het Prikbord kunnen de club en coaches berichten, bijlagen, aankondigingen, polls en nieuws met families delen."
+          },
+          {
+            "q": "Hoe meld ik een probleem?",
+            "a": "Gebruik de sectie Support in de app of vraag je club om het probleem door te geven. Je kunt ook mailen naar support@clubero.app."
+          }
+        ]
       }
     ],
     "ctaTitle": "Nog een vraag?",
@@ -1922,6 +2062,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "Voor ouders",
+      "title": "Ga goed van start met Clubero.",
+      "subtitle": "Bekijk de belangrijkste procedures en installeer de app binnen enkele minuten op je telefoon.",
+      "guide": {
+        "title": "Stapsgewijze gids voor ouders",
+        "body": "Account, kind, oproepen, afwezigheden, meldingen, meerijden, Prikbord en hulpvragen: elke procedure wordt uitgelegd met echte screenshots.",
+        "cta": "Bekijk de tutorials"
+      },
+      "install": {
+        "title": "Installeer de Clubero-app",
+        "body": "Voeg Clubero toe aan het beginscherm van je iPhone, iPad of Android en ontvang je meldingen in realtime.",
+        "cta": "Bekijk de installatiegids"
+      }
     }
   }
 }

@@ -1298,9 +1298,9 @@
     "ctaStart": "See the tutorials",
     "ctaFaq": "Frequently asked questions",
     "previewLabel": "Preview coming soon",
-    "reassure": ["From the mobile app", "Notifications your way", "Data protected"],
+    "reassure": ["From the mobile app", "Real-time notifications", "Data protected"],
     "tutorialsTitle": "The essentials, step by step.",
-    "tutorialsSubtitle": "Seven detailed, step-by-step procedures with a screenshot for each step.",
+    "tutorialsSubtitle": "Eight detailed, step-by-step procedures with a screenshot for each step.",
     "tutorials": [
       {
         "t": "Open your parent account",
@@ -1311,7 +1311,7 @@
           "Review and accept the consents (privacy, terms, notifications, data processing), then \"Accept and continue\".",
           "You land straight on your club's home screen — you're logged in.",
           "Open the \"Profile\" tab: you'll see your info, language and notifications.",
-          "Fill in your first name, last name and phone number, then tap \"Save\"."
+          "Check your first name, last name and phone number. If needed, update any relevant information, then tap \"Save\"."
         ]
       },
       {
@@ -1334,17 +1334,17 @@
         "steps": [
           "Receive the call-up by email: confirm attendance (Present / Uncertain / Absent) directly from the email.",
           "You also get a push notification that takes you straight into the app.",
-          "After responding from the email, a page confirms your choice — you can change it anytime.",
-          "Or respond in one tap from the app home, via the \"Insights\" card.",
-          "Open the \"Events\" tab to see all matches and trainings.",
+          "Without logging in to the app, the page opened from the email confirms your choice. Your response is sent to the coach immediately, helping them prepare the event with confidence.",
+          "On the home screen, the \"Insights\" card reminds you of actions to take. The home screen also shows up to the next three events your child has been called up for.",
+          "The \"Events\" page contains all upcoming events scheduled for the team. A green badge identifies those your child has been called up for; use \"Filters\" to show only the events you want.",
           "Open the event details: match info and your response (Present / Uncertain / Absent).",
           "For an absence or if unsure, add a reason (preset or free text) sent to the coach.",
-          "Chat in the event chat (parents, players, coach) and see the called-up players."
+          "Each event has its own chat: authorised parents, players and coaches can clarify anything relating to the match. With every new message, authorised participants receive a push notification."
         ]
       },
       {
         "t": "Set up notifications",
-        "b": "Turn on push notifications to get call-ups, reminders and messages straight on your phone.",
+        "b": "Turn on push notifications to receive call-ups, reminders, cancellations, rescheduled events and new Wall posts, according to your club's settings.",
         "steps": [
           "In the \"Profile\" menu, open the notifications section to enable them.",
           "Tap \"Enable\": a window opens — allow notifications.",
@@ -1389,29 +1389,169 @@
           "Your vote is saved: see the live results.",
           "You can change your vote anytime (unless the poll is anonymous)."
         ]
+      },
+      {
+        "t": "Respond to the club's needs",
+        "b": "Offer your help with refreshments, refereeing, transport or any other task organised by the club.",
+        "steps": [
+          "When a coach posts a need, parents, players or both receive an email, depending on the target audience.",
+          "Open the event, then the \"Helping hands\" tab to see the details. Indicate whether or not you are available.",
+          "If you are available, tap \"Volunteer\". Your participation is confirmed immediately or placed on hold for the coach's approval, then appears as \"Confirmed\".",
+          "From the bottom of the home page, open \"My helping hands\" to find the needs you were invited to, regardless of your response.",
+          "This page lists all your needs: you can respond directly and see which ones are confirmed.",
+          "You will also find the needs for which you indicated that you were unavailable.",
+          "When the coach accepts a pending offer, you receive a confirmation email."
+        ]
       }
     ],
-    "faqTitle": "Frequently asked questions from parents",
-    "faq": [
+    "faqTitle": "Help and questions for parents",
+    "faqSections": [
       {
-        "q": "Do I need an account separate from my child's?",
-        "a": "Yes. Each parent has their own access, linked to their child's profile. You manage call-ups and consent from your account."
+        "title": "Account and sign-in",
+        "items": [
+          {
+            "q": "I haven't received my invitation.",
+            "a": "First check your spam or junk folder. If you still cannot find it, ask your coach to check your email address or resend the invitation."
+          },
+          {
+            "q": "I've changed my email address.",
+            "a": "Your email address is visible in Profile, but it cannot be changed in the app. If you no longer have access to the old address, contact support from the app or email support@clubero.app."
+          },
+          {
+            "q": "I've forgotten my password.",
+            "a": "Use \"Forgot password\" on the sign-in screen. You will receive an email allowing you to set a new password."
+          },
+          {
+            "q": "Can my partner access our child's account?",
+            "a": "Yes. Each parent can have their own account and be linked to the same child by the club."
+          },
+          {
+            "q": "We have several children at the club.",
+            "a": "You can access several children from a single parent account, provided their profiles have been linked correctly by the club."
+          },
+          {
+            "q": "Can my child have their own account?",
+            "a": "Yes, if a parent enables platform access. The child must have their own email address to receive the invitation and create their password."
+          }
+        ]
       },
       {
-        "q": "Can my child have their own account?",
-        "a": "A minor child can have an account once you've given parental consent. You stay linked to their profile."
+        "title": "Call-ups",
+        "items": [
+          {
+            "q": "How do I respond to a call-up?",
+            "a": "Open the call-up, then choose \"Present\", \"Absent\" or \"Uncertain\". You can also respond directly from certain call-up emails."
+          },
+          {
+            "q": "I selected the wrong response.",
+            "a": "You can change your response provided the coach has not locked responses and the event has not passed or been cancelled."
+          },
+          {
+            "q": "Why hasn't my child been called up?",
+            "a": "Call-ups are managed by the coaches. If your child does not appear, contact the coach directly."
+          },
+          {
+            "q": "Why can't I see the list of called-up players?",
+            "a": "The club may hide the full list of called-up players from parents and players. In that case, you will mainly see your own child's call-up."
+          },
+          {
+            "q": "Why should I respond quickly?",
+            "a": "Your response helps the coach prepare the squad, organise the event and plan for absences."
+          },
+          {
+            "q": "Can I respond directly from the email I receive?",
+            "a": "Yes. When the email contains response buttons, one click is enough and you do not need to sign in to the app. The response is sent to the coach immediately."
+          }
+        ]
       },
       {
-        "q": "Will I get too many notifications?",
-        "a": "No: you choose exactly which channels (app, email, WhatsApp) and reminders you receive in your notification settings."
+        "title": "Calendar and events",
+        "items": [
+          {
+            "q": "Where can I find upcoming training sessions and matches?",
+            "a": "The \"Events\" page brings together upcoming events scheduled for the team. The home screen also shows up to your child's next three call-ups."
+          },
+          {
+            "q": "A match time has changed.",
+            "a": "Changes are updated automatically. Called-up players and their parents receive an in-app alert and an email; push notifications depend on the club's settings."
+          },
+          {
+            "q": "Can I add events to my personal calendar?",
+            "a": "Not currently. Clubero provides its calendar in the app, but does not yet automatically sync events with your phone's calendar."
+          },
+          {
+            "q": "What is an event chat for?",
+            "a": "It allows authorised parents, players and coaches to discuss the logistics of that event. With every new message, authorised participants receive a push notification."
+          }
+        ]
       },
       {
-        "q": "Can I manage several children?",
-        "a": "Yes. All your children appear in a single family calendar, even if they play in different teams."
+        "title": "Notifications",
+        "items": [
+          {
+            "q": "I'm not receiving any notifications.",
+            "a": "Check in Profile that notifications are enabled, then make sure your phone allows Clubero to send you notifications."
+          },
+          {
+            "q": "Will I receive too many notifications?",
+            "a": "Push notifications are enabled or disabled for the whole device: you cannot choose each type in Profile. The club decides which types of push notification are sent to its members."
+          },
+          {
+            "q": "Will I be notified if an event is cancelled or rescheduled?",
+            "a": "Yes. Called-up players and their parents receive an in-app alert and an email. The push notification depends on the settings defined by the club."
+          },
+          {
+            "q": "Will I be notified about a new Wall post?",
+            "a": "A push notification may be sent depending on the club's settings. The club may also choose to send an email."
+          }
+        ]
       },
       {
-        "q": "Can the club see my phone number?",
-        "a": "Communication goes through Clubero — the club wall and notifications. You don't need to share your personal number."
+        "title": "Club needs",
+        "items": [
+          {
+            "q": "What does \"Event needs\" mean?",
+            "a": "The club may be looking for volunteers to help with refreshments, refereeing, transport or other roles. You can volunteer directly in the app."
+          },
+          {
+            "q": "How can I help the club?",
+            "a": "When a need is posted, open it and tap \"Volunteer\" to choose the role or task."
+          },
+          {
+            "q": "I volunteered but am no longer available.",
+            "a": "You can withdraw your offer while the need is still open and your participation is pending or confirmed."
+          }
+        ]
+      },
+      {
+        "title": "Privacy",
+        "items": [
+          {
+            "q": "Who can see my child's information?",
+            "a": "Only people authorised by your club, such as the relevant administrators and coaches, can access the information needed to organise activities."
+          },
+          {
+            "q": "Can other parents see my contact details?",
+            "a": "No. Your contact details are not shown to other parents; they are accessible to your account and authorised people at the club."
+          },
+          {
+            "q": "Can I delete my account?",
+            "a": "Yes. In Profile → Privacy & data, request deletion of your account. It is scheduled and processed by the Clubero team; you can cancel the request while it is still in progress."
+          }
+        ]
+      },
+      {
+        "title": "Communication and support",
+        "items": [
+          {
+            "q": "What is the club Wall for?",
+            "a": "The Wall allows the club and coaches to share messages, attachments, announcements, polls and news with families."
+          },
+          {
+            "q": "How do I report a problem?",
+            "a": "Use the Support section in the app or ask your club to pass on the problem. You can also email support@clubero.app."
+          }
+        ]
       }
     ],
     "ctaTitle": "Still have a question?",
@@ -1922,6 +2062,21 @@
       "updated_now": "Updated just now",
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
+    },
+    "parentResources": {
+      "kicker": "For parents",
+      "title": "Get started with Clubero.",
+      "subtitle": "Find the essential procedures and install the app on your phone in just a few minutes.",
+      "guide": {
+        "title": "Step-by-step guide for parents",
+        "body": "Account, child, call-ups, absences, notifications, carpooling, Wall and helping hands: every procedure is explained with real screenshots.",
+        "cta": "View the tutorials"
+      },
+      "install": {
+        "title": "Install the Clubero app",
+        "body": "Add Clubero to your home screen on iPhone, iPad or Android and receive your notifications in real time.",
+        "cta": "View the installation guide"
+      }
     }
   }
 }

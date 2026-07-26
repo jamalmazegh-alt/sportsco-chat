@@ -112,6 +112,7 @@ function Landing() {
       <LandingTournament />
       <LandingSponsors />
       <LandingComingSoon />
+      <LandingParentResources />
       <V2Waitlist />
     </MarketingLayout>
   );
@@ -694,6 +695,70 @@ function LandingComingSoon() {
               {t("landing.coming_soon.body")}
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingParentResources() {
+  const { t, i18n: i18nInstance } = useTranslation("marketing");
+  const guideTo =
+    i18nInstance.language?.slice(0, 2) === "fr" ? "/fr/guide-parents" : "/en/parent-guide";
+
+  const resources = [
+    {
+      icon: BookOpen,
+      title: t("landing.parentResources.guide.title"),
+      body: t("landing.parentResources.guide.body"),
+      cta: t("landing.parentResources.guide.cta"),
+      to: guideTo,
+    },
+    {
+      icon: Smartphone,
+      title: t("landing.parentResources.install.title"),
+      body: t("landing.parentResources.install.body"),
+      cta: t("landing.parentResources.install.cta"),
+      to: "/install" as const,
+    },
+  ] as const;
+
+  return (
+    <section className="border-b border-border/60 bg-muted/20 py-20 lg:py-24">
+      <div className="mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            {t("landing.parentResources.kicker")}
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("landing.parentResources.title")}
+          </h2>
+          <p className="mt-4 text-muted-foreground">{t("landing.parentResources.subtitle")}</p>
+        </div>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          {resources.map((resource) => {
+            const Icon = resource.icon;
+            return (
+              <Link
+                key={resource.title}
+                to={resource.to}
+                className="group rounded-3xl border border-border bg-card p-7 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 font-display text-xl font-bold">{resource.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {resource.body}
+                </p>
+                <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                  {resource.cta}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
