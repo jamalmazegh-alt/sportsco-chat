@@ -117,6 +117,47 @@ function RegisterPage() {
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
+    // NOMINATIVE invite (member_invites): the token is bound to this exact
+    // e-mail, so receiving it already proves ownership. Create the account
+    // server-side, pre-confirmed → Supabase sends NO verification e-mail.
+    // Club link invites (QR / shared URL) keep the standard signUp() flow.
+    if (hasInvite && resolveSignupPath(inviteKind === "club" ? "club" : "member") === "server_create") {
+      try {
+        await createAccount({
+          data: {
+            token: inviteToken,
+            email,
+            password,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            language: i18n.language?.slice(0, 2) || "en",
+            signupRole,
+          },
+        });
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          setBusy(false);
+          toast.error(localizeAuthError(signInErr, t));
+          return;
+        }
+        const { error: rErr } = await supabase.rpc("redeem_member_invite", { _token: inviteToken });
+        if (rErr) {
+          setBusy(false);
+          toast.error(rErr.message || t("auth.inviteInvalid"));
+          return;
+        }
+        setBusy(false);
+        toast.success(t("auth.signupSuccess"));
+        (navigate as any)({ to: nextPath });
+        return;
+      } catch (err: any) {
+        setBusy(false);
+        toast.error(err?.message || t("auth.inviteInvalid"));
+        return;
+      }
+    }
+
     const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
@@ -134,6 +175,7 @@ function RegisterPage() {
         },
       },
     });
+
     if (error) {
       setBusy(false);
       toast.error(localizeAuthError(error, t));
