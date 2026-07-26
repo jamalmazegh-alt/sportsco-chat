@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -107,6 +107,10 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
   const navigate = useNavigate();
   const [showTop, setShowTop] = useState(false);
+  const tocRef = useRef<HTMLDetailsElement>(null);
+  const closeToc = () => {
+    if (tocRef.current) tocRef.current.open = false;
+  };
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 600);
@@ -188,21 +192,24 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       {/* SECTION NAV (sticky table of contents) */}
       <nav
         aria-label={t("parentGuide.tutorialsTitle")}
-        className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+        className="sticky top-[4.5rem] z-20 border-b border-border/60 bg-background shadow-sm"
       >
         <div className="mx-auto max-w-6xl px-5 lg:px-8">
           {/* Mobile: collapsible bulleted list so the nav never overflows the viewport */}
-          <details className="group py-3 sm:hidden">
+          <details ref={tocRef} className="group py-3 sm:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
               {t("parentGuide.tutorialsTitle")}
               <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
             </summary>
-            <ul className="mt-3 list-disc space-y-2 pl-6 text-sm marker:text-primary">
+            <ul className="mt-3 max-h-[55vh] list-disc space-y-2 overflow-y-auto rounded-2xl border border-border bg-card py-3 pl-9 pr-4 text-sm marker:text-primary">
               {tutorials.map((tuto, i) => (
                 <li key={`mobile-nav-${tuto.t}`}>
                   <a
                     href={`#tuto-${i + 1}`}
-                    onClick={(e) => scrollToId(e, `tuto-${i + 1}`)}
+                    onClick={(e) => {
+                      closeToc();
+                      scrollToId(e, `tuto-${i + 1}`);
+                    }}
                     className="text-foreground/80 hover:text-primary"
                   >
                     {tuto.t}
@@ -212,7 +219,10 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               <li>
                 <a
                   href="#faq"
-                  onClick={(e) => scrollToId(e, "faq")}
+                  onClick={(e) => {
+                    closeToc();
+                    scrollToId(e, "faq");
+                  }}
                   className="text-foreground/80 hover:text-primary"
                 >
                   {t("parentGuide.ctaFaq")}
@@ -253,7 +263,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       </nav>
 
       {/* TUTORIALS */}
-      <section id="tutorials" className="scroll-mt-24 border-b border-border/60">
+      <section id="tutorials" className="scroll-mt-40 border-b border-border/60">
         <div className="mx-auto max-w-6xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
@@ -267,7 +277,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               const Icon = TUTORIAL_ICONS[i] ?? CheckCircle2;
               const slug = TUTORIAL_SLUGS[i] ?? `tuto-${i + 1}`;
               return (
-                <div key={tuto.t} id={`tuto-${i + 1}`} className="scroll-mt-24">
+                <div key={tuto.t} id={`tuto-${i + 1}`} className="scroll-mt-40">
                   {/* Tutorial header */}
                   <div className="flex items-start gap-4 border-l-2 border-primary/40 pl-4">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">
@@ -335,7 +345,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="scroll-mt-24 border-b border-border/60 bg-muted/20">
+      <section id="faq" className="scroll-mt-40 border-b border-border/60 bg-muted/20">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("parentGuide.faqTitle")}
