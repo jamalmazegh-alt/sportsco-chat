@@ -106,4 +106,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "meeting-invite": meetingInviteTemplate,
   "meeting-removed": meetingRemovedTemplate,
   "parent-child-linked": parentChildLinkedTemplate,
+  "carpool-need": carpoolNeedTemplate,
 };
