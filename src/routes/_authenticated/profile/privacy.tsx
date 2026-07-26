@@ -83,7 +83,7 @@ function PrivacyPage() {
 
   // Children (players where current user is parent)
   const { data: children } = useQuery({
-    queryKey: ["my-children", user?.id],
+    queryKey: ["my-children-details", user?.id],
     enabled: !!user,
     queryFn: async () => {
       const { data } = await supabase
@@ -152,7 +152,7 @@ function PrivacyPage() {
 
   async function onChildMedia(playerId: string, status: "granted" | "denied") {
     await setMedia({ data: { player_id: playerId, status } });
-    await qc.invalidateQueries({ queryKey: ["my-children"] });
+    await qc.invalidateQueries({ queryKey: ["my-children-details"] });
     toast.success(t("privacy.consentSaved"));
   }
 

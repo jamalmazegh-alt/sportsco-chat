@@ -84,16 +84,16 @@ export function CarpoolSection({
     },
   });
 
+  const carpoolIds = useMemo(() => carpools.map((c) => c.id).sort(), [carpools]);
+
   const { data: passengers = [] } = useQuery({
-    queryKey: ["carpool-passengers", eventId],
-    enabled: carpools.length >= 0,
+    queryKey: ["carpool-passengers", eventId, carpoolIds],
     queryFn: async () => {
-      const ids = carpools.map((c) => c.id);
-      if (ids.length === 0) return [] as Passenger[];
+      if (carpoolIds.length === 0) return [] as Passenger[];
       const { data, error } = await supabase
         .from("carpool_passengers")
         .select("*")
-        .in("carpool_id", ids);
+        .in("carpool_id", carpoolIds);
       if (error) throw error;
       return (data ?? []) as Passenger[];
     },
