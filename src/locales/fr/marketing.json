@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Organiser le covoiturage",
-        "b": "Pour les matchs et entraînements, proposez ou trouvez une place directement depuis l'événement.",
+        "b": "Pour les matchs et entraînements, réservez une place ou demandez un transport directement depuis l'événement.",
         "steps": [
-          "Ouvrez un match ou un entraînement où le covoiturage est activé.",
-          "Repérez la carte « Covoiturage » (avec le rappel de responsabilité).",
-          "Pour conduire : « Je peux conduire → », indiquez le véhicule, le nombre de places et un point de départ.",
-          "Pour être transporté : « Réserver une place » chez un conducteur, puis choisissez le(s) enfant(s).",
-          "Aucun conducteur ? « Demander un transport » — le coach est prévenu."
+          "Ouvrez un match ou un entraînement où le covoiturage est activé (le coach l'active événement par événement).",
+          "Repérez la carte « Covoiturage » (avec le rappel de responsabilité) : vous y voyez les propositions disponibles.",
+          "Appuyez sur « Réserver une place » sur une proposition pour confirmer votre place.",
+          "Voyez quel joueur est assigné à quelle voiture ; vous pouvez annuler votre réservation et discuter des modalités dans le chat de l'événement.",
+          "Aucun covoiturage disponible ? Appuyez sur « Demander un transport ».",
+          "Confirmez, et ajoutez un commentaire si besoin.",
+          "Votre demande apparaît dans l'événement ; le coach est prévenu par email, ainsi que les autres parents et joueurs."
         ]
       },
       {

@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Meerijden organiseren",
-        "b": "Voor wedstrijden en trainingen bied je een plaats aan of vind je er een — rechtstreeks vanaf het evenement.",
+        "b": "Voor wedstrijden en trainingen reserveer je een plaats of vraag je vervoer aan — rechtstreeks vanaf het evenement.",
         "steps": [
-          "Open een wedstrijd of training waar meerijden is ingeschakeld.",
-          "Zoek de kaart «Meerijden» (met de verantwoordelijkheidsmelding).",
-          "Om te rijden: «Ik kan rijden →», geef het voertuig, het aantal plaatsen en een vertrekpunt op.",
-          "Voor een plaats: «Plaats reserveren» bij een chauffeur en kies het kind of de kinderen.",
-          "Nog geen chauffeur? «Vervoer aanvragen» — de coach wordt op de hoogte gebracht."
+          "Open een wedstrijd of training waar meerijden is ingeschakeld (de coach schakelt het per evenement in).",
+          "Zoek de kaart «Meerijden» (met de verantwoordelijkheidsmelding): je ziet de beschikbare aanbiedingen.",
+          "Tik op «Plaats reserveren» bij een aanbod om je plaats te bevestigen.",
+          "Bekijk welke speler aan welke auto is toegewezen; je kunt je reservering annuleren en de details bespreken in de evenementchat.",
+          "Geen rit beschikbaar? Tik op «Vervoer aanvragen».",
+          "Bevestig en voeg indien nodig een opmerking toe.",
+          "Je aanvraag verschijnt in het evenement; de coach wordt per e-mail op de hoogte gebracht, samen met de andere ouders en spelers."
         ]
       },
       {

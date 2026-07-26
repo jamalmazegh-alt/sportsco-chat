@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Organizzare il passaggio in auto",
-        "b": "Per partite e allenamenti, offri o trova un posto direttamente dall'evento.",
+        "b": "Per partite e allenamenti, prenota un posto o richiedi un passaggio direttamente dall'evento.",
         "steps": [
-          "Apri una partita o un allenamento in cui il passaggio in auto è attivato.",
-          "Individua la scheda «Passaggio in auto» (con l'avviso di responsabilità).",
-          "Per guidare: «Posso guidare →», indica il veicolo, il numero di posti e un punto di partenza.",
-          "Per un passaggio: «Prenota un posto» da un conducente e scegli il/i figlio/i.",
-          "Nessun conducente? «Richiedi un passaggio» — l'allenatore viene avvisato."
+          "Apri una partita o un allenamento in cui il passaggio in auto è attivato (l'allenatore lo attiva evento per evento).",
+          "Individua la scheda «Passaggio in auto» (con l'avviso di responsabilità): vedrai le offerte disponibili.",
+          "Tocca «Prenota un posto» su un'offerta per confermare il tuo posto.",
+          "Vedi quale giocatore è assegnato a quale auto; puoi annullare la tua prenotazione e discutere i dettagli nella chat dell'evento.",
+          "Nessun passaggio disponibile? Tocca «Richiedi un passaggio».",
+          "Conferma e aggiungi un commento se necessario.",
+          "La tua richiesta compare nell'evento; l'allenatore viene avvisato via email, insieme agli altri genitori e giocatori."
         ]
       },
       {

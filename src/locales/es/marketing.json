@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Organizar el coche compartido",
-        "b": "Para partidos y entrenamientos, ofrece o encuentra una plaza directamente desde el evento.",
+        "b": "Para partidos y entrenamientos, reserva una plaza o solicita transporte directamente desde el evento.",
         "steps": [
-          "Abre un partido o entrenamiento donde el coche compartido esté activado.",
-          "Localiza la tarjeta «Coche compartido» (con el aviso de responsabilidad).",
-          "Para conducir: «Yo puedo conducir →», indica el vehículo, el número de plazas y un punto de salida.",
-          "Para que te lleven: «Reservar plaza» con un conductor y elige al niño o niños.",
-          "¿No hay conductor? «Solicitar transporte» — se avisa al entrenador."
+          "Abre un partido o entrenamiento donde el coche compartido esté activado (el entrenador lo activa evento por evento).",
+          "Localiza la tarjeta «Coche compartido» (con el aviso de responsabilidad): verás las ofertas disponibles.",
+          "Pulsa «Reservar plaza» en una oferta para confirmar tu plaza.",
+          "Mira qué jugador está asignado a qué coche; puedes anular tu reserva y hablar de los detalles en el chat del evento.",
+          "¿No hay coche compartido disponible? Pulsa «Solicitar transporte».",
+          "Confirma y añade un comentario si hace falta.",
+          "Tu solicitud aparece en el evento; se avisa al entrenador por correo, junto con los demás padres y jugadores."
         ]
       },
       {

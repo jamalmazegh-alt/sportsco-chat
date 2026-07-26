@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Fahrgemeinschaft organisieren",
-        "b": "Bei Spielen und Trainings bieten Sie einen Platz an oder finden einen — direkt vom Ereignis aus.",
+        "b": "Bei Spielen und Trainings buchen Sie einen Platz oder fragen einen Transport an — direkt vom Ereignis aus.",
         "steps": [
-          "Öffnen Sie ein Spiel oder Training, bei dem die Mitfahrgelegenheit aktiviert ist.",
-          "Suchen Sie die Karte „Mitfahrgelegenheit“ (mit dem Verantwortungshinweis).",
-          "Zum Fahren: „Ich kann fahren →“, geben Sie Fahrzeug, Anzahl der Plätze und einen Treffpunkt an.",
-          "Für einen Platz: „Platz reservieren“ bei einem Fahrer und wählen Sie das/die Kind(er).",
-          "Noch kein Fahrer? „Transport anfragen“ — der Trainer wird informiert."
+          "Öffnen Sie ein Spiel oder Training, bei dem die Mitfahrgelegenheit aktiviert ist (der Trainer aktiviert sie pro Ereignis).",
+          "Suchen Sie die Karte „Mitfahrgelegenheit“ (mit dem Verantwortungshinweis): Dort sehen Sie die verfügbaren Angebote.",
+          "Tippen Sie bei einem Angebot auf „Platz reservieren“, um Ihren Platz zu bestätigen.",
+          "Sehen Sie, welcher Spieler welchem Auto zugeordnet ist; Sie können Ihre Reservierung stornieren und die Details im Event-Chat besprechen.",
+          "Keine Mitfahrgelegenheit verfügbar? Tippen Sie auf „Transport anfragen“.",
+          "Bestätigen Sie und fügen Sie bei Bedarf einen Kommentar hinzu.",
+          "Ihre Anfrage erscheint im Ereignis; der Trainer wird per E-Mail benachrichtigt, ebenso die anderen Eltern und Spieler."
         ]
       },
       {

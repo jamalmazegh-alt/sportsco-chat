@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Organizar as boleias",
-        "b": "Para jogos e treinos, ofereça ou encontre um lugar diretamente a partir do evento.",
+        "b": "Para jogos e treinos, reserve um lugar ou peça transporte diretamente a partir do evento.",
         "steps": [
-          "Abra um jogo ou treino onde as boleias estejam ativadas.",
-          "Localize o cartão «Boleias» (com o aviso de responsabilidade).",
-          "Para conduzir: «Eu posso conduzir →», indique o veículo, o número de lugares e um ponto de partida.",
-          "Para ter boleia: «Reservar lugar» com um condutor e escolha a(s) criança(s).",
-          "Sem condutor? «Pedir boleia» — o treinador é avisado."
+          "Abra um jogo ou treino onde as boleias estejam ativadas (o treinador ativa-as evento a evento).",
+          "Localize o cartão «Boleias» (com o aviso de responsabilidade): verá as ofertas disponíveis.",
+          "Toque em «Reservar lugar» numa oferta para confirmar o seu lugar.",
+          "Veja que jogador está atribuído a que carro; pode cancelar a sua reserva e falar dos detalhes no chat do evento.",
+          "Sem boleia disponível? Toque em «Pedir boleia».",
+          "Confirme e adicione um comentário se necessário.",
+          "O seu pedido aparece no evento; o treinador é avisado por email, bem como os outros pais e jogadores."
         ]
       },
       {

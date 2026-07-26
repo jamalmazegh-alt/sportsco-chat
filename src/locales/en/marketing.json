@@ -1366,13 +1366,15 @@
       },
       {
         "t": "Organise carpooling",
-        "b": "For matches and trainings, offer or find a seat directly from the event.",
+        "b": "For matches and trainings, book a seat or request a ride directly from the event.",
         "steps": [
-          "Open a match or a training where carpooling is enabled.",
-          "Find the \"Carpooling\" card (with the responsibility reminder).",
-          "To drive: \"I can drive →\", set the vehicle, number of seats and a pickup point.",
-          "To get a ride: \"Book a seat\" with a driver, then pick which child(ren).",
-          "No driver yet? \"Request a ride\" — the coach is notified."
+          "Open a match or a training where carpooling is enabled (the coach turns it on event by event).",
+          "Find the \"Carpooling\" card (with the responsibility reminder): you'll see the available offers.",
+          "Tap \"Book a seat\" on an offer to confirm your seat.",
+          "See which player is assigned to which car; you can cancel your booking and discuss the details in the event chat.",
+          "No ride available? Tap \"Request a ride\".",
+          "Confirm, and add a comment if needed.",
+          "Your request appears in the event; the coach is notified by email, along with the other parents and players."
         ]
       },
       {
