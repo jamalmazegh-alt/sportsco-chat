@@ -182,31 +182,36 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
         className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
       >
         <div className="mx-auto max-w-6xl px-5 lg:px-8">
-          {/* Mobile: compact native select so the nav never overflows the viewport */}
-          <div className="relative py-3 sm:hidden">
-            <label htmlFor="parent-guide-sections" className="sr-only">
+          {/* Mobile: collapsible bulleted list so the nav never overflows the viewport */}
+          <details className="group py-3 sm:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
               {t("parentGuide.tutorialsTitle")}
-            </label>
-            <select
-              id="parent-guide-sections"
-              defaultValue=""
-              onChange={(e) => {
-                if (e.target.value) scrollToSection(e.target.value);
-              }}
-              className="w-full appearance-none rounded-full border border-border bg-card px-4 py-2.5 pr-10 text-sm font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-            >
-              <option value="" disabled>
-                {t("parentGuide.tutorialsTitle")}
-              </option>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+            </summary>
+            <ul className="mt-3 list-disc space-y-2 pl-6 text-sm marker:text-primary">
               {tutorials.map((tuto, i) => (
-                <option key={`mobile-opt-${tuto.t}`} value={`tuto-${i + 1}`}>
-                  {i + 1}. {tuto.t}
-                </option>
+                <li key={`mobile-nav-${tuto.t}`}>
+                  <a
+                    href={`#tuto-${i + 1}`}
+                    onClick={(e) => scrollToId(e, `tuto-${i + 1}`)}
+                    className="text-foreground/80 hover:text-primary"
+                  >
+                    {tuto.t}
+                  </a>
+                </li>
               ))}
-              <option value="faq">{t("parentGuide.ctaFaq")}</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          </div>
+              <li>
+                <a
+                  href="#faq"
+                  onClick={(e) => scrollToId(e, "faq")}
+                  className="text-foreground/80 hover:text-primary"
+                >
+                  {t("parentGuide.ctaFaq")}
+                </a>
+              </li>
+            </ul>
+          </details>
+
 
           {/* Desktop: horizontal scrollable pills */}
           <ul className="hidden snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] sm:flex [&::-webkit-scrollbar]:hidden">
