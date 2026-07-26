@@ -1298,7 +1298,7 @@
     "ctaStart": "Zu den Tutorials",
     "ctaFaq": "Häufige Fragen",
     "previewLabel": "Vorschau folgt",
-    "reassure": ["Über die mobile App", "Benachrichtigungen nach Wahl", "Daten geschützt"],
+    "reassure": ["Über die mobile App", "Benachrichtigungen in Echtzeit", "Daten geschützt"],
     "tutorialsTitle": "Das Wichtigste, Schritt für Schritt.",
     "tutorialsSubtitle": "Sieben detaillierte Schritt-für-Schritt-Anleitungen mit einem Screenshot pro Schritt.",
     "tutorials": [
@@ -1311,7 +1311,7 @@
           "Prüfen und akzeptieren Sie die Einwilligungen (Datenschutz, AGB, Benachrichtigungen, Datenverarbeitung), dann „Akzeptieren und fortfahren“.",
           "Sie landen direkt auf der Startseite Ihres Vereins — Sie sind angemeldet.",
           "Öffnen Sie den Reiter „Profil“: Dort sehen Sie Ihre Daten, Sprache und Benachrichtigungen.",
-          "Tragen Sie Vorname, Nachname und Telefonnummer ein und tippen Sie auf „Speichern“."
+          "Prüfen Sie Vorname, Nachname und Telefonnummer. Ändern Sie bei Bedarf alle relevanten Angaben und tippen Sie dann auf „Speichern“."
         ]
       },
       {
@@ -1334,17 +1334,17 @@
         "steps": [
           "Erhalten Sie das Aufgebot per E-Mail: Bestätigen Sie die Teilnahme (Anwesend / Unsicher / Abwesend) direkt aus der E-Mail.",
           "Sie erhalten außerdem eine Push-Benachrichtigung, die Sie direkt in die App führt.",
-          "Nach der Antwort aus der E-Mail bestätigt eine Seite Ihre Wahl — Sie können sie jederzeit ändern.",
-          "Oder antworten Sie mit einem Tippen von der App-Startseite über die Karte „Insights“.",
-          "Öffnen Sie den Reiter „Termine“, um alle Spiele und Trainings zu sehen.",
+          "Ohne sich in der App anzumelden, bestätigt die über die E-Mail geöffnete Seite Ihre Auswahl. Die Antwort wird sofort an den Trainer gesendet, damit er das Event in Ruhe vorbereiten kann.",
+          "Auf der Startseite erinnert Sie die Karte „Insights“ an anstehende Aufgaben. Außerdem werden dort bis zu drei nächste Events angezeigt, für die Ihr Kind aufgeboten ist.",
+          "Die Seite „Events“ enthält alle geplanten zukünftigen Events des Teams. Ein grünes Badge kennzeichnet die Events, für die Ihr Kind aufgeboten ist; mit „Filter“ können Sie nur die gewünschten Events anzeigen.",
           "Öffnen Sie die Ereignisdetails: Spielinfos und Ihre Antwort (Anwesend / Unsicher / Abwesend).",
           "Bei Abwesenheit oder Unsicherheit fügen Sie einen Grund hinzu (vordefiniert oder Freitext), der an den Trainer gesendet wird.",
-          "Tauschen Sie sich im Event-Chat aus (Eltern, Spieler, Trainer) und sehen Sie die aufgebotenen Spieler."
+          "Jedes Event hat einen eigenen Chat: Berechtigte Eltern, Spieler und Trainer können dort Fragen zum Spiel klären. Bei jeder neuen Nachricht erhalten die berechtigten Teilnehmer eine Push-Benachrichtigung."
         ]
       },
       {
         "t": "Benachrichtigungen einrichten",
-        "b": "Aktivieren Sie Push-Benachrichtigungen, um Aufgebote, Erinnerungen und Nachrichten direkt auf Ihr Telefon zu erhalten.",
+        "b": "Aktivieren Sie Push-Benachrichtigungen, um je nach Vereinseinstellungen Aufgebote, Erinnerungen, Absagen, Verschiebungen und neue Beiträge auf der Pinnwand zu erhalten.",
         "steps": [
           "Öffnen Sie im Menü „Profil“ den Bereich Benachrichtigungen, um sie zu aktivieren.",
           "Tippen Sie auf „Aktivieren“: Ein Fenster öffnet sich — erlauben Sie die Benachrichtigungen.",
@@ -1391,27 +1391,154 @@
         ]
       }
     ],
-    "faqTitle": "Häufige Fragen von Eltern",
-    "faq": [
+    "faqTitle": "Hilfe und Fragen für Eltern",
+    "faqSections": [
       {
-        "q": "Brauche ich ein eigenes Konto getrennt von dem meines Kindes?",
-        "a": "Ja. Jedes Elternteil hat einen eigenen Zugang, der mit dem Profil des Kindes verknüpft ist. Aufgebote und Einwilligung verwalten Sie über Ihr Konto."
+        "title": "Konto und Anmeldung",
+        "items": [
+          {
+            "q": "Ich habe meine Einladung nicht erhalten.",
+            "a": "Prüfen Sie zuerst Ihren Spam- oder Junk-Ordner. Wenn Sie weiterhin nichts finden, bitten Sie Ihren Trainer, Ihre E-Mail-Adresse zu prüfen oder die Einladung erneut zu senden."
+          },
+          {
+            "q": "Ich habe meine E-Mail-Adresse geändert.",
+            "a": "Ihre E-Mail-Adresse ist im Profil sichtbar, kann aber nicht in der App geändert werden. Wenn Sie keinen Zugriff mehr auf die alte Adresse haben, kontaktieren Sie den Support über die App oder schreiben Sie an support@clubero.app."
+          },
+          {
+            "q": "Ich habe mein Passwort vergessen.",
+            "a": "Verwenden Sie „Passwort vergessen“ auf dem Anmeldebildschirm. Sie erhalten eine E-Mail, mit der Sie ein neues Passwort festlegen können."
+          },
+          {
+            "q": "Kann mein Partner auf das Konto unseres Kindes zugreifen?",
+            "a": "Ja. Jedes Elternteil kann ein eigenes Konto haben und vom Verein mit demselben Kind verknüpft werden."
+          },
+          {
+            "q": "Wir haben mehrere Kinder im Verein.",
+            "a": "Sie können mehrere Kinder über ein einziges Elternkonto aufrufen, sofern der Verein deren Profile korrekt verknüpft hat."
+          },
+          {
+            "q": "Kann mein Kind ein eigenes Konto haben?",
+            "a": "Ja, wenn ein Elternteil den Plattformzugang aktiviert. Das Kind benötigt eine eigene E-Mail-Adresse, um die Einladung zu erhalten und sein Passwort zu erstellen."
+          }
+        ]
       },
       {
-        "q": "Kann mein Kind ein eigenes Konto haben?",
-        "a": "Ein minderjähriges Kind kann ein Konto haben, sobald Sie die elterliche Einwilligung erteilt haben. Sie bleiben mit seinem Profil verbunden."
+        "title": "Aufgebote",
+        "items": [
+          {
+            "q": "Wie antworte ich auf ein Aufgebot?",
+            "a": "Öffnen Sie das Aufgebot und wählen Sie „Anwesend“, „Abwesend“ oder „Unsicher“. Bei manchen Aufgebots-E-Mails können Sie auch direkt aus der E-Mail antworten."
+          },
+          {
+            "q": "Ich habe die falsche Antwort ausgewählt.",
+            "a": "Sie können Ihre Antwort ändern, solange der Trainer die Antworten nicht gesperrt hat und das Event weder vorbei noch abgesagt ist."
+          },
+          {
+            "q": "Warum wurde mein Kind nicht aufgeboten?",
+            "a": "Die Aufgebote werden von den Trainern verwaltet. Wenn Ihr Kind nicht erscheint, wenden Sie sich direkt an den Trainer."
+          },
+          {
+            "q": "Warum sehe ich die Liste der aufgebotenen Spieler nicht?",
+            "a": "Der Verein kann die vollständige Liste vor Eltern und Spielern verbergen. In diesem Fall sehen Sie hauptsächlich das Aufgebot Ihres eigenen Kindes."
+          },
+          {
+            "q": "Warum sollte ich schnell antworten?",
+            "a": "Ihre Antwort hilft dem Trainer, den Kader vorzubereiten, das Event zu organisieren und Abwesenheiten einzuplanen."
+          },
+          {
+            "q": "Kann ich direkt aus der erhaltenen E-Mail antworten?",
+            "a": "Ja. Wenn die E-Mail Antwortschaltflächen enthält, genügt ein Klick, ohne dass Sie sich in der App anmelden müssen. Die Antwort wird sofort an den Trainer übermittelt."
+          }
+        ]
       },
       {
-        "q": "Bekomme ich zu viele Benachrichtigungen?",
-        "a": "Nein: Sie wählen in Ihren Benachrichtigungseinstellungen genau die Kanäle (App, E-Mail, WhatsApp) und Erinnerungen aus."
+        "title": "Kalender und Events",
+        "items": [
+          {
+            "q": "Wo finde ich die nächsten Trainings und Spiele?",
+            "a": "Auf der Seite „Events“ finden Sie alle geplanten zukünftigen Events des Teams. Auf der Startseite werden außerdem bis zu drei nächste Aufgebote Ihres Kindes angezeigt."
+          },
+          {
+            "q": "Die Uhrzeit eines Spiels hat sich geändert.",
+            "a": "Änderungen werden automatisch aktualisiert. Aufgebotene Personen und deren Eltern erhalten eine Meldung in der App und eine E-Mail; Push-Benachrichtigungen hängen von den Vereinseinstellungen ab."
+          },
+          {
+            "q": "Kann ich Events zu meinem persönlichen Kalender hinzufügen?",
+            "a": "Derzeit nicht. Clubero bietet einen Kalender in der App, synchronisiert Events aber noch nicht automatisch mit dem Kalender Ihres Telefons."
+          },
+          {
+            "q": "Wozu dient der Chat eines Events?",
+            "a": "Berechtigte Eltern, Spieler und Trainer können dort die Logistik dieses Events besprechen. Bei jeder neuen Nachricht erhalten die berechtigten Teilnehmer eine Push-Benachrichtigung."
+          }
+        ]
       },
       {
-        "q": "Kann ich mehrere Kinder verwalten?",
-        "a": "Ja. Alle Ihre Kinder erscheinen in einem einzigen Familienkalender, auch wenn sie in verschiedenen Teams spielen."
+        "title": "Benachrichtigungen",
+        "items": [
+          {
+            "q": "Ich erhalte keine Benachrichtigungen.",
+            "a": "Prüfen Sie im Profil, ob Benachrichtigungen aktiviert sind, und stellen Sie anschließend sicher, dass Ihr Telefon Clubero das Senden von Benachrichtigungen erlaubt."
+          },
+          {
+            "q": "Erhalte ich zu viele Benachrichtigungen?",
+            "a": "Push-Benachrichtigungen werden für das gesamte Gerät ein- oder ausgeschaltet; einzelne Typen können Sie im Profil nicht auswählen. Der Verein entscheidet, welche Push-Typen an seine Mitglieder gesendet werden."
+          },
+          {
+            "q": "Werde ich bei einer Absage oder Verschiebung benachrichtigt?",
+            "a": "Ja. Aufgebotene Personen und deren Eltern erhalten eine Meldung in der App und eine E-Mail. Die Push-Benachrichtigung hängt von den Vereinseinstellungen ab."
+          },
+          {
+            "q": "Werde ich über einen neuen Beitrag auf der Pinnwand benachrichtigt?",
+            "a": "Je nach Vereinseinstellungen kann eine Push-Benachrichtigung gesendet werden. Der Verein kann zusätzlich eine E-Mail versenden."
+          }
+        ]
       },
       {
-        "q": "Sieht der Verein meine Telefonnummer?",
-        "a": "Die Kommunikation läuft über Clubero — die Vereinspinnwand und Benachrichtigungen. Sie müssen Ihre private Nummer nicht teilen."
+        "title": "Unterstützungsbedarf des Vereins",
+        "items": [
+          {
+            "q": "Was bedeutet „Bedarf des Events“?",
+            "a": "Der Verein kann Freiwillige für Bewirtung, Schiedsrichteraufgaben, Fahrdienste oder andere Rollen suchen. Sie können sich direkt in der App melden."
+          },
+          {
+            "q": "Wie kann ich den Verein unterstützen?",
+            "a": "Wenn ein Bedarf veröffentlicht wird, öffnen Sie ihn und tippen Sie auf „Ich helfe“, um eine Rolle oder Aufgabe auszuwählen."
+          },
+          {
+            "q": "Ich habe mich gemeldet, bin aber nicht mehr verfügbar.",
+            "a": "Sie können Ihre Meldung zurückziehen, solange der Bedarf offen und Ihre Teilnahme ausstehend oder bestätigt ist."
+          }
+        ]
+      },
+      {
+        "title": "Datenschutz",
+        "items": [
+          {
+            "q": "Wer kann die Informationen meines Kindes sehen?",
+            "a": "Nur vom Verein autorisierte Personen, etwa zuständige Administratoren und Trainer, können auf die für die Organisation der Aktivitäten erforderlichen Informationen zugreifen."
+          },
+          {
+            "q": "Sehen andere Eltern meine Kontaktdaten?",
+            "a": "Nein. Ihre Kontaktdaten werden anderen Eltern nicht angezeigt; sie sind für Ihr Konto und autorisierte Personen des Vereins zugänglich."
+          },
+          {
+            "q": "Kann ich mein Konto löschen?",
+            "a": "Ja. Beantragen Sie unter Profil → Datenschutz & Daten die Löschung Ihres Kontos. Sie wird vom Clubero-Team geplant und bearbeitet; solange der Vorgang läuft, können Sie den Antrag widerrufen."
+          }
+        ]
+      },
+      {
+        "title": "Kommunikation und Support",
+        "items": [
+          {
+            "q": "Wozu dient die Vereinspinnwand?",
+            "a": "Über die Pinnwand können Verein und Trainer Nachrichten, Anhänge, Ankündigungen, Umfragen und Neuigkeiten mit Familien teilen."
+          },
+          {
+            "q": "Wie melde ich ein Problem?",
+            "a": "Nutzen Sie den Bereich Support in der App oder bitten Sie Ihren Verein, das Problem weiterzuleiten. Sie können auch an support@clubero.app schreiben."
+          }
+        ]
       }
     ],
     "ctaTitle": "Noch eine offene Frage?",

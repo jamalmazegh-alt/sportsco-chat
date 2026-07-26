@@ -48,6 +48,10 @@ const TUTORIAL_SLUGS = [
 const REASSURE_ICONS = [Smartphone, Bell, ShieldCheck];
 
 type Tutorial = { t: string; b: string; steps: string[] };
+type FaqSection = {
+  title: string;
+  items: { q: string; a: string }[];
+};
 
 // Renders the real screenshot when the file exists in
 // public/images/parent-guide/, and gracefully falls back to a placeholder
@@ -108,7 +112,9 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
 
   const reassure = t("parentGuide.reassure", { returnObjects: true }) as string[];
   const tutorials = t("parentGuide.tutorials", { returnObjects: true }) as Tutorial[];
-  const faq = t("parentGuide.faq", { returnObjects: true }) as { q: string; a: string }[];
+  const faqSections = t("parentGuide.faqSections", {
+    returnObjects: true,
+  }) as FaqSection[];
 
   return (
     <MarketingLayout>
@@ -234,24 +240,33 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
 
       {/* FAQ */}
       <section className="border-b border-border/60 bg-muted/20">
-        <div className="mx-auto max-w-3xl px-5 py-20 lg:px-8">
+        <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("parentGuide.faqTitle")}
           </h2>
-          <div className="mt-10 space-y-3">
-            {faq.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-2xl border border-border bg-card p-5 open:shadow-sm"
-              >
-                <summary className="flex cursor-pointer items-center justify-between gap-4 font-display text-base font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
-                  <span>{item.q}</span>
-                  <span className="text-muted-foreground transition-transform group-open:rotate-45">
-                    +
-                  </span>
-                </summary>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
-              </details>
+          <div className="mt-12 grid gap-x-8 gap-y-10 lg:grid-cols-2">
+            {faqSections.map((section) => (
+              <section key={section.title}>
+                <h3 className="mb-4 font-display text-lg font-bold text-[color:var(--brand-blue-deep)]">
+                  {section.title}
+                </h3>
+                <div className="space-y-3">
+                  {section.items.map((item) => (
+                    <details
+                      key={item.q}
+                      className="group rounded-2xl border border-border bg-card p-5 open:shadow-sm"
+                    >
+                      <summary className="flex cursor-pointer items-center justify-between gap-4 font-display text-base font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
+                        <span>{item.q}</span>
+                        <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                          +
+                        </span>
+                      </summary>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         </div>

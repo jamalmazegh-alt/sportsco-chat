@@ -1298,7 +1298,7 @@
     "ctaStart": "Ver os tutoriais",
     "ctaFaq": "Perguntas frequentes",
     "previewLabel": "Pré-visualização em breve",
-    "reassure": ["A partir da app móvel", "Notificações à sua medida", "Dados protegidos"],
+    "reassure": ["A partir da app móvel", "Notificações em tempo real", "Dados protegidos"],
     "tutorialsTitle": "O essencial, passo a passo.",
     "tutorialsSubtitle": "Sete procedimentos detalhados, passo a passo e com uma captura por passo.",
     "tutorials": [
@@ -1311,7 +1311,7 @@
           "Consulte e aceite os consentimentos (privacidade, termos, notificações, tratamento de dados) e depois «Aceitar e continuar».",
           "Chega diretamente ao ecrã inicial do seu clube — está com sessão iniciada.",
           "Abra o separador «Perfil»: verá os seus dados, o idioma e as notificações.",
-          "Preencha o nome, apelido e número de telefone e toque em «Guardar»."
+          "Verifique o nome, apelido e número de telefone. Se necessário, altere qualquer informação relevante e toque em «Guardar»."
         ]
       },
       {
@@ -1334,17 +1334,17 @@
         "steps": [
           "Receba a convocatória por email: confirme a presença (Presente / Incerto / Ausente) diretamente a partir do email.",
           "Recebe também uma notificação push que o leva diretamente à app.",
-          "Depois de responder pelo email, uma página confirma a sua escolha — pode alterá-la a qualquer momento.",
-          "Ou responda com um toque a partir do início da app, através do cartão «Insights».",
-          "Abra o separador «Eventos» para ver todos os jogos e treinos.",
+          "Sem iniciar sessão na app, a página aberta a partir do email confirma a sua escolha. A resposta é enviada imediatamente ao treinador, que pode assim preparar o evento com tranquilidade.",
+          "No ecrã inicial, o cartão «Insights» lembra-lhe as ações a realizar. O ecrã inicial também mostra até aos três próximos eventos para os quais o seu filho foi convocado.",
+          "A página «Eventos» contém todos os próximos eventos planeados para a equipa. Um selo verde identifica aqueles para os quais o seu filho foi convocado; use «Filtros» para mostrar apenas os eventos pretendidos.",
           "Abra o detalhe do evento: informações do jogo e a sua resposta (Presente / Incerto / Ausente).",
           "Em caso de ausência ou dúvida, adicione um motivo (predefinido ou texto livre) enviado ao treinador.",
-          "Converse no chat do evento (pais, jogadores, treinador) e veja os jogadores convocados."
+          "Cada evento tem o seu próprio chat: pais, jogadores e treinadores autorizados podem esclarecer qualquer questão relacionada com o jogo. A cada nova mensagem, os participantes autorizados recebem uma notificação push."
         ]
       },
       {
         "t": "Configurar as notificações",
-        "b": "Ative as notificações push para receber convocatórias, lembretes e mensagens diretamente no seu telemóvel.",
+        "b": "Ative as notificações push para receber convocatórias, lembretes, cancelamentos, alterações de data e novas publicações no Mural, consoante as definições do seu clube.",
         "steps": [
           "No menu «Perfil», aceda às notificações para as ativar.",
           "Toque em «Ativar»: abre-se uma janela — autorize as notificações.",
@@ -1391,27 +1391,154 @@
         ]
       }
     ],
-    "faqTitle": "Perguntas frequentes dos pais",
-    "faq": [
+    "faqTitle": "Ajuda e perguntas dos pais",
+    "faqSections": [
       {
-        "q": "Preciso de uma conta separada da do meu filho?",
-        "a": "Sim. Cada pai ou mãe tem o seu próprio acesso, ligado ao perfil do filho. Gere as convocatórias e o consentimento a partir da sua conta."
+        "title": "Conta e início de sessão",
+        "items": [
+          {
+            "q": "Não recebi o meu convite.",
+            "a": "Verifique primeiro a pasta de spam ou correio indesejado. Se continuar sem o encontrar, peça ao seu treinador para verificar o seu endereço de email ou reenviar o convite."
+          },
+          {
+            "q": "Mudei de endereço de email.",
+            "a": "O seu endereço de email está visível em Perfil, mas não pode ser alterado na app. Se já não tiver acesso ao endereço antigo, contacte o suporte através da app ou escreva para support@clubero.app."
+          },
+          {
+            "q": "Esqueci-me da palavra-passe.",
+            "a": "Use «Esqueci-me da palavra-passe» no ecrã de início de sessão. Receberá um email para definir uma nova palavra-passe."
+          },
+          {
+            "q": "O meu companheiro ou companheira pode aceder à conta do nosso filho?",
+            "a": "Sim. Cada progenitor pode ter a sua própria conta e ser associado pelo clube ao mesmo filho."
+          },
+          {
+            "q": "Temos vários filhos no clube.",
+            "a": "Pode aceder a vários filhos a partir de uma única conta de pai ou mãe, desde que o clube tenha associado corretamente os respetivos perfis."
+          },
+          {
+            "q": "O meu filho pode ter a sua própria conta?",
+            "a": "Sim, se um dos pais ativar o acesso à plataforma. A criança deve ter o seu próprio endereço de email para receber o convite e criar a palavra-passe."
+          }
+        ]
       },
       {
-        "q": "O meu filho pode ter a sua própria conta?",
-        "a": "Uma criança menor pode ter uma conta depois de dar o consentimento parental. Continua ligado ao perfil dela."
+        "title": "Convocatórias",
+        "items": [
+          {
+            "q": "Como respondo a uma convocatória?",
+            "a": "Abra a convocatória e escolha «Presente», «Ausente» ou «Incerto». Também pode responder diretamente a partir de determinados emails de convocatória."
+          },
+          {
+            "q": "Escolhi a resposta errada.",
+            "a": "Pode alterar a sua resposta desde que o treinador não tenha bloqueado as respostas e o evento ainda não tenha terminado nem sido cancelado."
+          },
+          {
+            "q": "Porque é que o meu filho não foi convocado?",
+            "a": "As convocatórias são geridas pelos treinadores. Se o seu filho não aparecer, contacte diretamente o treinador."
+          },
+          {
+            "q": "Porque não consigo ver a lista de jogadores convocados?",
+            "a": "O clube pode ocultar a lista completa de convocados aos pais e jogadores. Nesse caso, verá sobretudo a convocatória do seu filho."
+          },
+          {
+            "q": "Porque devo responder rapidamente?",
+            "a": "A sua resposta ajuda o treinador a preparar o plantel, organizar o evento e antecipar as ausências."
+          },
+          {
+            "q": "Posso responder diretamente a partir do email recebido?",
+            "a": "Sim. Quando o email inclui botões de resposta, basta um clique e não precisa de iniciar sessão na app. A resposta é enviada imediatamente ao treinador."
+          }
+        ]
       },
       {
-        "q": "Vou receber notificações a mais?",
-        "a": "Não: escolhe com precisão os canais (app, email, WhatsApp) e os lembretes nas suas definições de notificações."
+        "title": "Calendário e eventos",
+        "items": [
+          {
+            "q": "Onde encontro os próximos treinos e jogos?",
+            "a": "A página «Eventos» reúne os próximos eventos planeados para a equipa. O ecrã inicial também mostra até às três próximas convocatórias do seu filho."
+          },
+          {
+            "q": "O horário de um jogo mudou.",
+            "a": "As alterações são atualizadas automaticamente. Os jogadores convocados e os respetivos pais recebem um alerta na app e um email; a notificação push depende das definições do clube."
+          },
+          {
+            "q": "Posso adicionar os eventos ao meu calendário pessoal?",
+            "a": "Atualmente, não. O Clubero disponibiliza o seu calendário na app, mas ainda não sincroniza automaticamente os eventos com o calendário do seu telemóvel."
+          },
+          {
+            "q": "Para que serve o chat de um evento?",
+            "a": "Permite que pais, jogadores e treinadores autorizados conversem sobre a logística desse evento. A cada nova mensagem, os participantes autorizados recebem uma notificação push."
+          }
+        ]
       },
       {
-        "q": "Posso gerir vários filhos?",
-        "a": "Sim. Todos os seus filhos aparecem num único calendário familiar, mesmo que joguem em equipas diferentes."
+        "title": "Notificações",
+        "items": [
+          {
+            "q": "Não recebo notificações.",
+            "a": "Verifique em Perfil se as notificações estão ativadas e confirme que o seu telemóvel permite ao Clubero enviar-lhe notificações."
+          },
+          {
+            "q": "Vou receber demasiadas notificações?",
+            "a": "As notificações push são ativadas ou desativadas para todo o dispositivo: não pode escolher cada tipo em Perfil. O clube decide que tipos de notificação push são enviados aos seus membros."
+          },
+          {
+            "q": "Serei avisado se um evento for cancelado ou adiado?",
+            "a": "Sim. Os jogadores convocados e os respetivos pais recebem um alerta na app e um email. A notificação push depende das definições estabelecidas pelo clube."
+          },
+          {
+            "q": "Serei avisado de uma nova publicação no Mural?",
+            "a": "Pode ser enviada uma notificação push, consoante as definições do clube. O clube também pode optar por enviar um email."
+          }
+        ]
       },
       {
-        "q": "O clube vê o meu número de telefone?",
-        "a": "A comunicação passa pelo Clubero — o mural do clube e as notificações. Não precisa de partilhar o seu número pessoal."
+        "title": "Necessidades do clube",
+        "items": [
+          {
+            "q": "O que significa «Necessidades do evento»?",
+            "a": "O clube pode procurar voluntários para o bar, arbitragem, transporte ou outras funções. Pode oferecer-se diretamente na app."
+          },
+          {
+            "q": "Como posso ajudar o clube?",
+            "a": "Quando uma necessidade for publicada, abra-a e toque em «Ofereço-me» para escolher a função ou tarefa."
+          },
+          {
+            "q": "Ofereci-me, mas já não estou disponível.",
+            "a": "Pode retirar a sua candidatura enquanto a necessidade estiver aberta e a sua participação estiver pendente ou confirmada."
+          }
+        ]
+      },
+      {
+        "title": "Privacidade",
+        "items": [
+          {
+            "q": "Quem pode ver as informações do meu filho?",
+            "a": "Apenas as pessoas autorizadas pelo seu clube, como os administradores e treinadores responsáveis, podem aceder às informações necessárias para organizar as atividades."
+          },
+          {
+            "q": "Os outros pais podem ver os meus dados de contacto?",
+            "a": "Não. Os seus dados de contacto não são apresentados aos outros pais; estão acessíveis na sua conta e às pessoas autorizadas do clube."
+          },
+          {
+            "q": "Posso eliminar a minha conta?",
+            "a": "Sim. Em Perfil → Privacidade e dados, peça a eliminação da sua conta. O pedido é agendado e tratado pela equipa Clubero; pode cancelá-lo enquanto estiver em curso."
+          }
+        ]
+      },
+      {
+        "title": "Comunicação e suporte",
+        "items": [
+          {
+            "q": "Para que serve o Mural do clube?",
+            "a": "O Mural permite ao clube e aos treinadores partilhar mensagens, anexos, anúncios, sondagens e notícias com as famílias."
+          },
+          {
+            "q": "Como comunico um problema?",
+            "a": "Use a secção Suporte na app ou peça ao seu clube para transmitir o problema. Também pode escrever para support@clubero.app."
+          }
+        ]
       }
     ],
     "ctaTitle": "Ainda tem alguma questão?",
