@@ -1862,7 +1862,8 @@
     "disabledHint": "Schakel meerijden in zodat ouders plaatsen kunnen aanbieden en reserveren.",
     "needsTitle": "Vervoersaanvragen",
     "cancelNeed": "Mijn aanvraag intrekken",
-    "noNeeds": "Geen vervoersaanvragen."
+    "noNeeds": "Geen vervoersaanvragen.",
+    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden."
   },
   "journey": {
     "tab": {

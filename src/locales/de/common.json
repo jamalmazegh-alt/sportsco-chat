@@ -1867,7 +1867,8 @@
     "disabledHint": "Aktiviere Mitfahrgelegenheiten, damit Eltern Plätze anbieten und buchen können.",
     "needsTitle": "Transportanfragen",
     "cancelNeed": "Meine Anfrage zurückziehen",
-    "noNeeds": "Keine Transportanfragen."
+    "noNeeds": "Keine Transportanfragen.",
+    "notifyFailed": "Anfrage gespeichert, aber die E-Mail an das Team konnte nicht gesendet werden."
   },
   "journey": {
     "tab": {

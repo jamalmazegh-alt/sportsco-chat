@@ -1862,7 +1862,8 @@
     "disabledHint": "Activa el coche compartido para que los padres puedan ofrecer y reservar plazas.",
     "needsTitle": "Solicitudes de transporte",
     "cancelNeed": "Retirar mi solicitud",
-    "noNeeds": "Sin solicitudes de transporte."
+    "noNeeds": "Sin solicitudes de transporte.",
+    "notifyFailed": "Solicitud guardada, pero no se pudo enviar el correo al staff."
   },
   "journey": {
     "tab": {
