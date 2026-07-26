@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { inviteMatchesEmail, isEmailAlreadyExistsError } from "@/lib/invite-signup";
+import { findUserByEmail } from "@/lib/invite.server";
+
 
 
 export type InviteValidationResult =
