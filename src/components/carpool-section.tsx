@@ -600,8 +600,12 @@ function ReserveDialog({
         </DialogHeader>
         <div className="space-y-2 max-h-[50vh] overflow-y-auto">
           {selectablePlayers.length === 0 && (
-            <p className="text-sm text-muted-foreground italic">{t("carpool.noTransport")}</p>
+            <p className="text-sm text-muted-foreground">
+              Aucun joueur rattaché à votre compte pour cet événement — vous réservez une place pour
+              vous-même.
+            </p>
           )}
+
           {selectablePlayers.map((c) => (
             <label
               key={c.player_id}
