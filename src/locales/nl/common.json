@@ -943,8 +943,20 @@
     "confirmResponse": "Antwoord bevestigen",
     "responseRecorded": "Antwoord opgeslagen",
     "coachNotified": "De Coach is geïnformeerd.",
-    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
-    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
+    "reasonsAbsent": [
+      "Werk",
+      "Familie",
+      "Blessure",
+      "Ziekte",
+      "Studie",
+      "Andere verplichting"
+    ],
+    "reasonsUncertain": [
+      "Nog te bevestigen",
+      "Werk",
+      "Familie",
+      "Lichte gezondheidsklachten"
+    ],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",
@@ -1293,7 +1305,9 @@
     "placeholder": "Bericht typen…",
     "disabled": "De chat is uitgeschakeld voor dit evenement.",
     "you": "Jij",
-    "loadMore": "Meer laden"
+    "loadMore": "Meer laden",
+    "noAccess": "De chat van dit evenement is alleen voor staf. Vraag je club om deze open te stellen voor ouders of spelers.",
+    "sendFailed": "Bericht niet verzonden: je hebt geen toegang tot deze chat."
   },
   "assistant": {
     "title": "Clubero Assistent",

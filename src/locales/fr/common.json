@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
@@ -1293,7 +1305,9 @@
     "placeholder": "Écrivez un message…",
     "disabled": "Le chat est désactivé pour cet événement.",
     "you": "Vous",
-    "loadMore": "Charger plus"
+    "loadMore": "Charger plus",
+    "noAccess": "Le chat de cet événement est réservé au staff. Contactez votre club pour l'ouvrir aux parents ou aux joueurs.",
+    "sendFailed": "Impossible d'envoyer le message : vous n'avez pas accès à ce chat."
   },
   "assistant": {
     "title": "Assistant Clubero",

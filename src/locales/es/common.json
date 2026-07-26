@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmar respuesta",
     "responseRecorded": "Respuesta guardada",
     "coachNotified": "El entrenador ha sido notificado.",
-    "reasonsAbsent": ["Trabajo", "Familia", "Lesión", "Enfermedad", "Estudios", "Otro compromiso"],
-    "reasonsUncertain": ["Por confirmar", "Trabajo", "Familia", "Problema de salud leve"],
+    "reasonsAbsent": [
+      "Trabajo",
+      "Familia",
+      "Lesión",
+      "Enfermedad",
+      "Estudios",
+      "Otro compromiso"
+    ],
+    "reasonsUncertain": [
+      "Por confirmar",
+      "Trabajo",
+      "Familia",
+      "Problema de salud leve"
+    ],
     "suggestedReasons": "Sugerencias",
     "forceResponseTitle": "¿Forzar respuesta?",
     "forceResponseDesc": "{{name}} ya ha respondido {{current}}. ¿De verdad quieres cambiar el estado a {{next}}?",
@@ -1293,7 +1305,9 @@
     "placeholder": "Escribir mensaje…",
     "disabled": "El chat está deshabilitado para este evento.",
     "you": "Tú",
-    "loadMore": "Cargar más"
+    "loadMore": "Cargar más",
+    "noAccess": "El chat de este evento está reservado al staff. Pide a tu club que lo abra a padres o jugadores.",
+    "sendFailed": "No se pudo enviar el mensaje: no tienes acceso a este chat."
   },
   "assistant": {
     "title": "Asistente de Clubero",

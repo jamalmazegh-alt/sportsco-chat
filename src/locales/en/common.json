@@ -943,8 +943,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -1293,7 +1305,9 @@
     "placeholder": "Type a message…",
     "disabled": "Chat is disabled for this event.",
     "you": "You",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "noAccess": "This event chat is limited to staff. Ask your club to open it to parents or players.",
+    "sendFailed": "Message not sent: you don't have access to this chat."
   },
   "assistant": {
     "title": "Clubero Assistant",
