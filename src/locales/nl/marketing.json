@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Toestemming en toegang voor je kind geven",
-        "b": "Als ouder koppel je je kind aan je account en geef je toestemming voor de toegang. Jij houdt de controle.",
+        "t": "Toegang van je kind beheren",
+        "b": "Bekijk de gegevens van je kind en geef het, als je wilt, toegang tot zijn eigen spelersruimte. Jij houdt de controle.",
         "steps": [
-          "Open het gedeelte «Mijn gezin» of het toestemmingsverzoek van de club.",
-          "Selecteer het door de club voorgestelde profiel van je kind.",
-          "Controleer de gegevens (naam, geboortedatum, team).",
-          "Lees en aanvaard de vereiste ouderlijke toestemming voor een minderjarige.",
-          "De toegang van je kind is geactiveerd — het kan indien nodig een eigen login aanmaken."
+          "Ontvang de e-mail die je laat weten dat je kind aan je account is gekoppeld.",
+          "Open het tabblad «Teams» en selecteer je kind bovenaan de lijst.",
+          "Bekijk zijn gegevens: voornaam, achternaam en positie.",
+          "Scrol om het licentienummer, telefoonnummer en e-mailadres te zien.",
+          "Controleer de toestemming voor platformtoegang en de gegevens van de ouders.",
+          "Schakel de platformtoegang van je kind in met de schakelaar (toggle).",
+          "Stuur de uitnodiging naar de speler: je kind heeft een eigen e-mailadres nodig. Het ontvangt een e-mail om een wachtwoord aan te maken en toegang te krijgen tot de teamgegevens.",
+          "Vink «Kan op oproepen reageren (Speler)» aan om het zelf te laten reageren — anders kunnen alleen ouders op oproepen reageren."
         ]
       },
       {

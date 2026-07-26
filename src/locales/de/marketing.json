@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Einwilligung und Zugang für Ihr Kind geben",
-        "b": "Als Elternteil verknüpfen Sie Ihr Kind mit Ihrem Konto und genehmigen seinen Zugang. Sie behalten die Kontrolle.",
+        "t": "Den Zugang Ihres Kindes verwalten",
+        "b": "Sehen Sie die Informationen Ihres Kindes ein und geben Sie ihm bei Bedarf Zugang zu seinem eigenen Spielerbereich. Sie behalten die Kontrolle.",
         "steps": [
-          "Öffnen Sie den Bereich „Meine Familie“ oder die Einwilligungsanfrage des Vereins.",
-          "Wählen Sie das vom Verein vorgeschlagene Profil Ihres Kindes.",
-          "Prüfen Sie die Daten (Name, Geburtsdatum, Team).",
-          "Lesen und akzeptieren Sie die für Minderjährige erforderliche elterliche Einwilligung.",
-          "Der Zugang Ihres Kindes ist aktiviert — es kann bei Bedarf einen eigenen Login erstellen."
+          "Erhalten Sie die E-Mail, die Sie darüber informiert, dass Ihr Kind mit Ihrem Konto verknüpft wurde.",
+          "Öffnen Sie den Reiter „Teams“ und wählen Sie Ihr Kind oben in der Liste.",
+          "Sehen Sie seine Informationen ein: Vorname, Nachname und Position.",
+          "Scrollen Sie, um Lizenznummer, Telefon und E-Mail zu sehen.",
+          "Prüfen Sie die Zugriffsberechtigung für die Plattform und die Daten der Eltern.",
+          "Aktivieren Sie den Plattformzugang Ihres Kindes mit dem Schalter (Toggle).",
+          "Senden Sie die Einladung an den Spieler: Ihr Kind benötigt eine eigene E-Mail-Adresse. Es erhält eine E-Mail, um ein Passwort zu erstellen und auf die Daten seines Teams zuzugreifen.",
+          "Aktivieren Sie „Kann auf Aufgebote antworten (Spieler)“, damit es selbst antworten darf — andernfalls können nur die Eltern auf Aufgebote antworten."
         ]
       },
       {

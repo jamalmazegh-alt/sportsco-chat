@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Donner le consentement et l'accès à votre enfant",
-        "b": "En tant que parent, vous reliez votre enfant à votre compte et autorisez son accès. Vous gardez le contrôle.",
+        "t": "Gérer l'accès de votre enfant",
+        "b": "Consultez les informations de votre enfant et, si vous le souhaitez, donnez-lui accès à son propre espace joueur. Vous gardez le contrôle.",
         "steps": [
-          "Ouvrez la section « Ma famille » ou la demande de consentement envoyée par le club.",
-          "Sélectionnez le profil de votre enfant proposé par le club.",
-          "Vérifiez ses informations (nom, date de naissance, équipe).",
-          "Lisez et acceptez le consentement parental requis pour un mineur.",
-          "L'accès de votre enfant est activé — il peut, si besoin, créer son propre identifiant."
+          "Recevez l'email vous informant que votre enfant a été rattaché à votre compte.",
+          "Ouvrez l'onglet « Équipes » et sélectionnez votre enfant en haut de la liste.",
+          "Consultez ses informations : nom, prénom et poste.",
+          "Faites défiler pour voir son numéro de licence, son téléphone et son email.",
+          "Vérifiez l'autorisation d'accès à la plateforme et les données des parents.",
+          "Activez l'accès de votre enfant à la plateforme avec le bouton (toggle).",
+          "Envoyez l'invitation au joueur : votre enfant doit avoir sa propre adresse email. Il recevra un email pour créer son mot de passe et accéder aux données de son équipe.",
+          "Cochez « Peut répondre aux convocations (Joueur) » pour l'autoriser à répondre lui-même — sinon, seuls les parents peuvent répondre aux convocations."
         ]
       },
       {

@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Dare il consenso e l'accesso a tuo figlio",
-        "b": "Come genitore, colleghi tuo figlio al tuo account e autorizzi il suo accesso. Mantieni il controllo.",
+        "t": "Gestire l'accesso di tuo figlio",
+        "b": "Consulta le informazioni di tuo figlio e, se vuoi, dagli accesso al suo spazio giocatore. Mantieni il controllo.",
         "steps": [
-          "Apri la sezione «La mia famiglia» o la richiesta di consenso inviata dal club.",
-          "Seleziona il profilo di tuo figlio proposto dal club.",
-          "Verifica i dati (nome, data di nascita, squadra).",
-          "Leggi e accetta il consenso dei genitori richiesto per un minore.",
-          "L'accesso di tuo figlio è attivato — se necessario, può creare le proprie credenziali."
+          "Ricevi l'email che ti informa che tuo figlio è stato collegato al tuo account.",
+          "Apri la scheda «Squadre» e seleziona tuo figlio in cima all'elenco.",
+          "Consulta le sue informazioni: nome, cognome e ruolo.",
+          "Scorri per vedere il numero di tessera, il telefono e l'email.",
+          "Verifica l'autorizzazione di accesso alla piattaforma e i dati dei genitori.",
+          "Attiva l'accesso di tuo figlio alla piattaforma con l'interruttore (toggle).",
+          "Invia l'invito al giocatore: tuo figlio deve avere un proprio indirizzo email. Riceverà un'email per creare una password e accedere ai dati della sua squadra.",
+          "Spunta «Può rispondere alle convocazioni (Giocatore)» per permettergli di rispondere da solo — altrimenti, solo i genitori possono rispondere alle convocazioni."
         ]
       },
       {

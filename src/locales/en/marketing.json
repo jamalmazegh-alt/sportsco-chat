@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Give consent and access for your child",
-        "b": "As a parent, you link your child to your account and authorise their access. You stay in control.",
+        "t": "Manage your child's access",
+        "b": "Review your child's information and, if you wish, give them access to their own player space. You stay in control.",
         "steps": [
-          "Open the \"My family\" section or the consent request sent by the club.",
-          "Select your child's profile proposed by the club.",
-          "Check their details (name, date of birth, team).",
-          "Read and accept the parental consent required for a minor.",
-          "Your child's access is activated — they can create their own login if needed."
+          "Receive the email letting you know your child has been linked to your account.",
+          "Open the \"Teams\" tab and select your child at the top of the list.",
+          "Review their information: first name, last name and position.",
+          "Scroll down to see their licence number, phone and email.",
+          "Check the platform access permission and the parents' details.",
+          "Turn on your child's platform access with the toggle.",
+          "Send the invitation to the player: your child needs their own email address. They'll get an email to create a password and access their team's data.",
+          "Tick \"Can respond to call-ups (Player)\" to let them respond themselves — otherwise, only parents can respond to call-ups."
         ]
       },
       {

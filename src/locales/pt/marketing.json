@@ -1315,14 +1315,17 @@
         ]
       },
       {
-        "t": "Dar o consentimento e o acesso ao seu filho",
-        "b": "Enquanto pai ou mãe, associa o seu filho à sua conta e autoriza o seu acesso. Mantém o controlo.",
+        "t": "Gerir o acesso do seu filho",
+        "b": "Consulte as informações do seu filho e, se quiser, dê-lhe acesso ao seu próprio espaço de jogador. Mantém o controlo.",
         "steps": [
-          "Abra a secção «A minha família» ou o pedido de consentimento enviado pelo clube.",
-          "Selecione o perfil do seu filho proposto pelo clube.",
-          "Verifique os dados (nome, data de nascimento, equipa).",
-          "Leia e aceite o consentimento parental exigido para um menor.",
-          "O acesso do seu filho é ativado — ele pode criar o seu próprio início de sessão se precisar."
+          "Receba o email a informar que o seu filho foi associado à sua conta.",
+          "Abra o separador «Equipas» e selecione o seu filho no topo da lista.",
+          "Consulte as suas informações: nome, apelido e posição.",
+          "Desça para ver o número de licença, telefone e email.",
+          "Verifique a autorização de acesso à plataforma e os dados dos pais.",
+          "Ative o acesso do seu filho à plataforma com o botão (toggle).",
+          "Envie o convite ao jogador: o seu filho precisa de um email próprio. Receberá um email para criar uma palavra-passe e aceder aos dados da sua equipa.",
+          "Marque «Pode responder às convocatórias (Jogador)» para o autorizar a responder — caso contrário, só os pais podem responder às convocatórias."
         ]
       },
       {
