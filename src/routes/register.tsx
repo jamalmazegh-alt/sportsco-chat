@@ -66,6 +66,8 @@ function RegisterPage() {
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
   const confirmInvitedEmail = useServerFn(confirmInvitedUserEmail);
+  const createAccount = useServerFn(createInvitedAccount);
+
 
   useEffect(() => {
     if (!hasInvite) return;
