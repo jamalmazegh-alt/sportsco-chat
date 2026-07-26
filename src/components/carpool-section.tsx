@@ -512,12 +512,15 @@ function OfferDialog({
             <label className="text-xs font-medium">{t("carpool.seats")}</label>
             <input
               type="number"
+              inputMode="numeric"
               min={1}
               max={8}
-              value={seats}
-              onChange={(e) => setSeats(Math.min(8, Math.max(1, Number(e.target.value) || 1)))}
+              value={seatsInput}
+              onChange={(e) => setSeatsInput(e.target.value.replace(/[^0-9]/g, ""))}
+              onBlur={() => setSeatsInput(String(Math.min(8, Math.max(1, Number(seatsInput) || 1))))}
               className="mt-1 w-full rounded-lg border border-border px-3 py-2"
             />
+
           </div>
           <Textarea
             placeholder={t("carpool.note")}
