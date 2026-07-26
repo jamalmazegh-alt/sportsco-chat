@@ -1787,6 +1787,11 @@
     "adminVenues": {
       "title": "Locais e campos – Clubero",
       "description": "Configure locais e campos do seu clube."
+    },
+    "parentGuide": {
+      "title": "Guia para pais — começar com o Clubero",
+      "description": "Tutoriais passo a passo para pais: responder a uma convocatória, declarar uma ausência, dar o consentimento, configurar as notificações e acompanhar o calendário familiar.",
+      "ogDescription": "Convocatórias, ausências, notificações: o guia para pais para começar com o Clubero."
     }
   },
   "trial": {
@@ -2441,7 +2446,13 @@
     "iosStep3After": "para expandir a lista",
     "iosStep4Before": "Escolha",
     "iosStep4Icon": "Adicionar ao ecrã principal",
-    "iosStep4After": "e toque em «Adicionar»"
+    "iosStep4After": "e toque em «Adicionar»",
+    "androidStepsTitle": "No Android (Chrome)",
+    "androidStepsSubtitle": "3 passos para instalar o Clubero",
+    "androidStep1": "Abra o menu ⋮ no canto superior direito do Chrome.",
+    "androidStep2": "Escolha «Instalar aplicação» (ou «Adicionar ao ecrã principal»).",
+    "androidStep3": "Confirme: o ícone do Clubero aparece no seu ecrã inicial.",
+    "ctaHint": "No Android, este botão instala o Clubero diretamente. No iPhone, siga os passos do Safari abaixo."
   },
   "person": {
     "playerSubline": "Jogador · {{category}}",

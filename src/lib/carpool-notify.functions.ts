@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Database } from "@/integrations/supabase/types";
 
 const InputSchema = z.object({ needId: z.string().uuid() });
 
@@ -14,6 +16,26 @@ const resolveLocale = (...c: Array<string | null | undefined>) => {
   return "fr";
 };
 
+async function assertCanManageCarpoolNeed(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  needId: string,
+) {
+  // Resolve the client-provided id through the authenticated, RLS-scoped client
+  // before any service-role query. The explicit owner filter prevents a caller
+  // from using another member's visible need to trigger duplicate emails.
+  const { data: need, error } = await supabase
+    .from("carpool_needs")
+    .select("id, event_id, parent_user_id, player_ids, note")
+    .eq("id", needId)
+    .eq("parent_user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!need) throw new Error("Forbidden");
+  return need;
+}
+
 /**
  * Notify a team's staff (coaches / assistant coaches / admins) by email that a
  * parent or player declared a carpool need for an event.
@@ -23,16 +45,8 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { userId } = context;
-
-    const { data: need } = await supabaseAdmin
-      .from("carpool_needs")
-      .select("id, event_id, parent_user_id, player_ids, note")
-      .eq("id", data.needId)
-      .maybeSingle();
-    if (!need) return { sent: 0 };
-    // Only the author may trigger the notification for their own need.
-    if (need.parent_user_id !== userId) throw new Error("Forbidden");
+    const { supabase, userId } = context;
+    const need = await assertCanManageCarpoolNeed(supabase, userId, data.needId);
 
     const { data: ev } = await supabaseAdmin
       .from("events")

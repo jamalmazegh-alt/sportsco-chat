@@ -1787,6 +1787,11 @@
     "adminVenues": {
       "title": "Lieux et terrains – Clubero",
       "description": "Configurez les sites et terrains de votre club."
+    },
+    "parentGuide": {
+      "title": "Guide des parents — bien démarrer sur Clubero",
+      "description": "Tutos pas à pas pour les parents : répondre à une convocation, déclarer une absence, donner son consentement, régler les notifications et suivre le calendrier familial.",
+      "ogDescription": "Convocations, absences, notifications : le guide des parents pour bien démarrer sur Clubero."
     }
   },
   "trial": {
@@ -2441,7 +2446,13 @@
     "iosStep3After": "pour dérouler la liste",
     "iosStep4Before": "Choisissez",
     "iosStep4Icon": "Sur l'écran d'accueil",
-    "iosStep4After": "puis appuyez sur « Ajouter »"
+    "iosStep4After": "puis appuyez sur « Ajouter »",
+    "androidStepsTitle": "Sur Android (Chrome)",
+    "androidStepsSubtitle": "3 étapes pour installer Clubero",
+    "androidStep1": "Ouvrez le menu ⋮ en haut à droite de Chrome.",
+    "androidStep2": "Choisissez « Installer l'application » (ou « Ajouter à l'écran d'accueil »).",
+    "androidStep3": "Confirmez : l'icône Clubero apparaît sur votre écran d'accueil.",
+    "ctaHint": "Sur Android, ce bouton lance directement l'installation. Sur iPhone, suivez les étapes Safari ci-dessous."
   },
   "person": {
     "playerSubline": "Joueur · {{category}}",

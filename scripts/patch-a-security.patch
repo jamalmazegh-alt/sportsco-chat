@@ -1,0 +1,916 @@
+diff --git a/src/lib/safe-login-redirect.ts b/src/lib/safe-login-redirect.ts
+new file mode 100644
+index 00000000..5c27de00
+--- /dev/null
++++ b/src/lib/safe-login-redirect.ts
+@@ -0,0 +1,53 @@
++/**
++ * Validates a post-auth relative redirect (`next` search param).
++ * Rejects open redirects; returns a same-origin path or undefined.
++ */
++export function resolveSafeLoginRedirect(
++  raw: string | undefined | null,
++  origin: string,
++): string | undefined {
++  if (raw == null || raw === "") return undefined;
++
++  let decoded = raw;
++  try {
++    decoded = decodeURIComponent(raw);
++  } catch {
++    return undefined;
++  }
++
++  // Strip leading whitespace / control characters (e.g. " //evil.com").
++  decoded = decoded.replace(/^[\s\u0000-\u001f\u007f]+/, "");
++
++  if (!decoded.startsWith("/")) return undefined;
++  if (decoded.startsWith("//")) return undefined;
++  if (decoded.includes("\\")) return undefined;
++
++  // Reject absolute schemes (https:, javascript:, data:, etc.).
++  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(decoded)) return undefined;
++
++  let parsed: URL;
++  let base: URL;
++  try {
++    parsed = new URL(decoded, origin);
++    base = new URL(origin);
++  } catch {
++    return undefined;
++  }
++
++  if (parsed.origin !== base.origin) return undefined;
++
++  const path = parsed.pathname;
++  if (!path.startsWith("/") || path.startsWith("//")) return undefined;
++
++  return `${parsed.pathname}${parsed.search}${parsed.hash}`;
++}
++
++/** Canonical origin used when validating `next` during SSR (pathname-only redirects). */
++export function loginRedirectOrigin(): string {
++  return process.env.APP_URL || "https://app.clubero.app";
++}
++
++export function parseLoginNextSearchParam(raw: unknown): string | undefined {
++  if (typeof raw !== "string") return undefined;
++  return resolveSafeLoginRedirect(raw, loginRedirectOrigin());
++}
+diff --git a/src/lib/safe-remote-asset.server.ts b/src/lib/safe-remote-asset.server.ts
+new file mode 100644
+index 00000000..cefd5f34
+--- /dev/null
++++ b/src/lib/safe-remote-asset.server.ts
+@@ -0,0 +1,210 @@
++import { createLogger } from "@/lib/logger.server";
++import { supabaseAdmin } from "@/integrations/supabase/client.server";
++
++const log = createLogger("safe-remote-asset");
++
++const STORAGE_MARKERS = [
++  { marker: "/club-logos/", bucket: "club-logos" },
++  { marker: "/attachments/", bucket: "attachments" },
++  { marker: "/tournament-documents/", bucket: "tournament-documents" },
++] as const;
++
++const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
++const DEFAULT_MAX_BYTES = 6 * 1024 * 1024;
++
++export function extractPublicStoragePath(url: string, bucket: string): string | null {
++  const marker = `/${bucket}/`;
++  const idx = url.indexOf(marker);
++  if (idx < 0) return null;
++  const path = url.slice(idx + marker.length).split("?")[0]?.split("#")[0];
++  if (!path || path.includes("..")) return null;
++  return path;
++}
++
++export async function downloadPublicStorageObject(
++  bucket: string,
++  path: string,
++): Promise<ArrayBuffer | null> {
++  const { data, error } = await supabaseAdmin.storage.from(bucket).download(path);
++  if (error || !data) {
++    log.warn("storage_download_failed", { bucket, path, err: error?.message });
++    return null;
++  }
++  return data.arrayBuffer();
++}
++
++function isPrivateIpv4(host: string): boolean {
++  const parts = host.split(".").map((p) => Number(p));
++  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) {
++    return false;
++  }
++  const [a, b] = parts;
++  if (a === 0) return true;
++  if (a === 10) return true;
++  if (a === 127) return true;
++  if (a === 169 && b === 254) return true;
++  if (a === 172 && b >= 16 && b <= 31) return true;
++  if (a === 192 && b === 168) return true;
++  if (a === 100 && b === 100) return true;
++  return false;
++}
++
++export function isBlockedFetchHostname(hostname: string): boolean {
++  const h = hostname.toLowerCase().replace(/^\[|\]$/g, "");
++  if (!h) return true;
++  if (h === "localhost" || h.endsWith(".localhost")) return true;
++  if (h === "metadata.google.internal" || h.endsWith(".internal")) return true;
++  if (h === "0.0.0.0" || h === "::" || h === "::1") return true;
++  if (h === "169.254.169.254" || h === "100.100.100.200") return true;
++  if (h.startsWith("fe80:") || h.startsWith("fc") || h.startsWith("fd")) return true;
++  if (isPrivateIpv4(h)) return true;
++  return false;
++}
++
++export function isSafeHttpsUrl(url: string): boolean {
++  try {
++    const u = new URL(url);
++    return u.protocol === "https:";
++  } catch {
++    return false;
++  }
++}
++
++function validateFetchUrl(url: string): URL | null {
++  if (!isSafeHttpsUrl(url)) return null;
++  const parsed = new URL(url);
++  if (isBlockedFetchHostname(parsed.hostname)) return null;
++  return parsed;
++}
++
++async function readResponseBytes(
++  res: Response,
++  maxBytes: number,
++): Promise<ArrayBuffer | null> {
++  const len = res.headers.get("content-length");
++  if (len && Number(len) > maxBytes) return null;
++  const buf = await res.arrayBuffer();
++  if (buf.byteLength > maxBytes) return null;
++  return buf;
++}
++
++/**
++ * HTTPS fetch with redirect:manual, destination re-validation, timeout and size cap.
++ * DNS rebinding between validation and fetch is a residual risk on shared infra.
++ */
++export async function fetchBytesSsrfSafe(
++  url: string,
++  opts: {
++    maxBytes?: number;
++    timeoutMs?: number;
++    allowedContentTypePrefixes?: string[];
++  } = {},
++): Promise<ArrayBuffer | null> {
++  const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
++  const timeoutMs = opts.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
++
++  let current = validateFetchUrl(url);
++  if (!current) {
++    log.warn("fetch_rejected_url", { reason: "invalid_or_blocked", url });
++    return null;
++  }
++
++  for (let hop = 0; hop < 5; hop++) {
++    const controller = new AbortController();
++    const timer = setTimeout(() => controller.abort(), timeoutMs);
++    try {
++      const res = await fetch(current.toString(), {
++        redirect: "manual",
++        signal: controller.signal,
++      });
++
++      if (res.status >= 300 && res.status < 400) {
++        const location = res.headers.get("location");
++        if (!location) {
++          log.warn("fetch_rejected_redirect", { url: current.toString(), reason: "no_location" });
++          return null;
++        }
++        const next = validateFetchUrl(new URL(location, current).toString());
++        if (!next) {
++          log.warn("fetch_rejected_redirect", { url: current.toString(), location });
++          return null;
++        }
++        current = next;
++        continue;
++      }
++
++      if (!res.ok) return null;
++
++      if (opts.allowedContentTypePrefixes?.length) {
++        const ct = (res.headers.get("content-type") ?? "").toLowerCase();
++        const ok = opts.allowedContentTypePrefixes.some((p) => ct.startsWith(p));
++        if (!ok) {
++          log.warn("fetch_rejected_content_type", { url: current.toString(), contentType: ct });
++          return null;
++        }
++      }
++
++      return await readResponseBytes(res, maxBytes);
++    } catch (err) {
++      log.warn("fetch_failed", {
++        url: current.toString(),
++        err: err instanceof Error ? err.message : String(err),
++      });
++      return null;
++    } finally {
++      clearTimeout(timer);
++    }
++  }
++
++  log.warn("fetch_rejected_redirect", { url, reason: "too_many_hops" });
++  return null;
++}
++
++function detectImageKind(bytes: ArrayBuffer, url: string): "png" | "jpg" | null {
++  const head = new Uint8Array(bytes.slice(0, 4));
++  if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47) return "png";
++  if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return "jpg";
++  const lower = url.toLowerCase();
++  if (lower.endsWith(".png")) return "png";
++  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "jpg";
++  return null;
++}
++
++export async function fetchImageBytes(
++  url: string,
++): Promise<{ bytes: ArrayBuffer; kind: "png" | "jpg" } | null> {
++  for (const { marker, bucket } of STORAGE_MARKERS) {
++    if (!url.includes(marker)) continue;
++    const path = extractPublicStoragePath(url, bucket);
++    if (!path) continue;
++    const bytes = await downloadPublicStorageObject(bucket, path);
++    if (!bytes) continue;
++    const kind = detectImageKind(bytes, url);
++    if (kind) return { bytes, kind };
++  }
++
++  const bytes = await fetchBytesSsrfSafe(url, {
++    allowedContentTypePrefixes: ["image/png", "image/jpeg", "image/jpg", "image/webp"],
++    maxBytes: 5 * 1024 * 1024,
++  });
++  if (!bytes) return null;
++  const kind = detectImageKind(bytes, url);
++  if (!kind) return null;
++  return { bytes, kind };
++}
++
++export async function fetchUploadedRegulationsPdf(
++  uploadedUrl: string,
++  tournamentId: string,
++): Promise<ArrayBuffer | null> {
++  const path = extractPublicStoragePath(uploadedUrl, "tournament-documents");
++  if (path?.startsWith(`${tournamentId}/`)) {
++    const bytes = await downloadPublicStorageObject("tournament-documents", path);
++    if (bytes) return bytes;
++  }
++
++  return fetchBytesSsrfSafe(uploadedUrl, {
++    allowedContentTypePrefixes: ["application/pdf"],
++    maxBytes: 12 * 1024 * 1024,
++  });
++}
+diff --git a/src/modules/tournaments/lib/public-tournament.ts b/src/modules/tournaments/lib/public-tournament.ts
+new file mode 100644
+index 00000000..1f6bea33
+--- /dev/null
++++ b/src/modules/tournaments/lib/public-tournament.ts
+@@ -0,0 +1,14 @@
++import type { Database } from "@/integrations/supabase/types";
++
++/** Statuses exposed on the public tournament page (`getPublicTournament`). */
++export const PUBLIC_TOURNAMENT_STATUSES = [
++  "published",
++  "in_progress",
++  "completed",
++] as const satisfies readonly Database["public"]["Enums"]["tournament_status"][];
++
++export type PublicTournamentStatus = (typeof PUBLIC_TOURNAMENT_STATUSES)[number];
++
++export function isPublicTournamentStatus(status: string): status is PublicTournamentStatus {
++  return (PUBLIC_TOURNAMENT_STATUSES as readonly string[]).includes(status);
++}
+diff --git a/src/modules/tournaments/tournaments-public.functions.ts b/src/modules/tournaments/tournaments-public.functions.ts
+index 175fa2c6..75eb218d 100644
+--- a/src/modules/tournaments/tournaments-public.functions.ts
++++ b/src/modules/tournaments/tournaments-public.functions.ts
+@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
+ import { z } from "zod";
+ 
+ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
++import { PUBLIC_TOURNAMENT_STATUSES } from "@/modules/tournaments/lib/public-tournament";
+ 
+ export const getPublicTournament = createServerFn({ method: "POST" })
+   .inputValidator((input: unknown) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+@@ -13,7 +14,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
+         "id, name, slug, sport, custom_sport_name, category, starts_on, ends_on, location, format, status, cover_image_url, num_teams, settings, published_programme_at, registration_fee, registration_currency, field_streams",
+       )
+       .eq("slug", data.slug)
+-      .in("status", ["published", "in_progress", "completed"])
++      .in("status", [...PUBLIC_TOURNAMENT_STATUSES])
+       .maybeSingle();
+     if (!t) return null;
+ 
+diff --git a/src/modules/tournaments/tournaments.functions.ts b/src/modules/tournaments/tournaments.functions.ts
+index 2278aed7..1e8ad076 100644
+--- a/src/modules/tournaments/tournaments.functions.ts
++++ b/src/modules/tournaments/tournaments.functions.ts
+@@ -1186,6 +1186,7 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
+   });
+ 
+ // ---------- Public (anonymous) read by slug — uses admin client scoped by slug
++// TODO: dedupe with tournaments-public.functions.ts + PUBLIC_TOURNAMENT_STATUSES
+ 
+ export const getPublicTournament = createServerFn({ method: "POST" })
+   .inputValidator((input: { slug: string }) =>
+diff --git a/src/routes/api/public/tournament.$id.regulations.ts b/src/routes/api/public/tournament.$id.regulations.ts
+index 1b65e4b5..15d267cc 100644
+--- a/src/routes/api/public/tournament.$id.regulations.ts
++++ b/src/routes/api/public/tournament.$id.regulations.ts
+@@ -7,9 +7,24 @@ import {
+   type PDFImage,
+   type PDFPage,
+ } from "pdf-lib";
++import { createLogger } from "@/lib/logger.server";
++import {
++  fetchImageBytes,
++  fetchUploadedRegulationsPdf,
++} from "@/lib/safe-remote-asset.server";
+ import { supabaseAdmin } from "@/integrations/supabase/client.server";
+ import { sportAllowsDraw } from "@/lib/sports";
+ import { mergeRules } from "@/modules/tournaments/lib/rules";
++import { PUBLIC_TOURNAMENT_STATUSES } from "@/modules/tournaments/lib/public-tournament";
++
++const log = createLogger("regulations");
++
++const REGULATIONS_TOURNAMENT_SELECT =
++  "id, name, slug, sport, category, starts_on, ends_on, location, format, num_teams, points_win, points_draw, points_loss, tiebreakers, settings, club_id, cover_image_url, status" as const;
++
++function notFoundResponse(): Response {
++  return new Response(null, { status: 404 });
++}
+ 
+ // ── Constantes mise en page (A4 portrait, marges en pt — 1mm ≈ 2.83465pt) ──
+ const PAGE_W = 595.28;
+@@ -40,22 +55,27 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
+ 
+         const { data: t, error } = await supabaseAdmin
+           .from("tournaments")
+-          .select("*")
++          .select(REGULATIONS_TOURNAMENT_SELECT)
+           .eq("id", params.id)
++          .in("status", [...PUBLIC_TOURNAMENT_STATUSES])
+           .maybeSingle();
+ 
+         if (error) return new Response(error.message, { status: 500 });
+-        if (!t) return new Response("Tournament not found", { status: 404 });
++        if (!t) return notFoundResponse();
+ 
+         const rules = mergeRules(t.settings);
+ 
+         // Mode "uploaded" — stream the organizer-provided PDF instead of generating one.
+         if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
+-          const upstream = await fetch(rules.regulations.uploadedUrl);
+-          if (!upstream.ok) {
++          const pdfBytes = await fetchUploadedRegulationsPdf(
++            rules.regulations.uploadedUrl,
++            t.id,
++          );
++          if (!pdfBytes) {
++            log.warn("uploaded_regulations_unavailable", { tournamentId: t.id });
+             return new Response("Uploaded regulations not available", { status: 502 });
+           }
+-          return new Response(upstream.body, {
++          return new Response(pdfBytes, {
+             status: 200,
+             headers: {
+               "Content-Type": "application/pdf",
+@@ -83,10 +103,10 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
+             .select("logo_url")
+             .eq("id", t.club_id)
+             .maybeSingle();
+-          if (club?.logo_url) clubLogo = await fetchImage(club.logo_url);
++          if (club?.logo_url) clubLogo = await fetchImageBytes(club.logo_url);
+         }
+         if (t.cover_image_url) {
+-          tournamentLogo = await fetchImage(t.cover_image_url);
++          tournamentLogo = await fetchImageBytes(t.cover_image_url);
+         }
+ 
+         const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes, clubLogo, tournamentLogo);
+@@ -718,27 +738,7 @@ function formatShortDate(d: Date, lang: Lang): string {
+ export async function fetchImage(
+   url: string,
+ ): Promise<{ bytes: ArrayBuffer; kind: "png" | "jpg" } | null> {
+-  try {
+-    const res = await fetch(url);
+-    if (!res.ok) return null;
+-    const ct = (res.headers.get("content-type") ?? "").toLowerCase();
+-    const bytes = await res.arrayBuffer();
+-    if (ct.includes("png") || url.toLowerCase().endsWith(".png")) return { bytes, kind: "png" };
+-    if (
+-      ct.includes("jpeg") ||
+-      ct.includes("jpg") ||
+-      url.toLowerCase().endsWith(".jpg") ||
+-      url.toLowerCase().endsWith(".jpeg")
+-    )
+-      return { bytes, kind: "jpg" };
+-    const head = new Uint8Array(bytes.slice(0, 4));
+-    if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47)
+-      return { bytes, kind: "png" };
+-    if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return { bytes, kind: "jpg" };
+-    return null;
+-  } catch {
+-    return null;
+-  }
++  return fetchImageBytes(url);
+ }
+ 
+ async function embedImage(
+diff --git a/src/routes/login.tsx b/src/routes/login.tsx
+index d6997733..34895390 100644
+--- a/src/routes/login.tsx
++++ b/src/routes/login.tsx
+@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
+ import { toast } from "sonner";
+ import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
++import { parseLoginNextSearchParam, resolveSafeLoginRedirect } from "@/lib/safe-login-redirect";
+ 
+ export const Route = createFileRoute("/login")({
+   validateSearch: (search: Record<string, unknown>) => ({
+     invite: typeof search.invite === "string" ? search.invite : undefined,
+-    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
++    next: parseLoginNextSearchParam(search.next),
+   }),
+   component: LoginPage,
+   head: () => ({
+@@ -54,7 +55,9 @@ function LoginPage() {
+       }
+     }
+     if (typeof window !== "undefined") {
+-      window.location.replace(search.next ?? "/home");
++      const next =
++        resolveSafeLoginRedirect(search.next, window.location.origin) ?? "/home";
++      window.location.replace(next);
+     }
+   }
+ 
+diff --git a/src/routes/register.tsx b/src/routes/register.tsx
+index 844cfd16..1059beb7 100644
+--- a/src/routes/register.tsx
++++ b/src/routes/register.tsx
+@@ -18,6 +18,7 @@ import { localizeAuthError } from "@/lib/auth-errors";
+ import { toast } from "sonner";
+ import { AlertCircle, Loader2 } from "lucide-react";
+ import logo from "@/assets/clubero-logo.png";
++import { parseLoginNextSearchParam, resolveSafeLoginRedirect } from "@/lib/safe-login-redirect";
+ 
+ type SignupRole = "club_admin" | "player" | "parent";
+ 
+@@ -25,7 +26,7 @@ export const Route = createFileRoute("/register")({
+   validateSearch: (search: Record<string, unknown>) => ({
+     invite: typeof search.invite === "string" ? search.invite : undefined,
+     email: typeof search.email === "string" ? search.email : undefined,
+-    next: typeof search.next === "string" && search.next.startsWith("/") ? search.next : undefined,
++    next: parseLoginNextSearchParam(search.next),
+   }),
+   component: RegisterPage,
+   head: () => ({
+@@ -48,7 +49,10 @@ function RegisterPage() {
+   const [signupRole, setSignupRole] = useState<SignupRole>(search.invite ? "player" : "club_admin");
+   const inviteToken = search.invite ?? "";
+   const hasInvite = inviteToken.length > 0;
+-  const nextPath = search.next ?? "/home";
++  const nextPath =
++    (typeof window !== "undefined"
++      ? resolveSafeLoginRedirect(search.next, window.location.origin)
++      : search.next) ?? "/home";
+   const emailLockedByQuery = !!search.email && !hasInvite;
+   // Member invite kind ("player" | "parent" | "member") if the token belongs to member_invites.
+   // Null while loading; "club" means token isn't found in member_invites and we'll fall back to club_invites.
+diff --git a/src/tests/unit/regulations-route.test.ts b/src/tests/unit/regulations-route.test.ts
+new file mode 100644
+index 00000000..d768cf13
+--- /dev/null
++++ b/src/tests/unit/regulations-route.test.ts
+@@ -0,0 +1,202 @@
++import { describe, it, expect, vi, beforeEach } from "vitest";
++import { PUBLIC_TOURNAMENT_STATUSES } from "@/modules/tournaments/lib/public-tournament";
++
++const tournamentRow = vi.hoisted(() => ({
++  value: null as Record<string, unknown> | null,
++}));
++
++const lastSelect = vi.hoisted(() => ({ value: "" }));
++
++const clubsRow = vi.hoisted(() => ({
++  value: null as { logo_url: string | null } | null,
++}));
++
++const downloadMock = vi.hoisted(() => vi.fn());
++const storageFromMock = vi.hoisted(() => vi.fn(() => ({ download: downloadMock })));
++
++vi.mock("@/integrations/supabase/client.server", () => {
++  const from = (table: string) => {
++    if (table === "tournaments") {
++      return {
++        select: (cols: string) => {
++          lastSelect.value = cols;
++          return {
++            eq: () => ({
++              in: (_col: string, statuses: string[]) => ({
++                maybeSingle: async () => {
++                  const row = tournamentRow.value;
++                  if (!row) return { data: null, error: null };
++                  if (!statuses.includes(String(row.status))) return { data: null, error: null };
++                  return { data: row, error: null };
++                },
++              }),
++            }),
++          };
++        },
++      };
++    }
++    if (table === "clubs") {
++      return {
++        select: () => ({
++          eq: () => ({
++            maybeSingle: async () => ({ data: clubsRow.value, error: null }),
++          }),
++        }),
++      };
++    }
++    throw new Error(`unexpected table ${table}`);
++  };
++  return {
++    supabaseAdmin: {
++      from,
++      storage: { from: (...args: unknown[]) => storageFromMock(...args) },
++    },
++  };
++});
++
++const fetchUploadedRegulationsPdfMock = vi.hoisted(() => vi.fn());
++const fetchImageBytesMock = vi.hoisted(() => vi.fn());
++
++vi.mock("@/lib/safe-remote-asset.server", async () => {
++  const actual = await vi.importActual<typeof import("@/lib/safe-remote-asset.server")>(
++    "@/lib/safe-remote-asset.server",
++  );
++  return {
++    ...actual,
++    fetchUploadedRegulationsPdf: (...args: unknown[]) =>
++      fetchUploadedRegulationsPdfMock(...args),
++    fetchImageBytes: (...args: unknown[]) => fetchImageBytesMock(...args),
++  };
++});
++
++async function loadHandler() {
++  const mod = await import("@/routes/api/public/tournament.$id.regulations");
++  return (mod.Route as { options: { server: { handlers: { GET: Function } } } }).options.server
++    .handlers.GET;
++}
++
++function makeReq(id: string, lang = "fr"): { request: Request; params: { id: string } } {
++  return {
++    request: new Request(`http://localhost/api/public/tournament/${id}/regulations?lang=${lang}`),
++    params: { id },
++  };
++}
++
++const PUBLIC_ID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
++const DRAFT_ID = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
++const MISSING_ID = "cccccccc-cccc-cccc-cccc-cccccccccccc";
++
++const baseTournament = {
++  id: PUBLIC_ID,
++  name: "Open Cup",
++  slug: "open-cup",
++  sport: "football",
++  category: "U15",
++  starts_on: "2026-08-01",
++  ends_on: null,
++  location: "Paris",
++  format: "group",
++  num_teams: 8,
++  points_win: 3,
++  points_draw: 1,
++  points_loss: 0,
++  tiebreakers: ["points"],
++  settings: {
++    regulations: { mode: "generated", uploadedUrl: null, uploadedName: null, uploadedAt: null },
++    qualification: { perGroup: 2, bestThirds: 0 },
++    fairPlay: { yellow: -1, secondYellow: -3, red: -5 },
++    overtime: { enabled: false },
++    penaltyShootout: { enabled: true },
++    roster: { playersPerTeam: 11, maxSubstitutes: 5 },
++  },
++  club_id: null,
++  cover_image_url: null,
++};
++
++beforeEach(() => {
++  tournamentRow.value = null;
++  lastSelect.value = "";
++  clubsRow.value = null;
++  downloadMock.mockReset();
++  storageFromMock.mockClear();
++  fetchUploadedRegulationsPdfMock.mockReset();
++  fetchImageBytesMock.mockReset();
++  fetchImageBytesMock.mockResolvedValue(null);
++});
++
++describe("GET /api/public/tournament/$id/regulations", () => {
++  for (const status of ["draft", "cancelled"] as const) {
++    it(`returns identical 404 for ${status} tournaments`, async () => {
++      tournamentRow.value = { ...baseTournament, id: DRAFT_ID, status };
++      const handler = await loadHandler();
++      const res = await handler(makeReq(DRAFT_ID));
++      expect(res.status).toBe(404);
++      expect(await res.text()).toBe("");
++    });
++  }
++
++  it("returns identical 404 for unknown tournament id", async () => {
++    tournamentRow.value = null;
++    const handler = await loadHandler();
++    const res = await handler(makeReq(MISSING_ID));
++    expect(res.status).toBe(404);
++    expect(await res.text()).toBe("");
++  });
++
++  it("returns 404 for draft vs missing with identical body (no oracle)", async () => {
++    tournamentRow.value = { ...baseTournament, id: DRAFT_ID, status: "draft" };
++    const handler = await loadHandler();
++    const draftRes = await handler(makeReq(DRAFT_ID));
++    tournamentRow.value = null;
++    const missingRes = await handler(makeReq(MISSING_ID));
++    expect(draftRes.status).toBe(404);
++    expect(missingRes.status).toBe(404);
++    expect(await draftRes.text()).toBe(await missingRes.text());
++  });
++
++  for (const status of PUBLIC_TOURNAMENT_STATUSES) {
++    it(`allows public status ${status} to reach PDF generation`, async () => {
++      tournamentRow.value = { ...baseTournament, status };
++      const handler = await loadHandler();
++      const res = await handler(makeReq(PUBLIC_ID));
++      expect(res.status).toBe(200);
++      expect(res.headers.get("Content-Type")).toBe("application/pdf");
++    });
++  }
++
++  it("streams uploaded regulations via storage helper (no raw uploadedUrl fetch in route)", async () => {
++    const uploadedUrl = `https://x.supabase.co/storage/v1/object/public/tournament-documents/${PUBLIC_ID}/regulations/x.pdf`;
++    tournamentRow.value = {
++      ...baseTournament,
++      status: "published",
++      settings: {
++        ...baseTournament.settings,
++        regulations: {
++          mode: "uploaded",
++          uploadedUrl,
++          uploadedName: "rules.pdf",
++          uploadedAt: new Date().toISOString(),
++        },
++      },
++    };
++    const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46]);
++    fetchUploadedRegulationsPdfMock.mockResolvedValueOnce(pdf.buffer);
++
++    const handler = await loadHandler();
++    const res = await handler(makeReq(PUBLIC_ID));
++
++    expect(res.status).toBe(200);
++    expect(fetchUploadedRegulationsPdfMock).toHaveBeenCalledWith(uploadedUrl, PUBLIC_ID);
++    expect(res.headers.get("Content-Type")).toBe("application/pdf");
++  });
++
++  it("uses explicit select list (no select *)", async () => {
++    tournamentRow.value = { ...baseTournament, status: "published" };
++    const handler = await loadHandler();
++    await handler(makeReq(PUBLIC_ID));
++    expect(lastSelect.value).not.toContain("*");
++    expect(lastSelect.value).toContain("settings");
++    expect(lastSelect.value).not.toContain("created_by");
++    expect(lastSelect.value).not.toContain("stripe");
++  });
++});
+diff --git a/src/tests/unit/safe-login-redirect.test.ts b/src/tests/unit/safe-login-redirect.test.ts
+new file mode 100644
+index 00000000..945af692
+--- /dev/null
++++ b/src/tests/unit/safe-login-redirect.test.ts
+@@ -0,0 +1,67 @@
++import { describe, it, expect } from "vitest";
++import {
++  loginRedirectOrigin,
++  parseLoginNextSearchParam,
++  resolveSafeLoginRedirect,
++} from "@/lib/safe-login-redirect";
++
++const ORIGIN = "https://app.clubero.app";
++
++describe("resolveSafeLoginRedirect", () => {
++  it("accepts safe in-app paths", () => {
++    expect(resolveSafeLoginRedirect("/dashboard", ORIGIN)).toBe("/dashboard");
++    expect(resolveSafeLoginRedirect("/clubs/123/events", ORIGIN)).toBe("/clubs/123/events");
++    expect(resolveSafeLoginRedirect("/home?tab=1#x", ORIGIN)).toBe("/home?tab=1#x");
++  });
++
++  it("rejects protocol-relative and absolute URLs", () => {
++    expect(resolveSafeLoginRedirect("//evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("https://evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("http:evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("javascript:alert(1)", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("data:text/html,hi", ORIGIN)).toBeUndefined();
++  });
++
++  it("rejects backslash and encoded bypass attempts", () => {
++    expect(resolveSafeLoginRedirect("/\\evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("/\\/\\evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("%2F%2Fevil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("%5Cevil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("/%2F%2Fevil.com", ORIGIN)).toBeUndefined();
++  });
++
++  it("rejects leading whitespace before protocol-relative paths", () => {
++    expect(resolveSafeLoginRedirect(" //evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("\t//evil.com", ORIGIN)).toBeUndefined();
++    expect(resolveSafeLoginRedirect("\n//evil.com", ORIGIN)).toBeUndefined();
++  });
++
++  it("parseLoginNextSearchParam uses canonical origin and rejects unsafe values", () => {
++    expect(parseLoginNextSearchParam("/events")).toBe("/events");
++    expect(parseLoginNextSearchParam("//evil.com")).toBeUndefined();
++    expect(loginRedirectOrigin()).toMatch(/^https:\/\//);
++  });
++});
++
++describe("login and register validateSearch parity", () => {
++  const cases: Array<{ raw: string; ok: boolean }> = [
++    { raw: "//evil.com", ok: false },
++    { raw: "/\\evil.com", ok: false },
++    { raw: "%2F%2Fevil.com", ok: false },
++    { raw: "https://evil.com", ok: false },
++    { raw: " //evil.com", ok: false },
++    { raw: "/dashboard", ok: true },
++    { raw: "/clubs/123/events", ok: true },
++  ];
++
++  for (const { raw, ok } of cases) {
++    it(`${ok ? "accepts" : "rejects"} ${JSON.stringify(raw)}`, () => {
++      const parsed = parseLoginNextSearchParam(raw);
++      if (ok) {
++        expect(parsed).toBe(raw.startsWith("/") ? raw : undefined);
++      } else {
++        expect(parsed).toBeUndefined();
++      }
++    });
++  }
++});
+diff --git a/src/tests/unit/safe-remote-asset.test.ts b/src/tests/unit/safe-remote-asset.test.ts
+new file mode 100644
+index 00000000..6cca0837
+--- /dev/null
++++ b/src/tests/unit/safe-remote-asset.test.ts
+@@ -0,0 +1,135 @@
++import { describe, it, expect, vi, beforeEach } from "vitest";
++import {
++  fetchBytesSsrfSafe,
++  fetchImageBytes,
++  fetchUploadedRegulationsPdf,
++  isBlockedFetchHostname,
++  isSafeHttpsUrl,
++} from "@/lib/safe-remote-asset.server";
++
++const downloadMock = vi.fn();
++const storageFromMock = vi.fn(() => ({ download: downloadMock }));
++
++vi.mock("@/integrations/supabase/client.server", () => ({
++  supabaseAdmin: {
++    storage: { from: (...args: unknown[]) => storageFromMock(...args) },
++  },
++}));
++
++const fetchMock = vi.fn();
++vi.stubGlobal("fetch", fetchMock);
++
++beforeEach(() => {
++  downloadMock.mockReset();
++  storageFromMock.mockClear();
++  fetchMock.mockReset();
++});
++
++describe("isBlockedFetchHostname", () => {
++  it("blocks loopback, link-local and metadata hosts", () => {
++    expect(isBlockedFetchHostname("127.0.0.1")).toBe(true);
++    expect(isBlockedFetchHostname("169.254.169.254")).toBe(true);
++    expect(isBlockedFetchHostname("10.0.0.5")).toBe(true);
++    expect(isBlockedFetchHostname("metadata.google.internal")).toBe(true);
++    expect(isBlockedFetchHostname("localhost")).toBe(true);
++  });
++
++  it("allows public hostnames", () => {
++    expect(isBlockedFetchHostname("cdn.example.com")).toBe(false);
++  });
++});
++
++describe("fetchBytesSsrfSafe", () => {
++  it("rejects non-https and internal targets", async () => {
++    expect(await fetchBytesSsrfSafe("http://example.com/x")).toBeNull();
++    expect(await fetchBytesSsrfSafe("https://127.0.0.1/internal")).toBeNull();
++    expect(await fetchBytesSsrfSafe("https://169.254.169.254/latest/meta-data/")).toBeNull();
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it("rejects redirects to internal targets (manual redirect handling)", async () => {
++    fetchMock.mockResolvedValueOnce(
++      new Response(null, {
++        status: 302,
++        headers: { Location: "https://169.254.169.254/secret" },
++      }),
++    );
++
++    const bytes = await fetchBytesSsrfSafe("https://allowed.example.com/start");
++    expect(bytes).toBeNull();
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({ redirect: "manual" });
++  });
++
++  it("rejects non-matching Content-Type", async () => {
++    fetchMock.mockResolvedValueOnce(
++      new Response(new Uint8Array([1, 2, 3]), {
++        status: 200,
++        headers: { "Content-Type": "text/html" },
++      }),
++    );
++
++    const bytes = await fetchBytesSsrfSafe("https://allowed.example.com/doc", {
++      allowedContentTypePrefixes: ["application/pdf"],
++    });
++    expect(bytes).toBeNull();
++  });
++});
++
++describe("fetchImageBytes storage-backed path", () => {
++  it("downloads club logos from storage without HTTP fetch", async () => {
++    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
++    downloadMock.mockResolvedValueOnce({ data: new Blob([png]), error: null });
++
++    const url =
++      "https://project.supabase.co/storage/v1/object/public/club-logos/club-1/logo.png";
++    const result = await fetchImageBytes(url);
++
++    expect(result?.kind).toBe("png");
++    expect(storageFromMock).toHaveBeenCalledWith("club-logos");
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it("falls back to SSRF-safe HTTPS fetch for non-storage URLs", async () => {
++    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
++    fetchMock.mockResolvedValueOnce(
++      new Response(png, {
++        status: 200,
++        headers: { "Content-Type": "image/png" },
++      }),
++    );
++
++    const result = await fetchImageBytes("https://cdn.example.com/logo.png");
++    expect(result?.kind).toBe("png");
++    expect(isSafeHttpsUrl("https://cdn.example.com/logo.png")).toBe(true);
++  });
++});
++
++describe("fetchUploadedRegulationsPdf", () => {
++  it("downloads tournament regulations from storage when path matches tournament", async () => {
++    const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46]);
++    downloadMock.mockResolvedValueOnce({ data: new Blob([pdf]), error: null });
++
++    const tid = "11111111-1111-1111-1111-111111111111";
++    const url = `https://project.supabase.co/storage/v1/object/public/tournament-documents/${tid}/regulations/a.pdf`;
++
++    const bytes = await fetchUploadedRegulationsPdf(url, tid);
++    expect(bytes).not.toBeNull();
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it("rejects storage path for a different tournament id", async () => {
++    fetchMock.mockResolvedValueOnce(
++      new Response(new Uint8Array([0x25, 0x50, 0x44, 0x46]), {
++        status: 200,
++        headers: { "Content-Type": "application/pdf" },
++      }),
++    );
++
++    const url =
++      "https://project.supabase.co/storage/v1/object/public/tournament-documents/other-id/regulations/a.pdf";
++    await fetchUploadedRegulationsPdf(url, "11111111-1111-1111-1111-111111111111");
++    expect(downloadMock).not.toHaveBeenCalled();
++    expect(fetchMock).toHaveBeenCalled();
++  });
++});

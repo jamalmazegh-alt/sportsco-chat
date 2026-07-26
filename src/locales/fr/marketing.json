@@ -8,6 +8,7 @@
     "players": "Joueurs",
     "tournaments": "Tournois",
     "onboarding": "Mise en route",
+    "parentGuide": "Guide parents",
     "pricing": "Tarifs",
     "faq": "FAQ",
     "contact": "Contact",
@@ -15,7 +16,8 @@
     "signup": "Inscrire votre club",
     "demo": "Demander une démo",
     "buildClubero": "Donnez votre avis",
-    "backToSite": "Retour au site"
+    "backToSite": "Retour au site",
+    "install": "Installer l'app"
   },
   "footer": {
     "tagline": "La coordination d'équipe, simplifiée pour les clubs sportifs.",
@@ -1287,6 +1289,140 @@
       "expiredBody": "Votre lien de confirmation email n'est plus valide. Saisissez votre email pour recevoir un nouveau lien.",
       "resendCta": "Renvoyer",
       "resendSent": "Email de confirmation renvoyé. Vérifiez votre boîte de réception."
+    }
+  },
+  "parentGuide": {
+    "kicker": "Guide des parents",
+    "title": "Prenez Clubero en main en quelques minutes.",
+    "subtitle": "Tout ce qu'un parent doit savoir pour suivre son enfant : convocations, absences, notifications et le Mur du club.",
+    "ctaStart": "Voir les tutos",
+    "ctaFaq": "Questions fréquentes",
+    "previewLabel": "Aperçu à venir",
+    "reassure": ["Depuis l'appli mobile", "Notifications au choix", "Données protégées"],
+    "tutorialsTitle": "Les gestes essentiels, pas à pas.",
+    "tutorialsSubtitle": "Sept procédures détaillées, étape par étape et capture à l'appui.",
+    "tutorials": [
+      {
+        "t": "Ouvrir votre compte parent",
+        "b": "Tout commence par l'invitation de votre club. Créez votre accès en quelques minutes.",
+        "steps": [
+          "Ouvrez l'email d'invitation de votre club et appuyez sur « Accepter l'invitation ».",
+          "Renseignez vos nom et prénom, puis créez votre mot de passe (votre email est déjà pré-rempli). Appuyez sur « Créer un compte ».",
+          "Consultez et acceptez les consentements (confidentialité, CGU, notifications, traitement des données), puis « Accepter et continuer ».",
+          "Vous arrivez directement sur l'accueil de votre club — vous êtes connecté(e).",
+          "Ouvrez l'onglet « Profil » : vous y voyez vos infos, la langue et les notifications.",
+          "Complétez vos nom, prénom et numéro de téléphone, puis appuyez sur « Enregistrer »."
+        ]
+      },
+      {
+        "t": "Gérer l'accès de votre enfant",
+        "b": "Consultez les informations de votre enfant et, si vous le souhaitez, donnez-lui accès à son propre espace joueur. Vous gardez le contrôle.",
+        "steps": [
+          "Recevez l'email vous informant que votre enfant a été rattaché à votre compte.",
+          "Ouvrez l'onglet « Équipes » et sélectionnez votre enfant en haut de la liste.",
+          "Consultez ses informations : nom, prénom et poste.",
+          "Faites défiler pour voir son numéro de licence, son téléphone et son email.",
+          "Vérifiez l'autorisation d'accès à la plateforme et les données des parents.",
+          "Activez l'accès de votre enfant à la plateforme avec le bouton (toggle).",
+          "Envoyez l'invitation au joueur : votre enfant doit avoir sa propre adresse email. Il recevra un email pour créer son mot de passe et accéder aux données de son équipe.",
+          "Cochez « Peut répondre aux convocations (Joueur) » pour l'autoriser à répondre lui-même — sinon, seuls les parents peuvent répondre aux convocations."
+        ]
+      },
+      {
+        "t": "Voir les événements et répondre à une convocation",
+        "b": "Recevez les convocations par email, notification ou dans l'app, et répondez pour votre enfant en un clic.",
+        "steps": [
+          "Recevez la convocation par email : validez la présence (Présent / Incertain / Absent) directement depuis l'email.",
+          "Recevez aussi une notification push qui vous renvoie directement dans l'app.",
+          "Après avoir répondu depuis l'email, une page confirme votre choix — vous pouvez le modifier à tout moment.",
+          "Ou répondez en un geste depuis l'accueil de l'app, grâce à la carte « Insights ».",
+          "Ouvrez l'onglet « Événements » pour voir tous les matchs et entraînements.",
+          "Ouvrez le détail de l'événement : infos du match et votre réponse (Présent / Incertain / Absent).",
+          "En cas d'absence ou d'incertitude, ajoutez un motif (prédéfini ou libre) envoyé au coach.",
+          "Échangez dans le chat de l'événement (parents, joueurs, coach) et voyez les joueurs convoqués."
+        ]
+      },
+      {
+        "t": "Paramétrer les notifications",
+        "b": "Activez les notifications push pour recevoir convocations, rappels et messages directement sur votre téléphone.",
+        "steps": [
+          "Dans le menu « Profil », accédez aux notifications pour les activer.",
+          "Appuyez sur « Activer » : une fenêtre s'ouvre — autorisez les notifications.",
+          "Les notifications apparaissent comme « activées » : les push seront désormais envoyées sur ce téléphone."
+        ]
+      },
+      {
+        "t": "Déclarer une absence",
+        "b": "Prévenez le staff à l'avance quand votre enfant ne peut pas venir : le coach est notifié et le planning mis à jour.",
+        "steps": [
+          "Depuis l'accueil de l'app, appuyez sur « Déclarer une absence ».",
+          "Autre accès : ouvrez « Équipes » puis le profil de votre enfant.",
+          "Ouvrez l'écran pour déclarer une absence.",
+          "Sélectionnez la plage de dates concernée.",
+          "Choisissez le motif, ajoutez un commentaire si besoin, puis enregistrez : le coach est notifié et le planning de l'équipe est mis à jour.",
+          "L'absence apparaît dans l'onglet « Disponibilités » du profil de votre enfant.",
+          "Vous pouvez l'annuler via « Annuler » dans la partie historique."
+        ]
+      },
+      {
+        "t": "Organiser le covoiturage",
+        "b": "Pour les matchs et entraînements, réservez une place ou demandez un transport directement depuis l'événement.",
+        "steps": [
+          "Ouvrez un match ou un entraînement où le covoiturage est activé (le coach l'active événement par événement).",
+          "Repérez la carte « Covoiturage » (avec le rappel de responsabilité) : vous y voyez les propositions disponibles.",
+          "Appuyez sur « Réserver une place » sur une proposition pour confirmer votre place.",
+          "Voyez quel joueur est assigné à quelle voiture ; vous pouvez annuler votre réservation et discuter des modalités dans le chat de l'événement.",
+          "Aucun covoiturage disponible ? Appuyez sur « Demander un transport ».",
+          "Confirmez, et ajoutez un commentaire si besoin.",
+          "Votre demande apparaît dans l'événement ; le coach est prévenu par email, ainsi que les autres parents et joueurs."
+        ]
+      },
+      {
+        "t": "Suivre le Mur du club",
+        "b": "Le Mur est le fil d'actualité de votre club : annonces, publications, sondages — et bientôt les réseaux sociaux du club.",
+        "steps": [
+          "Ouvrez l'onglet « Mur » : vous y trouvez les annonces et publications du club et du coach (messages, pièces jointes, sondages — et, d'ici septembre 2026, les publications Instagram/Facebook du club).",
+          "À chaque nouvelle publication, vous recevez une notification push.",
+          "Et, selon le choix du club, éventuellement un email.",
+          "Interagissez avec les publications en postant un message (si les commentaires sont activés).",
+          "Pour un sondage, appuyez sur « Voter », sélectionnez votre réponse et confirmez.",
+          "Votre vote est enregistré : consultez les résultats en direct.",
+          "Vous pouvez changer votre vote à tout moment (sauf si le sondage est anonyme)."
+        ]
+      }
+    ],
+    "faqTitle": "Questions fréquentes des parents",
+    "faq": [
+      {
+        "q": "Dois-je avoir un compte séparé de celui de mon enfant ?",
+        "a": "Oui. Chaque parent a son propre accès, relié au profil de son enfant. Vous gérez les convocations et le consentement depuis votre compte."
+      },
+      {
+        "q": "Mon enfant peut-il avoir son propre compte ?",
+        "a": "Un enfant mineur peut avoir un compte une fois votre consentement parental donné. Vous restez rattaché à son profil."
+      },
+      {
+        "q": "Vais-je recevoir trop de notifications ?",
+        "a": "Non : vous choisissez précisément les canaux (appli, email, WhatsApp) et les rappels dans vos paramètres de notifications."
+      },
+      {
+        "q": "Puis-je gérer plusieurs enfants ?",
+        "a": "Oui. Tous vos enfants apparaissent dans un calendrier familial unique, même s'ils jouent dans des équipes différentes."
+      },
+      {
+        "q": "Le club voit-il mon numéro de téléphone ?",
+        "a": "La communication passe par Clubero — le Mur du club et les notifications. Vous n'avez pas besoin de partager votre numéro personnel."
+      }
+    ],
+    "ctaTitle": "Une question sans réponse ?",
+    "ctaBody": "Notre équipe et votre club sont là pour vous aider à démarrer sereinement.",
+    "ctaPrimary": "Contacter l'équipe",
+    "ctaSecondary": "Se connecter",
+    "download": {
+      "title": "Installez l'app sur votre téléphone",
+      "body": "Clubero s'installe comme une app, directement depuis votre navigateur — pas besoin d'App Store. Retrouvez convocations et notifications sur votre écran d'accueil.",
+      "iosHint": "iPhone / iPad (Safari) : Partager → Sur l'écran d'accueil → Ajouter.",
+      "cta": "Guide d'installation"
     }
   },
   "onboarding": {

@@ -8,6 +8,7 @@
     "players": "Players",
     "tournaments": "Tournaments",
     "onboarding": "Club onboarding",
+    "parentGuide": "Parent guide",
     "pricing": "Pricing",
     "faq": "FAQ",
     "contact": "Contact",
@@ -15,7 +16,8 @@
     "signup": "Register your club",
     "demo": "Request a demo",
     "buildClubero": "Give your feedback",
-    "backToSite": "Back to site"
+    "backToSite": "Back to site",
+    "install": "Install the app"
   },
   "footer": {
     "tagline": "Team coordination, simplified for sports clubs.",
@@ -1287,6 +1289,140 @@
       "expiredBody": "Your email confirmation link is no longer valid. Enter your email to get a new one.",
       "resendCta": "Resend",
       "resendSent": "Confirmation email sent. Check your inbox."
+    }
+  },
+  "parentGuide": {
+    "kicker": "Parent guide",
+    "title": "Get started with Clubero in minutes.",
+    "subtitle": "Everything a parent needs to follow their child: call-ups, absences, notifications and the club wall.",
+    "ctaStart": "See the tutorials",
+    "ctaFaq": "Frequently asked questions",
+    "previewLabel": "Preview coming soon",
+    "reassure": ["From the mobile app", "Notifications your way", "Data protected"],
+    "tutorialsTitle": "The essentials, step by step.",
+    "tutorialsSubtitle": "Seven detailed, step-by-step procedures with a screenshot for each step.",
+    "tutorials": [
+      {
+        "t": "Open your parent account",
+        "b": "It all starts with your club's invitation. Set up your access in a few minutes.",
+        "steps": [
+          "Open your club's invitation email and tap \"Accept invitation\".",
+          "Enter your first and last name, then create your password (your email is already pre-filled). Tap \"Create account\".",
+          "Review and accept the consents (privacy, terms, notifications, data processing), then \"Accept and continue\".",
+          "You land straight on your club's home screen — you're logged in.",
+          "Open the \"Profile\" tab: you'll see your info, language and notifications.",
+          "Fill in your first name, last name and phone number, then tap \"Save\"."
+        ]
+      },
+      {
+        "t": "Manage your child's access",
+        "b": "Review your child's information and, if you wish, give them access to their own player space. You stay in control.",
+        "steps": [
+          "Receive the email letting you know your child has been linked to your account.",
+          "Open the \"Teams\" tab and select your child at the top of the list.",
+          "Review their information: first name, last name and position.",
+          "Scroll down to see their licence number, phone and email.",
+          "Check the platform access permission and the parents' details.",
+          "Turn on your child's platform access with the toggle.",
+          "Send the invitation to the player: your child needs their own email address. They'll get an email to create a password and access their team's data.",
+          "Tick \"Can respond to call-ups (Player)\" to let them respond themselves — otherwise, only parents can respond to call-ups."
+        ]
+      },
+      {
+        "t": "See events and respond to a call-up",
+        "b": "Get call-ups by email, notification or in the app, and respond for your child in one tap.",
+        "steps": [
+          "Receive the call-up by email: confirm attendance (Present / Uncertain / Absent) directly from the email.",
+          "You also get a push notification that takes you straight into the app.",
+          "After responding from the email, a page confirms your choice — you can change it anytime.",
+          "Or respond in one tap from the app home, via the \"Insights\" card.",
+          "Open the \"Events\" tab to see all matches and trainings.",
+          "Open the event details: match info and your response (Present / Uncertain / Absent).",
+          "For an absence or if unsure, add a reason (preset or free text) sent to the coach.",
+          "Chat in the event chat (parents, players, coach) and see the called-up players."
+        ]
+      },
+      {
+        "t": "Set up notifications",
+        "b": "Turn on push notifications to get call-ups, reminders and messages straight on your phone.",
+        "steps": [
+          "In the \"Profile\" menu, open the notifications section to enable them.",
+          "Tap \"Enable\": a window opens — allow notifications.",
+          "Notifications show as enabled: push will now be sent to this phone."
+        ]
+      },
+      {
+        "t": "Report an absence",
+        "b": "Let the staff know ahead of time when your child can't make it: the coach is notified and the schedule is updated.",
+        "steps": [
+          "From the app home, tap \"Report an absence\".",
+          "Another way: open \"Teams\" then your child's profile.",
+          "Open the report-an-absence screen.",
+          "Select the date range concerned.",
+          "Choose the reason, add a comment if needed, then save: the coach is notified and the team schedule is updated.",
+          "The absence appears in the \"Availability\" tab of your child's profile.",
+          "You can cancel it via \"Cancel\" in the history section."
+        ]
+      },
+      {
+        "t": "Organise carpooling",
+        "b": "For matches and trainings, book a seat or request a ride directly from the event.",
+        "steps": [
+          "Open a match or a training where carpooling is enabled (the coach turns it on event by event).",
+          "Find the \"Carpooling\" card (with the responsibility reminder): you'll see the available offers.",
+          "Tap \"Book a seat\" on an offer to confirm your seat.",
+          "See which player is assigned to which car; you can cancel your booking and discuss the details in the event chat.",
+          "No ride available? Tap \"Request a ride\".",
+          "Confirm, and add a comment if needed.",
+          "Your request appears in the event; the coach is notified by email, along with the other parents and players."
+        ]
+      },
+      {
+        "t": "Follow the club wall",
+        "b": "The Wall is your club's news feed: announcements, posts, polls — and soon the club's social media.",
+        "steps": [
+          "Open the \"Wall\" tab: you'll find the club's and coach's announcements and posts (messages, attachments, polls — and, by September 2026, the club's Instagram/Facebook posts).",
+          "Whenever there's a new post, you get a push notification.",
+          "And, depending on the club, possibly an email.",
+          "Interact with posts by leaving a message (if comments are enabled).",
+          "For a poll, tap \"Vote\", select your answer and confirm.",
+          "Your vote is saved: see the live results.",
+          "You can change your vote anytime (unless the poll is anonymous)."
+        ]
+      }
+    ],
+    "faqTitle": "Frequently asked questions from parents",
+    "faq": [
+      {
+        "q": "Do I need an account separate from my child's?",
+        "a": "Yes. Each parent has their own access, linked to their child's profile. You manage call-ups and consent from your account."
+      },
+      {
+        "q": "Can my child have their own account?",
+        "a": "A minor child can have an account once you've given parental consent. You stay linked to their profile."
+      },
+      {
+        "q": "Will I get too many notifications?",
+        "a": "No: you choose exactly which channels (app, email, WhatsApp) and reminders you receive in your notification settings."
+      },
+      {
+        "q": "Can I manage several children?",
+        "a": "Yes. All your children appear in a single family calendar, even if they play in different teams."
+      },
+      {
+        "q": "Can the club see my phone number?",
+        "a": "Communication goes through Clubero — the club wall and notifications. You don't need to share your personal number."
+      }
+    ],
+    "ctaTitle": "Still have a question?",
+    "ctaBody": "Our team and your club are here to help you get started with confidence.",
+    "ctaPrimary": "Contact the team",
+    "ctaSecondary": "Log in",
+    "download": {
+      "title": "Install the app on your phone",
+      "body": "Clubero installs like an app, straight from your browser — no App Store needed. Keep call-ups and notifications on your home screen.",
+      "iosHint": "iPhone / iPad (Safari): Share → Add to Home Screen → Add.",
+      "cta": "Installation guide"
     }
   },
   "onboarding": {

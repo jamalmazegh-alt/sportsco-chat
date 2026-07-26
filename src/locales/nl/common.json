@@ -1787,6 +1787,11 @@
     "adminVenues": {
       "title": "Locaties en velden – Clubero",
       "description": "Configureer locaties en velden van je club."
+    },
+    "parentGuide": {
+      "title": "Oudergids — aan de slag met Clubero",
+      "description": "Stapsgewijze tutorials voor ouders: reageren op een oproep, een afwezigheid melden, toestemming geven, meldingen instellen en de gezinskalender volgen.",
+      "ogDescription": "Oproepen, afwezigheden, meldingen: de oudergids om te starten met Clubero."
     }
   },
   "trial": {
@@ -2441,7 +2446,13 @@
     "iosStep3After": "om de lijst uit te klappen",
     "iosStep4Before": "Kies",
     "iosStep4Icon": "Zet op beginscherm",
-    "iosStep4After": "en tik op „Voeg toe“"
+    "iosStep4After": "en tik op „Voeg toe“",
+    "androidStepsTitle": "Op Android (Chrome)",
+    "androidStepsSubtitle": "3 stappen om Clubero te installeren",
+    "androidStep1": "Open het menu ⋮ rechtsboven in Chrome.",
+    "androidStep2": "Kies «App installeren» (of «Toevoegen aan startscherm»).",
+    "androidStep3": "Bevestig: het Clubero-pictogram verschijnt op je startscherm.",
+    "ctaHint": "Op Android start deze knop de installatie meteen. Op iPhone volg je de Safari-stappen hieronder."
   },
   "person": {
     "playerSubline": "Speler · {{category}}",

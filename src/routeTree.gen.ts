@@ -56,7 +56,9 @@ import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
 import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-club'
+import { Route as FrGuideParentsRouteImport } from './routes/fr.guide-parents'
 import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
+import { Route as EnParentGuideRouteImport } from './routes/en.parent-guide'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CoachSlugRouteImport } from './routes/coach.$slug'
@@ -420,9 +422,19 @@ const FrOnboardingClubRoute = FrOnboardingClubRouteImport.update({
   path: '/fr/onboarding-club',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FrGuideParentsRoute = FrGuideParentsRouteImport.update({
+  id: '/fr/guide-parents',
+  path: '/fr/guide-parents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnTournamentsRoute = EnTournamentsRouteImport.update({
   id: '/en/tournaments',
   path: '/en/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnParentGuideRoute = EnParentGuideRouteImport.update({
+  id: '/en/parent-guide',
+  path: '/en/parent-guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
@@ -1192,7 +1204,9 @@ export interface FileRoutesByFullPath {
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/parent-guide': typeof EnParentGuideRoute
   '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/guide-parents': typeof FrGuideParentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -1364,7 +1378,9 @@ export interface FileRoutesByTo {
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/parent-guide': typeof EnParentGuideRoute
   '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/guide-parents': typeof FrGuideParentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -1541,7 +1557,9 @@ export interface FileRoutesById {
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/parent-guide': typeof EnParentGuideRoute
   '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/guide-parents': typeof FrGuideParentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -1719,7 +1737,9 @@ export interface FileRouteTypes {
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/parent-guide'
     | '/en/tournaments'
+    | '/fr/guide-parents'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -1891,7 +1911,9 @@ export interface FileRouteTypes {
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/parent-guide'
     | '/en/tournaments'
+    | '/fr/guide-parents'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -2067,7 +2089,9 @@ export interface FileRouteTypes {
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/parent-guide'
     | '/en/tournaments'
+    | '/fr/guide-parents'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -2232,7 +2256,9 @@ export interface RootRouteChildren {
   CoachSlugRoute: typeof CoachSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
+  EnParentGuideRoute: typeof EnParentGuideRoute
   EnTournamentsRoute: typeof EnTournamentsRoute
+  FrGuideParentsRoute: typeof FrGuideParentsRoute
   FrOnboardingClubRoute: typeof FrOnboardingClubRoute
   FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
@@ -2623,11 +2649,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrOnboardingClubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fr/guide-parents': {
+      id: '/fr/guide-parents'
+      path: '/fr/guide-parents'
+      fullPath: '/fr/guide-parents'
+      preLoaderRoute: typeof FrGuideParentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/tournaments': {
       id: '/en/tournaments'
       path: '/en/tournaments'
       fullPath: '/en/tournaments'
       preLoaderRoute: typeof EnTournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/parent-guide': {
+      id: '/en/parent-guide'
+      path: '/en/parent-guide'
+      fullPath: '/en/parent-guide'
+      preLoaderRoute: typeof EnParentGuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/club-onboarding': {
@@ -3920,7 +3960,9 @@ const rootRouteChildren: RootRouteChildren = {
   CoachSlugRoute: CoachSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
+  EnParentGuideRoute: EnParentGuideRoute,
   EnTournamentsRoute: EnTournamentsRoute,
+  FrGuideParentsRoute: FrGuideParentsRoute,
   FrOnboardingClubRoute: FrOnboardingClubRoute,
   FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,

@@ -8,6 +8,7 @@
     "players": "Spieler",
     "tournaments": "Turniere",
     "onboarding": "Einrichtung",
+    "parentGuide": "Eltern-Guide",
     "pricing": "Preise",
     "faq": "FAQ",
     "contact": "Kontakt",
@@ -15,7 +16,8 @@
     "signup": "Verein registrieren",
     "demo": "Demo anfragen",
     "buildClubero": "Feedback geben",
-    "backToSite": "Zurück zur Website"
+    "backToSite": "Zurück zur Website",
+    "install": "App installieren"
   },
   "footer": {
     "tagline": "Teamkoordination, vereinfacht für Sportvereine.",
@@ -1287,6 +1289,140 @@
       "expiredBody": "Dein E-Mail-Bestätigungslink ist nicht mehr gültig. Gib deine E-Mail-Adresse ein, um einen neuen Link zu erhalten.",
       "resendCta": "Renvoyer",
       "resendSent": "Bestätigungs-E-Mail erneut gesendet. Prüfe deinen Posteingang."
+    }
+  },
+  "parentGuide": {
+    "kicker": "Eltern-Guide",
+    "title": "In wenigen Minuten mit Clubero startklar.",
+    "subtitle": "Alles, was Eltern wissen müssen, um ihr Kind zu begleiten: Aufgebote, Abwesenheiten, Benachrichtigungen und die Vereinspinnwand.",
+    "ctaStart": "Zu den Tutorials",
+    "ctaFaq": "Häufige Fragen",
+    "previewLabel": "Vorschau folgt",
+    "reassure": ["Über die mobile App", "Benachrichtigungen nach Wahl", "Daten geschützt"],
+    "tutorialsTitle": "Das Wichtigste, Schritt für Schritt.",
+    "tutorialsSubtitle": "Sieben detaillierte Schritt-für-Schritt-Anleitungen mit einem Screenshot pro Schritt.",
+    "tutorials": [
+      {
+        "t": "Ihr Elternkonto eröffnen",
+        "b": "Alles beginnt mit der Einladung Ihres Vereins. Richten Sie Ihren Zugang in wenigen Minuten ein.",
+        "steps": [
+          "Öffnen Sie die Einladungs-E-Mail Ihres Vereins und tippen Sie auf „Einladung annehmen“.",
+          "Geben Sie Vor- und Nachnamen ein und erstellen Sie Ihr Passwort (Ihre E-Mail ist bereits vorausgefüllt). Tippen Sie auf „Konto erstellen“.",
+          "Prüfen und akzeptieren Sie die Einwilligungen (Datenschutz, AGB, Benachrichtigungen, Datenverarbeitung), dann „Akzeptieren und fortfahren“.",
+          "Sie landen direkt auf der Startseite Ihres Vereins — Sie sind angemeldet.",
+          "Öffnen Sie den Reiter „Profil“: Dort sehen Sie Ihre Daten, Sprache und Benachrichtigungen.",
+          "Tragen Sie Vorname, Nachname und Telefonnummer ein und tippen Sie auf „Speichern“."
+        ]
+      },
+      {
+        "t": "Den Zugang Ihres Kindes verwalten",
+        "b": "Sehen Sie die Informationen Ihres Kindes ein und geben Sie ihm bei Bedarf Zugang zu seinem eigenen Spielerbereich. Sie behalten die Kontrolle.",
+        "steps": [
+          "Erhalten Sie die E-Mail, die Sie darüber informiert, dass Ihr Kind mit Ihrem Konto verknüpft wurde.",
+          "Öffnen Sie den Reiter „Teams“ und wählen Sie Ihr Kind oben in der Liste.",
+          "Sehen Sie seine Informationen ein: Vorname, Nachname und Position.",
+          "Scrollen Sie, um Lizenznummer, Telefon und E-Mail zu sehen.",
+          "Prüfen Sie die Zugriffsberechtigung für die Plattform und die Daten der Eltern.",
+          "Aktivieren Sie den Plattformzugang Ihres Kindes mit dem Schalter (Toggle).",
+          "Senden Sie die Einladung an den Spieler: Ihr Kind benötigt eine eigene E-Mail-Adresse. Es erhält eine E-Mail, um ein Passwort zu erstellen und auf die Daten seines Teams zuzugreifen.",
+          "Aktivieren Sie „Kann auf Aufgebote antworten (Spieler)“, damit es selbst antworten darf — andernfalls können nur die Eltern auf Aufgebote antworten."
+        ]
+      },
+      {
+        "t": "Termine sehen und auf ein Aufgebot antworten",
+        "b": "Erhalten Sie Aufgebote per E-Mail, Benachrichtigung oder in der App und antworten Sie für Ihr Kind mit einem Tippen.",
+        "steps": [
+          "Erhalten Sie das Aufgebot per E-Mail: Bestätigen Sie die Teilnahme (Anwesend / Unsicher / Abwesend) direkt aus der E-Mail.",
+          "Sie erhalten außerdem eine Push-Benachrichtigung, die Sie direkt in die App führt.",
+          "Nach der Antwort aus der E-Mail bestätigt eine Seite Ihre Wahl — Sie können sie jederzeit ändern.",
+          "Oder antworten Sie mit einem Tippen von der App-Startseite über die Karte „Insights“.",
+          "Öffnen Sie den Reiter „Termine“, um alle Spiele und Trainings zu sehen.",
+          "Öffnen Sie die Ereignisdetails: Spielinfos und Ihre Antwort (Anwesend / Unsicher / Abwesend).",
+          "Bei Abwesenheit oder Unsicherheit fügen Sie einen Grund hinzu (vordefiniert oder Freitext), der an den Trainer gesendet wird.",
+          "Tauschen Sie sich im Event-Chat aus (Eltern, Spieler, Trainer) und sehen Sie die aufgebotenen Spieler."
+        ]
+      },
+      {
+        "t": "Benachrichtigungen einrichten",
+        "b": "Aktivieren Sie Push-Benachrichtigungen, um Aufgebote, Erinnerungen und Nachrichten direkt auf Ihr Telefon zu erhalten.",
+        "steps": [
+          "Öffnen Sie im Menü „Profil“ den Bereich Benachrichtigungen, um sie zu aktivieren.",
+          "Tippen Sie auf „Aktivieren“: Ein Fenster öffnet sich — erlauben Sie die Benachrichtigungen.",
+          "Die Benachrichtigungen werden als aktiviert angezeigt: Push wird ab jetzt an dieses Telefon gesendet."
+        ]
+      },
+      {
+        "t": "Eine Abwesenheit melden",
+        "b": "Informieren Sie das Team frühzeitig, wenn Ihr Kind nicht kommen kann: Der Trainer wird benachrichtigt und der Plan aktualisiert.",
+        "steps": [
+          "Tippen Sie auf der App-Startseite auf „Abwesenheit melden“.",
+          "Alternativ: Öffnen Sie „Teams“ und dann das Profil Ihres Kindes.",
+          "Öffnen Sie den Bildschirm zum Melden einer Abwesenheit.",
+          "Wählen Sie den betreffenden Zeitraum.",
+          "Wählen Sie den Grund, fügen Sie bei Bedarf einen Kommentar hinzu und speichern Sie: Der Trainer wird benachrichtigt und der Teamplan aktualisiert.",
+          "Die Abwesenheit erscheint im Reiter „Verfügbarkeit“ im Profil Ihres Kindes.",
+          "Sie können sie über „Abbrechen“ im Verlauf entfernen."
+        ]
+      },
+      {
+        "t": "Fahrgemeinschaft organisieren",
+        "b": "Bei Spielen und Trainings buchen Sie einen Platz oder fragen einen Transport an — direkt vom Ereignis aus.",
+        "steps": [
+          "Öffnen Sie ein Spiel oder Training, bei dem die Mitfahrgelegenheit aktiviert ist (der Trainer aktiviert sie pro Ereignis).",
+          "Suchen Sie die Karte „Mitfahrgelegenheit“ (mit dem Verantwortungshinweis): Dort sehen Sie die verfügbaren Angebote.",
+          "Tippen Sie bei einem Angebot auf „Platz reservieren“, um Ihren Platz zu bestätigen.",
+          "Sehen Sie, welcher Spieler welchem Auto zugeordnet ist; Sie können Ihre Reservierung stornieren und die Details im Event-Chat besprechen.",
+          "Keine Mitfahrgelegenheit verfügbar? Tippen Sie auf „Transport anfragen“.",
+          "Bestätigen Sie und fügen Sie bei Bedarf einen Kommentar hinzu.",
+          "Ihre Anfrage erscheint im Ereignis; der Trainer wird per E-Mail benachrichtigt, ebenso die anderen Eltern und Spieler."
+        ]
+      },
+      {
+        "t": "Der Vereinspinnwand folgen",
+        "b": "Die Pinnwand ist der Neuigkeiten-Feed Ihres Vereins: Ankündigungen, Beiträge, Umfragen — und bald die sozialen Netzwerke des Vereins.",
+        "steps": [
+          "Öffnen Sie den Reiter „Pinnwand“: Dort finden Sie die Ankündigungen und Beiträge des Vereins und des Trainers (Nachrichten, Anhänge, Umfragen — und ab September 2026 die Instagram/Facebook-Beiträge des Vereins).",
+          "Bei jedem neuen Beitrag erhalten Sie eine Push-Benachrichtigung.",
+          "Und, je nach Verein, eventuell eine E-Mail.",
+          "Interagieren Sie mit Beiträgen, indem Sie eine Nachricht schreiben (wenn Kommentare aktiviert sind).",
+          "Für eine Umfrage tippen Sie auf „Abstimmen“, wählen Ihre Antwort und bestätigen.",
+          "Ihre Stimme wird gespeichert: Sehen Sie die aktuellen Ergebnisse.",
+          "Sie können Ihre Stimme jederzeit ändern (außer bei anonymen Umfragen)."
+        ]
+      }
+    ],
+    "faqTitle": "Häufige Fragen von Eltern",
+    "faq": [
+      {
+        "q": "Brauche ich ein eigenes Konto getrennt von dem meines Kindes?",
+        "a": "Ja. Jedes Elternteil hat einen eigenen Zugang, der mit dem Profil des Kindes verknüpft ist. Aufgebote und Einwilligung verwalten Sie über Ihr Konto."
+      },
+      {
+        "q": "Kann mein Kind ein eigenes Konto haben?",
+        "a": "Ein minderjähriges Kind kann ein Konto haben, sobald Sie die elterliche Einwilligung erteilt haben. Sie bleiben mit seinem Profil verbunden."
+      },
+      {
+        "q": "Bekomme ich zu viele Benachrichtigungen?",
+        "a": "Nein: Sie wählen in Ihren Benachrichtigungseinstellungen genau die Kanäle (App, E-Mail, WhatsApp) und Erinnerungen aus."
+      },
+      {
+        "q": "Kann ich mehrere Kinder verwalten?",
+        "a": "Ja. Alle Ihre Kinder erscheinen in einem einzigen Familienkalender, auch wenn sie in verschiedenen Teams spielen."
+      },
+      {
+        "q": "Sieht der Verein meine Telefonnummer?",
+        "a": "Die Kommunikation läuft über Clubero — die Vereinspinnwand und Benachrichtigungen. Sie müssen Ihre private Nummer nicht teilen."
+      }
+    ],
+    "ctaTitle": "Noch eine offene Frage?",
+    "ctaBody": "Unser Team und Ihr Verein helfen Ihnen gerne bei einem entspannten Start.",
+    "ctaPrimary": "Team kontaktieren",
+    "ctaSecondary": "Anmelden",
+    "download": {
+      "title": "Installieren Sie die App auf Ihrem Handy",
+      "body": "Clubero installiert sich wie eine App, direkt aus dem Browser — ohne App Store. Behalten Sie Aufgebote und Benachrichtigungen auf Ihrem Startbildschirm.",
+      "iosHint": "iPhone / iPad (Safari): Teilen → Zum Home-Bildschirm → Hinzufügen.",
+      "cta": "Installationsanleitung"
     }
   },
   "onboarding": {

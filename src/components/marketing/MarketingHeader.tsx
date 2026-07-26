@@ -26,10 +26,12 @@ const LOCALIZED_NAV = {
   fr: [
     { to: "/fr/tournois", key: "tournaments" },
     { to: "/fr/onboarding-club", key: "onboarding" },
+    { to: "/fr/guide-parents", key: "parentGuide" },
   ],
   en: [
     { to: "/en/tournaments", key: "tournaments" },
     { to: "/en/club-onboarding", key: "onboarding" },
+    { to: "/en/parent-guide", key: "parentGuide" },
   ],
 } as const;
 

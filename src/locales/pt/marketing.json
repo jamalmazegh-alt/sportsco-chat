@@ -8,6 +8,7 @@
     "players": "Jogadores",
     "tournaments": "Torneios",
     "onboarding": "Configuração",
+    "parentGuide": "Guia para pais",
     "pricing": "Preços",
     "faq": "FAQ",
     "contact": "Contacto",
@@ -15,7 +16,8 @@
     "signup": "Registar clube",
     "demo": "Solicitar demonstração",
     "buildClubero": "Dê a sua opinião",
-    "backToSite": "Voltar ao site"
+    "backToSite": "Voltar ao site",
+    "install": "Instalar a app"
   },
   "footer": {
     "tagline": "Coordenação de equipa, simplificada para clubes desportivos.",
@@ -1287,6 +1289,140 @@
       "expiredBody": "O seu link de confirmação de e-mail não é mais válido. Introduza o seu endereço de e-mail para receber um novo link.",
       "resendCta": "Reenviar",
       "resendSent": "E-mail de confirmação reenviado. Verifique a sua caixa de entrada."
+    }
+  },
+  "parentGuide": {
+    "kicker": "Guia para pais",
+    "title": "Comece a usar o Clubero em minutos.",
+    "subtitle": "Tudo o que um pai ou mãe precisa para acompanhar o seu filho: convocatórias, ausências, notificações e o mural do clube.",
+    "ctaStart": "Ver os tutoriais",
+    "ctaFaq": "Perguntas frequentes",
+    "previewLabel": "Pré-visualização em breve",
+    "reassure": ["A partir da app móvel", "Notificações à sua medida", "Dados protegidos"],
+    "tutorialsTitle": "O essencial, passo a passo.",
+    "tutorialsSubtitle": "Sete procedimentos detalhados, passo a passo e com uma captura por passo.",
+    "tutorials": [
+      {
+        "t": "Abrir a sua conta de pai ou mãe",
+        "b": "Tudo começa com o convite do seu clube. Crie o seu acesso em poucos minutos.",
+        "steps": [
+          "Abra o email de convite do seu clube e toque em «Aceitar convite».",
+          "Introduza o nome e apelido e crie a sua palavra-passe (o seu email já está preenchido). Toque em «Criar conta».",
+          "Consulte e aceite os consentimentos (privacidade, termos, notificações, tratamento de dados) e depois «Aceitar e continuar».",
+          "Chega diretamente ao ecrã inicial do seu clube — está com sessão iniciada.",
+          "Abra o separador «Perfil»: verá os seus dados, o idioma e as notificações.",
+          "Preencha o nome, apelido e número de telefone e toque em «Guardar»."
+        ]
+      },
+      {
+        "t": "Gerir o acesso do seu filho",
+        "b": "Consulte as informações do seu filho e, se quiser, dê-lhe acesso ao seu próprio espaço de jogador. Mantém o controlo.",
+        "steps": [
+          "Receba o email a informar que o seu filho foi associado à sua conta.",
+          "Abra o separador «Equipas» e selecione o seu filho no topo da lista.",
+          "Consulte as suas informações: nome, apelido e posição.",
+          "Desça para ver o número de licença, telefone e email.",
+          "Verifique a autorização de acesso à plataforma e os dados dos pais.",
+          "Ative o acesso do seu filho à plataforma com o botão (toggle).",
+          "Envie o convite ao jogador: o seu filho precisa de um email próprio. Receberá um email para criar uma palavra-passe e aceder aos dados da sua equipa.",
+          "Marque «Pode responder às convocatórias (Jogador)» para o autorizar a responder — caso contrário, só os pais podem responder às convocatórias."
+        ]
+      },
+      {
+        "t": "Ver os eventos e responder a uma convocatória",
+        "b": "Receba as convocatórias por email, notificação ou na app, e responda pelo seu filho com um toque.",
+        "steps": [
+          "Receba a convocatória por email: confirme a presença (Presente / Incerto / Ausente) diretamente a partir do email.",
+          "Recebe também uma notificação push que o leva diretamente à app.",
+          "Depois de responder pelo email, uma página confirma a sua escolha — pode alterá-la a qualquer momento.",
+          "Ou responda com um toque a partir do início da app, através do cartão «Insights».",
+          "Abra o separador «Eventos» para ver todos os jogos e treinos.",
+          "Abra o detalhe do evento: informações do jogo e a sua resposta (Presente / Incerto / Ausente).",
+          "Em caso de ausência ou dúvida, adicione um motivo (predefinido ou texto livre) enviado ao treinador.",
+          "Converse no chat do evento (pais, jogadores, treinador) e veja os jogadores convocados."
+        ]
+      },
+      {
+        "t": "Configurar as notificações",
+        "b": "Ative as notificações push para receber convocatórias, lembretes e mensagens diretamente no seu telemóvel.",
+        "steps": [
+          "No menu «Perfil», aceda às notificações para as ativar.",
+          "Toque em «Ativar»: abre-se uma janela — autorize as notificações.",
+          "As notificações aparecem como ativadas: os push serão enviados a partir de agora para este telemóvel."
+        ]
+      },
+      {
+        "t": "Declarar uma ausência",
+        "b": "Avise a equipa técnica com antecedência quando o seu filho não puder ir: o treinador é notificado e o calendário é atualizado.",
+        "steps": [
+          "A partir do início da app, toque em «Declarar uma ausência».",
+          "Outra via: abra «Equipas» e depois o perfil do seu filho.",
+          "Abra o ecrã para declarar uma ausência.",
+          "Selecione o intervalo de datas em questão.",
+          "Escolha o motivo, acrescente um comentário se necessário e guarde: o treinador é notificado e o calendário da equipa é atualizado.",
+          "A ausência aparece no separador «Disponibilidade» do perfil do seu filho.",
+          "Pode cancelá-la com «Cancelar» na parte do histórico."
+        ]
+      },
+      {
+        "t": "Organizar as boleias",
+        "b": "Para jogos e treinos, reserve um lugar ou peça transporte diretamente a partir do evento.",
+        "steps": [
+          "Abra um jogo ou treino onde as boleias estejam ativadas (o treinador ativa-as evento a evento).",
+          "Localize o cartão «Boleias» (com o aviso de responsabilidade): verá as ofertas disponíveis.",
+          "Toque em «Reservar lugar» numa oferta para confirmar o seu lugar.",
+          "Veja que jogador está atribuído a que carro; pode cancelar a sua reserva e falar dos detalhes no chat do evento.",
+          "Sem boleia disponível? Toque em «Pedir boleia».",
+          "Confirme e adicione um comentário se necessário.",
+          "O seu pedido aparece no evento; o treinador é avisado por email, bem como os outros pais e jogadores."
+        ]
+      },
+      {
+        "t": "Acompanhar o mural do clube",
+        "b": "O mural é o feed de notícias do seu clube: anúncios, publicações, sondagens — e em breve as redes sociais do clube.",
+        "steps": [
+          "Abra o separador «Mural»: encontra os anúncios e publicações do clube e do treinador (mensagens, anexos, sondagens — e, até setembro de 2026, as publicações de Instagram/Facebook do clube).",
+          "Sempre que há uma nova publicação, recebe uma notificação push.",
+          "E, consoante o clube, eventualmente um email.",
+          "Interaja com as publicações deixando uma mensagem (se os comentários estiverem ativados).",
+          "Numa sondagem, toque em «Votar», selecione a sua resposta e confirme.",
+          "O seu voto fica guardado: veja os resultados em direto.",
+          "Pode alterar o seu voto a qualquer momento (exceto se a sondagem for anónima)."
+        ]
+      }
+    ],
+    "faqTitle": "Perguntas frequentes dos pais",
+    "faq": [
+      {
+        "q": "Preciso de uma conta separada da do meu filho?",
+        "a": "Sim. Cada pai ou mãe tem o seu próprio acesso, ligado ao perfil do filho. Gere as convocatórias e o consentimento a partir da sua conta."
+      },
+      {
+        "q": "O meu filho pode ter a sua própria conta?",
+        "a": "Uma criança menor pode ter uma conta depois de dar o consentimento parental. Continua ligado ao perfil dela."
+      },
+      {
+        "q": "Vou receber notificações a mais?",
+        "a": "Não: escolhe com precisão os canais (app, email, WhatsApp) e os lembretes nas suas definições de notificações."
+      },
+      {
+        "q": "Posso gerir vários filhos?",
+        "a": "Sim. Todos os seus filhos aparecem num único calendário familiar, mesmo que joguem em equipas diferentes."
+      },
+      {
+        "q": "O clube vê o meu número de telefone?",
+        "a": "A comunicação passa pelo Clubero — o mural do clube e as notificações. Não precisa de partilhar o seu número pessoal."
+      }
+    ],
+    "ctaTitle": "Ainda tem alguma questão?",
+    "ctaBody": "A nossa equipa e o seu clube estão aqui para o ajudar a começar com tranquilidade.",
+    "ctaPrimary": "Contactar a equipa",
+    "ctaSecondary": "Iniciar sessão",
+    "download": {
+      "title": "Instale a app no seu telemóvel",
+      "body": "O Clubero instala-se como uma app, diretamente a partir do navegador — sem App Store. Tenha as convocatórias e as notificações no seu ecrã inicial.",
+      "iosHint": "iPhone / iPad (Safari): Partilhar → Adicionar ao ecrã principal → Adicionar.",
+      "cta": "Guia de instalação"
     }
   },
   "onboarding": {

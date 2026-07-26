@@ -1787,6 +1787,11 @@
     "adminVenues": {
       "title": "Venues – Clubero",
       "description": "Configure your club sites and fields."
+    },
+    "parentGuide": {
+      "title": "Parent guide — getting started with Clubero",
+      "description": "Step-by-step tutorials for parents: respond to a call-up, report an absence, give consent, set up notifications and follow the family calendar.",
+      "ogDescription": "Call-ups, absences, notifications: the parent guide to getting started with Clubero."
     }
   },
   "trial": {
@@ -2441,7 +2446,13 @@
     "iosStep3After": "arrow to expand the list",
     "iosStep4Before": "Choose",
     "iosStep4Icon": "Add to Home Screen",
-    "iosStep4After": "then tap “Add”"
+    "iosStep4After": "then tap “Add”",
+    "androidStepsTitle": "On Android (Chrome)",
+    "androidStepsSubtitle": "3 steps to install Clubero",
+    "androidStep1": "Open the ⋮ menu at the top right of Chrome.",
+    "androidStep2": "Choose \"Install app\" (or \"Add to Home screen\").",
+    "androidStep3": "Confirm: the Clubero icon appears on your home screen.",
+    "ctaHint": "On Android, this button installs Clubero directly. On iPhone, follow the Safari steps below."
   },
   "person": {
     "playerSubline": "Player · {{category}}",

@@ -8,6 +8,7 @@ export function MarketingFooter() {
   const current = i18n.language?.slice(0, 2) === "fr" ? "fr" : "en";
   const tournamentsTo = current === "fr" ? "/fr/tournois" : "/en/tournaments";
   const onboardingTo = current === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
+  const parentGuideTo = current === "fr" ? "/fr/guide-parents" : "/en/parent-guide";
 
   return (
     <footer className="border-t border-border/60 bg-muted/30">
@@ -40,6 +41,16 @@ export function MarketingFooter() {
               <li>
                 <Link to={onboardingTo} className="hover:text-foreground">
                   {t("nav.onboarding")}
+                </Link>
+              </li>
+              <li>
+                <Link to={parentGuideTo} className="hover:text-foreground">
+                  {t("nav.parentGuide")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/install" className="hover:text-foreground">
+                  {t("nav.install")}
                 </Link>
               </li>
               <li>
