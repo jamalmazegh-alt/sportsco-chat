@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Configurar as notificações",
-        "b": "Escolha como quer ser avisado: app, email ou WhatsApp, conforme a sua preferência.",
+        "b": "Ative as notificações push para receber convocatórias, lembretes e mensagens diretamente no seu telemóvel.",
         "steps": [
-          "Abra o seu perfil e depois «Notificações».",
-          "Escolha os seus canais: app, email e/ou WhatsApp.",
-          "Ative os tipos de aviso (convocatórias, lembretes, mensagens do Mural).",
-          "Defina com quanta antecedência os lembretes são enviados antes dos eventos."
+          "No menu «Perfil», aceda às notificações para as ativar.",
+          "Toque em «Ativar»: abre-se uma janela — autorize as notificações.",
+          "As notificações aparecem como ativadas: os push serão enviados a partir de agora para este telemóvel."
         ]
       },
       {

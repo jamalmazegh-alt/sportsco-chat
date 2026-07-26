@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Benachrichtigungen einrichten",
-        "b": "Wählen Sie, wie Sie informiert werden: App, E-Mail oder WhatsApp, ganz nach Wunsch.",
+        "b": "Aktivieren Sie Push-Benachrichtigungen, um Aufgebote, Erinnerungen und Nachrichten direkt auf Ihr Telefon zu erhalten.",
         "steps": [
-          "Öffnen Sie Ihr Profil und dann „Benachrichtigungen“.",
-          "Wählen Sie Ihre Kanäle: App, E-Mail und/oder WhatsApp.",
-          "Aktivieren Sie die Benachrichtigungstypen (Aufgebote, Erinnerungen, Pinnwand-Nachrichten).",
-          "Legen Sie fest, wie lange vor Terminen die Erinnerungen gesendet werden."
+          "Öffnen Sie im Menü „Profil“ den Bereich Benachrichtigungen, um sie zu aktivieren.",
+          "Tippen Sie auf „Aktivieren“: Ein Fenster öffnet sich — erlauben Sie die Benachrichtigungen.",
+          "Die Benachrichtigungen werden als aktiviert angezeigt: Push wird ab jetzt an dieses Telefon gesendet."
         ]
       },
       {

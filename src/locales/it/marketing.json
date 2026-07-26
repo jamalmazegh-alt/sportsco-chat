@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Impostare le notifiche",
-        "b": "Scegli come essere avvisato: app, email o WhatsApp, secondo le tue preferenze.",
+        "b": "Attiva le notifiche push per ricevere convocazioni, promemoria e messaggi direttamente sul telefono.",
         "steps": [
-          "Apri il tuo profilo, poi «Notifiche».",
-          "Scegli i tuoi canali: app, email e/o WhatsApp.",
-          "Attiva i tipi di avviso (convocazioni, promemoria, messaggi della Bacheca).",
-          "Imposta con quanto anticipo vengono inviati i promemoria prima degli eventi."
+          "Nel menu «Profilo», apri la sezione notifiche per attivarle.",
+          "Tocca «Attiva»: si apre una finestra — autorizza le notifiche.",
+          "Le notifiche risultano attivate: i push verranno ora inviati a questo telefono."
         ]
       },
       {

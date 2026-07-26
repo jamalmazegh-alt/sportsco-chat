@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Meldingen instellen",
-        "b": "Kies hoe je op de hoogte wordt gebracht: app, e-mail of WhatsApp, naar jouw voorkeur.",
+        "b": "Zet pushmeldingen aan om oproepen, herinneringen en berichten rechtstreeks op je telefoon te ontvangen.",
         "steps": [
-          "Open je profiel en daarna «Meldingen».",
-          "Kies je kanalen: app, e-mail en/of WhatsApp.",
-          "Schakel de meldingstypes in (oproepen, herinneringen, prikbordberichten).",
-          "Stel in hoe lang vóór evenementen de herinneringen worden verstuurd."
+          "Ga in het menu «Profiel» naar de meldingen om ze in te schakelen.",
+          "Tik op «Inschakelen»: er opent een venster — sta de meldingen toe.",
+          "De meldingen worden als ingeschakeld weergegeven: push wordt vanaf nu naar deze telefoon gestuurd."
         ]
       },
       {

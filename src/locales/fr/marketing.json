@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Paramétrer les notifications",
-        "b": "Choisissez comment être prévenu : appli, email ou WhatsApp, selon vos préférences.",
+        "b": "Activez les notifications push pour recevoir convocations, rappels et messages directement sur votre téléphone.",
         "steps": [
-          "Ouvrez votre profil, puis « Notifications ».",
-          "Choisissez vos canaux : appli, email et/ou WhatsApp.",
-          "Activez les types d'alertes (convocations, rappels, messages du Mur).",
-          "Réglez le délai des rappels envoyés avant les événements."
+          "Dans le menu « Profil », accédez aux notifications pour les activer.",
+          "Appuyez sur « Activer » : une fenêtre s'ouvre — autorisez les notifications.",
+          "Les notifications apparaissent comme « activées » : les push seront désormais envoyées sur ce téléphone."
         ]
       },
       {

@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Configurar las notificaciones",
-        "b": "Elige cómo quieres recibir los avisos: app, correo o WhatsApp, según tu preferencia.",
+        "b": "Activa las notificaciones push para recibir convocatorias, recordatorios y mensajes directamente en tu teléfono.",
         "steps": [
-          "Abre tu perfil y luego «Notificaciones».",
-          "Elige tus canales: app, correo y/o WhatsApp.",
-          "Activa los tipos de aviso (convocatorias, recordatorios, mensajes del Muro).",
-          "Ajusta con cuánta antelación se envían los recordatorios antes de los eventos."
+          "En el menú «Perfil», accede a las notificaciones para activarlas.",
+          "Pulsa «Activar»: se abre una ventana — autoriza las notificaciones.",
+          "Las notificaciones aparecen como activadas: los push se enviarán ahora a este teléfono."
         ]
       },
       {

@@ -1344,12 +1344,11 @@
       },
       {
         "t": "Set up notifications",
-        "b": "Choose how you're notified: app, email or WhatsApp, whichever suits you.",
+        "b": "Turn on push notifications to get call-ups, reminders and messages straight on your phone.",
         "steps": [
-          "Open your profile, then \"Notifications\".",
-          "Choose your channels: app, email and/or WhatsApp.",
-          "Enable the alert types (call-ups, reminders, Wall messages).",
-          "Set how long before events the reminders are sent."
+          "In the \"Profile\" menu, open the notifications section to enable them.",
+          "Tap \"Enable\": a window opens — allow notifications.",
+          "Notifications show as enabled: push will now be sent to this phone."
         ]
       },
       {
