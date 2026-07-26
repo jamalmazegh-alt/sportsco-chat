@@ -74,7 +74,6 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
     ) as string[];
     if (staffIds.length === 0) return { sent: 0 };
 
-
     const { data: club } = ev.teams
       ? await supabaseAdmin
           .from("clubs")
