@@ -935,14 +935,7 @@
     "confirmResponse": "Antwort bestätigen",
     "responseRecorded": "Antwort gespeichert",
     "coachNotified": "Der Trainer wurde informiert.",
-    "reasonsAbsent": [
-      "Travail",
-      "Famille",
-      "Blessure",
-      "Maladie",
-      "Lernen",
-      "Autre engagement"
-    ],
+    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",
@@ -1784,6 +1777,11 @@
     "adminVenues": {
       "title": "Anlagen & Plätze – Clubero",
       "description": "Konfiguriere Standorte und Plätze deines Vereins."
+    },
+    "install": {
+      "title": "Clubero-App installieren (iPhone & Android)",
+      "description": "Installieren Sie Clubero in Sekunden auf Ihrem Handy aus Safari (iPhone/iPad) oder Chrome (Android), ohne App Store. Benachrichtigungen, Aufgebote und Kalender immer dabei.",
+      "ogDescription": "Fügen Sie Clubero zum Startbildschirm hinzu — ohne App Store."
     }
   },
   "trial": {

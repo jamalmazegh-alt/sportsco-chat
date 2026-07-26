@@ -935,20 +935,8 @@
     "confirmResponse": "Antwoord bevestigen",
     "responseRecorded": "Antwoord opgeslagen",
     "coachNotified": "De Coach is geïnformeerd.",
-    "reasonsAbsent": [
-      "Werk",
-      "Familie",
-      "Blessure",
-      "Ziekte",
-      "Studie",
-      "Andere verplichting"
-    ],
-    "reasonsUncertain": [
-      "Nog te bevestigen",
-      "Werk",
-      "Familie",
-      "Lichte gezondheidsklachten"
-    ],
+    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
+    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",
@@ -1784,6 +1772,11 @@
     "adminVenues": {
       "title": "Locaties en velden – Clubero",
       "description": "Configureer locaties en velden van je club."
+    },
+    "install": {
+      "title": "Clubero-app installeren (iPhone & Android)",
+      "description": "Installeer Clubero in seconden op je telefoon vanuit Safari (iPhone/iPad) of Chrome (Android), zonder App Store. Meldingen, oproepen en agenda binnen handbereik.",
+      "ogDescription": "Zet Clubero op je startscherm — zonder App Store."
     }
   },
   "trial": {

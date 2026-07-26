@@ -16,7 +16,8 @@
     "signup": "Register your club",
     "demo": "Request a demo",
     "buildClubero": "Give your feedback",
-    "backToSite": "Back to site"
+    "backToSite": "Back to site",
+    "install": "Install the app"
   },
   "footer": {
     "tagline": "Team coordination, simplified for sports clubs.",
@@ -1297,11 +1298,7 @@
     "ctaStart": "See the tutorials",
     "ctaFaq": "Frequently asked questions",
     "previewLabel": "Preview coming soon",
-    "reassure": [
-      "From the mobile app",
-      "Notifications your way",
-      "Data protected"
-    ],
+    "reassure": ["From the mobile app", "Notifications your way", "Data protected"],
     "tutorialsTitle": "The essentials, step by step.",
     "tutorialsSubtitle": "Seven detailed, step-by-step procedures with a screenshot for each step.",
     "tutorials": [
@@ -1406,7 +1403,13 @@
     "ctaTitle": "Still have a question?",
     "ctaBody": "Our team and your club are here to help you get started with confidence.",
     "ctaPrimary": "Contact the team",
-    "ctaSecondary": "Log in"
+    "ctaSecondary": "Log in",
+    "download": {
+      "title": "Install the app on your phone",
+      "body": "Clubero installs like an app, straight from your browser — no App Store needed. Keep call-ups and notifications on your home screen.",
+      "iosHint": "iPhone / iPad (Safari): Share → Add to Home Screen → Add.",
+      "cta": "Installation guide"
+    }
   },
   "onboarding": {
     "kicker": "Onboarding",
@@ -1673,11 +1676,7 @@
         "b": "Final phase after a regular season."
       }
     ],
-    "formatsExtras": [
-      "Automatic scheduling",
-      "Field assignment",
-      "Qualification management"
-    ],
+    "formatsExtras": ["Automatic scheduling", "Field assignment", "Qualification management"],
     "mobileTitle": "Mobile first, on the field.",
     "mobileSubtitle": "Designed to be used one-handed, between matches.",
     "mobilePoints": [
@@ -1910,5 +1909,38 @@
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
     }
+  },
+  "install": {
+    "kicker": "Install Clubero",
+    "title": "Install Clubero on your device.",
+    "subtitle": "Clubero is a web app: install it in seconds from your browser, without going through a store.",
+    "iosTitle": "On iPhone / iPad (Safari)",
+    "iosLead": "From Safari, in 4 steps.",
+    "iosShare": "Share",
+    "iosAdd": "Add to Home Screen",
+    "iosSteps": [
+      "Open clubero.app in Safari.",
+      "Tap the \"Share\" button (the square with an up arrow).",
+      "Scroll down and choose \"Add to Home Screen\".",
+      "Tap \"Add\" — the Clubero icon appears on your home screen."
+    ],
+    "androidTitle": "On Android (Chrome)",
+    "androidLead": "From Chrome, in 3 steps.",
+    "androidSteps": [
+      "Open clubero.app in Chrome.",
+      "Tap the menu (⋮) at the top right.",
+      "Choose \"Install app\" and confirm."
+    ],
+    "note": "No App Store or Play Store needed: Clubero installs straight from your browser.",
+    "benefitsTitle": "Why install the app?",
+    "benefits": [
+      "Real-time notifications: call-ups, reminders and messages.",
+      "One-tap access from your home screen.",
+      "A full-screen experience, even offline for the essentials."
+    ],
+    "ctaTitle": "Ready to get started?",
+    "ctaBody": "Log in to your club and enable notifications once the app is installed.",
+    "ctaPrimary": "Log in",
+    "ctaSecondary": "Contact us"
   }
 }

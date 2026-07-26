@@ -935,20 +935,8 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "reasonsAbsent": [
-      "Trabalho",
-      "Família",
-      "Lesão",
-      "Doença",
-      "Estudos",
-      "Outro compromisso"
-    ],
-    "reasonsUncertain": [
-      "A confirmar",
-      "Trabalho",
-      "Família",
-      "Problema de saúde ligeiro"
-    ],
+    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
+    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
@@ -1784,6 +1772,11 @@
     "adminVenues": {
       "title": "Locais e campos – Clubero",
       "description": "Configure locais e campos do seu clube."
+    },
+    "install": {
+      "title": "Instalar a app Clubero (iPhone e Android)",
+      "description": "Instale o Clubero no seu telemóvel em segundos a partir do Safari (iPhone/iPad) ou do Chrome (Android), sem App Store. Notificações, convocatórias e calendário sempre à mão.",
+      "ogDescription": "Adicione o Clubero ao ecrã inicial — sem App Store."
     }
   },
   "trial": {

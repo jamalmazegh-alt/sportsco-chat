@@ -85,8 +85,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   // Sync i18n with the route locale on mount; if the user switches language
   // afterwards, navigate to the counterpart route instead of forcing it back.
   useEffect(() => {
-    const routeFor = (lng: string) =>
-      lng === "fr" ? "/fr/guide-parents" : "/en/parent-guide";
+    const routeFor = (lng: string) => (lng === "fr" ? "/fr/guide-parents" : "/en/parent-guide");
     const current = i18n.language?.slice(0, 2);
     if (current && current !== locale) {
       navigate({ to: routeFor(current) });
@@ -202,6 +201,33 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* DOWNLOAD THE APP */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto max-w-5xl px-5 py-16 lg:px-8">
+          <div className="flex flex-col items-center gap-6 rounded-3xl border border-border bg-gradient-to-br from-[color:var(--brand-blue-soft)]/40 to-card p-8 text-center sm:p-12">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Smartphone className="h-7 w-7" />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                {t("parentGuide.download.title")}
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+                {t("parentGuide.download.body")}
+              </p>
+            </div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground/80">
+              {t("parentGuide.download.iosHint")}
+            </p>
+            <Button asChild size="lg" className="h-12 px-6">
+              <Link to="/install">
+                {t("parentGuide.download.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

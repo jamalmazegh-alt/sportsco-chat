@@ -935,20 +935,8 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": [
-      "Work",
-      "Family",
-      "Injury",
-      "Illness",
-      "Studies",
-      "Other commitment"
-    ],
-    "reasonsUncertain": [
-      "To confirm",
-      "Work",
-      "Family",
-      "Minor health issue"
-    ],
+    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
+    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -1784,6 +1772,11 @@
     "adminVenues": {
       "title": "Venues – Clubero",
       "description": "Configure your club sites and fields."
+    },
+    "install": {
+      "title": "Install the Clubero app (iPhone & Android)",
+      "description": "Install Clubero on your phone in seconds from Safari (iPhone/iPad) or Chrome (Android), with no App Store. Notifications, call-ups and calendar at your fingertips.",
+      "ogDescription": "Add Clubero to your home screen — no App Store needed."
     }
   },
   "trial": {

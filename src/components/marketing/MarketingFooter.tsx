@@ -49,6 +49,11 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
+                <Link to="/install" className="hover:text-foreground">
+                  {t("nav.install")}
+                </Link>
+              </li>
+              <li>
                 <Link to="/pricing" className="hover:text-foreground">
                   {t("nav.pricing")}
                 </Link>
