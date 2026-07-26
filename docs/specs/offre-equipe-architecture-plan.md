@@ -26,15 +26,39 @@ ALTER TABLE public.clubs
 identique. Pas de nouvel enum Postgres — un `CHECK` sur text s'étend sans migration
 d'enum.
 
-### 1.2 `teams`
+### 1.2 `teams` et `team_members`
 
 ```sql
 ALTER TABLE public.teams
   ADD COLUMN created_by_user_id uuid REFERENCES auth.users(id);
+
+-- Appartenance active à une équipe : la notion n'existe pas aujourd'hui.
+-- team_members ne contient que id, team_id, user_id, player_id, role, created_at.
+ALTER TABLE public.team_members
+  ADD COLUMN status text NOT NULL DEFAULT 'active'
+  CHECK (status IN ('active', 'archived'));
+
+-- Comptage du quota Découverte : index partiel dédié
+CREATE INDEX team_members_active_players_idx
+  ON public.team_members (team_id)
+  WHERE player_id IS NOT NULL AND status = 'active';
+
+-- Empêche deux lignes joueur pour le même couple (équipe, joueur)
+CREATE UNIQUE INDEX team_members_unique_player_per_team
+  ON public.team_members (team_id, player_id)
+  WHERE player_id IS NOT NULL;
 ```
 
-Provenance historique, distincte du porteur de quota Découverte (§1.4). Backfill
-impossible pour l'existant → colonne nullable, jamais utilisée comme source d'autorisation.
+`created_by_user_id` : provenance historique, distincte du porteur de quota Découverte
+(§1.4). Backfill impossible pour l'existant → colonne nullable, jamais utilisée comme
+source d'autorisation.
+
+`status` avec DEFAULT `'active'` : toutes les lignes existantes deviennent actives, ce qui
+est le comportement actuel — aucune régression. L'archivage dans une équipe ne touche ni
+`players.deleted_at` ni l'historique sportif.
+
+**Vérifier avant migration** l'absence de doublons `(team_id, player_id)` existants, qui
+feraient échouer l'index unique.
 
 ### 1.3 `team_subscriptions`
 
@@ -53,7 +77,8 @@ CREATE TABLE public.team_subscriptions (
   trial_end timestamptz,
   current_period_start timestamptz,
   current_period_end timestamptz,
-  grace_end timestamptz,                                   -- dérivé, voir §5
+  grace_started_at timestamptz,                            -- posé UNE FOIS, jamais écrasé
+  grace_end timestamptz,                                   -- grace_started_at + 14 j
   cancel_at_period_end boolean NOT NULL DEFAULT false,
   canceled_at timestamptz,
   exempt_from_billing boolean NOT NULL DEFAULT false,
@@ -186,7 +211,11 @@ get_team_coverage(_team_id)            → club_plan | team_plan | team_trial | 
                                          | grace | expired | none
 get_team_access_state(_team_id)        → active | grace | restricted | locked
 team_has_paid_access(_team_id)         → couverture quelconque active
-team_has_write_access(_team_id)        → mutations catégorie A autorisées
+team_can_manage_content(_team_id)      → catégorie A  (création/administration)
+team_can_operate_events(_team_id)      → catégorie A′ (annulation, notification) — vrai
+                                         aussi en restricted
+team_can_respond(_team_id, _user_id)   → catégorie B  — vrai aussi en restricted
+count_active_players(_team_id)         → team_members joueur actif + players non supprimé
 club_has_any_team_coverage(_club_id)
 can_manage_team_billing(_user_id, _team_id)
 can_view_team_billing_status(_user_id, _team_id)
@@ -223,9 +252,28 @@ REVOKE SELECT (stripe_customer_id, stripe_subscription_id, stripe_price_id)
   superadmin. Écritures service role.
 - `club_attach_requests` — `SELECT` : demandeur + admins du club cible. Écritures via
   server functions.
-- **Mutations d'équipe existantes** : ajout de `team_has_write_access()` sur les policies
-  de catégorie A uniquement, selon l'inventaire du Lot 0 bis §28.2. Les catégories B, C
-  et D ne sont pas touchées.
+- **Mutations d'équipe existantes** : ajout de `team_can_manage_content()` sur les
+  policies de **catégorie A uniquement**, selon l'inventaire du Lot 0 bis §28.2. Les
+  catégories A′, B, C et D ne sont pas touchées — en particulier, l'annulation d'un
+  événement et les réponses des familles restent possibles en `restricted`.
+
+### 4.5 `import_players_to_team` — calcul du quota consommé
+
+Le comptage ne porte pas sur le nombre de lignes du fichier, mais sur ce qui **augmente
+réellement l'effectif actif** :
+
+```text
+consommation = nouveaux joueurs uniques
+             + joueurs archivés réactivés
+  (hors doublons internes au fichier, doublons déjà présents dans l'équipe,
+   et joueurs existants simplement mis à jour — qui ne consomment rien)
+
+SI count_active_players + consommation > quota → RAISE, lot entier rejeté
+```
+
+Le message d'erreur remonte le nombre de places restantes et le nombre de lignes
+consommatrices, pas le nombre de lignes du fichier — sinon l'utilisateur ne comprend pas
+le refus quand son fichier contient surtout des mises à jour.
 
 ## 4. Stratégies transactionnelles
 
@@ -260,9 +308,23 @@ Transactionnel : vérification d'éligibilité → mise à jour de `billing_owne
 Source unique `get_team_coverage`. Dérivation complète en Lot 0 bis §28.5.
 Priorité absolue : `club_plan` (ou exemption Club) l'emporte sur tout le reste.
 
-**`grace_end` : durée non encore décidée** — décision bloquante (Lot 0 bis §28.5).
-Recommandation : configurable, défaut 14 jours, aligné sur la fin de la séquence de
-relance Stripe pour ne pas couper un club qui allait être débité avec succès.
+**Période de grâce : `TEAM_BILLING_GRACE_DAYS = 14`**, constante serveur surchargeable par
+env — pas une valeur en base, donc modifiable sans migration.
+
+Implémentation critique dans le handler `invoice.payment_failed` :
+
+```text
+IF grace_started_at IS NULL THEN
+  grace_started_at := now()
+  grace_end        := now() + TEAM_BILLING_GRACE_DAYS
+END IF
+-- sinon : ne rien faire. Les relances Stripe et les webhooks rejoués
+-- ne doivent JAMAIS repousser grace_end.
+```
+
+Remise à zéro de `grace_started_at` / `grace_end` uniquement sur
+`invoice.payment_succeeded` (le club a régularisé). Sans cette écriture conditionnelle, le
+*smart retry* de Stripe prolongerait la grâce indéfiniment.
 
 **Job planifié** idempotent : fins d'essai avec évaluation d'éligibilité Découverte, fins
 de grâce, journalisation, notifications, réconciliation Stripe ↔ Clubero. Précédent à
@@ -392,8 +454,23 @@ se retrouverait sans couverture au rollback. Flags séparés pour les lots 7 et 
 Prix Stripe créés en amont (test puis live), IDs injectés par env. Migrations additives :
 rollback = flag off, les données restent cohérentes.
 
-## Points bloquants avant le Lot 1
+## Prérequis avant le Lot 1
 
-Les six décisions du §33 du prompt, résolues par les chantiers du Lot 0 bis :
-durée de grâce ; définition du joueur actif ; libération du quota Découverte ;
-séquencement du correctif `exempt_until` ; stratégie CI ; politique d'import CSV.
+Toutes les décisions produit et techniques sont tranchées (§32 du prompt). Restent des
+**travaux d'exécution**, pas des arbitrages :
+
+1. **Correctif `exempt_until`** — prérequis bloquant, en 7 étapes : inventaire des
+   exemptions expirées → analyse d'impact → régularisation manuelle → communication
+   éventuelle → correction SQL → tests de non-régression → démarrage du Lot 1. Ne jamais
+   modifier silencieusement l'accès des clubs existants.
+2. **Dette CI** — corriger les contrôles bloquants (dont `check:i18n`) avant le Lot 1 ;
+   baseline chiffrée uniquement pour la dette réellement indépendante et risquée à
+   corriger. Aucune nouvelle erreur autorisée par rapport à cette baseline.
+3. **Inventaires du Lot 0 bis** — mutations directes (56 fichiers, classification
+   A/A′/B/C/D), lecteurs de `subscriptions` (39 sites).
+4. **Vérification pré-migration** — absence de doublons `(team_id, player_id)` avant la
+   création de l'index unique sur `team_members`.
+
+Seul point ouvert, non bloquant : les **paramètres juridiques** de la conservation des
+données après suppression d'un billing owner (durées, périmètre d'archivage). Le flux
+produit est arrêté ; ces paramètres doivent être des constantes de configuration.

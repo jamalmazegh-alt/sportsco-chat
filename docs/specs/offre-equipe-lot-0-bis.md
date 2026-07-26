@@ -4,8 +4,12 @@
 > `offre-equipe-architecture-plan.md`.
 >
 > **Aucun développement fonctionnel du Lot 1 ne commence avant validation de ce
-> document.** Les chantiers ci-dessous produisent des décisions, des inventaires et des
-> stratégies validées — pas de code fonctionnel.
+> document.**
+>
+> **Toutes les décisions produit et techniques sont désormais tranchées** (§32 du prompt).
+> Ce document ne contient plus d'arbitrages à rendre : uniquement des **inventaires à
+> produire**, des **spécifications à rédiger** à partir des décisions acquises, et une
+> **régularisation de données** à exécuter (`exempt_until`).
 >
 > Les comptages cités proviennent d'une exploration réelle du dépôt et servent d'amorce ;
 > ils doivent être complétés, pas repris tels quels.
@@ -109,19 +113,37 @@ Fichiers représentatifs déjà identifiés : `src/components/import-players-csv
 | Modification proposée | ajout de `team_has_write_access()`, RPC, ou aucun changement |
 | Risque de régression | faible / moyen / élevé |
 
-### Règle de classification
+### Règle de classification — quatre catégories
 
-Ne pas ajouter aveuglément `team_has_paid_access()` partout. La distinction **A vs B est
-le point le plus risqué de tout le chantier** : une mutation de réponse mal classée en
-« gestion » bloquerait des parents légitimes sur des événements déjà créés.
+Ne pas ajouter aveuglément `team_has_paid_access()` partout. La classification est **le
+point le plus risqué de tout le chantier** : une mutation mal classée bloque soit des
+parents légitimes, soit l'annulation d'un entraînement.
 
-Cas manifestement **B** repérés à l'amorce, à confirmer :
-`declare-absence-drawer.tsx`, `declare-staff-absence-drawer.tsx` (disponibilités),
-`needs/event-needs-section.tsx` (candidature à un besoin), `carpool-section.tsx`
-(inscription covoiturage), et les réponses à convocation.
+```text
+A  — création et administration        → bloquée après la grâce
+A′ — continuité et sécurité            → MAINTENUE en lecture seule
+B  — réponses à un objet existant      → MAINTENUE en lecture seule
+C  — système (webhook, cron, service role) → hors RLS utilisateur, auditée
+D  — lectures                          → conservées
+```
 
-Cas manifestement **A** : `import-players-csv-dialog.tsx`, `staff-assignment-section.tsx`,
-`existing-player-picker.tsx`, `quick-sanction-drawer.tsx`, les écrans `admin/settings.*`.
+Pré-classement de l'amorce, à confirmer fichier par fichier :
+
+- **B** : `declare-absence-drawer.tsx`, `declare-staff-absence-drawer.tsx`
+  (disponibilités), `needs/event-needs-section.tsx` (candidature), `carpool-section.tsx`
+  (inscription covoiturage), réponses à convocation.
+- **A′** : annulation d'un événement et notification associée dans
+  `routes/_authenticated/events/$eventId.tsx` ; retrait d'une convocation erronée ;
+  consultation des réponses ; clôture d'un besoin. **Ces chemins doivent être identifiés
+  explicitement** — ils sont aujourd'hui mêlés aux mutations de gestion dans les mêmes
+  écrans, ce qui est précisément le risque.
+- **A** : `import-players-csv-dialog.tsx`, `staff-assignment-section.tsx`,
+  `existing-player-picker.tsx`, `quick-sanction-drawer.tsx`, `wall-feed.tsx` (création de
+  publication), écrans `admin/settings.*`.
+
+Point d'attention : « modifier un événement » peut relever de A (changer le lieu et
+l'horaire) ou de A′ (annuler). La granularité doit descendre au niveau de l'action, pas
+de l'écran.
 
 ### Livrables
 
@@ -234,16 +256,37 @@ aucune couverture                        → none          (restricted)
 équipe archivée / suspendue              → —             (locked)
 ```
 
-### Décision bloquante : durée de la période de grâce
+### Période de grâce — décision tranchée
 
-`grace_end` apparaît dans la table de dérivation mais **sa durée n'a jamais été
-spécifiée**. Il faut trancher avant le Lot 1. Éléments de cadrage : Stripe relance
-automatiquement les paiements échoués selon le *smart retry* configuré (typiquement
-jusqu'à ~3 semaines) ; une grâce plus courte que la fenêtre de relance couperait des
-clubs qui allaient être débités avec succès.
+```text
+TEAM_BILLING_GRACE_DAYS = 14
+```
 
-Recommandation : aligner la grâce sur la fin de la séquence de relance Stripe, soit une
-valeur configurable avec un défaut de **14 jours**, à confirmer.
+Constante serveur surchargeable par env, **pas une valeur en base** : modifiable sans
+migration.
+
+Règle d'écriture, à implémenter dans le handler `invoice.payment_failed` :
+
+```text
+IF grace_started_at IS NULL THEN
+  grace_started_at := now()
+  grace_end        := now() + TEAM_BILLING_GRACE_DAYS
+END IF
+```
+
+`grace_started_at` est posé **une seule fois** et jamais écrasé — ni par les relances du
+*smart retry* Stripe, ni par le rejeu d'un webhook. Sans cette écriture conditionnelle,
+chaque relance repousserait l'échéance et la grâce ne se terminerait jamais.
+
+Remise à zéro uniquement sur `invoice.payment_succeeded`.
+
+Pendant la grâce, l'usage reste **complet** (`canManageTeamContent`,
+`canOperateExistingEvents`, `canRespondToExistingObjects` tous à `true`) : pas d'état
+intermédiaire complexe, une simple alerte au billing owner. À l'expiration : Découverte si
+tous les quotas sont respectés, sinon lecture seule.
+
+À spécifier : le test « trois `invoice.payment_failed` successifs → `grace_end` inchangé »,
+et le test « webhook rejoué → `grace_end` inchangé ».
 
 ### 28.5.1 Job planifié
 
@@ -294,18 +337,53 @@ Ne jamais produire : une `team_subscription` pointant vers un utilisateur suppri
 customer Stripe sans responsable Clubero ; une facture active sans interlocuteur
 fonctionnel.
 
-### Question ouverte
+### Flux tranché — jamais de blocage indéfini
 
-Que faire d'un utilisateur qui **exige** la suppression RGPD alors qu'il est billing
-owner et refuse de transférer ? Le RGPD n'autorise pas un blocage indéfini. Piste :
-anonymiser les données personnelles tout en conservant la relation de facturation sous
-une identité technique, avec notification au club pour désigner un nouveau responsable
-sous délai. À valider juridiquement — cette question dépasse le cadre technique.
+Le droit à l'effacement n'est pas absolu, mais il ne peut pas être suspendu indéfiniment
+faute de transfert. Forcer une personne à rester cliente n'est pas une option.
+
+```text
+1. demande de suppression enregistrée
+2. proposition de transfert à un responsable éligible
+3. sans transfert : désactivation du renouvellement
+4. retrait immédiat des accès personnels et opérationnels non nécessaires
+5. couverture maintenue jusqu'à current_period_end (le service payé n'est pas coupé
+   pour les autres membres)
+6. à l'échéance : Découverte si éligible, sinon lecture seule
+7. suppression des données de profil non nécessaires
+8. conservation restreinte des seules données comptables / fiscales / contentieuses,
+   en archivage à accès limité
+9. effacement à l'expiration des durées légales
+```
+
+Ce flux évite quatre écueils : forcer la personne à rester cliente ; conserver un
+abonnement renouvelable sans responsable ; supprimer des preuves comptables requises ;
+couper immédiatement un service déjà payé pour les autres membres de l'équipe.
+
+### Pseudonymisation ≠ anonymisation
+
+Substituer un identifiant technique au nom du payeur **n'est pas une anonymisation** si
+Clubero ou Stripe peut encore relier cet identifiant à la personne : c'est une
+pseudonymisation, et les obligations RGPD continuent de s'appliquer. Ne jamais présenter
+cette substitution comme un effacement définitif, ni dans le code, ni dans l'UI, ni dans
+la politique de confidentialité.
+
+### Point ouvert — validation juridique (non bloquant)
+
+À instruire hors chantier technique : durées de conservation selon la société estonienne
+et les marchés servis ; rôle exact de Stripe et de Clubero (responsable de traitement /
+sous-traitant) ; données minimales à conserver ; information remise à la personne ;
+distinction explicite entre suppression du compte, résiliation de l'abonnement et
+archivage légal.
+
+**Conséquence d'implémentation** : durées et périmètre d'archivage doivent être des
+constantes de configuration, ajustables sans migration une fois l'avis rendu. Le flux
+ci-dessus est implémentable dès maintenant.
 
 ### Livrables
 
-Spécification de la fonction, points d'insertion dans le flux existant, décision sur le
-cas « suppression exigée sans transfert », plan de test §27.5 du prompt.
+Spécification de la fonction, points d'insertion dans le flux existant, constantes de
+configuration pour les durées, plan de test §27.5 du prompt.
 
 ---
 
@@ -359,13 +437,21 @@ pour distinguer les clubs réellement actifs des comptes dormants : un club dorm
 ### Dette CI
 
 Le projet possède déjà des contrôles rouges (clés `groups.*` manquantes, lint existant).
-Deux options, à trancher :
 
-- **Recommandée** — corriger la dette avant le Lot 1, pour que
-  `bun run check:i18n | lint | check:guards | test:rls` soient de vrais critères de sortie.
-- **Repli** — baseline documentée : erreurs présentes avant le chantier, nombre exact,
-  fichiers concernés. Les critères deviennent « aucune nouvelle erreur par rapport à la
-  baseline », et non un faux vert inatteignable.
+**Décision tranchée — trois catégories, pas un choix binaire :**
+
+| Catégorie | Traitement |
+|---|---|
+| Erreurs empêchant la validation du chantier (dont `check:i18n`) | **À corriger avant le Lot 1** |
+| Avertissements et dette réellement indépendante, risquée à corriger maintenant | **Baseline chiffrée et documentée** |
+| Régressions introduites par les lots | **Interdites** |
+
+Il ne s'agit donc pas de nettoyer toute la dette historique du dépôt avant de commencer,
+mais de rendre les contrôles bloquants réellement fiables. Fonctionnement cible pendant le
+chantier : `check:i18n` vert, tests ciblés verts, aucune nouvelle erreur de lint.
+
+La baseline, si elle est utilisée, doit être chiffrée : nombre exact d'erreurs, fichiers
+concernés, date de relevé.
 
 ### Livrables
 
@@ -426,52 +512,69 @@ sécurité §27.6 du prompt.
 
 ## 28.9 Quotas Découverte et définition du joueur actif
 
-### A. Définition du « joueur actif » — décision bloquante
+### A. Définition du « joueur actif » — décision tranchée
 
-Constat : `players` possède `deleted_at` (soft delete) mais **aucun état « archivé »** ni
-colonne de statut. Le rattachement à une équipe passe par `team_members.player_id`.
+L'activité est portée par **la relation joueur ↔ équipe**, pas par le profil global : un
+joueur peut être actif dans une équipe et archivé dans une autre.
 
-Le prompt évoque des « joueurs archivés » non comptés : cet état n'existe pas. Il faut
-trancher :
+Colonne à créer sur `team_members` :
 
-- **Option 1** — s'en tenir au soft delete : joueur actif = ligne `team_members` jointe à
-  `players` avec `players.deleted_at IS NULL`. Simple, aucun schéma à changer, mais
-  « retirer un joueur de l'effectif » revient à le supprimer.
-- **Option 2** — introduire un état « archivé », sur `players` ou sur `team_members` (un
-  joueur peut être archivé dans une équipe et actif dans une autre — ce qui plaide pour
-  `team_members`). Plus juste fonctionnellement, migration additive, mais élargit le
-  périmètre.
+```sql
+status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived'))
+```
 
-Sous-questions : les joueurs temporairement inactifs (blessure, saison suspendue)
-comptent-ils ? **Recommandation : oui** — ils occupent une place dans l'effectif, sinon la
-limite devient contournable par un simple marquage.
+Deux états suffisent en V1 (`pending` et `left` éventuellement plus tard).
 
-### B. Porteur du quota Découverte
+Prédicat de comptage — **corrigé d'après le schéma réel** : `team_members` ne contient que
+`id`, `team_id`, `user_id`, `player_id`, `role`, `created_at`. Il n'y a **ni `member_type`
+ni `deleted_at`** sur cette table ; une ligne joueur s'identifie par
+`player_id IS NOT NULL`.
 
-`teams` n'a pas de `created_by`. Deux options :
+```sql
+team_members.team_id = :team_id
+AND team_members.player_id IS NOT NULL
+AND team_members.status = 'active'
+AND players.deleted_at IS NULL
+```
 
-- ajouter `teams.created_by_user_id` (utile au-delà des quotas, pour la provenance) ;
-- porter le rattachement sur la ligne de couverture Découverte
-  (`discovery_owner_user_id`), plus explicite et transférable.
+La suppression dans `players` reste réservée à la suppression ou à l'anonymisation du
+profil, **jamais** à une sortie d'effectif — ce qui préserve convocations, statistiques,
+présences, compositions et anciens événements.
 
-**Recommandation : les deux** — `created_by_user_id` pour la provenance historique,
-`discovery_owner_user_id` pour le quota, car le porteur du quota doit pouvoir changer
-sans réécrire l'histoire de la création.
+Les joueurs temporairement inactifs (blessure, saison suspendue) **comptent** : ils
+occupent une place dans l'effectif, sinon la limite serait contournable par un simple
+marquage.
 
-Tension à lever : le prompt indique que « la couverture Découverte est rattachée à
-l'équipe, pas à son créateur », tout en fixant un quota **par créateur**. Résolution
-proposée : le quota est consommé par le porteur au moment de l'octroi ; la couverture
-appartient à l'équipe ; le porteur peut être transféré à un autre membre éligible.
+**Vérification pré-migration** : absence de doublons `(team_id, player_id)` existants, qui
+feraient échouer l'index unique prévu au plan d'architecture.
 
-### C. Libération du quota — décision bloquante
+### B. Porteur du quota Découverte — décision tranchée
 
-Quand une équipe Découverte est archivée ou passe en offre payante, le quota du porteur et
-celui du club se libèrent-ils ? Et une équipe en lecture seule peut-elle alors réclamer la
-place libérée ?
+Les deux colonnes coexistent : `teams.created_by_user_id` pour la provenance historique,
+`team_discovery_coverage.discovery_owner_user_id` pour le quota — le porteur doit pouvoir
+changer sans réécrire l'histoire de la création.
 
-**Recommandation V1** : le quota se libère (révocation de la couverture), mais **aucune
-bascule rétroactive automatique** — l'utilisateur doit la demander explicitement. Évite
-les effets de bord silencieux et les allers-retours d'état.
+Tension levée : la couverture appartient à **l'équipe** ; le quota est consommé par le
+**porteur** au moment de l'octroi ; le porteur est transférable à un autre membre éligible.
+
+### C. Libération du quota — décision tranchée
+
+Le quota est libéré **immédiatement** lorsque l'équipe devient payante, passe sous
+couverture Club, est archivée, est supprimée logiquement, ou perd son statut Découverte.
+
+**Aucune bascule rétroactive automatique.** Une modification de facturation sur une équipe
+ne doit jamais provoquer un changement d'offre silencieux sur une autre.
+
+```text
+U13 Découverte · U15 Découverte · U17 lecture seule
+puis U13 devient payante → une place se libère
+→ U17 NE bascule PAS automatiquement
+```
+
+L'équipe en attente affiche un CTA explicite (« Une place en offre Découverte est
+désormais disponible pour ce club »). Au clic, revérification **atomique** : quota club,
+quota bénéficiaire, statut de l'équipe, absence de conflit concurrent. **Aucune
+réservation implicite** — deux équipes peuvent demander la même place, une seule l'obtient.
 
 ### D. Atomicité
 
@@ -500,11 +603,29 @@ add_player_to_team(_team_id, _player_payload)
 Trigger de défense en profondeur sur `team_members` : recompte et refuse le dépassement,
 couvrant tout chemin contournant la RPC. Filet, pas mécanisme principal.
 
-**Import CSV — décision bloquante.** Recommandation : traiter l'import comme un **lot
-cohérent** et refuser le lot entier avant insertion s'il dépasserait le quota, plutôt que
-des erreurs ligne par ligne. Un import partiel laisse un effectif silencieusement tronqué,
-difficile à réconcilier avec le fichier source. Alternative à trancher : proposer
-explicitement « importer les N premières lignes qui rentrent » (non recommandé en V1).
+**Import CSV — décision tranchée : refus atomique du lot entier.** Aucune insertion
+partielle.
+
+Le calcul ne porte pas sur le nombre de lignes du fichier, mais sur ce qui **augmente
+réellement l'effectif actif** :
+
+```text
+consommation = nouveaux joueurs uniques
+             + joueurs archivés réactivés
+
+ne consomment RIEN : doublons internes au fichier,
+                     doublons déjà présents dans l'équipe,
+                     joueurs existants simplement mis à jour
+
+SI count_active_players + consommation > quota → RAISE, lot entier rejeté
+```
+
+Le message d'erreur remonte le nombre de **places restantes** et le nombre de **lignes
+consommatrices**, pas le nombre de lignes du fichier — sinon l'utilisateur ne comprend pas
+le refus quand son fichier contient surtout des mises à jour.
+
+> Cet import contient 6 nouveaux joueurs alors que votre équipe ne dispose que de 3 places
+> en offre Découverte. Retirez au moins 3 joueurs du fichier ou passez à l'offre Équipe.
 
 ### F. Anti-contournement
 
@@ -547,17 +668,25 @@ concurrence avec la méthode d'exécution.
 
 ## Récapitulatif des sorties bloquantes
 
-| § | Chantier | Sortie |
-|---|---|---|
-| 28.1 | Garde-fous DB | Définitions SQL, portée service role, tests de contournement |
-| 28.2 | Mutations directes | Tableau des 56 fichiers, classification A/B/C/D, plan RLS |
-| 28.3 | Lecteurs `subscriptions` | Tableau des 39 sites, plan de correction, test « club sans ligne » |
-| 28.4 | Saga Équipe → Club | Diagramme d'états, persistance, reprise manuelle |
-| 28.5 | Machine à états | Table de dérivation, **durée de grâce**, spécification du job |
-| 28.6 | RGPD | Fonction, points d'insertion, cas « suppression sans transfert » |
-| 28.7 | Dette CI + `exempt_until` | Inventaire renseigné, régularisations, séquence de déploiement |
-| 28.8 | Clubs et rattachement | Endpoint fail-closed, suggestion, conflits d'équipes |
-| 28.9 | Quotas et joueur actif | **Définition du joueur actif**, RPC atomiques, stratégie d'import |
+| § | Chantier | Sortie | Nature |
+|---|---|---|---|
+| 28.1 | Garde-fous DB | Définitions SQL, portée service role, tests de contournement | Spécification |
+| 28.2 | Mutations directes | Tableau des 56 fichiers, classification A/A′/B/C/D, plan RLS | **Inventaire** |
+| 28.3 | Lecteurs `subscriptions` | Tableau des 39 sites, plan de correction, test « club sans ligne » | **Inventaire** |
+| 28.4 | Saga Équipe → Club | Diagramme d'états, persistance, reprise manuelle | Spécification |
+| 28.5 | Machine à états | Table de dérivation, écriture conditionnelle de `grace_started_at`, job | Spécification |
+| 28.6 | RGPD | Fonction, points d'insertion, constantes de durée | Spécification |
+| 28.7 | Dette CI + `exempt_until` | Inventaire renseigné, régularisations, séquence en 7 étapes | **Inventaire + exécution** |
+| 28.8 | Clubs et rattachement | Endpoint fail-closed, suggestion, conflits d'équipes | Spécification |
+| 28.9 | Quotas et joueur actif | Prédicat de comptage, RPC atomiques, calcul de consommation d'import | Spécification |
 
-Les six décisions listées au §33 du prompt sont résolues par ces chantiers. Le Lot 1 ne
-démarre qu'après validation de l'ensemble.
+**Aucun arbitrage produit ne reste à rendre** : les décisions sont prises (§32 du prompt).
+Ce lot produit des inventaires, des spécifications et une régularisation de données.
+
+Le seul point encore ouvert — les **paramètres juridiques** de conservation après
+suppression d'un billing owner — ne bloque pas : le flux produit est arrêté, seules les
+durées et le périmètre d'archivage restent à confirmer, et ce sont des constantes de
+configuration.
+
+Le Lot 1 démarre après validation de l'ensemble, et **après** la correction d'`exempt_until`
+(§28.7) qui en est le prérequis strict.

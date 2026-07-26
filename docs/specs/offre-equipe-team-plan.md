@@ -33,10 +33,13 @@ financial_admin`. `club_members.roles text[]` porte les rôles fins (`assistant_
 de rôles.
 
 **Joueurs — point critique.** La table `players` possède `deleted_at` (soft delete) mais
-**aucun état « archivé »** ni colonne de statut. Le rattachement à une équipe passe par
-`team_members.player_id`. Toute règle mentionnant des « joueurs archivés » suppose un
-état qui n'existe pas : il faut soit le créer, soit s'en tenir au soft delete
-(décision ouverte, Lot 0 bis).
+**aucun état « archivé »**. La table `team_members` ne contient que `id`, `team_id`,
+`user_id`, `player_id`, `role`, `created_at` : **ni `status`, ni `member_type`, ni
+`deleted_at`**. Une ligne joueur s'y identifie par `player_id IS NOT NULL`.
+
+La notion d'appartenance active à une équipe n'existe donc pas aujourd'hui et doit être
+créée : `team_members.status` (§5). Ne pas écrire de prédicat s'appuyant sur
+`member_type` ou `team_members.deleted_at` — ces colonnes n'existent pas.
 
 **Facturation existante.** Table `subscriptions` **une ligne par club** (contrainte UNIQUE
 sur `club_id`, `upsert(onConflict: "club_id")` dans le webhook). Enums
@@ -265,9 +268,36 @@ Club       : illimité
 Ne **jamais** compter : parents, responsables légaux, coaches, assistants, membres du
 staff, joueurs supprimés.
 
-La notion de « joueur actif » doit être définie dans une fonction centrale unique.
-**Point ouvert** : `players` n'a pas d'état « archivé » (§0) — il faut décider entre créer
-cet état ou s'en tenir à `deleted_at` (Lot 0 bis §28.9).
+### 5.0 Définition du joueur actif — décision tranchée
+
+La notion d'activité appartient à **la relation entre le joueur et l'équipe**, pas au
+profil global. Un joueur peut être actif dans une équipe, archivé dans une autre,
+transféré, ou rattaché à plusieurs contextes sportifs.
+
+Ajouter sur `team_members` :
+
+```text
+status = 'active' | 'archived'      (défaut 'active')
+```
+
+Deux états suffisent en V1 ; `pending` et `left` pourront être ajoutés plus tard.
+
+Prédicat de comptage — **adapté aux colonnes réellement présentes** (`team_members` n'a ni
+`member_type` ni `deleted_at`, §0) :
+
+```sql
+team_members.team_id = :team_id
+AND team_members.player_id IS NOT NULL   -- une ligne joueur, pas un membre du staff
+AND team_members.status = 'active'
+AND players.deleted_at IS NULL           -- profil global non supprimé
+```
+
+La suppression globale dans `players` reste réservée à la suppression ou à
+l'anonymisation du profil — **jamais** à une simple sortie d'effectif. L'archivage dans
+une équipe ne supprime ni le profil global ni l'historique sportif, ce qui préserve :
+convocations, statistiques, présences, compositions et anciens événements.
+
+Ce prédicat doit vivre dans une fonction centrale unique, jamais dupliqué.
 
 ### 5.1 Dépassement après essai
 
@@ -299,10 +329,36 @@ voyant chacun 14 joueurs peuvent monter à 16 ou plus.
 
 Exigence : vérification et insertion dans **une même transaction**, avec verrou de ligne
 sur l'équipe ; RPC transactionnelle comme seul chemin d'ajout ; trigger de défense en
-profondeur ; import traité comme un **lot cohérent**.
+profondeur.
 
 Test obligatoire : équipe à 14 joueurs actifs, quota 15, deux insertions concurrentes
 réelles → **jamais plus de 15**.
+
+### 5.3.1 Import CSV — refus atomique du lot entier
+
+**Aucune insertion si l'import ferait dépasser le quota.** Pas d'insertion partielle.
+
+```text
+Équipe : 12 joueurs actifs — capacité restante : 3
+CSV    : 6 nouveaux joueurs valides
+Résultat : 0 joueur importé
+```
+
+> Cet import contient 6 nouveaux joueurs alors que votre équipe ne dispose que de 3 places
+> en offre Découverte. Retirez au moins 3 joueurs du fichier ou passez à l'offre Équipe.
+
+Avant écriture, calculer précisément ce qui **consomme réellement** du quota :
+
+- joueurs actifs actuels ;
+- nouveaux joueurs réellement uniques ;
+- doublons internes au fichier ;
+- doublons déjà présents dans l'équipe ;
+- joueurs existants qui seraient simplement **mis à jour** (ne consomment rien) ;
+- joueurs archivés qui seraient **réactivés** (consomment du quota).
+
+Seules les créations et les réactivations augmentant l'effectif actif consomment le quota.
+Validation et insertion dans une transaction cohérente ; deux imports concurrents ne
+doivent jamais dépasser la limite.
 
 ### 5.4 Anti-contournement
 
@@ -383,6 +439,32 @@ deux catégories ne peut avoir ni deux équipes gratuites ni deux essais : **sa 
 C'est une décision UX assumée, pas un défaut. Elle doit être **annoncée avant la fin du
 wizard**, avec un message distinguant les deux causes (quota utilisateur vs quota club),
 car la solution proposée diffère.
+
+### 6.4 Libération des quotas Découverte
+
+Une équipe libère **immédiatement** sa place Découverte lorsqu'elle devient payante, passe
+sous couverture Club, est archivée, est supprimée logiquement, ou perd son statut
+Découverte.
+
+**Aucune autre équipe ne bascule automatiquement vers Découverte.** Une bascule
+rétroactive silencieuse serait dangereuse : une modification de facturation sur une équipe
+provoquerait un changement d'offre sur une autre.
+
+```text
+U13 — Découverte      U15 — Découverte      U17 — lecture seule (fin d'essai)
+puis U13 devient payante
+→ une place Découverte se libère pour le club
+→ U17 NE bascule PAS automatiquement
+```
+
+L'équipe en lecture seule peut demander explicitement l'activation :
+
+> Une place en offre Découverte est désormais disponible pour ce club. Activer l'offre
+> Découverte pour cette équipe.
+
+Au clic, revérifier **atomiquement** : quota du club, quota du bénéficiaire, statut de
+l'équipe, absence de conflit concurrent. **Aucune place n'est réservée implicitement** —
+deux équipes peuvent demander la même place, une seule l'obtient.
 
 ---
 
@@ -566,12 +648,50 @@ Couvrir : souscription active ; période d'essai ; statut `incomplete` ; paiemen
 échec ; annulation programmée ; migration vers Club en cours ; exemption dont
 l'utilisateur est responsable ; obligations Stripe encore actives.
 
-Si une responsabilité existe : **suppression bloquée** → transfert ou annulation
-obligatoire. Modifier le flux `privacy.functions` ou son équivalent.
+### 14.1 Ne jamais bloquer indéfiniment une demande de suppression
 
-Ne jamais produire : une `team_subscription` pointant vers un utilisateur supprimé ; un
-customer Stripe sans responsable Clubero ; une facture active sans interlocuteur
-fonctionnel.
+Le droit à l'effacement n'est pas absolu — certaines données peuvent être conservées
+lorsqu'une obligation légale, comptable ou la défense de droits en justice l'exige — mais
+il ne peut pas être **suspendu indéfiniment** au motif qu'un transfert n'a pas eu lieu.
+Forcer une personne à rester cliente n'est pas une option.
+
+Flux produit retenu :
+
+1. demande de suppression enregistrée ;
+2. **proposition de transfert** à un autre responsable éligible ;
+3. en l'absence de transfert : désactivation du renouvellement de la souscription ;
+4. retrait **immédiat** des accès personnels et opérationnels non nécessaires (portail
+   Stripe, rôles opérationnels) ;
+5. maintien de la couverture **jusqu'à la fin de la période déjà payée**
+   (`current_period_end`) — le service déjà réglé n'est pas coupé pour les autres membres ;
+6. à l'échéance : bascule de l'équipe vers Découverte si éligible, sinon lecture seule ;
+7. suppression des données de profil non nécessaires ;
+8. isolation et conservation **restreinte** des seules données requises par les
+   obligations comptables, fiscales ou contentieuses, en environnement d'archivage à accès
+   limité ;
+9. effacement à l'expiration des durées légales applicables.
+
+### 14.2 Pseudonymisation ≠ anonymisation
+
+Remplacer le nom du payeur par un identifiant technique **n'est pas une anonymisation**
+si Clubero ou Stripe peut encore relier cet identifiant à la personne : c'est une
+pseudonymisation, et les obligations RGPD continuent de s'appliquer. Une anonymisation
+véritable rend l'identification irréversible. Ne jamais présenter la substitution par une
+identité technique comme un effacement définitif.
+
+### 14.3 Invariants techniques
+
+Ne jamais produire : une `team_subscription` renouvelable sans responsable ; un customer
+Stripe sans interlocuteur fonctionnel ; une facture active sans destinataire ; ni la
+suppression de preuves comptables requises.
+
+### 14.4 Validation juridique requise
+
+Point ouvert assumé, à instruire hors chantier technique : durée de conservation selon la
+société estonienne et les marchés servis ; rôle exact de Stripe et de Clubero
+(responsable de traitement / sous-traitant) ; données minimales à conserver ; information
+remise à la personne ; distinction explicite entre suppression du compte, résiliation de
+l'abonnement et archivage légal.
 
 ---
 
@@ -595,15 +715,27 @@ modification proposée ; risque de régression. Livrable du Lot 0 bis §28.2.
 
 Ne pas ajouter aveuglément `team_has_paid_access()` dans toutes les policies.
 
-**A — Mutations de gestion.** Couverture d'écriture obligatoire : créer/modifier/supprimer
-un événement ; gérer les joueurs ; gérer les membres ; publier sur le mur ; créer un
-sondage ; créer des documents ; créer des besoins ; gérer des compositions ; modifier la
-configuration d'équipe.
+**A — Création et administration** (`canManageTeamContent`). Bloquée après la grâce :
+créer un événement ; modifier substantiellement un événement ; envoyer une nouvelle
+convocation ; ajouter des joueurs ; créer une publication ; créer un sondage ; créer un
+besoin ; inviter de nouveaux membres ; ajouter un document ; gérer les compositions ;
+modifier la configuration d'équipe.
 
-**B — Réponses à un objet existant.** À analyser spécifiquement : répondre à une
-convocation ; indiquer une disponibilité ; répondre à un sondage ; candidater à un
-besoin ; accepter une invitation. **Ces actions restent autorisées pendant la grâce et en
-lecture seule** afin de ne pas casser l'usage des familles sur des événements déjà créés.
+**A′ — Continuité et sécurité d'événements existants** (`canOperateExistingEvents`).
+**Maintenue même en lecture seule** : annuler un événement existant ; notifier une
+annulation ; consulter les réponses ; retirer une convocation erronée ; clôturer un
+besoin.
+
+> Justification : il serait dangereux d'empêcher un coach d'annuler un entraînement parce
+> que le paiement a expiré. Les familles se déplaceraient pour un événement annulé sans en
+> être informées. La continuité et la sécurité priment sur le levier commercial.
+
+**B — Réponses à un objet existant** (`canRespondToExistingObjects`,
+`canAcceptTeamInvitation`). **Autorisées pendant la grâce et en lecture seule**, tant que
+l'objet existe et que l'utilisateur y est légitimement lié : répondre présent ou absent ;
+modifier sa réponse avant l'événement ; répondre à un sondage existant ; indiquer une
+disponibilité ; candidater à un besoin existant ; consulter les informations d'un
+événement ; télécharger un document déjà accessible ; accepter une invitation.
 
 **C — Mutations système.** Webhooks, cron, service role, traitements internes : non
 bloquées par la RLS utilisateur, mais gardées et auditées.
@@ -637,8 +769,11 @@ Objet cible :
   accessState: "active" | "grace" | "restricted" | "locked",
 
   canReadTeam: boolean,
-  canWriteTeam: boolean,              // mutations catégorie A
-  canRespondToExistingObjects: boolean, // catégorie B — reste true en grâce et restricted
+
+  // Trois niveaux distincts — ne PAS retomber sur un unique canWriteTeam
+  canManageTeamContent: boolean,        // catégorie A  — création et administration
+  canOperateExistingEvents: boolean,    // catégorie A′ — continuité et sécurité
+  canRespondToExistingObjects: boolean, // catégorie B  — réponses
   canAcceptTeamInvitation: boolean,     // catégorie B
 
   canManageTeam: boolean,
@@ -663,11 +798,23 @@ Correspondance états → droits :
 
 ```text
 active     : tout autorisé selon l'offre (canUseClubFeatures false hors offre Club)
-grace      : identique à active, plus une alerte au billing owner
-restricted : canWriteTeam = false ; canRespondToExistingObjects = true ;
-             canAcceptTeamInvitation = true ; lectures conservées
+
+grace      : usage complet conservé + alerte au billing owner
+             canManageTeamContent      = true
+             canOperateExistingEvents  = true
+             canRespondToExistingObjects = true
+
+restricted : canManageTeamContent      = false
+             canOperateExistingEvents  = true    ← annulation, notification, retrait
+             canRespondToExistingObjects = true
+             canAcceptTeamInvitation   = true
+             lectures conservées
+
 locked     : équipe archivée ou suspendue — lectures seules
 ```
+
+Pendant la grâce, l'usage reste **complet** : plutôt que de créer un état intermédiaire
+complexe, on conserve le service et on alerte le payeur.
 
 ---
 
@@ -700,7 +847,31 @@ incohérences ; réconcilier périodiquement Stripe et Clubero.
 Préciser : fréquence ; mécanisme de verrouillage ; idempotence ; journalisation ; reprise
 après échec.
 
-**Durée de la période de grâce : décision encore ouverte** (§33).
+### 17.2 Période de grâce — décision tranchée
+
+```text
+TEAM_BILLING_GRACE_DAYS = 14
+```
+
+Configurable côté serveur, **sans migration**. La grâce démarre au **premier** échec de
+paiement ouvrant la période, et **n'est jamais réinitialisée** par les tentatives Stripe
+suivantes ni par le rejeu d'un webhook :
+
+```text
+invoice.payment_failed le 1er septembre
+→ grace_started_at = 1er septembre   (posé une seule fois)
+→ grace_end        = 15 septembre
+
+invoice.payment_failed le 5 septembre (relance Stripe)
+→ grace_started_at INCHANGÉ, grace_end INCHANGÉ
+```
+
+C'est ce qui distingue `grace_started_at` (posé une fois, jamais écrasé) d'un simple
+`last_payment_failed_at`. Sans cette règle, les relances automatiques de Stripe
+prolongeraient la grâce indéfiniment.
+
+Pendant la grâce, l'usage est complet (§16). À l'expiration : Découverte si tous les
+quotas sont respectés (§6.1), sinon lecture seule.
 
 ---
 
@@ -1042,6 +1213,18 @@ Les lots 7 et 8 doivent pouvoir avoir des flags séparés.
     payeur.
 27. **Les mutations de catégorie B (réponses, acceptation d'invitation) restent
     autorisées en grâce et en lecture seule.**
+27 bis. **Les mutations de catégorie A′ restent autorisées en lecture seule** : un coach
+    peut annuler un événement existant et en notifier les participants même après
+    expiration de la couverture.
+27 ter. **La grâce dure 14 jours à compter du premier échec** et n'est jamais réinitialisée
+    par une relance Stripe ou un webhook rejoué.
+27 quater. **Un import CSV dépassant le quota est refusé intégralement**, en ne comptant
+    comme consommatrices que les créations et réactivations.
+27 quinquies. **La libération d'une place Découverte ne déclenche aucune bascule
+    automatique** ; la réactivation est explicite et revérifiée atomiquement.
+27 sexies. **Une demande de suppression RGPD n'est jamais bloquée indéfiniment** : le
+    renouvellement est désactivé, la couverture court jusqu'à `current_period_end`, puis
+    l'équipe bascule en Découverte ou en lecture seule.
 28. Les mutations directes Supabase sont inventoriées et sécurisées.
 29. Les lecteurs de `subscriptions` supportent l'absence de ligne pour un club `per_team`.
 30. Les exemptions expirées ne donnent plus accès, après régularisation documentée.
@@ -1068,28 +1251,39 @@ Tournoi : offre séparée existante
 Pas de fusion automatique d'équipes ni de clubs
 Rapprochement de deux clubs : hors V1, chantier ultérieur
 Contrôle tournoi : billing_mode explicite + garde-fou DB
-Mutations catégorie B autorisées en grâce et lecture seule
+
+— tranché en dernier lieu —
+Période de grâce : TEAM_BILLING_GRACE_DAYS = 14, configurable, non réinitialisable
+Grâce : usage complet conservé (pas d'état intermédiaire)
+Joueur actif : porté par team_members.status, pas par players.deleted_at seul
+Quota Découverte : libéré immédiatement, réactivation sur demande explicite uniquement
+Correctif exempt_until : prérequis bloquant au Lot 1, en 7 étapes
+Dette CI : contrôles bloquants corrigés avant Lot 1, baseline pour la dette indépendante
+Import CSV : refus atomique du lot entier
+Entitlements : 3 niveaux (canManageTeamContent / canOperateExistingEvents /
+                          canRespondToExistingObjects) — plus de canWriteTeam unique
+Suppression du billing owner : jamais bloquée indéfiniment, flux en 9 étapes
 ```
 
-## 33. Décisions réellement encore bloquantes
+## 33. Points encore ouverts
 
-Seules ces six décisions manquent pour démarrer le Lot 1. Elles sont détaillées dans le
-Lot 0 bis.
+**Aucune décision produit ou technique ne reste bloquante pour le Lot 1.**
 
-1. **Durée de la période de grâce** après échec de paiement — jamais spécifiée à ce jour,
-   alors que la machine à états (§17) en dépend directement.
-2. **Définition du « joueur actif »** : `players` n'a pas d'état « archivé », seulement
-   `deleted_at`. Créer cet état, ou s'en tenir au soft delete ?
-3. **Libération du quota Découverte** : quand une équipe Découverte est archivée ou passe
-   en offre payante, le quota du porteur se libère-t-il ? Une équipe en lecture seule
-   peut-elle réclamer la place libérée automatiquement, ou seulement sur demande explicite
-   (recommandé) ?
-4. **Séquencement du correctif `exempt_until`** : corriger avant le Lot 1 (recommandé) ou
-   livrer les nouvelles fonctions correctes et traiter l'existant séparément ? Dépend de
-   l'inventaire du Lot 0 bis §28.7.
-5. **Dette CI** : corriger avant le Lot 1 (recommandé) ou baseline documentée ?
-6. **Import CSV dépassant le quota** : refus du lot entier avant insertion (recommandé)
-   ou insertion partielle avec erreurs ligne par ligne ?
+Un seul point demeure ouvert, et il ne bloque pas le démarrage : la **mise en œuvre
+juridique exacte de la suppression du billing owner** (§14.4) — durées de conservation
+selon la société estonienne et les marchés servis, rôle exact de Stripe et de Clubero,
+données minimales à conserver, information remise à la personne, distinction entre
+suppression du compte, résiliation et archivage légal.
+
+Le flux produit (§14.1) est arrêté et implémentable ; seuls les **paramètres de durée et
+de périmètre d'archivage** dépendent de la validation juridique. Ils doivent être des
+constantes de configuration, pas des valeurs codées en dur, afin d'être ajustées sans
+migration une fois l'avis rendu.
+
+Le Lot 0 bis reste un prérequis bloquant, mais il ne contient plus de décisions à
+prendre : uniquement des **inventaires à produire** (mutations directes, lecteurs de
+`subscriptions`, exemptions expirées) et des spécifications à rédiger à partir des
+décisions ci-dessus.
 
 ## 34. Contradictions résolues dans cette version
 
@@ -1098,6 +1292,10 @@ Lot 0 bis.
 | « Fin d'essai → Découverte » (inconditionnel) vs quotas Découverte | Bascule **conditionnelle** à l'éligibilité (§6.1), sinon lecture seule, sans grandfathering |
 | Rapprochement de clubs en V1 vs risque `club_id` cross-club | **Hors V1** (§4.5) ; seule la demande de rattachement reste |
 | A/B/C/D employé à la fois pour les mutations et les états d'accès | A/B/C/D = **mutations** (§15.2) ; états d'accès nommés `active / grace / restricted / locked` (§16) |
-| « Ne pas compter les joueurs archivés » alors qu'aucun état « archivé » n'existe | Signalé comme décision bloquante (§33.2) |
+| « Ne pas compter les joueurs archivés » alors qu'aucun état « archivé » n'existe | **Résolu** : `team_members.status` à créer ; l'activité appartient à l'appartenance, pas au profil (§5.0) |
+| `member_type` et `team_members.deleted_at` employés dans le prédicat de comptage | **Résolu** : ces colonnes n'existent pas ; le prédicat s'appuie sur `player_id IS NOT NULL` (§5.0) |
+| Grâce prolongeable indéfiniment par les relances Stripe | **Résolu** : `grace_started_at` posé une seule fois, jamais écrasé (§17.2) |
+| Blocage indéfini d'une suppression RGPD faute de transfert | **Résolu** : flux en 9 étapes, couverture jusqu'à `current_period_end`, jamais de blocage indéfini (§14.1) |
+| Un seul `canWriteTeam` pour des actions de nature différente | **Résolu** : trois niveaux, dont `canOperateExistingEvents` pour l'annulation d'événements (§15.2) |
 | `can_create_tournament` inchangée vs contrôle explicite | **Contrôle explicite retenu** (§9.2) : plus sûr que de dépendre de l'absence de ligne |
 | Index d'unicité bloquant un retry de checkout `incomplete` | Réconciliation Stripe avant nouveau checkout (§11) |
