@@ -203,8 +203,6 @@ export function CarpoolSection({
   const [reserveCarpool, setReserveCarpool] = useState<Carpool | null>(null);
   const [needOpen, setNeedOpen] = useState(false);
 
-  const canParticipate = isCoach || bookableConvocations.length > 0;
-
   return (
     <>
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
@@ -376,7 +374,6 @@ export function CarpoolSection({
                         </Button>
                       )
                     )}
-
                   </div>
                 );
               })}
@@ -631,7 +628,6 @@ function ReserveDialog({
             onClick={submit}
             disabled={busy || (selectablePlayers.length > 0 && selected.length === 0)}
           >
-
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("carpool.confirm")}
           </Button>
