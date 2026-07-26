@@ -15,6 +15,8 @@ import {
   ArrowRight,
   ImageIcon,
   ChevronDown,
+  ArrowUp,
+
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
