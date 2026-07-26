@@ -19,13 +19,62 @@
 A  — création et administration     → bloquée après la grâce
 A′ — continuité et sécurité         → MAINTENUE en lecture seule
 B  — réponses à un objet existant   → MAINTENUE en lecture seule
+B0 — état personnel sans valeur commerciale → JAMAIS bloquée, aucun état
 C  — système (webhook, cron, service role) → hors RLS utilisateur
 D  — lecture                        → conservée
 N  — hors périmètre équipe          → aucun changement
 ```
 
-**La classification porte sur l'action, pas sur le fichier.** Plusieurs écrans contiennent
-des mutations de catégories différentes — `events/$eventId.tsx` en contient au moins trois.
+**La classification porte sur l'action, pas sur le fichier, ni sur la table, ni sur
+l'écran.** `events/$eventId.tsx` contient à lui seul A, A′, B et des effets de bord.
+
+**B0** est une sous-catégorie explicite pour empêcher qu'un développeur ultérieur
+requalifie les marquages « lu » en « création de données » : `wall_post_reads`,
+`notifications.read_at`, accusés de lecture équivalents. Jamais bloqués, y compris en
+`locked`, sous peine de badges de non-lus qui ne redescendent jamais.
+
+**Classification par acteur, pas par écran** — quand un même écran sert plusieurs rôles :
+
+```text
+joueur ou parent répond pour lui-même        → B
+coach saisit à la place du joueur            → A
+coach corrige une erreur manifeste, journalisée → A′
+```
+
+---
+
+## 🔴 Découverte structurante — les tables d'effets de bord partagées
+
+**C'est le résultat le plus important de cette passe, et il change la façon d'implémenter
+le Lot 5.**
+
+Deux tables sont écrites **à la fois** par des actions de catégorie A et par des actions
+de catégorie A′ ou B :
+
+| Table | Écrite par une action A | Écrite aussi par |
+|---|---|---|
+| `notifications` | création de publication (`wall-feed.tsx:439`), envoi de convocations (`$eventId.tsx:1121`) | **B** — commentaire (`wall-feed.tsx:1685`), réponse à convocation (`$eventId.tsx:778`) · **A′** — annulation d'événement (`$eventId.tsx:1549`) |
+| `wall_posts` | publication manuelle sur le mur (`wall-feed.tsx:540`) | **A′** — annonce automatique d'annulation (`$eventId.tsx:1660`) |
+
+**Conséquence directe : on ne peut pas ajouter `team_can_manage_content()` sur les policies
+INSERT de `notifications` ni de `wall_posts`.** Le faire casserait :
+
+- la notification qu'un parent déclenche en répondant à une convocation (B) ;
+- la notification et l'annonce murale produites par l'annulation d'un événement (A′) ;
+- la notification qu'un commentaire déclenche (B).
+
+Autrement dit, **une policy posée au niveau de la table est structurellement incapable de
+distinguer les catégories ici**. Le seul découpage correct est au niveau de l'action.
+
+**Cela confirme et renforce la décision de la RPC dédiée.** `cancel_event` doit réaliser,
+dans une seule opération `SECURITY DEFINER` : la mise à jour de `events`, les
+`notifications`, l'annonce dans `wall_posts` et le journal d'audit. Les policies génériques
+peuvent alors rester strictes sur `events`, tandis que l'annulation passe par un chemin
+explicite et auditable.
+
+Sans cette RPC, il faudrait laisser `wall_posts` INSERT ouvert pour ne pas casser
+l'annulation — ce qui reviendrait à ne plus protéger la création de publications, l'une
+des fonctionnalités les plus visibles de l'offre.
 
 ---
 
@@ -69,28 +118,25 @@ Un coach doit pouvoir annuler un entraînement et prévenir les familles même s
 couverture a expiré. C'est la catégorie que la revue Cursor avait identifiée comme
 manquante.
 
-| Fichier | Ligne | Table | Op | Action |
+Décision validée : **RPC dédiées, aucune policy permissive générique sur
+`events UPDATE` en état restreint.**
+
+| Fichier | Ligne | Fonction | Table | Catégorie |
 |---|---|---|---|---|
-| `src/routes/_authenticated/events/$eventId.tsx` | 1339, 1354, 1488, 1517, 2134, 4525 | `events` | update/delete | **À départager** : annulation d'un événement (A′) vs modification de fond (A) |
-| `src/routes/_authenticated/events/$eventId.tsx` | 804, 1077 | `convocations` | insert/delete | **À départager** : retrait d'une convocation erronée (A′) vs nouvelle convocation (A) |
-| `src/components/urgency-center.tsx` | 254 | `convocations` | delete/update | Traitement d'une convocation en souffrance |
-| `src/routes/_authenticated/events/$eventId/feedback.tsx` | — | `events` | delete | Retrait d'un retour d'événement |
+| `events/$eventId.tsx` | 1494-1517 | `confirmCancelEvent` | `events` (+ `notifications:1549`, `wall_posts:1660`) | **A′ — à convertir en RPC `cancel_event`** |
+| `events/$eventId.tsx` | 867-878 | `confirmCancelConvocation` | `convocations` delete | **A′ — à convertir en RPC `withdraw_convocation`** |
+| `components/urgency-center.tsx` | 254 | — | `convocations` | A′ — traitement d'une convocation en souffrance |
+| `events/$eventId/feedback.tsx` | — | — | `events` delete | À vérifier — retrait d'un retour |
 
-**Ces six mutations sur `events` sont le nœud du Lot 5.** Elles vivent dans le même
-fichier, sur la même table, avec la même opération SQL (`update`), et seule l'intention
-les distingue. Une policy RLS ne peut pas lire l'intention.
+`confirmCancelConvocation` porte déjà une garde base de données : l'erreur
+`past_event_locked` est interceptée (`:880-882`), signe qu'un trigger protège les
+événements passés. La RPC `withdraw_convocation` devra la conserver.
 
-Deux options, à trancher avant le Lot 5 :
-
-1. **Colonne discriminante** — l'annulation passe par un champ dédié (`cancelled_at`,
-   `status`) et la policy autorise les `update` restreints à cette colonne même en lecture
-   seule. Propre, mais suppose que l'annulation n'écrive pas d'autres champs.
-2. **RPC dédiée** — `cancel_event(event_id, reason)` en `SECURITY DEFINER`, seule
-   habilitée en lecture seule, tandis que l'`update` générique est bloqué. Plus verbeux,
-   mais l'intention devient explicite et auditable.
-
-**Recommandation : option 2.** Elle rend la catégorie A′ visible dans le code plutôt que
-déduite d'une policy, et elle survit aux évolutions du schéma.
+**Périmètre exact de `cancel_event`**, d'après la lecture du flux `confirmCancelEvent`
+(`:1494` → `:1660`) : mise à jour de `events` avec le patch d'annulation, notifications
+in-app aux joueurs et parents, envois best-effort (push/email), publication d'une annonce
+dans `wall_posts`. Les quatre écritures doivent être dans la RPC, sinon le problème des
+tables partagées (ci-dessus) resurgit.
 
 ---
 
@@ -120,15 +166,57 @@ Bloquées après la grâce. Aucune ambiguïté sur ce lot.
 | `src/routes/_authenticated/follow-ups.tsx` | — | `reminders`, `notifications` | insert/delete | Relances |
 | `src/components/event-chat.tsx` | — | `event_messages` | insert | **À trancher** : messagerie d'événement, A ou B ? |
 
-Deux cas signalés comme incertains plutôt que tranchés seul :
+### Détail complet de `events/$eventId.tsx` (lecture intégrale)
 
-- **`players/$playerId/availability.tsx:119`** — si cet écran est utilisé par le coach
-  pour saisir la disponibilité d'un joueur, c'est A ; s'il sert au joueur lui-même, c'est
-  B. Le nom de la route suggère une vue coach, mais à confirmer par lecture du composant.
-- **`event-chat.tsx`** — envoyer un message dans le fil d'un événement existant ressemble
-  à B (continuité d'un objet créé), mais c'est de la création de contenu. **Penche vers
-  B** : couper la communication d'une équipe pendant la lecture seule aurait un coût
-  fonctionnel élevé pour un gain commercial faible.
+| Ligne | Fonction | Table | Catégorie | Justification |
+|---|---|---|---|---|
+| 804-805 | `submitResponse` | `convocations` update | **B** | Réponse à une convocation |
+| 778 | (effet de bord de la réponse) | `notifications` insert | **effet de bord de B** | Ne doit jamais être gaté |
+| 867-878 | `confirmCancelConvocation` | `convocations` delete | **A′** | Retrait d'une convocation |
+| 1077-1078 | envoi de convocations | `convocations` insert | **A** | Nouvelle convocation |
+| 1121, 1437 | effets de bord de l'envoi | `notifications` insert | effet de bord de A | — |
+| 1339, 1354 | suite de l'envoi | `events` update | **A** | Écriture de suivi : `convocations_sent`, `convocation_sent_snapshot`, passage `draft → published` |
+| 1398 | rappels | `reminders` | **A** | Programmation de rappels |
+| 1488-1489 | `toggleLock` | `events` update `responses_locked` | **A** | Verrouillage des réponses |
+| 1494-1517 | `confirmCancelEvent` | `events` update | **A′** | Annulation |
+| 1549 | effet de bord de l'annulation | `notifications` insert | **effet de bord de A′** | Doit survivre |
+| 1660 | effet de bord de l'annulation | `wall_posts` insert | **effet de bord de A′** | Doit survivre — table par ailleurs A |
+| 1698-1730 | `confirmReschedule` | `events` update | **A** | Reprogrammation : horaire, lieu |
+| 1762, 1872 | effets de bord de la reprogrammation | `notifications`, `wall_posts` insert | effets de bord de A | — |
+| 2134 | renvoi de convocations | `events` update | **A** | Écriture de suivi du renvoi |
+| 4525-4526 | bascule covoiturage | `events` update `carpool_enabled` | **A** | Configuration |
+
+### Détail complet de `wall-feed.tsx` (lecture intégrale)
+
+| Ligne | Fonction | Table | Catégorie |
+|---|---|---|---|
+| 225-226 | marquage automatique | `wall_post_reads` insert | **B0 — jamais bloqué** |
+| 540-541 | création de publication | `wall_posts` insert | **A** |
+| 439 | effet de bord de la publication | `notifications` insert | effet de bord de A |
+| 742 | `deletePost` | `wall_posts` delete | **A** (ou A′ si modération — à trancher) |
+| 763-764 | `togglePin` | `wall_posts` update `is_pinned` | **A** |
+| 1671-1672 | `CommentBlock.add` | `wall_comments` insert | **B** |
+| 1685 | effet de bord du commentaire | `notifications` insert | **effet de bord de B** |
+
+À vérifier encore : `club_poll_votes` et `club_poll_options` apparaissent dans les imports
+de `wall-feed.tsx` mais aucune mutation directe n'a été trouvée — les votes passent
+probablement par une RPC. **Si c'est le cas, c'est le bon modèle à généraliser** ; à
+confirmer avant le Lot 5.
+
+### Arbitrages tranchés
+
+- **`wall_comments` → B.** Commenter une publication existante est une réponse. Bloquer
+  les commentaires alors que la publication reste visible créerait une conversation à sens
+  unique. Décliné : commenter = B ; modifier ou supprimer **son propre** commentaire = B ;
+  modérer le commentaire d'autrui = A ou A′ selon le motif.
+- **`event-chat.tsx` → B**, tant que le message est rattaché à un événement existant et
+  non archivé. Le chat sert à l'exécution d'un événement déjà planifié — le couper après
+  expiration est dangereux (changement d'heure, retard, matériel, lieu de rendez-vous).
+  Limite : un nouveau fil autonome ou une discussion générale relèverait de A.
+- **`players/$playerId/availability.tsx:119` → dépend de l'acteur.** S'il s'agit d'un
+  écran coach, A. S'il est partagé avec le joueur ou le parent, il faut **deux actions
+  serveur distinctes** ou deux contrôles distincts, pas une classification unique.
+  À confirmer par lecture du composant avant le Lot 5.
 
 ---
 
@@ -139,61 +227,104 @@ périmètre club/profil déjà gouverné par les rôles existants.
 
 | Fichier | Table | Remarque |
 |---|---|---|
-| `src/routes/_authenticated/admin/settings.branding.tsx:69` | `clubs` | **Identité du club — reste autorisé** en `per_team` (`canManageClubIdentity`) |
-| `src/routes/_authenticated/admin/settings.communications.tsx:83` | `clubs` | Paramètres club — à arbitrer selon `canUseClubFeatures` |
-| `src/routes/_authenticated/admin/settings.convocations.tsx:77` | `clubs` | Idem |
-| `src/routes/_authenticated/admin/settings.reminders.tsx:83` | `clubs` | Idem |
-| `src/routes/_authenticated/admin/settings.notifications.tsx` | `club_notification_settings` | Idem |
-| `src/routes/_authenticated/admin/settings.sponsors.tsx` | — | Sponsoring : **fonctionnalité Club**, exclue des offres Découverte et Équipe |
+| `src/routes/_authenticated/admin/settings.branding.tsx:69` | `clubs` | **Identité — autorisée** en `per_team` (`canManageClubIdentity`) : nom, logo, sport, ville, coordonnées publiques, branding minimal visible sur l'équipe |
+| `src/routes/_authenticated/admin/settings.communications.tsx:83` | `clubs` | **Club — bloqué** : communication globale |
+| `src/routes/_authenticated/admin/settings.sponsors.tsx` | — | **Club — bloqué** : sponsoring |
+| `src/routes/_authenticated/admin/settings.convocations.tsx:77` | `clubs` | **À DÉCOUPER** — réglages d'équipe = Équipe · défauts globaux du club = Club |
+| `src/routes/_authenticated/admin/settings.reminders.tsx:83` | `clubs` | **À DÉCOUPER** — mêmes règles |
+| `src/routes/_authenticated/admin/settings.notifications.tsx` | `club_notification_settings` | **À DÉCOUPER** — mêmes règles |
+
+⚠️ Les trois écrans « à découper » posent un problème de **modèle de données**, pas
+seulement de permission : ils écrivent aujourd'hui sur `clubs` (et
+`club_notification_settings`), c'est-à-dire au niveau du club. Descendre certains réglages
+au niveau équipe suppose de nouvelles colonnes ou une table de réglages par équipe.
+
+**Bloquer l'écran entier serait plus simple mais fonctionnellement faux** : un club en
+offre Équipe doit pouvoir régler les convocations et les rappels de ses équipes. Ce
+découpage est donc un chantier à part entière, à instruire avant le Lot 5 — il ne se
+réduit pas à un `if` sur les entitlements.
 | `src/routes/_authenticated/profile.index.tsx:120,139,159` | `profiles` | Profil personnel — jamais bloqué |
 | `src/components/follow-button.tsx:74` | `follows` | Réseau social, hors périmètre facturation |
 | `src/routes/_authenticated/following.tsx` | `follows` | Idem |
-| `src/routes/register_.player.tsx` | `players`, `profiles` | Inscription publique — **attention : chemin d'entrée de joueur, doit respecter le quota Découverte** |
+| `src/routes/register_.player.tsx` | `players`, `profiles` | Inscription publique de joueur indépendant, `club_id: null` — **ne consomme aucun quota**, voir vérification ci-dessous |
 | `src/routes/_authenticated.tsx:248,258` | `clubs`, `club_members` | Création de club à l'onboarding — **deviendra le point d'écriture de `coverage_mode`** |
 | `src/modules/tournaments/components/TournamentUpgradeCard.tsx:39,45` | `clubs`, `club_members` | Création de club personnel pour organisateur — parcours tournoi, à ne pas perturber |
 | `src/routes/superadmin/*.tsx` | — | Superadmin, catégorie C |
 | `src/components/events/EventsFilterSheet.tsx`, `needs/audience-picker.tsx` | — | `.delete()` sur des structures locales, pas des tables — **faux positifs du grep** |
 
-⚠️ **`register_.player.tsx`** mérite une attention particulière : c'est un chemin
-d'inscription **public** qui crée des joueurs. Il doit passer par le même contrôle de
-quota que les autres, sinon il constitue un contournement trivial de la limite Découverte.
-Classé N ici parce qu'il n'est pas une mutation d'équipe au sens de la lecture seule, mais
-il relève de la §5.2 de la spec (« chemins à protéger »).
+### `register_.player.tsx` — vérification faite, alerte levée
+
+J'avais signalé ce fichier comme possible contournement du quota Découverte. **Après
+lecture intégrale (324 lignes), ce risque ne se matérialise pas.** Réponses aux six
+questions posées :
+
+| Question | Réponse |
+|---|---|
+| Comment le `team_id` est-il résolu ? | **Il ne l'est pas.** Aucun `team_id` n'apparaît dans le fichier |
+| Qui peut utiliser ce parcours ? | N'importe qui — route publique d'auto-inscription |
+| Un token d'invitation est-il nécessaire ? | **Non**, aucun |
+| Le même joueur peut-il être recréé ? | Oui, aucune déduplication — mais sans conséquence sur le quota |
+| L'ajout à `team_members` est-il direct ? | **Non**, aucune écriture dans `team_members` |
+| Peut-il contourner la RPC atomique et la limite de 15 ? | **Non** |
+
+Le parcours crée un `profiles` (`:89`) et un `players` (`:103`) avec **`club_id: null`**,
+`is_independent: true`, `person_type: "player"`, `looking_for_club`. C'est le parcours
+« joueur indépendant cherchant un club », relevant du réseau social — pas du rattachement
+à une équipe.
+
+Le quota Découverte compte les lignes `team_members` avec `player_id`, que ce parcours ne
+crée jamais. **Il ne consomme donc aucun quota.**
+
+**En revanche, le point de vigilance se déplace** : ces joueurs indépendants finiront par
+être rattachés à une équipe, et c'est **ce** chemin qui doit respecter le quota. Il s'agit
+de `src/components/existing-player-picker.tsx` (« sélectionner un joueur existant »), déjà
+classé A et déjà identifié comme devant passer par la RPC atomique. La protection est donc
+au bon endroit — mais elle doit couvrir explicitement le cas « joueur indépendant
+pré-existant rattaché à une équipe Découverte », pas seulement « nouveau joueur créé dans
+l'équipe ».
 
 ---
 
-## Ce qui reste à faire
+## État de complétion
 
-Cet inventaire est un **premier passage exploitable, pas un relevé exhaustif**. Il couvre
-les 44 fichiers et identifie les décisions structurantes, mais :
+Les trois lectures prioritaires sont **faites** : `events/$eventId.tsx` (4 500 lignes),
+`wall-feed.tsx` (1 700 lignes), `register_.player.tsx` (324 lignes). Les six arbitrages
+produit sont **tranchés**. L'inventaire est utilisable comme base de conception du Lot 5.
 
-1. **Les lignes exactes ne sont ancrées que lorsque `from("table")` précède la mutation de
-   trois lignes au plus.** Les chaînes plus longues (variable intermédiaire, helper) ne
-   sont pas capturées. Méthode de complétion : parcourir chaque fichier listé et relever
-   chaque appel, sans se fier au grep.
-2. **`events/$eventId.tsx` (4 500+ lignes) doit être traité seul.** Il concentre à lui
-   seul les trois catégories A, A′ et B sur les mêmes tables. C'est le fichier le plus
-   important de l'inventaire et il mérite sa propre passe de lecture.
-3. **`wall-feed.tsx` (1 700+ lignes)** contient publications (A), commentaires (B),
-   marquages lus (B) et votes de sondage (B) — même remarque.
-4. **Les mutations passant par des helpers partagés** (`src/lib/*.functions.ts` appelées
-   depuis le client) ne figurent pas ici : elles sont couvertes par les gardes serveur, à
-   inventorier séparément si le Lot 5 les touche.
+Reste à faire avant de **modifier la moindre policy** :
+
+1. **`players/$playerId/availability.tsx`** — déterminer l'acteur réel (coach seul, ou
+   écran partagé) ; si partagé, prévoir deux actions serveur distinctes.
+2. **`club_poll_votes`** — vérifier que les votes passent bien par une RPC. Si oui, c'est
+   le modèle à généraliser ; si non, les classer B et les protéger.
+3. **`events/$eventId/feedback.tsx`** — nature exacte du `delete` sur `events`.
+4. **`wall-feed.tsx:742 deletePost`** — supprimer sa propre publication (B) ou modérer
+   celle d'autrui (A/A′) ? Le code ne distingue pas les deux cas aujourd'hui.
+5. **Découpage des trois écrans de paramètres** — chantier de modèle de données, pas de
+   permission (voir ci-dessus).
+6. **Mutations via helpers partagés** (`src/lib/*.functions.ts` appelées depuis le
+   client) — couvertes par les gardes serveur, à inventorier séparément si le Lot 5 les
+   touche.
+
+Les points 1 à 4 sont des vérifications de code, réalisables sans arbitrage. Le point 5
+est un chantier de conception.
 
 ---
 
-## Décisions à valider avant le Lot 5
+## Conséquences pour la conception du Lot 5
 
-1. **Mécanisme de la catégorie A′** : colonne discriminante ou RPC dédiée
-   (recommandation : RPC `cancel_event`).
-2. **`wall_comments`** : B (recommandé) ou A ?
-3. **`event-chat.tsx`** : B (recommandé) ou A ?
-4. **`players/$playerId/availability.tsx`** : vue coach (A) ou saisie joueur (B) ?
-5. **`wall_post_reads` et `notifications`** : confirmer qu'ils ne sont **jamais** bloqués,
-   quel que soit l'état.
-6. **Paramètres club** (`settings.communications`, `.convocations`, `.reminders`,
-   `.notifications`) : lesquels relèvent de `canManageClubIdentity` (autorisés en
-   `per_team`) et lesquels de `canUseClubFeatures` (bloqués) ?
-
-Ces six points ne peuvent pas être tranchés depuis le code seul : ils relèvent d'un
-arbitrage produit.
+1. **Aucune policy de couverture sur `notifications` ni sur `wall_posts` INSERT.** Ces
+   tables sont des canaux d'effets de bord partagés entre A, A′ et B.
+2. **RPC `SECURITY DEFINER` pour toute action A′** : `cancel_event`,
+   `withdraw_convocation`, et `close_event_need` si la clôture d'un besoin doit rester
+   possible. Chaque RPC embarque ses effets de bord (notifications, annonce murale,
+   journal), sinon le problème des tables partagées resurgit.
+3. **Les policies de couverture portent sur les tables « métier » à intention unique** :
+   `events` (hors annulation, désormais passée en RPC), `wall_posts` INSERT direct depuis
+   le mur, `team_members`, `players`, `event_staff_assignments`, `match_results`,
+   `player_suspensions`, `reminders`, `club_invites`, `member_invites`.
+4. **`wall_post_reads` et `notifications.read_at` (B0) ne reçoivent jamais de contrôle**,
+   à aucun état.
+5. **Le quota Découverte se protège sur le rattachement à l'équipe**
+   (`existing-player-picker.tsx`, `$teamId.tsx`, import CSV), pas sur la création de
+   profil joueur.

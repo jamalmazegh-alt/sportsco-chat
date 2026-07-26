@@ -155,10 +155,33 @@ fonctions, pas par celles-ci.
 | 🟢 Sûr | 12 | Aucune action |
 | ⚙️ Écriture à préserver | 11 | Aucune action, non-régression à tester |
 
-**Test de non-régression à écrire dès la Phase A** : créer un club `coverage_mode='per_team'`
-sans ligne `subscriptions`, puis traverser l'application avec un compte coach, un compte
-parent et un compte admin. Aucun écran ne doit planter, aucun ne doit annoncer un
-abonnement expiré, et l'utilisateur ne doit jamais être redirigé vers `/tournaments`.
+## Stratégie de test — deux tests, jamais de CI rouge volontaire
 
-Ce test échouera tant que les deux bloquants ne sont pas corrigés — c'est son rôle : il
-matérialise la condition d'entrée en Phase C.
+Un test unique « qui échoue tant que les bloquants ne sont pas corrigés » banaliserait une
+CI rouge pendant toute la Phase A. À proscrire.
+
+**Test de caractérisation (Phase A)** — capture le comportement actuel, passe au vert dès
+maintenant :
+
+```text
+club coverage_mode='per_team' sans ligne subscriptions, flag désactivé
+→ la garde verrouille le club          (comportement historique, documenté)
+→ useTournamentOnlyMode capture l'utilisateur si pass/collaboration tournoi
+```
+
+Il documente le blocage au lieu de le signaler par un échec, et il détecte toute
+modification involontaire du comportement historique pendant les phases A et B.
+
+**Test cible (Phase C)** — activé par le flag, ou après correction :
+
+```text
+club coverage_mode='per_team' avec au moins une équipe couverte, flag activé
+→ coach, parent et admin accèdent normalement
+→ aucun écran ne plante
+→ aucun écran n'annonce un abonnement expiré
+→ aucune redirection vers /tournaments
+```
+
+**Forme recommandée : un seul test paramétré par le flag**, avec les deux jeux
+d'assertions. Le passage de l'un à l'autre devient alors la preuve exécutable du
+franchissement de la Phase C, et la CI reste verte du début à la fin.
