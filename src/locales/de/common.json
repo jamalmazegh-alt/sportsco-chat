@@ -1298,7 +1298,9 @@
     "placeholder": "Nachricht schreiben…",
     "disabled": "Der Chat ist für dieses Event deaktiviert.",
     "you": "Du",
-    "loadMore": "Mehr laden"
+    "loadMore": "Mehr laden",
+    "noAccess": "Der Chat dieses Termins ist dem Staff vorbehalten. Bitte dein Verein, ihn für Eltern oder Spieler zu öffnen.",
+    "sendFailed": "Nachricht nicht gesendet: Du hast keinen Zugriff auf diesen Chat."
   },
   "assistant": {
     "title": "Clubero-Assistent",

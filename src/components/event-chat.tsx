@@ -28,6 +28,8 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [canPost, setCanPost] = useState<boolean | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [open, setOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -58,6 +60,15 @@ export function EventChat({ eventId }: { eventId: string }) {
         ?.clubs?.event_chat_enabled;
       if (!active) return;
       setEnabled(ec === undefined ? true : !!ec);
+      // Access is governed by RLS (can_access_event_chat): staff always, players
+      // and parents only when the club opened the chat to them.
+      const { data: access } = await (supabase.rpc as any)("can_access_event_chat", {
+        _user_id: user?.id ?? null,
+        _event_id: eventId,
+      });
+      if (!active) return;
+      setCanPost(access === true);
+
       const { data } = await supabase
         .from("event_messages")
         .select("id, event_id, author_user_id, body, created_at, attachments")
@@ -76,7 +87,7 @@ export function EventChat({ eventId }: { eventId: string }) {
     return () => {
       active = false;
     };
-  }, [eventId]);
+  }, [eventId, user?.id]);
 
   async function loadMore() {
     if (loadingMore || messages.length === 0) return;
@@ -138,6 +149,7 @@ export function EventChat({ eventId }: { eventId: string }) {
   async function send() {
     if ((!body.trim() && atts.length === 0) || !user) return;
     setSending(true);
+    setSendError(null);
     const text = body.trim();
     const attachmentsToSend = atts;
     setBody("");
@@ -152,14 +164,16 @@ export function EventChat({ eventId }: { eventId: string }) {
     if (error) {
       setBody(text);
       setAtts(attachmentsToSend);
+      setSendError(t("chat.sendFailed"));
+      setCanPost(false);
     }
   }
 
-  if (enabled === false) {
+  if (enabled === false || canPost === false) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
         <Lock className="h-5 w-5" />
-        {t("chat.disabled")}
+        {enabled === false ? t("chat.disabled") : t("chat.noAccess")}
       </div>
     );
   }
@@ -265,6 +279,7 @@ export function EventChat({ eventId }: { eventId: string }) {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            {sendError && <p className="text-xs text-destructive">{sendError}</p>}
             <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
           </form>
         </>

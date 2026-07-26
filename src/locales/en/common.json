@@ -1293,7 +1293,9 @@
     "placeholder": "Type a message…",
     "disabled": "Chat is disabled for this event.",
     "you": "You",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "noAccess": "This event chat is limited to staff. Ask your club to open it to parents or players.",
+    "sendFailed": "Message not sent: you don't have access to this chat."
   },
   "assistant": {
     "title": "Clubero Assistant",

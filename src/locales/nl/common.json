@@ -1293,7 +1293,9 @@
     "placeholder": "Bericht typen…",
     "disabled": "De chat is uitgeschakeld voor dit evenement.",
     "you": "Jij",
-    "loadMore": "Meer laden"
+    "loadMore": "Meer laden",
+    "noAccess": "De chat van dit evenement is alleen voor staf. Vraag je club om deze open te stellen voor ouders of spelers.",
+    "sendFailed": "Bericht niet verzonden: je hebt geen toegang tot deze chat."
   },
   "assistant": {
     "title": "Clubero Assistent",

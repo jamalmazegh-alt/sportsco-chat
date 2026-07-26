@@ -1293,7 +1293,9 @@
     "placeholder": "Escrever mensagem…",
     "disabled": "O chat está desativado para este evento.",
     "you": "Tu",
-    "loadMore": "Carregar mais"
+    "loadMore": "Carregar mais",
+    "noAccess": "O chat deste evento é reservado ao staff. Peça ao seu clube para abri-lo a pais ou jogadores.",
+    "sendFailed": "Mensagem não enviada: não tem acesso a este chat."
   },
   "assistant": {
     "title": "Assistente Clubero",
