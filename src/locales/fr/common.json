@@ -1862,7 +1862,8 @@
     "disabledHint": "Activez le covoiturage pour permettre aux parents de proposer et réserver des places.",
     "needsTitle": "Demandes de transport",
     "cancelNeed": "Retirer ma demande",
-    "noNeeds": "Aucune demande de transport."
+    "noNeeds": "Aucune demande de transport.",
+    "notifyFailed": "Demande enregistrée mais l'e-mail au staff n'a pas pu être envoyé."
   },
   "journey": {
     "tab": {

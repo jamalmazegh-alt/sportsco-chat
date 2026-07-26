@@ -1862,7 +1862,8 @@
     "disabledHint": "Ative as boleias para que os encarregados possam oferecer e reservar lugares.",
     "needsTitle": "Pedidos de boleia",
     "cancelNeed": "Retirar o meu pedido",
-    "noNeeds": "Sem pedidos de boleia."
+    "noNeeds": "Sem pedidos de boleia.",
+    "notifyFailed": "Pedido guardado, mas o e-mail para a equipa não pôde ser enviado."
   },
   "journey": {
     "tab": {

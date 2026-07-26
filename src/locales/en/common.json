@@ -1862,7 +1862,8 @@
     "disabledHint": "Enable carpooling to let parents offer and book seats.",
     "needsTitle": "Ride requests",
     "cancelNeed": "Withdraw my request",
-    "noNeeds": "No ride requests."
+    "noNeeds": "No ride requests.",
+    "notifyFailed": "Request saved but the email to staff could not be sent."
   },
   "journey": {
     "tab": {

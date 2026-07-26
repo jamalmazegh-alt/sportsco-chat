@@ -1862,7 +1862,8 @@
     "disabledHint": "Attiva i passaggi in auto per permettere ai genitori di offrire e prenotare posti.",
     "needsTitle": "Richieste di passaggio",
     "cancelNeed": "Ritira la mia richiesta",
-    "noNeeds": "Nessuna richiesta di passaggio."
+    "noNeeds": "Nessuna richiesta di passaggio.",
+    "notifyFailed": "Richiesta salvata ma l'email allo staff non è stata inviata."
   },
   "journey": {
     "tab": {
