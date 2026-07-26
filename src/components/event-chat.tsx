@@ -28,11 +28,14 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [canPost, setCanPost] = useState<boolean | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [open, setOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+
 
   async function attachAuthors(msgs: Msg[]): Promise<Msg[]> {
     const ids = Array.from(new Set(msgs.map((m) => m.author_user_id).filter(Boolean)));
