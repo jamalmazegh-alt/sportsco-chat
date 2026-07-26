@@ -131,7 +131,9 @@ function HomePage() {
       const teamIds = teams.map((t) => t.id);
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id, opponent, is_home")
+        .select(
+          "id, title, starts_at, location, type, status, team_id, opponent, is_home, convocations_sent",
+        )
         .in("team_id", teamIds)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -444,7 +446,7 @@ function HomePage() {
                             >
                               {formatHomeEventTitle(e as any)}
                             </p>
-                            {isCoach && convocSentSet?.has(e.id) && (
+                            {((e as any).convocations_sent || convocSentSet?.has(e.id)) && (
                               <span
                                 className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
                                 title={t("events.convocsSentTitle", {
