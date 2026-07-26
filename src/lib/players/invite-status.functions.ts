@@ -22,22 +22,27 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
 
     const { data: parents, error } = await supabase
       .from("player_parents")
-      .select("email")
+      .select("email, parent_user_id")
       .eq("player_id", data.playerId);
     if (error || !parents) {
       return {
         sentEmails: [] as string[],
         failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
+        unconfirmedUserIds: [] as string[],
       };
     }
 
     const emails = Array.from(
       new Set(parents.map((p) => (p.email ?? "").trim().toLowerCase()).filter((e) => e.length > 0)),
     );
-    if (emails.length === 0) {
+    const parentUserIds = Array.from(
+      new Set(parents.map((p) => p.parent_user_id).filter((v): v is string => !!v)),
+    );
+    if (emails.length === 0 && parentUserIds.length === 0) {
       return {
         sentEmails: [] as string[],
         failedEmails: [] as { email: string; error: string | null; reason: string | null }[],
+        unconfirmedUserIds: [] as string[],
       };
     }
 
