@@ -943,8 +943,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -1859,7 +1871,10 @@
     "noDriversYet": "No drivers yet.",
     "iNeedRide": "Request a ride",
     "needRideRegistered": "Request sent to coach",
-    "disabledHint": "Enable carpooling to let parents offer and book seats."
+    "disabledHint": "Enable carpooling to let parents offer and book seats.",
+    "needsTitle": "Ride requests",
+    "cancelNeed": "Withdraw my request",
+    "noNeeds": "No ride requests."
   },
   "journey": {
     "tab": {

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { notifyCoachesOfCarpoolNeed } from "@/lib/carpool-notify.functions";
 import { useTranslation } from "react-i18next";
 import { Car, Users, Plus, Trash2, Loader2, HandHelping } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -379,6 +381,53 @@ export function CarpoolSection({
               })}
             </div>
 
+            {/* Ride requests */}
+            {needs.length > 0 && (
+              <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold">
+                  <HandHelping className="h-3.5 w-3.5 text-primary" />
+                  {t("carpool.needsTitle" as any) || "Demandes de transport"}
+                  <span className="text-muted-foreground font-normal">({needs.length})</span>
+                </div>
+                {needs.map((n) => {
+                  const names =
+                    (n.player_ids ?? [])
+                      .map((pid) => playerById.get(pid))
+                      .filter(Boolean)
+                      .map((pl) => `${pl!.first_name} ${pl!.last_name?.[0] ?? ""}.`)
+                      .join(", ") || "—";
+                  const isMineNeed = n.parent_user_id === user?.id;
+                  return (
+                    <div key={n.id} className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium truncate">{names}</p>
+                        {n.note && (
+                          <p className="text-xs text-muted-foreground italic">"{n.note}"</p>
+                        )}
+                      </div>
+                      {(isMineNeed || isCoach) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6 shrink-0"
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from("carpool_needs")
+                              .delete()
+                              .eq("id", n.id);
+                            if (error) toast.error(error.message);
+                            else qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] });
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {myBookingCarpool && (
               <div className="rounded-lg bg-primary/10 border border-primary/30 p-2.5 text-xs">
                 ✅ {t("carpool.youTravelWith", { name: myBookingCarpool.driver_name })}
@@ -644,6 +693,7 @@ function NeedDialog({
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const notifyStaff = useServerFn(notifyCoachesOfCarpoolNeed);
   const [selected, setSelected] = useState<string[]>(myConvokedChildren.map((c) => c.player_id));
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -651,14 +701,21 @@ function NeedDialog({
   async function submit() {
     if (!user || selected.length === 0) return;
     setBusy(true);
-    const { error } = await supabase.from("carpool_needs").insert({
-      event_id: eventId,
-      parent_user_id: user.id,
-      player_ids: selected,
-      note: note.trim() || null,
-    });
+    const { data: inserted, error } = await supabase
+      .from("carpool_needs")
+      .insert({
+        event_id: eventId,
+        parent_user_id: user.id,
+        player_ids: selected,
+        note: note.trim() || null,
+      })
+      .select("id")
+      .maybeSingle();
     setBusy(false);
     if (error) return toast.error(error.message);
+    if (inserted?.id) {
+      notifyStaff({ data: { needId: inserted.id } }).catch(() => undefined);
+    }
     onDone();
   }
 

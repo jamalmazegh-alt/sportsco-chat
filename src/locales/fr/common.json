@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
@@ -1859,7 +1871,10 @@
     "noDriversYet": "Aucun conducteur pour le moment.",
     "iNeedRide": "Demander un transport",
     "needRideRegistered": "Demande envoyée au coach",
-    "disabledHint": "Activez le covoiturage pour permettre aux parents de proposer et réserver des places."
+    "disabledHint": "Activez le covoiturage pour permettre aux parents de proposer et réserver des places.",
+    "needsTitle": "Demandes de transport",
+    "cancelNeed": "Retirer ma demande",
+    "noNeeds": "Aucune demande de transport."
   },
   "journey": {
     "tab": {
