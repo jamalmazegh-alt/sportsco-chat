@@ -1,6 +1,45 @@
 import { isPushSupported, VAPID_PUBLIC_KEY } from "@/lib/pwa";
 import { supabase } from "@/integrations/supabase/client";
 
+const PUSH_OWNER_KEY = "clubero:push:owner-user-id";
+
+type SubscribeOptions = {
+  /**
+   * True for an explicit user action (button/test setup): the current account
+   * becomes the owner of this browser/device subscription. Automatic background
+   * syncs keep the existing owner and must not steal the endpoint from another
+   * account used on the same phone.
+   */
+  takeOwnership?: boolean;
+};
+
+function readPushOwner(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(PUSH_OWNER_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writePushOwner(userId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PUSH_OWNER_KEY, userId);
+  } catch {
+    // Ignore storage failures: server-side ownership still protects the row.
+  }
+}
+
+function clearPushOwner(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(PUSH_OWNER_KEY);
+  } catch {
+    // noop
+  }
+}
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -22,8 +61,38 @@ function subscriptionUsesCurrentVapidKey(sub: PushSubscription): boolean {
   return arrayBufferToUrlBase64(sub.options.applicationServerKey) === VAPID_PUBLIC_KEY;
 }
 
-export async function subscribeToPush(): Promise<PushSubscription | null> {
+async function registerSubscriptionOnServer(
+  sub: PushSubscription,
+  token: string,
+  takeOwnership: boolean,
+): Promise<boolean> {
+  const json = sub.toJSON();
+  const res = await fetch("/api/push/subscribe", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      endpoint: sub.endpoint,
+      p256dh: json.keys?.p256dh,
+      auth: json.keys?.auth,
+      user_agent: navigator.userAgent,
+      takeover: takeOwnership,
+    }),
+  });
+  if (!res.ok) {
+    console.warn("[push] server subscription failed", res.status, await res.text().catch(() => ""));
+    return false;
+  }
+  return true;
+}
+
+export async function subscribeToPush(
+  options: SubscribeOptions = {},
+): Promise<PushSubscription | null> {
   if (!isPushSupported()) return null;
+  const takeOwnership = options.takeOwnership ?? true;
 
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return null;
@@ -43,28 +112,19 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
     });
   }
 
-  const json = sub.toJSON();
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData.session?.access_token;
-  if (!token) return null;
+  const userId = sessionData.session?.user.id;
+  if (!token || !userId) return null;
 
-  const res = await fetch("/api/push/subscribe", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      endpoint: sub.endpoint,
-      p256dh: json.keys?.p256dh,
-      auth: json.keys?.auth,
-      user_agent: navigator.userAgent,
-    }),
-  });
-  if (!res.ok) {
-    console.warn("[push] server subscription failed", res.status, await res.text().catch(() => ""));
+  const owner = readPushOwner();
+  if (!takeOwnership && owner && owner !== userId) return null;
+
+  const registered = await registerSubscriptionOnServer(sub, token, takeOwnership);
+  if (!registered) {
     return null;
   }
+  writePushOwner(userId);
 
   return sub;
 }
@@ -92,6 +152,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
   } catch {
     // Best effort: local unsubscribe already succeeded.
   }
+  clearPushOwner();
   return true;
 }
 
@@ -117,7 +178,9 @@ export async function syncPushSubscriptionState(): Promise<void> {
 
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData.session?.access_token;
-  if (!token) return;
+  const userId = sessionData.session?.user.id;
+  if (!token || !userId) return;
+  const owner = readPushOwner();
 
   const permission = Notification.permission;
   let reg: ServiceWorkerRegistration | null = null;
@@ -138,19 +201,27 @@ export async function syncPushSubscriptionState(): Promise<void> {
       }
     }
     try {
-      await fetch("/api/push/unsubscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ all_for_user: true }),
-      });
+      if (!owner || owner === userId) {
+        await fetch("/api/push/unsubscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ all_for_user: true }),
+        });
+        clearPushOwner();
+      }
     } catch {
       /* best effort */
     }
     return;
   }
+
+  // Same installed PWA/browser can be used to log into several test accounts.
+  // Once one account explicitly owns the push endpoint, automatic sync must not
+  // reassign it to the next account that happens to open the app.
+  if (owner && owner !== userId) return;
 
   // Permission granted but no local sub (iOS quirk after Settings toggle):
   // try to silently re-create it. iOS allows pushManager.subscribe() without
@@ -187,7 +258,6 @@ export async function syncPushSubscriptionState(): Promise<void> {
   // for the current device. iOS rotates the endpoint on every re-enable,
   // so we delete any stale rows for this user_agent first, then upsert.
   if (permission === "granted" && sub) {
-    const json = sub.toJSON();
     try {
       // 1) wipe any previous rows for this user (stale endpoints from
       //    earlier toggle cycles or other devices we no longer use).
@@ -200,19 +270,8 @@ export async function syncPushSubscriptionState(): Promise<void> {
         body: JSON.stringify({ all_for_user: true, keep_endpoint: sub.endpoint }),
       });
       // 2) (re)insert the current one.
-      await fetch("/api/push/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          endpoint: sub.endpoint,
-          p256dh: json.keys?.p256dh,
-          auth: json.keys?.auth,
-          user_agent: navigator.userAgent,
-        }),
-      });
+      const registered = await registerSubscriptionOnServer(sub, token, false);
+      if (registered) writePushOwner(userId);
     } catch {
       /* best effort */
     }
