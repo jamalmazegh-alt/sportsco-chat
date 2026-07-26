@@ -470,7 +470,7 @@ export function DeclareAbsenceDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
+        <SheetHeader className="pt-[env(safe-area-inset-top)]">
           <SheetTitle>
             {t("availability.declare", { defaultValue: "Déclarer une absence" })}
           </SheetTitle>

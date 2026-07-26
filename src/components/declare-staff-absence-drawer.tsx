@@ -209,7 +209,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
+        <SheetHeader className="pt-[env(safe-area-inset-top)]">
           <SheetTitle>
             {editing
               ? t("staffAvailability.edit", { defaultValue: "Modifier l'indisponibilité" })
