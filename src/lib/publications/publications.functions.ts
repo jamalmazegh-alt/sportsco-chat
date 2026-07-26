@@ -128,6 +128,19 @@ export const createPublication = createServerFn({ method: "POST" })
       }
     }
 
+    // Best-effort : notification push (même règle que les posts du mur)
+    if (data.publishToWall && dispatchRowId) {
+      try {
+        const { dispatchPublicationPush } = await import("./publications.push.server");
+        await dispatchPublicationPush(publicationId, dispatchRowId, "publish", {
+          excludeUserId: userId,
+        });
+      } catch (e) {
+        console.error("[createPublication] dispatchPublicationPush failed", e);
+      }
+    }
+
+
     return {
       publicationId,
       dispatchRowId,
