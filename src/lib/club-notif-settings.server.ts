@@ -19,6 +19,7 @@ export type ClubNotifSettings = {
   wall_new_post: boolean;
   tournament_match_reminder: boolean;
   tournament_draw: boolean;
+  event_chat_new_message: boolean;
 };
 
 export const DEFAULT_CLUB_NOTIF_SETTINGS: ClubNotifSettings = {
@@ -32,7 +33,9 @@ export const DEFAULT_CLUB_NOTIF_SETTINGS: ClubNotifSettings = {
   wall_new_post: true,
   tournament_match_reminder: true,
   tournament_draw: true,
+  event_chat_new_message: true,
 };
+
 
 const CACHE_TTL_MS = 60_000;
 type Entry = { value: ClubNotifSettings; expiresAt: number };
