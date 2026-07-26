@@ -1332,14 +1332,14 @@
         "t": "Termine sehen und auf ein Aufgebot antworten",
         "b": "Erhalten Sie Aufgebote per E-Mail, Benachrichtigung oder in der App und antworten Sie für Ihr Kind mit einem Tippen.",
         "steps": [
-          "Erhalten Sie das Aufgebot per E-Mail: Sie können die Teilnahme direkt aus der E-Mail bestätigen.",
+          "Erhalten Sie das Aufgebot per E-Mail: Bestätigen Sie die Teilnahme (Anwesend / Unsicher / Abwesend) direkt aus der E-Mail.",
           "Sie erhalten außerdem eine Push-Benachrichtigung, die Sie direkt in die App führt.",
-          "Antworten Sie von der App-Startseite aus schnell auf das Aufgebot oder öffnen Sie die Ereignisdetails.",
+          "Nach der Antwort aus der E-Mail bestätigt eine Seite Ihre Wahl — Sie können sie jederzeit ändern.",
+          "Oder antworten Sie mit einem Tippen von der App-Startseite über die Karte „Insights“.",
           "Öffnen Sie den Reiter „Termine“, um alle Spiele und Trainings zu sehen.",
-          "Sehen Sie in den Ereignisdetails die Liste der aufgebotenen Spieler und die zu treffende Auswahl.",
-          "Bei einer Abwesenheit fügen Sie einen Grund hinzu (vordefiniert oder als Freitext), der an den Trainer gesendet wird.",
-          "Ist die Teilnahme unsicher, kennzeichnen Sie dies und geben Sie einen Grund an.",
-          "Nutzen Sie den Event-Chat, um sich mit Eltern, Spielern und dem Trainer auszutauschen und die Logistik zu klären."
+          "Öffnen Sie die Ereignisdetails: Spielinfos und Ihre Antwort (Anwesend / Unsicher / Abwesend).",
+          "Bei Abwesenheit oder Unsicherheit fügen Sie einen Grund hinzu (vordefiniert oder Freitext), der an den Trainer gesendet wird.",
+          "Tauschen Sie sich im Event-Chat aus (Eltern, Spieler, Trainer) und sehen Sie die aufgebotenen Spieler."
         ]
       },
       {

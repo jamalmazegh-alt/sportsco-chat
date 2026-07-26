@@ -1332,14 +1332,14 @@
         "t": "Ver los eventos y responder a una convocatoria",
         "b": "Recibe las convocatorias por correo, notificación o en la app, y responde por tu hijo con un toque.",
         "steps": [
-          "Recibe la convocatoria por correo: puedes confirmar la asistencia directamente desde el correo.",
+          "Recibe la convocatoria por correo: confirma la asistencia (Presente / Incierto / Ausente) directamente desde el correo.",
           "También recibes una notificación push que te lleva directamente a la app.",
-          "Desde el inicio de la app, responde rápidamente a la convocatoria o abre el detalle del evento.",
+          "Tras responder desde el correo, una página confirma tu elección — puedes cambiarla cuando quieras.",
+          "O responde con un toque desde el inicio de la app, mediante la tarjeta «Insights».",
           "Abre la pestaña «Eventos» para ver todos los partidos y entrenamientos.",
-          "En el detalle del evento, consulta la lista de jugadores convocados y la respuesta a dar.",
-          "En caso de ausencia, añade un motivo (predefinido o texto libre) que se enviará al entrenador.",
-          "Si la asistencia es incierta, indícalo y añade un motivo.",
-          "Usa el chat del evento para hablar con padres, jugadores y el entrenador y aclarar la logística."
+          "Abre el detalle del evento: información del partido y tu respuesta (Presente / Incierto / Ausente).",
+          "En caso de ausencia o duda, añade un motivo (predefinido o texto libre) que se envía al entrenador.",
+          "Habla en el chat del evento (padres, jugadores, entrenador) y consulta los jugadores convocados."
         ]
       },
       {

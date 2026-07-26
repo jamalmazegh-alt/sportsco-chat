@@ -1332,14 +1332,14 @@
         "t": "Evenementen bekijken en op een oproep reageren",
         "b": "Ontvang oproepen per e-mail, melding of in de app, en reageer voor je kind met één tik.",
         "steps": [
-          "Ontvang de oproep per e-mail: je kunt de aanwezigheid rechtstreeks vanuit de e-mail bevestigen.",
+          "Ontvang de oproep per e-mail: bevestig de aanwezigheid (Aanwezig / Onzeker / Afwezig) rechtstreeks vanuit de e-mail.",
           "Je ontvangt ook een pushmelding die je meteen naar de app brengt.",
-          "Reageer vanaf het startscherm van de app snel op de oproep of open de details van het evenement.",
+          "Na je reactie vanuit de e-mail bevestigt een pagina je keuze — je kunt die altijd wijzigen.",
+          "Of reageer met één tik vanaf het startscherm van de app, via de kaart «Insights».",
           "Open het tabblad «Evenementen» om alle wedstrijden en trainingen te zien.",
-          "Bekijk in de details van het evenement de lijst met opgeroepen spelers en de te geven reactie.",
-          "Bij afwezigheid voeg je een reden toe (vooraf ingesteld of vrije tekst) die naar de coach wordt gestuurd.",
-          "Als de aanwezigheid onzeker is, geef dit aan en voeg een reden toe.",
-          "Gebruik de evenementchat om met ouders, spelers en de coach te overleggen en de logistiek te verduidelijken."
+          "Open de details van het evenement: wedstrijdinfo en je reactie (Aanwezig / Onzeker / Afwezig).",
+          "Bij afwezigheid of twijfel voeg je een reden toe (vooraf ingesteld of vrije tekst) die naar de coach wordt gestuurd.",
+          "Chat in de evenementchat (ouders, spelers, coach) en bekijk de opgeroepen spelers."
         ]
       },
       {
