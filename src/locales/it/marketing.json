@@ -1306,11 +1306,12 @@
         "t": "Aprire il tuo account genitore",
         "b": "Tutto inizia con l'invito del tuo club. Crea il tuo accesso in pochi minuti.",
         "steps": [
-          "Apri l'email di invito del tuo club e tocca «Unisciti al club».",
-          "Inserisci il tuo indirizzo email e crea la tua password.",
-          "Conferma il tuo indirizzo email tramite il link di conferma ricevuto.",
-          "Accedi per la prima volta con le tue credenziali.",
-          "Completa il tuo profilo genitore (nome, telefono) — è tutto pronto."
+          "Apri l'email di invito del tuo club e tocca «Accetta invito».",
+          "Inserisci nome e cognome e crea la tua password (la tua email è già precompilata). Tocca «Crea account».",
+          "Leggi e accetta i consensi (privacy, termini, notifiche, trattamento dei dati), poi «Accetta e continua».",
+          "Arrivi direttamente alla schermata Home del tuo club — hai effettuato l'accesso.",
+          "Apri la scheda «Profilo»: vedrai i tuoi dati, la lingua e le notifiche.",
+          "Inserisci nome, cognome e numero di telefono, poi tocca «Salva»."
         ]
       },
       {

@@ -6,6 +6,7 @@
 > `Lot 0 bis` (`offre-equipe-lot-0-bis.md`) doit être validé avant tout développement.
 >
 > Changements v4 par rapport à la version précédente :
+>
 > - offre **Découverte** intégrée au modèle de couverture dès le Lot 1 ;
 > - **garde-fous DB** durs (anti-`subscriptions` sur `per_team`, `can_create_tournament`
 >   explicite) ;
@@ -127,7 +128,7 @@ couverture reste la fonction.
 5. Fonctions SECURITY DEFINER (§3) : couverture, exemptions, billing, garde-fous.
 6. **Garde-fou DB anti-`subscriptions` sur `per_team`** (§3) + modification
    `can_create_tournament` (§3).
-7. **Correctif SQL `exempt_until`** — *conditionné à l'audit préalable* (team-plan §12.1,
+7. **Correctif SQL `exempt_until`** — _conditionné à l'audit préalable_ (team-plan §12.1,
    Lot 0 bis §7). Migration séparée, déployée après décision sur les données.
 8. Policies RLS + REVOKE colonnes (§3).
 
@@ -328,35 +329,39 @@ Préciser fréquence, verrouillage, idempotence, reprise. **Pas de promotion sil
 
 ## 8. Écrans & routes
 
-| Surface | Action |
-|---|---|
-| `src/routes/_authenticated.tsx` (`NoMembershipScreen`) | 4 choix d'onboarding (§24) ; recherche club + demande de rattachement ; mini-formulaire club + première équipe |
-| Nouvelle route checkout Équipe (+ succès) | motif des routes tournoi pricing/success |
-| `src/routes/_authenticated/teams.tsx` | « Ajouter une équipe » → création + choix Découverte/checkout dans le même club (`per_team`) |
-| Nouvelle page « Facturation et abonnements » (ex. `_authenticated/billing-teams.tsx`) | liste des équipes + couverture, actions selon permissions, CTA ajouter une équipe, upsell Club |
-| `src/routes/_authenticated/admin/billing.tsx` | clubs `per_team` : synthèse des couvertures + CTA passage offre Club (§18) |
-| Écrans de blocage | bannière/écran **lecture seule à portée équipe** ; écran upsell Tournoi (remplace tout état vide) ; admin club restreint à l'identité (`canManageClubIdentity`) |
-| `src/routes/pricing.tsx` + marketing | grille Découverte / Équipe / Club ; aligner `marketing.json` (mentions « Découverte »/« Fédération » obsolètes) |
-| `src/routes/superadmin/billing.tsx` | onglet/liste `team_subscriptions` |
+| Surface                                                                               | Action                                                                                                                                                          |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/_authenticated.tsx` (`NoMembershipScreen`)                                | 4 choix d'onboarding (§24) ; recherche club + demande de rattachement ; mini-formulaire club + première équipe                                                  |
+| Nouvelle route checkout Équipe (+ succès)                                             | motif des routes tournoi pricing/success                                                                                                                        |
+| `src/routes/_authenticated/teams.tsx`                                                 | « Ajouter une équipe » → création + choix Découverte/checkout dans le même club (`per_team`)                                                                    |
+| Nouvelle page « Facturation et abonnements » (ex. `_authenticated/billing-teams.tsx`) | liste des équipes + couverture, actions selon permissions, CTA ajouter une équipe, upsell Club                                                                  |
+| `src/routes/_authenticated/admin/billing.tsx`                                         | clubs `per_team` : synthèse des couvertures + CTA passage offre Club (§18)                                                                                      |
+| Écrans de blocage                                                                     | bannière/écran **lecture seule à portée équipe** ; écran upsell Tournoi (remplace tout état vide) ; admin club restreint à l'identité (`canManageClubIdentity`) |
+| `src/routes/pricing.tsx` + marketing                                                  | grille Découverte / Équipe / Club ; aligner `marketing.json` (mentions « Découverte »/« Fédération » obsolètes)                                                 |
+| `src/routes/superadmin/billing.tsx`                                                   | onglet/liste `team_subscriptions`                                                                                                                               |
 
 ## 9. Impacts
 
 ### Onboarding
+
 - `NoMembershipScreen` : nouveaux chemins (le parcours `tournament_organizer` sert de
   précédent). Club `per_team` **sans** essai Club (trigger §2.2). `is_personal` /
   `get_or_create_personal_club` inchangés (réservés tournoi).
 
 ### Offre Club existante
+
 - Aucun changement de schéma sur `subscriptions` ; trigger d'essai identique pour
   `billing_mode='club'` ; webhook Club isolé par `metadata.purpose`. Cas A (passage Club) :
   aucun changement de `club_id`, aucun déplacement, pas de trou de couverture.
 
 ### Module Tournoi
+
 - `can_create_tournament` durcie (§3.3) + garde-fou DB (§3.2) ; tests de régression
   dédiés. Participation à un tournoi tiers : flux inchangés. Écran d'upsell à la place de
   tout état vide.
 
 ### Lecture seule à portée équipe (Lot 5, HAUT RISQUE)
+
 - Deuxième couche au layout d'équipe (`teams/$teamId`) : `get_team_coverage` ∈
   {`grace`,`expired`,`none`} → bannière + UI lecture seule. **Enforcement serveur au
   niveau RLS/RPC** (pas seulement server functions — cf. inventaire Lot 0 bis §3). La garde
@@ -366,6 +371,7 @@ Préciser fréquence, verrouillage, idempotence, reprise. **Pas de promotion sil
   seule (team-plan §15.2).
 
 ### RGPD (Lot 6)
+
 - `user_has_active_billing_responsibilities` avant suppression ; blocage + transfert/
   annulation obligatoire (team-plan §14).
 
@@ -391,19 +397,19 @@ Alignement de la grille marketing. Attention à la dette i18n existante (clés `
 
 ## 12. Risques de régression
 
-| Risque | Mitigation |
-|---|---|
-| Trigger d'essai modifié casse la création de clubs classiques | Early-return `per_team` minimal + test « club classique reçoit toujours son essai 14 j » |
-| Branche webhook `team_plan` intercepte des événements Club | Routage strict `metadata.purpose` ; défaut = flux Club ; tests des deux flux |
-| Garde `_authenticated.tsx` régresse le verrouillage Club | `billing_mode='club'` suit le chemin actuel à l'identique ; nouvelle logique atteinte seulement pour `per_team` |
-| Déblocage tournoi via `subscriptions` injectée sur `per_team` | Garde-fou DB (§3.2) + `can_create_tournament` explicite (§3.3) + tests invariants |
-| Événements `subscription.updated` sans metadata | Metadata sur la souscription à la création + fallback `stripe_subscription_id` |
-| Fenêtre de double facturation au passage Cas A | Couverture Club d'abord, arrêt Équipe ensuite ; prorata Stripe ; saga idempotente |
-| Correctif `exempt_until` coupe des clubs en prod | **Audit préalable** des clubs `exempt_until <= now()` (Lot 0 bis §7) avant déploiement |
-| Paywall équipe contourné par write client direct | Enforcement RLS/RPC (inventaire Lot 0 bis §3), pas server-fn seul |
-| Limite Découverte contournée par concurrence | Contrôle atomique (§3.4) + test de concurrence |
-| RGPD : team_subscription orpheline | `user_has_active_billing_responsibilities` bloquant (Lot 6) |
-| Parité i18n (CI rouge) | Corriger la dette d'abord ou baseline ; clés livrées dans les 7 locales |
+| Risque                                                        | Mitigation                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Trigger d'essai modifié casse la création de clubs classiques | Early-return `per_team` minimal + test « club classique reçoit toujours son essai 14 j »                        |
+| Branche webhook `team_plan` intercepte des événements Club    | Routage strict `metadata.purpose` ; défaut = flux Club ; tests des deux flux                                    |
+| Garde `_authenticated.tsx` régresse le verrouillage Club      | `billing_mode='club'` suit le chemin actuel à l'identique ; nouvelle logique atteinte seulement pour `per_team` |
+| Déblocage tournoi via `subscriptions` injectée sur `per_team` | Garde-fou DB (§3.2) + `can_create_tournament` explicite (§3.3) + tests invariants                               |
+| Événements `subscription.updated` sans metadata               | Metadata sur la souscription à la création + fallback `stripe_subscription_id`                                  |
+| Fenêtre de double facturation au passage Cas A                | Couverture Club d'abord, arrêt Équipe ensuite ; prorata Stripe ; saga idempotente                               |
+| Correctif `exempt_until` coupe des clubs en prod              | **Audit préalable** des clubs `exempt_until <= now()` (Lot 0 bis §7) avant déploiement                          |
+| Paywall équipe contourné par write client direct              | Enforcement RLS/RPC (inventaire Lot 0 bis §3), pas server-fn seul                                               |
+| Limite Découverte contournée par concurrence                  | Contrôle atomique (§3.4) + test de concurrence                                                                  |
+| RGPD : team_subscription orpheline                            | `user_has_active_billing_responsibilities` bloquant (Lot 6)                                                     |
+| Parité i18n (CI rouge)                                        | Corriger la dette d'abord ou baseline ; clés livrées dans les 7 locales                                         |
 
 ## 13. Déploiement & rollback
 

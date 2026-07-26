@@ -148,7 +148,10 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
                 {t("needs:section.coverageAll")}
               </Badge>
             ) : (
-              <Badge variant="outline" className="border-amber-300 text-amber-700 dark:text-amber-300">
+              <Badge
+                variant="outline"
+                className="border-amber-300 text-amber-700 dark:text-amber-300"
+              >
                 <AlertCircle className="h-3 w-3 mr-1" />
                 {t("needs:section.coverageMissing", { count: missingSeats })}
               </Badge>
@@ -157,9 +160,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
         )}
 
         {isStaff && needs.length === 0 && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("needs:section.emptyStaff")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{t("needs:section.emptyStaff")}</p>
         )}
       </CardHeader>
       <CardContent className="space-y-3">
@@ -187,7 +188,6 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           onSaved={refresh}
         />
       )}
-
     </Card>
   );
 }
@@ -228,7 +228,6 @@ function NeedRow({
   existingRoleKeys: string[];
   onChange: () => void;
 }) {
-
   const { t } = useTranslation();
   const locale = useDateLocale();
   const apply = useServerFn(applyToEventNeed);
@@ -241,7 +240,6 @@ function NeedRow({
   const [editOpen, setEditOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
-
   const remaining = need.remaining_seats;
   const capacity = need.capacity;
   const status = need.status;
@@ -251,14 +249,11 @@ function NeedRow({
     mutationFn: () => apply({ data: { need_id: need.id } }),
     onSuccess: (r: { status: string } | null | undefined) => {
       toast.success(
-        r?.status === "confirmed"
-          ? t("needs:signup.confirmed")
-          : t("needs:signup.applied"),
+        r?.status === "confirmed" ? t("needs:signup.confirmed") : t("needs:signup.applied"),
       );
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const withdrawM = useMutation({
     mutationFn: () => withdraw({ data: { signup_id: mySignup!.id } }),
@@ -266,8 +261,7 @@ function NeedRow({
       toast.success(t("needs:signup.withdrawn"));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const closeM = useMutation({
     mutationFn: () => close({ data: { need_id: need.id } }),
@@ -275,8 +269,7 @@ function NeedRow({
       toast.success(t("needs:actions.close"));
       onChange();
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
   const cancelM = useMutation({
     mutationFn: () => cancel({ data: { need_id: need.id } }),
@@ -344,7 +337,12 @@ function NeedRow({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0", needChip)}>
+            <span
+              className={cn(
+                "inline-flex h-7 w-7 items-center justify-center rounded-full shrink-0",
+                needChip,
+              )}
+            >
               <NeedIcon className="h-4 w-4" />
             </span>
             <p className="text-sm font-semibold text-foreground truncate">{displayLabel}</p>
@@ -433,9 +431,7 @@ function NeedRow({
                     onClick={() => withdrawM.mutate()}
                     disabled={withdrawM.isPending}
                   >
-                    {withdrawM.isPending && (
-                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                    )}
+                    {withdrawM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                     {t("needs:actions.withdraw")}
                   </Button>
                 )}
@@ -457,9 +453,7 @@ function NeedRow({
             {(status === "draft" || status === "open") && (
               <Button size="sm" variant="default" onClick={() => setPublishOpen(true)}>
                 <Send className="h-3.5 w-3.5 mr-1" />
-                {status === "draft"
-                  ? t("needs:actions.publish")
-                  : t("needs:actions.republish")}
+                {status === "draft" ? t("needs:actions.publish") : t("needs:actions.republish")}
               </Button>
             )}
             {(status === "draft" || status === "open") && (
@@ -547,9 +541,7 @@ function NeedRow({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("needs:cancelDialog.title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("needs:cancelDialog.description")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("needs:cancelDialog.description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setCancelConfirmOpen(false)}>
@@ -657,15 +649,13 @@ function NeedFormDialog({
     // Always keep the current role_key visible when editing so it stays selectable.
     if (initial) used.delete(initial.role_key);
     return NEED_TEMPLATES.filter((tpl) => {
-      const sportOk =
-        tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
+      const sportOk = tpl.sports === "all" || (s && (tpl.sports as readonly string[]).includes(s));
       if (!sportOk) return false;
       // "other" is always allowed (multiple custom needs are OK).
       if (tpl.key === "other") return true;
       return !used.has(tpl.key);
     });
   }, [sport, initial, existingRoleKeys]);
-
 
   const [templateKey, setTemplateKey] = useState<string>(
     initial?.role_key ?? availableTemplates[0]?.key ?? "other",
@@ -681,9 +671,7 @@ function NeedFormDialog({
   );
 
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [capacity, setCapacity] = useState(
-    initial?.capacity ?? currentTpl.suggestedCapacity ?? 1,
-  );
+  const [capacity, setCapacity] = useState(initial?.capacity ?? currentTpl.suggestedCapacity ?? 1);
   const [mode, setMode] = useState<"auto" | "manual">(
     initial?.validation_mode ?? currentTpl.suggestedValidationMode ?? "auto",
   );
@@ -695,7 +683,6 @@ function NeedFormDialog({
     setCapacity(currentTpl.suggestedCapacity ?? 1);
     setMode(currentTpl.suggestedValidationMode ?? "auto");
   }
-
 
   const wantsPublish = !isEdit && audiences.length > 0 && (previewCount ?? 0) > 0;
 
@@ -738,7 +725,8 @@ function NeedFormDialog({
       if (isEdit) {
         toast.success(t("common.saved", { defaultValue: "Modifications enregistrées" }));
       } else if ((r as { __published?: { recipients_count: number } })?.__published) {
-        const rc = (r as { __published: { recipients_count: number } }).__published.recipients_count;
+        const rc = (r as { __published: { recipients_count: number } }).__published
+          .recipients_count;
         toast.success(t("needs:publish.success", { count: rc ?? 0 }));
       } else {
         toast.success(t("needs:section.created"));
@@ -786,7 +774,12 @@ function NeedFormDialog({
                       templateLocked && "opacity-60 cursor-not-allowed",
                     )}
                   >
-                    <span className={cn("inline-flex h-5 w-5 items-center justify-center rounded-full", active ? "bg-primary-foreground/20 text-primary-foreground" : chip)}>
+                    <span
+                      className={cn(
+                        "inline-flex h-5 w-5 items-center justify-center rounded-full",
+                        active ? "bg-primary-foreground/20 text-primary-foreground" : chip,
+                      )}
+                    >
                       <TplIcon className="h-3 w-3" />
                     </span>
                     {t(`needs:templates.${tpl.key}`)}
@@ -796,7 +789,9 @@ function NeedFormDialog({
             </div>
             {templateLocked && (
               <p className="text-xs text-muted-foreground">
-                {t("needs:edit.templateLocked", { defaultValue: "Le type de besoin ne peut pas être modifié après publication." })}
+                {t("needs:edit.templateLocked", {
+                  defaultValue: "Le type de besoin ne peut pas être modifié après publication.",
+                })}
               </p>
             )}
           </div>
@@ -832,9 +827,7 @@ function NeedFormDialog({
                   min={1}
                   max={200}
                   value={capacity}
-                  onChange={(e) =>
-                    setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))
-                  }
+                  onChange={(e) => setCapacity(Math.max(1, Math.min(200, +e.target.value || 1)))}
                   className="text-center font-semibold"
                 />
                 <Button
@@ -905,13 +898,9 @@ function NeedFormDialog({
                     {t("needs:publish.previewLoading")}
                   </span>
                 ) : audiences.length === 0 ? (
-                  <span className="text-muted-foreground">
-                    {t("needs:publish.previewNone")}
-                  </span>
+                  <span className="text-muted-foreground">{t("needs:publish.previewNone")}</span>
                 ) : (previewCount ?? 0) === 0 ? (
-                  <span className="text-muted-foreground">
-                    {t("needs:publish.previewNone")}
-                  </span>
+                  <span className="text-muted-foreground">{t("needs:publish.previewNone")}</span>
                 ) : (
                   <span className="text-emerald-800 dark:text-emerald-200 font-medium">
                     {t("needs:publish.preview", { count: previewCount ?? 0 })}
@@ -1005,13 +994,13 @@ function PublishDialog({
 
   const publishM = useMutation({
     mutationFn: () => publish({ data: { need_id: needId, audiences } }),
-    onSuccess: (r: { recipients_count: number; was_idempotent_skip: boolean } | null | undefined) => {
+    onSuccess: (
+      r: { recipients_count: number; was_idempotent_skip: boolean } | null | undefined,
+    ) => {
       if (r?.was_idempotent_skip) {
         toast.success(t("needs:publish.successIdempotent"));
       } else {
-        toast.success(
-          t("needs:publish.success", { count: r?.recipients_count ?? 0 }),
-        );
+        toast.success(t("needs:publish.success", { count: r?.recipients_count ?? 0 }));
       }
       onPublished();
       onOpenChange(false);
@@ -1060,11 +1049,7 @@ function PublishDialog({
           </Button>
           <Button
             onClick={() => publishM.mutate()}
-            disabled={
-              publishM.isPending ||
-              audiences.length === 0 ||
-              (previewCount ?? 0) === 0
-            }
+            disabled={publishM.isPending || audiences.length === 0 || (previewCount ?? 0) === 0}
           >
             {publishM.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
             {t("needs:actions.publish")}
@@ -1083,7 +1068,8 @@ const ROLE_COLORS: Record<string, string> = {
   admin: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300",
   coach: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300",
   assistant_coach: "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300",
-  staff: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300",
+  staff:
+    "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300",
   tournament_manager:
     "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300",
   player: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300",
@@ -1112,7 +1098,6 @@ function StaffSignupsDialog({
   onChanged: () => void;
   defaultAddOpen?: boolean;
 }) {
-
   const { t } = useTranslation();
   const listFn = useServerFn(listStaffSignupsForNeed);
   const decide = useServerFn(decideSignup);
@@ -1127,8 +1112,7 @@ function StaffSignupsDialog({
   });
 
   const decideM = useMutation({
-    mutationFn: (v: { signup_id: string; decision: "confirm" | "decline" }) =>
-      decide({ data: v }),
+    mutationFn: (v: { signup_id: string; decision: "confirm" | "decline" }) => decide({ data: v }),
     onSuccess: () => {
       refetch();
       onChanged();
@@ -1164,15 +1148,13 @@ function StaffSignupsDialog({
       onChanged();
       qc.invalidateQueries({ queryKey: ["need-add-members", needId] });
     },
-    onError: (e: Error) =>
-      toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
+    onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
   });
 
   const signups = (data?.signups ?? []) as StaffSignup[];
   const pending = signups.filter((s) => s.status === "applied");
   const pendingIds = pending.map((s) => s.id);
-  const allPendingSelected =
-    pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
+  const allPendingSelected = pendingIds.length > 0 && pendingIds.every((id) => selected.has(id));
 
   const toggleOne = (id: string) => {
     setSelected((prev) => {
@@ -1229,10 +1211,7 @@ function StaffSignupsDialog({
         {pending.length > 0 && (
           <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/40 p-2">
             <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-              <Checkbox
-                checked={allPendingSelected}
-                onCheckedChange={toggleAll}
-              />
+              <Checkbox checked={allPendingSelected} onCheckedChange={toggleAll} />
               {allPendingSelected
                 ? t("common.deselectAll", { defaultValue: "Tout désélectionner" })
                 : t("needs:staff.selectAllPending", {
@@ -1341,7 +1320,6 @@ function StaffSignupsDialog({
           )}
         </div>
 
-
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {signups.map((s) => {
             const isPending = s.status === "applied";
@@ -1364,8 +1342,7 @@ function StaffSignupsDialog({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium truncate">
-                      {s.profile?.full_name ??
-                        t("common.unknown", { defaultValue: "Sans nom" })}
+                      {s.profile?.full_name ?? t("common.unknown", { defaultValue: "Sans nom" })}
                     </p>
                     {s.roles.map((r) => (
                       <Badge

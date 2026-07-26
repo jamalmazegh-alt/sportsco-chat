@@ -3,6 +3,7 @@
 **Objectif :** fermer S3 (succès mensonger) sur `validateMatch` quand `applyBracketProgression` échoue. Rendre la corruption visible en beta — pas la masquer.
 **Prérequis :** Classe A mergée (`derivedTournamentId`, tests spy `not.toHaveBeenCalled`) — **ne pas toucher**.
 **Décisions verrouillées :**
+
 - **Tier A fail-loud uniquement** sur `validateMatchHandler` — pas de compensate (Tier B tué), pas de RPC (Tier C → ticket séparé).
 - `recordMatchScore` / `setMatchStatus` : **non touchés** — répertoriés dans ticket follow-up.
 - Tests Classe A : **4/4 verts**, `not.toHaveBeenCalled()` sur mismatch inchangé.
@@ -63,6 +64,7 @@ Ce résultat **détermine le libellé UI** (§2.5).
 **Question obligatoire** : si validation est commitée et progression a échoué, un **second appel** `applyBracketProgression(derivedTournamentId)` est-il sûr ?
 
 Analyser :
+
 - `computeProgressionUpdates` (`progression.ts`) — commentaire L16-17 « idempotent : rejouer ne change rien »
 - Les UPDATEs sont-ils des **assignations déterministes** depuis l'état courant, ou des incréments/inserts ?
 - Citer `progression.test.ts` (test idempotence L149-150 si présent)
@@ -73,26 +75,27 @@ Si `RETRY_UNSAFE` ou état indéterminé : le message UI **doit** inclure « ne 
 
 ### 2.4 Tier atomicité (constat, pas implémentation)
 
-| Tier | Statut ce patch |
-|------|-----------------|
-| A — Fail-loud | **À implémenter** (`validateMatch` seul) |
-| B — Compensate rollback | **Tué** |
+| Tier                     | Statut ce patch                                                                   |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| A — Fail-loud            | **À implémenter** (`validateMatch` seul)                                          |
+| B — Compensate rollback  | **Tué**                                                                           |
 | C — RPC transactionnelle | **Ticket séparé** (honêteté TOCTOU, `search_path`, re-check `can_validate_match`) |
 
 ### 2.5 Message UI — règle de choix (pas de texte unique figé)
 
 L'investigation §2.1 + §2.3 choisit **une** variante. Le prompt ne présuppose pas l'ordre des écritures.
 
-| Condition (PHASE 1) | Libellé (clé i18n suggérée `matches.progressionFailed*`) |
-|---------------------|----------------------------------------------------------|
-| **A** — `POST_VALIDATION_COMMITTED_BEFORE_PROGRESSION` **et** progression a throw après commit confirmé | *« Résultat enregistré. La progression du tableau n'a pas pu être finalisée — contactez un administrateur avant de continuer. »* |
-| **B** — état indéterminé **ou** `RETRY_UNSAFE` **ou** commit non confirmé avant progression | *« La validation n'a pas pu être finalisée complètement. Ne rejouez pas l'action ; contactez un administrateur pour vérifier l'état du match. »* |
+| Condition (PHASE 1)                                                                                     | Libellé (clé i18n suggérée `matches.progressionFailed*`)                                                                                         |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **A** — `POST_VALIDATION_COMMITTED_BEFORE_PROGRESSION` **et** progression a throw après commit confirmé | _« Résultat enregistré. La progression du tableau n'a pas pu être finalisée — contactez un administrateur avant de continuer. »_                 |
+| **B** — état indéterminé **ou** `RETRY_UNSAFE` **ou** commit non confirmé avant progression             | _« La validation n'a pas pu être finalisée complètement. Ne rejouez pas l'action ; contactez un administrateur pour vérifier l'état du match. »_ |
 
 **Implémentation** : trouver le call site UI (`MatchesList.tsx` `validateM` mutation ~L768) — mapper l'erreur serveur (`bracket_progression_failed` ou status 500) vers la variante choisie. **Ne pas coder le libellé avant PHASE 1.**
 
 ### 2.6 Ticket follow-up (documenter, ne pas implémenter)
 
 Créer ou compléter `TICKET-A-bis-followup.md` :
+
 - `recordMatchScore` + `setMatchStatus` : même fail-loud + message
 - Tier C RPC atomique (réf. `TICKET-A-bis-atomicity.md`)
 
@@ -105,7 +108,7 @@ Créer ou compléter `TICKET-A-bis-followup.md` :
 ### 3.1 `applyBracketProgression` — fail-loud global
 
 Supprimer le catch qui avale (L48-51). `log.error` + **rethrow**.  
-*(Note : `recordMatchScore` / `setMatchStatus` appelleront encore la version fail-loud — comportement change pour eux aussi au runtime, mais **hors scope tests/UI** ce patch — documenter dans follow-up.)*
+_(Note : `recordMatchScore` / `setMatchStatus` appelleront encore la version fail-loud — comportement change pour eux aussi au runtime, mais **hors scope tests/UI** ce patch — documenter dans follow-up.)_
 
 ### 3.2 `validateMatchHandler` — propager l'échec
 
@@ -129,13 +132,13 @@ await validateMatchBracketHooks.applyBracketProgression(derivedTournamentId);
 
 ## 4. PHASE 3 — TESTS
 
-| # | Cas | Attendu |
-|---|-----|---------|
-| 1-4 | Régression Classe A (`validate-match.test.ts`) | 4/4 verts, spy mismatch inchangé |
-| 5 | Progression mock throw après validation commit | Handler **pas** `{ ok: true }` ; status 500 ; body contient `bracket_progression_failed` |
-| 6 | Spy : progression appelée avant throw | `applyBracketProgressionSpy` called 1× |
-| 7 | **État match post-échec** (mock UPDATE validation success + progression throw) | Documenter dans test : `validated_at` set (si ordre §2.1 = A) — assert sur mock update calls |
-| 8 | `bun run test src/tests/unit/progression.test.ts` | Régression idempotence |
+| #   | Cas                                                                            | Attendu                                                                                      |
+| --- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 1-4 | Régression Classe A (`validate-match.test.ts`)                                 | 4/4 verts, spy mismatch inchangé                                                             |
+| 5   | Progression mock throw après validation commit                                 | Handler **pas** `{ ok: true }` ; status 500 ; body contient `bracket_progression_failed`     |
+| 6   | Spy : progression appelée avant throw                                          | `applyBracketProgressionSpy` called 1×                                                       |
+| 7   | **État match post-échec** (mock UPDATE validation success + progression throw) | Documenter dans test : `validated_at` set (si ordre §2.1 = A) — assert sur mock update calls |
+| 8   | `bun run test src/tests/unit/progression.test.ts`                              | Régression idempotence                                                                       |
 
 Typecheck ciblé. Pas de commit/push.
 

@@ -56,12 +56,7 @@ function NeedsFeedPage() {
 
       <div className="space-y-3">
         {needs.map((n) => (
-          <Link
-            key={n.id}
-            to="/events/$eventId"
-            params={{ eventId: n.event_id }}
-            className="block"
-          >
+          <Link key={n.id} to="/events/$eventId" params={{ eventId: n.event_id }} className="block">
             <Card className="hover:bg-muted/30 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">

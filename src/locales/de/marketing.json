@@ -1306,11 +1306,12 @@
         "t": "Ihr Elternkonto eröffnen",
         "b": "Alles beginnt mit der Einladung Ihres Vereins. Richten Sie Ihren Zugang in wenigen Minuten ein.",
         "steps": [
-          "Öffnen Sie die Einladungs-E-Mail Ihres Vereins und tippen Sie auf „Verein beitreten“.",
-          "Geben Sie Ihre E-Mail-Adresse ein und erstellen Sie Ihr Passwort.",
-          "Bestätigen Sie Ihre E-Mail-Adresse über den erhaltenen Bestätigungslink.",
-          "Melden Sie sich zum ersten Mal mit Ihren Zugangsdaten an.",
-          "Vervollständigen Sie Ihr Elternprofil (Name, Telefon) — fertig."
+          "Öffnen Sie die Einladungs-E-Mail Ihres Vereins und tippen Sie auf „Einladung annehmen“.",
+          "Geben Sie Vor- und Nachnamen ein und erstellen Sie Ihr Passwort (Ihre E-Mail ist bereits vorausgefüllt). Tippen Sie auf „Konto erstellen“.",
+          "Prüfen und akzeptieren Sie die Einwilligungen (Datenschutz, AGB, Benachrichtigungen, Datenverarbeitung), dann „Akzeptieren und fortfahren“.",
+          "Sie landen direkt auf der Startseite Ihres Vereins — Sie sind angemeldet.",
+          "Öffnen Sie den Reiter „Profil“: Dort sehen Sie Ihre Daten, Sprache und Benachrichtigungen.",
+          "Tragen Sie Vorname, Nachname und Telefonnummer ein und tippen Sie auf „Speichern“."
         ]
       },
       {

@@ -113,8 +113,8 @@ Livrable : tableau exhaustif. Un club `per_team` peut **légitimement** n'avoir 
 `subscriptions` ; aucun écran/helper ne doit planter.
 
 | Fichier / fonction | Hypothèse actuelle | Comportement sur club `per_team` (sans ligne) | Risque | Modification requise | Lot |
-|---|---|---|---|---|---|
-| _(à remplir)_ | | | | | |
+| ------------------ | ------------------ | --------------------------------------------- | ------ | -------------------- | --- |
+| _(à remplir)_      |                    |                                               |        |                      |     |
 
 Sources à balayer (au minimum) : `has-paid-access.ts` / `.server.ts`,
 `club_has_active_subscription`, gardes de `src/routes/_authenticated.tsx`, hooks
@@ -127,9 +127,9 @@ de facturation, exemptions, trial reminders, notifications, scripts, tests. Rep�
 Livrable : tableau exhaustif des mutations client→Supabase portant sur des données
 d'équipe, avec classement A/B/C/D (team-plan §15.2).
 
-| Fichier | Table/RPC | Opération | Rôle | Colonne d'où l'équipe est déductible | Catégorie A/B/C/D | Couverture requise | Policy actuelle | Modification proposée | Risque régression |
-|---|---|---|---|---|---|---|---|---|---|
-| _(à remplir)_ | | | | | | | | | |
+| Fichier       | Table/RPC | Opération | Rôle | Colonne d'où l'équipe est déductible | Catégorie A/B/C/D | Couverture requise | Policy actuelle | Modification proposée | Risque régression |
+| ------------- | --------- | --------- | ---- | ------------------------------------ | ----------------- | ------------------ | --------------- | --------------------- | ----------------- |
+| _(à remplir)_ |           |           |      |                                      |                   |                    |                 |                       |                   |
 
 Classement :
 
@@ -146,15 +146,15 @@ Classement :
 Livrable : table figée reliant chaque `coverage` aux booléens de l'objet entitlements
 (team-plan §16). Exemple de trame à compléter/valider :
 
-| coverage | canRead | canWrite | canManageTeamContent | canRespond… | canAcceptInvit. | canManagePlayers | canCreateEvents | canUseTeamWall | canUseClubFeatures | canManageClubIdentity | canCreateTournament | maxPlayers |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| club_plan  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔* | null |
-| team_plan  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✗ | ✔ | ✗ | null |
-| team_trial | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✗ | ✔ | ✗ | null |
-| discovery  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ (≤15) | ✔ | ✔ | ✗ | ✔ | ✗ | 15 |
-| grace      | ✔ | ✗ | ✗ | **✔** | **✔** | ✗ | ✗ | lecture | ✗ | ✔ | ✗ | — |
-| expired    | ✔ | ✗ | ✗ | **✔** | **✔** | ✗ | ✗ | lecture | ✗ | ✔ | ✗ | — |
-| none       | ✔/✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — |
+| coverage   | canRead | canWrite | canManageTeamContent | canRespond… | canAcceptInvit. | canManagePlayers | canCreateEvents | canUseTeamWall | canUseClubFeatures | canManageClubIdentity | canCreateTournament | maxPlayers |
+| ---------- | ------- | -------- | -------------------- | ----------- | --------------- | ---------------- | --------------- | -------------- | ------------------ | --------------------- | ------------------- | ---------- |
+| club_plan  | ✔       | ✔        | ✔                    | ✔           | ✔               | ✔                | ✔               | ✔              | ✔                  | ✔                     | ✔\*                 | null       |
+| team_plan  | ✔       | ✔        | ✔                    | ✔           | ✔               | ✔                | ✔               | ✔              | ✗                  | ✔                     | ✗                   | null       |
+| team_trial | ✔       | ✔        | ✔                    | ✔           | ✔               | ✔                | ✔               | ✔              | ✗                  | ✔                     | ✗                   | null       |
+| discovery  | ✔       | ✔        | ✔                    | ✔           | ✔               | ✔ (≤15)          | ✔               | ✔              | ✗                  | ✔                     | ✗                   | 15         |
+| grace      | ✔       | ✗        | ✗                    | **✔**       | **✔**           | ✗                | ✗               | lecture        | ✗                  | ✔                     | ✗                   | —          |
+| expired    | ✔       | ✗        | ✗                    | **✔**       | **✔**           | ✗                | ✗               | lecture        | ✗                  | ✔                     | ✗                   | —          |
+| none       | ✔/✗     | ✗        | ✗                    | ✗           | ✗               | ✗                | ✗               | ✗              | ✗                  | ✗                     | ✗                   | —          |
 
 `*` tournoi via Club uniquement si `billing_mode='club'` + abonnement actif.
 Colonne `canUseClubFeatures` : les fonctionnalités Club transverses ne sont jamais
@@ -177,9 +177,9 @@ WHERE exempt_from_billing = true
 
 Pour chaque club concerné, produire :
 
-| club_id | nom | date d'expiration | motif | accès actuellement obtenu (à cause du bug) | impact de la correction | action de régularisation |
-|---|---|---|---|---|---|---|
-| _(à remplir)_ | | | | | | |
+| club_id       | nom | date d'expiration | motif | accès actuellement obtenu (à cause du bug) | impact de la correction | action de régularisation |
+| ------------- | --- | ----------------- | ----- | ------------------------------------------ | ----------------------- | ------------------------ |
+| _(à remplir)_ |     |                   |       |                                            |                         |                          |
 
 Règles :
 
@@ -232,7 +232,7 @@ token / identifiant opaque de demande
 
 ## 10. Baseline CI
 
-Livrable : baseline documentée avant d'utiliser la CI comme *exit gate*.
+Livrable : baseline documentée avant d'utiliser la CI comme _exit gate_.
 
 - `bun run check:i18n` : lister les clés manquantes actuelles (dont `common.groups.*`) —
   décider **corriger d'abord** (recommandé) ou baseline.

@@ -77,7 +77,6 @@ export const listClubUsers = createServerFn({ method: "POST" })
       grouped.set(m.user_id, g);
     }
 
-
     return {
       users: Array.from(grouped.values()).sort((a, b) =>
         (a.profile?.full_name ?? a.email ?? "").localeCompare(
@@ -158,8 +157,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       last_sign_in_at: u?.last_sign_in_at ?? null,
       memberships: (memberships ?? []).map((m: { role?: string; roles?: string[] | null }) => ({
         ...m,
-        roles:
-          Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
+        roles: Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : m.role ? [m.role] : [],
       })),
 
       linkedPlayers: linkedPlayers ?? [],

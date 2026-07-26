@@ -298,8 +298,6 @@ export const republishEventNeed = createServerFn({ method: "POST" })
 /* 2. publishEventNeed — audiences + publication + open + dispatch          */
 /* ------------------------------------------------------------------------ */
 
-
-
 export const publishEventNeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => PublishInput.parse(input))
@@ -733,9 +731,7 @@ export const listEventNeeds = createServerFn({ method: "POST" })
     }
 
     // Résoudre les noms des confirmés (pour afficher qui a été accepté).
-    const allConfirmedUserIds = Array.from(
-      new Set(Object.values(confirmedUserIdsByNeed).flat()),
-    );
+    const allConfirmedUserIds = Array.from(new Set(Object.values(confirmedUserIdsByNeed).flat()));
     const nameByUser: Record<string, string | null> = {};
     if (allConfirmedUserIds.length > 0) {
       const { data: profs } = await supabaseAdmin
@@ -790,7 +786,8 @@ export const listEventNeeds = createServerFn({ method: "POST" })
       .select("need_id, recipients_count, published_at")
       .in("need_id", needIds)
       .order("published_at", { ascending: false });
-    const lastPubByNeed: Record<string, { recipients_count: number | null; published_at: string }> = {};
+    const lastPubByNeed: Record<string, { recipients_count: number | null; published_at: string }> =
+      {};
     for (const p of pubs ?? []) {
       if (!lastPubByNeed[p.need_id]) {
         lastPubByNeed[p.need_id] = {
@@ -912,7 +909,7 @@ export const listStaffSignupsForNeed = createServerFn({ method: "POST" })
     return {
       signups: (signups ?? []).map((s) => {
         const prof = (s.user_id && profiles[s.user_id]) || { full_name: null };
-        const dob = s.user_id ? birthByUser[s.user_id] ?? null : null;
+        const dob = s.user_id ? (birthByUser[s.user_id] ?? null) : null;
         return {
           ...s,
           profile: { full_name: prof.full_name },
@@ -1011,11 +1008,7 @@ export const getNeedAudienceContext = createServerFn({ method: "POST" })
     });
 
     const cats = Array.from(
-      new Set(
-        teams
-          .map((t) => t.age_group?.trim())
-          .filter((c): c is string => !!c),
-      ),
+      new Set(teams.map((t) => t.age_group?.trim()).filter((c): c is string => !!c)),
     ).sort();
 
     return {
@@ -1086,8 +1079,7 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eventTeamId = ((ev as any)?.team_id as string | null) ?? null;
-    const eventCategory =
-      teams.find((t) => t.id === eventTeamId)?.age_group?.trim() || null;
+    const eventCategory = teams.find((t) => t.id === eventTeamId)?.age_group?.trim() || null;
 
     return {
       club_id: clubId,
@@ -1099,7 +1091,6 @@ export const getEventAudienceContext = createServerFn({ method: "POST" })
       event_category: eventCategory,
     };
   });
-
 
 /* ------------------------------------------------------------------------ */
 /* 12ter. previewEventAudience — preview par event_id (avant création need) */

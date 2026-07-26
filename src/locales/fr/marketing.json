@@ -1306,11 +1306,12 @@
         "t": "Ouvrir votre compte parent",
         "b": "Tout commence par l'invitation de votre club. Créez votre accès en quelques minutes.",
         "steps": [
-          "Ouvrez l'email d'invitation envoyé par votre club et appuyez sur « Rejoindre le club ».",
-          "Renseignez votre adresse email et créez votre mot de passe.",
-          "Validez votre adresse email grâce au lien de confirmation reçu.",
-          "Connectez-vous pour la première fois avec vos identifiants.",
-          "Complétez votre profil parent (nom, téléphone) — c'est prêt."
+          "Ouvrez l'email d'invitation de votre club et appuyez sur « Accepter l'invitation ».",
+          "Renseignez vos nom et prénom, puis créez votre mot de passe (votre email est déjà pré-rempli). Appuyez sur « Créer un compte ».",
+          "Consultez et acceptez les consentements (confidentialité, CGU, notifications, traitement des données), puis « Accepter et continuer ».",
+          "Vous arrivez directement sur l'accueil de votre club — vous êtes connecté(e).",
+          "Ouvrez l'onglet « Profil » : vous y voyez vos infos, la langue et les notifications.",
+          "Complétez vos nom, prénom et numéro de téléphone, puis appuyez sur « Enregistrer »."
         ]
       },
       {

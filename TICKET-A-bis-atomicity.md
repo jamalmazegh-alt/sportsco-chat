@@ -12,11 +12,11 @@
 
 ### Ordre d'exécution et écritures
 
-| # | Client | Opération | Table | Fichier:ligne |
-|---|--------|-----------|-------|---------------|
-| 1 | `context.supabase` (RLS) | **UPDATE** | `tournament_matches` (`validated_at`, `validated_by`) | `tournaments.functions.ts:1449-1456` |
-| 2 | `supabaseAdmin` | SELECT (lecture) | `tournament_matches` (tous les matchs du tournoi) | `tournaments.functions.ts:25-30` |
-| 3..N | `supabaseAdmin` | **UPDATE** × k (boucle) | `tournament_matches` (`team_a_id`, `team_b_id`, `winner_team_id`) | `tournaments.functions.ts:34-42` |
+| #    | Client                   | Opération               | Table                                                             | Fichier:ligne                        |
+| ---- | ------------------------ | ----------------------- | ----------------------------------------------------------------- | ------------------------------------ |
+| 1    | `context.supabase` (RLS) | **UPDATE**              | `tournament_matches` (`validated_at`, `validated_by`)             | `tournaments.functions.ts:1449-1456` |
+| 2    | `supabaseAdmin`          | SELECT (lecture)        | `tournament_matches` (tous les matchs du tournoi)                 | `tournaments.functions.ts:25-30`     |
+| 3..N | `supabaseAdmin`          | **UPDATE** × k (boucle) | `tournament_matches` (`team_a_id`, `team_b_id`, `winner_team_id`) | `tournaments.functions.ts:34-42`     |
 
 **Total écritures mutantes :** `1 + k` appels HTTP/PostgREST distincts (`k` = nombre de mises à jour de progression, variable).
 

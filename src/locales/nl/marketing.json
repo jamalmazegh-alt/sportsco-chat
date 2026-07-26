@@ -1306,11 +1306,12 @@
         "t": "Je ouderaccount aanmaken",
         "b": "Alles begint met de uitnodiging van je club. Maak je toegang in een paar minuten aan.",
         "steps": [
-          "Open de uitnodigingsmail van je club en tik op «Lid worden van de club».",
-          "Vul je e-mailadres in en maak je wachtwoord aan.",
-          "Bevestig je e-mailadres via de ontvangen bevestigingslink.",
-          "Log voor de eerste keer in met je gegevens.",
-          "Vul je ouderprofiel aan (naam, telefoon) — klaar."
+          "Open de uitnodigingsmail van je club en tik op «Uitnodiging accepteren».",
+          "Vul je voor- en achternaam in en maak je wachtwoord aan (je e-mail is al ingevuld). Tik op «Account aanmaken».",
+          "Bekijk en aanvaard de toestemmingen (privacy, voorwaarden, meldingen, gegevensverwerking) en tik daarna op «Accepteren en doorgaan».",
+          "Je komt meteen op het startscherm van je club — je bent ingelogd.",
+          "Open het tabblad «Profiel»: je ziet je gegevens, taal en meldingen.",
+          "Vul je voornaam, achternaam en telefoonnummer in en tik op «Opslaan»."
         ]
       },
       {

@@ -75,7 +75,10 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
     .select("id, first_name, preferred_language")
     .in("id", params.recipientUserIds);
   const profileById = new Map(
-    (profiles ?? []).map((p) => [p.id as string, p as { first_name: string | null; preferred_language: string | null }]),
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p as { first_name: string | null; preferred_language: string | null },
+    ]),
   );
 
   // Get emails from auth.users via admin.listUsers is expensive; use RPC or
@@ -190,7 +193,8 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   }
 
   const { sendPushToUser } = await import("@/lib/push-send.server");
-  const title = params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
+  const title =
+    params.status === "confirmed" ? `✅ Volontaire confirmé` : `📝 Nouvelle candidature`;
   const startsAt = ev?.starts_at as string | null;
   const dateStr = startsAt
     ? new Date(startsAt).toLocaleDateString("fr-FR", {
@@ -270,9 +274,7 @@ export async function notifyNeedCancelled(params: { needId: string }) {
   // Dédupliqué : un seul dispatch par personne (confirmed ET applied).
   const uids = Array.from(
     new Set(
-      (signups ?? [])
-        .map((s) => s.user_id as string | null)
-        .filter((v): v is string => Boolean(v)),
+      (signups ?? []).map((s) => s.user_id as string | null).filter((v): v is string => Boolean(v)),
     ),
   );
   if (uids.length === 0) return { dispatched: 0 };

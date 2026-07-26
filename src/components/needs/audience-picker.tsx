@@ -65,7 +65,6 @@ export type AudienceCtx = {
   event_category?: string | null;
 };
 
-
 export type AudienceState = {
   scalar: Set<ScalarAudienceKey>;
   groupIds: Set<string>;
@@ -74,13 +73,9 @@ export type AudienceState = {
 };
 
 export function useAudienceState(defaults: Partial<AudienceState> = {}) {
-  const [scalar, setScalar] = useState<Set<ScalarAudienceKey>>(
-    defaults.scalar ?? new Set(),
-  );
+  const [scalar, setScalar] = useState<Set<ScalarAudienceKey>>(defaults.scalar ?? new Set());
   const [groupIds, setGroupIds] = useState<Set<string>>(defaults.groupIds ?? new Set());
-  const [teamPicks, setTeamPicks] = useState<AudienceState["teamPicks"]>(
-    defaults.teamPicks ?? [],
-  );
+  const [teamPicks, setTeamPicks] = useState<AudienceState["teamPicks"]>(defaults.teamPicks ?? []);
   const [category, setCategory] = useState<string>(defaults.category ?? "");
 
   const state = useMemo<AudienceState>(
@@ -141,11 +136,7 @@ export function useHydratedAudiences(
 /* Kind registry — labels, icons, colors                              */
 /* ------------------------------------------------------------------ */
 
-type KindKey =
-  | ScalarAudienceKey
-  | "club_group"
-  | TeamKind
-  | "category_educators";
+type KindKey = ScalarAudienceKey | "club_group" | TeamKind | "category_educators";
 
 const KIND_META: Record<KindKey, { Icon: LucideIcon; cls: string }> = {
   convoked_players: {
@@ -340,15 +331,11 @@ export function AudiencePickerBody({
   const eventSuggestions: Suggestion[] = useMemo(() => {
     if (!ctx) return [];
     const list: Suggestion[] = [];
-    const eventTeam = ctx.event_team_id
-      ? ctx.teams.find((t) => t.id === ctx.event_team_id)
-      : null;
+    const eventTeam = ctx.event_team_id ? ctx.teams.find((t) => t.id === ctx.event_team_id) : null;
     if (eventTeam) {
       const teamKinds: TeamKind[] = ["team_players", "team_parents", "team_educators"];
       for (const kind of teamKinds) {
-        const active = state.teamPicks.some(
-          (p) => p.team_id === eventTeam.id && p.kind === kind,
-        );
+        const active = state.teamPicks.some((p) => p.team_id === eventTeam.id && p.kind === kind);
         list.push({
           id: `sg-t-${eventTeam.id}-${kind}`,
           kind,
@@ -389,8 +376,7 @@ export function AudiencePickerBody({
         {chips.length === 0 ? (
           <p className="mt-2 text-xs text-muted-foreground italic">
             {t("needs:audiences.emptyHint", {
-              defaultValue:
-                "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
+              defaultValue: "Aucune audience sélectionnée. Ajoute au moins un critère ci-dessous.",
             })}
           </p>
         ) : (
@@ -398,11 +384,7 @@ export function AudiencePickerBody({
             {chips.map((c) => {
               const { Icon, cls } = KIND_META[c.kind];
               return (
-                <Badge
-                  key={c.id}
-                  variant="outline"
-                  className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}
-                >
+                <Badge key={c.id} variant="outline" className={`gap-1.5 py-1 pl-2 pr-1 ${cls}`}>
                   <Icon className="h-3 w-3" />
                   <span className="text-xs">{c.label}</span>
                   <button
@@ -419,7 +401,6 @@ export function AudiencePickerBody({
           </div>
         )}
       </div>
-
 
       {/* Custom groups — highlighted */}
       {customGroupSuggestions.length > 0 && (
@@ -439,9 +420,7 @@ export function AudiencePickerBody({
                   type="button"
                   onClick={s.onToggle}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
+                    s.active ? cls : "border-border bg-background hover:bg-muted text-foreground"
                   }`}
                 >
                   <Icon className="h-3 w-3" />
@@ -476,9 +455,7 @@ export function AudiencePickerBody({
                   type="button"
                   onClick={s.onToggle}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs transition ${
-                    s.active
-                      ? cls
-                      : "border-border bg-background hover:bg-muted text-foreground"
+                    s.active ? cls : "border-border bg-background hover:bg-muted text-foreground"
                   }`}
                 >
                   <Icon className="h-3 w-3" />
@@ -556,9 +533,7 @@ export function AudiencePickerBody({
                       (ctx?.teams ?? [])
                         .filter(
                           (tm) =>
-                            !state.teamPicks.some(
-                              (p) => p.team_id === tm.id && p.kind === kind,
-                            ),
+                            !state.teamPicks.some((p) => p.team_id === tm.id && p.kind === kind),
                         )
                         .map((tm) => [tm.id, tm]),
                     ).values(),
@@ -580,12 +555,7 @@ export function AudiencePickerBody({
             <div />
           )}
 
-          <Button
-            type="button"
-            size="sm"
-            disabled={!canSubmit()}
-            onClick={submit}
-          >
+          <Button type="button" size="sm" disabled={!canSubmit()} onClick={submit}>
             <Plus className="h-4 w-4 mr-1" />
             {t("common.add", { defaultValue: "Ajouter" })}
           </Button>
@@ -602,4 +572,3 @@ export function AudiencePickerBody({
     </div>
   );
 }
-

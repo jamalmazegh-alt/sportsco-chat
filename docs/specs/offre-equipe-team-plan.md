@@ -8,6 +8,7 @@
 > dépôt (audit du 2026-07-25) ; les re-vérifier rapidement avant de coder.
 >
 > Documents liés :
+>
 > - `docs/specs/offre-equipe-architecture-plan.md` (design technique)
 > - `docs/specs/offre-equipe-lot-0-bis.md` (durcissement, inventaires, prérequis)
 
@@ -709,7 +710,7 @@ helper ne doit planter. Détail en Lot 0 bis §3 (inventaire lecteurs).
 ## 21. CI & dette existante
 
 Contrôles déjà rouges sur `main` : `bun run check:i18n` (clés `common.groups.*`
-manquantes) et `bun run lint`. Avant d'utiliser ces commandes comme *exit gates* :
+manquantes) et `bun run lint`. Avant d'utiliser ces commandes comme _exit gates_ :
 
 - **Option recommandée** — corriger la dette d'abord : clés `groups.*` manquantes ; lint ;
   bug SQL `exempt_until`.
@@ -771,9 +772,9 @@ Je souhaite organiser un tournoi
 ### 24.1 Parcours Découverte / Équipe
 
 1. création du compte ; 2. **recherche d'un club existant** ; 3. demande de rattachement
-éventuelle ; 4. sinon création d'un vrai club ; 5. nom, logo optionnel, sport,
-localisation ; 6. première équipe ; 7. choix Découverte / mensuel / annuel ; 8. essai
-éventuel ; 9. invitation du staff. Le club est créé en `billing_mode='per_team'`.
+   éventuelle ; 4. sinon création d'un vrai club ; 5. nom, logo optionnel, sport,
+   localisation ; 6. première équipe ; 7. choix Découverte / mensuel / annuel ; 8. essai
+   éventuel ; 9. invitation du staff. Le club est créé en `billing_mode='per_team'`.
 
 ### 24.2 Club existant détecté
 
@@ -890,14 +891,14 @@ après transfert valide.
 ## 28. Découpage en lots
 
 - **Lot 0 — Architecture initiale** : audit et modèle général (produits).
-- **Lot 0 bis — Durcissement & inventaires** : *obligatoire avant tout code fonctionnel*
+- **Lot 0 bis — Durcissement & inventaires** : _obligatoire avant tout code fonctionnel_
   (`offre-equipe-lot-0-bis.md`).
 - **Lot 1 — Modèle de couverture** : `clubs.billing_mode` ; modèle Découverte ;
   `team_subscriptions` (+ exemptions corrigées) ; helpers de couverture ; garde-fous DB
   (§9) ; trigger d'essai ajusté ; RLS de base ; tests tournoi ; feature flag.
 - **Lot 2 — Onboarding & rattachement simple** : recherche de club ; demande de rejoindre ;
   création de club ; première équipe ; choix Découverte/Équipe ; limites gratuites ;
-  invitation staff. *(Le rapprochement complet de clubs est hors V1.)*
+  invitation staff. _(Le rapprochement complet de clubs est hors V1.)_
 - **Lot 3 — Stripe & facturation Équipe** : checkout ; webhook ; portail ; changement de
   périodicité ; `incomplete` ; paiement échoué ; grâce ; annulation ; réactivation ;
   exemptions.

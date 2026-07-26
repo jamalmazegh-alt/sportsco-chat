@@ -1306,11 +1306,12 @@
         "t": "Abrir tu cuenta de padre o madre",
         "b": "Todo empieza con la invitación de tu club. Crea tu acceso en unos minutos.",
         "steps": [
-          "Abre el correo de invitación de tu club y pulsa «Unirme al club».",
-          "Introduce tu dirección de correo y crea tu contraseña.",
-          "Valida tu dirección de correo con el enlace de confirmación recibido.",
-          "Inicia sesión por primera vez con tus credenciales.",
-          "Completa tu perfil de padre o madre (nombre, teléfono) — listo."
+          "Abre el correo de invitación de tu club y pulsa «Aceptar invitación».",
+          "Introduce tu nombre y apellidos y crea tu contraseña (tu correo ya está rellenado). Pulsa «Crear cuenta».",
+          "Revisa y acepta los consentimientos (privacidad, condiciones, notificaciones, tratamiento de datos), y luego «Aceptar y continuar».",
+          "Llegas directamente a la pantalla de inicio de tu club — has iniciado sesión.",
+          "Abre la pestaña «Perfil»: verás tus datos, el idioma y las notificaciones.",
+          "Completa tu nombre, apellidos y número de teléfono, y pulsa «Guardar»."
         ]
       },
       {

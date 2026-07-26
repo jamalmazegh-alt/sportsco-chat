@@ -47,12 +47,7 @@ export interface NeedTemplate {
 }
 
 /** Sport slugs acceptés (alignés sur `clubs.sport` / `teams.sport`). */
-export const NEEDS_SUPPORTED_SPORTS = [
-  "football",
-  "basketball",
-  "handball",
-  "volleyball",
-] as const;
+export const NEEDS_SUPPORTED_SPORTS = ["football", "basketball", "handball", "volleyball"] as const;
 
 export const NEED_TEMPLATES: readonly NeedTemplate[] = [
   // ---- Football ---------------------------------------------------------

@@ -4512,7 +4512,6 @@ function EventDetail() {
 
       <EventChat eventId={eventId} />
 
-
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (
         <div className="md:hidden fixed bottom-16 inset-x-0 z-30 px-4 pb-3 pointer-events-none">

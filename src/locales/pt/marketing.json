@@ -1306,11 +1306,12 @@
         "t": "Abrir a sua conta de pai ou mãe",
         "b": "Tudo começa com o convite do seu clube. Crie o seu acesso em poucos minutos.",
         "steps": [
-          "Abra o email de convite do seu clube e toque em «Juntar-me ao clube».",
-          "Introduza o seu endereço de email e crie a sua palavra-passe.",
-          "Valide o seu endereço de email com o link de confirmação recebido.",
-          "Inicie sessão pela primeira vez com as suas credenciais.",
-          "Complete o seu perfil de pai ou mãe (nome, telefone) — pronto."
+          "Abra o email de convite do seu clube e toque em «Aceitar convite».",
+          "Introduza o nome e apelido e crie a sua palavra-passe (o seu email já está preenchido). Toque em «Criar conta».",
+          "Consulte e aceite os consentimentos (privacidade, termos, notificações, tratamento de dados) e depois «Aceitar e continuar».",
+          "Chega diretamente ao ecrã inicial do seu clube — está com sessão iniciada.",
+          "Abra o separador «Perfil»: verá os seus dados, o idioma e as notificações.",
+          "Preencha o nome, apelido e número de telefone e toque em «Guardar»."
         ]
       },
       {

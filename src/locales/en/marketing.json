@@ -1306,11 +1306,12 @@
         "t": "Open your parent account",
         "b": "It all starts with your club's invitation. Set up your access in a few minutes.",
         "steps": [
-          "Open the invitation email from your club and tap \"Join the club\".",
-          "Enter your email address and create your password.",
-          "Confirm your email address via the confirmation link you received.",
-          "Log in for the first time with your credentials.",
-          "Complete your parent profile (name, phone) — you're all set."
+          "Open your club's invitation email and tap \"Accept invitation\".",
+          "Enter your first and last name, then create your password (your email is already pre-filled). Tap \"Create account\".",
+          "Review and accept the consents (privacy, terms, notifications, data processing), then \"Accept and continue\".",
+          "You land straight on your club's home screen — you're logged in.",
+          "Open the \"Profile\" tab: you'll see your info, language and notifications.",
+          "Fill in your first name, last name and phone number, then tap \"Save\"."
         ]
       },
       {
