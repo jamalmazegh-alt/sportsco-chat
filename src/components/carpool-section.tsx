@@ -362,8 +362,10 @@ export function CarpoolSection({
                         {t("carpool.cancel")}
                       </Button>
                     ) : (
-                      !isMine &&
-                      canParticipate && (
+                      // Toute personne pouvant voir l'événement peut réserver
+                      // (parent d'un convoqué, joueur, ou accompagnant sans
+                      // enfant convoqué → réservation d'une place pour soi).
+                      !isMine && (
                         <Button
                           size="sm"
                           className="w-full"
@@ -374,6 +376,7 @@ export function CarpoolSection({
                         </Button>
                       )
                     )}
+
                   </div>
                 );
               })}
