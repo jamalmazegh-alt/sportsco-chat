@@ -59,17 +59,21 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
     const requesterName =
       (requester as any)?.full_name || (requester as any)?.first_name || undefined;
 
-    const { data: staff } = await supabaseAdmin
+    // NB: `app_role` n'a pas de valeur "assistant_coach" — utiliser un rôle
+    // inexistant fait échouer toute la requête PostgREST (enum invalide).
+    const { data: staff, error: staffError } = await supabaseAdmin
       .from("team_members")
       .select("user_id")
       .eq("team_id", ev.team_id)
-      .in("role", ["coach", "assistant_coach", "admin"] as any);
+      .in("role", ["coach", "admin", "dirigeant"] as any);
+    if (staffError) console.error("[carpool-need] staff query failed", staffError.message);
     const staffIds = Array.from(
       new Set(
         (staff ?? []).map((s: any) => s.user_id).filter((u: string | null) => u && u !== userId),
       ),
     ) as string[];
     if (staffIds.length === 0) return { sent: 0 };
+
 
     const { data: club } = ev.teams
       ? await supabaseAdmin
