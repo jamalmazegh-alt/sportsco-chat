@@ -1119,6 +1119,7 @@ function PlayerProfile() {
               <ul className="space-y-2">
                 {(parents ?? []).map((pp) => {
                   const linked = !!pp.parent_user_id;
+                  const unconfirmed = linked && unconfirmedParentIds.has(pp.parent_user_id!);
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
                   const emailKey = pp.email?.trim().toLowerCase() ?? "";
@@ -1148,12 +1149,28 @@ function PlayerProfile() {
                           <span
                             className={cn(
                               "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                              linked
+                              linked && !unconfirmed
                                 ? "bg-present/15 text-present"
-                                : "bg-muted text-muted-foreground",
+                                : unconfirmed
+                                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                  : "bg-muted text-muted-foreground",
                             )}
+                            title={
+                              unconfirmed
+                                ? t("players.accountUnconfirmedHint", {
+                                    defaultValue:
+                                      "Le compte existe mais l'e-mail n'a pas encore été confirmé. Le parent doit cliquer sur le lien de confirmation reçu par e-mail.",
+                                  })
+                                : undefined
+                            }
                           >
-                            {linked ? t("players.accountActive") : t("players.accountInactive")}
+                            {unconfirmed
+                              ? t("players.accountUnconfirmed", {
+                                  defaultValue: "E-mail non confirmé",
+                                })
+                              : linked
+                                ? t("players.accountActive")
+                                : t("players.accountInactive")}
                           </span>
                           {inviteSent && (
                             <span
