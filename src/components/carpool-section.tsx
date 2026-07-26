@@ -691,6 +691,7 @@ function NeedDialog({
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const notifyStaff = useServerFn(notifyCoachesOfCarpoolNeed);
   const [selected, setSelected] = useState<string[]>(myConvokedChildren.map((c) => c.player_id));
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
