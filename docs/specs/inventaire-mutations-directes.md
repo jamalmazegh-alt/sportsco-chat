@@ -285,6 +285,19 @@ l'équipe ».
 
 ---
 
+## ⚠️ Deux corrections après vérification finale
+
+- **`events/$eventId/feedback.tsx`** : il n'y a **aucun `.delete()` sur `events`** dans ce
+  fichier. La ligne 230 est un `Set.delete(playerId)` JavaScript. Faux positif du grep,
+  à retirer du relevé.
+- **`wall-feed.tsx:742 deletePost`** : ce n'est **pas une suppression directe**. La
+  fonction appelle la RPC `soft_delete_entity` (`:743`), avec restauration par
+  `restore_entity`. Même chose pour la suppression de commentaire (`:1702`).
+
+`soft_delete_entity` s'avère être un **point de passage central** couvrant `wall_post`,
+`wall_comment`, `event`, `team` et `player`, en `SECURITY DEFINER`, avec la distinction
+auteur / admin déjà implémentée. Détail dans `matrice-enforcement-lot5.md`.
+
 ## État de complétion
 
 Les trois lectures prioritaires sont **faites** : `events/$eventId.tsx` (4 500 lignes),
