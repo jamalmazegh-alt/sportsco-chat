@@ -1,266 +1,333 @@
-# Offre Équipe — Lot 0 bis : investigations bloquantes avant implémentation
+# Lot 0 bis — Durcissement, inventaires et prérequis
 
-> Complément au plan d'architecture (`offre-equipe-architecture-plan.md`).
-> Ce lot regroupe trois chantiers d'investigation qui doivent aboutir **avant** toute
-> écriture de code fonctionnel, parce qu'ils touchent des données de production, des
-> invariants de concurrence ou des règles commerciales non encore tranchées.
+> Addendum obligatoire à `offre-equipe-team-plan.md` et
+> `offre-equipe-architecture-plan.md`.
 >
-> Aucun de ces trois chantiers ne produit de code fonctionnel : ils produisent des
-> décisions, des inventaires et des stratégies validées.
+> **Aucun développement fonctionnel du Lot 1 ne commence avant validation de ce
+> document.** Les chantiers ci-dessous produisent des décisions, des inventaires et des
+> stratégies validées — pas de code fonctionnel.
+>
+> Les comptages cités proviennent d'une exploration réelle du dépôt et servent d'amorce ;
+> ils doivent être complétés, pas repris tels quels.
 
 ---
 
-## 0 bis.1 — Quotas Découverte et éligibilité en fin d'essai
+## 28.1 Garde-fous en base de données
 
-### Règle décidée
+Les invariants critiques ne doivent dépendre ni du code applicatif, ni des tests, ni de la
+discipline des développeurs. Chaque garde-fou ci-dessous doit couvrir **les écritures via
+service role et `supabaseAdmin`**, qui contournent la RLS.
 
-La bascule automatique d'une équipe en fin d'essai vers l'offre Découverte n'est
-autorisée que si **les deux quotas** sont respectés au moment de la bascule :
+### A. Anti-abonnement Club sur un club `per_team`
 
-```text
-Quota club       : le club possède strictement moins de 2 équipes Découverte actives
-Quota utilisateur: le créateur/bénéficiaire de l'équipe ne possède pas déjà
-                   une équipe Découverte active
-```
+Interdire qu'une ligne `subscriptions` active, en essai ou exemptée soit associée
+durablement à un club `billing_mode='per_team'`.
 
-Si l'un des deux quotas est atteint :
+Un `CHECK` inter-tables étant impossible en Postgres, retenir un **trigger
+`BEFORE INSERT OR UPDATE` sur `subscriptions`** qui lève une exception si le club cible
+est en `per_team`, **sauf** lorsque le flux contrôlé de passage à l'offre Club est en
+cours. Matérialiser ce flux par un marqueur explicite (colonne d'état de migration ou
+paramètre de session `SET LOCAL`), jamais par une heuristique.
 
-```text
-fin d'essai
-→ conservation intégrale des données
-→ équipe en lecture seule
-→ proposition Offre Équipe ou Offre Club
-```
+À spécifier : le mécanisme d'exception exact, sa portée transactionnelle, et son
+comportement si la migration échoue en cours de route.
 
-**Aucun grandfathering** : il n'existe aucun mécanisme permettant de dépasser les quotas
-Découverte, quelle que soit l'ancienneté du compte ou de l'équipe.
+### B. Contrôle tournoi explicite
 
-Exemple de référence :
+`can_create_tournament` doit tester `clubs.billing_mode = 'club'` **en plus de**
+`club_has_active_subscription(club_id)`. Ne pas déduire le mode commercial de la seule
+existence d'une souscription.
 
-```text
-U13 — Découverte, portée par Coach 1
-U15 — Découverte, portée par Coach 2
-U17 — essai créé par Coach 1
+Livrable : la nouvelle définition de la fonction, et la vérification que les clubs
+existants (`billing_mode='club'` par défaut) conservent un comportement strictement
+identique.
 
-Fin de l'essai U17 :
-  quota club     = 2/2 atteint      → refus
-  quota Coach 1  = 1/1 atteint      → refus
-  → U17 passe en lecture seule (données conservées, upsell affiché)
-```
+### C. Cohérence `team_subscriptions.club_id`
 
-Rappel des règles V1 associées (friction assumée, §0 bis.1.3) :
+Trigger vérifiant à l'INSERT et à l'UPDATE que
+`club_id = (SELECT club_id FROM teams WHERE id = team_id)`. Définir le comportement lors
+d'un transfert d'équipe vers un autre club (Lot 8) : mise à jour en cascade dans la même
+transaction.
 
-```text
-1 équipe Découverte maximum par utilisateur
-2 équipes Découverte maximum par club
-1 essai Équipe maximum par utilisateur
-```
+### D. Unicité des souscriptions
 
-### 0 bis.1.1 — Ce qu'il faut définir précisément
+Index partiel garantissant une seule souscription vivante par équipe. **Point d'attention
+identifié** : si l'index exclut seulement `canceled` et `incomplete_expired`, une ligne
+`incomplete` issue d'un checkout abandonné bloque tout nouvel achat sur la même équipe
+jusqu'à son expiration Stripe (~24 h), avec une erreur d'unicité brute. Voir E.
 
-1. **« Équipe Découverte active »** : définition exacte et requêtable. Proposition —
-   une équipe dont la couverture résolue est `discovery`, non archivée
-   (`teams.archived_at IS NULL`, `teams.deleted_at IS NULL`).
-2. **« Créateur ou bénéficiaire »** : quelle colonne fait foi ? Il n'existe pas
-   aujourd'hui de `created_by` sur `teams` (à vérifier au moment de l'implémentation ;
-   l'audit n'en a pas relevé). Deux options :
-   - ajouter `teams.created_by` (migration additive) ;
-   - ou porter le rattachement sur la ligne de couverture Découverte elle-même
-     (`discovery_owner_user_id`), ce qui est plus explicite et évite d'interpréter la
-     création historique. **Recommandation : la seconde.**
-3. **Moment d'évaluation** : à la fin d'essai (job/webhook `trial_will_end` puis
-   expiration effective). L'évaluation doit être refaite au moment de la bascule, pas au
-   début de l'essai — les quotas peuvent avoir été consommés entre-temps.
-4. **Ordre de résolution en cas d'égalité** : si deux essais expirent simultanément dans
-   un club à 1 équipe Découverte, laquelle bascule ? Proposition : ordre déterministe par
-   `trial_end` puis `created_at` croissants ; la seconde passe en lecture seule.
-5. **Libération d'un quota** : que se passe-t-il si une équipe Découverte est archivée ou
-   passe en offre payante ? Le quota se libère-t-il, et une équipe en lecture seule
-   peut-elle alors réclamer la place libérée ? Proposition V1 : le quota se libère, mais
-   **aucune bascule rétroactive automatique** — l'utilisateur doit la demander
-   explicitement (évite les effets de bord silencieux et les allers-retours).
+### E. Stratégie `incomplete`
 
-### 0 bis.1.2 — Atomicité des quotas
+Avant tout nouveau checkout : rechercher une souscription vivante ou incomplète → vérifier
+son état réel auprès de Stripe → réutiliser une session récente reprenable, ou passer la
+ligne à `incomplete_expired` si Stripe confirme l'expiration, ou l'invalider proprement →
+seulement ensuite créer une nouvelle session.
 
-Les deux quotas sont soumis aux mêmes risques de concurrence que la limite de joueurs
-(§0 bis.2) : deux fins d'essai simultanées dans le même club pourraient chacune constater
-« 1 équipe Découverte » et basculer toutes les deux, produisant 3 équipes Découverte.
+**Ne jamais exposer une erreur d'unicité brute à l'utilisateur.** L'index est le garde-fou
+ultime, pas la logique applicative.
 
-La vérification et la bascule doivent donc se faire dans **une seule transaction avec
-verrou sur le club** (et sur l'utilisateur bénéficiaire), selon la même stratégie que
-§0 bis.2. Test obligatoire : deux bascules concurrentes sur un club à 1 équipe Découverte
-→ exactement une bascule réussie.
+### F. Quotas Découverte
 
-### 0 bis.1.3 — Annonce de la friction avant la fin du wizard
+- quota **par porteur** : exprimable par un index unique partiel → garantie au niveau
+  base, indépendante de toute logique applicative ;
+- quota **par club** (2 maximum) : non exprimable par un index → garanti par une
+  transaction verrouillée sur le club **plus** un trigger de défense en profondeur.
 
-La restriction est intentionnelle et doit être **annoncée avant la fin du wizard de
-création**, pas découverte à la fin de l'essai.
+### Livrables
 
-Un coach seul qui crée une deuxième équipe doit donc choisir immédiatement l'offre
-Équipe payante — sauf si cette deuxième équipe est créée et portée par un autre coach
-éligible du même club.
-
-Message à prévoir (clé i18n, 7 locales), affiché dans le wizard dès que l'utilisateur
-crée une équipe qui ne sera pas éligible à Découverte :
-
-> Vous utilisez déjà l'offre Découverte pour une équipe. Cette nouvelle équipe nécessite
-> l'offre Équipe (9,99 €/mois), ou peut être portée par un autre coach de votre club.
-
-Le wizard doit distinguer les deux causes de non-éligibilité (quota utilisateur vs quota
-club) car la solution proposée diffère.
-
-### 0 bis.1.4 — Livrables du chantier
-
-1. définition requêtable de « équipe Découverte active » ;
-2. choix du porteur (`discovery_owner_user_id` recommandé) ;
-3. règle d'ordre déterministe en cas de fins d'essai simultanées ;
-4. règle de libération de quota ;
-5. stratégie transactionnelle de bascule ;
-6. maquettes/textes des messages d'annonce dans le wizard et à la fin d'essai.
+Définition SQL de chaque garde-fou, portée transactionnelle, comportement en cas de
+contournement service role, et test de contournement associé.
 
 ---
 
-## 0 bis.2 — Contrôle atomique de la limite de joueurs
+## 28.2 Inventaire des mutations directes Supabase
 
-### Problème
+**Amorce chiffrée : 56 fichiers hors `*.server.ts`, `*.functions.ts`, routes API et
+webhooks contiennent des `.insert() / .update() / .delete() / .upsert()`.** Ce sont autant
+de chemins où le paywall ne peut pas être garanti par les server functions.
 
-Un simple `count` applicatif suivi d'un `insert` est faux sous écritures concurrentes :
+Fichiers représentatifs déjà identifiés : `src/components/import-players-csv-dialog.tsx`,
+`wall-feed.tsx`, `event-chat.tsx`, `needs/event-needs-section.tsx`,
+`declare-absence-drawer.tsx`, `declare-staff-absence-drawer.tsx`,
+`staff-assignment-section.tsx`, `existing-player-picker.tsx`, `carpool-section.tsx`,
+`match-result-card.tsx`, `quick-sanction-drawer.tsx`, `player-suspensions.tsx`,
+`team-invite-share-button.tsx`, `src/routes/_authenticated/teams.tsx`, plusieurs écrans
+`admin/settings.*`.
 
-```text
-Équipe à 14 joueurs actifs, limite 15
-  Requête A : count → 14, OK
-  Requête B : count → 14, OK
-  Requête A : insert → 15
-  Requête B : insert → 16   ← quota dépassé
-```
+### Tableau à produire (une ligne par mutation)
 
-Ce motif est **interdit**. La vérification et l'insertion doivent être atomiques.
+| Colonne | Contenu |
+|---|---|
+| Fichier | chemin:ligne |
+| Table ou RPC | cible de l'écriture |
+| Opération | insert / update / delete / upsert |
+| Rôle utilisateur | qui déclenche |
+| Équipe déductible depuis | colonne permettant de remonter à `team_id` |
+| Catégorie | **A** gestion / **B** réponse / **C** système / **D** lecture |
+| Couverture requise | oui / non |
+| Policy actuelle | policy RLS en vigueur |
+| Modification proposée | ajout de `team_has_write_access()`, RPC, ou aucun changement |
+| Risque de régression | faible / moyen / élevé |
 
-### Stratégie retenue
+### Règle de classification
 
-1. **RPC transactionnelle unique** (`SECURITY DEFINER`, `search_path = public`), seul
-   chemin autorisé pour ajouter un joueur à une équipe :
+Ne pas ajouter aveuglément `team_has_paid_access()` partout. La distinction **A vs B est
+le point le plus risqué de tout le chantier** : une mutation de réponse mal classée en
+« gestion » bloquerait des parents légitimes sur des événements déjà créés.
 
-```text
-add_player_to_team(_team_id, _player_payload)  →  joueur créé | erreur quota
-```
+Cas manifestement **B** repérés à l'amorce, à confirmer :
+`declare-absence-drawer.tsx`, `declare-staff-absence-drawer.tsx` (disponibilités),
+`needs/event-needs-section.tsx` (candidature à un besoin), `carpool-section.tsx`
+(inscription covoiturage), et les réponses à convocation.
 
-   Corps de la fonction, dans une seule transaction :
-   - verrou sur l'équipe : `SELECT ... FROM teams WHERE id = _team_id FOR UPDATE`
-     (verrou de ligne, sérialise les insertions concurrentes sur la même équipe sans
-     bloquer les autres équipes) ;
-   - résolution du quota effectif via les entitlements serveur (`null` = illimité →
-     court-circuit immédiat, aucun coût pour les offres payantes) ;
-   - comptage des joueurs actifs (définition §0 bis.2.2) ;
-   - `IF count >= quota THEN RAISE` avec un code d'erreur typé
-     (ex. `CLUBERO_PLAYER_QUOTA_EXCEEDED`) exploitable par le front pour afficher
-     l'upsell ;
-   - insertion et rattachement `team_members` dans la même transaction.
+Cas manifestement **A** : `import-players-csv-dialog.tsx`, `staff-assignment-section.tsx`,
+`existing-player-picker.tsx`, `quick-sanction-drawer.tsx`, les écrans `admin/settings.*`.
 
-2. **Trigger de défense en profondeur** sur l'insertion de `team_members` (ou de la
-   liaison joueur↔équipe), qui recompte et refuse le dépassement. Il couvre tout chemin
-   d'écriture qui contournerait la RPC (script, import mal branché, correctif manuel).
-   Le trigger est un filet, pas le mécanisme principal : il ne doit pas porter la logique
-   commerciale ni les messages utilisateur.
+### Livrables
 
-3. **Le contrôle applicatif reste** pour l'ergonomie (désactiver le bouton, afficher le
-   compteur), mais n'est jamais la garantie.
-
-### 0 bis.2.1 — Import CSV
-
-**Recommandation retenue : refuser le lot avant insertion lorsqu'il dépasserait le
-quota** — l'import est traité comme un lot cohérent, pas ligne par ligne.
-
-Déroulé : dans la même transaction, verrou sur l'équipe → comptage actuel → si
-`count + lignes_valides > quota`, rejet du lot entier avec un message indiquant le
-nombre de places disponibles et le nombre de lignes soumises. Aucune insertion partielle.
-
-Justification : un import partiel laisse l'utilisateur avec un effectif incomplet et
-silencieusement tronqué, difficile à réconcilier avec son fichier source. Le rejet
-explicite est plus lisible et plus facile à corriger.
-
-À trancher malgré tout : faut-il proposer une variante « importer les N premières lignes
-qui rentrent » en option explicite de l'écran d'import ? (Non recommandé en V1.)
-
-### 0 bis.2.2 — Définition du joueur comptabilisé (à verrouiller)
-
-Constat de l'audit : la table `players` possède `deleted_at` (soft delete) mais **aucun
-état « archivé »** ni colonne de statut. Le rattachement à une équipe passe par
-`team_members.player_id`. Le prompt évoque « ne pas compter les joueurs archivés » — cet
-état n'existe pas aujourd'hui et doit donc être soit créé, soit abandonné au profit du
-seul `deleted_at`.
-
-Définition proposée, à valider :
-
-```text
-joueur actif d'une équipe =
-  ligne team_members (team_id = X, player_id NOT NULL)
-  jointe à players
-  WHERE players.deleted_at IS NULL
-```
-
-Points à trancher :
-
-- faut-il introduire un état « archivé » distinct du soft delete, et si oui, sur
-  `players` ou sur `team_members` (un joueur peut être archivé dans une équipe et actif
-  dans une autre) ?
-- comportement des joueurs temporairement inactifs (blessure, saison suspendue) :
-  comptés ou non ? Proposition : **comptés** (ils occupent une place dans l'effectif) —
-  sinon la limite devient contournable par un simple marquage.
-- anti-contournement archiver/restaurer en boucle : la restauration d'un joueur doit
-  repasser par le même contrôle de quota que la création ; journaliser les cycles
-  archivage/restauration rapprochés pour détecter les abus.
-- transferts entre équipes : l'ajout dans l'équipe cible est soumis au quota de l'équipe
-  cible, dans la même transaction que le retrait de l'équipe source.
-
-### 0 bis.2.3 — Tests obligatoires
-
-- **Concurrence** : équipe à 14 joueurs actifs, quota 15, deux insertions simultanées →
-  exactement une réussite, une erreur `CLUBERO_PLAYER_QUOTA_EXCEEDED`, effectif final
-  = 15. Jamais 16.
-- Import de 10 lignes sur une équipe à 8/15 → lot entièrement rejeté, effectif inchangé
-  à 8.
-- Import de 5 lignes sur une équipe à 8/15 → 13 joueurs, succès.
-- Restauration d'un joueur soft-deleted sur une équipe déjà à 15 → refus.
-- Transfert vers une équipe pleine → refus, joueur conservé dans l'équipe source.
-- Offre Équipe / Club (quota `null`) → aucune limite, aucun surcoût de comptage.
-- Trigger de défense : insertion directe en base contournant la RPC → refusée.
-
-### 0 bis.2.4 — Livrables du chantier
-
-1. signature et corps de la RPC `add_player_to_team` ;
-2. définition verrouillée du « joueur actif » et décision sur l'état « archivé » ;
-3. stratégie d'import (lot atomique) et messages associés ;
-4. trigger de défense en profondeur ;
-5. jeu de tests de concurrence (avec la méthode d'exécution : deux transactions
-   simultanées réelles, pas une simulation séquentielle).
+Tableau complet ; liste des mutations nécessitant une policy modifiée ; liste des
+mutations à convertir en RPC ; liste des exceptions autorisées en lecture seule ; plan de
+test par catégorie.
 
 ---
 
-## 0 bis.3 — Audit préalable à la correction de `exempt_until`
+## 28.3 Inventaire des lecteurs de `subscriptions`
 
-### Constat vérifié dans le code
+**Amorce chiffrée : 39 sites de lecture ou d'écriture de `subscriptions` répartis sur
+~10 fichiers.**
 
-Il existe une divergence entre la logique SQL et la logique applicative :
+Répartition constatée :
 
-| Couche | Fichier | Comportement |
+| Fichier | Sites | Nature |
 |---|---|---|
-| SQL | `supabase/migrations/20260622120000_subscription_billing_exemption.sql:36` | `s.exempt_from_billing = true` — **`exempt_until` n'est pas testé** |
-| TypeScript | `src/lib/has-paid-access.ts:22-25` (`isBillingExempt`) | honore `exempt_until` : accès refusé si la date est passée |
+| `src/lib/superadmin.functions.ts` | 9 | console superadmin, listes de clubs |
+| `src/lib/billing.functions.ts` | 9 | checkout, portail, sync, annulation |
+| `src/lib/billing-exemption.functions.ts` | 4 | exemptions |
+| `src/lib/stripe-webhook-handler.server.ts` | 3 | upsert webhook (`onConflict: "club_id"`) |
+| `src/components/trial-banner.tsx` | 1 | bannière d'essai (composant client) |
+| `src/lib/has-paid-access.server.ts` | 1 | prédicat d'accès serveur |
+| `src/lib/stripe-connect.functions.ts` | 1 | Stripe Connect |
+| `src/modules/tournaments/tournament-payments.server.ts` | 1 | paiements tournoi |
+| `src/modules/tournaments/hooks/useTournamentOnlyMode.ts` | 1 | mode tournoi seul |
+| autres | reste | à compléter |
 
-La colonne `exempt_until` a été ajoutée **après** la fonction, par
-`supabase/migrations/20260622170729_0ff402e5-….sql:1`, sans mise à jour de
-`club_has_active_subscription`. Aucune migration ultérieure ne redéfinit cette fonction.
+### Question centrale
 
-Conséquence : un club dont l'exemption est **expirée** conserve un accès via toutes les
-voies SQL — RLS s'appuyant sur `club_has_active_subscription`, et
-`can_create_tournament` (`…120000_….sql:95`) — alors que la couche applicative le
-considère comme non exempté. Corriger la fonction SQL revient donc à **couper l'accès en
-production** à ces clubs, potentiellement sans préavis.
+**Un club `per_team` peut légitimement n'avoir aucune ligne `subscriptions`.** Chaque site
+doit être audité pour vérifier qu'il gère l'absence de ligne sans planter ni afficher un
+état trompeur (« abonnement expiré » alors que les équipes sont couvertes
+individuellement).
 
-### Inventaire obligatoire avant tout correctif
+Vérifier en particulier : les `.single()` (qui lèvent une erreur sur zéro ligne, contre
+`.maybeSingle()` qui retourne `null`), les jointures qui excluraient silencieusement les
+clubs `per_team`, et `trial-banner.tsx` qui afficherait une bannière d'essai Club sur un
+club sans souscription.
 
-Produire la liste des clubs correspondant à :
+### Tableau à produire
+
+Fichier / fonction ; hypothèse actuelle ; comportement sur club `per_team` ; risque ;
+modification requise ; lot concerné.
+
+### Livrables
+
+Tableau complet, plan de correction, et test de non-régression « club `per_team` sans
+ligne `subscriptions` » traversant chaque écran concerné.
+
+---
+
+## 28.4 Saga Équipe → Club
+
+Le passage à l'offre Club sur le même club est une **saga idempotente**, pas une
+transaction SQL unique : elle traverse Stripe, plusieurs webhooks et plusieurs tables.
+
+### États de la saga
+
+```text
+pending        → checkout Club lancé
+club_confirmed → abonnement Club actif confirmé par Stripe
+mode_switched  → billing_mode basculé, couverture Club effective
+stopping       → arrêt des team_subscriptions demandé à Stripe
+completed      → toutes les team_subscriptions résolues
+failed_partial → au moins un arrêt Stripe a échoué, reprise requise
+```
+
+### Ordre imposé (§18.1 du prompt)
+
+Les onze étapes, avec la garantie structurante : **la couverture Club est active avant
+tout arrêt d'abonnement Équipe**. Aucune fenêtre où une équipe se retrouve sans couverture.
+
+### À spécifier
+
+- persistance de l'état de saga (table dédiée ou colonnes sur `clubs`) ;
+- idempotence : rejouer une étape déjà effectuée ne doit produire aucun effet ;
+- gestion des échecs partiels : une équipe dont l'arrêt Stripe échoue reste facturée —
+  détection, alerte, reprise manuelle ;
+- monitoring : comment un opérateur voit qu'une saga est bloquée en `stopping` ;
+- délai maximal avant escalade ;
+- comportement si le club résilie l'offre Club pendant la saga.
+
+### Livrables
+
+Diagramme d'états, table de persistance, procédure de reprise manuelle, plan de test des
+huit scénarios Stripe du §18.2 du prompt.
+
+---
+
+## 28.5 Machine à états
+
+### Table de dérivation
+
+Source unique : `get_team_coverage(team_id)`. Aucun statut Stripe artificiel ; les états
+Clubero sont **dérivés**, jamais stockés dans l'enum `subscription_status`.
+
+```text
+Club actif ou exemption Club active      → club_plan     (active)   ← prioritaire
+subscription active + période valide     → team_plan     (active)
+trialing + trial_end future              → team_trial    (active)
+couverture Découverte valide             → discovery     (active)
+past_due + grace_end future              → grace         (grace)
+past_due + grace_end dépassée            → expired       (restricted)
+unpaid                                   → expired       (restricted)
+cancel_at_period_end + period_end future → team_plan jusqu'à l'échéance
+canceled + period_end dépassée           → discovery si éligible, sinon expired
+aucune couverture                        → none          (restricted)
+équipe archivée / suspendue              → —             (locked)
+```
+
+### Décision bloquante : durée de la période de grâce
+
+`grace_end` apparaît dans la table de dérivation mais **sa durée n'a jamais été
+spécifiée**. Il faut trancher avant le Lot 1. Éléments de cadrage : Stripe relance
+automatiquement les paiements échoués selon le *smart retry* configuré (typiquement
+jusqu'à ~3 semaines) ; une grâce plus courte que la fenêtre de relance couperait des
+clubs qui allaient être débités avec succès.
+
+Recommandation : aligner la grâce sur la fin de la séquence de relance Stripe, soit une
+valeur configurable avec un défaut de **14 jours**, à confirmer.
+
+### 28.5.1 Job planifié
+
+Route cron ou tâche planifiée **idempotente** traitant : fins d'essai (avec évaluation
+d'éligibilité Découverte, §28.9) ; fins de grâce ; journalisation des transitions ;
+notifications ; détection d'incohérences ; réconciliation périodique Stripe ↔ Clubero.
+
+À spécifier : fréquence ; mécanisme de verrouillage (empêcher deux exécutions
+concurrentes) ; idempotence par transition ; journalisation ; reprise après échec ;
+comportement si le job n'a pas tourné pendant plusieurs jours (rattrapage en masse).
+
+**Contrainte d'environnement** : l'application tourne sur Cloudflare Workers. Vérifier le
+mécanisme de planification disponible (Cron Triggers Wrangler ou route appelée par un
+ordonnanceur externe) — le dépôt contient déjà des routes de hook sous
+`src/routes/api/public/hooks/` (dont `trial-reminders.ts`) qui constituent le précédent à
+suivre.
+
+### Livrables
+
+Table de dérivation validée, durée de grâce décidée, spécification du job (fréquence,
+verrou, idempotence, reprise), et jeu de tests couvrant chaque transition.
+
+---
+
+## 28.6 RGPD et billing owner
+
+### Fonction à créer
+
+```text
+user_has_active_billing_responsibilities(user_id) → boolean
+```
+
+Couvre : souscription active ; période d'essai ; statut `incomplete` ; paiement en échec ;
+annulation programmée non encore effective ; migration vers Club en cours ; exemption dont
+l'utilisateur est responsable ; obligations Stripe encore actives.
+
+### Flux à modifier
+
+Analyser le flux de suppression et d'anonymisation existant (`src/lib/privacy.functions.ts`
+et ses appelants) et y insérer le contrôle **avant** toute suppression ou anonymisation.
+
+Si une responsabilité existe : **suppression bloquée**, avec un message actionnable
+proposant le transfert (§13.2 du prompt) ou l'annulation.
+
+### Invariants à garantir
+
+Ne jamais produire : une `team_subscription` pointant vers un utilisateur supprimé ; un
+customer Stripe sans responsable Clubero ; une facture active sans interlocuteur
+fonctionnel.
+
+### Question ouverte
+
+Que faire d'un utilisateur qui **exige** la suppression RGPD alors qu'il est billing
+owner et refuse de transférer ? Le RGPD n'autorise pas un blocage indéfini. Piste :
+anonymiser les données personnelles tout en conservant la relation de facturation sous
+une identité technique, avec notification au club pour désigner un nouveau responsable
+sous délai. À valider juridiquement — cette question dépasse le cadre technique.
+
+### Livrables
+
+Spécification de la fonction, points d'insertion dans le flux existant, décision sur le
+cas « suppression exigée sans transfert », plan de test §27.5 du prompt.
+
+---
+
+## 28.7 Dette CI et bug `exempt_until`
+
+### Bug vérifié
+
+| Couche | Emplacement | Comportement |
+|---|---|---|
+| SQL | `supabase/migrations/20260622120000_subscription_billing_exemption.sql:36` | `s.exempt_from_billing = true` — **`exempt_until` non testé** |
+| TypeScript | `src/lib/has-paid-access.ts:22-25` (`isBillingExempt`) | honore `exempt_until` |
+
+`exempt_until` a été ajoutée par `supabase/migrations/20260622170729_0ff402e5-….sql:1`,
+**après** la fonction, sans mise à jour de celle-ci. Aucune migration ultérieure ne la
+redéfinit.
+
+Conséquence : un club dont l'exemption est expirée conserve l'accès par toutes les voies
+SQL — RLS s'appuyant sur `club_has_active_subscription`, et `can_create_tournament` — alors
+que la couche applicative le considère non exempté. **Corriger la fonction coupe l'accès
+en production à ces clubs.**
+
+### Inventaire obligatoire avant correctif
 
 ```sql
 SELECT s.club_id, c.name, s.exempt_until, s.exempt_reason,
@@ -272,68 +339,225 @@ WHERE s.exempt_from_billing = true
   AND s.exempt_until <= now();
 ```
 
-Pour chaque club de la liste, documenter :
+Pour chaque club : identifiant ; nom ; date d'expiration ; motif et auteur de l'octroi ;
+**accès actuellement obtenu à cause du bug** ; impact de la correction ; action de
+régularisation requise.
 
-1. identifiant ;
-2. nom ;
-3. date d'expiration de l'exemption ;
-4. motif (`exempt_reason`) et qui l'a accordée (`exempt_granted_by`, `exempt_granted_at`) ;
-5. **accès actuellement obtenu à cause du bug** (fonctionnalités Club, création de
-   tournois, données accessibles) ;
-6. impact de la correction (ce que le club perdrait immédiatement) ;
-7. action de régularisation requise (prolonger l'exemption, convertir en abonnement
-   payant, contacter le club, laisser expirer avec préavis).
+Enrichir avec l'activité récente (dernière connexion, équipes actives, événements à venir)
+pour distinguer les clubs réellement actifs des comptes dormants : un club dormant peut
+être coupé sans précaution, un club actif en pleine saison non.
 
-Enrichir avec le volume d'activité récente (dernière connexion, équipes actives,
-événements à venir) pour distinguer les clubs réellement actifs des comptes dormants —
-un club dormant peut être coupé sans précaution, un club actif en pleine saison non.
+### Séquence de déploiement imposée
 
-### Règle de déploiement
-
-**Ne pas déployer le correctif SQL avant décision explicite sur ces données.**
-
-Séquence imposée :
-
-1. produire l'inventaire (lecture seule, aucun changement) ;
+1. produire l'inventaire (lecture seule) ;
 2. décider club par club de l'action de régularisation ;
-3. appliquer les régularisations (prolongation d'`exempt_until`, souscription, préavis
-   envoyé) ;
-4. seulement ensuite, déployer la correction de `club_has_active_subscription` pour
-   qu'elle teste `exempt_until` de la même manière que `isBillingExempt` ;
-5. vérifier après déploiement que la liste des clubs ayant perdu l'accès correspond
-   exactement à la liste attendue.
+3. appliquer les régularisations (prolongation, souscription, préavis) ;
+4. **seulement ensuite** déployer le correctif SQL ;
+5. vérifier que la liste des clubs ayant perdu l'accès correspond exactement à la liste
+   attendue.
 
-### Pourquoi ce chantier est dans le périmètre de l'offre Équipe
+### Dette CI
 
-La nouvelle logique de couverture (`get_team_coverage`, `team_has_paid_access`) doit
-s'appuyer sur une sémantique d'exemption cohérente entre SQL et TypeScript. Livrer
-l'offre Équipe sur une base incohérente propagerait le bug aux nouvelles fonctions.
+Le projet possède déjà des contrôles rouges (clés `groups.*` manquantes, lint existant).
+Deux options, à trancher :
 
-Deux options de séquencement, à trancher :
+- **Recommandée** — corriger la dette avant le Lot 1, pour que
+  `bun run check:i18n | lint | check:guards | test:rls` soient de vrais critères de sortie.
+- **Repli** — baseline documentée : erreurs présentes avant le chantier, nombre exact,
+  fichiers concernés. Les critères deviennent « aucune nouvelle erreur par rapport à la
+  baseline », et non un faux vert inatteignable.
 
-- **Option 1 (recommandée)** : traiter l'audit et le correctif en amont du Lot 1, pour
-  que la nouvelle couverture soit bâtie sur une sémantique saine.
-- **Option 2** : livrer les nouvelles fonctions en honorant `exempt_until` dès le départ
-  (donc correctes), et traiter la correction de l'existant séparément — au prix d'une
-  incohérence temporaire entre l'ancienne et la nouvelle fonction.
+### Livrables
 
-### Livrables du chantier
-
-1. l'inventaire complet renseigné (les 7 colonnes ci-dessus par club) ;
-2. la décision de régularisation par club ;
-3. la migration corrective (rédigée mais non déployée avant validation) ;
-4. la séquence de déploiement et le contrôle post-déploiement ;
-5. le choix de séquencement (Option 1 ou 2).
+Inventaire renseigné ; décisions de régularisation ; migration corrective rédigée mais non
+déployée ; séquence de déploiement ; choix de l'option CI et baseline chiffrée le cas
+échéant.
 
 ---
 
-## Récapitulatif des sorties attendues du Lot 0 bis
+## 28.8 Clubs identiques et rattachement
 
-| Chantier | Sortie bloquante |
-|---|---|
-| 0 bis.1 Quotas Découverte | Définitions requêtables, porteur du quota, ordre déterministe, règle de libération, stratégie transactionnelle, textes du wizard |
-| 0 bis.2 Limite de joueurs | RPC atomique spécifiée, définition du joueur actif, stratégie d'import (lot atomique), trigger de défense, tests de concurrence |
-| 0 bis.3 Audit `exempt_until` | Inventaire renseigné, décisions de régularisation, migration corrective non déployée, séquence de déploiement |
+### Périmètre V1
 
-Aucun code fonctionnel n'est écrit dans ce lot. Le Lot 1 ne démarre qu'après validation
-des trois sorties.
+**Inclus** : recherche d'un club existant ; suggestion plafonnée ; demande de
+rattachement ; création d'un club distinct en cas de faux positif ; signalement manuel
+d'un doublon à Clubero.
+
+**Exclus** : rapprochement complet de deux clubs, et toute fusion impliquant des
+changements transversaux de `club_id`. C'est la zone la plus risquée du chantier ; elle
+fait l'objet d'un chantier ultérieur indépendant.
+
+### Détection
+
+Signaux **indicatifs**, jamais probants : nom normalisé, ville, code postal, sport, logo,
+identifiant fédéral futur. Résultat = suggestion.
+
+À spécifier : algorithme de normalisation du nom ; seuil de similarité ; ordre de
+présentation ; comportement en l'absence de ville renseignée (le champ existe-t-il
+aujourd'hui sur `clubs` ? à vérifier — l'audit initial ne l'a pas relevé, il faudra
+peut-être l'ajouter).
+
+### Sécurité de l'endpoint
+
+**Le helper de rate limiting existant est fail-open** (`src/lib/rate-limit.server.ts:46-52`
+retourne `true` en cas d'erreur DB) : il ne peut pas être réutilisé tel quel pour un
+endpoint public révélant l'existence de clubs. Une variante **fail-closed** est
+obligatoire.
+
+Autres exigences : longueur minimale de recherche ; plafond de résultats sans pagination
+(empêche l'énumération exhaustive) ; projection limitée à nom public, logo public, sport,
+ville approximative, identifiant **opaque** ; journalisation des comportements suspects
+(rafales, balayage alphabétique) ; création des demandes côté serveur uniquement.
+
+### Conflits d'équipes lors d'un rattachement (Lot 8)
+
+Si une équipe équivalente existe déjà dans le club cible (deux « U13 ») : **détecter,
+bloquer, ne jamais fusionner**. Traitement manuel par un administrateur : renommage,
+archivage, ou décision explicite. Aucune fusion automatique de joueurs, événements,
+convocations ou documents en V1.
+
+### Livrables
+
+Spécification de l'endpoint et de sa variante fail-closed ; algorithme de suggestion ;
+modèle de demande de rattachement ; règle de détection des conflits d'équipes ; tests de
+sécurité §27.6 du prompt.
+
+---
+
+## 28.9 Quotas Découverte et définition du joueur actif
+
+### A. Définition du « joueur actif » — décision bloquante
+
+Constat : `players` possède `deleted_at` (soft delete) mais **aucun état « archivé »** ni
+colonne de statut. Le rattachement à une équipe passe par `team_members.player_id`.
+
+Le prompt évoque des « joueurs archivés » non comptés : cet état n'existe pas. Il faut
+trancher :
+
+- **Option 1** — s'en tenir au soft delete : joueur actif = ligne `team_members` jointe à
+  `players` avec `players.deleted_at IS NULL`. Simple, aucun schéma à changer, mais
+  « retirer un joueur de l'effectif » revient à le supprimer.
+- **Option 2** — introduire un état « archivé », sur `players` ou sur `team_members` (un
+  joueur peut être archivé dans une équipe et actif dans une autre — ce qui plaide pour
+  `team_members`). Plus juste fonctionnellement, migration additive, mais élargit le
+  périmètre.
+
+Sous-questions : les joueurs temporairement inactifs (blessure, saison suspendue)
+comptent-ils ? **Recommandation : oui** — ils occupent une place dans l'effectif, sinon la
+limite devient contournable par un simple marquage.
+
+### B. Porteur du quota Découverte
+
+`teams` n'a pas de `created_by`. Deux options :
+
+- ajouter `teams.created_by_user_id` (utile au-delà des quotas, pour la provenance) ;
+- porter le rattachement sur la ligne de couverture Découverte
+  (`discovery_owner_user_id`), plus explicite et transférable.
+
+**Recommandation : les deux** — `created_by_user_id` pour la provenance historique,
+`discovery_owner_user_id` pour le quota, car le porteur du quota doit pouvoir changer
+sans réécrire l'histoire de la création.
+
+Tension à lever : le prompt indique que « la couverture Découverte est rattachée à
+l'équipe, pas à son créateur », tout en fixant un quota **par créateur**. Résolution
+proposée : le quota est consommé par le porteur au moment de l'octroi ; la couverture
+appartient à l'équipe ; le porteur peut être transféré à un autre membre éligible.
+
+### C. Libération du quota — décision bloquante
+
+Quand une équipe Découverte est archivée ou passe en offre payante, le quota du porteur et
+celui du club se libèrent-ils ? Et une équipe en lecture seule peut-elle alors réclamer la
+place libérée ?
+
+**Recommandation V1** : le quota se libère (révocation de la couverture), mais **aucune
+bascule rétroactive automatique** — l'utilisateur doit la demander explicitement. Évite
+les effets de bord silencieux et les allers-retours d'état.
+
+### D. Atomicité
+
+Deux fins d'essai simultanées dans un même club pourraient chacune constater « 1 équipe
+Découverte » et basculer toutes les deux → 3 équipes Découverte. Vérification et bascule
+dans **une seule transaction avec verrou sur le club**, plus les garde-fous de §28.1.F.
+
+Ordre déterministe en cas de fins d'essai simultanées : par `trial_end` puis `created_at`
+croissants.
+
+### E. Limite de joueurs — stratégie atomique
+
+Contrôle applicatif `count` puis `insert` **interdit**.
+
+RPC transactionnelle unique, seul chemin d'ajout autorisé :
+
+```text
+add_player_to_team(_team_id, _player_payload)
+  → SELECT ... FROM teams WHERE id = _team_id FOR UPDATE   (sérialise par équipe)
+  → résolution du quota (null = illimité → court-circuit, coût nul pour les offres payantes)
+  → comptage des joueurs actifs
+  → IF count >= quota THEN RAISE 'CLUBERO_PLAYER_QUOTA_EXCEEDED'
+  → INSERT player + team_members
+```
+
+Trigger de défense en profondeur sur `team_members` : recompte et refuse le dépassement,
+couvrant tout chemin contournant la RPC. Filet, pas mécanisme principal.
+
+**Import CSV — décision bloquante.** Recommandation : traiter l'import comme un **lot
+cohérent** et refuser le lot entier avant insertion s'il dépasserait le quota, plutôt que
+des erreurs ligne par ligne. Un import partiel laisse un effectif silencieusement tronqué,
+difficile à réconcilier avec le fichier source. Alternative à trancher : proposer
+explicitement « importer les N premières lignes qui rentrent » (non recommandé en V1).
+
+### F. Anti-contournement
+
+Empêcher : archiver puis recréer les mêmes joueurs ; répartir un effectif sur plusieurs
+équipes Découverte fictives ; créer plusieurs comptes pour multiplier les quotas ; déplacer
+les joueurs en boucle entre équipes gratuites.
+
+La restauration d'un joueur doit repasser par le même contrôle de quota que la création.
+Journaliser les cycles archivage/restauration rapprochés. Rester raisonnable pour la V1 :
+règles vérifiables, journalisation et alertes plutôt qu'un moteur anti-fraude complexe.
+
+### G. Tests de concurrence obligatoires
+
+Exécutés avec **deux transactions réelles simultanées**, pas une simulation séquentielle :
+
+```text
+équipe à 14 joueurs, quota 15, deux insertions concurrentes
+  → exactement une réussite, effectif final 15, jamais 16
+deux bascules Découverte concurrentes, club à 1 équipe Découverte
+  → exactement une réussite
+deux bascules concurrentes pour le même porteur
+  → exactement une réussite
+import de 10 lignes sur une équipe à 8/15
+  → lot entièrement rejeté, effectif inchangé à 8
+import de 5 lignes sur une équipe à 8/15
+  → 13 joueurs, succès
+restauration d'un joueur sur une équipe à 15/15
+  → refus
+insertion directe en base contournant la RPC
+  → refusée par le trigger
+```
+
+### Livrables
+
+Définition verrouillée du joueur actif ; choix du porteur de quota ; règle de libération ;
+signature et corps des RPC ; stratégie d'import ; triggers de défense ; jeu de tests de
+concurrence avec la méthode d'exécution.
+
+---
+
+## Récapitulatif des sorties bloquantes
+
+| § | Chantier | Sortie |
+|---|---|---|
+| 28.1 | Garde-fous DB | Définitions SQL, portée service role, tests de contournement |
+| 28.2 | Mutations directes | Tableau des 56 fichiers, classification A/B/C/D, plan RLS |
+| 28.3 | Lecteurs `subscriptions` | Tableau des 39 sites, plan de correction, test « club sans ligne » |
+| 28.4 | Saga Équipe → Club | Diagramme d'états, persistance, reprise manuelle |
+| 28.5 | Machine à états | Table de dérivation, **durée de grâce**, spécification du job |
+| 28.6 | RGPD | Fonction, points d'insertion, cas « suppression sans transfert » |
+| 28.7 | Dette CI + `exempt_until` | Inventaire renseigné, régularisations, séquence de déploiement |
+| 28.8 | Clubs et rattachement | Endpoint fail-closed, suggestion, conflits d'équipes |
+| 28.9 | Quotas et joueur actif | **Définition du joueur actif**, RPC atomiques, stratégie d'import |
+
+Les six décisions listées au §33 du prompt sont résolues par ces chantiers. Le Lot 1 ne
+démarre qu'après validation de l'ensemble.
