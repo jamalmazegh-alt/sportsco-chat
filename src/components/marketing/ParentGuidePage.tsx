@@ -140,7 +140,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               </a>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/faq">{t("parentGuide.ctaFaq")}</Link>
+              <a href="#faq">{t("parentGuide.ctaFaq")}</a>
             </Button>
           </div>
 
@@ -241,7 +241,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       </section>
 
       {/* FAQ */}
-      <section className="border-b border-border/60 bg-muted/20">
+      <section id="faq" className="scroll-mt-24 border-b border-border/60 bg-muted/20">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("parentGuide.faqTitle")}
