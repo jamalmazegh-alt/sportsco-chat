@@ -150,6 +150,7 @@ export function EventChat({ eventId }: { eventId: string }) {
   async function send() {
     if ((!body.trim() && atts.length === 0) || !user) return;
     setSending(true);
+    setSendError(null);
     const text = body.trim();
     const attachmentsToSend = atts;
     setBody("");
@@ -164,17 +165,20 @@ export function EventChat({ eventId }: { eventId: string }) {
     if (error) {
       setBody(text);
       setAtts(attachmentsToSend);
+      setSendError(t("chat.sendFailed"));
+      setCanPost(false);
     }
   }
 
-  if (enabled === false) {
+  if (enabled === false || canPost === false) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
         <Lock className="h-5 w-5" />
-        {t("chat.disabled")}
+        {enabled === false ? t("chat.disabled") : t("chat.noAccess")}
       </div>
     );
   }
+
 
   return (
     <section className="rounded-2xl border border-border bg-card overflow-hidden">
