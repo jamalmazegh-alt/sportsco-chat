@@ -1383,9 +1383,9 @@
           "Sempre que há uma nova publicação, recebe uma notificação push.",
           "E, consoante o clube, eventualmente um email.",
           "Interaja com as publicações deixando uma mensagem (se os comentários estiverem ativados).",
-          "As sondagens também aparecem diretamente no mural.",
-          "Toque em «Votar», selecione a sua resposta e guarde.",
-          "Veja os resultados em direto (exceto se a sondagem for anónima) — pode alterar o seu voto."
+          "Numa sondagem, toque em «Votar», selecione a sua resposta e confirme.",
+          "O seu voto fica guardado: veja os resultados em direto.",
+          "Pode alterar o seu voto a qualquer momento (exceto se a sondagem for anónima)."
         ]
       }
     ],

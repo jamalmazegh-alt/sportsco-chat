@@ -1383,9 +1383,9 @@
           "Cada vez que hay una nueva publicación, recibes una notificación push.",
           "Y, según el club, posiblemente un correo.",
           "Interactúa con las publicaciones dejando un mensaje (si los comentarios están activados).",
-          "Las encuestas también aparecen directamente en el muro.",
-          "Pulsa «Votar», selecciona tu respuesta y guárdala.",
-          "Consulta los resultados en directo (salvo si la encuesta es anónima) — puedes cambiar tu voto."
+          "Para una encuesta, pulsa «Votar», selecciona tu respuesta y confirma.",
+          "Tu voto queda guardado: consulta los resultados en directo.",
+          "Puedes cambiar tu voto cuando quieras (salvo si la encuesta es anónima)."
         ]
       }
     ],

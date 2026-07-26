@@ -1383,9 +1383,9 @@
           "Whenever there's a new post, you get a push notification.",
           "And, depending on the club, possibly an email.",
           "Interact with posts by leaving a message (if comments are enabled).",
-          "Polls also appear directly in the Wall.",
-          "Tap \"Vote\", select your answer and save.",
-          "See live results (unless the poll is anonymous) — you can change your vote."
+          "For a poll, tap \"Vote\", select your answer and confirm.",
+          "Your vote is saved: see the live results.",
+          "You can change your vote anytime (unless the poll is anonymous)."
         ]
       }
     ],

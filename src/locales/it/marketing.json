@@ -1383,9 +1383,9 @@
           "A ogni nuovo post ricevi una notifica push.",
           "E, a seconda del club, eventualmente un'email.",
           "Interagisci con i post lasciando un messaggio (se i commenti sono attivi).",
-          "Anche i sondaggi compaiono direttamente nella bacheca.",
-          "Tocca «Vota», seleziona la tua risposta e salva.",
-          "Guarda i risultati in tempo reale (tranne se il sondaggio è anonimo) — puoi cambiare il tuo voto."
+          "Per un sondaggio, tocca «Vota», seleziona la tua risposta e conferma.",
+          "Il tuo voto viene salvato: guarda i risultati in tempo reale.",
+          "Puoi cambiare il tuo voto in qualsiasi momento (tranne se il sondaggio è anonimo)."
         ]
       }
     ],

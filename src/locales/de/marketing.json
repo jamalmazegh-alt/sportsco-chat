@@ -1383,9 +1383,9 @@
           "Bei jedem neuen Beitrag erhalten Sie eine Push-Benachrichtigung.",
           "Und, je nach Verein, eventuell eine E-Mail.",
           "Interagieren Sie mit Beiträgen, indem Sie eine Nachricht schreiben (wenn Kommentare aktiviert sind).",
-          "Umfragen werden ebenfalls direkt in der Pinnwand angezeigt.",
-          "Tippen Sie auf „Abstimmen“, wählen Sie Ihre Antwort und speichern Sie.",
-          "Sehen Sie die aktuellen Ergebnisse (außer bei anonymen Umfragen) — Sie können Ihre Stimme ändern."
+          "Für eine Umfrage tippen Sie auf „Abstimmen“, wählen Ihre Antwort und bestätigen.",
+          "Ihre Stimme wird gespeichert: Sehen Sie die aktuellen Ergebnisse.",
+          "Sie können Ihre Stimme jederzeit ändern (außer bei anonymen Umfragen)."
         ]
       }
     ],

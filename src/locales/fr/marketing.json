@@ -1383,9 +1383,9 @@
           "À chaque nouvelle publication, vous recevez une notification push.",
           "Et, selon le choix du club, éventuellement un email.",
           "Interagissez avec les publications en postant un message (si les commentaires sont activés).",
-          "Les sondages s'affichent aussi directement dans le Mur.",
-          "Appuyez sur « Voter », sélectionnez votre réponse et enregistrez.",
-          "Consultez les résultats en direct (sauf si le sondage est anonyme) — vous pouvez changer votre vote."
+          "Pour un sondage, appuyez sur « Voter », sélectionnez votre réponse et confirmez.",
+          "Votre vote est enregistré : consultez les résultats en direct.",
+          "Vous pouvez changer votre vote à tout moment (sauf si le sondage est anonyme)."
         ]
       }
     ],
