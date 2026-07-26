@@ -281,7 +281,9 @@ export function EventChat({ eventId }: { eventId: string }) {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            {sendError && <p className="text-xs text-destructive">{sendError}</p>}
             <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
+
           </form>
         </>
       )}
