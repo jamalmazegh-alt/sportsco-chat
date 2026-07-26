@@ -128,6 +128,18 @@ export const createPublication = createServerFn({ method: "POST" })
       }
     }
 
+    // Best-effort : notification push (même règle que les posts du mur)
+    if (data.publishToWall && dispatchRowId) {
+      try {
+        const { dispatchPublicationPush } = await import("./publications.push.server");
+        await dispatchPublicationPush(publicationId, dispatchRowId, "publish", {
+          excludeUserId: userId,
+        });
+      } catch (e) {
+        console.error("[createPublication] dispatchPublicationPush failed", e);
+      }
+    }
+
     return {
       publicationId,
       dispatchRowId,
@@ -171,6 +183,18 @@ export const republishPublication = createServerFn({ method: "POST" })
         }
       } catch (e) {
         console.error("[republishPublication] dispatchPollEmails failed", e);
+      }
+    }
+
+    // Best-effort : push aux nouveaux destinataires (ou à tous en manual_resend)
+    if (dispatchRowId) {
+      try {
+        const { dispatchPublicationPush } = await import("./publications.push.server");
+        await dispatchPublicationPush(data.publicationId, dispatchRowId, data.mode, {
+          excludeUserId: context.userId,
+        });
+      } catch (e) {
+        console.error("[republishPublication] dispatchPublicationPush failed", e);
       }
     }
 
