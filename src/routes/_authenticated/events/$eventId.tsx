@@ -2567,7 +2567,25 @@ function EventDetail() {
                 </div>
               ) : null;
             })()}
+            <div className="pt-1">
+              <AddToCalendarButton
+                event={{
+                  id: event.id,
+                  title: event.title,
+                  description: event.description ?? null,
+                  location: event.location ?? null,
+                  startsAt: event.starts_at,
+                  endsAt: event.ends_at ?? null,
+                  url:
+                    typeof window !== "undefined"
+                      ? `${window.location.origin}/events/${event.id}`
+                      : null,
+                }}
+                className="h-8 gap-1.5 text-xs"
+              />
+            </div>
           </div>
+
 
           {/* Primary action toolbar — Lineup / Feedback (edit moved to hero top) */}
           {teams && (isCoach || showFeedbackButton) && (
