@@ -51,9 +51,9 @@ describe("resolveSignupPath", () => {
 
 describe("isEmailAlreadyExistsError", () => {
   it("detects existing-account errors so we sign in instead of recreating", () => {
-    expect(isEmailAlreadyExistsError("A user with this email address has already been registered")).toBe(
-      true,
-    );
+    expect(
+      isEmailAlreadyExistsError("A user with this email address has already been registered"),
+    ).toBe(true);
     expect(isEmailAlreadyExistsError("email exists")).toBe(true);
     expect(isEmailAlreadyExistsError("user_already_exists")).toBe(true);
   });

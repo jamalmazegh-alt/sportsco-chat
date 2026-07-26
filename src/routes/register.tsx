@@ -6,7 +6,6 @@ import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import {
   validateInviteToken,
-  confirmInvitedUserEmail,
   createInvitedAccount,
   type InviteValidationResult,
 } from "@/lib/invite.functions";
@@ -65,9 +64,7 @@ function RegisterPage() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
-  const confirmInvitedEmail = useServerFn(confirmInvitedUserEmail);
   const createAccount = useServerFn(createInvitedAccount);
-
 
   useEffect(() => {
     if (!hasInvite) return;
@@ -127,7 +124,10 @@ function RegisterPage() {
     // e-mail, so receiving it already proves ownership. Create the account
     // server-side, pre-confirmed → Supabase sends NO verification e-mail.
     // Club link invites (QR / shared URL) keep the standard signUp() flow.
-    if (hasInvite && resolveSignupPath(inviteKind === "club" ? "club" : "member") === "server_create") {
+    if (
+      hasInvite &&
+      resolveSignupPath(inviteKind === "club" ? "club" : "member") === "server_create"
+    ) {
       try {
         await createAccount({
           data: {

@@ -4,8 +4,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { inviteMatchesEmail, isEmailAlreadyExistsError } from "@/lib/invite-signup";
 import { findUserByEmail } from "@/lib/invite.server";
 
-
-
 export type InviteValidationResult =
   | { valid: false; reason: "invalid" | "expired" | "used" }
   | {
@@ -153,10 +151,9 @@ export const createInvitedAccount = createServerFn({ method: "POST" })
     const token = data.token.trim();
     const email = data.email.trim().toLowerCase();
 
-    const { data: memberRows, error: infoErr } = await supabaseAdmin.rpc(
-      "get_member_invite_info",
-      { _token: token },
-    );
+    const { data: memberRows, error: infoErr } = await supabaseAdmin.rpc("get_member_invite_info", {
+      _token: token,
+    });
     if (infoErr) throw new Response(infoErr.message, { status: 500 });
     const member = Array.isArray(memberRows) ? memberRows[0] : null;
     if (!inviteMatchesEmail(member, email)) {
