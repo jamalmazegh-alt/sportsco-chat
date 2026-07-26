@@ -107,6 +107,15 @@ function scrollToSection(id: string) {
 export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
   const navigate = useNavigate();
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
 
   // Sync i18n with the route locale on mount; if the user switches language
   // afterwards, navigate to the counterpart route instead of forcing it back.
