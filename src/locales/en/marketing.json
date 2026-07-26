@@ -1330,13 +1330,16 @@
       },
       {
         "t": "See events and respond to a call-up",
-        "b": "Check your child's matches and trainings and confirm their attendance in one tap.",
+        "b": "Get call-ups by email, notification or in the app, and respond for your child in one tap.",
         "steps": [
-          "Open the \"Calendar\" or \"Home\" tab to see upcoming events.",
-          "Tap a match or a training to open its details.",
-          "Check the location, time and meeting time.",
-          "Tap \"Present\" (or \"Absent\") to respond to the call-up.",
-          "Got a question? Open the \"Event chat\" to message the staff (if the club has enabled it)."
+          "Receive the call-up by email: you can confirm attendance directly from the email.",
+          "You also get a push notification that takes you straight into the app.",
+          "From the app home, respond to the call-up quickly or open the event details.",
+          "Open the \"Events\" tab to see all matches and trainings.",
+          "In the event details, review the list of called-up players and the response to give.",
+          "If your child is absent, add a reason (preset or free text) that's sent to the coach.",
+          "If attendance is uncertain, flag it and add a reason.",
+          "Use the event chat to talk with parents, players and the coach and clarify logistics."
         ]
       },
       {

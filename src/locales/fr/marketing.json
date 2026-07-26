@@ -1330,13 +1330,16 @@
       },
       {
         "t": "Voir les événements et répondre à une convocation",
-        "b": "Consultez les matchs et entraînements de votre enfant et confirmez sa présence en un clic.",
+        "b": "Recevez les convocations par email, notification ou dans l'app, et répondez pour votre enfant en un clic.",
         "steps": [
-          "Ouvrez l'onglet « Calendrier » ou « Accueil » pour voir les prochains événements.",
-          "Appuyez sur un match ou un entraînement pour ouvrir son détail.",
-          "Vérifiez le lieu, l'heure et l'heure de rassemblement.",
-          "Appuyez sur « Présent » (ou « Absent ») pour répondre à la convocation.",
-          "Une question ? Ouvrez le « Chat de l'événement » pour écrire au staff (si le club l'a activé)."
+          "Recevez la convocation par email : vous pouvez valider la présence directement depuis l'email.",
+          "Recevez aussi une notification push qui vous renvoie directement dans l'app.",
+          "Depuis l'accueil de l'app, répondez rapidement à la convocation ou ouvrez le détail de l'événement.",
+          "Ouvrez l'onglet « Événements » pour voir tous les matchs et entraînements.",
+          "Dans le détail de l'événement, consultez la liste des joueurs convoqués et le choix à formuler.",
+          "En cas d'absence, ajoutez un motif (prédéfini ou libre) qui sera envoyé au coach.",
+          "Si la présence est incertaine, indiquez-le et précisez un motif.",
+          "Utilisez le chat de l'événement pour échanger entre parents, joueurs et coach et clarifier la logistique."
         ]
       },
       {

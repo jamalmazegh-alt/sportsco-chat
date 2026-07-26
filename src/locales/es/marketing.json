@@ -1330,13 +1330,16 @@
       },
       {
         "t": "Ver los eventos y responder a una convocatoria",
-        "b": "Consulta los partidos y entrenamientos de tu hijo y confirma su asistencia con un toque.",
+        "b": "Recibe las convocatorias por correo, notificación o en la app, y responde por tu hijo con un toque.",
         "steps": [
-          "Abre la pestaña «Calendario» o «Inicio» para ver los próximos eventos.",
-          "Pulsa en un partido o entrenamiento para abrir su detalle.",
-          "Comprueba el lugar, la hora y la hora de encuentro.",
-          "Pulsa «Presente» (o «Ausente») para responder a la convocatoria.",
-          "¿Alguna duda? Abre el «Chat del evento» para escribir al staff (si el club lo ha activado)."
+          "Recibe la convocatoria por correo: puedes confirmar la asistencia directamente desde el correo.",
+          "También recibes una notificación push que te lleva directamente a la app.",
+          "Desde el inicio de la app, responde rápidamente a la convocatoria o abre el detalle del evento.",
+          "Abre la pestaña «Eventos» para ver todos los partidos y entrenamientos.",
+          "En el detalle del evento, consulta la lista de jugadores convocados y la respuesta a dar.",
+          "En caso de ausencia, añade un motivo (predefinido o texto libre) que se enviará al entrenador.",
+          "Si la asistencia es incierta, indícalo y añade un motivo.",
+          "Usa el chat del evento para hablar con padres, jugadores y el entrenador y aclarar la logística."
         ]
       },
       {
