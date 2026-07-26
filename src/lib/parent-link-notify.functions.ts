@@ -29,17 +29,6 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     }
     if (!links || links.length === 0) return { sent: 0 };
 
-    const playerIds = links.map((l: any) => l.player_id);
-    const { data: already } = await (supabaseAdmin as any)
-      .from("parent_link_notifications")
-      .select("player_id")
-      .eq("parent_user_id", userId)
-      .in("player_id", playerIds);
-
-    const notifiedSet = new Set((already ?? []).map((r: any) => r.player_id));
-    const pending = links.filter((l: any) => !notifiedSet.has(l.player_id));
-    if (pending.length === 0) return { sent: 0 };
-
     const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
     const email = authUser?.user?.email;
     if (!email) return { sent: 0 };
@@ -50,12 +39,28 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
 
-    // If the parent disabled email notifications, record the pending links as
-    // notified so we don't recheck every login, and skip sending.
+    // ATOMIC CLAIM — on insère d'abord la ligne de dédoublonnage et on ne
+    // garde que celles réellement insérées (ON CONFLICT DO NOTHING sur la PK
+    // (parent_user_id, player_id)). Sans ça, deux appels concurrents (le hook
+    // auth se déclenche sur SIGNED_IN + TOKEN_REFRESH) lisaient tous les deux
+    // "pas encore notifié" et envoyaient chacun un e-mail.
+    const { data: claimed, error: claimErr } = await (supabaseAdmin as any)
+      .from("parent_link_notifications")
+      .upsert(
+        links.map((l: any) => ({ parent_user_id: userId, player_id: l.player_id })),
+        { onConflict: "parent_user_id,player_id", ignoreDuplicates: true },
+      )
+      .select("player_id");
+    if (claimErr) {
+      console.error("[parent-child-linked] claim failed", claimErr);
+      return { sent: 0 };
+    }
+    const claimedSet = new Set((claimed ?? []).map((r: any) => r.player_id));
+    const pending = links.filter((l: any) => claimedSet.has(l.player_id));
+    if (pending.length === 0) return { sent: 0 };
+
+    // Parent ayant coupé les e-mails : la claim suffit, on n'envoie rien.
     if (prof && (prof as any).notifications_email === false) {
-      await (supabaseAdmin as any)
-        .from("parent_link_notifications")
-        .insert(pending.map((p: any) => ({ parent_user_id: userId, player_id: p.player_id })));
       return { sent: 0 };
     }
 
@@ -86,10 +91,6 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
             locale,
           },
         });
-        await (supabaseAdmin as any)
-          .from("parent_link_notifications")
-          .insert({ parent_user_id: userId, player_id: link.player_id });
-
         sent += 1;
       } catch (e) {
         console.error("[parent-child-linked] email failed", {
@@ -97,6 +98,13 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
           player_id: link.player_id,
           error: e instanceof Error ? e.message : String(e),
         });
+        // Envoi raté : on relâche la claim pour permettre un retry au
+        // prochain login.
+        await (supabaseAdmin as any)
+          .from("parent_link_notifications")
+          .delete()
+          .eq("parent_user_id", userId)
+          .eq("player_id", link.player_id);
       }
     }
     return { sent };
