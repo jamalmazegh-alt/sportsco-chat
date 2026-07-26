@@ -1772,11 +1772,6 @@
     "adminVenues": {
       "title": "Lieux et terrains – Clubero",
       "description": "Configurez les sites et terrains de votre club."
-    },
-    "install": {
-      "title": "Installer l'app Clubero (iPhone & Android)",
-      "description": "Installez Clubero sur votre téléphone en quelques secondes depuis Safari (iPhone/iPad) ou Chrome (Android), sans App Store. Notifications, convocations et calendrier à portée de main.",
-      "ogDescription": "Installez Clubero sur votre écran d'accueil — sans App Store."
     }
   },
   "trial": {
@@ -2356,5 +2351,45 @@
       "team_educators": "Éducateurs d'une équipe",
       "category_educators": "Éducateurs d'une catégorie"
     }
+  },
+  "install": {
+    "meta": {
+      "title": "Installer Clubero sur votre téléphone",
+      "description": "Installez Clubero en un tap sur iPhone ou Android pour recevoir vos convocations, rappels et notifications en temps réel.",
+      "ogTitle": "Installer Clubero sur votre téléphone",
+      "ogDescription": "Convocations, présences et rappels en temps réel — installez Clubero sur votre écran d'accueil."
+    },
+    "back": "Retour",
+    "title": "Installer Clubero",
+    "subtitle": "L'app s'installe en 1 tap depuis votre navigateur — pas besoin de passer par l'App Store ou Google Play.",
+    "cta": "Installer sur mon téléphone",
+    "notifTitle": "Notifications en temps réel",
+    "notifDesc": "Convocations, rappels et messages coach dès qu'ils sont envoyés.",
+    "launchTitle": "Ouverture instantanée",
+    "launchDesc": "Une icône sur l'écran d'accueil, comme une vraie app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Compatible Safari (iOS 16.4+) et Chrome / Edge / Samsung Internet sur Android.",
+    "platformCompareTitle": "iPhone ou Android : quelle différence ?",
+    "platformCompareSubtitle": "Le résultat est le même (une icône sur l'écran d'accueil), mais le chemin diffère.",
+    "platformAppleTitle": "iPhone / iPad",
+    "platformAppleDesc": "Safari ne propose pas de bouton direct. Il faut passer par le menu Partager, puis Sur l'écran d'accueil.",
+    "platformAndroidTitle": "Android",
+    "platformAndroidDesc": "Chrome affiche souvent un bouton Ajouter directement. Sinon, utilisez le menu ⋮ en haut à droite.",
+    "platformCompareNote": "Peu importe votre téléphone : une fois installé, Clubero fonctionne comme une app normale.",
+    "alreadyInstalledTitle": "Déjà installée ?",
+    "alreadyInstalledDesc": "Ouvrez Clubero depuis l'icône sur votre écran d'accueil pour activer les notifications.",
+    "iosStepsTitle": "Sur iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 étapes pour ajouter Clubero à votre écran d'accueil",
+    "iosStep1Before": "Appuyez sur les",
+    "iosStep1Icon": "3 petits points",
+    "iosStep1After": "en bas de Safari",
+    "iosStep2Before": "Choisissez",
+    "iosStep2Icon": "Partager",
+    "iosStep3Before": "Appuyez sur la flèche",
+    "iosStep3Icon": "Voir plus",
+    "iosStep3After": "pour dérouler la liste",
+    "iosStep4Before": "Choisissez",
+    "iosStep4Icon": "Sur l'écran d'accueil",
+    "iosStep4After": "puis appuyez sur « Ajouter »"
   }
 }

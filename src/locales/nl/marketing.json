@@ -1910,38 +1910,5 @@
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
     }
-  },
-  "install": {
-    "kicker": "Clubero installeren",
-    "title": "Installeer Clubero op je apparaat.",
-    "subtitle": "Clubero is een web-app: installeer hem in seconden vanuit je browser, zonder via een store te gaan.",
-    "iosTitle": "Op iPhone / iPad (Safari)",
-    "iosLead": "Vanuit Safari, in 4 stappen.",
-    "iosShare": "Deel",
-    "iosAdd": "Zet op beginscherm",
-    "iosSteps": [
-      "Open clubero.app in Safari.",
-      "Tik op de knop «Deel» (het vierkant met een pijl omhoog).",
-      "Scrol en kies «Zet op beginscherm».",
-      "Tik op «Voeg toe» — het Clubero-pictogram verschijnt op je startscherm."
-    ],
-    "androidTitle": "Op Android (Chrome)",
-    "androidLead": "Vanuit Chrome, in 3 stappen.",
-    "androidSteps": [
-      "Open clubero.app in Chrome.",
-      "Tik rechtsboven op het menu (⋮).",
-      "Kies «App installeren» en bevestig."
-    ],
-    "note": "Geen App Store of Play Store nodig: Clubero installeer je rechtstreeks vanuit de browser.",
-    "benefitsTitle": "Waarom de app installeren?",
-    "benefits": [
-      "Realtime meldingen: oproepen, herinneringen en berichten.",
-      "Toegang met één tik vanaf je startscherm.",
-      "Een schermvullende ervaring, zelfs offline voor het belangrijkste."
-    ],
-    "ctaTitle": "Klaar om te beginnen?",
-    "ctaBody": "Log in bij je club en schakel meldingen in zodra de app is geïnstalleerd.",
-    "ctaPrimary": "Inloggen",
-    "ctaSecondary": "Neem contact op"
   }
 }

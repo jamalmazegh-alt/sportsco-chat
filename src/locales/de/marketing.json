@@ -1914,38 +1914,5 @@
       "new_record": "★ New record",
       "floating_badge": "🏆 +1 record"
     }
-  },
-  "install": {
-    "kicker": "Clubero installieren",
-    "title": "Installieren Sie Clubero auf Ihrem Gerät.",
-    "subtitle": "Clubero ist eine Web-App: Installieren Sie sie in Sekunden aus Ihrem Browser, ohne Umweg über einen Store.",
-    "iosTitle": "Auf iPhone / iPad (Safari)",
-    "iosLead": "In Safari, in 4 Schritten.",
-    "iosShare": "Teilen",
-    "iosAdd": "Zum Home-Bildschirm",
-    "iosSteps": [
-      "Öffnen Sie clubero.app in Safari.",
-      "Tippen Sie auf „Teilen“ (das Quadrat mit dem Pfeil nach oben).",
-      "Scrollen Sie und wählen Sie „Zum Home-Bildschirm“.",
-      "Tippen Sie auf „Hinzufügen“ — das Clubero-Symbol erscheint auf Ihrem Startbildschirm."
-    ],
-    "androidTitle": "Auf Android (Chrome)",
-    "androidLead": "In Chrome, in 3 Schritten.",
-    "androidSteps": [
-      "Öffnen Sie clubero.app in Chrome.",
-      "Tippen Sie oben rechts auf das Menü (⋮).",
-      "Wählen Sie „App installieren“ und bestätigen Sie."
-    ],
-    "note": "Kein App Store oder Play Store nötig: Clubero installiert sich direkt aus dem Browser.",
-    "benefitsTitle": "Warum die App installieren?",
-    "benefits": [
-      "Echtzeit-Benachrichtigungen: Aufgebote, Erinnerungen und Nachrichten.",
-      "Zugriff mit einem Tippen vom Startbildschirm.",
-      "Ein Vollbild-Erlebnis, für das Wesentliche auch offline."
-    ],
-    "ctaTitle": "Bereit loszulegen?",
-    "ctaBody": "Melden Sie sich bei Ihrem Verein an und aktivieren Sie die Benachrichtigungen nach der Installation.",
-    "ctaPrimary": "Anmelden",
-    "ctaSecondary": "Kontakt aufnehmen"
   }
 }

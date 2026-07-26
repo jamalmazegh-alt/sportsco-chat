@@ -1772,11 +1772,6 @@
     "adminVenues": {
       "title": "Locaties en velden – Clubero",
       "description": "Configureer locaties en velden van je club."
-    },
-    "install": {
-      "title": "Clubero-app installeren (iPhone & Android)",
-      "description": "Installeer Clubero in seconden op je telefoon vanuit Safari (iPhone/iPad) of Chrome (Android), zonder App Store. Meldingen, oproepen en agenda binnen handbereik.",
-      "ogDescription": "Zet Clubero op je startscherm — zonder App Store."
     }
   },
   "trial": {
@@ -2334,5 +2329,45 @@
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
     "openGroups": "Groups"
+  },
+  "install": {
+    "meta": {
+      "title": "Installeer Clubero op je telefoon",
+      "description": "Installeer Clubero met één tik op iPhone of Android voor oproepen, herinneringen en realtime meldingen.",
+      "ogTitle": "Installeer Clubero op je telefoon",
+      "ogDescription": "Oproepen, aanwezigheid en herinneringen in realtime — installeer Clubero op je startscherm."
+    },
+    "back": "Terug",
+    "title": "Clubero installeren",
+    "subtitle": "De app installeert met 1 tik vanuit je browser — geen App Store of Google Play nodig.",
+    "cta": "Installeren op mijn telefoon",
+    "notifTitle": "Realtime meldingen",
+    "notifDesc": "Oproepen, herinneringen en coach-berichten zodra ze verzonden zijn.",
+    "launchTitle": "Direct openen",
+    "launchDesc": "Een pictogram op je startscherm, net als een echte app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Werkt op Safari (iOS 16.4+) en Chrome / Edge / Samsung Internet op Android.",
+    "platformCompareTitle": "iPhone of Android: wat is het verschil?",
+    "platformCompareSubtitle": "Het resultaat is hetzelfde (een pictogram op je startscherm), maar de weg verschilt.",
+    "platformAppleTitle": "iPhone / iPad",
+    "platformAppleDesc": "Safari heeft geen directe knop. Gebruik het Deel-menu, daarna Zet op beginscherm.",
+    "platformAndroidTitle": "Android",
+    "platformAndroidDesc": "Chrome toont vaak direct een Toevoegen-knop. Zo niet, tik dan op het ⋮-menu rechtsboven.",
+    "platformCompareNote": "Welke telefoon je ook hebt: eenmaal geïnstalleerd werkt Clubero als een normale app.",
+    "alreadyInstalledTitle": "Al geïnstalleerd?",
+    "alreadyInstalledDesc": "Open Clubero via het pictogram op je startscherm om meldingen in te schakelen.",
+    "iosStepsTitle": "Op iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 stappen om Clubero aan je beginscherm toe te voegen",
+    "iosStep1Before": "Tik op de",
+    "iosStep1Icon": "3 puntjes",
+    "iosStep1After": "onderin Safari",
+    "iosStep2Before": "Kies",
+    "iosStep2Icon": "Deel",
+    "iosStep3Before": "Tik op de pijl",
+    "iosStep3Icon": "Meer weergeven",
+    "iosStep3After": "om de lijst uit te klappen",
+    "iosStep4Before": "Kies",
+    "iosStep4Icon": "Zet op beginscherm",
+    "iosStep4After": "en tik op „Voeg toe“"
   }
 }

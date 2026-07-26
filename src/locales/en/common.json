@@ -1772,11 +1772,6 @@
     "adminVenues": {
       "title": "Venues – Clubero",
       "description": "Configure your club sites and fields."
-    },
-    "install": {
-      "title": "Install the Clubero app (iPhone & Android)",
-      "description": "Install Clubero on your phone in seconds from Safari (iPhone/iPad) or Chrome (Android), with no App Store. Notifications, call-ups and calendar at your fingertips.",
-      "ogDescription": "Add Clubero to your home screen — no App Store needed."
     }
   },
   "trial": {
@@ -2334,5 +2329,45 @@
     "memberRemoved": "Member removed",
     "backToList": "Back to groups",
     "openGroups": "Groups"
+  },
+  "install": {
+    "meta": {
+      "title": "Install Clubero on your phone",
+      "description": "Install Clubero in one tap on iPhone or Android to get your call-ups, reminders and real-time notifications.",
+      "ogTitle": "Install Clubero on your phone",
+      "ogDescription": "Call-ups, attendance and reminders in real time — install Clubero on your home screen."
+    },
+    "back": "Back",
+    "title": "Install Clubero",
+    "subtitle": "The app installs in 1 tap from your browser — no App Store or Google Play needed.",
+    "cta": "Install on my phone",
+    "notifTitle": "Real-time notifications",
+    "notifDesc": "Call-ups, reminders and coach messages as soon as they're sent.",
+    "launchTitle": "Instant launch",
+    "launchDesc": "An icon on your home screen, just like a real app.",
+    "platformsTitle": "iPhone & Android",
+    "platformsDesc": "Works on Safari (iOS 16.4+) and Chrome / Edge / Samsung Internet on Android.",
+    "platformCompareTitle": "iPhone or Android: what's the difference?",
+    "platformCompareSubtitle": "The result is the same (an icon on your home screen), but the path differs.",
+    "platformAppleTitle": "iPhone / iPad",
+    "platformAppleDesc": "Safari has no direct Add button. Use the Share menu, then Add to Home Screen.",
+    "platformAndroidTitle": "Android",
+    "platformAndroidDesc": "Chrome usually shows an Add button directly. If not, tap the ⋮ menu at the top right.",
+    "platformCompareNote": "No matter your phone: once installed, Clubero works like a normal app.",
+    "alreadyInstalledTitle": "Already installed?",
+    "alreadyInstalledDesc": "Open Clubero from the icon on your home screen to enable notifications.",
+    "iosStepsTitle": "On iPhone / iPad (Safari)",
+    "iosStepsSubtitle": "4 steps to add Clubero to your home screen",
+    "iosStep1Before": "Tap the",
+    "iosStep1Icon": "three dots",
+    "iosStep1After": "at the bottom of Safari",
+    "iosStep2Before": "Choose",
+    "iosStep2Icon": "Share",
+    "iosStep3Before": "Tap the",
+    "iosStep3Icon": "Show more",
+    "iosStep3After": "arrow to expand the list",
+    "iosStep4Before": "Choose",
+    "iosStep4Icon": "Add to Home Screen",
+    "iosStep4After": "then tap “Add”"
   }
 }

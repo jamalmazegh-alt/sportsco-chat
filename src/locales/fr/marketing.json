@@ -1914,38 +1914,5 @@
       "new_record": "★ Nouveau record",
       "floating_badge": "🏆 +1 record"
     }
-  },
-  "install": {
-    "kicker": "Installer Clubero",
-    "title": "Installez Clubero sur votre appareil.",
-    "subtitle": "Clubero est une application web : installez-la en quelques secondes depuis votre navigateur, sans passer par un store.",
-    "iosTitle": "Sur iPhone / iPad (Safari)",
-    "iosLead": "Depuis Safari, en 4 étapes.",
-    "iosShare": "Partager",
-    "iosAdd": "Sur l'écran d'accueil",
-    "iosSteps": [
-      "Ouvrez clubero.app dans Safari.",
-      "Appuyez sur le bouton « Partager » (le carré avec une flèche vers le haut).",
-      "Faites défiler et choisissez « Sur l'écran d'accueil ».",
-      "Appuyez sur « Ajouter » — l'icône Clubero apparaît sur votre écran d'accueil."
-    ],
-    "androidTitle": "Sur Android (Chrome)",
-    "androidLead": "Depuis Chrome, en 3 étapes.",
-    "androidSteps": [
-      "Ouvrez clubero.app dans Chrome.",
-      "Appuyez sur le menu (⋮) en haut à droite.",
-      "Choisissez « Installer l'application » puis confirmez."
-    ],
-    "note": "Pas besoin d'App Store ni de Play Store : Clubero s'installe directement depuis le navigateur.",
-    "benefitsTitle": "Pourquoi installer l'app ?",
-    "benefits": [
-      "Notifications en temps réel : convocations, rappels et messages.",
-      "Accès en un tap depuis votre écran d'accueil.",
-      "Une expérience plein écran, même hors connexion pour l'essentiel."
-    ],
-    "ctaTitle": "Prêt à commencer ?",
-    "ctaBody": "Connectez-vous à votre club et activez les notifications une fois l'app installée.",
-    "ctaPrimary": "Se connecter",
-    "ctaSecondary": "Nous contacter"
   }
 }
