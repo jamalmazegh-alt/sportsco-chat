@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Report an absence",
-        "b": "Let the staff know ahead of time when your child can't make it, with a reason if needed.",
+        "b": "Let the staff know ahead of time when your child can't make it: the coach is notified and the schedule is updated.",
         "steps": [
-          "Open the relevant event in the \"Calendar\" or \"Call-ups\" tab.",
-          "Tap \"Absent\".",
-          "Add a reason (optional) to inform the coach.",
-          "Confirm — your response is saved and the staff is notified."
+          "From the app home, tap \"Report an absence\".",
+          "Another way: open \"Teams\" then your child's profile.",
+          "Open the report-an-absence screen.",
+          "Select the date range concerned.",
+          "Choose the reason, add a comment if needed, then save: the coach is notified and the team schedule is updated.",
+          "The absence appears in the \"Availability\" tab of your child's profile.",
+          "You can cancel it via \"Cancel\" in the history section."
         ]
       },
       {

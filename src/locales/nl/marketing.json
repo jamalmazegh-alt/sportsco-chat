@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Een afwezigheid melden",
-        "b": "Laat de staf op tijd weten wanneer je kind niet kan komen, met een reden indien nodig.",
+        "b": "Laat de staf op tijd weten wanneer je kind niet kan komen: de coach wordt op de hoogte gebracht en de planning wordt bijgewerkt.",
         "steps": [
-          "Open het betreffende evenement in het tabblad «Kalender» of «Oproepen».",
-          "Tik op «Afwezig».",
-          "Voeg een reden toe (optioneel) om de coach te informeren.",
-          "Bevestig — je antwoord wordt opgeslagen en de staf wordt op de hoogte gebracht."
+          "Tik op het startscherm van de app op «Een afwezigheid melden».",
+          "Andere manier: open «Teams» en daarna het profiel van je kind.",
+          "Open het scherm om een afwezigheid te melden.",
+          "Selecteer de betreffende periode.",
+          "Kies de reden, voeg indien nodig een opmerking toe en sla op: de coach wordt op de hoogte gebracht en de teamplanning wordt bijgewerkt.",
+          "De afwezigheid verschijnt op het tabblad «Beschikbaarheid» in het profiel van je kind.",
+          "Je kunt hem annuleren via «Annuleren» in het geschiedenisgedeelte."
         ]
       },
       {

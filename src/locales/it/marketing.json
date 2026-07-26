@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Segnalare un'assenza",
-        "b": "Avvisa lo staff in anticipo quando tuo figlio non può venire, con un motivo se necessario.",
+        "b": "Avvisa lo staff in anticipo quando tuo figlio non può venire: l'allenatore viene avvisato e il calendario aggiornato.",
         "steps": [
-          "Apri l'evento interessato nella scheda «Calendario» o «Convocazioni».",
-          "Tocca «Assente».",
-          "Aggiungi un motivo (facoltativo) per informare l'allenatore.",
-          "Conferma — la tua risposta viene salvata e lo staff viene avvisato."
+          "Dalla home dell'app, tocca «Segnala un'assenza».",
+          "Un altro modo: apri «Squadre» e poi il profilo di tuo figlio.",
+          "Apri la schermata per segnalare un'assenza.",
+          "Seleziona l'intervallo di date interessato.",
+          "Scegli il motivo, aggiungi un commento se necessario e salva: l'allenatore viene avvisato e il calendario della squadra aggiornato.",
+          "L'assenza compare nella scheda «Disponibilità» del profilo di tuo figlio.",
+          "Puoi annullarla con «Annulla» nella sezione cronologia."
         ]
       },
       {

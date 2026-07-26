@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Declarar uma ausência",
-        "b": "Avise a equipa técnica com antecedência quando o seu filho não puder ir, com um motivo se necessário.",
+        "b": "Avise a equipa técnica com antecedência quando o seu filho não puder ir: o treinador é notificado e o calendário é atualizado.",
         "steps": [
-          "Abra o evento em questão no separador «Calendário» ou «Convocatórias».",
-          "Toque em «Ausente».",
-          "Adicione um motivo (opcional) para informar o treinador.",
-          "Confirme — a sua resposta é guardada e a equipa é avisada."
+          "A partir do início da app, toque em «Declarar uma ausência».",
+          "Outra via: abra «Equipas» e depois o perfil do seu filho.",
+          "Abra o ecrã para declarar uma ausência.",
+          "Selecione o intervalo de datas em questão.",
+          "Escolha o motivo, acrescente um comentário se necessário e guarde: o treinador é notificado e o calendário da equipa é atualizado.",
+          "A ausência aparece no separador «Disponibilidade» do perfil do seu filho.",
+          "Pode cancelá-la com «Cancelar» na parte do histórico."
         ]
       },
       {

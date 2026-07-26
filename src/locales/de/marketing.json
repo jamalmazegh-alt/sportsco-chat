@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Eine Abwesenheit melden",
-        "b": "Informieren Sie das Team frühzeitig, wenn Ihr Kind nicht kommen kann, bei Bedarf mit Grund.",
+        "b": "Informieren Sie das Team frühzeitig, wenn Ihr Kind nicht kommen kann: Der Trainer wird benachrichtigt und der Plan aktualisiert.",
         "steps": [
-          "Öffnen Sie das betreffende Ereignis im Reiter „Kalender“ oder „Aufgebote“.",
-          "Tippen Sie auf „Abwesend“.",
-          "Fügen Sie einen Grund hinzu (optional), um den Trainer zu informieren.",
-          "Bestätigen Sie — Ihre Antwort wird gespeichert und das Team informiert."
+          "Tippen Sie auf der App-Startseite auf „Abwesenheit melden“.",
+          "Alternativ: Öffnen Sie „Teams“ und dann das Profil Ihres Kindes.",
+          "Öffnen Sie den Bildschirm zum Melden einer Abwesenheit.",
+          "Wählen Sie den betreffenden Zeitraum.",
+          "Wählen Sie den Grund, fügen Sie bei Bedarf einen Kommentar hinzu und speichern Sie: Der Trainer wird benachrichtigt und der Teamplan aktualisiert.",
+          "Die Abwesenheit erscheint im Reiter „Verfügbarkeit“ im Profil Ihres Kindes.",
+          "Sie können sie über „Abbrechen“ im Verlauf entfernen."
         ]
       },
       {

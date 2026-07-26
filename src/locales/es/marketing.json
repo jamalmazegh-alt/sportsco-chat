@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Declarar una ausencia",
-        "b": "Avisa al staff con antelación cuando tu hijo no pueda asistir, con un motivo si hace falta.",
+        "b": "Avisa al staff con antelación cuando tu hijo no pueda asistir: el entrenador recibe un aviso y el calendario se actualiza.",
         "steps": [
-          "Abre el evento correspondiente en la pestaña «Calendario» o «Convocatorias».",
-          "Pulsa «Ausente».",
-          "Añade un motivo (opcional) para informar al entrenador.",
-          "Confirma — tu respuesta se guarda y se avisa al staff."
+          "Desde el inicio de la app, pulsa «Declarar una ausencia».",
+          "Otra vía: abre «Equipos» y luego el perfil de tu hijo.",
+          "Abre la pantalla para declarar una ausencia.",
+          "Selecciona el intervalo de fechas correspondiente.",
+          "Elige el motivo, añade un comentario si hace falta y guarda: el entrenador recibe un aviso y el calendario del equipo se actualiza.",
+          "La ausencia aparece en la pestaña «Disponibilidad» del perfil de tu hijo.",
+          "Puedes anularla con «Anular» en la parte del historial."
         ]
       },
       {

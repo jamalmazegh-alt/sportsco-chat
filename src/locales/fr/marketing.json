@@ -1353,12 +1353,15 @@
       },
       {
         "t": "Déclarer une absence",
-        "b": "Prévenez le staff à l'avance quand votre enfant ne peut pas venir, avec un motif si besoin.",
+        "b": "Prévenez le staff à l'avance quand votre enfant ne peut pas venir : le coach est notifié et le planning mis à jour.",
         "steps": [
-          "Ouvrez l'événement concerné dans « Calendrier » ou « Convocations ».",
-          "Appuyez sur « Absent ».",
-          "Ajoutez un motif (optionnel) pour informer le coach.",
-          "Confirmez — votre réponse est enregistrée et le staff est prévenu."
+          "Depuis l'accueil de l'app, appuyez sur « Déclarer une absence ».",
+          "Autre accès : ouvrez « Équipes » puis le profil de votre enfant.",
+          "Ouvrez l'écran pour déclarer une absence.",
+          "Sélectionnez la plage de dates concernée.",
+          "Choisissez le motif, ajoutez un commentaire si besoin, puis enregistrez : le coach est notifié et le planning de l'équipe est mis à jour.",
+          "L'absence apparaît dans l'onglet « Disponibilités » du profil de votre enfant.",
+          "Vous pouvez l'annuler via « Annuler » dans la partie historique."
         ]
       },
       {
