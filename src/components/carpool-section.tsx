@@ -698,16 +698,24 @@ function NeedDialog({
   async function submit() {
     if (!user || selected.length === 0) return;
     setBusy(true);
-    const { error } = await supabase.from("carpool_needs").insert({
-      event_id: eventId,
-      parent_user_id: user.id,
-      player_ids: selected,
-      note: note.trim() || null,
-    });
+    const { data: inserted, error } = await supabase
+      .from("carpool_needs")
+      .insert({
+        event_id: eventId,
+        parent_user_id: user.id,
+        player_ids: selected,
+        note: note.trim() || null,
+      })
+      .select("id")
+      .maybeSingle();
     setBusy(false);
     if (error) return toast.error(error.message);
+    if (inserted?.id) {
+      notifyStaff({ data: { needId: inserted.id } }).catch(() => undefined);
+    }
     onDone();
   }
+
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
