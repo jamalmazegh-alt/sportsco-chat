@@ -59,14 +59,14 @@ describe("RLS: superadmin_* RPCs refuse non-super callers", () => {
     }
   }
 
-  it("superadmin can call every superadmin_* RPC without forbidden error", async () => {
+  it("superadmin can call every superadmin_* RPC without error", async () => {
     const fx = getFixtures();
     const c = await signInAs("superadmin");
     for (const rpc of RPCS) {
       const { error } = await (c.rpc as any)(rpc.name, rpc.args(fx));
-      // Some RPCs may return empty for synthetic args, but must NOT raise forbidden.
-      const msg = `${error?.code ?? ""} ${error?.message ?? ""}`.toLowerCase();
-      expect(msg).not.toMatch(/forbidden|42501/);
+      // Empty rowsets are fine; PL/pgSQL RETURNS TABLE clashes (e.g. ambiguous
+      // message_id) and forbidden must both fail the suite.
+      expect(error, `superadmin → ${rpc.name}: ${error?.message ?? "ok"}`).toBeNull();
     }
   });
 });
