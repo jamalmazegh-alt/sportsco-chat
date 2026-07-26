@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Bell, X } from "lucide-react";
 import { toast } from "sonner";
 import { isAndroid, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
-import { subscribeToPush } from "@/lib/push-subscribe";
+import { subscribeToPush, syncPushSubscriptionState } from "@/lib/push-subscribe";
 import { useAuth } from "@/lib/auth-context";
 
 const DISMISS_KEY = "clubero:push:dismissed-at";
@@ -28,7 +28,7 @@ export function PushPermissionBanner() {
     if (!isPushSupported()) return;
 
     if (Notification.permission === "granted" && (isInStandaloneMode() || isAndroid())) {
-      subscribeToPush().catch((e) => console.warn("[push] background sync failed", e));
+      syncPushSubscriptionState().catch((e) => console.warn("[push] background sync failed", e));
       return;
     }
 

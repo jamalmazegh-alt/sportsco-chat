@@ -6,6 +6,7 @@ const Body = z.object({
   p256dh: z.string().min(20).max(256),
   auth: z.string().min(10).max(256),
   user_agent: z.string().max(512).optional(),
+  takeover: z.boolean().optional(),
 });
 
 export const Route = createFileRoute("/api/push/subscribe")({
@@ -33,6 +34,19 @@ export const Route = createFileRoute("/api/push/subscribe")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: existing, error: existingError } = await supabaseAdmin
+          .from("push_subscriptions")
+          .select("user_id")
+          .eq("endpoint", parsed.endpoint)
+          .maybeSingle();
+        if (existingError) {
+          console.error("[push/subscribe] ownership check failed", existingError);
+          return new Response("Server error", { status: 500 });
+        }
+        if (existing?.user_id && existing.user_id !== userId && parsed.takeover !== true) {
+          return new Response("Subscription already belongs to another account", { status: 409 });
+        }
+
         const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
           {
             user_id: userId,
