@@ -107,6 +107,11 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
   const navigate = useNavigate();
   const [showTop, setShowTop] = useState(false);
+  const tocRef = useRef<HTMLDetailsElement>(null);
+  const closeToc = () => {
+    if (tocRef.current) tocRef.current.open = false;
+  };
+
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 600);
