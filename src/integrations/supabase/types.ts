@@ -1431,6 +1431,7 @@ export type Database = {
           convocation_on_create: boolean
           convocation_reminder: boolean
           event_cancel: boolean
+          event_chat_new_message: boolean
           event_reschedule: boolean
           score_result: boolean | null
           tournament_draw: boolean
@@ -1445,6 +1446,7 @@ export type Database = {
           convocation_on_create?: boolean
           convocation_reminder?: boolean
           event_cancel?: boolean
+          event_chat_new_message?: boolean
           event_reschedule?: boolean
           score_result?: boolean | null
           tournament_draw?: boolean
@@ -1459,6 +1461,7 @@ export type Database = {
           convocation_on_create?: boolean
           convocation_reminder?: boolean
           event_cancel?: boolean
+          event_chat_new_message?: boolean
           event_reschedule?: boolean
           score_result?: boolean | null
           tournament_draw?: boolean
