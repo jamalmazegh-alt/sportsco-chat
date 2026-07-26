@@ -84,6 +84,15 @@ function StepMedia({ src, step, label }: { src: string; step: number; label: str
   );
 }
 
+// Smooth-scrolls to an in-page section and keeps the hash in the URL.
+function scrollToId(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
+  const el = typeof document !== "undefined" ? document.getElementById(id) : null;
+  if (!el) return;
+  e.preventDefault();
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.history.replaceState(null, "", `#${id}`);
+}
+
 export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
   const navigate = useNavigate();
@@ -157,6 +166,42 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
           </ul>
         </div>
       </section>
+
+      {/* SECTION NAV (sticky table of contents) */}
+      <nav
+        aria-label={t("parentGuide.tutorialsTitle")}
+        className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+      >
+        <div className="mx-auto max-w-6xl px-5 lg:px-8">
+          <ul className="flex snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {tutorials.map((tuto, i) => {
+              const Icon = TUTORIAL_ICONS[i] ?? CheckCircle2;
+              return (
+                <li key={`nav-${tuto.t}`} className="snap-start">
+                  <a
+                    href={`#tuto-${i + 1}`}
+                    onClick={(e) => scrollToId(e, `tuto-${i + 1}`)}
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {tuto.t}
+                  </a>
+                </li>
+              );
+            })}
+            <li className="snap-start">
+              <a
+                href="#faq"
+                onClick={(e) => scrollToId(e, "faq")}
+                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {t("parentGuide.ctaFaq")}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
 
       {/* TUTORIALS */}
       <section id="tutorials" className="scroll-mt-24 border-b border-border/60">
