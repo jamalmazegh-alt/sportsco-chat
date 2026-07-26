@@ -177,7 +177,35 @@ export function EventsFilterSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 pb-8">
+          {/* Convocations sent */}
+          {isCoach && (
+            <Section title={t("events.filterConvocations", { defaultValue: "Convocations" })}>
+              <div className="flex flex-wrap gap-2">
+                <ChipButton
+                  active={draft.convocationsSent === "all"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "all" })}
+                >
+                  {t("events.convocAll", { defaultValue: "Tous" })}
+                </ChipButton>
+                <ChipButton
+                  active={draft.convocationsSent === "sent"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "sent" })}
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  {t("events.convocSent", { defaultValue: "Envoyées" })}
+                </ChipButton>
+                <ChipButton
+                  active={draft.convocationsSent === "not_sent"}
+                  onClick={() => setDraft({ ...draft, convocationsSent: "not_sent" })}
+                >
+                  <MailX className="h-3.5 w-3.5" />
+                  {t("events.convocNotSent", { defaultValue: "Non envoyées" })}
+                </ChipButton>
+              </div>
+            </Section>
+          )}
+
           {/* Types */}
           <Section title={t("events.filterType", { defaultValue: "Type d'événement" })}>
             <div className="flex flex-wrap gap-2">
@@ -314,34 +342,6 @@ export function EventsFilterSheet({
               )}
             </div>
           </Section>
-
-          {/* Convocations sent */}
-          {isCoach && (
-            <Section title={t("events.filterConvocations", { defaultValue: "Convocations" })}>
-              <div className="flex flex-wrap gap-2">
-                <ChipButton
-                  active={draft.convocationsSent === "all"}
-                  onClick={() => setDraft({ ...draft, convocationsSent: "all" })}
-                >
-                  {t("events.convocAll", { defaultValue: "Tous" })}
-                </ChipButton>
-                <ChipButton
-                  active={draft.convocationsSent === "sent"}
-                  onClick={() => setDraft({ ...draft, convocationsSent: "sent" })}
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  {t("events.convocSent", { defaultValue: "Envoyées" })}
-                </ChipButton>
-                <ChipButton
-                  active={draft.convocationsSent === "not_sent"}
-                  onClick={() => setDraft({ ...draft, convocationsSent: "not_sent" })}
-                >
-                  <MailX className="h-3.5 w-3.5" />
-                  {t("events.convocNotSent", { defaultValue: "Non envoyées" })}
-                </ChipButton>
-              </div>
-            </Section>
-          )}
         </div>
 
         <SheetFooter className="gap-2 sm:gap-2">
