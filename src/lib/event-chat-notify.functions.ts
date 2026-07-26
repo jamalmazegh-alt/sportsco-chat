@@ -17,16 +17,18 @@ const InputSchema = z.object({ messageId: z.string().uuid() });
 
 const GROUPING_WINDOW_MS = 5 * 60 * 1000;
 
-const I18N: Record<string, { title: (ev: string) => string; body: (a: string, m: string) => string }> =
-  {
-    fr: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a} : ${m}` },
-    en: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-    es: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-    de: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-    it: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-    nl: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-    pt: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
-  };
+const I18N: Record<
+  string,
+  { title: (ev: string) => string; body: (a: string, m: string) => string }
+> = {
+  fr: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a} : ${m}` },
+  en: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+  es: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+  de: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+  it: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+  nl: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+  pt: { title: (ev) => `💬 ${ev}`, body: (a, m) => `${a}: ${m}` },
+};
 
 export const dispatchEventChatPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

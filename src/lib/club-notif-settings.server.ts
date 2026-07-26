@@ -36,7 +36,6 @@ export const DEFAULT_CLUB_NOTIF_SETTINGS: ClubNotifSettings = {
   event_chat_new_message: true,
 };
 
-
 const CACHE_TTL_MS = 60_000;
 type Entry = { value: ClubNotifSettings; expiresAt: number };
 const cache = new Map<string, Entry>();
