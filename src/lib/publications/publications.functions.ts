@@ -187,6 +187,20 @@ export const republishPublication = createServerFn({ method: "POST" })
       }
     }
 
+    // Best-effort : push aux nouveaux destinataires (ou à tous en manual_resend)
+    if (dispatchRowId) {
+      try {
+        const { dispatchPublicationPush } = await import("./publications.push.server");
+        await dispatchPublicationPush(data.publicationId, dispatchRowId, data.mode, {
+          excludeUserId: context.userId,
+        });
+      } catch (e) {
+        console.error("[republishPublication] dispatchPublicationPush failed", e);
+      }
+    }
+
+
+
     return {
       dispatchRowId,
       totalRecipients: (row?.recipients_count as number) ?? 0,
