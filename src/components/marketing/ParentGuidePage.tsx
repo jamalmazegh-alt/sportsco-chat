@@ -84,6 +84,15 @@ function StepMedia({ src, step, label }: { src: string; step: number; label: str
   );
 }
 
+// Smooth-scrolls to an in-page section and keeps the hash in the URL.
+function scrollToId(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
+  const el = typeof document !== "undefined" ? document.getElementById(id) : null;
+  if (!el) return;
+  e.preventDefault();
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.history.replaceState(null, "", `#${id}`);
+}
+
 export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
   const navigate = useNavigate();
