@@ -384,6 +384,22 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
           </div>
         </div>
       </section>
+
+      {/* Back to top */}
+      {showTop && (
+        <button
+          type="button"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.history.replaceState(null, "", window.location.pathname);
+          }}
+          className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-1.5 rounded-full border border-border bg-card/95 px-4 py-2.5 text-xs font-medium text-foreground shadow-lg backdrop-blur transition-colors hover:border-primary/40 hover:text-primary"
+        >
+          <ArrowUp className="h-4 w-4" />
+          {locale === "fr" ? "Haut de page" : "Back to top"}
+        </button>
+      )}
     </MarketingLayout>
+
   );
 }
