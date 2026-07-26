@@ -640,6 +640,8 @@
     "respondBoth": "Les deux",
     "accountActive": "Compte actif",
     "accountInactive": "Pas de compte",
+    "accountUnconfirmed": "E-mail non confirmé",
+    "accountUnconfirmedHint": "Le compte existe mais l'e-mail n'a pas encore été confirmé. Le parent doit cliquer sur le lien de confirmation reçu par e-mail.",
     "inviteNotSent": "Invitation non envoyée",
     "inviteSentLabel": "Invitation envoyée",
     "parentActivationPending": "En attente d'activation du compte parent",

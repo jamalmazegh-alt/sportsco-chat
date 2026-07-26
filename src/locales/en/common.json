@@ -640,6 +640,8 @@
     "respondBoth": "Both",
     "accountActive": "Account active",
     "accountInactive": "No account yet",
+    "accountUnconfirmed": "Email not confirmed",
+    "accountUnconfirmedHint": "The account exists but the email has not been confirmed yet. The parent must click the confirmation link they received by email.",
     "inviteNotSent": "Invitation not sent",
     "inviteSentLabel": "Invitation sent",
     "inviteSentAction": "Invite",
