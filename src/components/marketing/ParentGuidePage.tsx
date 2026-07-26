@@ -112,7 +112,6 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
     if (tocRef.current) tocRef.current.open = false;
   };
 
-
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 600);
     onScroll();
@@ -232,7 +231,6 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
             </ul>
           </details>
 
-
           {/* Desktop: horizontal scrollable pills */}
           <ul className="hidden snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] sm:flex [&::-webkit-scrollbar]:hidden">
             {tutorials.map((tuto, i) => {
@@ -265,7 +263,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       </nav>
 
       {/* TUTORIALS */}
-      <section id="tutorials" className="scroll-mt-24 border-b border-border/60">
+      <section id="tutorials" className="scroll-mt-40 border-b border-border/60">
         <div className="mx-auto max-w-6xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
@@ -279,7 +277,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               const Icon = TUTORIAL_ICONS[i] ?? CheckCircle2;
               const slug = TUTORIAL_SLUGS[i] ?? `tuto-${i + 1}`;
               return (
-                <div key={tuto.t} id={`tuto-${i + 1}`} className="scroll-mt-24">
+                <div key={tuto.t} id={`tuto-${i + 1}`} className="scroll-mt-40">
                   {/* Tutorial header */}
                   <div className="flex items-start gap-4 border-l-2 border-primary/40 pl-4">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">
@@ -347,7 +345,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="scroll-mt-24 border-b border-border/60 bg-muted/20">
+      <section id="faq" className="scroll-mt-40 border-b border-border/60 bg-muted/20">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("parentGuide.faqTitle")}
