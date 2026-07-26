@@ -8,6 +8,7 @@ import { Send, MessageCircle, Lock, ChevronDown } from "lucide-react";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
+import { dispatchEventChatPush } from "@/lib/event-chat-notify.functions";
 
 type Msg = {
   id: string;
@@ -154,18 +155,27 @@ export function EventChat({ eventId }: { eventId: string }) {
     const attachmentsToSend = atts;
     setBody("");
     setAtts([]);
-    const { error } = await supabase.from("event_messages").insert({
-      event_id: eventId,
-      author_user_id: user.id,
-      body: text,
-      attachments: attachmentsToSend as unknown as never,
-    });
+    const { data: inserted, error } = await supabase
+      .from("event_messages")
+      .insert({
+        event_id: eventId,
+        author_user_id: user.id,
+        body: text,
+        attachments: attachmentsToSend as unknown as never,
+      })
+      .select("id")
+      .maybeSingle();
     setSending(false);
     if (error) {
       setBody(text);
       setAtts(attachmentsToSend);
       setSendError(t("chat.sendFailed"));
       setCanPost(false);
+      return;
+    }
+    if (inserted?.id) {
+      // Fire-and-forget push fan-out to convoked players, parents and staff.
+      dispatchEventChatPush({ data: { messageId: inserted.id } }).catch(() => {});
     }
   }
 

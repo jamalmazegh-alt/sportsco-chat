@@ -41,6 +41,7 @@ type Settings = {
   wall_new_post: boolean;
   tournament_match_reminder: boolean;
   tournament_draw: boolean;
+  event_chat_new_message: boolean;
 };
 
 const DEFAULTS: Omit<Settings, "club_id"> = {
@@ -54,6 +55,7 @@ const DEFAULTS: Omit<Settings, "club_id"> = {
   wall_new_post: true,
   tournament_match_reminder: true,
   tournament_draw: true,
+  event_chat_new_message: true,
 };
 
 type ToggleKey = keyof Omit<Settings, "club_id">;
@@ -113,6 +115,7 @@ function NotificationsSettingsPage() {
         wall_new_post: next.wall_new_post,
         tournament_match_reminder: next.tournament_match_reminder,
         tournament_draw: next.tournament_draw,
+        event_chat_new_message: next.event_chat_new_message,
       },
       { onConflict: "club_id" },
     );
@@ -194,6 +197,12 @@ function NotificationsSettingsPage() {
           hint="Push aux joueurs et coaches quand un score est saisi."
           checked={form.score_result}
           onChange={(v) => update("score_result", v)}
+        />
+        <Toggle
+          label="Nouveau message dans le chat d'un événement"
+          hint="Push aux convoqués, à leurs parents et au staff (hors auteur, regroupé si plusieurs messages)."
+          checked={form.event_chat_new_message}
+          onChange={(v) => update("event_chat_new_message", v)}
         />
       </Section>
 
