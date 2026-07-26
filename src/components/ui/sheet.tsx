@@ -110,7 +110,6 @@ const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
     className={cn("flex flex-col space-y-2 pr-12 text-center sm:text-left", className)}
     {...props}
   />
-
 );
 SheetHeader.displayName = "SheetHeader";
 
