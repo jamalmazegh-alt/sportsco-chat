@@ -88,7 +88,7 @@ export function EventChat({ eventId }: { eventId: string }) {
     return () => {
       active = false;
     };
-  }, [eventId]);
+  }, [eventId, user?.id]);
 
   async function loadMore() {
     if (loadingMore || messages.length === 0) return;
