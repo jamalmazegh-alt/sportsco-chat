@@ -47,12 +47,32 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
-      .from("email_send_log")
-      .select("recipient_email, status, error_message, message_id, created_at")
-      .eq("template_name", "player-invite")
-      .in("recipient_email", emails)
-      .order("created_at", { ascending: false });
+
+    // Detect linked parents whose auth email is not yet confirmed
+    const unconfirmedUserIds: string[] = [];
+    if (parentUserIds.length > 0) {
+      const { data: authUsers } = await supabaseAdmin
+        .schema("auth")
+        .from("users")
+        .select("id, email_confirmed_at")
+        .in("id", parentUserIds);
+      for (const u of (authUsers ?? []) as Array<{
+        id: string;
+        email_confirmed_at: string | null;
+      }>) {
+        if (!u.email_confirmed_at) unconfirmedUserIds.push(u.id);
+      }
+    }
+
+    const { data: rows } = emails.length
+      ? await supabaseAdmin
+          .from("email_send_log")
+          .select("recipient_email, status, error_message, message_id, created_at")
+          .eq("template_name", "player-invite")
+          .in("recipient_email", emails)
+          .order("created_at", { ascending: false })
+      : { data: [] as any[] };
+
 
     // Latest status per message_id
     const latestByMessage = new Map<
