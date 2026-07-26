@@ -943,8 +943,20 @@
     "confirmResponse": "Antwoord bevestigen",
     "responseRecorded": "Antwoord opgeslagen",
     "coachNotified": "De Coach is geïnformeerd.",
-    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
-    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
+    "reasonsAbsent": [
+      "Werk",
+      "Familie",
+      "Blessure",
+      "Ziekte",
+      "Studie",
+      "Andere verplichting"
+    ],
+    "reasonsUncertain": [
+      "Nog te bevestigen",
+      "Werk",
+      "Familie",
+      "Lichte gezondheidsklachten"
+    ],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",
@@ -1859,7 +1871,10 @@
     "noDriversYet": "Nog geen chauffeur.",
     "iNeedRide": "Vervoer aanvragen",
     "needRideRegistered": "Aanvraag naar de Coach gestuurd",
-    "disabledHint": "Schakel meerijden in zodat ouders plaatsen kunnen aanbieden en reserveren."
+    "disabledHint": "Schakel meerijden in zodat ouders plaatsen kunnen aanbieden en reserveren.",
+    "needsTitle": "Vervoersaanvragen",
+    "cancelNeed": "Mijn aanvraag intrekken",
+    "noNeeds": "Geen vervoersaanvragen."
   },
   "journey": {
     "tab": {

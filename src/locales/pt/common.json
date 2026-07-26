@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
-    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
+    "reasonsAbsent": [
+      "Trabalho",
+      "Família",
+      "Lesão",
+      "Doença",
+      "Estudos",
+      "Outro compromisso"
+    ],
+    "reasonsUncertain": [
+      "A confirmar",
+      "Trabalho",
+      "Família",
+      "Problema de saúde ligeiro"
+    ],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
@@ -1859,7 +1871,10 @@
     "noDriversYet": "Ainda sem condutores.",
     "iNeedRide": "Pedir boleia",
     "needRideRegistered": "Pedido enviado ao treinador",
-    "disabledHint": "Ative as boleias para que os encarregados possam oferecer e reservar lugares."
+    "disabledHint": "Ative as boleias para que os encarregados possam oferecer e reservar lugares.",
+    "needsTitle": "Pedidos de boleia",
+    "cancelNeed": "Retirar o meu pedido",
+    "noNeeds": "Sem pedidos de boleia."
   },
   "journey": {
     "tab": {

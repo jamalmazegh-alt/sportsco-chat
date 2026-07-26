@@ -943,7 +943,14 @@
     "confirmResponse": "Antwort bestätigen",
     "responseRecorded": "Antwort gespeichert",
     "coachNotified": "Der Trainer wurde informiert.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",
@@ -1864,7 +1871,10 @@
     "noDriversYet": "Noch kein Fahrer.",
     "iNeedRide": "Transport anfragen",
     "needRideRegistered": "Anfrage an den Trainer gesendet",
-    "disabledHint": "Aktiviere Mitfahrgelegenheiten, damit Eltern Plätze anbieten und buchen können."
+    "disabledHint": "Aktiviere Mitfahrgelegenheiten, damit Eltern Plätze anbieten und buchen können.",
+    "needsTitle": "Transportanfragen",
+    "cancelNeed": "Meine Anfrage zurückziehen",
+    "noNeeds": "Keine Transportanfragen."
   },
   "journey": {
     "tab": {
