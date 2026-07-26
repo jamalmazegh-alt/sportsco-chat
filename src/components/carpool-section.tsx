@@ -711,13 +711,22 @@ function NeedDialog({
       })
       .select("id")
       .maybeSingle();
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    if (inserted?.id) {
-      notifyStaff({ data: { needId: inserted.id } }).catch(() => undefined);
+    if (error) {
+      setBusy(false);
+      return toast.error(error.message);
     }
+    if (inserted?.id) {
+      try {
+        await notifyStaff({ data: { needId: inserted.id } });
+      } catch (e) {
+        console.error("[carpool] notifyStaff failed", e);
+        toast.error(t("carpool.notifyFailed"));
+      }
+    }
+    setBusy(false);
     onDone();
   }
+
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
