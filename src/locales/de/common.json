@@ -640,6 +640,8 @@
     "respondBoth": "Beide",
     "accountActive": "Konto aktiv",
     "accountInactive": "Kein Konto",
+    "accountUnconfirmed": "E-Mail nicht bestätigt",
+    "accountUnconfirmedHint": "Das Konto existiert, aber die E-Mail wurde noch nicht bestätigt. Der Elternteil muss auf den Bestätigungslink in der E-Mail klicken.",
     "inviteNotSent": "Einladung nicht gesendet",
     "inviteSentLabel": "Einladung gesendet",
     "inviteSentAction": "Einladen",

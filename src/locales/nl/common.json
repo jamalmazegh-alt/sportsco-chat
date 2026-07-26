@@ -640,6 +640,8 @@
     "respondBoth": "Beide",
     "accountActive": "Account actief",
     "accountInactive": "Geen account",
+    "accountUnconfirmed": "E-mail niet bevestigd",
+    "accountUnconfirmedHint": "Het account bestaat, maar de e-mail is nog niet bevestigd. De ouder moet op de bevestigingslink in de e-mail klikken.",
     "inviteNotSent": "Uitnodiging niet verzonden",
     "inviteSentLabel": "Uitnodiging verzonden",
     "inviteSentAction": "Uitnodigen",

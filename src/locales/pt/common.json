@@ -640,6 +640,8 @@
     "respondBoth": "Ambos",
     "accountActive": "Conta ativa",
     "accountInactive": "Sem conta",
+    "accountUnconfirmed": "E-mail não confirmado",
+    "accountUnconfirmedHint": "A conta existe, mas o e-mail ainda não foi confirmado. O responsável deve clicar no link de confirmação recebido por e-mail.",
     "inviteNotSent": "Convite não enviado",
     "inviteSentLabel": "Convite enviado",
     "inviteSentAction": "Convidar",

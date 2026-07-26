@@ -640,6 +640,8 @@
     "respondBoth": "Entrambi",
     "accountActive": "Account attivo",
     "accountInactive": "Nessun account",
+    "accountUnconfirmed": "Email non confermata",
+    "accountUnconfirmedHint": "L'account esiste ma l'email non è ancora stata confermata. Il genitore deve cliccare sul link di conferma ricevuto via email.",
     "inviteNotSent": "Invito non inviato",
     "inviteSentLabel": "Invito inviato",
     "inviteSentAction": "Invita",

@@ -12,6 +12,7 @@ import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getParentInviteStatuses } from "@/lib/players/invite-status.functions";
+import { resolveParentAccountBadge } from "@/lib/players/parent-account-status";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
@@ -1119,7 +1120,10 @@ function PlayerProfile() {
               <ul className="space-y-2">
                 {(parents ?? []).map((pp) => {
                   const linked = !!pp.parent_user_id;
-                  const unconfirmed = linked && unconfirmedParentIds.has(pp.parent_user_id!);
+                  const accountBadge = resolveParentAccountBadge({
+                    parentUserId: pp.parent_user_id,
+                    unconfirmedUserIds: unconfirmedParentIds,
+                  });
                   const displayName = parentDisplayName(pp);
                   const contactLine = parentContactLine(pp, displayName);
                   const emailKey = pp.email?.trim().toLowerCase() ?? "";
@@ -1149,26 +1153,21 @@ function PlayerProfile() {
                           <span
                             className={cn(
                               "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                              linked && !unconfirmed
+                              accountBadge === "active"
                                 ? "bg-present/15 text-present"
-                                : unconfirmed
+                                : accountBadge === "unconfirmed"
                                   ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                                   : "bg-muted text-muted-foreground",
                             )}
                             title={
-                              unconfirmed
-                                ? t("players.accountUnconfirmedHint", {
-                                    defaultValue:
-                                      "Le compte existe mais l'e-mail n'a pas encore été confirmé. Le parent doit cliquer sur le lien de confirmation reçu par e-mail.",
-                                  })
+                              accountBadge === "unconfirmed"
+                                ? t("players.accountUnconfirmedHint")
                                 : undefined
                             }
                           >
-                            {unconfirmed
-                              ? t("players.accountUnconfirmed", {
-                                  defaultValue: "E-mail non confirmé",
-                                })
-                              : linked
+                            {accountBadge === "unconfirmed"
+                              ? t("players.accountUnconfirmed")
+                              : accountBadge === "active"
                                 ? t("players.accountActive")
                                 : t("players.accountInactive")}
                           </span>
