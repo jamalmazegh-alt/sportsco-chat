@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Follow the club wall",
-        "b": "The Wall is your club's announcement feed: the coach and club post the important news, you read it and can reply.",
+        "b": "The Wall is your club's news feed: announcements, posts, polls — and soon the club's social media.",
         "steps": [
-          "Tap the \"Wall\" tab (megaphone icon) at the bottom of the screen.",
-          "Browse the club's and your child's team announcements.",
-          "Open a post to see the details and attachments.",
-          "Reply with \"Reply\" if the club has enabled comments."
+          "Open the \"Wall\" tab: you'll find the club's and coach's announcements and posts (messages, attachments, polls — and, by September 2026, the club's Instagram/Facebook posts).",
+          "Whenever there's a new post, you get a push notification.",
+          "And, depending on the club, possibly an email.",
+          "Interact with posts by leaving a message (if comments are enabled).",
+          "Polls also appear directly in the Wall.",
+          "Tap \"Vote\", select your answer and save.",
+          "See live results (unless the poll is anonymous) — you can change your vote."
         ]
       }
     ],

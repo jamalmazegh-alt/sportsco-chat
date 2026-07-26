@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Seguir el muro del club",
-        "b": "El muro es el feed de anuncios de tu club: el entrenador y el club publican la información importante, tú la lees y puedes responder.",
+        "b": "El muro es el feed de noticias de tu club: anuncios, publicaciones, encuestas — y pronto las redes sociales del club.",
         "steps": [
-          "Pulsa la pestaña «Tablón» (icono de megáfono) en la parte inferior.",
-          "Consulta los anuncios del club y del equipo de tu hijo.",
-          "Abre una publicación para ver el detalle y los archivos adjuntos.",
-          "Responde con «Responder» si el club ha activado los comentarios."
+          "Abre la pestaña «Tablón»: encontrarás los anuncios y publicaciones del club y del entrenador (mensajes, archivos adjuntos, encuestas — y, para septiembre de 2026, las publicaciones de Instagram/Facebook del club).",
+          "Cada vez que hay una nueva publicación, recibes una notificación push.",
+          "Y, según el club, posiblemente un correo.",
+          "Interactúa con las publicaciones dejando un mensaje (si los comentarios están activados).",
+          "Las encuestas también aparecen directamente en el muro.",
+          "Pulsa «Votar», selecciona tu respuesta y guárdala.",
+          "Consulta los resultados en directo (salvo si la encuesta es anónima) — puedes cambiar tu voto."
         ]
       }
     ],

@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Suivre le Mur du club",
-        "b": "Le Mur est le fil d'annonces de votre club : le coach et le club y publient les infos importantes, vous les lisez et pouvez réagir.",
+        "b": "Le Mur est le fil d'actualité de votre club : annonces, publications, sondages — et bientôt les réseaux sociaux du club.",
         "steps": [
-          "Appuyez sur l'onglet « Mur » (icône mégaphone) en bas de l'écran.",
-          "Parcourez les annonces du club et de l'équipe de votre enfant.",
-          "Ouvrez une publication pour voir le détail et les pièces jointes.",
-          "Répondez avec « Répondre » si le club a activé les commentaires."
+          "Ouvrez l'onglet « Mur » : vous y trouvez les annonces et publications du club et du coach (messages, pièces jointes, sondages — et, d'ici septembre 2026, les publications Instagram/Facebook du club).",
+          "À chaque nouvelle publication, vous recevez une notification push.",
+          "Et, selon le choix du club, éventuellement un email.",
+          "Interagissez avec les publications en postant un message (si les commentaires sont activés).",
+          "Les sondages s'affichent aussi directement dans le Mur.",
+          "Appuyez sur « Voter », sélectionnez votre réponse et enregistrez.",
+          "Consultez les résultats en direct (sauf si le sondage est anonyme) — vous pouvez changer votre vote."
         ]
       }
     ],

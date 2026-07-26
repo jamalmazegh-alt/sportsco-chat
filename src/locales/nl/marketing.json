@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Het clubprikbord volgen",
-        "b": "Het prikbord is de nieuwsfeed van je club: de coach en de club plaatsen er belangrijke info, jij leest die en kunt reageren.",
+        "b": "Het prikbord is de nieuwsfeed van je club: aankondigingen, berichten, polls — en binnenkort de social media van de club.",
         "steps": [
-          "Tik onderaan op het tabblad «Prikbord» (megafoonpictogram).",
-          "Blader door de aankondigingen van de club en het team van je kind.",
-          "Open een bericht om de details en bijlagen te zien.",
-          "Reageer met «Reageren» als de club reacties heeft ingeschakeld."
+          "Open het tabblad «Prikbord»: je vindt er de aankondigingen en berichten van de club en de coach (berichten, bijlagen, polls — en, vanaf september 2026, de Instagram/Facebook-berichten van de club).",
+          "Bij elk nieuw bericht ontvang je een pushmelding.",
+          "En, afhankelijk van de club, eventueel een e-mail.",
+          "Reageer op berichten door een bericht te plaatsen (als reacties zijn ingeschakeld).",
+          "Polls verschijnen ook rechtstreeks op het prikbord.",
+          "Tik op «Stemmen», kies je antwoord en sla het op.",
+          "Bekijk de actuele resultaten (behalve bij een anonieme poll) — je kunt je stem wijzigen."
         ]
       }
     ],

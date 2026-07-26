@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Seguire la bacheca del club",
-        "b": "La bacheca è il feed di annunci del tuo club: l'allenatore e il club pubblicano le informazioni importanti, tu le leggi e puoi rispondere.",
+        "b": "La bacheca è il feed di notizie del tuo club: annunci, post, sondaggi — e presto i social del club.",
         "steps": [
-          "Tocca la scheda «Bacheca» (icona megafono) in basso.",
-          "Sfoglia gli annunci del club e della squadra di tuo figlio.",
-          "Apri un post per vedere il dettaglio e gli allegati.",
-          "Rispondi con «Rispondi» se il club ha attivato i commenti."
+          "Apri la scheda «Bacheca»: trovi gli annunci e i post del club e dell'allenatore (messaggi, allegati, sondaggi — e, entro settembre 2026, i post Instagram/Facebook del club).",
+          "A ogni nuovo post ricevi una notifica push.",
+          "E, a seconda del club, eventualmente un'email.",
+          "Interagisci con i post lasciando un messaggio (se i commenti sono attivi).",
+          "Anche i sondaggi compaiono direttamente nella bacheca.",
+          "Tocca «Vota», seleziona la tua risposta e salva.",
+          "Guarda i risultati in tempo reale (tranne se il sondaggio è anonimo) — puoi cambiare il tuo voto."
         ]
       }
     ],

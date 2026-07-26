@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Acompanhar o mural do clube",
-        "b": "O mural é o feed de anúncios do seu clube: o treinador e o clube publicam as informações importantes, você lê-as e pode responder.",
+        "b": "O mural é o feed de notícias do seu clube: anúncios, publicações, sondagens — e em breve as redes sociais do clube.",
         "steps": [
-          "Toque no separador «Mural» (ícone de megafone) na parte inferior.",
-          "Consulte os anúncios do clube e da equipa do seu filho.",
-          "Abra uma publicação para ver o detalhe e os anexos.",
-          "Responda com «Responder» se o clube tiver ativado os comentários."
+          "Abra o separador «Mural»: encontra os anúncios e publicações do clube e do treinador (mensagens, anexos, sondagens — e, até setembro de 2026, as publicações de Instagram/Facebook do clube).",
+          "Sempre que há uma nova publicação, recebe uma notificação push.",
+          "E, consoante o clube, eventualmente um email.",
+          "Interaja com as publicações deixando uma mensagem (se os comentários estiverem ativados).",
+          "As sondagens também aparecem diretamente no mural.",
+          "Toque em «Votar», selecione a sua resposta e guarde.",
+          "Veja os resultados em direto (exceto se a sondagem for anónima) — pode alterar o seu voto."
         ]
       }
     ],

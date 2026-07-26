@@ -1377,12 +1377,15 @@
       },
       {
         "t": "Der Vereinspinnwand folgen",
-        "b": "Die Pinnwand ist der Neuigkeiten-Feed Ihres Vereins: Trainer und Verein veröffentlichen dort wichtige Infos, Sie lesen sie und können antworten.",
+        "b": "Die Pinnwand ist der Neuigkeiten-Feed Ihres Vereins: Ankündigungen, Beiträge, Umfragen — und bald die sozialen Netzwerke des Vereins.",
         "steps": [
-          "Tippen Sie unten auf den Reiter „Pinnwand“ (Megafon-Symbol).",
-          "Durchstöbern Sie die Ankündigungen des Vereins und des Teams Ihres Kindes.",
-          "Öffnen Sie einen Beitrag, um Details und Anhänge zu sehen.",
-          "Antworten Sie mit „Antworten“, wenn der Verein Kommentare aktiviert hat."
+          "Öffnen Sie den Reiter „Pinnwand“: Dort finden Sie die Ankündigungen und Beiträge des Vereins und des Trainers (Nachrichten, Anhänge, Umfragen — und ab September 2026 die Instagram/Facebook-Beiträge des Vereins).",
+          "Bei jedem neuen Beitrag erhalten Sie eine Push-Benachrichtigung.",
+          "Und, je nach Verein, eventuell eine E-Mail.",
+          "Interagieren Sie mit Beiträgen, indem Sie eine Nachricht schreiben (wenn Kommentare aktiviert sind).",
+          "Umfragen werden ebenfalls direkt in der Pinnwand angezeigt.",
+          "Tippen Sie auf „Abstimmen“, wählen Sie Ihre Antwort und speichern Sie.",
+          "Sehen Sie die aktuellen Ergebnisse (außer bei anonymen Umfragen) — Sie können Ihre Stimme ändern."
         ]
       }
     ],
