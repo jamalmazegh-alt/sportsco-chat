@@ -7,6 +7,8 @@
 > Documents liés :
 > - `docs/specs/offre-equipe-architecture-plan.md` — plan d'architecture technique
 > - `docs/specs/offre-equipe-lot-0-bis.md` — durcissement, inventaires et prérequis
+> - `docs/specs/IMPLEMENTATION_ORDER.md` — **ordre de développement imposé, à suivre
+>   étape par étape ; ne jamais développer par fonctionnalité**
 >
 > **Aucun développement fonctionnel ne commence avant validation du Lot 0 bis.**
 
@@ -104,6 +106,20 @@ DISCOVERY_MAX_TEAMS_PER_CLUB          = 2
 
 La couverture Découverte est rattachée à **l'équipe**, pas définitivement à son créateur ;
 le quota par créateur s'évalue au moment de l'octroi (voir §6.1).
+
+**Seules les équipes réellement en état Découverte consomment un quota.** Une équipe en
+lecture seule ne réserve jamais une place Découverte — ni pour elle-même, ni pour son
+porteur. Une équipe en essai, payante, couverte par le Club, archivée ou expirée ne
+consomme rien.
+
+```text
+U13 Découverte · U15 Découverte · U17 lecture seule   → club à 2/2, pas 3/2
+puis U13 devient payante                              → club à 1/2
+→ U17 peut alors redevenir Découverte, sur demande explicite (§6.4)
+```
+
+Cette règle est structurellement garantie : le quota se compte sur les lignes de
+couverture Découverte vivantes, et une équipe en lecture seule n'en possède aucune.
 
 ### 1.2 Offre Équipe
 
@@ -331,6 +347,20 @@ Exigence : vérification et insertion dans **une même transaction**, avec verro
 sur l'équipe ; RPC transactionnelle comme seul chemin d'ajout ; trigger de défense en
 profondeur.
 
+**Le verrou ne s'applique qu'aux offres à quota.** Résoudre le quota **avant** de prendre
+le verrou : si `maxPlayers = null` (offre Équipe ou Club), aucun verrou, aucun comptage,
+insertion directe.
+
+```text
+quota = resolve_quota(team_id)
+SI quota EST NULL  → insertion normale, sans verrou ni comptage
+SINON              → FOR UPDATE, comptage, contrôle, insertion
+```
+
+Sans cette règle, une équipe de 300 joueurs en offre Club sérialiserait tous ses ajouts
+sur un verrou qui ne sert à rien. La contention n'est justifiée que là où une limite
+existe, c'est-à-dire uniquement en Découverte.
+
 Test obligatoire : équipe à 14 joueurs actifs, quota 15, deux insertions concurrentes
 réelles → **jamais plus de 15**.
 
@@ -498,8 +528,8 @@ l'offre Club.
 ## 8. Modèle technique de couverture
 
 ```sql
-clubs.billing_mode text NOT NULL DEFAULT 'club'
-  CHECK (billing_mode IN ('club', 'per_team'))
+clubs.coverage_mode text NOT NULL DEFAULT 'club'
+  CHECK (coverage_mode IN ('club', 'per_team'))
 ```
 
 ```text
@@ -508,7 +538,7 @@ per_team = club réel dont les équipes sont couvertes individuellement
            par Découverte, essai ou abonnement Équipe
 ```
 
-Tous les clubs existants restent en `billing_mode='club'`. L'onboarding Découverte ou
+Tous les clubs existants restent en `coverage_mode='club'`. L'onboarding Découverte ou
 Équipe crée un club en `per_team`. Le trigger `auto_create_trial_subscription` doit
 **ignorer les clubs `per_team`**. Le parcours tournoi personnel reste inchangé.
 
@@ -521,9 +551,9 @@ Les invariants critiques ne doivent dépendre ni du code applicatif ni des tests
 ### 9.1 Interdiction d'une offre Club active sur un club `per_team`
 
 Garde-fou DB empêchant qu'une ligne `subscriptions` active, en essai ou exemptée soit
-associée **durablement** à un club `billing_mode='per_team'`. Seule exception : le flux
+associée **durablement** à un club `coverage_mode='per_team'`. Seule exception : le flux
 contrôlé de passage vers l'offre Club, qui bascule explicitement le club en
-`billing_mode='club'`.
+`coverage_mode='club'`.
 
 Un `CHECK` inter-tables étant impossible, utiliser un trigger, une fonction
 transactionnelle ou une RPC SECURITY DEFINER dédiée. **Le garde-fou doit couvrir les
@@ -534,7 +564,7 @@ transactionnelle ou une RPC SECURITY DEFINER dédiée. **Le garde-fou doit couvr
 Modifier `can_create_tournament` pour vérifier explicitement :
 
 ```text
-clubs.billing_mode = 'club'
+clubs.coverage_mode = 'club'
 AND club_has_active_subscription(club_id) = true
 ```
 
@@ -885,7 +915,7 @@ d'événements. C'est une **saga idempotente**, pas une transaction SQL unique.
 1. lancer le checkout Club ;
 2. attendre la confirmation Stripe de l'abonnement Club actif ;
 3. enregistrer ou confirmer la souscription Club ;
-4. basculer `billing_mode='club'` via le flux contrôlé (§9.1) ;
+4. basculer `coverage_mode='club'` via le flux contrôlé (§9.1) ;
 5. la précédence `club_plan` couvre immédiatement toutes les équipes ;
 6. identifier toutes les `team_subscriptions` encore vivantes ;
 7. marquer la migration financière comme en cours ;
@@ -1137,7 +1167,7 @@ Document dédié (`docs/specs/offre-equipe-lot-0-bis.md`) contenant :
 
 - **Lot 0 — Architecture initiale.** Produit.
 - **Lot 0 bis — Durcissement et inventaires.** Obligatoire avant tout code fonctionnel.
-- **Lot 1 — Modèle de couverture.** `clubs.billing_mode` ; modèle Découverte ;
+- **Lot 1 — Modèle de couverture.** `clubs.coverage_mode` ; modèle Découverte ;
   `team_subscriptions` ; exemptions corrigées ; helpers de couverture ; garde-fous DB ;
   trigger d'essai ; RLS de base ; tests tournoi ; feature flag.
 - **Lot 2 — Onboarding et rattachement simple.** Recherche de club ; demande de
@@ -1198,7 +1228,7 @@ Les lots 7 et 8 doivent pouvoir avoir des flags séparés.
 14. **Aucun rapprochement de deux clubs n'est implémenté en V1.**
 15. Une offre Équipe ou Découverte ne permet jamais de créer un tournoi.
 16. Le blocage tournoi est protégé par la DB **et** par le contrôle explicite de
-    `billing_mode` dans `can_create_tournament`.
+    `coverage_mode` dans `can_create_tournament`.
 17. Une ligne `subscriptions` injectée par erreur ne débloque pas un club `per_team`.
 18. `club_has_active_subscription` conserve sa sémantique Club.
 19. Les états Découverte, grâce et lecture seule sont dérivés par une source unique.
@@ -1250,7 +1280,7 @@ Upsell Club : informatif à 3, visible à 4, fort à 5
 Tournoi : offre séparée existante
 Pas de fusion automatique d'équipes ni de clubs
 Rapprochement de deux clubs : hors V1, chantier ultérieur
-Contrôle tournoi : billing_mode explicite + garde-fou DB
+Contrôle tournoi : coverage_mode explicite + garde-fou DB
 
 — tranché en dernier lieu —
 Période de grâce : TEAM_BILLING_GRACE_DAYS = 14, configurable, non réinitialisable

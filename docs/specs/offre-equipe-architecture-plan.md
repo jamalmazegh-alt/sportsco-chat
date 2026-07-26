@@ -12,8 +12,8 @@
 
 ```sql
 ALTER TABLE public.clubs
-  ADD COLUMN billing_mode text NOT NULL DEFAULT 'club'
-  CHECK (billing_mode IN ('club', 'per_team'));
+  ADD COLUMN coverage_mode text NOT NULL DEFAULT 'club'
+  CHECK (coverage_mode IN ('club', 'per_team'));
 
 -- Nécessaire à la suggestion de club existant (§4.4 du prompt) — vérifier si une
 -- colonne de localisation existe déjà avant de l'ajouter.
@@ -174,18 +174,42 @@ CREATE TABLE public.club_attach_requests (         -- rattachement (§4.3 du pro
 `club_plan_migrations` rend la saga observable et reprenable — c'est ce qui la distingue
 d'une suite d'appels Stripe non traçable.
 
-### 1.6 Hors périmètre V1
+### 1.6 Terrain préparé, non implémenté en V1 — `billing_delegates`
+
+En V1, `team_subscriptions.billing_owner_user_id` porte **un seul** responsable. Le besoin
+« le président souscrit, le trésorier gère Stripe » viendra ; il ne doit pas imposer une
+refonte.
+
+Préparation retenue, **sans table créée en V1** :
+
+- `can_manage_team_billing(_user_id, _team_id)` est déjà une **fonction**, pas une
+  comparaison `billing_owner_user_id = auth.uid()` en dur. Toutes les server functions et
+  policies passent par elle. Le jour où les délégués existent, seule cette fonction
+  change ;
+- aucun appel ne compare directement `billing_owner_user_id` à l'utilisateur courant —
+  règle à faire respecter en revue de code, sous peine de disperser la logique ;
+- nom réservé pour la table future :
+
+```sql
+-- FUTUR — hors V1, ne pas créer maintenant
+-- billing_delegates (team_subscription_id, user_id, granted_by, granted_at, revoked_at)
+-- can_manage_team_billing() consultera cette table en plus du billing_owner
+```
+
+Le modèle V1 est donc un cas particulier du modèle cible (zéro délégué), pas un modèle
+concurrent.
+
+### 1.7 Hors périmètre V1
 
 Pas de moteur d'entitlements en base (module serveur typé, §3). Pas de `max_players` en
 base (config serveur surchargeable par env). **Pas de table ni de procédure de fusion de
-clubs** (§4.5 du prompt). Pas d'état « archivé » sur les joueurs tant que la décision du
-Lot 0 bis §28.9.A n'est pas prise.
+clubs** (§4.5 du prompt). Pas de table `billing_delegates` (§1.6).
 
 ## 2. Migrations — ordre
 
-1. `clubs.billing_mode` (+ `city`, `postal_code` si absentes).
+1. `clubs.coverage_mode` (+ `city`, `postal_code` si absentes).
 2. Ajustement du trigger `auto_create_trial_subscription` : early return si
-   `NEW.billing_mode = 'per_team'` (même motif que l'exclusion `is_personal` existante,
+   `NEW.coverage_mode = 'per_team'` (même motif que l'exclusion `is_personal` existante,
    `20260604212414_…sql:8`).
 3. `teams.created_by_user_id`.
 4. `team_subscriptions` + index + triggers (cohérence `club_id`, `updated_at`).
@@ -195,12 +219,12 @@ Lot 0 bis §28.9.A n'est pas prise.
 8. RPC transactionnelles (§4).
 9. Garde-fous : trigger anti-abonnement Club sur `per_team`, trigger quota joueurs,
    trigger quota Découverte club.
-10. `can_create_tournament` avec contrôle explicite de `billing_mode`.
+10. `can_create_tournament` avec contrôle explicite de `coverage_mode`.
 11. Policies RLS + REVOKE colonnes.
 12. **Correctif `exempt_until`** — uniquement après l'audit du Lot 0 bis §28.7.
 
 Toutes additives sauf 2, 10 et 12, qui modifient des objets existants avec un comportement
-**identique** pour les clubs `billing_mode='club'` (soit 100 % de l'existant).
+**identique** pour les clubs `coverage_mode='club'` (soit 100 % de l'existant).
 
 ## 3. Fonctions et RLS
 
@@ -231,7 +255,7 @@ get_team_billing_status(_team_id)      → RPC de statut simplifié pour les mem
 d'`exempt_until` est corrigé, sous contrôle de l'audit.
 
 `can_create_tournament` est modifiée pour tester **explicitement**
-`clubs.billing_mode = 'club'` en plus de `club_has_active_subscription(club_id)` —
+`clubs.coverage_mode = 'club'` en plus de `club_has_active_subscription(club_id)` —
 plus sûr que de dépendre de l'absence d'une ligne `subscriptions`.
 
 ### Policies
@@ -279,16 +303,35 @@ le refus quand son fichier contient surtout des mises à jour.
 
 ### 4.1 `add_player_to_team`
 
-Seul chemin d'ajout autorisé. Verrou `SELECT … FROM teams WHERE id = _team_id FOR UPDATE`
-(sérialise par équipe, sans bloquer les autres) → résolution du quota (`null` = illimité →
-court-circuit, coût nul pour les offres payantes) → comptage des joueurs actifs →
-`RAISE 'CLUBERO_PLAYER_QUOTA_EXCEEDED'` si dépassement → insertion dans la même
-transaction. Trigger de défense en profondeur sur `team_members`.
+Seul chemin d'ajout autorisé. **Ordre imposé — la résolution du quota précède le verrou :**
+
+```text
+quota := resolve_quota(_team_id)
+
+IF quota IS NULL THEN                     -- offre Équipe ou Club
+  INSERT directement                      -- aucun verrou, aucun comptage
+  RETURN
+END IF
+
+SELECT ... FROM teams WHERE id = _team_id FOR UPDATE   -- Découverte uniquement
+count := count_active_players(_team_id)
+IF count >= quota THEN RAISE 'CLUBERO_PLAYER_QUOTA_EXCEEDED'
+INSERT player + team_members
+```
+
+Prendre le verrou avant de savoir s'il y a un quota sérialiserait inutilement les ajouts
+sur les équipes illimitées : une équipe de 300 joueurs en offre Club paierait la contention
+d'une limite qui ne s'applique pas à elle. Le verrou porte sur la ligne `teams`, donc deux
+ajouts sur des équipes différentes ne se bloquent jamais.
+
+Trigger de défense en profondeur sur `team_members` — lui aussi court-circuité quand le
+quota est `null`.
 
 ### 4.2 `import_players_to_team`
 
-Même verrou ; rejet du **lot entier avant toute insertion** si
-`count + lignes_valides > quota`. Aucune insertion partielle.
+Même ordre : quota résolu d'abord, verrou seulement si `quota IS NOT NULL`. Rejet du **lot
+entier avant toute insertion** si `count + consommation > quota` (§4.5). Aucune insertion
+partielle.
 
 ### 4.3 `downgrade_team_to_discovery`
 
@@ -407,9 +450,9 @@ redirigés vers la RPC ; `import.functions.ts` (lot atomique).
 `clubs.is_personal` inchangé, réservé au parcours tournoi.
 
 **Offre Club.** Aucun changement de schéma sur `subscriptions` ; trigger identique pour
-`billing_mode='club'` ; webhook Club inchangé. Cas A sans changement de `club_id`.
+`coverage_mode='club'` ; webhook Club inchangé. Cas A sans changement de `club_id`.
 
-**Tournois.** Contrôle explicite `billing_mode` + garde-fou DB ; six tests de régression
+**Tournois.** Contrôle explicite `coverage_mode` + garde-fou DB ; six tests de régression
 (§9.2 du prompt) dont « ligne `subscriptions` injectée par erreur → refusé ».
 
 **i18n.** Nouvelles clés dans les 7 locales (couverture inégale de `nl` constatée) ;
@@ -437,7 +480,7 @@ suppression) ; sécurité recherche de club ; E2E (onboarding, ajout d'équipe, 
 | Saga bloquée en `failed_partial` → équipe encore facturée | État persisté, alerte, reprise manuelle, visibilité superadmin |
 | Trigger d'essai modifié cassant la création de clubs classiques | Early return `per_team` ; test « club classique reçoit son essai 14 j » |
 | Branche webhook interceptant des événements Club | Routage strict sur `metadata.purpose` ; défaut = flux actuel |
-| Déblocage tournois accidentel | Contrôle explicite `billing_mode` + garde-fou DB + 6 tests |
+| Déblocage tournois accidentel | Contrôle explicite `coverage_mode` + garde-fou DB + 6 tests |
 | Recherche de club servant à énumérer la base | Fail-closed, longueur minimale, plafond sans pagination, identifiants opaques |
 | Suppression RGPD laissant une souscription orpheline | `user_has_active_billing_responsibilities` avant suppression |
 | Rattachement Lot 8 : rayon RLS du changement de `club_id` | Lot isolé en fin de chantier, conflits bloqués, fusion de clubs hors V1 |

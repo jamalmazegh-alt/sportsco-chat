@@ -25,7 +25,7 @@ service role et `supabaseAdmin`**, qui contournent la RLS.
 ### A. Anti-abonnement Club sur un club `per_team`
 
 Interdire qu'une ligne `subscriptions` active, en essai ou exemptée soit associée
-durablement à un club `billing_mode='per_team'`.
+durablement à un club `coverage_mode='per_team'`.
 
 Un `CHECK` inter-tables étant impossible en Postgres, retenir un **trigger
 `BEFORE INSERT OR UPDATE` sur `subscriptions`** qui lève une exception si le club cible
@@ -38,12 +38,12 @@ comportement si la migration échoue en cours de route.
 
 ### B. Contrôle tournoi explicite
 
-`can_create_tournament` doit tester `clubs.billing_mode = 'club'` **en plus de**
+`can_create_tournament` doit tester `clubs.coverage_mode = 'club'` **en plus de**
 `club_has_active_subscription(club_id)`. Ne pas déduire le mode commercial de la seule
 existence d'une souscription.
 
 Livrable : la nouvelle définition de la fonction, et la vérification que les clubs
-existants (`billing_mode='club'` par défaut) conservent un comportement strictement
+existants (`coverage_mode='club'` par défaut) conservent un comportement strictement
 identique.
 
 ### C. Cohérence `team_subscriptions.club_id`
@@ -76,6 +76,13 @@ ultime, pas la logique applicative.
   base, indépendante de toute logique applicative ;
 - quota **par club** (2 maximum) : non exprimable par un index → garanti par une
   transaction verrouillée sur le club **plus** un trigger de défense en profondeur.
+
+**Règle de comptage — seules les équipes réellement en état Découverte consomment un
+quota.** Une équipe en lecture seule ne réserve jamais une place, ni pour elle-même ni
+pour son porteur. Structurellement : le comptage porte sur les lignes
+`team_discovery_coverage` avec `revoked_at IS NULL` ; une équipe en lecture seule n'en
+possède aucune. Les états essai, payant, couvert par le Club, archivé et expiré ne
+consomment rien.
 
 ### Livrables
 
@@ -207,7 +214,7 @@ transaction SQL unique : elle traverse Stripe, plusieurs webhooks et plusieurs t
 ```text
 pending        → checkout Club lancé
 club_confirmed → abonnement Club actif confirmé par Stripe
-mode_switched  → billing_mode basculé, couverture Club effective
+mode_switched  → coverage_mode basculé, couverture Club effective
 stopping       → arrêt des team_subscriptions demandé à Stripe
 completed      → toutes les team_subscriptions résolues
 failed_partial → au moins un arrêt Stripe a échoué, reprise requise
@@ -589,16 +596,28 @@ croissants.
 
 Contrôle applicatif `count` puis `insert` **interdit**.
 
-RPC transactionnelle unique, seul chemin d'ajout autorisé :
+RPC transactionnelle unique, seul chemin d'ajout autorisé. **Le quota est résolu AVANT le
+verrou** — prendre un verrou sur une équipe sans limite est une contention pure perte :
 
 ```text
 add_player_to_team(_team_id, _player_payload)
-  → SELECT ... FROM teams WHERE id = _team_id FOR UPDATE   (sérialise par équipe)
-  → résolution du quota (null = illimité → court-circuit, coût nul pour les offres payantes)
-  → comptage des joueurs actifs
-  → IF count >= quota THEN RAISE 'CLUBERO_PLAYER_QUOTA_EXCEEDED'
-  → INSERT player + team_members
+
+  quota := resolve_quota(_team_id)
+
+  SI quota EST NULL                        -- offre Équipe ou Club
+    → INSERT direct, sans verrou ni comptage
+    → RETURN
+
+  SINON                                    -- Découverte uniquement
+    → SELECT ... FROM teams WHERE id = _team_id FOR UPDATE   (sérialise par équipe)
+    → count := count_active_players(_team_id)
+    → IF count >= quota THEN RAISE 'CLUBERO_PLAYER_QUOTA_EXCEEDED'
+    → INSERT player + team_members
 ```
+
+Une équipe de 300 joueurs en offre Club ne doit jamais sérialiser ses ajouts sur un verrou
+qui ne protège aucune limite. Même règle pour `import_players_to_team` et pour le trigger
+de défense en profondeur, tous deux court-circuités quand le quota est `null`.
 
 Trigger de défense en profondeur sur `team_members` : recompte et refuse le dépassement,
 couvrant tout chemin contournant la RPC. Filet, pas mécanisme principal.
@@ -644,6 +663,10 @@ Exécutés avec **deux transactions réelles simultanées**, pas une simulation 
 ```text
 équipe à 14 joueurs, quota 15, deux insertions concurrentes
   → exactement une réussite, effectif final 15, jamais 16
+équipe en offre Club (quota null), deux insertions concurrentes
+  → les deux réussissent, aucun verrou pris
+club à 2 équipes Découverte + 1 équipe en lecture seule
+  → quota club = 2/2 (l'équipe en lecture seule ne réserve rien)
 deux bascules Découverte concurrentes, club à 1 équipe Découverte
   → exactement une réussite
 deux bascules concurrentes pour le même porteur
