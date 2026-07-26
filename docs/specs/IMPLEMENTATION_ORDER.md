@@ -38,6 +38,86 @@ SQL existants.
 
 ---
 
+## 0 bis. Quatre règles non négociables
+
+Elles priment sur tout le reste de ce document en cas de doute.
+
+### R1 — Une migration à la fois, jamais de « mega migration »
+
+Chaque migration touchant une table critique (`team_members`, `clubs`, `subscriptions`,
+`teams`) est **indépendante** :
+
+```text
+Migration → Déploiement → 24 à 48 h d'observation → Migration suivante
+```
+
+Ne jamais regrouper plusieurs `ALTER TABLE` sur des tables différentes dans un même
+fichier, ni enchaîner deux migrations sensibles dans la même fenêtre de déploiement. Si
+un incident survient, on doit pouvoir désigner **une seule** migration comme cause.
+
+### R2 — Le webhook Stripe doit rester à l'identique tant qu'aucune équipe `per_team` n'existe
+
+**Invariant vérifiable** : tant qu'aucune ligne `team_subscriptions` n'existe en
+production, le comportement du webhook doit être **strictement identique** à aujourd'hui,
+octet pour octet dans ses effets.
+
+```text
+metadata.purpose absent          → ANCIEN code, chemin inchangé   ← branche par défaut
+metadata.purpose = "team_plan"   → nouveau code
+```
+
+**Jamais l'inverse.** Le nouveau code n'est jamais la branche par défaut ; il est
+strictement conditionné à la présence de la métadonnée. Un événement mal formé, une
+métadonnée manquante, un événement ancien rejoué : tous retombent sur le chemin existant.
+
+Test de non-régression obligatoire avant tout déploiement du webhook modifié : rejouer un
+échantillon d'événements Stripe réels antérieurs au chantier et vérifier que les écritures
+produites sont identiques à celles du code actuel.
+
+C'est le composant qui peut casser le plus **discrètement** : une erreur ici ne se voit pas
+dans l'UI, elle se voit sur les abonnements des clubs existants, plusieurs jours après.
+
+### R3 — Mode sombre obligatoire jusqu'à zéro divergence
+
+Pour toute nouvelle fonction de couverture (`get_team_coverage`, `team_has_paid_access`,
+`team_can_manage_content`, `team_can_operate_events`, `team_can_respond`,
+`get_team_access_state`) :
+
+```text
+ancienne logique  → DÉCIDE
+nouvelle logique  → calculée
+si différent      → journalisé
+                  → l'ANCIENNE décide quand même
+```
+
+Cette obligation ne se lève pas au bout d'un délai, mais **à l'atteinte de zéro divergence
+inexpliquée** sur une période d'observation continue. Une divergence « comprise mais
+acceptée » n'est pas une divergence résolue : soit la nouvelle fonction est corrigée, soit
+l'écart est documenté comme changement de comportement **voulu**, validé explicitement.
+
+### R4 — Arrêt obligatoire après chaque phase
+
+**Ne jamais développer les huit lots d'un seul tenant.**
+
+```text
+Phase A → ARRÊT → revue humaine → autorisation explicite
+Phase B → ARRÊT → revue humaine → autorisation explicite
+Phase C → ARRÊT → revue humaine → autorisation explicite
+Phase D → ARRÊT → revue humaine → autorisation explicite
+Phase E
+```
+
+Aucune phase ne s'enchaîne automatiquement sur la précédente, même si tous les tests
+passent, même si le calendrier le voudrait, même si la phase suivante paraît triviale.
+
+> **Instruction directe à tout agent travaillant sur ce chantier :** à la fin d'une phase,
+> s'arrêter, résumer ce qui a été fait, lister ce qui reste, et **attendre une
+> autorisation explicite**. Ne pas enchaîner. Ne pas « prendre de l'avance sur la phase
+> suivante pendant que la revue est en cours ». La discipline d'exécution est le dernier
+> garde-fou, et c'est celui qu'aucun document ne peut imposer à votre place.
+
+---
+
 ## 1. Séquence par phases
 
 Les huit lots fonctionnels sont regroupés en cinq phases de déploiement. **La phase est
@@ -46,15 +126,18 @@ résultats de la précédente.
 
 ```text
 Phase A — Sans impact utilisateur          (additif pur)
-   ↓  ← point d'arrêt et revue
+   ↓  ← ARRÊT OBLIGATOIRE — revue humaine — autorisation explicite (R4)
 Phase B — Mode sombre                      (calcul parallèle, aucune décision)
-   ↓  ← point d'arrêt et revue des divergences
+   ↓  ← ARRÊT — revue des divergences — zéro divergence inexpliquée exigée (R3)
 Phase C — Nouveau parcours uniquement      (clubs per_team neufs, bêta restreinte)
-   ↓  ← point d'arrêt et revue
+   ↓  ← ARRÊT — revue humaine — autorisation explicite
 Phase D — Enforcement                      (quotas, lecture seule, policies A)
-   ↓  ← point d'arrêt et revue
+   ↓  ← ARRÊT — revue humaine — autorisation explicite
 Phase E — Migration Équipe → Club          (après semaines de stabilité)
 ```
+
+Chaque flèche est un point d'arrêt dur, pas une transition. Le critère de sortie d'une
+phase est une **autorisation humaine explicite**, pas la réussite des tests.
 
 ### Phase A — Sans impact sur les utilisateurs
 
@@ -70,7 +153,7 @@ Le trigger `auto_create_trial_subscription` et `can_create_tournament` font l'ob
 
 ### Phase B — Mode sombre
 
-Les nouvelles fonctions de couverture sont **calculées mais ne décident rien** :
+Les nouvelles fonctions de couverture sont **calculées mais ne décident rien** (R3) :
 
 ```text
 ancien_droit  = logique actuelle          → DÉCIDE
@@ -78,9 +161,16 @@ nouveau_droit = get_team_coverage etc.    → calculé, journalisé, ne décide 
 divergence    → journalisée, jamais bloquante
 ```
 
-Aucun utilisateur n'est bloqué par la nouvelle logique. On bascule seulement après
-analyse des écarts et explication de **chaque** divergence — une divergence non expliquée
-est un bug, pas un cas particulier.
+Aucun utilisateur n'est bloqué par la nouvelle logique.
+
+**Critère de sortie : zéro divergence inexpliquée**, pas une durée écoulée. Chaque écart
+est soit corrigé dans la nouvelle fonction, soit documenté comme changement de
+comportement voulu et validé explicitement. Une divergence « comprise mais laissée en
+l'état » ne compte pas comme résolue.
+
+À instrumenter : volume de divergences par type, par club, par état de couverture. Un
+écart isolé sur un club atypique et un écart systématique sur toute une catégorie ne se
+traitent pas de la même façon — et seul le comptage permet de les distinguer.
 
 ### Phase C — Nouveau parcours uniquement
 
@@ -342,7 +432,8 @@ chemins cohabitent aujourd'hui dans les mêmes fichiers.
 
 ## 8. Règles transverses
 
-1. **Une migration par objet logique** — le rollback doit pouvoir être partiel.
+1. **Une migration par objet logique, une migration à la fois** (R1) — déploiement isolé,
+   24 à 48 h d'observation avant la suivante. Le rollback doit pouvoir être partiel.
 2. **Aucune policy sans son test** dans le même commit.
 3. **`bun run check:guards`** après chaque ajout de server function.
 4. **`bun run check:i18n`** vert avant tout merge touchant l'UI.
@@ -372,7 +463,12 @@ Interrompre et remonter le point plutôt que de contourner :
 - la seule façon de faire passer un test est de désactiver une RLS ;
 - **une divergence du mode sombre ne s'explique pas** ;
 - **des doublons `(team_id, player_id)` réapparaissent après correction** ;
-- **une migration de retour n'a pas été écrite ou n'a pas été testée**.
+- **une migration de retour n'a pas été écrite ou n'a pas été testée** ;
+- **le rejeu d'événements Stripe antérieurs produit des écritures différentes de
+  l'existant** (violation de R2) ;
+- **une phase s'apprête à s'enchaîner sans autorisation explicite** (violation de R4) ;
+- **plusieurs migrations sensibles sont sur le point d'être déployées ensemble**
+  (violation de R1).
 
 Chacun de ces signaux indique que la spécification est en train d'être contournée, pas
 appliquée.

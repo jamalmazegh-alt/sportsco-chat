@@ -226,6 +226,11 @@ clubs** (§4.5 du prompt). Pas de table `billing_delegates` (§1.6).
 Toutes additives sauf 2, 10 et 12, qui modifient des objets existants avec un comportement
 **identique** pour les clubs `coverage_mode='club'` (soit 100 % de l'existant).
 
+**Cette numérotation est un ordre logique, pas un plan de déploiement.** Chaque migration
+touchant `team_members`, `clubs`, `subscriptions` ou `teams` part **seule**, suivie de 24
+à 48 h d'observation avant la suivante (règle R1 de `IMPLEMENTATION_ORDER.md`). Les
+étapes 2, 10 et 12 relèvent en outre de releases dédiées, isolées du reste.
+
 ## 3. Fonctions et RLS
 
 ### Fonctions de couverture (SECURITY DEFINER, STABLE, `search_path = public`)
@@ -386,9 +391,27 @@ ordonnanceur externe).
   reprenable, ou passer la ligne à `incomplete_expired`, ou l'invalider → seulement
   ensuite créer une session. Jamais d'erreur d'unicité brute exposée.
 - Webhook : branche `metadata.purpose === "team_plan"` dans `handleStripeWebhookPost`, à
-  côté des branches tournoi. **`upsertSubscription` (club) n'est appelé que si la
-  métadonnée est absente**, préservant le flux Club. Résolution de secours par
-  `stripe_subscription_id`. Idempotence par `stripe_webhook_events`.
+  côté des branches tournoi. Idempotence par `stripe_webhook_events`.
+
+  **Invariant R2 — l'ancien chemin est la branche par défaut.** Tant qu'aucune ligne
+  `team_subscriptions` n'existe en production, le webhook doit se comporter **exactement**
+  comme aujourd'hui :
+
+  ```text
+  metadata.purpose absent        → ANCIEN code, chemin inchangé   ← défaut
+  metadata.purpose = "team_plan" → nouveau code
+  ```
+
+  **Jamais l'inverse** : le nouveau code n'est jamais atteint par défaut. Un événement mal
+  formé, une métadonnée manquante, un événement ancien rejoué retombent tous sur le chemin
+  existant. La résolution de secours par `stripe_subscription_id` ne s'applique qu'**à
+  l'intérieur** de la branche `team_plan`, jamais pour décider d'y entrer.
+
+  Test de non-régression avant déploiement : rejouer un échantillon d'événements Stripe
+  réels antérieurs au chantier et vérifier que les écritures produites sont identiques à
+  celles du code actuel. C'est le composant qui casse le plus discrètement — une erreur ne
+  se voit pas dans l'UI, mais sur les abonnements des clubs existants, plusieurs jours
+  plus tard.
 - Nouveaux prix `STRIPE_PRICE_TEAM_MONTHLY` (9,99 €) et `STRIPE_PRICE_TEAM_YEARLY`
   (99,99 €) dans `src/lib/stripe.server.ts`, surchargeables par env comme les prix
   existants.
