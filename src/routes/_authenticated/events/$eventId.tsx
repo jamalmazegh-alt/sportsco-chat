@@ -710,14 +710,16 @@ function EventDetail() {
   }, [convocations, user]);
 
   const { data: childrenLinks } = useQuery({
-    queryKey: ["my-children", user?.id],
+    // NB: clé distincte de ["my-children"] (profil/privacy) qui renvoie des
+    // objets joueur — une collision de cache vidait cette liste d'IDs.
+    queryKey: ["my-children-ids", user?.id],
     enabled: !!user && !isCoach,
     queryFn: async () => {
       const { data } = await supabase
         .from("player_parents")
         .select("player_id")
         .eq("parent_user_id", user!.id);
-      return (data ?? []).map((d) => d.player_id);
+      return (data ?? []).map((d) => d.player_id).filter((id): id is string => !!id);
     },
   });
 

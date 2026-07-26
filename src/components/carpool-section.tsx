@@ -84,16 +84,16 @@ export function CarpoolSection({
     },
   });
 
+  const carpoolIds = useMemo(() => carpools.map((c) => c.id).sort(), [carpools]);
+
   const { data: passengers = [] } = useQuery({
-    queryKey: ["carpool-passengers", eventId],
-    enabled: carpools.length >= 0,
+    queryKey: ["carpool-passengers", eventId, carpoolIds],
     queryFn: async () => {
-      const ids = carpools.map((c) => c.id);
-      if (ids.length === 0) return [] as Passenger[];
+      if (carpoolIds.length === 0) return [] as Passenger[];
       const { data, error } = await supabase
         .from("carpool_passengers")
         .select("*")
-        .in("carpool_id", ids);
+        .in("carpool_id", carpoolIds);
       if (error) throw error;
       return (data ?? []) as Passenger[];
     },
@@ -568,7 +568,16 @@ function ReserveDialog({
       player_ids: selected,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message || "";
+      if (msg.includes("already_booked_in_another_carpool"))
+        return toast.error(
+          "Vous avez déjà réservé une place dans un autre véhicule pour cet événement.",
+        );
+      if (msg.includes("driver_cannot_book_own_car"))
+        return toast.error("Vous êtes le conducteur de ce véhicule.");
+      return toast.error(msg);
+    }
     onDone();
   }
 
