@@ -221,7 +221,6 @@ export function EventsFilterSheet({
             </div>
           </Section>
 
-
           {/* Home / Away */}
           {(draft.types.size === 0 ||
             draft.types.has("match") ||
@@ -344,7 +343,6 @@ export function EventsFilterSheet({
             </div>
           </Section>
         </div>
-
 
         <SheetFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="ghost" onClick={reset} className="flex-1 sm:flex-none">
