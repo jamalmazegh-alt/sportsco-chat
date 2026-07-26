@@ -140,7 +140,6 @@ export const createPublication = createServerFn({ method: "POST" })
       }
     }
 
-
     return {
       publicationId,
       dispatchRowId,
@@ -198,8 +197,6 @@ export const republishPublication = createServerFn({ method: "POST" })
         console.error("[republishPublication] dispatchPublicationPush failed", e);
       }
     }
-
-
 
     return {
       dispatchRowId,

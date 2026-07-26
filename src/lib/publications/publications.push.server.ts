@@ -28,7 +28,11 @@ const I18N: Record<string, Copy> = {
     message: "Nouveau message du club",
     body: (a) => `${a} attend votre réponse`,
   },
-  en: { poll: "New poll", message: "New club post", body: (a) => `${a} is waiting for your answer` },
+  en: {
+    poll: "New poll",
+    message: "New club post",
+    body: (a) => `${a} is waiting for your answer`,
+  },
   de: {
     poll: "Neue Umfrage",
     message: "Neue Vereinsnachricht",
@@ -97,7 +101,10 @@ export async function dispatchPublicationPush(
         .maybeSingle();
       authorName =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [(author as any)?.first_name, (author as any)?.last_name].filter(Boolean).join(" ").trim() ||
+        [(author as any)?.first_name, (author as any)?.last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim() ||
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((author as any)?.full_name as string) ||
         "Un membre";
@@ -129,7 +136,9 @@ export async function dispatchPublicationPush(
 
     const playerIds = Array.from(
       new Set(
-        recipients.filter((r) => r.subject_kind === "player" && r.member_id).map((r) => r.member_id!),
+        recipients
+          .filter((r) => r.subject_kind === "player" && r.member_id)
+          .map((r) => r.member_id!),
       ),
     );
     if (playerIds.length > 0) {
