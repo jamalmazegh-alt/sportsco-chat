@@ -188,21 +188,24 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
       {/* SECTION NAV (sticky table of contents) */}
       <nav
         aria-label={t("parentGuide.tutorialsTitle")}
-        className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+        className="sticky top-[4.5rem] z-20 border-b border-border/60 bg-background shadow-sm"
       >
         <div className="mx-auto max-w-6xl px-5 lg:px-8">
           {/* Mobile: collapsible bulleted list so the nav never overflows the viewport */}
-          <details className="group py-3 sm:hidden">
+          <details ref={tocRef} className="group py-3 sm:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
               {t("parentGuide.tutorialsTitle")}
               <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
             </summary>
-            <ul className="mt-3 list-disc space-y-2 pl-6 text-sm marker:text-primary">
+            <ul className="mt-3 max-h-[55vh] list-disc space-y-2 overflow-y-auto rounded-2xl border border-border bg-card py-3 pl-9 pr-4 text-sm marker:text-primary">
               {tutorials.map((tuto, i) => (
                 <li key={`mobile-nav-${tuto.t}`}>
                   <a
                     href={`#tuto-${i + 1}`}
-                    onClick={(e) => scrollToId(e, `tuto-${i + 1}`)}
+                    onClick={(e) => {
+                      closeToc();
+                      scrollToId(e, `tuto-${i + 1}`);
+                    }}
                     className="text-foreground/80 hover:text-primary"
                   >
                     {tuto.t}
@@ -212,7 +215,10 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               <li>
                 <a
                   href="#faq"
-                  onClick={(e) => scrollToId(e, "faq")}
+                  onClick={(e) => {
+                    closeToc();
+                    scrollToId(e, "faq");
+                  }}
                   className="text-foreground/80 hover:text-primary"
                 >
                   {t("parentGuide.ctaFaq")}
@@ -220,6 +226,7 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               </li>
             </ul>
           </details>
+
 
           {/* Desktop: horizontal scrollable pills */}
           <ul className="hidden snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] sm:flex [&::-webkit-scrollbar]:hidden">
