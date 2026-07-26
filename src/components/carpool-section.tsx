@@ -459,7 +459,9 @@ function OfferDialog({
   const { user } = useAuth();
   const qc = useQueryClient();
   const [vehicle, setVehicle] = useState<"car" | "van">("car");
-  const [seats, setSeats] = useState(3);
+  const [seatsInput, setSeatsInput] = useState("3");
+  const seats = Math.min(8, Math.max(1, Number(seatsInput) || 1));
+
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
