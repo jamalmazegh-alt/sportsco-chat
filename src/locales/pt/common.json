@@ -2368,6 +2368,12 @@
     "iosStep3After": "para expandir a lista",
     "iosStep4Before": "Escolha",
     "iosStep4Icon": "Adicionar ao ecrã principal",
-    "iosStep4After": "e toque em «Adicionar»"
+    "iosStep4After": "e toque em «Adicionar»",
+    "androidStepsTitle": "No Android (Chrome)",
+    "androidStepsSubtitle": "3 passos para instalar o Clubero",
+    "androidStep1": "Abra o menu ⋮ no canto superior direito do Chrome.",
+    "androidStep2": "Escolha «Instalar aplicação» (ou «Adicionar ao ecrã principal»).",
+    "androidStep3": "Confirme: o ícone do Clubero aparece no seu ecrã inicial.",
+    "ctaHint": "No Android, este botão instala o Clubero diretamente. No iPhone, siga os passos do Safari abaixo."
   }
 }

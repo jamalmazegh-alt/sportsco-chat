@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Bell, Smartphone, Zap } from "lucide-react";
 import { Apple } from "lucide-react";
@@ -7,7 +8,8 @@ import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/install")({
   head: () => {
-    const t = i18n.getFixedT(i18n.language || "fr", "translation");
+    // The install copy lives in the default ("common") namespace.
+    const t = i18n.getFixedT(i18n.language || "fr", "common");
     return {
       meta: [
         { title: t("install.meta.title") },
@@ -80,7 +82,6 @@ function IOSAddIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 function AndroidIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
@@ -89,9 +90,27 @@ function AndroidIcon({ className }: { className?: string }) {
   );
 }
 
+function StepNumber({ n }: { n: number }) {
+  return (
+    <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-500/15 text-emerald-300 flex items-center justify-center font-bold text-xs">
+      {n}
+    </span>
+  );
+}
+
+function Chip({ icon, label }: { icon: ReactNode; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md bg-white/10 px-1.5 py-0.5 text-white">
+      {icon}
+      <span className="text-[12px] font-medium">{label}</span>
+    </span>
+  );
+}
+
 function InstallPage() {
   const { t } = useTranslation();
-  const steps = [
+
+  const iosSteps = [
     {
       icon: <IOSMoreIcon className="h-4 w-4" />,
       before: t("install.iosStep1Before"),
@@ -117,9 +136,16 @@ function InstallPage() {
       after: t("install.iosStep4After"),
     },
   ];
+
+  const androidSteps = [
+    t("install.androidStep1"),
+    t("install.androidStep2"),
+    t("install.androidStep3"),
+  ];
+
   return (
     <div className="min-h-dvh bg-gradient-to-b from-[#070D1B] to-[#0B1730] text-white">
-      <div className="mx-auto max-w-lg px-5 pt-6 pb-16">
+      <div className="mx-auto max-w-3xl px-5 pt-6 pb-16">
         <Link
           to="/"
           className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition"
@@ -127,66 +153,75 @@ function InstallPage() {
           <ArrowLeft className="h-4 w-4" /> {t("install.back")}
         </Link>
 
+        {/* HERO */}
         <div className="mt-8 text-center">
           <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] flex items-center justify-center shadow-lg">
             <Smartphone className="h-8 w-8 text-white" />
           </div>
-          <h1 className="mt-5 text-2xl font-bold">{t("install.title")}</h1>
+          <h1 className="mt-5 text-2xl font-bold sm:text-3xl">{t("install.title")}</h1>
           <p className="mt-2 text-sm text-white/70">{t("install.subtitle")}</p>
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <InstallAppButton alwaysShow label={t("install.cta")} className="px-6 py-3" />
+        {/* PROMINENT INSTALL BUTTON */}
+        <div className="mt-8 rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-6 text-center shadow-[0_0_40px_-12px_rgba(29,122,69,0.6)]">
+          <InstallAppButton
+            alwaysShow
+            label={t("install.cta")}
+            className="w-full justify-center px-8 py-4 text-base sm:w-auto"
+          />
+          <p className="mx-auto mt-3 max-w-md text-xs text-white/60">{t("install.ctaHint")}</p>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
-          <h2 className="text-sm font-bold">{t("install.platformCompareTitle")}</h2>
-          <p className="text-xs text-white/60 mt-0.5">{t("install.platformCompareSubtitle")}</p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="flex items-center gap-2">
-                <Apple className="h-4 w-4 text-white/80" />
-                <span className="text-sm font-semibold">{t("install.platformAppleTitle")}</span>
+        {/* TWO SEPARATE PROCEDURES */}
+        <div className="mt-8 grid gap-5 lg:grid-cols-2">
+          {/* Android */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+                <AndroidIcon className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-bold">{t("install.androidStepsTitle")}</h2>
+                <p className="text-xs text-white/60">{t("install.androidStepsSubtitle")}</p>
               </div>
-              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">
-                {t("install.platformAppleDesc")}
-              </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="flex items-center gap-2">
-                <AndroidIcon className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-semibold">{t("install.platformAndroidTitle")}</span>
-              </div>
-              <p className="mt-1.5 text-xs text-white/60 leading-relaxed">
-                {t("install.platformAndroidDesc")}
-              </p>
-            </div>
+            <ol className="mt-4 space-y-3">
+              {androidSteps.map((step, i) => (
+                <li key={step} className="flex gap-3 items-start">
+                  <StepNumber n={i + 1} />
+                  <span className="flex-1 pt-0.5 text-sm text-white/85">{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
-          <p className="mt-3 text-xs text-white/50">{t("install.platformCompareNote")}</p>
-        </div>
 
-        <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
-          <h2 className="text-sm font-bold">{t("install.iosStepsTitle")}</h2>
-          <p className="text-xs text-white/60 mt-0.5">{t("install.iosStepsSubtitle")}</p>
-          <ol className="mt-4 space-y-3">
-            {steps.map((s, i) => (
-              <li key={i} className="flex gap-3 items-start">
-                <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-500/15 text-emerald-300 flex items-center justify-center font-bold text-xs">
-                  {i + 1}
-                </span>
-                <span className="flex-1 pt-0.5 text-sm text-white/85 inline-flex items-center gap-1.5 flex-wrap">
-                  {s.before}
-                  <span className="inline-flex items-center gap-1 rounded-md bg-white/10 px-1.5 py-0.5 text-white">
-                    {s.icon}
-                    <span className="text-[12px] font-medium">{s.label}</span>
+          {/* iOS / Safari */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white/90">
+                <Apple className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-bold">{t("install.iosStepsTitle")}</h2>
+                <p className="text-xs text-white/60">{t("install.iosStepsSubtitle")}</p>
+              </div>
+            </div>
+            <ol className="mt-4 space-y-3">
+              {iosSteps.map((s, i) => (
+                <li key={i} className="flex gap-3 items-start">
+                  <StepNumber n={i + 1} />
+                  <span className="flex-1 pt-0.5 text-sm text-white/85 inline-flex items-center gap-1.5 flex-wrap">
+                    {s.before}
+                    <Chip icon={s.icon} label={s.label} />
+                    {s.after}
                   </span>
-                  {s.after}
-                </span>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
 
+        {/* BENEFITS */}
         <ul className="mt-10 space-y-4">
           <li className="flex gap-3">
             <span className="h-9 w-9 shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
