@@ -60,6 +60,7 @@ import { template as eventStaffAssignmentTemplate } from "./event-staff-assignme
 import { template as meetingInviteTemplate } from "./meeting-invite";
 import { template as meetingRemovedTemplate } from "./meeting-removed";
 import { template as parentChildLinkedTemplate } from "./parent-child-linked";
+import { template as carpoolNeedTemplate } from "./carpool-need";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
