@@ -126,7 +126,7 @@ function EventsPage() {
       let q = supabase
         .from("events")
         .select(
-          "id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home",
+          "id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home, convocations_sent",
         )
         .in("team_id", teamIds)
         .is("deleted_at", null)
@@ -284,7 +284,7 @@ function EventsPage() {
   // Rendered as a small "Convocations envoyées" chip on each event row.
   const { data: convocSentSet } = useQuery({
     queryKey: ["convocs-sent-by-event", activeClubId, (events ?? []).length],
-    enabled: isCoach && !!events && events.length > 0,
+    enabled: !!events && events.length > 0,
     queryFn: async () => {
       const eventIds = (events ?? []).map((e) => e.id);
       if (eventIds.length === 0) return new Set<string>();
@@ -298,9 +298,9 @@ function EventsPage() {
   });
 
   const visibleEvents = useMemo(() => {
-    if (filters.convocationsSent === "all" || !convocSentSet) return baseVisibleEvents;
+    if (filters.convocationsSent === "all") return baseVisibleEvents;
     return baseVisibleEvents.filter((e) => {
-      const sent = convocSentSet.has(e.id);
+      const sent = !!(e as any).convocations_sent || !!convocSentSet?.has(e.id);
       return filters.convocationsSent === "sent" ? sent : !sent;
     });
   }, [baseVisibleEvents, convocSentSet, filters.convocationsSent]);
@@ -511,7 +511,7 @@ function EventsPage() {
                 if (!resp) return null;
                 return <ConvocationResponseBadge response={resp} />;
               })()}
-              {isCoach && convocSentSet?.has(e.id) && !isCancelled && (
+              {((e as any).convocations_sent || convocSentSet?.has(e.id)) && !isCancelled && (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
                   title={t("events.convocsSentTitle", {
