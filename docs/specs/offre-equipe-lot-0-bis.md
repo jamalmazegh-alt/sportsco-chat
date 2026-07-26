@@ -115,6 +115,11 @@ contournement service role, et test de contournement associé.
 
 ## 28.2 Inventaire des mutations directes Supabase
 
+> **Premier passage livré : `docs/specs/inventaire-mutations-directes.md`.**
+> 44 fichiers relevés et classés A / A′ / B / N, avec 6 arbitrages produit identifiés et
+> le mécanisme de la catégorie A′ à trancher (recommandation : RPC `cancel_event`).
+> Reste à compléter : `events/$eventId.tsx` et `wall-feed.tsx` en lecture intégrale.
+
 **Amorce chiffrée : 56 fichiers hors `*.server.ts`, `*.functions.ts`, routes API et
 webhooks contiennent des `.insert() / .update() / .delete() / .upsert()`.** Ce sont autant
 de chemins où le paywall ne peut pas être garanti par les server functions.
@@ -183,6 +188,12 @@ test par catégorie.
 ---
 
 ## 28.3 Inventaire des lecteurs de `subscriptions`
+
+> **Livré : `docs/specs/inventaire-lecteurs-subscriptions.md`.**
+> Résultat : aucun `.single()` dans le dépôt, donc **aucun risque de crash**. En revanche
+> **deux bloquants** empêchent aujourd'hui l'existence même d'un club `per_team` — la
+> garde de `_authenticated.tsx` et le mode « tournoi seul ». Tous deux à corriger avant
+> la Phase C.
 
 **Amorce chiffrée : 39 sites de lecture ou d'écriture de `subscriptions` répartis sur
 ~10 fichiers.**
