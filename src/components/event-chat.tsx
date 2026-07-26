@@ -36,7 +36,6 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [loadingMore, setLoadingMore] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-
   async function attachAuthors(msgs: Msg[]): Promise<Msg[]> {
     const ids = Array.from(new Set(msgs.map((m) => m.author_user_id).filter(Boolean)));
     if (ids.length === 0) return msgs;
@@ -179,7 +178,6 @@ export function EventChat({ eventId }: { eventId: string }) {
     );
   }
 
-
   return (
     <section className="rounded-2xl border border-border bg-card overflow-hidden">
       <button
@@ -283,7 +281,6 @@ export function EventChat({ eventId }: { eventId: string }) {
             </div>
             {sendError && <p className="text-xs text-destructive">{sendError}</p>}
             <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
-
           </form>
         </>
       )}
