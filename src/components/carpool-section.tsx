@@ -568,7 +568,16 @@ function ReserveDialog({
       player_ids: selected,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message || "";
+      if (msg.includes("already_booked_in_another_carpool"))
+        return toast.error(
+          "Vous avez déjà réservé une place dans un autre véhicule pour cet événement.",
+        );
+      if (msg.includes("driver_cannot_book_own_car"))
+        return toast.error("Vous êtes le conducteur de ce véhicule.");
+      return toast.error(msg);
+    }
     onDone();
   }
 
