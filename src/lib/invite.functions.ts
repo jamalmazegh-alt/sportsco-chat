@@ -93,22 +93,9 @@ export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
 
     if (!ok) throw new Response("Invalid invite", { status: 400 });
 
-    // Paginate through users to find the exact email match (avoids the
-    // silent 200-user cap of a single listUsers page).
-    let user: { id: string; email_confirmed_at: string | null } | null = null;
-    for (let page = 1; page <= 50 && !user; page++) {
-      const { data: userList, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
-        page,
-        perPage: 200,
-      });
-      if (listErr) throw new Response(listErr.message, { status: 500 });
-      const found = userList.users.find((u) => (u.email ?? "").toLowerCase() === email);
-      if (found) {
-        user = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
-      }
-      if (userList.users.length < 200) break;
-    }
+    const user = await findUserByEmail(email);
     if (!user) throw new Response("User not found", { status: 404 });
+
     if (!user.email_confirmed_at) {
       const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
         email_confirm: true,
