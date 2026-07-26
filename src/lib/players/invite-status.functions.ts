@@ -50,19 +50,13 @@ export const getParentInviteStatuses = createServerFn({ method: "POST" })
 
     // Detect linked parents whose auth email is not yet confirmed
     const unconfirmedUserIds: string[] = [];
-    if (parentUserIds.length > 0) {
-      const { data: authUsers } = await supabaseAdmin
-        .schema("auth")
-        .from("users")
-        .select("id, email_confirmed_at")
-        .in("id", parentUserIds);
-      for (const u of (authUsers ?? []) as Array<{
-        id: string;
-        email_confirmed_at: string | null;
-      }>) {
-        if (!u.email_confirmed_at) unconfirmedUserIds.push(u.id);
+    for (const uid of parentUserIds) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(uid);
+      if (authUser?.user && !authUser.user.email_confirmed_at) {
+        unconfirmedUserIds.push(uid);
       }
     }
+
 
     const { data: rows } = emails.length
       ? await supabaseAdmin
