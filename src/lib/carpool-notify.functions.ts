@@ -87,7 +87,9 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
     const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
     const eventTitle =
-      ev.title || [(ev.teams as any)?.name, ev.opponent].filter(Boolean).join(" vs ") || "événement";
+      ev.title ||
+      [(ev.teams as any)?.name, ev.opponent].filter(Boolean).join(" vs ") ||
+      "événement";
 
     let sent = 0;
     for (const p of profs ?? []) {
