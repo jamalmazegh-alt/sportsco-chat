@@ -55,24 +55,34 @@ Ne jamais regrouper plusieurs `ALTER TABLE` sur des tables différentes dans un 
 fichier, ni enchaîner deux migrations sensibles dans la même fenêtre de déploiement. Si
 un incident survient, on doit pouvoir désigner **une seule** migration comme cause.
 
-### R2 — Le webhook Stripe doit rester à l'identique tant qu'aucune équipe `per_team` n'existe
+### R2 — La branche historique du webhook reste la branche par défaut, en permanence
 
-**Invariant vérifiable** : tant qu'aucune ligne `team_subscriptions` n'existe en
-production, le comportement du webhook doit être **strictement identique** à aujourd'hui,
-octet pour octet dans ses effets.
+**Invariant permanent, sans condition ni date d'expiration :**
 
 ```text
-metadata.purpose absent          → ANCIEN code, chemin inchangé   ← branche par défaut
-metadata.purpose = "team_plan"   → nouveau code
+metadata.purpose = "team_plan"                          → branche Équipe
+toute autre valeur, valeur absente, valeur inconnue     → branche historique, inchangée
 ```
 
-**Jamais l'inverse.** Le nouveau code n'est jamais la branche par défaut ; il est
-strictement conditionné à la présence de la métadonnée. Un événement mal formé, une
-métadonnée manquante, un événement ancien rejoué : tous retombent sur le chemin existant.
+Cela reste vrai lorsque Clubero aura 10 abonnements Équipe comme lorsqu'il en aura 1 000.
+Le routage se fait **exclusivement** sur la présence et la valeur exacte de
+`metadata.purpose`. Le nouveau code n'est jamais atteint par défaut : un événement mal
+formé, une métadonnée manquante, une valeur inconnue ou un événement ancien rejoué
+retombent tous sur le chemin existant.
 
-Test de non-régression obligatoire avant tout déploiement du webhook modifié : rejouer un
-échantillon d'événements Stripe réels antérieurs au chantier et vérifier que les écritures
-produites sont identiques à celles du code actuel.
+Corollaire : la résolution de secours par `stripe_subscription_id` s'applique
+**uniquement à l'intérieur** de la branche `team_plan`. Elle ne doit jamais servir à
+décider d'y entrer — ce serait une porte d'entrée détournée vers le nouveau code.
+
+**Test de non-régression initial, distinct de l'invariant.** Tant qu'aucune ligne
+`team_subscriptions` n'existe en production, les effets du webhook doivent être
+**strictement identiques** à aujourd'hui. C'est une vérification supplémentaire au
+démarrage, **pas** la condition de routage : elle ne cesse pas de s'appliquer, elle cesse
+simplement d'être observable une fois la première souscription Équipe créée.
+
+Avant tout déploiement du webhook modifié : rejouer un échantillon d'événements Stripe
+réels antérieurs au chantier et vérifier que les écritures produites sont identiques à
+celles du code actuel.
 
 C'est le composant qui peut casser le plus **discrètement** : une erreur ici ne se voit pas
 dans l'UI, elle se voit sur les abonnements des clubs existants, plusieurs jours après.

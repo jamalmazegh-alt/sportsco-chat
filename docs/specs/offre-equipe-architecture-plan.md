@@ -393,25 +393,31 @@ ordonnanceur externe).
 - Webhook : branche `metadata.purpose === "team_plan"` dans `handleStripeWebhookPost`, à
   côté des branches tournoi. Idempotence par `stripe_webhook_events`.
 
-  **Invariant R2 — l'ancien chemin est la branche par défaut.** Tant qu'aucune ligne
-  `team_subscriptions` n'existe en production, le webhook doit se comporter **exactement**
-  comme aujourd'hui :
+  **Invariant R2 — la branche historique est la branche par défaut, en permanence.**
+  Sans condition ni date d'expiration, quel que soit le nombre d'abonnements Équipe :
 
   ```text
-  metadata.purpose absent        → ANCIEN code, chemin inchangé   ← défaut
-  metadata.purpose = "team_plan" → nouveau code
+  metadata.purpose = "team_plan"                       → branche Équipe
+  toute autre valeur, absente ou inconnue              → branche historique, inchangée
   ```
 
-  **Jamais l'inverse** : le nouveau code n'est jamais atteint par défaut. Un événement mal
-  formé, une métadonnée manquante, un événement ancien rejoué retombent tous sur le chemin
-  existant. La résolution de secours par `stripe_subscription_id` ne s'applique qu'**à
-  l'intérieur** de la branche `team_plan`, jamais pour décider d'y entrer.
+  Le routage se fait **exclusivement** sur la présence et la valeur exacte de
+  `metadata.purpose`. Le nouveau code n'est jamais atteint par défaut : événement mal
+  formé, métadonnée manquante, valeur inconnue ou événement ancien rejoué retombent tous
+  sur le chemin existant.
 
-  Test de non-régression avant déploiement : rejouer un échantillon d'événements Stripe
-  réels antérieurs au chantier et vérifier que les écritures produites sont identiques à
-  celles du code actuel. C'est le composant qui casse le plus discrètement — une erreur ne
-  se voit pas dans l'UI, mais sur les abonnements des clubs existants, plusieurs jours
-  plus tard.
+  La résolution de secours par `stripe_subscription_id` ne s'applique qu'**à l'intérieur**
+  de la branche `team_plan`, jamais pour décider d'y entrer.
+
+  *Test de non-régression initial, distinct de l'invariant* : tant qu'aucune ligne
+  `team_subscriptions` n'existe, les effets doivent être strictement identiques à
+  aujourd'hui. Cette condition n'est pas le critère de routage — elle cesse seulement
+  d'être observable une fois la première souscription Équipe créée.
+
+  Avant déploiement : rejouer un échantillon d'événements Stripe réels antérieurs au
+  chantier et vérifier que les écritures produites sont identiques à celles du code
+  actuel. C'est le composant qui casse le plus discrètement — une erreur ne se voit pas
+  dans l'UI, mais sur les abonnements des clubs existants, plusieurs jours plus tard.
 - Nouveaux prix `STRIPE_PRICE_TEAM_MONTHLY` (9,99 €) et `STRIPE_PRICE_TEAM_YEARLY`
   (99,99 €) dans `src/lib/stripe.server.ts`, surchargeables par env comme les prix
   existants.
