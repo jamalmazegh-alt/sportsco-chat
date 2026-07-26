@@ -16,7 +16,6 @@ import {
   ImageIcon,
   ChevronDown,
   ArrowUp,
-
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -115,7 +114,6 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
 
   // Sync i18n with the route locale on mount; if the user switches language
   // afterwards, navigate to the counterpart route instead of forcing it back.
@@ -222,7 +220,6 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
               </li>
             </ul>
           </details>
-
 
           {/* Desktop: horizontal scrollable pills */}
           <ul className="hidden snap-x gap-2 overflow-x-auto py-3 [scrollbar-width:none] sm:flex [&::-webkit-scrollbar]:hidden">
@@ -409,6 +406,5 @@ export function ParentGuidePage({ locale }: { locale: "fr" | "en" }) {
         </button>
       )}
     </MarketingLayout>
-
   );
 }
