@@ -1137,7 +1137,6 @@ function TeamDetail() {
         </h2>
         {isCoach && (
           <div className="flex flex-wrap items-center justify-end gap-2 min-w-0">
-
             {selectMode ? (
               <>
                 <Button
