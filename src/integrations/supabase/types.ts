@@ -8195,6 +8195,7 @@ export type Database = {
           option_label: string
           sort_order: number
           subject_kind: string
+          subject_name: string
           voted_at: string
           voter_name: string
         }[]
