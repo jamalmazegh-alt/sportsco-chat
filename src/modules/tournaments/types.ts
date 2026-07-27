@@ -36,7 +36,7 @@ export type TournamentWithClub = TournamentRow & {
 export interface TournamentDetail {
   tournament: TournamentWithClub;
   groups: TournamentGroupRow[];
-  teams: TournamentTeamRow[];
+  teams: TournamentTeamPublicRow[];
   matches: TournamentMatchRow[];
   flights: TournamentFlightRow[];
   canManage: boolean;
