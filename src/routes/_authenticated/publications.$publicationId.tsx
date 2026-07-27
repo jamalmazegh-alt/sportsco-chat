@@ -211,7 +211,7 @@ function PublicationDetailPage() {
         results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
       ).map((r: any) => {
         const oid = r.option_id ?? r.id;
-        const isMine = myCurrentOption === oid;
+        const isMine = myCurrentOption === oid || myOptionIds.includes(oid);
         const count = r.vote_count;
         const chips = votersByOption.get(oid) ?? [];
         const pct =
