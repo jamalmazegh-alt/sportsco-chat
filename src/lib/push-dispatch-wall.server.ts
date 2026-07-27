@@ -235,7 +235,6 @@ export async function dispatchWallPostPushInternal(
   const collapseTag = `wall-post-${postId}`;
   void liveTeams;
 
-
   const sends = targets.map((uid) => {
     const lang = prefByUser.get(uid)?.lang || "fr";
     const t = I18N[lang] || I18N.fr;
