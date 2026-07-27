@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,6 +91,8 @@ function PublicationDetailPage() {
     eligibleSubjects[0] ??
     null;
   const myCurrentOption = activeSubject?.currentOptionId ?? null;
+  const myOptionIds = activeSubject?.currentOptionIds ?? [];
+  const allowMultiple = !!(data?.publication as any)?.poll_allow_multiple;
 
   // Deep-link intent (?vote=<optionId>) : pré-sélection uniquement.
   // Ne jamais auto-cast au chargement — l'utilisateur confirme explicitement.
@@ -208,7 +211,7 @@ function PublicationDetailPage() {
         results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
       ).map((r: any) => {
         const oid = r.option_id ?? r.id;
-        const isMine = myCurrentOption === oid;
+        const isMine = myCurrentOption === oid || myOptionIds.includes(oid);
         const count = r.vote_count;
         const chips = votersByOption.get(oid) ?? [];
         const pct =
@@ -390,7 +393,45 @@ function PublicationDetailPage() {
                   </div>
                 )}
 
-              {canVote && (!myCurrentOption || isChangingVote) ? (
+              {canVote && allowMultiple ? (
+                <div className="space-y-3">
+                  <div className="text-xs text-muted-foreground">
+                    {t(
+                      "publications:detail.multipleHint",
+                      "Plusieurs réponses possibles — touchez pour ajouter ou retirer.",
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {data.options.map((opt) => {
+                      const checked = myOptionIds.includes(opt.id);
+                      return (
+                        <label
+                          key={opt.id}
+                          className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            disabled={vote.isPending}
+                            onCheckedChange={() => vote.mutate(opt.id)}
+                          />
+                          <span className="text-sm">{opt.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {isStaff && (
+                    <div className="pt-3 border-t space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">
+                        {t("publications:detail.currentResults", "Résultats en cours")}
+                        {totalVotes > 0
+                          ? ` · ${t("publications:detail.voters", "{{count}} votant(s)", { count: totalVotes })}`
+                          : ""}
+                      </div>
+                      {renderResults()}
+                    </div>
+                  )}
+                </div>
+              ) : canVote && (!myCurrentOption || isChangingVote) ? (
                 <>
                   <RadioGroup
                     value={selectedOption ?? myCurrentOption ?? ""}

@@ -36,7 +36,12 @@
     "searchPlaceholder": "Rechercher un joueur…",
     "addPlayersBtn": "+ Joueurs",
     "addParentsBtn": "+ Parents",
-    "pollTitle": "Nouveau sondage"
+    "pollTitle": "Nouveau sondage",
+    "answerMode": "Réponses",
+    "answerSingle": "Réponse unique",
+    "answerSingleDesc": "Chaque votant choisit une seule option.",
+    "answerMultiple": "Réponses multiples",
+    "answerMultipleDesc": "Chaque votant peut sélectionner plusieurs options."
   },
   "detail": {
     "notFound": "Publication introuvable",
@@ -60,7 +65,8 @@
     "parentOf": "Parent de {{name}}",
     "player": "Joueur",
     "confirmVote": "Confirmer : {{option}}",
-    "pollClosed": "Sondage fermé"
+    "pollClosed": "Sondage fermé",
+    "multipleHint": "Plusieurs réponses possibles — touchez pour ajouter ou retirer."
   },
   "type": {
     "message": "Communication",

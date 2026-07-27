@@ -1899,6 +1899,7 @@ export type Database = {
           email_body: string | null
           event_id: string | null
           id: string
+          poll_allow_multiple: boolean
           poll_visibility: Database["public"]["Enums"]["poll_visibility"] | null
           publication_type: Database["public"]["Enums"]["publication_type"]
           publish_to_wall: boolean
@@ -1918,6 +1919,7 @@ export type Database = {
           email_body?: string | null
           event_id?: string | null
           id?: string
+          poll_allow_multiple?: boolean
           poll_visibility?:
             | Database["public"]["Enums"]["poll_visibility"]
             | null
@@ -1939,6 +1941,7 @@ export type Database = {
           email_body?: string | null
           event_id?: string | null
           id?: string
+          poll_allow_multiple?: boolean
           poll_visibility?:
             | Database["public"]["Enums"]["poll_visibility"]
             | null
@@ -8129,6 +8132,7 @@ export type Database = {
         Args: { _publication_id: string }
         Returns: {
           current_option_id: string
+          current_option_ids: string[]
           label: string
           relation: string
           subject_id: string
@@ -8564,6 +8568,10 @@ export type Database = {
       set_player_public_profile: {
         Args: { _enabled: boolean; _player_id: string }
         Returns: Json
+      }
+      set_poll_allow_multiple: {
+        Args: { _allow: boolean; _publication_id: string }
+        Returns: undefined
       }
       set_team_logo_via_token: {
         Args: { _logo_url: string; _token: string }

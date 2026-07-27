@@ -36,7 +36,12 @@
     "searchPlaceholder": "Search a player…",
     "addPlayersBtn": "+ Players",
     "addParentsBtn": "+ Parents",
-    "pollTitle": "New poll"
+    "pollTitle": "New poll",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Parent of {{name}}",
     "player": "Player",
     "confirmVote": "Confirm: {{option}}",
-    "pollClosed": "Poll closed"
+    "pollClosed": "Poll closed",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",

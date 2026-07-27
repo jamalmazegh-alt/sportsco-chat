@@ -36,7 +36,12 @@
     "searchPlaceholder": "Zoek een speler…",
     "addPlayersBtn": "+ Spelers",
     "addParentsBtn": "+ Ouders",
-    "pollTitle": "Nieuwe peiling"
+    "pollTitle": "Nieuwe peiling",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Ouder van {{name}}",
     "player": "Player",
     "confirmVote": "Bevestigen: {{option}}",
-    "pollClosed": "Poll gesloten"
+    "pollClosed": "Poll gesloten",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",

@@ -36,7 +36,12 @@
     "searchPlaceholder": "Buscar un jugador…",
     "addPlayersBtn": "+ Jugadores",
     "addParentsBtn": "+ Padres",
-    "pollTitle": "Nueva encuesta"
+    "pollTitle": "Nueva encuesta",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Padre/madre de {{name}}",
     "player": "Player",
     "confirmVote": "Confirmar: {{option}}",
-    "pollClosed": "Encuesta cerrada"
+    "pollClosed": "Encuesta cerrada",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",

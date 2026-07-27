@@ -36,7 +36,12 @@
     "searchPlaceholder": "Spieler suchen…",
     "addPlayersBtn": "+ Spieler",
     "addParentsBtn": "+ Eltern",
-    "pollTitle": "Neue Umfrage"
+    "pollTitle": "Neue Umfrage",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Elternteil von {{name}}",
     "player": "Player",
     "confirmVote": "Bestätigen: {{option}}",
-    "pollClosed": "Umfrage geschlossen"
+    "pollClosed": "Umfrage geschlossen",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",

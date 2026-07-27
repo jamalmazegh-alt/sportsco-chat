@@ -49,6 +49,7 @@ const CreateInput = z
     audiences: z.array(AudienceInput).default([]),
     manualMemberIds: z.array(z.string().uuid()).default([]),
     pollOptions: z.array(z.string().min(1).max(120)).default([]),
+    pollAllowMultiple: z.boolean().default(false),
     documentIds: z.array(z.string().uuid()).default([]),
     mediaPaths: z.array(z.string().min(1)).default([]),
   })
@@ -116,6 +117,17 @@ export const createPublication = createServerFn({ method: "POST" })
         row,
       );
       throw new Response("publish_failed", { status: 500 });
+    }
+
+    // Sondage à réponses multiples (réglage post-création, staff only côté SQL)
+    if (data.publicationType === "poll" && data.pollAllowMultiple) {
+      const { error: multiErr } = await supabase.rpc("set_poll_allow_multiple" as any, {
+        _publication_id: publicationId,
+        _allow: true,
+      });
+      if (multiErr) {
+        console.error("[createPublication] set_poll_allow_multiple failed", multiErr);
+      }
     }
 
     // Best-effort : e-mail interactif de sondage
@@ -424,7 +436,7 @@ export const getPublication = createServerFn({ method: "POST" })
     const { data: pub, error: pubErr } = await supabase
       .from("club_publications")
       .select(
-        "id, club_id, author_id, publication_type, title, content, poll_visibility, publish_to_wall, send_email, email_body, published_at, closes_at, closed_at, event_id, deleted_at",
+        "id, club_id, author_id, publication_type, title, content, poll_visibility, poll_allow_multiple, publish_to_wall, send_email, email_body, published_at, closes_at, closed_at, event_id, deleted_at",
       )
       .eq("id", data.publicationId)
       .maybeSingle();
@@ -450,6 +462,7 @@ export const getPublication = createServerFn({ method: "POST" })
         relation: string;
         label: string | null;
         current_option_id: string | null;
+        current_option_ids: string[] | null;
       }>
     ).map((r) => ({
       subjectKind: r.subject_kind as "user" | "player",
@@ -457,6 +470,7 @@ export const getPublication = createServerFn({ method: "POST" })
       relation: r.relation as "self" | "guardian",
       label: r.label,
       currentOptionId: r.current_option_id,
+      currentOptionIds: r.current_option_ids ?? (r.current_option_id ? [r.current_option_id] : []),
     }));
 
     return {
