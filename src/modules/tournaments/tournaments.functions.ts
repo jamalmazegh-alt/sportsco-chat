@@ -322,7 +322,11 @@ export const getTournament = createServerFn({ method: "POST" })
         .order("sort_order"),
       supabase
         .from("tournament_teams")
-        .select("*")
+        // Les colonnes de contact (contact_name/email/phone) ne sont plus lisibles
+        // côté client : elles restent réservées aux traitements serveur.
+        .select(
+          "id, tournament_id, team_id, name, short_name, logo_url, seed, group_id, notes, created_at, payment_status, amount_paid_cents, payment_currency, payment_method, payment_note, paid_at, marked_paid_by",
+        )
         .eq("tournament_id", data.tournament_id)
         .order("seed", { nullsFirst: false }),
       supabase
