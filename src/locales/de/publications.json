@@ -68,7 +68,8 @@
     "confirmVote": "Bestätigen: {{option}}",
     "pollClosed": "Umfrage geschlossen",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
-    "saveVote": "Antworten speichern"
+    "saveVote": "Antworten speichern",
+    "member": "Vereinsmitglied"
   },
   "type": {
     "message": "Message",

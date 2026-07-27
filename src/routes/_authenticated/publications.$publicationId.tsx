@@ -306,7 +306,6 @@ function PublicationDetailPage() {
                 })}
               </ul>
             )}
-
           </div>
         );
       })}
