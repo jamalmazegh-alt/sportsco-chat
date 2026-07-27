@@ -8202,6 +8202,8 @@ export type Database = {
           subject_name: string
           voted_at: string
           voter_name: string
+          voter_roles: string[]
+          voter_teams: string[]
         }[]
       }
       get_public_camp_by_slug: {
