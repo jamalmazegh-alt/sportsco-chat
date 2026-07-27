@@ -17,7 +17,6 @@ import {
   UserX,
   ChevronDown,
   ChevronUp,
-
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -426,7 +425,6 @@ function PublicationDetailPage() {
       )}
     </div>
   );
-
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
