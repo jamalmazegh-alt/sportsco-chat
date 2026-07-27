@@ -181,17 +181,26 @@ function PublicationDetailPage() {
   const totalVotes = results?.rows?.[0]?.total_voters ?? 0;
   const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
 
+  const votersByOption = new Map<string, string[]>();
+  for (const v of voters?.rows ?? []) {
+    const list = votersByOption.get(v.option_id) ?? [];
+    list.push(v.voter_name);
+    votersByOption.set(v.option_id, list);
+  }
+
   const renderResults = () => (
     <div className="space-y-2">
       {(
         results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
       ).map((r: any) => {
-        const isMine = myCurrentOption === (r.option_id ?? r.id);
+        const oid = r.option_id ?? r.id;
+        const isMine = myCurrentOption === oid;
         const count = r.vote_count;
+        const names = votersByOption.get(oid) ?? [];
         const pct =
           count == null ? null : totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
         return (
-          <div key={r.option_id ?? r.id} className="space-y-1">
+          <div key={oid} className="space-y-1">
             <div className="flex justify-between text-sm">
               <span className={isMine ? "font-medium" : ""}>
                 {r.label} {isMine && "✓"}
@@ -208,9 +217,22 @@ function PublicationDetailPage() {
                 }}
               />
             </div>
+            {names.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {names.map((n, i) => (
+                  <span
+                    key={`${oid}-${i}`}
+                    className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+                  >
+                    {n}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
+
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
           <Info className="h-3.5 w-3.5 mt-0.5" />
