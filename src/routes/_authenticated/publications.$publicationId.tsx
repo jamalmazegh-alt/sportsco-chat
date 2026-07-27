@@ -390,7 +390,45 @@ function PublicationDetailPage() {
                   </div>
                 )}
 
-              {canVote && (!myCurrentOption || isChangingVote) ? (
+              {canVote && allowMultiple ? (
+                <div className="space-y-3">
+                  <div className="text-xs text-muted-foreground">
+                    {t(
+                      "publications:detail.multipleHint",
+                      "Plusieurs réponses possibles — touchez pour ajouter ou retirer.",
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {data.options.map((opt) => {
+                      const checked = myOptionIds.includes(opt.id);
+                      return (
+                        <label
+                          key={opt.id}
+                          className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            disabled={vote.isPending}
+                            onCheckedChange={() => vote.mutate(opt.id)}
+                          />
+                          <span className="text-sm">{opt.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {isStaff && (
+                    <div className="pt-3 border-t space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">
+                        {t("publications:detail.currentResults", "Résultats en cours")}
+                        {totalVotes > 0
+                          ? ` · ${t("publications:detail.voters", "{{count}} votant(s)", { count: totalVotes })}`
+                          : ""}
+                      </div>
+                      {renderResults()}
+                    </div>
+                  )}
+                </div>
+              ) : canVote && (!myCurrentOption || isChangingVote) ? (
                 <>
                   <RadioGroup
                     value={selectedOption ?? myCurrentOption ?? ""}
