@@ -255,7 +255,7 @@ function PublicationDetailPage() {
             )}
           </div>
         );
-      })
+      })}
 
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
