@@ -274,7 +274,6 @@ function PublicationDetailPage() {
     votersByOption.set(v.option_id, list);
   }
 
-
   const renderResults = () => (
     <div className="space-y-3">
       {(

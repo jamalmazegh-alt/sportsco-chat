@@ -299,7 +299,6 @@ export const getPollVoters = createServerFn({ method: "POST" })
         voter_roles: string[] | null;
         voter_teams: string[] | null;
         voted_at: string;
-
       }>,
     };
   });
