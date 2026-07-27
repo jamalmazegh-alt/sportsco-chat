@@ -194,6 +194,12 @@ function PublicationDetailPage() {
   const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
 
   type VoterChip = { voterName: string; subjectName: string; subjectKind: string };
+  const shortName = (full: string) => {
+    const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length < 2) return full;
+    const last = parts[parts.length - 1];
+    return `${parts.slice(0, -1).join(" ")} ${last.charAt(0).toUpperCase()}.`;
+  };
   const votersByOption = new Map<string, VoterChip[]>();
   for (const v of voters?.rows ?? []) {
     const list = votersByOption.get(v.option_id) ?? [];
