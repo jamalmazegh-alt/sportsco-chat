@@ -63,6 +63,7 @@
     "votingAsSelf": "Me",
     "votingForChild": "You are voting for {{name}}",
     "parentOf": "Genitore di {{name}}",
+    "forChild": "per {{name}}",
     "player": "Player",
     "confirmVote": "Conferma: {{option}}",
     "pollClosed": "Sondaggio chiuso",
