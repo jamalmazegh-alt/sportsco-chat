@@ -69,7 +69,13 @@
     "pollClosed": "Umfrage geschlossen",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
     "saveVote": "Antworten speichern",
-    "member": "Vereinsmitglied"
+    "member": "Vereinsmitglied",
+    "roleCoach": "Trainer",
+    "roleAssistantCoach": "Co-Trainer",
+    "roleStaff": "Staff",
+    "roleAdmin": "Administrator",
+    "roleDirigeant": "Vorstand",
+    "roleParentSelf": "Elternteil (eigene Stimme)"
   },
   "type": {
     "message": "Message",
