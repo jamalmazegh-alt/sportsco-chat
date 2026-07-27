@@ -188,7 +188,8 @@ function PublicationDetailPage() {
       ).map((r: any) => {
         const isMine = myCurrentOption === (r.option_id ?? r.id);
         const count = r.vote_count;
-        const pct = count == null ? null : totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+        const pct =
+          count == null ? null : totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
         return (
           <div key={r.option_id ?? r.id} className="space-y-1">
             <div className="flex justify-between text-sm">
@@ -223,7 +224,6 @@ function PublicationDetailPage() {
       )}
     </div>
   );
-
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
@@ -414,7 +414,6 @@ function PublicationDetailPage() {
                   )}
                 </div>
               )}
-
             </div>
           )}
         </CardContent>
