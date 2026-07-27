@@ -348,6 +348,54 @@ function PublicationDetailPage() {
         );
       })}
 
+      {canSeeNonVoters && (
+        <div className="pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-between"
+            onClick={() => setShowNonVoters((v) => !v)}
+          >
+            <span className="flex items-center gap-2">
+              <UserX className="h-4 w-4" />
+              {t("publications:detail.nonVoters", "Qui n'a pas encore répondu")}
+            </span>
+            {showNonVoters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+          {showNonVoters && (
+            <div className="mt-2 rounded-xl border border-border bg-muted/30 overflow-hidden">
+              {nonVoters?.rows?.length ? (
+                <ul className="divide-y divide-border/60">
+                  {nonVoters.rows.map((n, i) => (
+                    <li
+                      key={`nv-${i}`}
+                      className="flex items-baseline justify-between gap-3 px-3 py-1.5"
+                    >
+                      <span className="truncate text-xs font-semibold text-foreground">
+                        {n.subject_name}
+                      </span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">
+                        {n.subject_kind === "player"
+                          ? t("publications:detail.player", "Joueur")
+                          : selfRoleLabel(n.subject_roles ?? [], n.subject_teams ?? [])}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="px-3 py-2 text-xs text-muted-foreground">
+                  {t("publications:detail.nonVotersEmpty", "Tout le monde a répondu 🎉")}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
           <Info className="h-3.5 w-3.5 mt-0.5" />
@@ -361,6 +409,7 @@ function PublicationDetailPage() {
       )}
     </div>
   );
+
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
