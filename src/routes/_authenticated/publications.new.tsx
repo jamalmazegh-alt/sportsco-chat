@@ -119,6 +119,7 @@ function NewPublicationPage() {
   const [content, setContent] = useState("");
   const [pollVisibility, setPollVisibility] = useState<"anonymous" | "staff_visible">("anonymous");
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
+  const [pollAllowMultiple, setPollAllowMultiple] = useState(false);
   const [publishToWall, setPublishToWall] = useState(true);
   const [sendEmail, setSendEmail] = useState(false);
   const [audiences, setAudiences] = useState<Audience[]>([]);
