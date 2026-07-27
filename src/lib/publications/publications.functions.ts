@@ -262,6 +262,34 @@ export const getPollResults = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
+// getPollVoters — staff only, only for polls created with nominative results
+// ---------------------------------------------------------------------------
+export const getPollVoters = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ publicationId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("get_poll_voters" as any, {
+      _publication_id: data.publicationId,
+    });
+    if (error) {
+      // Anonymous poll or non-staff caller: no voter detail, not a hard error.
+      if (/poll_is_anonymous|forbidden/.test(error.message)) return { rows: [] };
+      throw new Response(`voters_failed: ${error.message}`, { status: 500 });
+    }
+    return {
+      rows: (rows ?? []) as Array<{
+        option_id: string;
+        option_label: string;
+        sort_order: number;
+        voter_name: string;
+        subject_kind: string;
+        voted_at: string;
+      }>,
+    };
+  });
+
+// ---------------------------------------------------------------------------
+
 // closePublication / deletePublication
 // ---------------------------------------------------------------------------
 export const closePublication = createServerFn({ method: "POST" })
