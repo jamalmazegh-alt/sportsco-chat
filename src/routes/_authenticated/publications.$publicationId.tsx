@@ -303,7 +303,6 @@ function PublicationDetailPage() {
                     </span>
                   );
                 })}
-
               </div>
             )}
           </div>
