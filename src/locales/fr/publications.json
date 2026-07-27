@@ -68,7 +68,8 @@
     "confirmVote": "Confirmer : {{option}}",
     "pollClosed": "Sondage fermé",
     "multipleHint": "Plusieurs réponses possibles — touchez pour ajouter ou retirer.",
-    "saveVote": "Enregistrer mes réponses"
+    "saveVote": "Enregistrer mes réponses",
+    "member": "Membre du club"
   },
   "type": {
     "message": "Communication",

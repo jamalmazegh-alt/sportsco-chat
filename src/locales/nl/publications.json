@@ -68,7 +68,8 @@
     "confirmVote": "Bevestigen: {{option}}",
     "pollClosed": "Poll gesloten",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
-    "saveVote": "Antwoorden opslaan"
+    "saveVote": "Antwoorden opslaan",
+    "member": "Clublid"
   },
   "type": {
     "message": "Message",
