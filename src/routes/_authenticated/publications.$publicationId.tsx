@@ -31,7 +31,6 @@ import {
   getPublication,
   getPollResults,
   getPollVoters,
-
   castPollVote,
   closePublication,
   deletePublication,
@@ -120,7 +119,6 @@ function PublicationDetailPage() {
     queryFn: () => votersFn({ data: { publicationId } }),
     enabled: !!data && isPoll && isStaff && data?.publication?.poll_visibility === "staff_visible",
   });
-
 
   const { data: recipients } = useQuery({
     queryKey: ["publication-recipients", publicationId],
