@@ -351,6 +351,23 @@ function PublicationDetailPage() {
                       {t("publications:list.closed", "Fermé")}
                     </Badge>
                   )}
+                  {Array.from(
+                    new Set(
+                      ((data?.audiences ?? []) as any[]).map((a) => {
+                        const base = t(`publications:audience.types.${a.audience_type}`, {
+                          defaultValue: a.audience_type,
+                        });
+                        if (a.team_name) return `${base} · ${a.team_name}`;
+                        if (a.category_label) return `${base} · ${a.category_label}`;
+                        return base;
+                      }),
+                    ),
+                  ).map((label) => (
+                    <Badge key={label} variant="outline" className="gap-1">
+                      <Users className="h-3 w-3" />
+                      {label}
+                    </Badge>
+                  ))}
                   <span className="text-xs text-muted-foreground">
                     {new Date(pub.published_at).toLocaleString()}
                   </span>
