@@ -1600,13 +1600,14 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
           {targetLabels.map((label) => (
             <span
               key={label}
-              className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border max-w-[180px] truncate"
+              className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border whitespace-normal break-words text-left"
               title={label}
             >
               <Users className="h-2.5 w-2.5 shrink-0" />
               {label}
             </span>
           ))}
+
           {isAnonymous && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
               {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
