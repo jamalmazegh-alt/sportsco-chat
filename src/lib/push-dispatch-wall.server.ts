@@ -230,10 +230,11 @@ export async function dispatchWallPostPushInternal(
     targets.push(uid);
   }
 
-  const collapseTag =
-    audienceType === "team" && liveTeams.length === 1
-      ? `wall-team-${liveTeams[0].id}`
-      : `wall-club-${clubId}`;
+  // Un tag unique par post : chaque publication du mur produit sa propre
+  // notification (pas d'écrasement de la précédente par l'OS).
+  const collapseTag = `wall-post-${postId}`;
+  void liveTeams;
+
 
   const sends = targets.map((uid) => {
     const lang = prefByUser.get(uid)?.lang || "fr";
