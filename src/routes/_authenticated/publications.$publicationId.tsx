@@ -201,7 +201,6 @@ function PublicationDetailPage() {
     },
   });
 
-
   const closeMut = useMutation({
     mutationFn: async () => closeFn({ data: { publicationId } }),
     onSuccess: () => {
@@ -503,7 +502,6 @@ function PublicationDetailPage() {
                   )}
                 </div>
               ) : canVote && (!myCurrentOption || isChangingVote) ? (
-
                 <>
                   <RadioGroup
                     value={selectedOption ?? myCurrentOption ?? ""}

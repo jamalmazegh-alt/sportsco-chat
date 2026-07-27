@@ -66,7 +66,8 @@
     "player": "Player",
     "confirmVote": "Conferma: {{option}}",
     "pollClosed": "Sondaggio chiuso",
-    "multipleHint": "Multiple answers allowed — tap to add or remove."
+    "multipleHint": "Multiple answers allowed — tap to add or remove.",
+    "saveVote": "Salva le mie risposte"
   },
   "type": {
     "message": "Message",
