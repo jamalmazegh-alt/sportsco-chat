@@ -139,6 +139,7 @@ function NewPublicationPage() {
         .from("teams")
         .select("id, name")
         .eq("club_id", activeClubId!)
+        .eq("is_internal", false)
         .is("deleted_at", null)
         .is("archived_at", null)
         .order("name");
