@@ -90,6 +90,8 @@ function PublicationDetailPage() {
     eligibleSubjects[0] ??
     null;
   const myCurrentOption = activeSubject?.currentOptionId ?? null;
+  const myOptionIds = activeSubject?.currentOptionIds ?? [];
+  const allowMultiple = !!(data?.publication as any)?.poll_allow_multiple;
 
   // Deep-link intent (?vote=<optionId>) : pré-sélection uniquement.
   // Ne jamais auto-cast au chargement — l'utilisateur confirme explicitement.
