@@ -329,7 +329,8 @@ function PublicationDetailPage() {
                       })
                     : c.subjectKind === "player"
                       ? t("publications:detail.player", "Joueur")
-                      : t("publications:detail.member", "Membre du club");
+                      : selfRoleLabel(c.roles, c.teams);
+
                   return (
                     <li
                       key={`${oid}-${i}`}
