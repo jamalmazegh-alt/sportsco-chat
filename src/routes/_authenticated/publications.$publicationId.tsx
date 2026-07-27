@@ -160,6 +160,48 @@ function PublicationDetailPage() {
     },
   });
 
+  // Multi-choice polls: local draft + explicit save button.
+  const [multiDraftState, setMultiDraftState] = useState<string[] | null>(null);
+  const multiDraft = multiDraftState ?? myOptionIds;
+  const setMultiDraft = (fn: (prev: string[] | null) => string[]) =>
+    setMultiDraftState((prev) => fn(prev));
+  const multiDirty =
+    multiDraftState !== null &&
+    (multiDraft.length !== myOptionIds.length ||
+      multiDraft.some((id) => !myOptionIds.includes(id)));
+
+  const saveMulti = useMutation({
+    mutationFn: async () => {
+      if (!activeSubject) throw new Error("no_subject");
+      const toAdd = multiDraft.filter((id) => !myOptionIds.includes(id));
+      const toRemove = myOptionIds.filter((id) => !multiDraft.includes(id));
+      for (const optionId of [...toAdd, ...toRemove]) {
+        await voteFn({
+          data: {
+            publicationId,
+            optionId,
+            subjectKind: activeSubject.subjectKind,
+            subjectId: activeSubject.subjectId,
+          },
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success(t("publications:detail.voted", "Vote enregistré"));
+      setMultiDraftState(null);
+      qc.invalidateQueries({ queryKey: ["publication", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-voters", publicationId] });
+    },
+    onError: (e: any) => {
+      const msg = e?.message || "";
+      if (msg.includes("poll_closed")) toast.error(t("publications:errors.pollClosed"));
+      else if (/forbidden/i.test(msg)) toast.error(t("publications:errors.forbidden"));
+      else toast.error(t("common.error", "Erreur"));
+    },
+  });
+
+
   const closeMut = useMutation({
     mutationFn: async () => closeFn({ data: { publicationId } }),
     onSuccess: () => {
