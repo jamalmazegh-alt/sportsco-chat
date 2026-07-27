@@ -8179,6 +8179,15 @@ export type Database = {
           id: string
         }[]
       }
+      get_poll_non_voters: {
+        Args: { _publication_id: string }
+        Returns: {
+          subject_kind: string
+          subject_name: string
+          subject_roles: string[]
+          subject_teams: string[]
+        }[]
+      }
       get_poll_results: {
         Args: { _publication_id: string }
         Returns: {
