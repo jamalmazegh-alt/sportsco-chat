@@ -36,7 +36,12 @@
     "searchPlaceholder": "Pesquisar um jogador…",
     "addPlayersBtn": "+ Jogadores",
     "addParentsBtn": "+ Pais",
-    "pollTitle": "Nova sondagem"
+    "pollTitle": "Nova sondagem",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Progenitor de {{name}}",
     "player": "Player",
     "confirmVote": "Confirmar: {{option}}",
-    "pollClosed": "Sondagem fechada"
+    "pollClosed": "Sondagem fechada",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",

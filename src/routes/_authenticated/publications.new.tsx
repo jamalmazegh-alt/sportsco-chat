@@ -532,8 +532,6 @@ function NewPublicationPage() {
                 </RadioGroup>
               </div>
 
-
-
               <div className="space-y-2">
                 <Label>{t("publications:new.visibility", "Visibilité des résultats")}</Label>
                 <RadioGroup

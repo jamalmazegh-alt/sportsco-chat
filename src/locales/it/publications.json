@@ -36,7 +36,12 @@
     "searchPlaceholder": "Cerca un giocatore…",
     "addPlayersBtn": "+ Giocatori",
     "addParentsBtn": "+ Genitori",
-    "pollTitle": "Nuovo sondaggio"
+    "pollTitle": "Nuovo sondaggio",
+    "answerMode": "Answers",
+    "answerSingle": "Single answer",
+    "answerSingleDesc": "Each voter picks one option.",
+    "answerMultiple": "Multiple answers",
+    "answerMultipleDesc": "Each voter can select several options."
   },
   "detail": {
     "notFound": "Publication not found",
@@ -60,7 +65,8 @@
     "parentOf": "Genitore di {{name}}",
     "player": "Player",
     "confirmVote": "Conferma: {{option}}",
-    "pollClosed": "Sondaggio chiuso"
+    "pollClosed": "Sondaggio chiuso",
+    "multipleHint": "Multiple answers allowed — tap to add or remove."
   },
   "type": {
     "message": "Message",
