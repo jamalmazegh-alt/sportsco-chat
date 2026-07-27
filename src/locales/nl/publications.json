@@ -75,7 +75,9 @@
     "roleStaff": "Staf",
     "roleAdmin": "Beheerder",
     "roleDirigeant": "Bestuurslid",
-    "roleParentSelf": "Ouder (eigen stem)"
+    "roleParentSelf": "Ouder (eigen stem)",
+    "nonVoters": "Wie nog niet heeft geantwoord",
+    "nonVotersEmpty": "Iedereen heeft geantwoord 🎉"
   },
   "type": {
     "message": "Message",
