@@ -234,12 +234,32 @@ function PublicationDetailPage() {
   const totalVotes = results?.rows?.[0]?.total_voters ?? 0;
   const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
 
-  type VoterChip = { voterName: string; subjectName: string; subjectKind: string };
+  type VoterChip = {
+    voterName: string;
+    subjectName: string;
+    subjectKind: string;
+    roles: string[];
+    teams: string[];
+  };
   const shortName = (full: string) => {
     const parts = (full || "").trim().split(/\s+/).filter(Boolean);
     if (parts.length < 2) return full;
     const last = parts[parts.length - 1];
     return `${parts.slice(0, -1).join(" ")} ${last.charAt(0).toUpperCase()}.`;
+  };
+  /** Libellé du rôle réel pour un vote « pour soi-même ». */
+  const selfRoleLabel = (roles: string[], teams: string[]) => {
+    const has = (r: string) => roles.includes(r);
+    const withTeams = (base: string) => (teams.length > 0 ? `${base} ${teams.join(", ")}` : base);
+    if (has("coach")) return withTeams(t("publications:detail.roleCoach", "Coach"));
+    if (has("assistant_coach"))
+      return withTeams(t("publications:detail.roleAssistantCoach", "Coach adjoint"));
+    if (has("staff")) return withTeams(t("publications:detail.roleStaff", "Staff"));
+    if (has("admin")) return t("publications:detail.roleAdmin", "Administrateur");
+    if (has("dirigeant")) return t("publications:detail.roleDirigeant", "Dirigeant");
+    if (has("parent")) return t("publications:detail.roleParentSelf", "Parent (pour lui-même)");
+    if (has("player")) return t("publications:detail.player", "Joueur");
+    return t("publications:detail.member", "Membre du club");
   };
   const votersByOption = new Map<string, VoterChip[]>();
   for (const v of voters?.rows ?? []) {
@@ -248,9 +268,12 @@ function PublicationDetailPage() {
       voterName: v.voter_name,
       subjectName: v.subject_name,
       subjectKind: v.subject_kind,
+      roles: v.voter_roles ?? [],
+      teams: v.voter_teams ?? [],
     });
     votersByOption.set(v.option_id, list);
   }
+
 
   const renderResults = () => (
     <div className="space-y-3">
