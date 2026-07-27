@@ -8188,6 +8188,17 @@ export type Database = {
           vote_count: number
         }[]
       }
+      get_poll_voters: {
+        Args: { _publication_id: string }
+        Returns: {
+          option_id: string
+          option_label: string
+          sort_order: number
+          subject_kind: string
+          voted_at: string
+          voter_name: string
+        }[]
+      }
       get_public_camp_by_slug: {
         Args: { _camp_slug: string; _club_slug: string }
         Returns: Json
