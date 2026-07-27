@@ -58,6 +58,8 @@ function PublicationDetailPage() {
 
   const getFn = useServerFn(getPublication);
   const resultsFn = useServerFn(getPollResults);
+  const votersFn = useServerFn(getPollVoters);
+
   const voteFn = useServerFn(castPollVote);
   const closeFn = useServerFn(closePublication);
   const deleteFn = useServerFn(deletePublication);
