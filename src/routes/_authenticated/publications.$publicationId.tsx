@@ -36,6 +36,7 @@ import {
   getPublication,
   getPollResults,
   getPollVoters,
+  getPollNonVoters,
   castPollVote,
   closePublication,
   deletePublication,
@@ -70,11 +71,13 @@ function PublicationDetailPage() {
   const closeFn = useServerFn(closePublication);
   const deleteFn = useServerFn(deletePublication);
   const recipientsFn = useServerFn(listPublicationRecipients);
+  const nonVotersFn = useServerFn(getPollNonVoters);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState<string | null>(null);
   const [isChangingVote, setIsChangingVote] = useState(false);
   const [showRecipients, setShowRecipients] = useState(false);
+  const [showNonVoters, setShowNonVoters] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["publication", publicationId],
@@ -125,6 +128,15 @@ function PublicationDetailPage() {
     queryKey: ["publication-voters", publicationId],
     queryFn: () => votersFn({ data: { publicationId } }),
     enabled: !!data && isPoll && isStaff && data?.publication?.poll_visibility === "staff_visible",
+  });
+
+  const canSeeNonVoters =
+    !!data && isPoll && isStaff && data?.publication?.poll_visibility === "staff_visible";
+
+  const { data: nonVoters } = useQuery({
+    queryKey: ["publication-non-voters", publicationId],
+    queryFn: () => nonVotersFn({ data: { publicationId } }),
+    enabled: canSeeNonVoters && showNonVoters,
   });
 
   const { data: recipients } = useQuery({
@@ -196,6 +208,7 @@ function PublicationDetailPage() {
       qc.invalidateQueries({ queryKey: ["publication", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-voters", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-non-voters", publicationId] });
     },
     onError: (e: any) => {
       const msg = e?.message || "";
