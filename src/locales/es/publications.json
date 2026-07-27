@@ -57,6 +57,7 @@
     "votingAs": "I am voting as:",
     "votingAsSelf": "Me",
     "votingForChild": "You are voting for {{name}}",
+    "parentOf": "Padre/madre de {{name}}",
     "player": "Player",
     "confirmVote": "Confirmar: {{option}}",
     "pollClosed": "Encuesta cerrada"
