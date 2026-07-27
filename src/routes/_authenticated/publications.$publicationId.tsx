@@ -190,10 +190,15 @@ function PublicationDetailPage() {
   const totalVotes = results?.rows?.[0]?.total_voters ?? 0;
   const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
 
-  const votersByOption = new Map<string, string[]>();
+  type VoterChip = { voterName: string; subjectName: string; subjectKind: string };
+  const votersByOption = new Map<string, VoterChip[]>();
   for (const v of voters?.rows ?? []) {
     const list = votersByOption.get(v.option_id) ?? [];
-    list.push(v.voter_name);
+    list.push({
+      voterName: v.voter_name,
+      subjectName: v.subject_name,
+      subjectKind: v.subject_kind,
+    });
     votersByOption.set(v.option_id, list);
   }
 
@@ -205,7 +210,7 @@ function PublicationDetailPage() {
         const oid = r.option_id ?? r.id;
         const isMine = myCurrentOption === oid;
         const count = r.vote_count;
-        const names = votersByOption.get(oid) ?? [];
+        const chips = votersByOption.get(oid) ?? [];
         const pct =
           count == null ? null : totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
         return (
@@ -226,21 +231,31 @@ function PublicationDetailPage() {
                 }}
               />
             </div>
-            {names.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-0.5">
-                {names.map((n, i) => (
-                  <span
-                    key={`${oid}-${i}`}
-                    className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
-                  >
-                    {n}
-                  </span>
-                ))}
+            {chips.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {chips.map((c, i) => {
+                  const isGuardian = c.subjectKind === "player" && c.voterName !== c.subjectName;
+                  return (
+                    <span
+                      key={`${oid}-${i}`}
+                      className="rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground leading-tight"
+                    >
+                      <span className="block">{c.voterName}</span>
+                      {isGuardian && (
+                        <span className="block text-[10px] opacity-80">
+                          {t("publications:detail.parentOf", "Parent de {{name}}", {
+                            name: c.subjectName,
+                          })}
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
         );
-      })}
+      })
 
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
