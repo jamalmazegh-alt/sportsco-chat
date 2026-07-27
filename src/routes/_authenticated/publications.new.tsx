@@ -497,6 +497,42 @@ function NewPublicationPage() {
               </div>
 
               <div className="space-y-2">
+                <Label>{t("publications:new.answerMode", "Réponses")}</Label>
+                <RadioGroup
+                  value={pollAllowMultiple ? "multiple" : "single"}
+                  onValueChange={(v) => setPollAllowMultiple(v === "multiple")}
+                  className="space-y-1.5"
+                >
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <RadioGroupItem value="single" id="am-single" className="mt-0.5" />
+                    <div>
+                      <div>{t("publications:new.answerSingle", "Réponse unique")}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {t(
+                          "publications:new.answerSingleDesc",
+                          "Chaque votant choisit une seule option.",
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <RadioGroupItem value="multiple" id="am-multi" className="mt-0.5" />
+                    <div>
+                      <div>{t("publications:new.answerMultiple", "Réponses multiples")}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {t(
+                          "publications:new.answerMultipleDesc",
+                          "Chaque votant peut sélectionner plusieurs options.",
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+
+
+
+              <div className="space-y-2">
                 <Label>{t("publications:new.visibility", "Visibilité des résultats")}</Label>
                 <RadioGroup
                   value={pollVisibility}
