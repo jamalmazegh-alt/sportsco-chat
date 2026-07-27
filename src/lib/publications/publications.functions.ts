@@ -443,16 +443,24 @@ export const getPublication = createServerFn({ method: "POST" })
     if (pubErr) throw new Response(`get_failed: ${pubErr.message}`, { status: 500 });
     if (!pub) throw new Response("not_found", { status: 404 });
 
-    const [{ data: opts }, { data: eligible, error: eligibleErr }, { data: staff }] =
-      await Promise.all([
-        supabase
-          .from("club_poll_options")
-          .select("id, label, sort_order")
-          .eq("publication_id", data.publicationId)
-          .order("sort_order", { ascending: true }),
-        supabase.rpc("get_eligible_vote_subjects" as any, { _publication_id: data.publicationId }),
-        supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
-      ]);
+    const [
+      { data: opts },
+      { data: eligible, error: eligibleErr },
+      { data: staff },
+      { data: auds },
+    ] = await Promise.all([
+      supabase
+        .from("club_poll_options")
+        .select("id, label, sort_order")
+        .eq("publication_id", data.publicationId)
+        .order("sort_order", { ascending: true }),
+      supabase.rpc("get_eligible_vote_subjects" as any, { _publication_id: data.publicationId }),
+      supabase.rpc("is_club_staff" as any, { _user_id: userId, _club_id: pub.club_id }),
+      supabase
+        .from("club_publication_audiences")
+        .select("audience_type, team_id, group_id, category_label, event_id")
+        .eq("publication_id", data.publicationId),
+    ]);
     if (eligibleErr) throw new Response(`eligible_failed: ${eligibleErr.message}`, { status: 500 });
 
     const eligibleSubjects = (
@@ -473,10 +481,32 @@ export const getPublication = createServerFn({ method: "POST" })
       currentOptionIds: r.current_option_ids ?? (r.current_option_id ? [r.current_option_id] : []),
     }));
 
+    const audienceRows = (auds ?? []) as Array<{
+      audience_type: string;
+      team_id: string | null;
+      group_id: string | null;
+      category_label: string | null;
+      event_id: string | null;
+    }>;
+    const teamIds = Array.from(
+      new Set(audienceRows.map((a) => a.team_id).filter((x): x is string => !!x)),
+    );
+    const teamNames = new Map<string, string>();
+    if (teamIds.length > 0) {
+      const { data: teams } = await supabase.from("teams").select("id, name").in("id", teamIds);
+      for (const tm of (teams ?? []) as { id: string; name: string }[]) {
+        teamNames.set(tm.id, tm.name);
+      }
+    }
+
     return {
       publication: pub,
       options: opts ?? [],
       eligibleSubjects,
       isStaff: !!staff,
+      audiences: audienceRows.map((a) => ({
+        ...a,
+        team_name: a.team_id ? (teamNames.get(a.team_id) ?? null) : null,
+      })),
     };
   });

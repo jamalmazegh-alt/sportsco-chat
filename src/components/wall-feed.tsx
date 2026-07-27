@@ -84,6 +84,7 @@ type PollItem = {
   voter_count?: number;
   options?: PollOptionResult[];
   audiences?: PollAudience[];
+  can_vote?: boolean;
 };
 
 const SOURCE_META: Record<
@@ -318,12 +319,27 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
             optionsByPoll.set(o.publication_id, arr);
           }
         }
+        // Voting eligibility per poll (staff-only viewers get 0 subjects).
+        const eligibility = new Map<string, boolean>();
+        await Promise.all(
+          list.map(async (p) => {
+            try {
+              const { data: subjects } = await supabase.rpc("get_eligible_vote_subjects" as any, {
+                _publication_id: p.id,
+              });
+              eligibility.set(p.id, Array.isArray(subjects) && subjects.length > 0);
+            } catch {
+              eligibility.set(p.id, false);
+            }
+          }),
+        );
         if (!cancelled) {
           setPolls(
             list.map((p) => ({
               ...p,
               voter_count: counts.get(p.id) ?? 0,
               options: optionsByPoll.get(p.id),
+              can_vote: eligibility.get(p.id) ?? false,
             })),
           );
         }
@@ -1533,6 +1549,22 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
             defaultValue: "Staff {{team}}",
             team: `${staffTeams[0].name} +${staffTeams.length - 1}`,
           });
+  // Audience target badges (excluding staff_equipe already rendered above).
+  const targetLabels = Array.from(
+    new Set(
+      (poll.audiences ?? [])
+        .filter((a) => a.audience_type !== "staff_equipe")
+        .map((a) => {
+          const base = t(`publications:audience.types.${a.audience_type}`, {
+            defaultValue: a.audience_type,
+          });
+          const team = a.team_id ? teamsById.get(a.team_id)?.name : null;
+          if (team) return `${base} · ${team}`;
+          if (a.category_label) return `${base} · ${a.category_label}`;
+          return base;
+        }),
+    ),
+  ).slice(0, 3);
   return (
     <li
       className={cn(
@@ -1565,6 +1597,16 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
               {staffLabel}
             </span>
           )}
+          {targetLabels.map((label) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border max-w-[180px] truncate"
+              title={label}
+            >
+              <Users className="h-2.5 w-2.5 shrink-0" />
+              {label}
+            </span>
+          ))}
           {isAnonymous && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
               {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
@@ -1636,9 +1678,9 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
               count: poll.voter_count ?? 0,
             })}
           </span>
-          <Button asChild size="sm" variant={isClosed ? "outline" : "default"}>
+          <Button asChild size="sm" variant={isClosed || !poll.can_vote ? "outline" : "default"}>
             <Link to="/publications/$publicationId" params={{ publicationId: poll.id }}>
-              {isClosed
+              {isClosed || !poll.can_vote
                 ? t("publications:card.viewResults", { defaultValue: "Voir les résultats" })
                 : t("publications:card.vote", { defaultValue: "Voter" })}
             </Link>
