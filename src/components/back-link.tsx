@@ -20,7 +20,11 @@ export function BackLink({ label, className, ...linkProps }: CommonProps & LinkP
   const { t } = useTranslation();
   const text = label ?? t("common.back", { defaultValue: "Retour" });
   return (
-    <Link {...(linkProps as LinkProps)} aria-label={text} className={cn(backClasses, className)}>
+    <Link
+      {...(linkProps as React.ComponentProps<typeof Link>)}
+      aria-label={text}
+      className={cn(backClasses, className)}
+    >
       <span className={chevronWrapClasses}>
         <ChevronLeft className="h-3.5 w-3.5" />
       </span>
