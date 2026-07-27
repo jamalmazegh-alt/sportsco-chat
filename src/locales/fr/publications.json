@@ -66,7 +66,8 @@
     "player": "Joueur",
     "confirmVote": "Confirmer : {{option}}",
     "pollClosed": "Sondage fermé",
-    "multipleHint": "Plusieurs réponses possibles — touchez pour ajouter ou retirer."
+    "multipleHint": "Plusieurs réponses possibles — touchez pour ajouter ou retirer.",
+    "saveVote": "Enregistrer mes réponses"
   },
   "type": {
     "message": "Communication",

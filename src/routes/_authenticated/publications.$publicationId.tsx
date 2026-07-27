@@ -160,6 +160,47 @@ function PublicationDetailPage() {
     },
   });
 
+  // Multi-choice polls: local draft + explicit save button.
+  const [multiDraftState, setMultiDraftState] = useState<string[] | null>(null);
+  const multiDraft = multiDraftState ?? myOptionIds;
+  const setMultiDraft = (fn: (prev: string[] | null) => string[]) =>
+    setMultiDraftState((prev) => fn(prev));
+  const multiDirty =
+    multiDraftState !== null &&
+    (multiDraft.length !== myOptionIds.length ||
+      multiDraft.some((id) => !myOptionIds.includes(id)));
+
+  const saveMulti = useMutation({
+    mutationFn: async () => {
+      if (!activeSubject) throw new Error("no_subject");
+      const toAdd = multiDraft.filter((id) => !myOptionIds.includes(id));
+      const toRemove = myOptionIds.filter((id) => !multiDraft.includes(id));
+      for (const optionId of [...toAdd, ...toRemove]) {
+        await voteFn({
+          data: {
+            publicationId,
+            optionId,
+            subjectKind: activeSubject.subjectKind,
+            subjectId: activeSubject.subjectId,
+          },
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success(t("publications:detail.voted", "Vote enregistré"));
+      setMultiDraftState(null);
+      qc.invalidateQueries({ queryKey: ["publication", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-voters", publicationId] });
+    },
+    onError: (e: any) => {
+      const msg = e?.message || "";
+      if (msg.includes("poll_closed")) toast.error(t("publications:errors.pollClosed"));
+      else if (/forbidden/i.test(msg)) toast.error(t("publications:errors.forbidden"));
+      else toast.error(t("common.error", "Erreur"));
+    },
+  });
+
   const closeMut = useMutation({
     mutationFn: async () => closeFn({ data: { publicationId } }),
     onSuccess: () => {
@@ -411,7 +452,7 @@ function PublicationDetailPage() {
                   </div>
                   <div className="space-y-2">
                     {data.options.map((opt) => {
-                      const checked = myOptionIds.includes(opt.id);
+                      const checked = multiDraft.includes(opt.id);
                       return (
                         <label
                           key={opt.id}
@@ -419,13 +460,34 @@ function PublicationDetailPage() {
                         >
                           <Checkbox
                             checked={checked}
-                            disabled={vote.isPending}
-                            onCheckedChange={() => vote.mutate(opt.id)}
+                            disabled={saveMulti.isPending}
+                            onCheckedChange={() =>
+                              setMultiDraft((prev) => {
+                                const base = prev ?? myOptionIds;
+                                return base.includes(opt.id)
+                                  ? base.filter((id) => id !== opt.id)
+                                  : [...base, opt.id];
+                              })
+                            }
                           />
                           <span className="text-sm">{opt.label}</span>
                         </label>
                       );
                     })}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      disabled={!multiDirty || saveMulti.isPending}
+                      onClick={() => saveMulti.mutate()}
+                    >
+                      {saveMulti.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                      {t("publications:detail.saveVote", "Enregistrer mes réponses")}
+                    </Button>
+                    {multiDirty && (
+                      <Button variant="outline" onClick={() => setMultiDraftState(null)}>
+                        {t("common.cancel", "Annuler")}
+                      </Button>
+                    )}
                   </div>
                   {isStaff && (
                     <div className="pt-3 border-t space-y-2">

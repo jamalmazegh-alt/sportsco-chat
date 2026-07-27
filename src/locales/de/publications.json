@@ -66,7 +66,8 @@
     "player": "Player",
     "confirmVote": "Bestätigen: {{option}}",
     "pollClosed": "Umfrage geschlossen",
-    "multipleHint": "Multiple answers allowed — tap to add or remove."
+    "multipleHint": "Multiple answers allowed — tap to add or remove.",
+    "saveVote": "Antworten speichern"
   },
   "type": {
     "message": "Message",
