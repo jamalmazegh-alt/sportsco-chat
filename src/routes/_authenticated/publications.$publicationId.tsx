@@ -282,29 +282,31 @@ function PublicationDetailPage() {
               />
             </div>
             {chips.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1.5">
+              <ul className="divide-y divide-border/60 rounded-lg border border-border/60 bg-card/40 pt-0 mt-1.5">
                 {chips.map((c, i) => {
                   const isGuardian = c.subjectKind === "player" && c.voterName !== c.subjectName;
+                  const role = isGuardian
+                    ? t("publications:detail.parentOf", "Parent de {{name}}", {
+                        name: shortName(c.subjectName),
+                      })
+                    : c.subjectKind === "player"
+                      ? t("publications:detail.player", "Joueur")
+                      : t("publications:detail.member", "Membre du club");
                   return (
-                    <span
+                    <li
                       key={`${oid}-${i}`}
-                      className="inline-flex max-w-full items-stretch overflow-hidden rounded-full border border-border bg-card"
+                      className="flex items-baseline justify-between gap-3 px-3 py-1.5"
                     >
-                      <span className="truncate px-2.5 py-1 text-xs font-semibold text-foreground">
+                      <span className="truncate text-xs font-semibold text-foreground">
                         {c.voterName}
                       </span>
-                      {isGuardian && (
-                        <span className="truncate border-l border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                          {t("publications:detail.forChild", "pour {{name}}", {
-                            name: shortName(c.subjectName),
-                          })}
-                        </span>
-                      )}
-                    </span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">{role}</span>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             )}
+
           </div>
         );
       })}
