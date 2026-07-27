@@ -411,7 +411,7 @@ function PublicationDetailPage() {
                   </div>
                   <div className="space-y-2">
                     {data.options.map((opt) => {
-                      const checked = myOptionIds.includes(opt.id);
+                      const checked = multiDraft.includes(opt.id);
                       return (
                         <label
                           key={opt.id}
@@ -419,13 +419,34 @@ function PublicationDetailPage() {
                         >
                           <Checkbox
                             checked={checked}
-                            disabled={vote.isPending}
-                            onCheckedChange={() => vote.mutate(opt.id)}
+                            disabled={saveMulti.isPending}
+                            onCheckedChange={() =>
+                              setMultiDraft((prev) => {
+                                const base = prev ?? myOptionIds;
+                                return base.includes(opt.id)
+                                  ? base.filter((id) => id !== opt.id)
+                                  : [...base, opt.id];
+                              })
+                            }
                           />
                           <span className="text-sm">{opt.label}</span>
                         </label>
                       );
                     })}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      disabled={!multiDirty || saveMulti.isPending}
+                      onClick={() => saveMulti.mutate()}
+                    >
+                      {saveMulti.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                      {t("publications:detail.saveVote", "Enregistrer mes réponses")}
+                    </Button>
+                    {multiDirty && (
+                      <Button variant="outline" onClick={() => setMultiDraftState(null)}>
+                        {t("common.cancel", "Annuler")}
+                      </Button>
+                    )}
                   </div>
                   {isStaff && (
                     <div className="pt-3 border-t space-y-2">
@@ -440,6 +461,7 @@ function PublicationDetailPage() {
                   )}
                 </div>
               ) : canVote && (!myCurrentOption || isChangingVote) ? (
+
                 <>
                   <RadioGroup
                     value={selectedOption ?? myCurrentOption ?? ""}
