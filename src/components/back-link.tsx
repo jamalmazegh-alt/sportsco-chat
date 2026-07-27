@@ -3,7 +3,9 @@ import { ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-type LinkProps = React.ComponentProps<typeof Link>;
+type LinkProps = Omit<React.ComponentProps<typeof Link>, "params"> & {
+  params?: Record<string, string>;
+};
 
 interface CommonProps {
   label?: string;
