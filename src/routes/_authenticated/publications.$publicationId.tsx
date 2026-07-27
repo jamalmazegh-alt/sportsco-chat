@@ -392,58 +392,21 @@ function PublicationDetailPage() {
                       </Button>
                     )}
                   </div>
+                  {isStaff && (
+                    <div className="pt-3 border-t space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">
+                        {t("publications:detail.currentResults", "Résultats en cours")}
+                        {totalVotes > 0
+                          ? ` · ${t("publications:detail.voters", "{{count}} votant(s)", { count: totalVotes })}`
+                          : ""}
+                      </div>
+                      {renderResults()}
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="space-y-3">
-                  <div className="space-y-2">
-                    {(
-                      results?.rows ??
-                      data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
-                    ).map((r: any) => {
-                      const isMine = myCurrentOption === r.option_id;
-                      const count = r.vote_count;
-                      const pct =
-                        count == null
-                          ? null
-                          : totalVotes > 0
-                            ? Math.round((count / totalVotes) * 100)
-                            : 0;
-                      return (
-                        <div key={r.option_id} className="space-y-1">
-                          <div className="flex justify-between text-sm">
-                            <span className={isMine ? "font-medium" : ""}>
-                              {r.label} {isMine && "✓"}
-                            </span>
-                            <span className="text-muted-foreground text-xs">
-                              {count == null
-                                ? t("publications:detail.masked", "—")
-                                : `${count} · ${pct}%`}
-                            </span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${isMine ? "bg-primary" : "bg-primary/40"}`}
-                              style={{
-                                width:
-                                  count == null ? "0%" : `${Math.round((count / maxCount) * 100)}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {results?.rows?.some((r) => r.below_threshold) && (
-                      <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
-                        <Info className="h-3.5 w-3.5 mt-0.5" />
-                        <span>
-                          {t(
-                            "publications:detail.thresholdNotice",
-                            "Résultats masqués pour préserver l'anonymat (< 3 votes par option).",
-                          )}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  {renderResults()}
                   {canVote && (
                     <Button variant="outline" onClick={() => setIsChangingVote(true)}>
                       {t("publications:detail.changeVote", "Changer mon vote")}
@@ -451,6 +414,7 @@ function PublicationDetailPage() {
                   )}
                 </div>
               )}
+
             </div>
           )}
         </CardContent>
