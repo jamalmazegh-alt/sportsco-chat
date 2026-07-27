@@ -69,7 +69,13 @@
     "pollClosed": "Poll closed",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
     "saveVote": "Save my answers",
-    "member": "Club member"
+    "member": "Club member",
+    "roleCoach": "Coach",
+    "roleAssistantCoach": "Assistant coach",
+    "roleStaff": "Staff",
+    "roleAdmin": "Administrator",
+    "roleDirigeant": "Board member",
+    "roleParentSelf": "Parent (own vote)"
   },
   "type": {
     "message": "Message",

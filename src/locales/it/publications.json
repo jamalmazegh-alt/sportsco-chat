@@ -69,7 +69,13 @@
     "pollClosed": "Sondaggio chiuso",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
     "saveVote": "Salva le mie risposte",
-    "member": "Membro del club"
+    "member": "Membro del club",
+    "roleCoach": "Allenatore",
+    "roleAssistantCoach": "Vice allenatore",
+    "roleStaff": "Staff",
+    "roleAdmin": "Amministratore",
+    "roleDirigeant": "Dirigente",
+    "roleParentSelf": "Genitore (voto proprio)"
   },
   "type": {
     "message": "Message",

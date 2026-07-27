@@ -69,7 +69,13 @@
     "pollClosed": "Poll gesloten",
     "multipleHint": "Multiple answers allowed — tap to add or remove.",
     "saveVote": "Antwoorden opslaan",
-    "member": "Clublid"
+    "member": "Clublid",
+    "roleCoach": "Coach",
+    "roleAssistantCoach": "Assistent-coach",
+    "roleStaff": "Staf",
+    "roleAdmin": "Beheerder",
+    "roleDirigeant": "Bestuurslid",
+    "roleParentSelf": "Ouder (eigen stem)"
   },
   "type": {
     "message": "Message",
