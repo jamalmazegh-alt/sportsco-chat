@@ -304,6 +304,30 @@ export const getPollVoters = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
+// getPollNonVoters — staff only, nominative polls: recipients without a vote
+// ---------------------------------------------------------------------------
+export const getPollNonVoters = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ publicationId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("get_poll_non_voters" as any, {
+      _publication_id: data.publicationId,
+    });
+    if (error) {
+      if (/poll_is_anonymous|forbidden/.test(error.message)) return { rows: [] };
+      throw new Response(`non_voters_failed: ${error.message}`, { status: 500 });
+    }
+    return {
+      rows: (rows ?? []) as Array<{
+        subject_kind: string;
+        subject_name: string;
+        subject_roles: string[] | null;
+        subject_teams: string[] | null;
+      }>,
+    };
+  });
+
+// ---------------------------------------------------------------------------
 
 // closePublication / deletePublication
 // ---------------------------------------------------------------------------

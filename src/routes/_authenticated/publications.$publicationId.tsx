@@ -14,6 +14,9 @@ import {
   Trash2,
   Loader2,
   Info,
+  UserX,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +35,7 @@ import {
   getPublication,
   getPollResults,
   getPollVoters,
+  getPollNonVoters,
   castPollVote,
   closePublication,
   deletePublication,
@@ -66,11 +70,13 @@ function PublicationDetailPage() {
   const closeFn = useServerFn(closePublication);
   const deleteFn = useServerFn(deletePublication);
   const recipientsFn = useServerFn(listPublicationRecipients);
+  const nonVotersFn = useServerFn(getPollNonVoters);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState<string | null>(null);
   const [isChangingVote, setIsChangingVote] = useState(false);
   const [showRecipients, setShowRecipients] = useState(false);
+  const [showNonVoters, setShowNonVoters] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["publication", publicationId],
@@ -121,6 +127,15 @@ function PublicationDetailPage() {
     queryKey: ["publication-voters", publicationId],
     queryFn: () => votersFn({ data: { publicationId } }),
     enabled: !!data && isPoll && isStaff && data?.publication?.poll_visibility === "staff_visible",
+  });
+
+  const canSeeNonVoters =
+    !!data && isPoll && isStaff && data?.publication?.poll_visibility === "staff_visible";
+
+  const { data: nonVoters } = useQuery({
+    queryKey: ["publication-non-voters", publicationId],
+    queryFn: () => nonVotersFn({ data: { publicationId } }),
+    enabled: canSeeNonVoters && showNonVoters,
   });
 
   const { data: recipients } = useQuery({
@@ -192,6 +207,7 @@ function PublicationDetailPage() {
       qc.invalidateQueries({ queryKey: ["publication", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-results", publicationId] });
       qc.invalidateQueries({ queryKey: ["publication-voters", publicationId] });
+      qc.invalidateQueries({ queryKey: ["publication-non-voters", publicationId] });
     },
     onError: (e: any) => {
       const msg = e?.message || "";
@@ -347,6 +363,54 @@ function PublicationDetailPage() {
           </div>
         );
       })}
+
+      {canSeeNonVoters && (
+        <div className="pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-between"
+            onClick={() => setShowNonVoters((v) => !v)}
+          >
+            <span className="flex items-center gap-2">
+              <UserX className="h-4 w-4" />
+              {t("publications:detail.nonVoters", "Qui n'a pas encore répondu")}
+            </span>
+            {showNonVoters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+          {showNonVoters && (
+            <div className="mt-2 rounded-xl border border-border bg-muted/30 overflow-hidden">
+              {nonVoters?.rows?.length ? (
+                <ul className="divide-y divide-border/60">
+                  {nonVoters.rows.map((n, i) => (
+                    <li
+                      key={`nv-${i}`}
+                      className="flex items-baseline justify-between gap-3 px-3 py-1.5"
+                    >
+                      <span className="truncate text-xs font-semibold text-foreground">
+                        {n.subject_name}
+                      </span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">
+                        {n.subject_kind === "player"
+                          ? t("publications:detail.player", "Joueur")
+                          : selfRoleLabel(n.subject_roles ?? [], n.subject_teams ?? [])}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="px-3 py-2 text-xs text-muted-foreground">
+                  {t("publications:detail.nonVotersEmpty", "Tout le monde a répondu 🎉")}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">

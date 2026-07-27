@@ -75,7 +75,9 @@
     "roleStaff": "Staff",
     "roleAdmin": "Administrador",
     "roleDirigeant": "Dirigente",
-    "roleParentSelf": "Pai/Mãe (voto próprio)"
+    "roleParentSelf": "Pai/Mãe (voto próprio)",
+    "nonVoters": "Quem ainda não respondeu",
+    "nonVotersEmpty": "Todos responderam 🎉"
   },
   "type": {
     "message": "Message",
