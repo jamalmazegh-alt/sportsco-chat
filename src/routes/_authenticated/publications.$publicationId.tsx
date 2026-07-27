@@ -288,14 +288,14 @@ function PublicationDetailPage() {
                   return (
                     <span
                       key={`${oid}-${i}`}
-                      className="rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 leading-tight"
+                      className="inline-flex max-w-full items-stretch overflow-hidden rounded-full border border-border bg-card"
                     >
-                      <span className="block text-xs font-medium text-foreground">
-                        {shortName(c.voterName)}
+                      <span className="truncate px-2.5 py-1 text-xs font-semibold text-foreground">
+                        {c.voterName}
                       </span>
                       {isGuardian && (
-                        <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-muted-foreground">
-                          {t("publications:detail.parentOf", "Parent de {{name}}", {
+                        <span className="truncate border-l border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                          {t("publications:detail.forChild", "pour {{name}}", {
                             name: shortName(c.subjectName),
                           })}
                         </span>
@@ -303,6 +303,7 @@ function PublicationDetailPage() {
                     </span>
                   );
                 })}
+
               </div>
             )}
           </div>
