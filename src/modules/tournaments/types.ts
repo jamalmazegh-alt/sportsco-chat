@@ -12,6 +12,14 @@ type Tables = Database["public"]["Tables"];
 export type TournamentRow = Tables["tournaments"]["Row"];
 export type TournamentGroupRow = Tables["tournament_groups"]["Row"];
 export type TournamentTeamRow = Tables["tournament_teams"]["Row"];
+/**
+ * Team row as exposed to the client: the referent's contact details
+ * (name/email/phone) are server-only and never selected client-side.
+ */
+export type TournamentTeamPublicRow = Omit<
+  TournamentTeamRow,
+  "contact_name" | "contact_email" | "contact_phone"
+>;
 export type TournamentMatchRow = Tables["tournament_matches"]["Row"];
 export type TournamentFlightRow = Tables["tournament_flights"]["Row"];
 
@@ -28,7 +36,7 @@ export type TournamentWithClub = TournamentRow & {
 export interface TournamentDetail {
   tournament: TournamentWithClub;
   groups: TournamentGroupRow[];
-  teams: TournamentTeamRow[];
+  teams: TournamentTeamPublicRow[];
   matches: TournamentMatchRow[];
   flights: TournamentFlightRow[];
   canManage: boolean;

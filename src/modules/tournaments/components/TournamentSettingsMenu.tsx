@@ -23,7 +23,7 @@ import { StaffAndOfficialsPanel } from "./StaffAndOfficialsPanel";
 import { ShareDialog } from "./ShareDialog";
 import type {
   TournamentWithClub,
-  TournamentTeamRow,
+  TournamentTeamPublicRow,
   TournamentMatchRow,
   TournamentGroupRow,
 } from "../types";
@@ -41,7 +41,7 @@ export type FormatView = "all" | "format" | "draw" | "schedule";
 
 interface Props {
   tournament: TournamentWithClub;
-  teams: TournamentTeamRow[];
+  teams: TournamentTeamPublicRow[];
   matches: TournamentMatchRow[];
   groups: TournamentGroupRow[];
   publicUrl: string;
