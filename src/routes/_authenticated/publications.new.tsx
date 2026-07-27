@@ -231,6 +231,7 @@ function NewPublicationPage() {
           audiences: audiences as any,
           manualMemberIds,
           pollOptions: type === "poll" ? pollOptions.map((s) => s.trim()).filter(Boolean) : [],
+          pollAllowMultiple: type === "poll" ? pollAllowMultiple : false,
           documentIds: [],
           mediaPaths: [],
         },
