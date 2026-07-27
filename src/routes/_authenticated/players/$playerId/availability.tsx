@@ -153,7 +153,7 @@ function AvailabilityPage() {
 
   return (
     <div className="space-y-4">
-      <BackLink />
+      <BackLink to="/players/$playerId" params={{ playerId }} />
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-lg font-semibold">
           {t("availability.title", { defaultValue: "Disponibilités" })}

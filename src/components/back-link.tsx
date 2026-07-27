@@ -3,7 +3,9 @@ import { ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-type LinkProps = React.ComponentProps<typeof Link>;
+type LinkProps = Omit<React.ComponentProps<typeof Link>, "params"> & {
+  params?: Record<string, string>;
+};
 
 interface CommonProps {
   label?: string;
@@ -18,7 +20,11 @@ export function BackLink({ label, className, ...linkProps }: CommonProps & LinkP
   const { t } = useTranslation();
   const text = label ?? t("common.back", { defaultValue: "Retour" });
   return (
-    <Link {...(linkProps as LinkProps)} aria-label={text} className={cn(backClasses, className)}>
+    <Link
+      {...(linkProps as React.ComponentProps<typeof Link>)}
+      aria-label={text}
+      className={cn(backClasses, className)}
+    >
       <span className={chevronWrapClasses}>
         <ChevronLeft className="h-3.5 w-3.5" />
       </span>
