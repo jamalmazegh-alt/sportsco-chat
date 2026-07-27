@@ -282,6 +282,7 @@ export const getPollVoters = createServerFn({ method: "POST" })
         option_label: string;
         sort_order: number;
         voter_name: string;
+        subject_name: string;
         subject_kind: string;
         voted_at: string;
       }>,
