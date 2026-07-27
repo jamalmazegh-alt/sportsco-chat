@@ -264,7 +264,6 @@ function PublicationDetailPage() {
                 })}
               </div>
             )}
-
           </div>
         );
       })}
