@@ -194,6 +194,12 @@ function PublicationDetailPage() {
   const maxCount = Math.max(1, ...(results?.rows ?? []).map((r) => r.vote_count ?? 0));
 
   type VoterChip = { voterName: string; subjectName: string; subjectKind: string };
+  const shortName = (full: string) => {
+    const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length < 2) return full;
+    const last = parts[parts.length - 1];
+    return `${parts.slice(0, -1).join(" ")} ${last.charAt(0).toUpperCase()}.`;
+  };
   const votersByOption = new Map<string, VoterChip[]>();
   for (const v of voters?.rows ?? []) {
     const list = votersByOption.get(v.option_id) ?? [];
@@ -235,19 +241,21 @@ function PublicationDetailPage() {
               />
             </div>
             {chips.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
+              <div className="flex flex-wrap gap-2 pt-1.5">
                 {chips.map((c, i) => {
                   const isGuardian = c.subjectKind === "player" && c.voterName !== c.subjectName;
                   return (
                     <span
                       key={`${oid}-${i}`}
-                      className="rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground leading-tight"
+                      className="rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 leading-tight"
                     >
-                      <span className="block">{c.voterName}</span>
+                      <span className="block text-xs font-medium text-foreground">
+                        {shortName(c.voterName)}
+                      </span>
                       {isGuardian && (
-                        <span className="block text-[10px] opacity-80">
+                        <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-muted-foreground">
                           {t("publications:detail.parentOf", "Parent de {{name}}", {
-                            name: c.subjectName,
+                            name: shortName(c.subjectName),
                           })}
                         </span>
                       )}
@@ -256,6 +264,7 @@ function PublicationDetailPage() {
                 })}
               </div>
             )}
+
           </div>
         );
       })}
