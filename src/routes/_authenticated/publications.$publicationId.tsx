@@ -253,7 +253,7 @@ function PublicationDetailPage() {
   }
 
   const renderResults = () => (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {(
         results?.rows ?? data.options.map((o) => ({ ...o, vote_count: 0, below_threshold: false }))
       ).map((r: any) => {
@@ -264,25 +264,40 @@ function PublicationDetailPage() {
         const pct =
           count == null ? null : totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
         return (
-          <div key={oid} className="space-y-1">
-            <div className="flex justify-between text-sm">
-              <span className={isMine ? "font-medium" : ""}>
-                {r.label} {isMine && "✓"}
-              </span>
-              <span className="text-muted-foreground text-xs">
-                {count == null ? t("publications:detail.masked", "—") : `${count} · ${pct}%`}
-              </span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div
-                className={`h-full ${isMine ? "bg-primary" : "bg-primary/40"}`}
-                style={{
-                  width: count == null ? "0%" : `${Math.round((count / maxCount) * 100)}%`,
-                }}
-              />
+          <div
+            key={oid}
+            className={`rounded-xl border overflow-hidden ${
+              isMine ? "border-primary/60 bg-primary/5" : "border-border bg-card"
+            }`}
+          >
+            <div className="px-3 pt-3 pb-2">
+              <div className="flex items-start justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  {isMine && <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />}
+                  <span>{r.label}</span>
+                </span>
+                <span className="shrink-0 text-right leading-tight">
+                  <span className="block text-lg font-bold tabular-nums text-foreground">
+                    {count == null ? t("publications:detail.masked", "—") : `${pct}%`}
+                  </span>
+                  {count != null && (
+                    <span className="block text-[11px] font-medium text-muted-foreground">
+                      {t("publications:poll.votesCount", "{{count}} vote(s)", { count })}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="mt-2 h-2.5 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${isMine ? "bg-primary" : "bg-primary/45"}`}
+                  style={{
+                    width: count == null ? "0%" : `${Math.round((count / maxCount) * 100)}%`,
+                  }}
+                />
+              </div>
             </div>
             {chips.length > 0 && (
-              <ul className="divide-y divide-border/60 rounded-lg border border-border/60 bg-card/40 pt-0 mt-1.5">
+              <ul className="divide-y divide-border/60 border-t border-border/60 bg-muted/30">
                 {chips.map((c, i) => {
                   const isGuardian = c.subjectKind === "player" && c.voterName !== c.subjectName;
                   const role = isGuardian
@@ -309,6 +324,7 @@ function PublicationDetailPage() {
           </div>
         );
       })}
+
 
       {results?.rows?.some((r) => r.below_threshold) && (
         <div className="text-xs text-muted-foreground flex items-start gap-1.5 pt-1">
