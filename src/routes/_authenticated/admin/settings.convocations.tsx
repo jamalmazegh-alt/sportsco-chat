@@ -2,6 +2,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
 import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
+import { updateConvocationChannels } from "@/lib/club-settings.functions";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
@@ -47,6 +49,7 @@ function ConvocationsSettings() {
 
   const [channels, setChannels] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const saveChannels = useServerFn(updateConvocationChannels);
 
   useEffect(() => {
     if (data) {
@@ -73,14 +76,20 @@ function ConvocationsSettings() {
 
   async function save() {
     setSaving(true);
-    const { error } = await supabase
-      .from("clubs")
-      .update({ convocation_channels: channels })
-      .eq("id", data!.id);
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(t("admin.saved"));
-    refetch();
+    try {
+      // Préserve `in_app` (non exposé dans l'UI) pour ne pas l'écraser.
+      const existing = Array.isArray(data!.convocation_channels)
+        ? (data!.convocation_channels as string[])
+        : [];
+      const next = [...channels, ...existing.filter((c) => c !== "email")];
+      await saveChannels({ data: { clubId: data!.id, channels: next as ("email" | "in_app")[] } });
+      toast.success(t("admin.saved"));
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
