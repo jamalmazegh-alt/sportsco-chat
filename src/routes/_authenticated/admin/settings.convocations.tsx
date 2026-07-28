@@ -14,7 +14,6 @@ import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
 import { updateConvocationChannels } from "@/lib/club-settings.functions";
 import i18nInstance from "@/lib/i18n";
 
-
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
   component: ConvocationsSettings,
   head: () => ({
@@ -52,7 +51,6 @@ function ConvocationsSettings() {
   const [saving, setSaving] = useState(false);
   const saveChannels = useServerFn(updateConvocationChannels);
 
-
   useEffect(() => {
     if (data) {
       setChannels(
@@ -76,8 +74,6 @@ function ConvocationsSettings() {
     setChannels((prev) => (prev.includes(ch) ? prev.filter((c) => c !== ch) : [...prev, ch]));
   }
 
-
-
   async function save() {
     setSaving(true);
     try {
@@ -95,7 +91,6 @@ function ConvocationsSettings() {
       setSaving(false);
     }
   }
-
 
   return (
     <div className="px-5 py-4 space-y-5">
