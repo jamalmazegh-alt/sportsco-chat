@@ -117,12 +117,16 @@ export function useAuthState(): AuthState {
       console.error(error);
       return;
     }
-    const list: ClubMembership[] = (data ?? []).map((row: any) => ({
-      club_id: row.club_id,
-      role: row.role,
-      roles: row.roles ?? [row.role],
-      club: row.clubs,
-    }));
+    const list: ClubMembership[] = (data ?? [])
+      // Un club masqué par RLS (ou supprimé) renvoie `clubs: null` : on ignore
+      // ces adhésions plutôt que de crasher plus loin sur `club.logo_url`.
+      .filter((row: any) => row.clubs)
+      .map((row: any) => ({
+        club_id: row.club_id,
+        role: row.role,
+        roles: row.roles ?? [row.role],
+        club: row.clubs,
+      }));
     setMemberships(list);
     const current = activeClubIdRef.current;
     if (list.length > 0 && !list.some((m) => m.club_id === current)) {

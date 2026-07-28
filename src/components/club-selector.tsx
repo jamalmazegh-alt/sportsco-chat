@@ -64,13 +64,14 @@ export function ClubSelector({ className }: { className?: string }) {
   const activeRole = active ? pickPrimaryRole(active.roles, active.role) : null;
 
   if (memberships.length === 0) return null;
-  if (memberships.length === 1 && !active?.club.logo_url) {
+  if (memberships.length === 1 && !active?.club?.logo_url) {
     // Single club, no logo: subtle text + role badge (replaces the old "·" separator).
     return (
       <span className={cn("inline-flex items-center gap-1.5 min-w-0", className)}>
         <span className="text-xs font-medium text-muted-foreground truncate max-w-[120px]">
-          {active?.club.name}
+          {active?.club?.name}
         </span>
+
         {activeRole && <RoleBadge role={activeRole} />}
       </span>
     );
@@ -87,14 +88,15 @@ export function ClubSelector({ className }: { className?: string }) {
           )}
           aria-label={t("clubSelector.label", { defaultValue: "Changer de club" })}
         >
-          {active?.club.logo_url ? (
+          {active?.club?.logo_url ? (
             <img src={active.club.logo_url} alt="" className="h-5 w-5 rounded-sm object-cover" />
           ) : (
             <Building2 className="h-4 w-4 text-muted-foreground" />
           )}
           <span className="max-w-[100px] truncate hidden sm:inline">
-            {active?.club.name ?? t("clubSelector.noClub")}
+            {active?.club?.name ?? t("clubSelector.noClub")}
           </span>
+
           {activeRole && <RoleBadge role={activeRole} className="hidden sm:inline-flex" />}
           {memberships.length > 1 && (
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -118,12 +120,13 @@ export function ClubSelector({ className }: { className?: string }) {
                   isActive && "bg-accent font-medium",
                 )}
               >
-                {m.club.logo_url ? (
+                {m.club?.logo_url ? (
                   <img src={m.club.logo_url} alt="" className="h-5 w-5 rounded-sm object-cover" />
                 ) : (
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                 )}
-                <span className="flex-1 truncate">{m.club.name}</span>
+                <span className="flex-1 truncate">{m.club?.name}</span>
+
                 <RoleBadge role={role} />
                 {isActive && <Check className="h-4 w-4 text-primary shrink-0" />}
               </DropdownMenuItem>
