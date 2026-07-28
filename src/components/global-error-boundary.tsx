@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Sentry } from "@/lib/sentry";
 import { useAuth } from "@/lib/auth-context";
+import { recoverFromStaleChunk } from "@/lib/stale-chunk-guard";
 
 interface Props {
   error?: Error;
