@@ -35,8 +35,8 @@ function AdminLayout() {
         <ShieldCheck className="h-5 w-5 text-primary" />
         <h1 className="text-xl font-semibold">{t("nav.admin", { defaultValue: "Admin" })}</h1>
       </header>
-      <nav className="px-5 pb-3 sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border">
-        <div className="flex gap-1">
+      <nav className="pb-3 sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border">
+        <div className="flex gap-1 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => {
             const active = tab.exact ? pathname === tab.to : pathname.startsWith(tab.to);
             const Icon = tab.icon;
@@ -45,17 +45,18 @@ function AdminLayout() {
                 key={tab.to}
                 to={tab.to}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/40",
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4 shrink-0" />
                 {tab.label}
               </Link>
             );
           })}
         </div>
       </nav>
+
       <Outlet />
     </div>
   );
