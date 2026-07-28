@@ -76,7 +76,7 @@ function ConvocationsSettings() {
     setChannels((prev) => (prev.includes(ch) ? prev.filter((c) => c !== ch) : [...prev, ch]));
   }
 
-  const saveChannels = useServerFn(updateConvocationChannels);
+
 
   async function save() {
     setSaving(true);
