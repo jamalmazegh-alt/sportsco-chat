@@ -50,6 +50,8 @@ function ConvocationsSettings() {
 
   const [channels, setChannels] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const saveChannels = useServerFn(updateConvocationChannels);
+
 
   useEffect(() => {
     if (data) {
