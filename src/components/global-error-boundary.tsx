@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Sentry } from "@/lib/sentry";
 import { useAuth } from "@/lib/auth-context";
+import { recoverFromStaleChunk } from "@/lib/stale-chunk-guard";
 
 interface Props {
   error?: Error;
@@ -29,6 +30,8 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
   const homeHref = session ? "/home" : "/";
   useEffect(() => {
     if (error) {
+      // Chunk obsolète après un déploiement : on recharge au lieu d'afficher l'erreur.
+      if (recoverFromStaleChunk(error)) return;
       console.error("[GlobalErrorBoundary]", error);
       Sentry.captureException(error);
     }
