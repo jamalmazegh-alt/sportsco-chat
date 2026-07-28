@@ -74,17 +74,26 @@ function ConvocationsSettings() {
     setChannels((prev) => (prev.includes(ch) ? prev.filter((c) => c !== ch) : [...prev, ch]));
   }
 
+  const saveChannels = useServerFn(updateConvocationChannels);
+
   async function save() {
     setSaving(true);
-    const { error } = await supabase
-      .from("clubs")
-      .update({ convocation_channels: channels })
-      .eq("id", data!.id);
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(t("admin.saved"));
-    refetch();
+    try {
+      // Préserve `in_app` (non exposé dans l'UI) pour ne pas l'écraser.
+      const existing = Array.isArray(data!.convocation_channels)
+        ? (data!.convocation_channels as string[])
+        : [];
+      const next = [...channels, ...existing.filter((c) => c !== "email")];
+      await saveChannels({ data: { clubId: data!.id, channels: next as ("email" | "in_app")[] } });
+      toast.success(t("admin.saved"));
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSaving(false);
+    }
   }
+
 
   return (
     <div className="px-5 py-4 space-y-5">
