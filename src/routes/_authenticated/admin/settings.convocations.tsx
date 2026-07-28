@@ -2,6 +2,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,9 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
 import { CallUpVisibilityField } from "@/components/call-up-visibility-field";
+import { updateConvocationChannels } from "@/lib/club-settings.functions";
 import i18nInstance from "@/lib/i18n";
+
 
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
   component: ConvocationsSettings,
