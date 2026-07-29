@@ -1,7 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Bell, CheckCheck, ChevronRight, Inbox, Loader2 } from "lucide-react";
+import {
+  AtSign,
+  Bell,
+  CalendarCheck,
+  CalendarClock,
+  CalendarX,
+  Car,
+  CheckCheck,
+  ChevronRight,
+  Clock,
+  Inbox,
+  LifeBuoy,
+  Loader2,
+  Megaphone,
+  MessageSquare,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
 import { toast } from "sonner";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
 import { useAuth } from "@/lib/auth-context";
@@ -41,6 +59,30 @@ function normalizeNotificationLink(link: string | null): string | null {
   if (link.startsWith("/wall#")) return link.replace("/wall#", "/inbox#");
   return link;
 }
+
+const TYPE_ICONS: Record<string, LucideIcon> = {
+  wall_post: Megaphone,
+  wall_comment: MessageSquare,
+  wall_comment_follow: MessageSquare,
+  wall_mention: AtSign,
+  convocation: CalendarCheck,
+  convocation_response: CalendarCheck,
+  convocation_cancelled: CalendarX,
+  convocation_reminder: CalendarCheck,
+  coach_assigned: Users,
+  event_staff_assigned: Users,
+  event_staff_unassigned: Users,
+  event_cancelled: CalendarX,
+  event_rescheduled: CalendarClock,
+  reminder: Clock,
+  carpool_new_driver: Car,
+  carpool_booked: Car,
+  carpool_cancelled: Car,
+  carpool_needs_ride: Car,
+  support_ticket: LifeBuoy,
+  support_reply: LifeBuoy,
+  support_status: LifeBuoy,
+};
 
 function formatNotificationDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -178,8 +220,15 @@ function NotificationsPage() {
             {notifications.map((notification) => {
               const href = normalizeNotificationLink(notification.link);
               const unreadItem = !notification.read_at;
+              const TypeIcon = TYPE_ICONS[notification.type] ?? Bell;
+              const typeLabel = t(`notificationsCenter.types.${notification.type}`, {
+                defaultValue: notification.type.replace(/_/g, " "),
+              });
               const content = (
                 <>
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <TypeIcon className="h-4 w-4" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       {unreadItem && (
@@ -201,9 +250,10 @@ function NotificationsPage() {
                       </p>
                     )}
                     <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] uppercase">
-                        {notification.type}
+                      <Badge variant="outline" className="text-[10px]">
+                        {typeLabel}
                       </Badge>
+
                       {unreadItem && (
                         <button
                           type="button"

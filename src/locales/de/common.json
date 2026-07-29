@@ -1065,7 +1065,29 @@
     "unread": "Ungelesen",
     "emptyTitle": "Keine Benachrichtigungen",
     "emptyDescription": "Aufgebote, Erwähnungen, Zahlungen und wichtige Nachrichten erscheinen hier.",
-    "loadError": "Deine Benachrichtigungen konnten gerade nicht geladen werden."
+    "loadError": "Deine Benachrichtigungen konnten gerade nicht geladen werden.",
+    "types": {
+      "wall_post": "Beitrag",
+      "wall_comment": "Kommentar",
+      "wall_comment_follow": "Kommentar",
+      "wall_mention": "Erwähnung",
+      "convocation": "Aufgebot",
+      "convocation_response": "Aufgebot-Antwort",
+      "convocation_cancelled": "Aufgebot abgesagt",
+      "coach_assigned": "Trainer zugewiesen",
+      "event_staff_assigned": "Staff zugewiesen",
+      "event_staff_unassigned": "Staff entfernt",
+      "event_cancelled": "Termin abgesagt",
+      "event_rescheduled": "Termin verschoben",
+      "reminder": "Erinnerung",
+      "carpool_new_driver": "Fahrgemeinschaft",
+      "carpool_booked": "Fahrgemeinschaft",
+      "carpool_cancelled": "Fahrgemeinschaft",
+      "carpool_needs_ride": "Fahrgemeinschaft",
+      "support_ticket": "Support",
+      "support_reply": "Support",
+      "support_status": "Support"
+    }
   },
   "profile": {
     "title": "Profil",
