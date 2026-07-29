@@ -167,9 +167,19 @@ function HomePage() {
         return { sent: new Set<string>(), counts: new Map<string, ConvocationCounts>() };
       const { data } = await supabase
         .from("convocations")
-        .select("event_id, status")
+        .select("event_id, status, players:player_id(deleted_at)")
         .in("event_id", ids);
-      const rows = (data ?? []) as Array<{ event_id: string; status: string | null }>;
+      // Ignore convocations attached to soft-deleted player records (ghost duplicates),
+      // so card counts match the event detail page.
+      const rows = (
+        (data ?? []) as Array<{
+          event_id: string;
+          status: string | null;
+          players: { deleted_at: string | null } | null;
+        }>
+      )
+        .filter((r) => r.players && !r.players.deleted_at)
+        .map((r) => ({ event_id: r.event_id, status: r.status }));
       return {
         sent: new Set<string>(rows.map((c) => c.event_id)),
         counts: buildConvocationCounts(rows),
