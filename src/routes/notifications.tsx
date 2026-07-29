@@ -221,8 +221,15 @@ function NotificationsPage() {
             {notifications.map((notification) => {
               const href = normalizeNotificationLink(notification.link);
               const unreadItem = !notification.read_at;
+              const TypeIcon = TYPE_ICONS[notification.type] ?? Bell;
+              const typeLabel = t(`notificationsCenter.types.${notification.type}`, {
+                defaultValue: notification.type.replace(/_/g, " "),
+              });
               const content = (
                 <>
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <TypeIcon className="h-4 w-4" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       {unreadItem && (
@@ -244,9 +251,10 @@ function NotificationsPage() {
                       </p>
                     )}
                     <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] uppercase">
-                        {notification.type}
+                      <Badge variant="outline" className="text-[10px]">
+                        {typeLabel}
                       </Badge>
+
                       {unreadItem && (
                         <button
                           type="button"
