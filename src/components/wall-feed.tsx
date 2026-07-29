@@ -1738,7 +1738,14 @@ function CommentBlock({
         })),
       );
     }
+    if (data?.id) {
+      // Notify the post author + previous commenters (mentions already handled).
+      notifyWallComment({
+        data: { commentId: data.id, excludeUserIds: mentioned },
+      }).catch(() => {});
+    }
     setText("");
+
   }
 
   async function del(id: string) {
