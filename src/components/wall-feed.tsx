@@ -28,6 +28,8 @@ import { MentionInput, RenderWithMentions, parseMentions } from "@/components/me
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
+import { notifyWallComment } from "@/lib/wall-comment-notify.functions";
+
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
