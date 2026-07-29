@@ -644,6 +644,7 @@
     "accountUnconfirmedHint": "Het account bestaat, maar de e-mail is nog niet bevestigd. De ouder moet op de bevestigingslink in de e-mail klikken.",
     "inviteNotSent": "Uitnodiging niet verzonden",
     "inviteSentLabel": "Uitnodiging verzonden",
+    "playerInviteSentLabel": "Uitnodiging voor speler verzonden",
     "inviteSentAction": "Uitnodigen",
     "resendAction": "Opnieuw verzenden",
     "noPlayers": "Geen Spelers beschikbaar.",

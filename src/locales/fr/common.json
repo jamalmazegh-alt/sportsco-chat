@@ -644,6 +644,7 @@
     "accountUnconfirmedHint": "Le compte existe mais l'e-mail n'a pas encore été confirmé. Le parent doit cliquer sur le lien de confirmation reçu par e-mail.",
     "inviteNotSent": "Invitation non envoyée",
     "inviteSentLabel": "Invitation envoyée",
+    "playerInviteSentLabel": "Invitation joueur envoyée",
     "parentActivationPending": "En attente d'activation du compte parent",
     "inviteSentAction": "Inviter",
     "resendAction": "Renvoyer",

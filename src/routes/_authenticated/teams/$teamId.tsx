@@ -1582,6 +1582,15 @@ function TeamDetail() {
               parentsForP.length > 0 &&
               !hasFailedInvite &&
               !hasPendingInvite;
+            // When a minor has direct platform access, parents are already
+            // active, and the player's own invitation is pending, make it
+            // explicit that we are waiting for the child account.
+            const showPlayerInviteSent =
+              isMinorP &&
+              !!p.child_platform_access &&
+              anyParentLinked &&
+              !linked &&
+              hasPendingInvite;
 
             const checked = selectedIds.has(p.id);
             const rowClass = cn(
@@ -1675,7 +1684,11 @@ function TeamDetail() {
                       ) : hasPendingInvite ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                          {showPlayerInviteSent
+                            ? t("players.playerInviteSentLabel", {
+                                defaultValue: "Invitation joueur envoyée",
+                              })
+                            : t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
                         </span>
                       ) : showParentActivationPending ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">

@@ -644,6 +644,7 @@
     "accountUnconfirmedHint": "L'account esiste ma l'email non è ancora stata confermata. Il genitore deve cliccare sul link di conferma ricevuto via email.",
     "inviteNotSent": "Invito non inviato",
     "inviteSentLabel": "Invito inviato",
+    "playerInviteSentLabel": "Invito al giocatore inviato",
     "inviteSentAction": "Invita",
     "resendAction": "Invia di nuovo",
     "noPlayers": "Nessun Giocatore presente.",
