@@ -61,7 +61,13 @@ export function ConvocationSummaryPill({
       {items.map((i) => (
         <span key={i.key} className={cn("inline-flex items-center gap-0.5", i.color)}>
           <span aria-hidden className="text-[13px] leading-none">
-            {i.key === "present" ? "✓" : i.key === "absent" ? "✕" : i.key === "uncertain" ? "?" : "·"}
+            {i.key === "present"
+              ? "✓"
+              : i.key === "absent"
+                ? "✕"
+                : i.key === "uncertain"
+                  ? "?"
+                  : "·"}
           </span>
           {i.value}
         </span>

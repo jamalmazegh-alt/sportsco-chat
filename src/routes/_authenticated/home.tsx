@@ -472,6 +472,9 @@ function HomePage() {
                                 {t("events.convocationsSentShort")}
                               </span>
                             )}
+                            {isCoach && convocStats?.counts.get(e.id) && (
+                              <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
+                            )}
                           </div>
                           <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />

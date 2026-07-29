@@ -533,6 +533,9 @@ function EventsPage() {
                   {t("events.convocationsSentShort")}
                 </span>
               )}
+              {isCoach && !isCancelled && convocStats?.counts.get(e.id) && (
+                <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
+              )}
             </div>
             <p
               className={cn(
