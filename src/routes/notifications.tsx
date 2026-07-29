@@ -1,7 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Bell, CheckCheck, ChevronRight, Inbox, Loader2 } from "lucide-react";
+import {
+  AtSign,
+  Bell,
+  CalendarCheck,
+  CalendarClock,
+  CalendarX,
+  Car,
+  CheckCheck,
+  ChevronRight,
+  Clock,
+  Inbox,
+  LifeBuoy,
+  Loader2,
+  Megaphone,
+  MessageSquare,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
 import { toast } from "sonner";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
 import { useAuth } from "@/lib/auth-context";
