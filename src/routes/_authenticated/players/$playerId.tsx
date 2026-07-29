@@ -685,7 +685,11 @@ function PlayerProfile() {
             <span
               className={cn(
                 "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
-                player.user_id ? "bg-present" : "bg-muted-foreground/40",
+                accountStatus === "active"
+                  ? "bg-present"
+                  : accountStatus === "inactive"
+                    ? "bg-muted-foreground/40"
+                    : "bg-uncertain",
               )}
             />
           )}
@@ -699,10 +703,14 @@ function PlayerProfile() {
               <span
                 className={cn(
                   "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
-                  player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
+                  accountStatus === "active"
+                    ? "bg-present/15 text-present"
+                    : accountStatus === "inactive"
+                      ? "bg-muted text-muted-foreground"
+                      : "bg-uncertain/15 text-uncertain",
                 )}
               >
-                {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
+                {accountStatusLabel}
               </span>
             )}
             {minor && (
