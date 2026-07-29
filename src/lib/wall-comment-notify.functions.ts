@@ -48,7 +48,7 @@ export const notifyWallComment = createServerFn({ method: "POST" })
 
     const { data: post } = await supabaseAdmin
       .from("wall_posts")
-      .select("id, author_user_id, content, deleted_at")
+      .select("id, author_user_id, deleted_at")
       .eq("id", postId)
       .maybeSingle();
     if (!post || (post as any).deleted_at) return { dispatched: 0, sent: 0 };
