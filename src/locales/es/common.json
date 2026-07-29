@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmar respuesta",
     "responseRecorded": "Respuesta guardada",
     "coachNotified": "El entrenador ha sido notificado.",
-    "reasonsAbsent": ["Trabajo", "Familia", "Lesión", "Enfermedad", "Estudios", "Otro compromiso"],
-    "reasonsUncertain": ["Por confirmar", "Trabajo", "Familia", "Problema de salud leve"],
+    "reasonsAbsent": [
+      "Trabajo",
+      "Familia",
+      "Lesión",
+      "Enfermedad",
+      "Estudios",
+      "Otro compromiso"
+    ],
+    "reasonsUncertain": [
+      "Por confirmar",
+      "Trabajo",
+      "Familia",
+      "Problema de salud leve"
+    ],
     "suggestedReasons": "Sugerencias",
     "forceResponseTitle": "¿Forzar respuesta?",
     "forceResponseDesc": "{{name}} ya ha respondido {{current}}. ¿De verdad quieres cambiar el estado a {{next}}?",
@@ -1060,7 +1072,29 @@
     "unread": "Sin leer",
     "emptyTitle": "No hay notificaciones",
     "emptyDescription": "Convocatorias, menciones, pagos y mensajes importantes aparecerán aquí.",
-    "loadError": "No se pudieron cargar tus notificaciones."
+    "loadError": "No se pudieron cargar tus notificaciones.",
+    "types": {
+      "wall_post": "Publicación",
+      "wall_comment": "Comentario",
+      "wall_comment_follow": "Comentario",
+      "wall_mention": "Mención",
+      "convocation": "Convocatoria",
+      "convocation_response": "Respuesta convocatoria",
+      "convocation_cancelled": "Convocatoria cancelada",
+      "coach_assigned": "Entrenador asignado",
+      "event_staff_assigned": "Staff asignado",
+      "event_staff_unassigned": "Staff retirado",
+      "event_cancelled": "Evento cancelado",
+      "event_rescheduled": "Evento aplazado",
+      "reminder": "Recordatorio",
+      "carpool_new_driver": "Transporte compartido",
+      "carpool_booked": "Transporte compartido",
+      "carpool_cancelled": "Transporte compartido",
+      "carpool_needs_ride": "Transporte compartido",
+      "support_ticket": "Soporte",
+      "support_reply": "Soporte",
+      "support_status": "Soporte"
+    }
   },
   "profile": {
     "title": "Perfil",

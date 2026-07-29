@@ -943,8 +943,20 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
-    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
+    "reasonsAbsent": [
+      "Trabalho",
+      "Família",
+      "Lesão",
+      "Doença",
+      "Estudos",
+      "Outro compromisso"
+    ],
+    "reasonsUncertain": [
+      "A confirmar",
+      "Trabalho",
+      "Família",
+      "Problema de saúde ligeiro"
+    ],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
@@ -1060,7 +1072,29 @@
     "unread": "Não lida",
     "emptyTitle": "Nenhuma notificação",
     "emptyDescription": "Convocatórias, menções, pagamentos e mensagens importantes aparecerão aqui.",
-    "loadError": "Não foi possível carregar as suas notificações agora."
+    "loadError": "Não foi possível carregar as suas notificações agora.",
+    "types": {
+      "wall_post": "Publicação",
+      "wall_comment": "Comentário",
+      "wall_comment_follow": "Comentário",
+      "wall_mention": "Menção",
+      "convocation": "Convocatória",
+      "convocation_response": "Resposta convocatória",
+      "convocation_cancelled": "Convocatória cancelada",
+      "coach_assigned": "Treinador atribuído",
+      "event_staff_assigned": "Staff atribuído",
+      "event_staff_unassigned": "Staff removido",
+      "event_cancelled": "Evento cancelado",
+      "event_rescheduled": "Evento adiado",
+      "reminder": "Lembrete",
+      "carpool_new_driver": "Boleia",
+      "carpool_booked": "Boleia",
+      "carpool_cancelled": "Boleia",
+      "carpool_needs_ride": "Boleia",
+      "support_ticket": "Suporte",
+      "support_reply": "Suporte",
+      "support_status": "Suporte"
+    }
   },
   "profile": {
     "title": "Perfil",

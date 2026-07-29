@@ -943,8 +943,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -1060,7 +1072,29 @@
     "unread": "Unread",
     "emptyTitle": "No notifications",
     "emptyDescription": "Call-ups, mentions, payments and important messages will appear here.",
-    "loadError": "Could not load your notifications right now."
+    "loadError": "Could not load your notifications right now.",
+    "types": {
+      "wall_post": "Post",
+      "wall_comment": "Comment",
+      "wall_comment_follow": "Comment",
+      "wall_mention": "Mention",
+      "convocation": "Call-up",
+      "convocation_response": "Call-up reply",
+      "convocation_cancelled": "Call-up cancelled",
+      "coach_assigned": "Coach assigned",
+      "event_staff_assigned": "Staff assigned",
+      "event_staff_unassigned": "Staff removed",
+      "event_cancelled": "Event cancelled",
+      "event_rescheduled": "Event rescheduled",
+      "reminder": "Reminder",
+      "carpool_new_driver": "Carpool",
+      "carpool_booked": "Carpool",
+      "carpool_cancelled": "Carpool",
+      "carpool_needs_ride": "Carpool",
+      "support_ticket": "Support",
+      "support_reply": "Support",
+      "support_status": "Support"
+    }
   },
   "profile": {
     "title": "Profile",

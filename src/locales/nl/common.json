@@ -943,8 +943,20 @@
     "confirmResponse": "Antwoord bevestigen",
     "responseRecorded": "Antwoord opgeslagen",
     "coachNotified": "De Coach is geïnformeerd.",
-    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
-    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
+    "reasonsAbsent": [
+      "Werk",
+      "Familie",
+      "Blessure",
+      "Ziekte",
+      "Studie",
+      "Andere verplichting"
+    ],
+    "reasonsUncertain": [
+      "Nog te bevestigen",
+      "Werk",
+      "Familie",
+      "Lichte gezondheidsklachten"
+    ],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",
@@ -1060,7 +1072,29 @@
     "unread": "Ongelezen",
     "emptyTitle": "Geen meldingen",
     "emptyDescription": "Oproepen, vermeldingen, betalingen en belangrijke berichten verschijnen hier.",
-    "loadError": "Je meldingen kunnen nu niet worden geladen."
+    "loadError": "Je meldingen kunnen nu niet worden geladen.",
+    "types": {
+      "wall_post": "Bericht",
+      "wall_comment": "Reactie",
+      "wall_comment_follow": "Reactie",
+      "wall_mention": "Vermelding",
+      "convocation": "Oproep",
+      "convocation_response": "Antwoord oproep",
+      "convocation_cancelled": "Oproep geannuleerd",
+      "coach_assigned": "Coach toegewezen",
+      "event_staff_assigned": "Staf toegewezen",
+      "event_staff_unassigned": "Staf verwijderd",
+      "event_cancelled": "Evenement geannuleerd",
+      "event_rescheduled": "Evenement verplaatst",
+      "reminder": "Herinnering",
+      "carpool_new_driver": "Carpool",
+      "carpool_booked": "Carpool",
+      "carpool_cancelled": "Carpool",
+      "carpool_needs_ride": "Carpool",
+      "support_ticket": "Support",
+      "support_reply": "Support",
+      "support_status": "Support"
+    }
   },
   "profile": {
     "title": "Profiel",

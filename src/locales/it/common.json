@@ -943,8 +943,20 @@
     "confirmResponse": "Conferma risposta",
     "responseRecorded": "Risposta registrata",
     "coachNotified": "L'Allenatore è stato informato.",
-    "reasonsAbsent": ["Lavoro", "Famiglia", "Infortunio", "Malattia", "Studio", "Altro impegno"],
-    "reasonsUncertain": ["Da confermare", "Lavoro", "Famiglia", "Leggero problema di salute"],
+    "reasonsAbsent": [
+      "Lavoro",
+      "Famiglia",
+      "Infortunio",
+      "Malattia",
+      "Studio",
+      "Altro impegno"
+    ],
+    "reasonsUncertain": [
+      "Da confermare",
+      "Lavoro",
+      "Famiglia",
+      "Leggero problema di salute"
+    ],
     "suggestedReasons": "Suggerimenti",
     "forceResponseTitle": "Forzare la risposta?",
     "forceResponseDesc": "{{name}} ha già risposto {{current}}. Vuoi davvero impostare lo stato su {{next}}?",
@@ -1060,7 +1072,29 @@
     "unread": "Non letta",
     "emptyTitle": "Nessuna notifica",
     "emptyDescription": "Convocazioni, menzioni, pagamenti e messaggi importanti appariranno qui.",
-    "loadError": "Impossibile caricare le notifiche in questo momento."
+    "loadError": "Impossibile caricare le notifiche in questo momento.",
+    "types": {
+      "wall_post": "Pubblicazione",
+      "wall_comment": "Commento",
+      "wall_comment_follow": "Commento",
+      "wall_mention": "Menzione",
+      "convocation": "Convocazione",
+      "convocation_response": "Risposta convocazione",
+      "convocation_cancelled": "Convocazione annullata",
+      "coach_assigned": "Allenatore assegnato",
+      "event_staff_assigned": "Staff assegnato",
+      "event_staff_unassigned": "Staff rimosso",
+      "event_cancelled": "Evento annullato",
+      "event_rescheduled": "Evento rinviato",
+      "reminder": "Promemoria",
+      "carpool_new_driver": "Car pooling",
+      "carpool_booked": "Car pooling",
+      "carpool_cancelled": "Car pooling",
+      "carpool_needs_ride": "Car pooling",
+      "support_ticket": "Supporto",
+      "support_reply": "Supporto",
+      "support_status": "Supporto"
+    }
   },
   "profile": {
     "title": "Profilo",
