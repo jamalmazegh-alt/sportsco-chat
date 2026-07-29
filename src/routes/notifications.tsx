@@ -42,6 +42,30 @@ function normalizeNotificationLink(link: string | null): string | null {
   return link;
 }
 
+const TYPE_ICONS: Record<string, LucideIcon> = {
+  wall_post: Megaphone,
+  wall_comment: MessageSquare,
+  wall_comment_follow: MessageSquare,
+  wall_mention: AtSign,
+  convocation: CalendarCheck,
+  convocation_response: CalendarCheck,
+  convocation_cancelled: CalendarX,
+  convocation_reminder: CalendarCheck,
+  coach_assigned: Users,
+  event_staff_assigned: Users,
+  event_staff_unassigned: Users,
+  event_cancelled: CalendarX,
+  event_rescheduled: CalendarClock,
+  reminder: Clock,
+  carpool_new_driver: Car,
+  carpool_booked: Car,
+  carpool_cancelled: Car,
+  carpool_needs_ride: Car,
+  support_ticket: LifeBuoy,
+  support_reply: LifeBuoy,
+  support_status: LifeBuoy,
+};
+
 function formatNotificationDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
@@ -50,6 +74,7 @@ function formatNotificationDate(value: string, locale: string) {
     minute: "2-digit",
   }).format(new Date(value));
 }
+
 
 function NotificationsPage() {
   const { t, i18n } = useTranslation();
