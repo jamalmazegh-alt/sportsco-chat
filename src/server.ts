@@ -93,6 +93,44 @@ const SECURITY_HEADERS: Record<string, string> = {
   ].join("; "),
 };
 
+// Origines des WebViews Capacitor : `capacitor://localhost` sur iOS,
+// `https://localhost` sur Android (`androidScheme` vaut `https` par défaut depuis
+// Capacitor 1.2 — épinglé explicitement dans `capacitor.config.ts` puisque cette
+// allowlist en dépend). Allowlist stricte et fermée — jamais `*`.
+//
+// `http://localhost` est délibérément absent : aucune WebView ne l'émet avec la
+// configuration retenue, et l'autoriser élargirait la surface CORS de la prod à
+// tout serveur local d'un poste de développeur.
+//
+// Toute requête sans en-tête `Origin`, ou portant une autre origine, reçoit
+// exactement la réponse qu'elle recevait avant : le trafic web n'est pas affecté.
+const NATIVE_ORIGINS = new Set(["capacitor://localhost", "https://localhost"]);
+
+function nativeCorsHeaders(origin: string): Record<string, string> {
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, content-type",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+function applyNativeCors(response: Response, origin: string): Response {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(nativeCorsHeaders(origin))) {
+    headers.set(k, v);
+  }
+  // La réponse varie selon l'origine : indispensable pour ne pas empoisonner
+  // les caches intermédiaires avec une réponse taillée pour la WebView.
+  const vary = headers.get("Vary");
+  headers.set("Vary", vary && !/\borigin\b/i.test(vary) ? `${vary}, Origin` : (vary ?? "Origin"));
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 function applySecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
@@ -107,14 +145,24 @@ function applySecurityHeaders(response: Response): Response {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const origin = request.headers.get("Origin") ?? "";
+    const fromNativeApp = NATIVE_ORIGINS.has(origin);
+
+    // Preflight : répondre sans réveiller le handler SSR.
+    if (fromNativeApp && request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: nativeCorsHeaders(origin) });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       const normalized = await normalizeCatastrophicSsrResponse(response);
-      return applySecurityHeaders(normalized);
+      const secured = applySecurityHeaders(normalized);
+      return fromNativeApp ? applyNativeCors(secured, origin) : secured;
     } catch (error) {
       console.error(error);
-      return applySecurityHeaders(brandedErrorResponse());
+      const secured = applySecurityHeaders(brandedErrorResponse());
+      return fromNativeApp ? applyNativeCors(secured, origin) : secured;
     }
   },
 };

@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { defineConfig as defineLovableConfig } from "@lovable.dev/vite-tanstack-config";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
-import { loadEnv, type ConfigEnv } from "vite";
+import { defaultAllowedOrigins, loadEnv, type ConfigEnv } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,11 +18,34 @@ export default async function config(env: ConfigEnv) {
   const serverEnv = loadEnv(env.mode, process.cwd(), "");
   Object.assign(process.env, serverEnv);
 
+  // Build mobile (Capacitor) : produit un shell SPA statique à embarquer dans
+  // l'app, le Worker Cloudflare restant le backend distant. Strictement opt-in —
+  // `bun run build` et le build Lovable/Cloudflare ne définissent jamais cette
+  // variable, et conservent donc le SSR à l'identique.
+  const isMobileBuild = process.env.MOBILE_BUILD === "1";
+
   return defineLovableConfig({
+    // Le build mobile n'a pas de serveur : c'est un shell statique embarqué dans
+    // l'app, le Worker restant le backend distant. Nitro force la sortie vers
+    // `.output/{server,public}` (layout Cloudflare), alors que le prérendu du
+    // mode SPA attend le layout standard `dist/{client,server}` — d'où un
+    // ERR_MODULE_NOT_FOUND sur `dist/server/server.js` au prérendu.
+    // Désactiver Nitro lève le conflit et supprime un artefact inutile ici.
+    ...(isMobileBuild ? { nitro: false as const } : {}),
     tanstackStart: {
       server: { entry: "server" },
+      // `outputPath: "/index"` : le shell est écrit en `index.html`, le point
+      // d'entrée que Capacitor charge depuis `webDir` (défaut : `/_shell`).
+      ...(isMobileBuild ? { spa: { enabled: true, prerender: { outputPath: "/index" } } } : {}),
     },
     vite: {
+      // Dev uniquement (le serveur Vite n'existe pas en prod) : autorise la
+      // WebView Capacitor du spike mobile à appeler le serveur de dev.
+      // `defaultAllowedOrigins` (regex localhost de Vite) est conservé — cette
+      // liste est un sur-ensemble strict du comportement par défaut.
+      server: {
+        cors: { origin: [defaultAllowedOrigins, "capacitor://localhost"] },
+      },
       plugins: [mcpPlugin()],
       resolve: {
         alias: {

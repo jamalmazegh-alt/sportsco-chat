@@ -4,6 +4,8 @@
  * preview registration would keep serving stale HTML to every visitor.
  */
 
+import { isNativePlatform } from "@/lib/native-platform";
+
 // Public VAPID key — safe to expose (used by browser to subscribe).
 export const VAPID_PUBLIC_KEY =
   "BOj3RpAg2v-6FpIC_J-tMV0qj0vF73r04z82_3xqdml2rMeOH-3RpRCB8H1lrN4IDz5c7YjTncAkfY0KI-zeNkE";
@@ -30,6 +32,10 @@ function shouldRefuse(): boolean {
   if (!import.meta.env.PROD) return true;
   if (window.self !== window.top) return true; // iframe
   if (isLovablePreview()) return true;
+  // WebView Capacitor : le bundle est servi depuis le système de fichiers de
+  // l'app. Un service worker y sert du HTML périmé et court-circuite les mises à
+  // jour livrées par le store. Cette garde ne peut que refuser davantage.
+  if (isNativePlatform()) return true;
   if (new URL(window.location.href).searchParams.get("sw") === "off") return true;
   return false;
 }
