@@ -1747,7 +1747,6 @@ function CommentBlock({
       }).catch(() => {});
     }
     setText("");
-
   }
 
   async function del(id: string) {

@@ -93,7 +93,6 @@ function formatNotificationDate(value: string, locale: string) {
   }).format(new Date(value));
 }
 
-
 function NotificationsPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
