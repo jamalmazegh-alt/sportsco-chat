@@ -1684,7 +1684,11 @@ function TeamDetail() {
                       ) : hasPendingInvite ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                          {showPlayerInviteSent
+                            ? t("players.playerInviteSentLabel", {
+                                defaultValue: "Invitation joueur envoyée",
+                              })
+                            : t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
                         </span>
                       ) : showParentActivationPending ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
