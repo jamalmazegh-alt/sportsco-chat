@@ -395,6 +395,54 @@ function PlayerProfile() {
   const isSelf = !!player?.user_id && player.user_id === user?.id;
   const canSeePrivate = isCoach || isSelf || isParentOfThisPlayer;
 
+  // Pending (unused) invites for this player or its parents — used to show the
+  // same account status wording as the team roster.
+  const { data: pendingInviteEmails } = useQuery({
+    queryKey: ["player-pending-invites", playerId],
+    enabled: !!playerId && canSeePrivate,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("member_invites")
+        .select("email, player_id, parent_for_player_id, used_at")
+        .is("used_at", null)
+        .or(`player_id.eq.${playerId},parent_for_player_id.eq.${playerId}`);
+      return new Set(
+        (data ?? [])
+          .map((r: any) =>
+            String(r.email ?? "")
+              .toLowerCase()
+              .trim(),
+          )
+          .filter(Boolean),
+      );
+    },
+  });
+
+  // Account status, aligned with the roster rules:
+  // - a minor without personal access is "active" as soon as a parent account exists
+  // - a minor WITH personal access but no own account shows "invitation joueur envoyée"
+  const anyParentLinked = !!parents?.some((p) => p.parent_user_id);
+  const accountStatus: "active" | "playerInviteSent" | "inviteSent" | "inactive" = (() => {
+    if (player?.user_id) return "active";
+    if (minor && !player?.child_platform_access && anyParentLinked) return "active";
+    if (minor && player?.child_platform_access && anyParentLinked) return "playerInviteSent";
+    const parentEmails = (parents ?? [])
+      .map((p) => (p.email ?? "").toLowerCase().trim())
+      .filter(Boolean);
+    const own = (player?.email ?? "").toLowerCase().trim();
+    const pending = pendingInviteEmails;
+    if (pending && [...parentEmails, own].some((e) => e && pending.has(e))) return "inviteSent";
+    return "inactive";
+  })();
+  const accountStatusLabel =
+    accountStatus === "active"
+      ? t("players.accountActive")
+      : accountStatus === "playerInviteSent"
+        ? t("players.playerInviteSentLabel", { defaultValue: "Invitation joueur envoyée" })
+        : accountStatus === "inviteSent"
+          ? t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })
+          : t("players.accountInactive");
+
   async function sendChildOnboardingInvite(targetEmail: string) {
     if (!player || !user) return;
     if (!player.club_id) {
@@ -643,7 +691,11 @@ function PlayerProfile() {
             <span
               className={cn(
                 "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
-                player.user_id ? "bg-present" : "bg-muted-foreground/40",
+                accountStatus === "active"
+                  ? "bg-present"
+                  : accountStatus === "inactive"
+                    ? "bg-muted-foreground/40"
+                    : "bg-uncertain",
               )}
             />
           )}
@@ -657,10 +709,14 @@ function PlayerProfile() {
               <span
                 className={cn(
                   "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
-                  player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
+                  accountStatus === "active"
+                    ? "bg-present/15 text-present"
+                    : accountStatus === "inactive"
+                      ? "bg-muted text-muted-foreground"
+                      : "bg-uncertain/15 text-uncertain",
                 )}
               >
-                {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
+                {accountStatusLabel}
               </span>
             )}
             {minor && (
