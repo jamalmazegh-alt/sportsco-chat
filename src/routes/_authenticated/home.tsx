@@ -37,6 +37,11 @@ import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UrgencyCenter } from "@/components/urgency-center";
 import { SponsorBanner } from "@/components/sponsors/sponsor-banner";
 import { getActiveSponsorsForHome } from "@/lib/sponsors.functions";
+import {
+  ConvocationSummaryPill,
+  buildConvocationCounts,
+  type ConvocationCounts,
+} from "@/components/convocation-summary-pill";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -153,17 +158,26 @@ function HomePage() {
   });
 
   // Coach view: which of the "next events" already have convocations dispatched.
-  const { data: convocSentSet } = useQuery({
+  const { data: convocStats } = useQuery({
     queryKey: ["home-convocs-sent", activeClubId, (upcoming ?? []).map((e) => e.id).join(",")],
     enabled: !!upcoming && upcoming.length > 0,
     queryFn: async () => {
       const ids = (upcoming ?? []).map((e) => e.id);
-      if (ids.length === 0) return new Set<string>();
-      const { data } = await supabase.from("convocations").select("event_id").in("event_id", ids);
-      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+      if (ids.length === 0)
+        return { sent: new Set<string>(), counts: new Map<string, ConvocationCounts>() };
+      const { data } = await supabase
+        .from("convocations")
+        .select("event_id, status")
+        .in("event_id", ids);
+      const rows = (data ?? []) as Array<{ event_id: string; status: string | null }>;
+      return {
+        sent: new Set<string>(rows.map((c) => c.event_id)),
+        counts: buildConvocationCounts(rows),
+      };
     },
     staleTime: 30_000,
   });
+  const convocSentSet = convocStats?.sent;
 
   const { data: myConvocs } = useQuery({
     queryKey: ["my-convocs-home", user?.id, activeClubId],
@@ -457,6 +471,9 @@ function HomePage() {
                                 <Send className="h-3 w-3" />
                                 {t("events.convocationsSentShort")}
                               </span>
+                            )}
+                            {isCoach && convocStats?.counts.get(e.id) && (
+                              <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
                             )}
                           </div>
                           <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
