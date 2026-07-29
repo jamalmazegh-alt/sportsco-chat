@@ -282,20 +282,26 @@ function EventsPage() {
 
   // Coach view: which events already have convocations dispatched.
   // Rendered as a small "Convocations envoyées" chip on each event row.
-  const { data: convocSentSet } = useQuery({
+  const { data: convocStats } = useQuery({
     queryKey: ["convocs-sent-by-event", activeClubId, (events ?? []).length],
     enabled: !!events && events.length > 0,
     queryFn: async () => {
       const eventIds = (events ?? []).map((e) => e.id);
-      if (eventIds.length === 0) return new Set<string>();
+      if (eventIds.length === 0)
+        return { sent: new Set<string>(), counts: new Map<string, ConvocationCounts>() };
       const { data } = await supabase
         .from("convocations")
-        .select("event_id")
+        .select("event_id, status")
         .in("event_id", eventIds);
-      return new Set<string>((data ?? []).map((c: any) => c.event_id));
+      const rows = (data ?? []) as Array<{ event_id: string; status: string | null }>;
+      return {
+        sent: new Set<string>(rows.map((c) => c.event_id)),
+        counts: buildConvocationCounts(rows),
+      };
     },
     staleTime: 30_000,
   });
+  const convocSentSet = convocStats?.sent;
 
   const visibleEvents = useMemo(() => {
     if (filters.convocationsSent === "all") return baseVisibleEvents;
