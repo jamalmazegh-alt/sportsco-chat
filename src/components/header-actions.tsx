@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Bot, LifeBuoy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 const ASSISTANT_HIDE = [
   "/assistant",
@@ -12,6 +13,7 @@ const ASSISTANT_HIDE = [
   "/t/",
 ];
 const SUPPORT_HIDE = ["/support", "/login", "/onboarding"];
+const BELL_HIDE = ["/notifications", "/login", "/onboarding", "/t/"];
 
 function hidden(pathname: string, list: string[]): boolean {
   return list.some((p) =>
@@ -25,11 +27,13 @@ export function HeaderActions() {
 
   const showAssistant = !hidden(pathname, ASSISTANT_HIDE);
   const showSupport = !hidden(pathname, SUPPORT_HIDE);
+  const showBell = !hidden(pathname, BELL_HIDE);
 
-  if (!showAssistant && !showSupport) return null;
+  if (!showAssistant && !showSupport && !showBell) return null;
 
   return (
     <div className="flex items-center gap-1.5">
+      {showBell && <NotificationsBell />}
       {showSupport && (
         <Link
           to="/support"
