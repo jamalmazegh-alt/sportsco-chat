@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Check, X, HelpCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ConvocationCounts = {
@@ -9,7 +10,7 @@ export type ConvocationCounts = {
 };
 
 /**
- * Discreet present/absent/uncertain summary shown on event rows for staff.
+ * Compact present/absent/uncertain/pending summary shown on event rows for staff.
  * Purely presentational — counts are computed by the caller.
  */
 export function ConvocationSummaryPill({
@@ -23,52 +24,67 @@ export function ConvocationSummaryPill({
   const total = counts.present + counts.absent + counts.uncertain + counts.pending;
   if (total === 0) return null;
 
-  const items: Array<{ key: string; value: number; label: string; color: string }> = [
+  const items: Array<{
+    key: string;
+    value: number;
+    label: string;
+    Icon: typeof Check;
+    bg: string;
+    fg: string;
+  }> = [
     {
       key: "present",
       value: counts.present,
       label: t("attendance.present"),
-      color: "text-present",
+      Icon: Check,
+      bg: "bg-present/10",
+      fg: "text-present",
     },
     {
       key: "absent",
       value: counts.absent,
       label: t("attendance.absent"),
-      color: "text-defeat",
+      Icon: X,
+      bg: "bg-defeat/10",
+      fg: "text-defeat",
     },
     {
       key: "uncertain",
       value: counts.uncertain,
       label: t("attendance.uncertain"),
-      color: "text-amber-600 dark:text-amber-400",
+      Icon: HelpCircle,
+      bg: "bg-amber-500/10",
+      fg: "text-amber-600 dark:text-amber-400",
     },
     {
       key: "pending",
       value: counts.pending,
       label: t("attendance.pending"),
-      color: "text-muted-foreground",
+      Icon: Clock,
+      bg: "bg-muted",
+      fg: "text-muted-foreground",
     },
   ];
 
   return (
     <span
-      className={cn(
-        "inline-flex items-center gap-2 text-[11px] font-semibold tabular-nums",
-        className,
-      )}
+      className={cn("inline-flex items-center gap-1.5", className)}
       title={items.map((i) => `${i.value} ${i.label}`).join(" · ")}
     >
       {items.map((i) => (
-        <span key={i.key} className={cn("inline-flex items-center gap-0.5", i.color)}>
-          <span aria-hidden className="text-[13px] leading-none">
-            {i.key === "present"
-              ? "✓"
-              : i.key === "absent"
-                ? "✕"
-                : i.key === "uncertain"
-                  ? "?"
-                  : "·"}
-          </span>
+        <span
+          key={i.key}
+          className={cn(
+            "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-bold tabular-nums",
+            i.bg,
+            i.fg,
+            i.key === "present" && "border-present/20",
+            i.key === "absent" && "border-defeat/20",
+            i.key === "uncertain" && "border-amber-500/20",
+            i.key === "pending" && "border-border",
+          )}
+        >
+          <i.Icon className="h-3 w-3" strokeWidth={2.5} aria-hidden />
           {i.value}
         </span>
       ))}
