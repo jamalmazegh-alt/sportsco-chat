@@ -407,7 +407,13 @@ function PlayerProfile() {
         .is("used_at", null)
         .or(`player_id.eq.${playerId},parent_for_player_id.eq.${playerId}`);
       return new Set(
-        (data ?? []).map((r: any) => String(r.email ?? "").toLowerCase().trim()).filter(Boolean),
+        (data ?? [])
+          .map((r: any) =>
+            String(r.email ?? "")
+              .toLowerCase()
+              .trim(),
+          )
+          .filter(Boolean),
       );
     },
   });
