@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
+import { SwipeToDismiss } from "@/components/swipe-to-dismiss";
 import i18nInstance from "@/lib/i18n";
 
 type NotificationRow = {
@@ -106,6 +107,7 @@ function NotificationsPage() {
         .from("notifications")
         .select("id, title, body, type, link, read_at, created_at")
         .eq("user_id", user!.id)
+        .is("read_at", null)
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
@@ -125,6 +127,7 @@ function NotificationsPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["notifications-center", user?.id] });
+      qc.invalidateQueries({ queryKey: ["notifications-unread-count", user?.id] });
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : t("common.error"));
@@ -274,29 +277,35 @@ function NotificationsPage() {
 
               return (
                 <li key={notification.id}>
-                  {href ? (
-                    <a
-                      href={href}
-                      onClick={() => markOneRead(notification)}
-                      className={cn(
-                        "flex items-start gap-3 rounded-2xl border p-4 transition-colors",
-                        unreadItem
-                          ? "border-primary/25 bg-primary/5 hover:bg-primary/10"
-                          : "border-border bg-card hover:bg-muted/40",
-                      )}
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <div
-                      className={cn(
-                        "flex items-start gap-3 rounded-2xl border p-4",
-                        unreadItem ? "border-primary/25 bg-primary/5" : "border-border bg-card",
-                      )}
-                    >
-                      {content}
-                    </div>
-                  )}
+                  <SwipeToDismiss
+                    disabled={!unreadItem}
+                    label={t("notificationsCenter.markRead")}
+                    onDismiss={() => markOneRead(notification)}
+                  >
+                    {href ? (
+                      <a
+                        href={href}
+                        onClick={() => markOneRead(notification)}
+                        className={cn(
+                          "flex items-start gap-3 rounded-2xl border p-4 transition-colors",
+                          unreadItem
+                            ? "border-primary/25 bg-primary/5 hover:bg-primary/10"
+                            : "border-border bg-card hover:bg-muted/40",
+                        )}
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <div
+                        className={cn(
+                          "flex items-start gap-3 rounded-2xl border p-4",
+                          unreadItem ? "border-primary/25 bg-primary/5" : "border-border bg-card",
+                        )}
+                      >
+                        {content}
+                      </div>
+                    )}
+                  </SwipeToDismiss>
                 </li>
               );
             })}
