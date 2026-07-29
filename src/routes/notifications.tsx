@@ -147,7 +147,7 @@ function NotificationsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-5 py-5">
+    <main className="min-h-screen bg-background px-5 pb-5 pt-[calc(env(safe-area-inset-top)+1.25rem)]">
       <div className="mx-auto max-w-xl space-y-5">
         <BackLink to="/home" label={t("common.back")} />
 
