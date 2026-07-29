@@ -31,6 +31,7 @@ import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 import { notifyWallComment } from "@/lib/wall-comment-notify.functions";
 
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
+import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 
@@ -114,6 +115,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
+  const getAudienceCountsFn = useServerFn(getWallPostAudienceCounts);
   const listPublicationsFn = useServerFn(listPublications);
   const { user } = useAuth();
   const role = useActiveRole();
@@ -126,6 +128,8 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [memberCount, setMemberCount] = useState(0);
+  // Taille d'audience réelle par post (dénominateur du "Lu par X/Y").
+  const [audienceByPost, setAudienceByPost] = useState<Record<string, number>>({});
   // Targetable teams for the audience picker; computed from club teams + user rights.
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
@@ -245,12 +249,25 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     } else {
       setPostGroups([]);
     }
-    // Total club members (denominator for "Lu par X/Y")
+    // Total club members (fallback denominator for "Lu par X/Y")
     const { count } = await supabase
       .from("club_members")
       .select("id", { count: "exact", head: true })
       .eq("club_id", clubId);
     setMemberCount(count ?? 0);
+    // Audience réelle par post (staff uniquement côté serveur, sinon {}).
+    if (ps.length > 0) {
+      try {
+        const counts = await getAudienceCountsFn({
+          data: { clubId, postIds: ps.slice(0, 100).map((p) => p.id) },
+        });
+        setAudienceByPost((counts ?? {}) as Record<string, number>);
+      } catch {
+        setAudienceByPost({});
+      }
+    } else {
+      setAudienceByPost({});
+    }
     setPosts(ps);
     setLoading(false);
   }
@@ -929,6 +946,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         commentsEnabled={commentsEnabled}
         canPin={canPost}
         memberCount={memberCount}
+        audienceByPost={audienceByPost}
         teamsById={teamsById}
         groupsById={groupsById}
         onDelete={deletePost}
@@ -1291,6 +1309,7 @@ function WallGrouped({
   commentsEnabled,
   canPin,
   memberCount,
+  audienceByPost,
   teamsById,
   groupsById,
   onDelete,
@@ -1303,6 +1322,7 @@ function WallGrouped({
   commentsEnabled: boolean;
   canPin: boolean;
   memberCount: number;
+  audienceByPost: Record<string, number>;
   teamsById: Map<string, Team>;
   groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
@@ -1469,9 +1489,12 @@ function WallGrouped({
           )}
           {!isExternal &&
             (p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
-            memberCount > 0 &&
+            (audienceByPost[p.id] ?? memberCount) > 0 &&
             (() => {
-              const denom = Math.max(memberCount - 1, 0);
+              // Dénominateur = audience réelle du post (fallback: membres du club),
+              // moins l'auteur qui n'est pas compté comme lecteur.
+              const total = audienceByPost[p.id] ?? memberCount;
+              const denom = Math.max(total - 1, 0);
               const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
               const capped = Math.min(readers, denom);
               return (
