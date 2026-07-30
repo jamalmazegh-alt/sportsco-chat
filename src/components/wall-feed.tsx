@@ -34,6 +34,8 @@ import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
+import { WallReactions, type WallReaction } from "@/components/wall-reactions";
+
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
