@@ -830,8 +830,13 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     if (error) {
       toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
       load();
+      return;
+    }
+    if (!already) {
+      notifyWallReaction({ data: { postId: p.id, emoji } }).catch(() => {});
     }
   }
+
 
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
