@@ -406,6 +406,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
         load(),
       )
+      .on("postgres_changes", { event: "*", schema: "public", table: "wall_post_reactions" }, () =>
+        load(),
+      )
+
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
