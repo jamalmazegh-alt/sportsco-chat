@@ -69,6 +69,7 @@ type Post = {
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
+  reactions?: WallReaction[];
 };
 type PollOptionResult = { id: string; label: string; votes: number };
 type PollAudience = {
