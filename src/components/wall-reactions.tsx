@@ -5,7 +5,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-export const WALL_EMOJIS = ["👍", "❤️", "🔥", "👏", "😂", "😮"] as const;
+export const WALL_EMOJIS = [
+  "👍",
+  "❤️",
+  "🔥",
+  "👏",
+  "😂",
+  "😮",
+  "😢",
+  "🙏",
+  "💪",
+  "🎉",
+  "⚽",
+  "🤩",
+] as const;
 
 export type WallReaction = { user_id: string; emoji: string; name: string | null };
 
