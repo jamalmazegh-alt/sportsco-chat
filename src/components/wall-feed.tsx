@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -124,6 +124,8 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const role = useActiveRole();
   const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
+  const postsRef = useRef<Post[]>([]);
+  postsRef.current = posts;
   const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
@@ -292,6 +294,35 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     setLoading(false);
   }
 
+  /**
+   * Recharge uniquement les réactions des posts déjà affichés, sans toucher au
+   * spinner ni au reste du feed (évite le "refresh" visuel à chaque réaction).
+   */
+  async function refreshReactions() {
+    const ids = postsRef.current.map((p: Post) => p.id);
+    if (ids.length === 0) return;
+    const { data: rawReactions } = await supabase
+      .from("wall_post_reactions")
+      .select("post_id, user_id, emoji")
+      .in("post_id", ids);
+    const userIds = Array.from(new Set((rawReactions ?? []).map((r) => r.user_id)));
+    const names = new Map<string, string | null>();
+    if (userIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+      (profs ?? []).forEach((p) => names.set(p.id, p.full_name ?? null));
+    }
+    const byPost = new Map<string, WallReaction[]>();
+    (rawReactions ?? []).forEach((r) => {
+      const arr = byPost.get(r.post_id) ?? [];
+      arr.push({ user_id: r.user_id, emoji: r.emoji, name: names.get(r.user_id) ?? null });
+      byPost.set(r.post_id, arr);
+    });
+    setPosts((prev) => prev.map((p) => ({ ...p, reactions: byPost.get(p.id) ?? [] })));
+  }
+
   useEffect(() => {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
@@ -405,8 +436,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
         load(),
       )
+      // Réactions : rafraîchissement silencieux (pas de reload complet du mur,
+      // qui provoquait un "flash" de l'écran à chaque réaction).
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_post_reactions" }, () =>
-        load(),
+        refreshReactions(),
       )
 
       .subscribe();
