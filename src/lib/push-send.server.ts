@@ -387,7 +387,7 @@ export async function sendPushToUser(
   let sent = 0;
   const toPrune: string[] = [];
 
-  for (const s of subs as unknown as RawSubscription[]) {
+  for (const s of subs as RawSubscription[]) {
     // Routage par canal. `endpoint` d'une ligne fcm/apns est un token opaque,
     // pas une URL : le chemin Web Push (new URL, VAPID) ne doit jamais le voir.
     // Expéditeur natif branché au lot 3 (FCM HTTP v1) — d'ici là on trace sans
