@@ -848,8 +848,11 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
           : {
               ...x,
               reactions: already
-                ? (x.reactions ?? []).filter((r) => !(r.user_id === uid && r.emoji === emoji))
-                : [...(x.reactions ?? []), { user_id: uid, emoji, name: myName }],
+                ? (x.reactions ?? []).filter((r) => r.user_id !== uid)
+                : [
+                    ...(x.reactions ?? []).filter((r) => r.user_id !== uid),
+                    { user_id: uid, emoji, name: myName },
+                  ],
             },
       ),
     );
@@ -860,7 +863,9 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
           .eq("post_id", p.id)
           .eq("user_id", uid)
           .eq("emoji", emoji)
-      : await supabase.from("wall_post_reactions").insert({ post_id: p.id, user_id: uid, emoji });
+      : await supabase
+          .from("wall_post_reactions")
+          .upsert({ post_id: p.id, user_id: uid, emoji }, { onConflict: "post_id,user_id" });
     if (error) {
       toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
       load();
