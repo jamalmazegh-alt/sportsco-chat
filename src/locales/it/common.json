@@ -1082,7 +1082,9 @@
       "carpool_needs_ride": "Car pooling",
       "support_ticket": "Supporto",
       "support_reply": "Supporto",
-      "support_status": "Supporto"
+      "support_status": "Supporto",
+      "wall_reaction": "Reazione",
+      "wall_comment_reaction": "Reazione commento"
     }
   },
   "profile": {
