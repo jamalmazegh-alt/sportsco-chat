@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+// `endpoint` désigne soit une URL Web Push, soit un token natif FCM/APNs
+// opaque (canal fcm/apns) — d'où l'absence de validation .url(). La suppression
+// est de toute façon bornée au user_id authentifié.
+const endpointOrToken = z.string().min(16).max(4096);
+
 const Body = z.object({
-  endpoint: z.string().url().max(2048).optional(),
+  endpoint: endpointOrToken.optional(),
   all_for_user: z.boolean().optional(),
-  keep_endpoint: z.string().url().max(2048).optional(),
+  keep_endpoint: endpointOrToken.optional(),
 });
 
 export const Route = createFileRoute("/api/push/unsubscribe")({

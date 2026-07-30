@@ -3,6 +3,7 @@ import { Bell, BellOff, CheckCircle2, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { isIOS, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
 import { isNativePlatform } from "@/lib/native-platform";
+import { enableNativePush, getNativePushStatus, type NativePushStatus } from "@/lib/native-push";
 import { subscribeToPush } from "@/lib/push-subscribe";
 
 type Status = "unsupported" | "ios-needs-pwa" | "default" | "granted" | "denied";
@@ -20,12 +21,111 @@ function computeStatus(): Status {
   return "default";
 }
 
-// App native Capacitor : le Web Push ne fonctionne pas en WKWebView et les
-// instructions « installer la PWA » n'ont pas de sens. C'est ici que le CTA
-// d'activation du push natif (FCM/APNs) prendra place au lot 3.
+// App native Capacitor : le Web Push ne fonctionne pas en WKWebView — le CTA
+// bascule sur l'enregistrement natif FCM/APNs (lot 3).
 export function EnablePushCard() {
-  if (isNativePlatform()) return null;
+  if (isNativePlatform()) return <EnablePushCardNative />;
   return <EnablePushCardWeb />;
+}
+
+function EnablePushCardNative() {
+  const [status, setStatus] = useState<NativePushStatus>("unavailable");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getNativePushStatus().then(setStatus);
+  }, []);
+
+  async function handleEnable() {
+    setLoading(true);
+    try {
+      const res = await enableNativePush();
+      if (res.ok) {
+        toast.success("Notifications activées");
+        setStatus("granted");
+      } else if (res.reason === "denied") {
+        setStatus("denied");
+        toast.error("Notifications refusées");
+      } else {
+        toast.error("Activation impossible pour le moment");
+        console.warn("[native-push] enable KO:", res.reason);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (status === "unavailable") return null;
+
+  return (
+    <section className="rounded-2xl border border-border bg-card overflow-hidden">
+      <header className="px-5 pt-4 pb-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Cet appareil
+        </h2>
+      </header>
+      <div className="px-5 py-4">
+        {status === "granted" && (
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">Notifications activées</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Vous recevrez les push de Clubero sur cet appareil.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {status === "prompt" && (
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <Bell className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">Activer les notifications</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Recevez convocations, rappels et actualités du club en temps réel.
+              </p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleEnable}
+                className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white text-xs font-semibold shadow-sm hover:opacity-90 transition disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Activation…
+                  </>
+                ) : (
+                  <>
+                    <Bell className="h-3.5 w-3.5" /> Activer les notifications
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === "denied" && (
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+              <BellOff className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">Notifications désactivées</p>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                Pour les réactiver : Réglages iOS/Android → <b>Clubero</b> → <b>Notifications</b> →{" "}
+                <b>Autoriser</b>.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }
 
 function EnablePushCardWeb() {

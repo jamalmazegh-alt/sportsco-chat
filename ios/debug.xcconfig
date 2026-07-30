@@ -1,1 +1,5 @@
 CAPACITOR_DEBUG = true
+
+// Push natif (lot 3) : enregistre l'app auprès d'APNs en développement.
+// La cible release recevra aps-environment=production via son provisioning.
+CODE_SIGN_ENTITLEMENTS = App/App.entitlements

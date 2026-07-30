@@ -1,13 +1,53 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-const Body = z.object({
+// Web Push (client PWA existant — `channel` absent pour compatibilité).
+const WebBody = z.object({
   endpoint: z.string().url().max(2048),
   p256dh: z.string().min(20).max(256),
   auth: z.string().min(10).max(256),
   user_agent: z.string().max(512).optional(),
   takeover: z.boolean().optional(),
 });
+
+// Push natif Capacitor : le token FCM/APNs est opaque (pas une URL). Il est
+// stocké dans `endpoint` (clé UNIQUE → upsert), p256dh/auth n'existent pas.
+const NativeBody = z.object({
+  channel: z.enum(["fcm", "apns"]),
+  token: z
+    .string()
+    .min(16)
+    .max(4096)
+    .regex(/^[A-Za-z0-9_:.-]+$/, "invalid token format"),
+  user_agent: z.string().max(512).optional(),
+  takeover: z.boolean().optional(),
+});
+
+type NormalizedSub = {
+  channel: "web" | "fcm" | "apns";
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  user_agent?: string;
+  takeover?: boolean;
+};
+
+function parseBody(raw: unknown): NormalizedSub {
+  const channel = (raw as { channel?: unknown })?.channel;
+  if (channel === "fcm" || channel === "apns") {
+    const b = NativeBody.parse(raw);
+    return {
+      channel: b.channel,
+      endpoint: b.token,
+      p256dh: "",
+      auth: "",
+      user_agent: b.user_agent,
+      takeover: b.takeover,
+    };
+  }
+  const b = WebBody.parse(raw);
+  return { channel: "web", ...b };
+}
 
 export const Route = createFileRoute("/api/push/subscribe")({
   server: {
@@ -26,9 +66,9 @@ export const Route = createFileRoute("/api/push/subscribe")({
         if (userErr || !userData?.user) return new Response("Unauthorized", { status: 401 });
         const userId = userData.user.id;
 
-        let parsed;
+        let parsed: NormalizedSub;
         try {
-          parsed = Body.parse(await request.json());
+          parsed = parseBody(await request.json());
         } catch {
           return new Response("Bad request", { status: 400 });
         }
@@ -53,6 +93,7 @@ export const Route = createFileRoute("/api/push/subscribe")({
             endpoint: parsed.endpoint,
             p256dh: parsed.p256dh,
             auth: parsed.auth,
+            channel: parsed.channel,
             user_agent: parsed.user_agent ?? null,
             updated_at: new Date().toISOString(),
           },

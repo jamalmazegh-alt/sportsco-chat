@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, Navigate, useRouterState, Link } from "@tanstack/react-router";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { initNativePushOnLaunch } from "@/lib/native-push";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,12 @@ function AuthLayout() {
   const { session, loading, memberships, refreshMemberships, user, activeClubId } = useAuth();
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
+
+  // Push natif (no-op hors Capacitor) : ré-enregistrement silencieux du token
+  // si la permission est déjà accordée + navigation depuis un tap de notif.
+  useEffect(() => {
+    if (session) void initNativePushOnLaunch();
+  }, [session]);
   const [busy, setBusy] = useState(false);
   const { tournamentOnly } = useTournamentOnlyMode();
   const { isActive: clubSubActive, isLoading: subLoading } =
