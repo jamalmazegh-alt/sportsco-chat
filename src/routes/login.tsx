@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { isNativePlatform } from "@/lib/native-platform";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -14,6 +15,14 @@ export const Route = createFileRoute("/login")({
     if (typeof search.invite === "string") out.invite = search.invite;
     if (typeof search.next === "string" && search.next.startsWith("/")) out.next = search.next;
     return out;
+  },
+  // App native : une session déjà restaurée saute le formulaire. Les liens
+  // d'invitation restent traités par le submit — pas de redirection dans ce
+  // cas. Sur le web, no-op : comportement inchangé.
+  beforeLoad: async ({ search }) => {
+    if (!isNativePlatform() || search.invite) return;
+    const { data } = await supabase.auth.getSession();
+    if (data.session) throw redirect({ to: "/home" });
   },
   component: LoginPage,
   head: () => ({

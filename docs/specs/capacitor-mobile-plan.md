@@ -50,7 +50,7 @@ Trois options :
 
 Découvertes à traiter (lot 5 sauf mention) :
 
-1. **Session non persistée entre deux lancements de l'app** — retour au login à chaque démarrage. À investiguer : persistance du `localStorage` WKWebView ou stratégie de stockage natif (`@capacitor/preferences`). Bloquant UX pour la v1.
+1. **Session non persistée entre deux lancements** — ~~à investiguer~~ **RÉSOLU le 30/07/2026**. Fausse piste : la session était persistée depuis le début (le `localStorage` WKWebView survit au relaunch, à la réinstallation de l'app et au reboot du simulateur). Le vrai défaut était le routage d'entrée : `/` (marketing) et `/login` ne consultaient jamais la session. Corrigé par deux `beforeLoad` gardés par `isNativePlatform()` (no-op web) : `/` → `/home` si session, sinon `/login` ; `/login` → `/home` si session déjà valide (sauf lien d'invitation). Validé en simulateur sur deux cycles kill/relaunch : ouverture directe sur le dashboard. Aucun besoin de `@capacitor/preferences`.
 2. **Prompt d'installation PWA** (« Installer Clubero ») affiché en natif — à masquer derrière `isNativePlatform()`.
 3. **Instructions PWA dans Profile** (« Installez Clubero sur iPhone » : Safari → Partager → écran d'accueil) — absurdes en natif, même traitement. C'est l'emplacement où le CTA push natif (lot 3) prendra place.
 4. **Section Subscription visible dans le build iOS** — confirmé à l'écran ; le masquage prévu au lot 4 (risque Apple 3.1.1) est bien nécessaire.

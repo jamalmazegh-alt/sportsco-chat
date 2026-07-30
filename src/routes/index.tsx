@@ -1,9 +1,11 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useAuth } from "@/lib/auth-context";
 import { isAppHost } from "@/lib/host";
+import { isNativePlatform } from "@/lib/native-platform";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Loader2,
   ArrowRight,
@@ -61,6 +63,14 @@ import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { V2Waitlist } from "@/components/marketing/V2Waitlist";
 
 export const Route = createFileRoute("/")({
+  // App native (Capacitor) : le bundle embarque le site marketing, mais l'app
+  // doit s'ouvrir sur le produit. Session restaurée → /home, sinon → /login.
+  // Sur le web, ce beforeLoad est un no-op : comportement inchangé.
+  beforeLoad: async () => {
+    if (!isNativePlatform()) return;
+    const { data } = await supabase.auth.getSession();
+    throw redirect({ to: data.session ? "/home" : "/login" });
+  },
   component: Index,
   head: () => ({
     meta: [
