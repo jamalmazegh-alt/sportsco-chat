@@ -1082,7 +1082,9 @@
       "carpool_needs_ride": "Carpool",
       "support_ticket": "Support",
       "support_reply": "Support",
-      "support_status": "Support"
+      "support_status": "Support",
+      "wall_reaction": "Reactie",
+      "wall_comment_reaction": "Reactie op reactie"
     }
   },
   "profile": {

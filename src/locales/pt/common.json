@@ -1082,7 +1082,9 @@
       "carpool_needs_ride": "Boleia",
       "support_ticket": "Suporte",
       "support_reply": "Suporte",
-      "support_status": "Suporte"
+      "support_status": "Suporte",
+      "wall_reaction": "Reação",
+      "wall_comment_reaction": "Reação a comentário"
     }
   },
   "profile": {

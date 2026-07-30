@@ -1087,7 +1087,9 @@
       "carpool_needs_ride": "Fahrgemeinschaft",
       "support_ticket": "Support",
       "support_reply": "Support",
-      "support_status": "Support"
+      "support_status": "Support",
+      "wall_reaction": "Reaktion",
+      "wall_comment_reaction": "Kommentar-Reaktion"
     }
   },
   "profile": {

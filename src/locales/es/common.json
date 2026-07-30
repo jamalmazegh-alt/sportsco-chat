@@ -1082,7 +1082,9 @@
       "carpool_needs_ride": "Transporte compartido",
       "support_ticket": "Soporte",
       "support_reply": "Soporte",
-      "support_status": "Soporte"
+      "support_status": "Soporte",
+      "wall_reaction": "Reacción",
+      "wall_comment_reaction": "Reacción comentario"
     }
   },
   "profile": {

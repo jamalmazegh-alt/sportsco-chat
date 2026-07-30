@@ -1082,7 +1082,9 @@
       "carpool_needs_ride": "Covoiturage",
       "support_ticket": "Support",
       "support_reply": "Support",
-      "support_status": "Support"
+      "support_status": "Support",
+      "wall_reaction": "Réaction",
+      "wall_comment_reaction": "Réaction commentaire"
     }
   },
   "profile": {
