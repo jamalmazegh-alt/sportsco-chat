@@ -14,15 +14,16 @@ const InputSchema = z.object({
   emoji: z.string().min(1).max(16),
 });
 
-const I18N: Record<string, { title: (a: string, e: string) => string; body: string }> = {
-  fr: { title: (a, e) => `${e} ${a} a réagi à votre commentaire`, body: "Voir la publication" },
-  en: { title: (a, e) => `${e} ${a} reacted to your comment`, body: "View the post" },
-  es: { title: (a, e) => `${e} ${a} ha reaccionado a tu comentario`, body: "Ver la publicación" },
-  de: { title: (a, e) => `${e} ${a} hat auf deinen Kommentar reagiert`, body: "Beitrag ansehen" },
-  it: { title: (a, e) => `${e} ${a} ha reagito al tuo commento`, body: "Vedi il post" },
-  nl: { title: (a, e) => `${e} ${a} reageerde op je reactie`, body: "Bekijk het bericht" },
-  pt: { title: (a, e) => `${e} ${a} reagiu ao seu comentário`, body: "Ver a publicação" },
+const I18N: Record<string, { title: (e: string) => string; body: (a: string) => string }> = {
+  fr: { title: (e) => `${e} Nouvelle réaction`, body: (a) => `${a} a réagi à votre commentaire` },
+  en: { title: (e) => `${e} New reaction`, body: (a) => `${a} reacted to your comment` },
+  es: { title: (e) => `${e} Nueva reacción`, body: (a) => `${a} ha reaccionado a tu comentario` },
+  de: { title: (e) => `${e} Neue Reaktion`, body: (a) => `${a} hat auf deinen Kommentar reagiert` },
+  it: { title: (e) => `${e} Nuova reazione`, body: (a) => `${a} ha reagito al tuo commento` },
+  nl: { title: (e) => `${e} Nieuwe reactie`, body: (a) => `${a} reageerde op je reactie` },
+  pt: { title: (e) => `${e} Nova reação`, body: (a) => `${a} reagiu ao seu comentário` },
 };
+
 
 export const notifyWallCommentReaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -92,13 +93,14 @@ export const notifyWallCommentReaction = createServerFn({ method: "POST" })
       .maybeSingle();
     const lang = ((profile as any)?.preferred_language as string) || "fr";
     const t = I18N[lang] || I18N.fr;
-    const title = t.title(reactorName, data.emoji);
+    const title = t.title(data.emoji);
+    const bodyText = t.body(reactorName);
 
     await supabaseAdmin.from("notifications").insert({
       user_id: authorId,
       type: "wall_comment_reaction",
       title,
-      body: t.body,
+      body: bodyText,
       link: `/inbox#${postId}`,
     });
 
@@ -106,7 +108,7 @@ export const notifyWallCommentReaction = createServerFn({ method: "POST" })
     if ((profile as any)?.notifications_push !== false) {
       const res = await sendPushToUser(authorId, {
         title,
-        body: t.body,
+        body: bodyText,
         url: `/inbox?post=${postId}&from=push#${postId}`,
         tag: `wall-comment-reaction-${postId}`,
       }).catch((e: unknown) => {
