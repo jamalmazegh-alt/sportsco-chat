@@ -233,25 +233,26 @@ function NotificationsPage() {
                     <TypeIcon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-start gap-2">
                       {unreadItem && (
                         <span
                           aria-label={t("notificationsCenter.unread")}
-                          className="h-2 w-2 rounded-full bg-primary"
+                          className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"
                         />
                       )}
-                      <p className="min-w-0 flex-1 truncate text-sm font-semibold">
+                      <p className="min-w-0 flex-1 break-words text-sm font-semibold">
                         {notification.title}
                       </p>
-                      <span className="shrink-0 text-[11px] text-muted-foreground">
+                      <span className="shrink-0 pt-0.5 text-[11px] text-muted-foreground">
                         {formatNotificationDate(notification.created_at, i18n.language)}
                       </span>
                     </div>
                     {notification.body && (
-                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground">
                         {notification.body}
                       </p>
                     )}
+
                     <div className="mt-2 flex items-center gap-2">
                       <Badge variant="outline" className="text-[10px]">
                         {typeLabel}
