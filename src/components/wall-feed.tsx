@@ -1533,6 +1533,7 @@ function WallGrouped({
   onDelete,
   onTogglePin,
   onToggleReaction,
+  onToggleCommentReaction,
 }: {
   posts: Post[];
   polls: PollItem[];
