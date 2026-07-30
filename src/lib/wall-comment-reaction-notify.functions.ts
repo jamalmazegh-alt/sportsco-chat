@@ -93,13 +93,14 @@ export const notifyWallCommentReaction = createServerFn({ method: "POST" })
       .maybeSingle();
     const lang = ((profile as any)?.preferred_language as string) || "fr";
     const t = I18N[lang] || I18N.fr;
-    const title = t.title(reactorName, data.emoji);
+    const title = t.title(data.emoji);
+    const bodyText = t.body(reactorName);
 
     await supabaseAdmin.from("notifications").insert({
       user_id: authorId,
       type: "wall_comment_reaction",
       title,
-      body: t.body,
+      body: bodyText,
       link: `/inbox#${postId}`,
     });
 
@@ -107,7 +108,7 @@ export const notifyWallCommentReaction = createServerFn({ method: "POST" })
     if ((profile as any)?.notifications_push !== false) {
       const res = await sendPushToUser(authorId, {
         title,
-        body: t.body,
+        body: bodyText,
         url: `/inbox?post=${postId}&from=push#${postId}`,
         tag: `wall-comment-reaction-${postId}`,
       }).catch((e: unknown) => {
