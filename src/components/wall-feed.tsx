@@ -1541,7 +1541,7 @@ function WallGrouped({
             <WallReactions
               reactions={p.reactions ?? []}
               currentUserId={currentUserId}
-              onToggle={(emoji) => toggleReaction(p, emoji)}
+              onToggle={(emoji) => onToggleReaction(p, emoji)}
             />
           )}
           {!isExternal && commentsEnabled && (
