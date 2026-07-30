@@ -14,15 +14,16 @@ const InputSchema = z.object({
   emoji: z.string().min(1).max(16),
 });
 
-const I18N: Record<string, { title: (a: string, e: string) => string; body: string }> = {
-  fr: { title: (a, e) => `${e} ${a} a réagi à votre publication`, body: "Voir la publication" },
-  en: { title: (a, e) => `${e} ${a} reacted to your post`, body: "View the post" },
-  es: { title: (a, e) => `${e} ${a} ha reaccionado a tu publicación`, body: "Ver la publicación" },
-  de: { title: (a, e) => `${e} ${a} hat auf deinen Beitrag reagiert`, body: "Beitrag ansehen" },
-  it: { title: (a, e) => `${e} ${a} ha reagito al tuo post`, body: "Vedi il post" },
-  nl: { title: (a, e) => `${e} ${a} reageerde op je bericht`, body: "Bekijk het bericht" },
-  pt: { title: (a, e) => `${e} ${a} reagiu à sua publicação`, body: "Ver a publicação" },
+const I18N: Record<string, { title: (e: string) => string; body: (a: string) => string }> = {
+  fr: { title: (e) => `${e} Nouvelle réaction`, body: (a) => `${a} a réagi à votre publication` },
+  en: { title: (e) => `${e} New reaction`, body: (a) => `${a} reacted to your post` },
+  es: { title: (e) => `${e} Nueva reacción`, body: (a) => `${a} ha reaccionado a tu publicación` },
+  de: { title: (e) => `${e} Neue Reaktion`, body: (a) => `${a} hat auf deinen Beitrag reagiert` },
+  it: { title: (e) => `${e} Nuova reazione`, body: (a) => `${a} ha reagito al tuo post` },
+  nl: { title: (e) => `${e} Nieuwe reactie`, body: (a) => `${a} reageerde op je bericht` },
+  pt: { title: (e) => `${e} Nova reação`, body: (a) => `${a} reagiu à sua publicação` },
 };
+
 
 export const notifyWallReaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
