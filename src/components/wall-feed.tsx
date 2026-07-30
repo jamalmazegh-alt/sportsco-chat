@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 import { notifyWallComment } from "@/lib/wall-comment-notify.functions";
 import { notifyWallReaction } from "@/lib/wall-reaction-notify.functions";
+import { notifyWallCommentReaction } from "@/lib/wall-comment-reaction-notify.functions";
 
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
@@ -45,6 +46,7 @@ type Comment = {
   body: string;
   created_at: string;
   author?: Profile | null;
+  reactions?: WallReaction[];
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
 type AudienceType = "club" | "team" | "multi_team" | "group" | "team_staff";
@@ -195,11 +197,19 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         .from("wall_post_reactions")
         .select("post_id, user_id, emoji")
         .in("post_id", ids);
+      const commentIds = (rawComments ?? []).map((c) => c.id);
+      const { data: rawCommentReactions } = commentIds.length
+        ? await supabase
+            .from("wall_comment_reactions")
+            .select("comment_id, user_id, emoji")
+            .in("comment_id", commentIds)
+        : { data: [] as { comment_id: string; user_id: string; emoji: string }[] };
       const allUserIds = Array.from(
         new Set([
           ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
           ...(rawComments ?? []).map((c) => c.author_user_id),
           ...(rawReactions ?? []).map((r) => r.user_id),
+          ...(rawCommentReactions ?? []).map((r) => r.user_id),
         ]),
       );
       const { data: profs } = await supabase
@@ -207,17 +217,33 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         .select("id, full_name, avatar_url")
         .in("id", allUserIds);
       const map = new Map((profs ?? []).map((p) => [p.id, p as Profile]));
+      // Réactions emoji sur les commentaires
+      const creByComment = new Map<string, WallReaction[]>();
+      (rawCommentReactions ?? []).forEach((r) => {
+        const arr = creByComment.get(r.comment_id) ?? [];
+        arr.push({
+          user_id: r.user_id,
+          emoji: r.emoji,
+          name: map.get(r.user_id)?.full_name ?? null,
+        });
+        creByComment.set(r.comment_id, arr);
+      });
       const cByPost = new Map<string, Comment[]>();
       const seenComments = new Set<string>();
       (rawComments ?? []).forEach((c) => {
         if (seenComments.has(c.id)) return;
         seenComments.add(c.id);
-        const cm = { ...c, author: map.get(c.author_user_id) ?? null } as Comment;
+        const cm = {
+          ...c,
+          author: map.get(c.author_user_id) ?? null,
+          reactions: creByComment.get(c.id) ?? [],
+        } as Comment;
         const arr = cByPost.get(c.post_id) ?? [];
         arr.push(cm);
         cByPost.set(c.post_id, arr);
       });
       // Réactions emoji
+
       const reByPost = new Map<string, WallReaction[]>();
       (rawReactions ?? []).forEach((r) => {
         const arr = reByPost.get(r.post_id) ?? [];
@@ -301,11 +327,23 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   async function refreshReactions() {
     const ids = postsRef.current.map((p: Post) => p.id);
     if (ids.length === 0) return;
+    const commentIds = postsRef.current.flatMap((p: Post) => (p.comments ?? []).map((c) => c.id));
     const { data: rawReactions } = await supabase
       .from("wall_post_reactions")
       .select("post_id, user_id, emoji")
       .in("post_id", ids);
-    const userIds = Array.from(new Set((rawReactions ?? []).map((r) => r.user_id)));
+    const { data: rawCommentReactions } = commentIds.length
+      ? await supabase
+          .from("wall_comment_reactions")
+          .select("comment_id, user_id, emoji")
+          .in("comment_id", commentIds)
+      : { data: [] as { comment_id: string; user_id: string; emoji: string }[] };
+    const userIds = Array.from(
+      new Set([
+        ...(rawReactions ?? []).map((r) => r.user_id),
+        ...(rawCommentReactions ?? []).map((r) => r.user_id),
+      ]),
+    );
     const names = new Map<string, string | null>();
     if (userIds.length > 0) {
       const { data: profs } = await supabase
@@ -320,7 +358,22 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       arr.push({ user_id: r.user_id, emoji: r.emoji, name: names.get(r.user_id) ?? null });
       byPost.set(r.post_id, arr);
     });
-    setPosts((prev) => prev.map((p) => ({ ...p, reactions: byPost.get(p.id) ?? [] })));
+    const byComment = new Map<string, WallReaction[]>();
+    (rawCommentReactions ?? []).forEach((r) => {
+      const arr = byComment.get(r.comment_id) ?? [];
+      arr.push({ user_id: r.user_id, emoji: r.emoji, name: names.get(r.user_id) ?? null });
+      byComment.set(r.comment_id, arr);
+    });
+    setPosts((prev) =>
+      prev.map((p) => ({
+        ...p,
+        reactions: byPost.get(p.id) ?? [],
+        comments: (p.comments ?? []).map((c) => ({
+          ...c,
+          reactions: byComment.get(c.id) ?? [],
+        })),
+      })),
+    );
   }
 
   useEffect(() => {
@@ -440,6 +493,11 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       // qui provoquait un "flash" de l'écran à chaque réaction).
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_post_reactions" }, () =>
         refreshReactions(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "wall_comment_reactions" },
+        () => refreshReactions(),
       )
 
       .subscribe();
@@ -876,6 +934,62 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     }
   }
 
+  /** Même logique que les posts, appliquée à un commentaire. */
+  async function toggleCommentReaction(comment: Comment, emoji: string) {
+    if (!user) return;
+    const uid = user.id;
+    const already = (comment.reactions ?? []).some((r) => r.user_id === uid && r.emoji === emoji);
+    const myName =
+      (comment.reactions ?? []).find((r) => r.user_id === uid)?.name ??
+      ((user.user_metadata as Record<string, unknown> | undefined)?.full_name as
+        | string
+        | undefined) ??
+      null;
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id !== comment.post_id
+          ? p
+          : {
+              ...p,
+              comments: (p.comments ?? []).map((c) =>
+                c.id !== comment.id
+                  ? c
+                  : {
+                      ...c,
+                      reactions: already
+                        ? (c.reactions ?? []).filter((r) => r.user_id !== uid)
+                        : [
+                            ...(c.reactions ?? []).filter((r) => r.user_id !== uid),
+                            { user_id: uid, emoji, name: myName },
+                          ],
+                    },
+              ),
+            },
+      ),
+    );
+    const { error } = already
+      ? await supabase
+          .from("wall_comment_reactions")
+          .delete()
+          .eq("comment_id", comment.id)
+          .eq("user_id", uid)
+          .eq("emoji", emoji)
+      : await supabase
+          .from("wall_comment_reactions")
+          .upsert(
+            { comment_id: comment.id, user_id: uid, emoji },
+            { onConflict: "comment_id,user_id" },
+          );
+    if (error) {
+      toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
+      load();
+      return;
+    }
+    if (!already) {
+      notifyWallCommentReaction({ data: { commentId: comment.id, emoji } }).catch(() => {});
+    }
+  }
+
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
     if (error) {
@@ -1054,6 +1168,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         onDelete={deletePost}
         onTogglePin={togglePin}
         onToggleReaction={toggleReaction}
+        onToggleCommentReaction={toggleCommentReaction}
       />
     </div>
   );
@@ -1418,6 +1533,7 @@ function WallGrouped({
   onDelete,
   onTogglePin,
   onToggleReaction,
+  onToggleCommentReaction,
 }: {
   posts: Post[];
   polls: PollItem[];
@@ -1432,6 +1548,7 @@ function WallGrouped({
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
   onToggleReaction: (post: Post, emoji: string) => void;
+  onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
@@ -1621,7 +1738,13 @@ function WallGrouped({
             />
           )}
           {!isExternal && commentsEnabled && (
-            <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
+            <CommentBlock
+              post={p}
+              currentUserId={currentUserId}
+              role={role}
+              clubId={p.club_id}
+              onToggleCommentReaction={onToggleCommentReaction}
+            />
           )}
         </div>
       </li>
@@ -1834,11 +1957,13 @@ function CommentBlock({
   currentUserId,
   role,
   clubId,
+  onToggleCommentReaction,
 }: {
   post: Post;
   currentUserId: string | null;
   role: string | null;
   clubId: string;
+  onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
@@ -1915,6 +2040,11 @@ function CommentBlock({
               <RenderWithMentions text={c.body} />
             </p>
             <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
+            <WallReactions
+              reactions={c.reactions ?? []}
+              currentUserId={currentUserId}
+              onToggle={(emoji) => onToggleCommentReaction(c, emoji)}
+            />
           </div>
           {(c.author_user_id === currentUserId || role === "admin") && (
             <button
