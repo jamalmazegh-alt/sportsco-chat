@@ -2040,6 +2040,11 @@ function CommentBlock({
               <RenderWithMentions text={c.body} />
             </p>
             <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
+            <WallReactions
+              reactions={c.reactions ?? []}
+              currentUserId={currentUserId}
+              onToggle={(emoji) => onToggleCommentReaction(c, emoji)}
+            />
           </div>
           {(c.author_user_id === currentUserId || role === "admin") && (
             <button
