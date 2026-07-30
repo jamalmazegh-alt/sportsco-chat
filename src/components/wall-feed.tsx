@@ -327,7 +327,6 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     load(); /* eslint-disable-next-line */
   }, [clubId]);
 
-
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
   useEffect(() => {
