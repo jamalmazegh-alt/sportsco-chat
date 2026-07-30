@@ -1,14 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SmilePlus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export const WALL_EMOJIS = ["👍", "❤️", "🔥", "👏", "😂", "😮"] as const;
@@ -22,15 +16,18 @@ type Props = {
 };
 
 /**
- * Barre de réactions emoji d'une publication du mur.
+ * Barre de réactions emoji d'une publication du mur (façon WhatsApp).
  * - Bouton "+" : palette de 6 emojis
- * - Pastilles agrégées (emoji + compteur), surlignées si l'utilisateur a réagi
- * - Tap sur une pastille du bas ("qui a réagi") : liste nominative
+ * - Pastilles agrégées (emoji + compteur) : un tap ouvre le détail « qui a réagi »
+ * - Dans la feuille : palette pour changer sa réaction, tap sur sa propre ligne
+ *   pour la retirer, et swipe vers le bas pour fermer.
  */
 export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
   const { t } = useTranslation();
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [whoOpen, setWhoOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const startY = useRef<number | null>(null);
 
   const grouped = useMemo(() => {
     const map = new Map<string, WallReaction[]>();
@@ -46,6 +43,11 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
     () => new Set(reactions.filter((r) => r.user_id === currentUserId).map((r) => r.emoji)),
     [reactions, currentUserId],
   );
+
+  function closeDetail() {
+    setDetailOpen(false);
+    setDragY(0);
+  }
 
   return (
     <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -85,7 +87,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
         <button
           key={emoji}
           type="button"
-          onClick={() => onToggle(emoji)}
+          onClick={() => setDetailOpen(true)}
           className={cn(
             "inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs transition-colors",
             mine.has(emoji)
@@ -99,50 +101,97 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
       ))}
 
       {reactions.length > 0 && (
-        <>
-          <button
-            type="button"
-            onClick={() => setWhoOpen(true)}
-            className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+        <Sheet
+          open={detailOpen}
+          onOpenChange={(o) => {
+            if (!o) closeDetail();
+            else setDetailOpen(true);
+          }}
+        >
+          <SheetContent
+            side="bottom"
+            className="max-h-[75vh] overflow-y-auto pt-3"
+            style={{ transform: dragY ? `translateY(${dragY}px)` : undefined }}
+            onTouchStart={(e) => {
+              startY.current = e.touches[0].clientY;
+            }}
+            onTouchMove={(e) => {
+              if (startY.current == null) return;
+              const dy = e.touches[0].clientY - startY.current;
+              if (dy > 0) setDragY(dy);
+            }}
+            onTouchEnd={() => {
+              startY.current = null;
+              if (dragY > 80) closeDetail();
+              else setDragY(0);
+            }}
           >
-            {t("wall.reactions.who", { defaultValue: "Qui a réagi" })}
-          </button>
-          <Sheet open={whoOpen} onOpenChange={setWhoOpen}>
-            <SheetContent side="bottom" className="max-h-[75vh] overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>{t("wall.reactions.who", { defaultValue: "Qui a réagi" })}</SheetTitle>
-                <SheetDescription>
-                  {t("wall.reactions.count", {
-                    defaultValue: "{{count}} réaction(s)",
-                    count: reactions.length,
-                  })}
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-4 space-y-4">
-                {grouped.map(([emoji, list]) => (
-                  <div key={emoji}>
-                    <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
-                      {emoji} · {list.length}
-                    </p>
-                    <ul className="space-y-1">
-                      {list.map((r) => (
-                        <li
-                          key={`${emoji}-${r.user_id}`}
-                          className="flex items-center gap-2 rounded-md bg-muted/40 px-2.5 py-1.5 text-sm"
-                        >
-                          <span className="text-base leading-none">{emoji}</span>
-                          <span className="truncate">
-                            {r.name ?? t("common.unknown", { defaultValue: "Inconnu" })}
-                          </span>
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            <SheetTitle className="text-center text-base">
+              {t("wall.reactions.count", {
+                defaultValue: "{{count}} réaction(s)",
+                count: reactions.length,
+              })}
+            </SheetTitle>
+
+            {/* Palette : changer / retirer sa réaction sans quitter la feuille */}
+            <div className="mt-3 flex items-center justify-center gap-1">
+              {WALL_EMOJIS.map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => onToggle(e)}
+                  className={cn(
+                    "rounded-full px-2 py-1 text-xl transition-transform active:scale-110",
+                    mine.has(e) && "bg-primary/15",
+                  )}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 space-y-4 pb-6">
+              {grouped.map(([emoji, list]) => (
+                <div key={emoji}>
+                  <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
+                    {emoji} · {list.length}
+                  </p>
+                  <ul className="space-y-1">
+                    {list.map((r) => {
+                      const isMine = r.user_id === currentUserId;
+                      return (
+                        <li key={`${emoji}-${r.user_id}`}>
+                          <button
+                            type="button"
+                            disabled={!isMine}
+                            onClick={() => isMine && onToggle(emoji)}
+                            className={cn(
+                              "flex w-full items-center gap-2 rounded-md bg-muted/40 px-2.5 py-1.5 text-left text-sm",
+                              isMine && "hover:bg-muted",
+                            )}
+                          >
+                            <span className="text-base leading-none">{emoji}</span>
+                            <span className="truncate">
+                              {r.name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                            </span>
+                            {isMine && (
+                              <span className="ml-auto shrink-0 text-xs text-muted-foreground">
+                                {t("wall.reactions.tapToRemove", {
+                                  defaultValue: "Appuyez pour supprimer",
+                                })}
+                              </span>
+                            )}
+                          </button>
                         </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       )}
     </div>
   );
