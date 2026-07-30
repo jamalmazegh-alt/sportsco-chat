@@ -292,9 +292,39 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     setLoading(false);
   }
 
+  /**
+   * Recharge uniquement les réactions des posts déjà affichés, sans toucher au
+   * spinner ni au reste du feed (évite le "refresh" visuel à chaque réaction).
+   */
+  async function refreshReactions() {
+    const ids = postsRef.current.map((p) => p.id);
+    if (ids.length === 0) return;
+    const { data: rawReactions } = await supabase
+      .from("wall_post_reactions")
+      .select("post_id, user_id, emoji")
+      .in("post_id", ids);
+    const userIds = Array.from(new Set((rawReactions ?? []).map((r) => r.user_id)));
+    const names = new Map<string, string | null>();
+    if (userIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+      (profs ?? []).forEach((p) => names.set(p.id, p.full_name ?? null));
+    }
+    const byPost = new Map<string, WallReaction[]>();
+    (rawReactions ?? []).forEach((r) => {
+      const arr = byPost.get(r.post_id) ?? [];
+      arr.push({ user_id: r.user_id, emoji: r.emoji, name: names.get(r.user_id) ?? null });
+      byPost.set(r.post_id, arr);
+    });
+    setPosts((prev) => prev.map((p) => ({ ...p, reactions: byPost.get(p.id) ?? [] })));
+  }
+
   useEffect(() => {
     load(); /* eslint-disable-next-line */
   }, [clubId]);
+
 
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
