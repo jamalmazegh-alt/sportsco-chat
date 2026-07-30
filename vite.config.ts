@@ -46,6 +46,9 @@ export default async function config(env: ConfigEnv) {
       server: {
         cors: { origin: [defaultAllowedOrigins, "capacitor://localhost"] },
       },
+      preview: {
+        cors: { origin: [defaultAllowedOrigins, "capacitor://localhost"] },
+      },
       plugins: [mcpPlugin()],
       resolve: {
         alias: {
