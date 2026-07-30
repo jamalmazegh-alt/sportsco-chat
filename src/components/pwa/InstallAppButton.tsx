@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, Smartphone, Apple } from "lucide-react";
 import { isAndroid, isIOS, isInStandaloneMode } from "@/lib/pwa";
+import { isNativePlatform } from "@/lib/native-platform";
 import { cn } from "@/lib/utils";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -55,7 +56,14 @@ function IOSAddIcon({ className }: { className?: string }) {
   );
 }
 
-export function InstallAppButton({
+// App native Capacitor : proposer d'« installer l'app » n'a pas de sens,
+// l'utilisateur est déjà dedans. Wrapper pour garder les hooks inconditionnels.
+export function InstallAppButton(props: Props) {
+  if (isNativePlatform()) return null;
+  return <InstallAppButtonWeb {...props} />;
+}
+
+function InstallAppButtonWeb({
   className,
   variant = "primary",
   label = "Installer l'app",

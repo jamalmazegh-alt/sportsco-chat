@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Bell, BellOff, CheckCircle2, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { isIOS, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
+import { isNativePlatform } from "@/lib/native-platform";
 import { subscribeToPush } from "@/lib/push-subscribe";
 
 type Status = "unsupported" | "ios-needs-pwa" | "default" | "granted" | "denied";
@@ -19,7 +20,15 @@ function computeStatus(): Status {
   return "default";
 }
 
+// App native Capacitor : le Web Push ne fonctionne pas en WKWebView et les
+// instructions « installer la PWA » n'ont pas de sens. C'est ici que le CTA
+// d'activation du push natif (FCM/APNs) prendra place au lot 3.
 export function EnablePushCard() {
+  if (isNativePlatform()) return null;
+  return <EnablePushCardWeb />;
+}
+
+function EnablePushCardWeb() {
   const [status, setStatus] = useState<Status>("unsupported");
   const [loading, setLoading] = useState(false);
 
