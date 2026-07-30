@@ -24,7 +24,6 @@ const I18N: Record<string, { title: (e: string) => string; body: (a: string) => 
   pt: { title: (e) => `${e} Nova reação`, body: (a) => `${a} reagiu à sua publicação` },
 };
 
-
 export const notifyWallReaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => InputSchema.parse(input))
