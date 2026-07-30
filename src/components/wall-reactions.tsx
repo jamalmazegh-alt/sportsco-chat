@@ -124,6 +124,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
         >
           <SheetContent
             side="bottom"
+            showClose={false}
             className="max-h-[75vh] overflow-y-auto pt-3"
             style={{ transform: dragY ? `translateY(${dragY}px)` : undefined }}
             onTouchStart={(e) => {
