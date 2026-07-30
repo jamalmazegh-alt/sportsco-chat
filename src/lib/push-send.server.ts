@@ -323,6 +323,8 @@ interface RawSubscription {
   endpoint: string;
   p256dh: string;
   auth: string;
+  /** 'web' (VAPID) | 'fcm' | 'apns' — les canaux natifs stockent leur token dans `endpoint`. */
+  channel?: "web" | "fcm" | "apns";
 }
 
 async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<number> {
@@ -377,7 +379,7 @@ export async function sendPushToUser(
 ): Promise<{ sent: number; pruned: number }> {
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
-    .select("endpoint, p256dh, auth")
+    .select("endpoint, p256dh, auth, channel")
     .eq("user_id", userId);
 
   if (!subs?.length) return { sent: 0, pruned: 0 };
@@ -385,7 +387,16 @@ export async function sendPushToUser(
   let sent = 0;
   const toPrune: string[] = [];
 
-  for (const s of subs as RawSubscription[]) {
+  for (const s of subs as unknown as RawSubscription[]) {
+    // Routage par canal. `endpoint` d'une ligne fcm/apns est un token opaque,
+    // pas une URL : le chemin Web Push (new URL, VAPID) ne doit jamais le voir.
+    // Expéditeur natif branché au lot 3 (FCM HTTP v1) — d'ici là on trace sans
+    // compter la ligne en échec, et le canal 'web' se comporte exactement
+    // comme avant (les lignes existantes n'ont pas de channel ≠ 'web').
+    if (s.channel === "fcm" || s.channel === "apns") {
+      console.log("[push] native channel pending sender", s.channel, "user:", userId);
+      continue;
+    }
     try {
       const status = await sendOne(s, payload);
       if (status >= 200 && status < 300) {
