@@ -1339,6 +1339,7 @@ function WallGrouped({
   groupsById,
   onDelete,
   onTogglePin,
+  onToggleReaction,
 }: {
   posts: Post[];
   polls: PollItem[];
@@ -1352,6 +1353,7 @@ function WallGrouped({
   groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
+  onToggleReaction: (post: Post, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
