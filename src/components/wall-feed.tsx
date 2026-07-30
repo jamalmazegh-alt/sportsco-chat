@@ -1548,6 +1548,7 @@ function WallGrouped({
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
   onToggleReaction: (post: Post, emoji: string) => void;
+  onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
