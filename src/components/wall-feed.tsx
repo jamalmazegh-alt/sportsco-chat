@@ -1533,9 +1533,17 @@ function WallGrouped({
                 </p>
               );
             })()}
+          {!isExternal && (
+            <WallReactions
+              reactions={p.reactions ?? []}
+              currentUserId={currentUserId}
+              onToggle={(emoji) => toggleReaction(p, emoji)}
+            />
+          )}
           {!isExternal && commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
+
         </div>
       </li>
     );
