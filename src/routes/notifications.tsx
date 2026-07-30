@@ -262,7 +262,7 @@ function NotificationsPage() {
                     </div>
                     {notification.body && (
                       <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground">
-                        {notification.body}
+                        {localizeStatusInBody(notification.body)}
                       </p>
                     )}
 
