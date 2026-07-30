@@ -36,7 +36,6 @@ import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 import { WallReactions, type WallReaction } from "@/components/wall-reactions";
 
-
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
   id: string;
@@ -243,7 +242,6 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         p.reads = rByPost.get(p.id) ?? [];
         p.reactions = reByPost.get(p.id) ?? [];
       });
-
 
       // Mark unread posts as read for current user (best-effort, ignore errors)
       if (user) {
@@ -1430,8 +1428,6 @@ function WallGrouped({
   }
 
   const renderItem = (p: Post) => {
-
-
     const d = new Date(p.created_at);
     const isExternal = p.source && p.source !== "clubero";
     const sourceMeta = isExternal ? SOURCE_META[p.source as Exclude<PostSource, "clubero">] : null;
@@ -1584,7 +1580,6 @@ function WallGrouped({
           {!isExternal && commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
-
         </div>
       </li>
     );
