@@ -299,7 +299,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
    * spinner ni au reste du feed (évite le "refresh" visuel à chaque réaction).
    */
   async function refreshReactions() {
-    const ids = postsRef.current.map((p) => p.id);
+    const ids = postsRef.current.map((p: Post) => p.id);
     if (ids.length === 0) return;
     const { data: rawReactions } = await supabase
       .from("wall_post_reactions")
