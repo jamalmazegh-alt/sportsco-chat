@@ -405,8 +405,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
         load(),
       )
+      // Réactions : rafraîchissement silencieux (pas de reload complet du mur,
+      // qui provoquait un "flash" de l'écran à chaque réaction).
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_post_reactions" }, () =>
-        load(),
+        refreshReactions(),
       )
 
       .subscribe();
