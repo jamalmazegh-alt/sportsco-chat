@@ -150,7 +150,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
             </SheetTitle>
 
             {/* Palette : changer / retirer sa réaction sans quitter la feuille */}
-            <div className="mt-3 flex items-center justify-center gap-1">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1">
               {WALL_EMOJIS.map((e) => (
                 <button
                   key={e}
