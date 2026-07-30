@@ -976,6 +976,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         groupsById={groupsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
+        onToggleReaction={toggleReaction}
       />
     </div>
   );
