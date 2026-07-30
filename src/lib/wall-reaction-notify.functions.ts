@@ -70,7 +70,10 @@ export const notifyWallReaction = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     const reactorName =
-      [(reactor as any)?.first_name, (reactor as any)?.last_name].filter(Boolean).join(" ").trim() ||
+      [(reactor as any)?.first_name, (reactor as any)?.last_name]
+        .filter(Boolean)
+        .join(" ")
+        .trim() ||
       ((reactor as any)?.full_name as string) ||
       "Un membre";
 

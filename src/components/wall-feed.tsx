@@ -838,7 +838,6 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     }
   }
 
-
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
     if (error) {
