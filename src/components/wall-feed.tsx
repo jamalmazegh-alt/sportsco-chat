@@ -124,6 +124,8 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const role = useActiveRole();
   const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
+  const postsRef = useRef<Post[]>([]);
+  postsRef.current = posts;
   const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
