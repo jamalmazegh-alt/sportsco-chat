@@ -1168,6 +1168,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         onDelete={deletePost}
         onTogglePin={togglePin}
         onToggleReaction={toggleReaction}
+        onToggleCommentReaction={toggleCommentReaction}
       />
     </div>
   );
