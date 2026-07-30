@@ -44,6 +44,18 @@ Trois options :
 - Les 25 routes qui font `loader:` / `beforeLoad` avec un server fn s'exécuteront désormais **côté client** : prévoir des états de chargement et vérifier qu'aucune ne suppose un contexte SSR.
 - Vérifier qu'aucun module côté client n'importe transitivement un `*.server.ts` (`stripe.server.ts`, `push-send.server.ts`, `authz.server.ts`, `client.server.ts`…).
 
+#### Audit lot 1 — exécuté le 30/07/2026 en simulateur (build SPA embarqué, backend `vite preview` sur bughunt)
+
+Écrans parcourus sans aucune erreur (log serveur vierge) : Home (dashboard + checklist), Events (état vide + filtres), Teams (liste), Wall, Profile, Admin (Club settings), **Tournament payments** (`admin/payments.dashboard`, route à loader). Les mutations fonctionnent aussi : le club et l'équipe U9 ont été créés à travers l'app. Le pattern loader-côté-client est validé ; les 18 routes à loaders restantes sont majoritairement des pages publiques hors périmètre v1 ou suivent le même pattern (`players/$playerId/*`).
+
+Découvertes à traiter (lot 5 sauf mention) :
+
+1. **Session non persistée entre deux lancements de l'app** — retour au login à chaque démarrage. À investiguer : persistance du `localStorage` WKWebView ou stratégie de stockage natif (`@capacitor/preferences`). Bloquant UX pour la v1.
+2. **Prompt d'installation PWA** (« Installer Clubero ») affiché en natif — à masquer derrière `isNativePlatform()`.
+3. **Instructions PWA dans Profile** (« Installez Clubero sur iPhone » : Safari → Partager → écran d'accueil) — absurdes en natif, même traitement. C'est l'emplacement où le CTA push natif (lot 3) prendra place.
+4. **Section Subscription visible dans le build iOS** — confirmé à l'écran ; le masquage prévu au lot 4 (risque Apple 3.1.1) est bien nécessaire.
+5. Localisation instable au premier lancement (home en anglais après réinstallation, français ensuite) — vérifier la détection de langue dans la WebView.
+
 ### Lot 2 — Server functions cross-origin
 
 - Dans `src/start.ts`, ajouter `serverFns: { fetch }` : si `Capacitor.isNativePlatform()`, réécrire l'URL relative `/_serverFn/...` en `${API_ORIGIN}/_serverFn/...`.
