@@ -74,8 +74,9 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
             <SmilePlus className="h-3.5 w-3.5" />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto p-1.5">
-          <div className="flex items-center gap-0.5">
+        <PopoverContent align="start" className="w-auto max-w-[16rem] p-1.5">
+          <div className="flex flex-wrap items-center justify-center gap-0.5">
+
             {WALL_EMOJIS.map((e) => (
               <button
                 key={e}
