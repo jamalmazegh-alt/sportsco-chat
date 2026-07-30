@@ -1957,11 +1957,13 @@ function CommentBlock({
   currentUserId,
   role,
   clubId,
+  onToggleCommentReaction,
 }: {
   post: Post;
   currentUserId: string | null;
   role: string | null;
   clubId: string;
+  onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
