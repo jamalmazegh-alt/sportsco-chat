@@ -5,7 +5,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-export const WALL_EMOJIS = ["👍", "❤️", "🔥", "👏", "😂", "😮"] as const;
+export const WALL_EMOJIS = [
+  "👍",
+  "❤️",
+  "🔥",
+  "👏",
+  "😂",
+  "😮",
+  "😢",
+  "🙏",
+  "💪",
+  "🎉",
+  "⚽",
+  "🤩",
+] as const;
 
 export type WallReaction = { user_id: string; emoji: string; name: string | null };
 
@@ -61,8 +74,8 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
             <SmilePlus className="h-3.5 w-3.5" />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto p-1.5">
-          <div className="flex items-center gap-0.5">
+        <PopoverContent align="start" className="w-auto max-w-[16rem] p-1.5">
+          <div className="flex flex-wrap items-center justify-center gap-0.5">
             {WALL_EMOJIS.map((e) => (
               <button
                 key={e}
@@ -110,6 +123,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
         >
           <SheetContent
             side="bottom"
+            showClose={false}
             className="max-h-[75vh] overflow-y-auto pt-3"
             style={{ transform: dragY ? `translateY(${dragY}px)` : undefined }}
             onTouchStart={(e) => {
@@ -135,7 +149,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
             </SheetTitle>
 
             {/* Palette : changer / retirer sa réaction sans quitter la feuille */}
-            <div className="mt-3 flex items-center justify-center gap-1">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1">
               {WALL_EMOJIS.map((e) => (
                 <button
                   key={e}
