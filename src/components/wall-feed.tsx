@@ -186,10 +186,15 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         .in("post_id", ids)
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
+      const { data: rawReactions } = await supabase
+        .from("wall_post_reactions")
+        .select("post_id, user_id, emoji")
+        .in("post_id", ids);
       const allUserIds = Array.from(
         new Set([
           ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
           ...(rawComments ?? []).map((c) => c.author_user_id),
+          ...(rawReactions ?? []).map((r) => r.user_id),
         ]),
       );
       const { data: profs } = await supabase
@@ -207,6 +212,17 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         arr.push(cm);
         cByPost.set(c.post_id, arr);
       });
+      // Réactions emoji
+      const reByPost = new Map<string, WallReaction[]>();
+      (rawReactions ?? []).forEach((r) => {
+        const arr = reByPost.get(r.post_id) ?? [];
+        arr.push({
+          user_id: r.user_id,
+          emoji: r.emoji,
+          name: map.get(r.user_id)?.full_name ?? null,
+        });
+        reByPost.set(r.post_id, arr);
+      });
       // Read receipts
       const { data: rawReads } = await supabase
         .from("wall_post_reads")
@@ -222,7 +238,9 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         p.author = p.author_user_id ? (map.get(p.author_user_id) ?? null) : null;
         p.comments = cByPost.get(p.id) ?? [];
         p.reads = rByPost.get(p.id) ?? [];
+        p.reactions = reByPost.get(p.id) ?? [];
       });
+
 
       // Mark unread posts as read for current user (best-effort, ignore errors)
       if (user) {
