@@ -799,6 +799,42 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     else setAudience([]);
   }
 
+  async function toggleReaction(p: Post, emoji: string) {
+    if (!user) return;
+    const uid = user.id;
+    const already = (p.reactions ?? []).some((r) => r.user_id === uid && r.emoji === emoji);
+    const myName =
+      (p.reactions ?? []).find((r) => r.user_id === uid)?.name ??
+      ((user.user_metadata as Record<string, unknown> | undefined)?.full_name as
+        | string
+        | undefined) ??
+      null;
+    setPosts((prev) =>
+      prev.map((x) =>
+        x.id !== p.id
+          ? x
+          : {
+              ...x,
+              reactions: already
+                ? (x.reactions ?? []).filter((r) => !(r.user_id === uid && r.emoji === emoji))
+                : [...(x.reactions ?? []), { user_id: uid, emoji, name: myName }],
+            },
+      ),
+    );
+    const { error } = already
+      ? await supabase
+          .from("wall_post_reactions")
+          .delete()
+          .eq("post_id", p.id)
+          .eq("user_id", uid)
+          .eq("emoji", emoji)
+      : await supabase.from("wall_post_reactions").insert({ post_id: p.id, user_id: uid, emoji });
+    if (error) {
+      toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
+      load();
+    }
+  }
+
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
     if (error) {
