@@ -76,7 +76,6 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto max-w-[16rem] p-1.5">
           <div className="flex flex-wrap items-center justify-center gap-0.5">
-
             {WALL_EMOJIS.map((e) => (
               <button
                 key={e}
