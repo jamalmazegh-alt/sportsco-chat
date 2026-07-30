@@ -94,6 +94,19 @@ function formatNotificationDate(value: string, locale: string) {
   }).format(new Date(value));
 }
 
+/**
+ * Localize raw English attendance status labels that may have been stored
+ * in older notification bodies (e.g. "Raphaël Albinet — uncertain").
+ */
+function localizeStatusInBody(body: string | null): string | null {
+  if (!body) return body;
+  return body
+    .replace(/\s*—\s*uncertain\s*$/i, " — incertain")
+    .replace(/\s*—\s*present\s*$/i, " — présent")
+    .replace(/\s*—\s*absent\s*$/i, " — absent")
+    .replace(/\s*—\s*pending\s*$/i, " — en attente");
+}
+
 function NotificationsPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
