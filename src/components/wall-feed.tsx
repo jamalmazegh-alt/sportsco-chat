@@ -34,6 +34,7 @@ import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
+import { WallReactions, type WallReaction } from "@/components/wall-reactions";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
@@ -67,6 +68,7 @@ type Post = {
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
+  reactions?: WallReaction[];
 };
 type PollOptionResult = { id: string; label: string; votes: number };
 type PollAudience = {
@@ -186,10 +188,15 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         .in("post_id", ids)
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
+      const { data: rawReactions } = await supabase
+        .from("wall_post_reactions")
+        .select("post_id, user_id, emoji")
+        .in("post_id", ids);
       const allUserIds = Array.from(
         new Set([
           ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
           ...(rawComments ?? []).map((c) => c.author_user_id),
+          ...(rawReactions ?? []).map((r) => r.user_id),
         ]),
       );
       const { data: profs } = await supabase
@@ -207,6 +214,17 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         arr.push(cm);
         cByPost.set(c.post_id, arr);
       });
+      // Réactions emoji
+      const reByPost = new Map<string, WallReaction[]>();
+      (rawReactions ?? []).forEach((r) => {
+        const arr = reByPost.get(r.post_id) ?? [];
+        arr.push({
+          user_id: r.user_id,
+          emoji: r.emoji,
+          name: map.get(r.user_id)?.full_name ?? null,
+        });
+        reByPost.set(r.post_id, arr);
+      });
       // Read receipts
       const { data: rawReads } = await supabase
         .from("wall_post_reads")
@@ -222,6 +240,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         p.author = p.author_user_id ? (map.get(p.author_user_id) ?? null) : null;
         p.comments = cByPost.get(p.id) ?? [];
         p.reads = rByPost.get(p.id) ?? [];
+        p.reactions = reByPost.get(p.id) ?? [];
       });
 
       // Mark unread posts as read for current user (best-effort, ignore errors)
@@ -385,6 +404,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
         load(),
       )
+      .on("postgres_changes", { event: "*", schema: "public", table: "wall_post_reactions" }, () =>
+        load(),
+      )
+
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
@@ -774,6 +797,42 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     else setAudience([]);
   }
 
+  async function toggleReaction(p: Post, emoji: string) {
+    if (!user) return;
+    const uid = user.id;
+    const already = (p.reactions ?? []).some((r) => r.user_id === uid && r.emoji === emoji);
+    const myName =
+      (p.reactions ?? []).find((r) => r.user_id === uid)?.name ??
+      ((user.user_metadata as Record<string, unknown> | undefined)?.full_name as
+        | string
+        | undefined) ??
+      null;
+    setPosts((prev) =>
+      prev.map((x) =>
+        x.id !== p.id
+          ? x
+          : {
+              ...x,
+              reactions: already
+                ? (x.reactions ?? []).filter((r) => !(r.user_id === uid && r.emoji === emoji))
+                : [...(x.reactions ?? []), { user_id: uid, emoji, name: myName }],
+            },
+      ),
+    );
+    const { error } = already
+      ? await supabase
+          .from("wall_post_reactions")
+          .delete()
+          .eq("post_id", p.id)
+          .eq("user_id", uid)
+          .eq("emoji", emoji)
+      : await supabase.from("wall_post_reactions").insert({ post_id: p.id, user_id: uid, emoji });
+    if (error) {
+      toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
+      load();
+    }
+  }
+
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
     if (error) {
@@ -951,6 +1010,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         groupsById={groupsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
+        onToggleReaction={toggleReaction}
       />
     </div>
   );
@@ -1314,6 +1374,7 @@ function WallGrouped({
   groupsById,
   onDelete,
   onTogglePin,
+  onToggleReaction,
 }: {
   posts: Post[];
   polls: PollItem[];
@@ -1327,6 +1388,7 @@ function WallGrouped({
   groupsById: Map<string, Group>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
+  onToggleReaction: (post: Post, emoji: string) => void;
 }) {
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
@@ -1508,6 +1570,13 @@ function WallGrouped({
                 </p>
               );
             })()}
+          {!isExternal && (
+            <WallReactions
+              reactions={p.reactions ?? []}
+              currentUserId={currentUserId}
+              onToggle={(emoji) => onToggleReaction(p, emoji)}
+            />
+          )}
           {!isExternal && commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
