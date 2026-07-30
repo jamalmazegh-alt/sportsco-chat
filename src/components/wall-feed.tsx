@@ -29,6 +29,7 @@ import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 import { notifyWallComment } from "@/lib/wall-comment-notify.functions";
+import { notifyWallReaction } from "@/lib/wall-reaction-notify.functions";
 
 import { sendWallPostEmails } from "@/lib/wall/send-wall-emails.functions";
 import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
@@ -830,6 +831,10 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     if (error) {
       toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
       load();
+      return;
+    }
+    if (!already) {
+      notifyWallReaction({ data: { postId: p.id, emoji } }).catch(() => {});
     }
   }
 
