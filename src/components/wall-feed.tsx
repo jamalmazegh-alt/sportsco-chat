@@ -1738,7 +1738,13 @@ function WallGrouped({
             />
           )}
           {!isExternal && commentsEnabled && (
-            <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
+            <CommentBlock
+              post={p}
+              currentUserId={currentUserId}
+              role={role}
+              clubId={p.club_id}
+              onToggleCommentReaction={onToggleCommentReaction}
+            />
           )}
         </div>
       </li>
