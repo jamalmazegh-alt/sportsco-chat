@@ -346,7 +346,7 @@ function HomePage() {
           ) : (
             <div
               className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-black text-primary-foreground shadow-sm ring-2 ring-border"
-              style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+              style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
             >
               {club?.name?.[0] ?? "C"}
             </div>
@@ -439,7 +439,7 @@ function HomePage() {
                       className={cn(
                         "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
                         isFirst
-                          ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                          ? "border-primary bg-card shadow-[0_4px_14px_color-mix(in oklab, var(--primary) 22%, transparent)]"
                           : "border-border bg-card hover:border-border",
                       )}
                     >
@@ -447,7 +447,7 @@ function HomePage() {
                         <div
                           className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
                           style={{
-                            background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                            background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                           }}
                         >
                           ★ {t("dashboard.nextEvent")}
@@ -533,7 +533,7 @@ function HomePage() {
                 onClick={() => setCreateOpen(true)}
                 className="group relative w-full overflow-hidden rounded-[14px] h-14 text-white font-black text-[15px] tracking-tight shadow-[0_4px_14px_rgba(15,74,38,0.3)] active:scale-[0.99] transition-all"
                 style={{
-                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                  background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                 }}
               >
                 <span
@@ -730,7 +730,7 @@ function HomePage() {
                               : actionRequired
                                 ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
                                 : isFirst
-                                  ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                                  ? "border-primary bg-card shadow-[0_4px_14px_color-mix(in oklab, var(--primary) 22%, transparent)]"
                                   : "border-border bg-card hover:border-border",
                           )}
                         >
@@ -738,7 +738,7 @@ function HomePage() {
                             <div
                               className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
                               style={{
-                                background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                               }}
                             >
                               ★ {t("dashboard.nextEvent")}

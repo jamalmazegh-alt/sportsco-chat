@@ -85,23 +85,23 @@ export function HomeQuickCards({ clubId, teams }: Props) {
         {/* Teams card */}
         <Link
           to="/teams"
-          className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
+          className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all hover:border-primary hover:shadow-[0_4px_12px_color-mix(in oklab, var(--primary) 14%, transparent)]"
         >
           <div
             aria-hidden
             className="absolute top-0 inset-x-0 h-[3px]"
-            style={{ background: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)" }}
+            style={{ background: "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
           />
           <div className="relative">
             <div
               className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
-              style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
+              style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)" }}
             >
               <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
             </div>
             <p
               className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+              style={{ backgroundImage: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
             >
               {teamsCount}
             </p>
@@ -125,10 +125,10 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           to="/tournaments"
           className={cn(
             "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all",
-            state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
+            state === "empty" && "border-dashed border-border hover:border-primary",
             state === "planned" &&
               "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
-            state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
+            state === "live" && "border-primary shadow-[0_4px_12px_color-mix(in oklab, var(--primary) 22%, transparent)]",
             state === "done" && "border-border opacity-90",
           )}
         >
@@ -138,7 +138,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             style={{
               background:
                 state === "live"
-                  ? "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)"
+                  ? "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)"
                   : state === "planned"
                     ? "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)"
                     : "linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%)",
@@ -150,7 +150,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
               style={{
                 background:
                   state === "live"
-                    ? "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)"
+                    ? "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)"
                     : state === "planned"
                       ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
                       : "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
@@ -160,7 +160,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                 className="h-4 w-4"
                 strokeWidth={2.4}
                 style={{
-                  color: state === "live" ? "#0f4a26" : state === "planned" ? "#92400e" : "#64748b",
+                  color: state === "live" ? "var(--primary)" : state === "planned" ? "#92400e" : "#64748b",
                 }}
               />
             </div>
@@ -189,7 +189,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                   style={{
                     backgroundImage:
                       state === "live"
-                        ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
+                        ? "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)"
                         : state === "planned"
                           ? "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)"
                           : "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
@@ -261,7 +261,7 @@ function StateBadge({ state, startsOn }: { state: TournamentState; startsOn: str
     return (
       <span
         className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-white"
-        style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
       >
         <span className="relative inline-flex h-1.5 w-1.5">
           <span className="absolute inset-0 rounded-full bg-card/70 animate-ping" />

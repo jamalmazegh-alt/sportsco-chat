@@ -205,7 +205,7 @@ export function UrgencyCenter({ className }: Props) {
         )}
         aria-live="polite"
       >
-        <span className="inline-flex h-2 w-2 rounded-full bg-[#2d9d5f]" aria-hidden />
+        <span className="inline-flex h-2 w-2 rounded-full bg-primary" aria-hidden />
         <span className="font-medium">
           {t("urgency.empty.status", {
             defaultValue: "Tout est sous contrôle · aucune action urgente",
@@ -401,7 +401,7 @@ export function UrgencyCenter({ className }: Props) {
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="w-full mt-1 inline-flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-2 hover:border-[#2d9d5f] hover:text-[#0f4a26] transition-colors"
+            className="w-full mt-1 inline-flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-2 hover:border-primary hover:text-primary transition-colors"
           >
             {t("urgency.deck.showMore", {
               count: hiddenCount,
@@ -508,7 +508,7 @@ function UrgencyDeck({
         <div className="flex items-center gap-2">
           <div
             className="h-8 w-8 rounded-[10px] flex items-center justify-center shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
-            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+            style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
           >
             <Sparkles className="h-4 w-4 text-white" strokeWidth={2.4} />
           </div>
@@ -517,7 +517,7 @@ function UrgencyDeck({
           </h2>
           <span
             className="text-[10px] font-black h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(15,74,38,0.3)]"
-            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+            style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
           >
             {total}
           </span>
@@ -525,7 +525,7 @@ function UrgencyDeck({
         <button
           type="button"
           onClick={onRefresh}
-          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-1.5 hover:border-[#2d9d5f] hover:text-[#0f4a26] transition-colors"
+          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-1.5 hover:border-primary hover:text-primary transition-colors"
         >
           <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
           {t("common.refresh", { defaultValue: "Actualiser" })}
@@ -639,7 +639,7 @@ function UrgencyDeck({
                                 disabled={busy || !isTop}
                                 className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
                                 style={{
-                                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                  background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                                 }}
                               >
                                 {busy ? (
@@ -690,7 +690,7 @@ function UrgencyDeck({
                                 disabled={busy || !isTop}
                                 className="h-8 px-2.5 text-white border-0 shadow-[0_2px_6px_rgba(15,74,38,0.25)]"
                                 style={{
-                                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                  background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                                 }}
                               >
                                 {busy ? (
@@ -739,7 +739,7 @@ function UrgencyDeck({
                               disabled={busy || !isTop}
                               className="text-white shadow-[0_2px_6px_rgba(15,74,38,0.25)] border-0"
                               style={{
-                                background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                                background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                               }}
                             >
                               {busy ? (
