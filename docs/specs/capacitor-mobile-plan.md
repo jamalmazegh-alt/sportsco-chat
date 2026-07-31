@@ -71,6 +71,20 @@ Découvertes à traiter (lot 5 sauf mention) :
 - **Impact serveur** : `src/lib/push-send.server.ts`, `push-fanout.server.ts`, `push-dispatch*.ts` doivent router par canal. Garder le Web Push pour le PWA desktop.
 - Deep-link depuis la notification vers la route concernée.
 
+#### Avancement lot 3 — 31/07/2026
+
+Livré et validé en simulateur (hors dépendances Apple) :
+
+- Migration additive `channel` (`web` | `fcm` | `apns`) appliquée sur bughunt. Le token natif est stocké dans `endpoint` — l'index UNIQUE existant fournit l'upsert, aucune colonne supplémentaire.
+- `sendPushToUser` route par canal : `web` inchangé, `fcm`/`apns` tracés et ignorés tant que l'expéditeur natif n'existe pas (un token opaque ne doit jamais atteindre le chemin VAPID). Tous les chemins d'envoi passent par cette fonction — point de routage unique.
+- `/api/push/subscribe` accepte le corps natif `{channel, token}` ; `unsubscribe` accepte les tokens opaques.
+- `src/lib/native-push.ts` : permission → `register()` → token → POST. Carte « Cet appareil » du profil avec CTA natif. Ré-enregistrement silencieux au lancement + navigation depuis un tap de notification.
+- Entitlement `aps-environment=development` via `ios/debug.xcconfig`.
+
+**Piège découvert — import dynamique du plugin.** `await import("@capacitor/push-notifications")` laisse une promesse **pendante** en WKWebView : ni valeur ni rejet. Conséquence : `getNativePushStatus()` retournait `"unavailable"` et la carte ne s'affichait pas, sans la moindre erreur. Corrigé par un import statique (commit `3a156854`). À retenir pour tout futur plugin Capacitor : **import statique**, la garde `isNativePlatform()` suffit à protéger le web.
+
+**Reste bloqué par l'adhésion Apple** : `register()` est bien appelé et la permission accordée (`didGrant: 1`), mais iOS ne délivre aucun token car l'app est signée en ad-hoc (`TeamIdentifier=not set`) — les entitlements `aps-environment` ne s'appliquent pas. Dès l'adhésion active : renseigner `DEVELOPMENT_TEAM`, générer la clé APNs `.p8`, créer le projet Firebase, puis brancher l'expéditeur FCM HTTP v1 dans `push-send.server.ts`.
+
 ### Lot 4 — Paiements et conformité stores
 
 - **Cotisations club, stages, tournois** (`payment-*.functions.ts`, Stripe Connect) : biens et services du monde réel → Stripe autorisé hors achat in-app.
