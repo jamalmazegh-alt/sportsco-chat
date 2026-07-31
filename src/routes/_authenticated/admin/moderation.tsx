@@ -198,7 +198,6 @@ function ModerationPage() {
               )}
               {r.details && <p className="text-xs text-muted-foreground italic">« {r.details} »</p>}
 
-
               {(r.status === "pending" || r.status === "reviewing") && !r.deleted && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button
@@ -261,6 +260,14 @@ type Report = {
   reporterName: string;
   kind: "post" | "comment";
   excerpt: string;
+  authorName: string;
+  contentCreatedAt: string | null;
+  postAuthorName: string;
+  postExcerpt: string;
+  postCreatedAt: string | null;
+  postAudience: string | null;
+  postHidden: boolean;
+  postDeleted: boolean;
   hidden: boolean;
   deleted: boolean;
 };

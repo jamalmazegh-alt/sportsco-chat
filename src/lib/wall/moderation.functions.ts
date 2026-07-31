@@ -152,11 +152,16 @@ export const reportWallContent = createServerFn({ method: "POST" })
       const MOD_ROLES = new Set(["admin", "dirigeant"]);
       const modIds = Array.from(
         new Set(
-          ((mods ?? []) as Array<{ user_id: string | null; role: string | null; roles: string[] | null }>)
+          (
+            (mods ?? []) as Array<{
+              user_id: string | null;
+              role: string | null;
+              roles: string[] | null;
+            }>
+          )
             .filter(
               (m) =>
-                (m.role && MOD_ROLES.has(m.role)) ||
-                (m.roles ?? []).some((x) => MOD_ROLES.has(x)),
+                (m.role && MOD_ROLES.has(m.role)) || (m.roles ?? []).some((x) => MOD_ROLES.has(x)),
             )
             .map((m) => m.user_id)
             .filter((x): x is string => !!x && x !== userId),
@@ -297,7 +302,8 @@ export const listWallReports = createServerFn({ method: "POST" })
     );
 
     // Profils : signaleurs + auteurs des posts + auteurs des commentaires.
-    for (const p of postById.values()) if (p.author_user_id) userIds.push(p.author_user_id as string);
+    for (const p of postById.values())
+      if (p.author_user_id) userIds.push(p.author_user_id as string);
     for (const c of commentById.values())
       if (c.author_user_id) userIds.push(c.author_user_id as string);
     const { data: profs } = await supabaseAdmin
@@ -339,7 +345,6 @@ export const listWallReports = createServerFn({ method: "POST" })
         };
       }),
     };
-
   });
 
 export const resolveWallReport = createServerFn({ method: "POST" })
@@ -398,7 +403,6 @@ export const resolveWallReport = createServerFn({ method: "POST" })
         .eq("id", targetId);
       if (delErr) throw new Error(delErr.message);
     }
-
 
     const status =
       data.action === "dismiss"
