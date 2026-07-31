@@ -108,4 +108,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "meeting-removed": meetingRemovedTemplate,
   "parent-child-linked": parentChildLinkedTemplate,
   "carpool-need": carpoolNeedTemplate,
+  "wall-content-reported": wallContentReportedTemplate,
 };
