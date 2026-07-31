@@ -83,7 +83,28 @@ Livré et validé en simulateur (hors dépendances Apple) :
 
 **Piège découvert — import dynamique du plugin.** `await import("@capacitor/push-notifications")` laisse une promesse **pendante** en WKWebView : ni valeur ni rejet. Conséquence : `getNativePushStatus()` retournait `"unavailable"` et la carte ne s'affichait pas, sans la moindre erreur. Corrigé par un import statique (commit `3a156854`). À retenir pour tout futur plugin Capacitor : **import statique**, la garde `isNativePlatform()` suffit à protéger le web.
 
-**Reste bloqué par l'adhésion Apple** : `register()` est bien appelé et la permission accordée (`didGrant: 1`), mais iOS ne délivre aucun token car l'app est signée en ad-hoc (`TeamIdentifier=not set`) — les entitlements `aps-environment` ne s'appliquent pas. Dès l'adhésion active : renseigner `DEVELOPMENT_TEAM`, générer la clé APNs `.p8`, créer le projet Firebase, puis brancher l'expéditeur FCM HTTP v1 dans `push-send.server.ts`.
+**Reste bloqué par l'adhésion Apple côté iOS** : `register()` est bien appelé et la permission accordée (`didGrant: 1`), mais iOS ne délivre aucun token car l'app est signée en ad-hoc (`TeamIdentifier=not set`) — les entitlements `aps-environment` ne s'appliquent pas.
+
+#### Lot 3 terminé côté serveur — validé sur Android le 31/07/2026
+
+`src/lib/push-fcm.server.ts` : expéditeur **FCM HTTP v1** en Web Crypto pur. `firebase-admin` dépend d'API Node absentes des Workers Cloudflare, donc le JWT du compte de service est signé en RS256 à la main — même approche que le VAPID ES256 du fichier voisin. Jeton OAuth2 mis en cache (un fanout ne refait pas un aller-retour par destinataire), élagage des tokens sur `404`/`UNREGISTERED`.
+
+**Chaîne validée de bout en bout sur l'émulateur Android**, chaque maillon vérifié séparément :
+
+```
+CTA profil → permission Android → token FCM → /api/push/subscribe
+→ push_subscriptions (channel='fcm') → JWT RS256 → OAuth2 Google
+→ FCM HTTP v1 (200) → notification affichée dans le volet système
+```
+
+Deux enseignements :
+
+- **App au premier plan = pas d'affichage système.** Android remet alors le message à l'application, qui doit l'afficher elle-même. Comportement normal de FCM, pas un défaut. Piste UX ultérieure : un toast in-app sur `pushNotificationReceived`.
+- L'avertissement « Mixed Content » de la WebView (page `https://localhost` appelant `http://10.0.2.2`) est **non bloquant** : `allowMixedContent` laisse passer la requête. Le message dit « should also be served over HTTPS », pas « was blocked » — nuance qui évite un faux diagnostic.
+
+**Pour iOS, il ne reste aucune ligne de code à écrire** : l'expéditeur est agnostique de la plateforme et le canal `apns` emprunte déjà le même chemin (avec `thread-id` et son par défaut). Il suffira de déposer la clé APNs `.p8` dans la console Firebase.
+
+Identifiants FCM (`FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY`) extraits du JSON de compte de service vers `.env.qa`, gitignoré. **Le JSON lui-même n'entre pas dans le dépôt** — contrairement à `google-services.json`, c'est une clé privée. En production, ce seront des secrets Cloudflare.
 
 ### Lot 4 — Paiements et conformité stores
 
