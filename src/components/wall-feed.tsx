@@ -2075,6 +2075,12 @@ function CommentBlock({
               <span className="font-medium">{c.author?.full_name ?? "—"}</span>{" "}
               <RenderWithMentions text={c.body} />
             </p>
+            {c.hidden_at && (
+              <p className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                <Flag className="h-2.5 w-2.5" />
+                {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
+              </p>
+            )}
             <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
             <WallReactions
               reactions={c.reactions ?? []}
@@ -2082,6 +2088,16 @@ function CommentBlock({
               onToggle={(emoji) => onToggleCommentReaction(c, emoji)}
             />
           </div>
+          {currentUserId && c.author_user_id !== currentUserId && (
+            <button
+              onClick={() => onReportComment(c.id)}
+              className="text-muted-foreground hover:text-amber-600"
+              aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
+              title={t("wall.report.action", { defaultValue: "Signaler" })}
+            >
+              <Flag className="h-3.5 w-3.5" />
+            </button>
+          )}
           {(c.author_user_id === currentUserId || role === "admin") && (
             <button
               onClick={() => del(c.id)}
