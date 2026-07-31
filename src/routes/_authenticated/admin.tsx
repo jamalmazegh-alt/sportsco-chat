@@ -15,9 +15,15 @@ function AdminLayout() {
   const roles = useMyRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
+  const isAdmin = roles.includes("admin");
+  const isModerator = isAdmin || roles.includes("dirigeant");
 
-  const tabs = [
+  if (!isModerator) return <Navigate to="/profile" replace />;
+  // Les dirigeants n'ont accès qu'à la modération du mur.
+  if (!isAdmin && !pathname.startsWith("/admin/moderation"))
+    return <Navigate to="/admin/moderation" replace />;
+
+  const allTabs = [
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
     { to: "/admin/groups", icon: UsersRound, label: t("groups.openGroups"), exact: false },
