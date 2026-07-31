@@ -1561,6 +1561,11 @@ function WallGrouped({
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
+  // Cible du signalement (publication ou commentaire) — modération manuelle.
+  const [reportTarget, setReportTarget] = useState<{
+    postId: string;
+    commentId: string | null;
+  } | null>(null);
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
