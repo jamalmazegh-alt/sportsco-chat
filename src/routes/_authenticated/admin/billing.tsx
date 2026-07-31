@@ -40,6 +40,7 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
+import { canPurchaseInApp } from "@/lib/native-platform";
 
 const searchSchema = z.object({
   billing: z.enum(["success", "canceled"]).optional(),
@@ -216,7 +217,16 @@ function BillingPage() {
     !!sub &&
     hasStripeSubscription &&
     (["active", "past_due"].includes(sub.status) || trialStillValid);
-  const showPlans = !isExempt && !canManageSubscription;
+
+  // Builds de store : on retire les parcours d'ACHAT (formules) et de gestion
+  // d'abonnement (le portail Stripe permet de changer de formule, donc
+  // d'acheter). Statut et factures restent affichés : c'est de l'information
+  // sur un achat effectué ailleurs, ce que les stores autorisent — et
+  // `canManageSubscription` gate aussi la liste des factures, d'où ce drapeau
+  // séparé plutôt qu'une condition fondue dedans.
+  const storePurchaseAllowed = canPurchaseInApp();
+  const showSubscriptionActions = canManageSubscription && storePurchaseAllowed;
+  const showPlans = !isExempt && !canManageSubscription && storePurchaseAllowed;
 
   const { data: invoicesData } = useQuery({
     queryKey: ["club-invoices", activeClubId],
@@ -440,7 +450,7 @@ function BillingPage() {
               </div>
             )}
 
-            {canManageSubscription && (
+            {showSubscriptionActions && (
               <div className="grid gap-2 sm:grid-cols-2 pt-1">
                 <Button
                   onClick={onUpdateCard}
@@ -488,7 +498,7 @@ function BillingPage() {
               </div>
             )}
 
-            {canManageSubscription && (
+            {showSubscriptionActions && (
               <button
                 onClick={openPortal}
                 disabled={busy === "portal"}
@@ -564,6 +574,27 @@ function BillingPage() {
                   </li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {/* Build de store : achat et gestion indisponibles dans l'app.
+              Message neutre, sans lien cliquable — un lien vers une page
+              d'achat serait du « steering », historiquement refusé en review. */}
+          {!storePurchaseAllowed && (
+            <section className="rounded-2xl border border-border bg-muted/30 p-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+                  <ExternalLink className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold">
+                    {t("billing.storeManagedElsewhere.title")}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {t("billing.storeManagedElsewhere.body")}
+                  </p>
+                </div>
+              </div>
             </section>
           )}
 

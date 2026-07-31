@@ -1425,7 +1425,8 @@
       "adminHint": "Contactez un administrateur du club pour relancer l'abonnement.",
       "supportHint": "Le support Clubero peut vous aider si vous ne savez pas qui contacter.",
       "profileCta": "Aller au profil",
-      "supportCta": "Contacter le support"
+      "supportCta": "Contacter le support",
+      "adminRenewElsewhere": "Un administrateur doit régulariser l'abonnement depuis le site Clubero, dans un navigateur."
     },
     "features": {
       "teams": "Équipes illimitées",
@@ -1439,6 +1440,10 @@
       "events": "Événements",
       "pwa": "Accès mobile / PWA",
       "roles": "Rôles coach & manager"
+    },
+    "storeManagedElsewhere": {
+      "title": "Abonnement géré sur le web",
+      "body": "Pour des raisons liées aux règles des stores d'applications, l'abonnement Clubero se souscrit et se gère depuis un navigateur, sur le site Clubero. Votre statut et vos factures restent consultables ici."
     }
   },
   "feedback": {

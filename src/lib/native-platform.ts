@@ -31,6 +31,22 @@ export function getPlatform(): string {
 }
 
 /**
+ * `false` dans les applications distribuées par un store (iOS ET Android).
+ *
+ * Apple (règle 3.1.1) comme Google (Play Payments policy) imposent leur propre
+ * système d'achat pour les abonnements numériques consommés dans l'app. Plutôt
+ * que d'intégrer StoreKit et Play Billing pour la v1, les parcours d'achat sont
+ * retirés des builds natifs : l'abonnement se souscrit et se gère sur le web.
+ *
+ * Ne concerne QUE l'abonnement SaaS du club. Les paiements de cotisations, de
+ * stages et de tournois portent sur des services du monde réel et restent
+ * autorisés hors achat in-app — ils ne doivent pas être masqués.
+ */
+export function canPurchaseInApp(): boolean {
+  return !isNativePlatform();
+}
+
+/**
  * Origine du backend distant, injectée au build mobile via `VITE_API_ORIGIN`.
  * Vide sur le build web : les appels restent relatifs, comme aujourd'hui.
  */

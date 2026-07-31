@@ -6,6 +6,7 @@ import { AlertTriangle, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
+import { canPurchaseInApp } from "@/lib/native-platform";
 
 const DISMISS_KEY = (clubId: string) => `clubero-trial-banner-dismissed:${clubId}`;
 
@@ -98,9 +99,13 @@ export function TrialBanner() {
     <div className={cn("px-3 py-2 text-xs flex items-center gap-2", tone)}>
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="flex-1 truncate">{message}</span>
-      <Link to="/admin/billing" className="font-semibold underline underline-offset-2 shrink-0">
-        {kind === "expired" || kind === "trial-ending" ? t("trial.activate") : t("trial.manage")}
-      </Link>
+      {/* Build de store : « Activer » mènerait à une page sans parcours
+          d'achat. Le bandeau reste informatif, sans CTA. */}
+      {canPurchaseInApp() && (
+        <Link to="/admin/billing" className="font-semibold underline underline-offset-2 shrink-0">
+          {kind === "expired" || kind === "trial-ending" ? t("trial.activate") : t("trial.manage")}
+        </Link>
+      )}
       {dismissable && (
         <button
           type="button"

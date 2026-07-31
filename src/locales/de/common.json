@@ -1430,7 +1430,8 @@
       "adminHint": "Kontaktiere einen Vereinsadmin, damit das Abonnement reaktiviert wird.",
       "supportHint": "Der Clubero-Support kann helfen, wenn du nicht weißt, wen du kontaktieren sollst.",
       "profileCta": "Zum Profil",
-      "supportCta": "Support kontaktieren"
+      "supportCta": "Support kontaktieren",
+      "adminRenewElsewhere": "Ein Administrator muss das Abonnement über die Clubero-Website in einem Browser erneuern."
     },
     "features": {
       "teams": "Unbegrenzte Teams",
@@ -1444,6 +1445,10 @@
       "events": "Events",
       "pwa": "Mobiler Zugang / PWA",
       "roles": "Trainer- & Manager-Rollen"
+    },
+    "storeManagedElsewhere": {
+      "title": "Abonnement im Web verwalten",
+      "body": "Aufgrund der Regeln der App-Stores wird das Clubero-Abonnement über einen Browser auf der Clubero-Website abgeschlossen und verwaltet. Status und Rechnungen bleiben hier einsehbar."
     }
   },
   "feedback": {

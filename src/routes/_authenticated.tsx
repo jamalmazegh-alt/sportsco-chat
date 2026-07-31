@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, Navigate, useRouterState, Link } from "@tanstack/react-router";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
+import { canPurchaseInApp } from "@/lib/native-platform";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { initNativePushOnLaunch } from "@/lib/native-push";
 import { useTranslation } from "react-i18next";
@@ -80,10 +81,16 @@ function AuthLayout() {
     !clubSubActive &&
     !isPathAllowed(pathname, CLUB_LOCKED_ALLOWED)
   ) {
-    if (!isAdmin) {
+    // En build de store, /admin/billing ne propose plus de parcours d'achat :
+    // y rediriger l'admin le mènerait dans un cul-de-sac. On lui montre donc
+    // l'écran d'abonnement expiré, avec la marche à suivre côté web.
+    if (!isAdmin || !canPurchaseInApp()) {
       return (
         <LockedClubShell>
-          <ClubSubscriptionExpiredScreen clubName={activeMembership?.club?.name} />
+          <ClubSubscriptionExpiredScreen
+            clubName={activeMembership?.club?.name}
+            isAdmin={isAdmin}
+          />
         </LockedClubShell>
       );
     }
@@ -162,7 +169,13 @@ function LockedClubShell({ children }: { children: ReactNode }) {
   );
 }
 
-function ClubSubscriptionExpiredScreen({ clubName }: { clubName?: string }) {
+function ClubSubscriptionExpiredScreen({
+  clubName,
+  isAdmin = false,
+}: {
+  clubName?: string;
+  isAdmin?: boolean;
+}) {
   const { t } = useTranslation();
   return (
     <main className="px-5 py-8">
@@ -198,7 +211,13 @@ function ClubSubscriptionExpiredScreen({ clubName }: { clubName?: string }) {
               </li>
               <li className="flex gap-2">
                 <CreditCard className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>{t("billing.memberLocked.adminHint")}</span>
+                <span>
+                  {/* L'admin est ici parce que l'app est un build de store :
+                      on lui indique où régulariser, sans lien d'achat. */}
+                  {isAdmin
+                    ? t("billing.memberLocked.adminRenewElsewhere")
+                    : t("billing.memberLocked.adminHint")}
+                </span>
               </li>
               <li className="flex gap-2">
                 <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

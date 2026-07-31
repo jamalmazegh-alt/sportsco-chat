@@ -1425,7 +1425,8 @@
       "adminHint": "Contacte um administrador do Clube para reativar a subscrição.",
       "supportHint": "O suporte Clubero pode ajudar se não souber quem contactar.",
       "profileCta": "Ir para o perfil",
-      "supportCta": "Contactar suporte"
+      "supportCta": "Contactar suporte",
+      "adminRenewElsewhere": "Um administrador deve regularizar a subscrição a partir do site Clubero, num navegador."
     },
     "features": {
       "teams": "Equipas ilimitadas",
@@ -1439,6 +1440,10 @@
       "events": "Eventos",
       "pwa": "Acesso móvel / PWA",
       "roles": "Funções de Treinador e Gestor"
+    },
+    "storeManagedElsewhere": {
+      "title": "Subscrição gerida na web",
+      "body": "Devido às regras das lojas de aplicações, a subscrição Clubero é adquirida e gerida a partir de um navegador, no site Clubero. O seu estado e as suas faturas continuam visíveis aqui."
     }
   },
   "feedback": {
