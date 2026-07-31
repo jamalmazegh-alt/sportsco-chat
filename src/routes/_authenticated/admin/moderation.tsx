@@ -121,7 +121,7 @@ function ModerationPage() {
         </div>
       ) : reports.length === 0 ? (
         <EmptyState
-          icon={Flag}
+          icon={<Flag className="h-5 w-5" />}
           title={t("wall.moderation.empty", { defaultValue: "Aucun signalement" })}
           description={t("wall.moderation.emptyHint", {
             defaultValue: "Les contenus signalés par les membres apparaîtront ici.",
