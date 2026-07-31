@@ -106,11 +106,26 @@ const SECURITY_HEADERS: Record<string, string> = {
 // exactement la réponse qu'elle recevait avant : le trafic web n'est pas affecté.
 const NATIVE_ORIGINS = new Set(["capacitor://localhost", "https://localhost"]);
 
-function nativeCorsHeaders(origin: string): Record<string, string> {
+// En-têtes toujours autorisés, même si le preflight n'en demande aucun.
+const DEFAULT_ALLOWED_HEADERS = "authorization, content-type, accept, x-tsr-serverfn";
+
+function nativeCorsHeaders(
+  origin: string,
+  requestedHeaders?: string | null,
+): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, content-type",
+    // On renvoie les en-têtes demandés par le preflight plutôt qu'une liste
+    // figée. TanStack Start envoie `x-tsr-serverFn` sur chaque RPC — une liste
+    // en dur l'avait omis et bloquait TOUTES les server functions en natif
+    // (constaté en émulateur contre la production). Une version future du
+    // framework pourrait en ajouter d'autres ; refléter la demande évite de
+    // rejouer ce bug à chaque montée de version.
+    //
+    // Sans risque : l'origine est déjà validée par une allowlist fermée, donc
+    // seul un client natif légitime atteint cette ligne.
+    "Access-Control-Allow-Headers": requestedHeaders || DEFAULT_ALLOWED_HEADERS,
     "Access-Control-Max-Age": "86400",
   };
 }
@@ -150,7 +165,10 @@ export default {
 
     // Preflight : répondre sans réveiller le handler SSR.
     if (fromNativeApp && request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: nativeCorsHeaders(origin) });
+      return new Response(null, {
+        status: 204,
+        headers: nativeCorsHeaders(origin, request.headers.get("Access-Control-Request-Headers")),
+      });
     }
 
     try {
