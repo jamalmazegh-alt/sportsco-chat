@@ -9,7 +9,13 @@ import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AlertTriangle, Ban, EyeOff, Megaphone, MessageSquareWarning, Shield } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
@@ -83,7 +89,12 @@ export function WallReportDialog({
     setBusy(true);
     try {
       const res = (await report({
-        data: { postId, commentId: commentId ?? null, reason, details: details.trim() || undefined },
+        data: {
+          postId,
+          commentId: commentId ?? null,
+          reason,
+          details: details.trim() || undefined,
+        },
       })) as { duplicate?: boolean };
       if (res?.duplicate) {
         toast.info(

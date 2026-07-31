@@ -32,7 +32,9 @@ export const Route = createFileRoute("/_authenticated/admin/moderation")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  errorComponent: ({ error }) => <div className="p-6 text-sm text-destructive">{error.message}</div>,
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-destructive">{error.message}</div>
+  ),
   notFoundComponent: () => <div className="p-6 text-sm">Page introuvable</div>,
 });
 
@@ -58,9 +60,10 @@ function ModerationPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["wall-reports", activeClubId, status],
     enabled: !!activeClubId,
-    queryFn: async () => (await list({ data: { clubId: activeClubId as string, status } })) as
-      | { reports: Report[] }
-      | undefined,
+    queryFn: async () =>
+      (await list({ data: { clubId: activeClubId as string, status } })) as
+        | { reports: Report[] }
+        | undefined,
   });
 
   const mutation = useMutation({
@@ -165,9 +168,7 @@ function ModerationPage() {
                   {r.excerpt}
                 </p>
               )}
-              {r.details && (
-                <p className="text-xs text-muted-foreground italic">« {r.details} »</p>
-              )}
+              {r.details && <p className="text-xs text-muted-foreground italic">« {r.details} »</p>}
 
               {(r.status === "pending" || r.status === "reviewing") && !r.deleted && (
                 <div className="flex flex-wrap gap-2 pt-1">
