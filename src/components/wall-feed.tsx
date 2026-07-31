@@ -48,6 +48,7 @@ type Comment = {
   body: string;
   created_at: string;
   author?: Profile | null;
+  hidden_at?: string | null;
   reactions?: WallReaction[];
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
