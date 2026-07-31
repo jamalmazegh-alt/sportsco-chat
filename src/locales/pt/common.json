@@ -2298,7 +2298,10 @@
       "convocationSilence_other": "{{count}} sem resposta",
       "reducedSquadTitle": "Plantel reduzido",
       "reducedSquadSubtitle_one": "{{count}} jogador indisponível em 14d",
-      "reducedSquadSubtitle_other": "{{count}} jogadores indisponíveis em 14d"
+      "reducedSquadSubtitle_other": "{{count}} jogadores indisponíveis em 14d",
+      "staffUncovered": "Nenhum treinador disponível",
+      "staffUncoveredTeam": "Nenhum treinador disponível — {{team}}",
+      "staffUncoveredFallback": "Evento"
     },
     "self": {
       "convocationSilence": "Não respondeste"
@@ -2537,5 +2540,12 @@
   },
   "network": {
     "offline": "Sem ligação à internet"
+  },
+  "staffCoverage": {
+    "badge": {
+      "assured": "Enquadramento assegurado",
+      "unassigned": "Nenhum treinador atribuído",
+      "uncovered": "Nenhum treinador disponível"
+    }
   }
 }
