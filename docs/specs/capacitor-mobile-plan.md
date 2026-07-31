@@ -114,6 +114,22 @@ Livré et validé en simulateur (hors dépendances Apple) :
 
 **Reste à valider sur appareil réel :** le retrait du bandeau au retour du réseau (mode avion off). Le simulateur ne permet pas de le prouver.
 
+#### Plateforme Android — 31/07/2026
+
+Compte Google Play en organisation, **identité vérifiée** — donc pas de test fermé imposé (14 jours / 12 testeurs) et aucune dépendance à Apple sur ce chemin.
+
+État : `android/` généré avec les 7 plugins, projet Firebase `clubero-e5c42` (package `app.clubero.mobile`) câblé, **APK debug de 24 Mo construit avec succès**. Vérifié dans le binaire : Firebase/FCM présent, bundle web embarqué, origine `10.0.2.2` et cible bughunt.
+
+Trois pièges rencontrés, tous consignés dans le code :
+
+1. **Le JDK 25 livré par Android Studio est rejeté** par Gradle 8.14 / AGP 8.13 (« Unsupported class file major version 69 »). JDK 21 LTS installé et épinglé dans `android/gradle.properties` — le build ne dépend donc plus du shell. À noter : le wrapper Gradle a malgré tout besoin d'un `JAVA_HOME` pour **démarrer**, avant même de lire `gradle.properties`.
+2. **Android bloque le trafic en clair depuis l'API 28.** Le serveur de dev étant en HTTP, toutes les requêtes auraient échoué. Autorisé via `android/app/src/debug/` uniquement, et restreint à `10.0.2.2` et `localhost` ; les builds de release n'héritent pas de ce manifeste.
+3. **L'émulateur n'atteint pas `localhost`** : il faut `10.0.2.2`, d'où `.env.mobile-android` et le script `build:mobile:android` (mode Vite distinct pour ne pas mélanger les origines avec iOS).
+
+Choix d'image système à conserver : variante **Google Play** obligatoire — sans les Play Services, FCM ne reçoit rien. ARM64 pour l'exécution native sur Apple Silicon.
+
+`google-services.json` est commité volontairement : la clé est restreinte au nom de package, c'est la pratique recommandée par Google et c'est nécessaire à la CI du lot 7.
+
 ### Lot 6 — Publication
 
 - Comptes : Apple Developer Program (99 $/an, délai de validation à anticiper), Google Play Console (25 $ une fois).
