@@ -1777,6 +1777,7 @@ function WallGrouped({
               role={role}
               clubId={p.club_id}
               onToggleCommentReaction={onToggleCommentReaction}
+              onReportComment={(commentId) => setReportTarget({ postId: p.id, commentId })}
             />
           )}
         </div>
