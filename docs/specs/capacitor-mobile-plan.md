@@ -104,9 +104,15 @@ Livré et validé en simulateur (hors dépendances Apple) :
 - **Coquille native** (`src/lib/native-shell.ts`, appelée au montage de la racine) : `SplashScreen.hide()` couplé à `launchAutoHide: false` (sans quoi le splash s'auto-masquait avant le montage de React et laissait un écran blanc), `StatusBar` en `Style.Default`, bouton retour matériel Android → `window.history.back()` / `exitApp()`.
 - **Uploads photo : aucun plugin nécessaire.** Vérifié en simulateur — un simple `<input type="file">` ouvre la feuille native iOS (Photothèque / Prendre une photo / Choisir un fichier). Les 22 surfaces d'upload fonctionnent telles quelles ; `@capacitor/camera` et le refactor associé sont évités.
 - **Descriptions d'usage Info.plist ajoutées** (`NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`). Elles étaient absentes : sur un appareil réel, « Prendre une photo » **tuait l'app** — invisible en simulateur, faute de caméra, et cause de rejet en review. À localiser via `InfoPlist.strings` au lot 6.
-- **Bandeau hors ligne natif** (`use-online-status.ts` + `offline-banner.tsx`) : `navigator.onLine` et les événements `online`/`offline`, sans plugin, ce qui couvre iOS, Android et le web. Nécessaire car `/offline` n'est servi que par le service worker, désactivé en natif — l'app ne signalait donc aucune perte de réseau.
+- **Bandeau hors ligne natif** (`use-online-status.ts` + `offline-banner.tsx`). Nécessaire car `/offline` n'est servi que par le service worker, désactivé en natif — l'app ne signalait aucune perte de réseau.
 
-**Non validé visuellement :** le bandeau hors ligne. Le simulateur partage le réseau du Mac et `navigator.onLine` ne peut pas y être forcé. À vérifier en mode avion lors de la QA sur appareil réel.
+**Ce que le test réseau a appris (Wi-Fi du Mac coupé puis rétabli, deux passes) :**
+
+1. Une première version reposait sur `navigator.onLine` seul, sans plugin. Le test a montré que **WKWebView émet `offline` mais jamais `online`** : le bandeau apparaissait et ne repartait plus. Un indicateur incapable de s'éteindre est pire que pas d'indicateur — d'où le passage à `@capacitor/network` en natif (`navigator.onLine` reste la source sur le web).
+2. Même avec le plugin, le bandeau ne se retirait pas. Test décisif : le Club wall a **chargé des données fraîches** depuis bughunt pendant que le bandeau affichait « hors ligne ». Le réseau fonctionnait donc ; c'est la couche de connectivité d'iOS qui **reste bloquée dans le simulateur** après un retour du Wi-Fi de l'hôte. Confirmé par un relancement de l'app : processus neuf, aucun bandeau.
+3. Filet de sécurité ajouté en conséquence : re-lecture de `Network.getStatus()` au retour au premier plan (`appStateChange`), car un changement survenu pendant la suspension n'émet pas toujours d'événement.
+
+**Reste à valider sur appareil réel :** le retrait du bandeau au retour du réseau (mode avion off). Le simulateur ne permet pas de le prouver.
 
 ### Lot 6 — Publication
 

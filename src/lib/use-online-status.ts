@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
+import { App } from "@capacitor/app";
+import { Network } from "@capacitor/network";
+import { isNativePlatform } from "@/lib/native-platform";
 
 /**
- * État de connexion réseau, via `navigator.onLine` et les événements
- * `online`/`offline`.
+ * État de connexion réseau.
  *
- * Pas de plugin Capacitor ici : ces API fonctionnent aussi bien en WKWebView
- * qu'en WebView Android et sur le web, et évitent une dépendance de plus.
+ * En natif, la source de vérité est `@capacitor/network`, adossé à l'API de
+ * connectivité de l'OS. Le web, lui, s'appuie sur `navigator.onLine` et les
+ * événements `online`/`offline`.
  *
- * Limite connue de `navigator.onLine` : il signale l'existence d'une interface
- * réseau, pas l'accès effectif à Internet. Un portail captif ou un backend
- * injoignable restent donc vus comme « en ligne » — c'est un indicateur, pas
- * une garantie, et les erreurs de requête restent gérées ailleurs.
+ * Pourquoi le plugin en natif : une première version n'utilisait que
+ * `navigator.onLine`, et le test en simulateur (Wi-Fi coupé puis rétabli) a
+ * montré que WKWebView émet bien `offline` mais **jamais** `online` — le
+ * bandeau apparaissait et ne repartait plus. Un indicateur qui ne sait pas
+ * s'éteindre est pire qu'aucun indicateur.
+ *
+ * Limite conservée dans les deux cas : on détecte l'interface réseau, pas
+ * l'accès effectif à Internet. Un portail captif reste vu comme « en ligne ».
  */
 export function useOnlineStatus(): boolean {
   // SSR et premier rendu : on suppose en ligne pour ne pas afficher un
@@ -18,13 +25,38 @@ export function useOnlineStatus(): boolean {
   const [online, setOnline] = useState(true);
 
   useEffect(() => {
-    if (typeof navigator === "undefined" || typeof window === "undefined") return;
+    if (typeof window === "undefined") return;
+
+    if (isNativePlatform()) {
+      const removers: Array<() => void> = [];
+
+      const refresh = () =>
+        Network.getStatus()
+          .then((status) => setOnline(status.connected))
+          .catch((e) => console.warn("[network] getStatus failed:", (e as Error).message));
+
+      refresh();
+
+      Network.addListener("networkStatusChange", (status) => setOnline(status.connected))
+        .then((handle) => removers.push(() => void handle.remove()))
+        .catch((e) => console.warn("[network] listener failed:", (e as Error).message));
+
+      // Filet de sécurité : un changement d'état réseau survenu pendant que
+      // l'app était suspendue n'émet pas toujours d'événement. Sans cette
+      // re-lecture au retour au premier plan, un bandeau « hors ligne » peut
+      // rester affiché alors que la connexion est revenue.
+      App.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) refresh();
+      })
+        .then((handle) => removers.push(() => void handle.remove()))
+        .catch((e) => console.warn("[network] appState listener failed:", (e as Error).message));
+
+      return () => removers.forEach((remove) => remove());
+    }
 
     setOnline(navigator.onLine);
-
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
-
     window.addEventListener("online", goOnline);
     window.addEventListener("offline", goOffline);
     return () => {
