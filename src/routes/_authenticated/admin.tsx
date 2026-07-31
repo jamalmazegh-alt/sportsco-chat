@@ -22,6 +22,12 @@ function AdminLayout() {
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
     { to: "/admin/groups", icon: UsersRound, label: t("groups.openGroups"), exact: false },
     {
+      to: "/admin/moderation",
+      icon: Flag,
+      label: t("wall.moderation.tab", { defaultValue: "Modération" }),
+      exact: false,
+    },
+    {
       to: "/admin/billing",
       icon: CreditCard,
       label: t("billing.title", { defaultValue: "Abonnement" }),
