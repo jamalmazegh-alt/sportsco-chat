@@ -185,7 +185,7 @@ export function UrgencyCenter({ className }: Props) {
         <button
           type="button"
           onClick={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
-          className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-[#2d9d5f] transition-colors shrink-0"
+          className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-primary transition-colors shrink-0"
         >
           <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
           {t("common.retry", { defaultValue: "Réessayer" })}

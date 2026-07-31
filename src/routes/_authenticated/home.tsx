@@ -414,7 +414,7 @@ function HomePage() {
             </h2>
             <Link
               to="/events"
-              className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors"
+              className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-primary transition-colors"
             >
               {t("dashboard.viewAll")}
               <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
@@ -699,7 +699,7 @@ function HomePage() {
                 </h2>
                 <Link
                   to="/events"
-                  className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors"
+                  className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-primary transition-colors"
                 >
                   {t("dashboard.viewAll")}
                   <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
