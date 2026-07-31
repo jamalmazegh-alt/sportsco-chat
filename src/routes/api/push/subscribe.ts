@@ -87,18 +87,35 @@ export const Route = createFileRoute("/api/push/subscribe")({
           return new Response("Subscription already belongs to another account", { status: 409 });
         }
 
-        const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
-          {
-            user_id: userId,
-            endpoint: parsed.endpoint,
-            p256dh: parsed.p256dh,
-            auth: parsed.auth,
-            channel: parsed.channel,
-            user_agent: parsed.user_agent ?? null,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "endpoint" },
-        );
+        const base = {
+          user_id: userId,
+          endpoint: parsed.endpoint,
+          p256dh: parsed.p256dh,
+          auth: parsed.auth,
+          user_agent: parsed.user_agent ?? null,
+          updated_at: new Date().toISOString(),
+        };
+
+        let { error } = await supabaseAdmin
+          .from("push_subscriptions")
+          .upsert({ ...base, channel: parsed.channel }, { onConflict: "endpoint" });
+
+        // La colonne `channel` peut ne pas encore exister (code déployé avant sa
+        // migration) : PostgREST renvoie alors 42703 et l'upsert échoue. Pour une
+        // souscription WEB, `channel` vaut de toute façon la valeur par défaut :
+        // on réessaie sans elle plutôt que de renvoyer une 500 à un utilisateur
+        // qui active simplement ses notifications.
+        //
+        // Pour un token NATIF, en revanche, on ne retente pas : l'enregistrer
+        // sans son canal le ferait passer pour du Web Push et l'envoi partirait
+        // sur le mauvais chemin. Mieux vaut échouer franchement.
+        if (error?.code === "42703" && parsed.channel === "web") {
+          console.warn("[push/subscribe] colonne `channel` absente — upsert sans elle");
+          ({ error } = await supabaseAdmin
+            .from("push_subscriptions")
+            .upsert(base, { onConflict: "endpoint" }));
+        }
+
         if (error) {
           console.error("[push/subscribe] upsert failed", error);
           return new Response("Server error", { status: 500 });
