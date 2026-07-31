@@ -90,18 +90,27 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           <div
             aria-hidden
             className="absolute top-0 inset-x-0 h-[3px]"
-            style={{ background: "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
+            style={{
+              background:
+                "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+            }}
           />
           <div className="relative">
             <div
               className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
-              style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)" }}
+              style={{
+                background:
+                  "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)",
+              }}
             >
               <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
             </div>
             <p
               className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+              }}
             >
               {teamsCount}
             </p>
@@ -128,7 +137,8 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             state === "empty" && "border-dashed border-border hover:border-primary",
             state === "planned" &&
               "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
-            state === "live" && "border-primary shadow-[0_4px_12px_color-mix(in oklab, var(--primary) 22%, transparent)]",
+            state === "live" &&
+              "border-primary shadow-[0_4px_12px_color-mix(in oklab, var(--primary) 22%, transparent)]",
             state === "done" && "border-border opacity-90",
           )}
         >
@@ -160,7 +170,12 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                 className="h-4 w-4"
                 strokeWidth={2.4}
                 style={{
-                  color: state === "live" ? "var(--primary)" : state === "planned" ? "#92400e" : "#64748b",
+                  color:
+                    state === "live"
+                      ? "var(--primary)"
+                      : state === "planned"
+                        ? "#92400e"
+                        : "#64748b",
                 }}
               />
             </div>
@@ -261,7 +276,10 @@ function StateBadge({ state, startsOn }: { state: TournamentState; startsOn: str
     return (
       <span
         className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-white"
-        style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
+        style={{
+          background:
+            "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+        }}
       >
         <span className="relative inline-flex h-1.5 w-1.5">
           <span className="absolute inset-0 rounded-full bg-card/70 animate-ping" />

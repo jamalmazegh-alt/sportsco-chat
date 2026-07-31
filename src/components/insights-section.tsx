@@ -75,7 +75,8 @@ const PRIORITY_TONE: Record<
   },
   low: {
     bar: "linear-gradient(180deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
-    iconBg: "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)",
+    iconBg:
+      "linear-gradient(135deg, color-mix(in oklab, var(--primary) 16%, white) 0%, color-mix(in oklab, var(--primary) 28%, white) 100%)",
     iconColor: "var(--primary)",
     chipBg: "color-mix(in oklab, var(--primary) 16%, white)",
     chipColor: "var(--primary)",
@@ -249,7 +250,10 @@ export function InsightsSection({ clubId }: { clubId: string }) {
         <div className="flex items-center gap-2">
           <div
             className="h-7 w-7 rounded-[8px] flex items-center justify-center shadow-[0_2px_6px_rgba(15,74,38,0.2)]"
-            style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
+            style={{
+              background:
+                "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+            }}
           >
             <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2.4} />
           </div>
@@ -258,7 +262,10 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           </h2>
           <span
             className="text-[10px] font-black px-2 py-0.5 rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(15,74,38,0.25)]"
-            style={{ background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)" }}
+            style={{
+              background:
+                "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+            }}
           >
             {insights.length}
           </span>
@@ -329,7 +336,8 @@ export function InsightsSection({ clubId }: { clubId: string }) {
                       onClick={() => handleAction(ins)}
                       className="mt-2 inline-flex items-center gap-0.5 text-[11px] font-bold rounded-[8px] px-2.5 py-1.5 -ml-1 text-white transition-all hover:shadow-[0_2px_6px_rgba(15,74,38,0.25)] active:scale-95"
                       style={{
-                        background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
+                        background:
+                          "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
                       }}
                     >
                       {label}
