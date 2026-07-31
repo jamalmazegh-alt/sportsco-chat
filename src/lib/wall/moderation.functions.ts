@@ -144,18 +144,25 @@ export const reportWallContent = createServerFn({ method: "POST" })
       const clubName = (club as { name?: string | null } | null)?.name ?? null;
       const clubLang = (club as { default_language?: string | null } | null)?.default_language;
 
+      // Modérateurs = rôle principal OU présence dans roles[] (admin / dirigeant).
       const { data: mods } = await supabaseAdmin
         .from("club_members")
-        .select("user_id, role")
-        .eq("club_id", clubId)
-        .in("role", ["admin", "dirigeant"]);
+        .select("user_id, role, roles")
+        .eq("club_id", clubId);
+      const MOD_ROLES = new Set(["admin", "dirigeant"]);
       const modIds = Array.from(
         new Set(
-          ((mods ?? []) as Array<{ user_id: string | null }>)
+          ((mods ?? []) as Array<{ user_id: string | null; role: string | null; roles: string[] | null }>)
+            .filter(
+              (m) =>
+                (m.role && MOD_ROLES.has(m.role)) ||
+                (m.roles ?? []).some((x) => MOD_ROLES.has(x)),
+            )
             .map((m) => m.user_id)
             .filter((x): x is string => !!x && x !== userId),
         ),
       );
+
       if (modIds.length === 0) return { ok: true, notified: 0 };
 
       const { data: profs } = await supabaseAdmin
