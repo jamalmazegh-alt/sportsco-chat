@@ -157,8 +157,14 @@ function ModerationPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {t("wall.moderation.by", { defaultValue: "Signalé par" })} {r.reporterName} ·{" "}
+                    {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
+                    <span className="font-medium text-foreground">{r.reporterName}</span> ·{" "}
                     {fmt(r.created_at, "d MMM HH:mm")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                    <span className="font-medium text-foreground">{r.authorName}</span>
+                    {r.contentCreatedAt ? ` · ${fmt(r.contentCreatedAt, "d MMM HH:mm")}` : ""}
                   </p>
                 </div>
               </div>
@@ -167,6 +173,28 @@ function ModerationPage() {
                 <p className="text-sm bg-muted/40 rounded-lg px-3 py-2 whitespace-pre-wrap">
                   {r.excerpt}
                 </p>
+              )}
+
+              {r.kind === "comment" && (
+                <div className="rounded-lg border border-dashed border-border px-3 py-2 space-y-1">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                    {t("wall.moderation.originalPost", { defaultValue: "Publication d'origine" })}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                    <span className="font-medium text-foreground">{r.postAuthorName}</span>
+                    {r.postCreatedAt ? ` · ${fmt(r.postCreatedAt, "d MMM HH:mm")}` : ""}
+                    {r.postHidden
+                      ? ` · ${t("wall.moderation.hidden", { defaultValue: "Masqué" })}`
+                      : ""}
+                    {r.postDeleted
+                      ? ` · ${t("wall.moderation.deleted", { defaultValue: "Supprimé" })}`
+                      : ""}
+                  </p>
+                  {r.postExcerpt && (
+                    <p className="text-sm whitespace-pre-wrap line-clamp-4">{r.postExcerpt}</p>
+                  )}
+                </div>
               )}
               {r.details && <p className="text-xs text-muted-foreground italic">« {r.details} »</p>}
 
@@ -232,6 +260,14 @@ type Report = {
   reporterName: string;
   kind: "post" | "comment";
   excerpt: string;
+  authorName: string;
+  contentCreatedAt: string | null;
+  postAuthorName: string;
+  postExcerpt: string;
+  postCreatedAt: string | null;
+  postAudience: string | null;
+  postHidden: boolean;
+  postDeleted: boolean;
   hidden: boolean;
   deleted: boolean;
 };
