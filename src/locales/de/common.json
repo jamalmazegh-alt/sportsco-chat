@@ -2493,5 +2493,8 @@
     "playerSubline": "Spieler · {{category}}",
     "playerSublineMulti": "Spieler · {{categories}}",
     "parentSubline": "Elternteil von {{children}}"
+  },
+  "network": {
+    "offline": "Keine Internetverbindung"
   }
 }

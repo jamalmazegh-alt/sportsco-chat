@@ -21,6 +21,7 @@ import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
 import { registerServiceWorker } from "@/lib/pwa";
 import { initNativeShell } from "@/lib/native-shell";
+import { OfflineBanner } from "@/components/offline-banner";
 import { isNativePlatform } from "@/lib/native-platform";
 import { syncPushSubscriptionState } from "@/lib/push-subscribe";
 import { COMPANY_LEGAL } from "@/config/company";
@@ -189,6 +190,7 @@ function RootComponent() {
       <AuthProvider>
         <ClubThemeProvider>
           <Outlet />
+          <OfflineBanner />
           <Toaster position="top-center" />
           <CookieConsentBanner />
           <InstallBanner />

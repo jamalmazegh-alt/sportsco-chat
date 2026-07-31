@@ -2488,5 +2488,8 @@
     "playerSubline": "Speler · {{category}}",
     "playerSublineMulti": "Speler · {{categories}}",
     "parentSubline": "Ouder van {{children}}"
+  },
+  "network": {
+    "offline": "Geen internetverbinding"
   }
 }

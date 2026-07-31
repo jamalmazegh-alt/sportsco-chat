@@ -2488,5 +2488,8 @@
     "playerSubline": "Joueur · {{category}}",
     "playerSublineMulti": "Joueur · {{categories}}",
     "parentSubline": "Parent de {{children}}"
+  },
+  "network": {
+    "offline": "Pas de connexion internet"
   }
 }

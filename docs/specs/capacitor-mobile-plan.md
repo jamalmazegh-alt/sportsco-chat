@@ -98,6 +98,16 @@ Livré et validé en simulateur (hors dépendances Apple) :
 - **Désactiver le service worker en natif** : ajouter un garde `Capacitor.isNativePlatform()` dans `shouldRefuse()` de `src/lib/pwa.ts`, sinon le SW peut servir du HTML périmé dans la WebView.
 - Écran hors-ligne natif (réutiliser `src/routes/offline.tsx`).
 
+#### Avancement lot 5 — 31/07/2026
+
+- **Safe areas : rien à faire.** `viewport-fit=cover`, `pt-[env(safe-area-inset-top)]` sur le header, `pb-…` sur la bottom-nav, FABs, sheets, bandeau cookies — l'héritage PWA couvrait déjà tout, vérifié à l'écran. Le poste estimé à 4–6 j était à zéro.
+- **Coquille native** (`src/lib/native-shell.ts`, appelée au montage de la racine) : `SplashScreen.hide()` couplé à `launchAutoHide: false` (sans quoi le splash s'auto-masquait avant le montage de React et laissait un écran blanc), `StatusBar` en `Style.Default`, bouton retour matériel Android → `window.history.back()` / `exitApp()`.
+- **Uploads photo : aucun plugin nécessaire.** Vérifié en simulateur — un simple `<input type="file">` ouvre la feuille native iOS (Photothèque / Prendre une photo / Choisir un fichier). Les 22 surfaces d'upload fonctionnent telles quelles ; `@capacitor/camera` et le refactor associé sont évités.
+- **Descriptions d'usage Info.plist ajoutées** (`NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`). Elles étaient absentes : sur un appareil réel, « Prendre une photo » **tuait l'app** — invisible en simulateur, faute de caméra, et cause de rejet en review. À localiser via `InfoPlist.strings` au lot 6.
+- **Bandeau hors ligne natif** (`use-online-status.ts` + `offline-banner.tsx`) : `navigator.onLine` et les événements `online`/`offline`, sans plugin, ce qui couvre iOS, Android et le web. Nécessaire car `/offline` n'est servi que par le service worker, désactivé en natif — l'app ne signalait donc aucune perte de réseau.
+
+**Non validé visuellement :** le bandeau hors ligne. Le simulateur partage le réseau du Mac et `navigator.onLine` ne peut pas y être forcé. À vérifier en mode avion lors de la QA sur appareil réel.
+
 ### Lot 6 — Publication
 
 - Comptes : Apple Developer Program (99 $/an, délai de validation à anticiper), Google Play Console (25 $ une fois).
