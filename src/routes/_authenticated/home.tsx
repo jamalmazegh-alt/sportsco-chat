@@ -472,7 +472,7 @@ function HomePage() {
                             </p>
                             {((e as any).convocations_sent || convocSentSet?.has(e.id)) && (
                               <span
-                                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
+                                className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
                                 title={t("events.convocsSentTitle", {
                                   defaultValue:
                                     "Les convocations ont été envoyées pour cet événement",
