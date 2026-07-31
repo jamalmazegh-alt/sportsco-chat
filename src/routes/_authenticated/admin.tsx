@@ -40,6 +40,9 @@ function AdminLayout() {
       exact: false,
     },
   ];
+  const tabs = isAdmin ? allTabs : allTabs.filter((tb) => tb.to === "/admin/moderation");
+
+
 
   return (
     <div className="pb-2">
