@@ -167,13 +167,18 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .single();
     setCommentsEnabled(!!club?.wall_comments_enabled);
 
+    // Les contenus masqués par la modération ne sont visibles que des
+    // admins/dirigeants (avec un badge « Masqué »).
+    const canSeeHidden = roles.includes("admin") || roles.includes("dirigeant");
+
     let postsQuery = supabase
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at",
       )
       .eq("club_id", clubId)
       .is("deleted_at", null);
+    if (!canSeeHidden) postsQuery = postsQuery.is("hidden_at", null);
     if (staffTeamId) {
       postsQuery = postsQuery
         .eq("audience_type", "team_staff")
@@ -191,12 +196,13 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     );
     if (ps.length) {
       const ids = ps.map((p) => p.id);
-      const { data: rawComments } = await supabase
+      let commentsQuery = supabase
         .from("wall_comments")
-        .select("id, post_id, author_user_id, body, created_at")
+        .select("id, post_id, author_user_id, body, created_at, hidden_at")
         .in("post_id", ids)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: true });
+        .is("deleted_at", null);
+      if (!canSeeHidden) commentsQuery = commentsQuery.is("hidden_at", null);
+      const { data: rawComments } = await commentsQuery.order("created_at", { ascending: true });
       const { data: rawReactions } = await supabase
         .from("wall_post_reactions")
         .select("post_id, user_id, emoji")
