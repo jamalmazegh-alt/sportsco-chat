@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin/moderation")({
   notFoundComponent: () => <div className="p-6 text-sm">Page introuvable</div>,
 });
 
-const REASONS: Record<string, string> = {
+const REASON_FALLBACK: Record<string, string> = {
   inappropriate: "Contenu inapproprié",
   harassment: "Harcèlement",
   spam: "Spam",
@@ -46,6 +46,7 @@ const REASONS: Record<string, string> = {
   privacy: "Vie privée",
   other: "Autre",
 };
+
 
 type StatusFilter = "pending" | "reviewing" | "dismissed" | "actioned" | "all";
 
