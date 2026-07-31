@@ -96,9 +96,11 @@ export const Route = createFileRoute("/api/push/subscribe")({
           updated_at: new Date().toISOString(),
         };
 
+        // `channel` n'est pas encore dans les types générés : cast local.
         let { error } = await supabaseAdmin
           .from("push_subscriptions")
-          .upsert({ ...base, channel: parsed.channel }, { onConflict: "endpoint" });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .upsert({ ...base, channel: parsed.channel } as any, { onConflict: "endpoint" });
 
         // La colonne `channel` peut ne pas encore exister (code déployé avant sa
         // migration) : PostgREST renvoie alors 42703 et l'upsert échoue. Pour une

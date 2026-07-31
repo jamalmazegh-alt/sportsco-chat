@@ -125,6 +125,7 @@ import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_aut
 import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin/moderation'
 import { Route as AuthenticatedAdminGroupsRouteImport } from './routes/_authenticated/admin/groups'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -800,6 +801,12 @@ const AuthenticatedClubDisciplineRoute =
     path: '/club/discipline',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/moderation',
+    path: '/moderation',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminGroupsRoute =
   AuthenticatedAdminGroupsRouteImport.update({
     id: '/groups',
@@ -1235,6 +1242,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/groups': typeof AuthenticatedAdminGroupsRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1408,6 +1416,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/groups': typeof AuthenticatedAdminGroupsRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1588,6 +1597,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/groups': typeof AuthenticatedAdminGroupsRoute
+  '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
@@ -1768,6 +1778,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
     | '/admin/groups'
+    | '/admin/moderation'
     | '/club/discipline'
     | '/events/$eventId'
     | '/payments/family'
@@ -1941,6 +1952,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/billing'
     | '/admin/groups'
+    | '/admin/moderation'
     | '/club/discipline'
     | '/events/$eventId'
     | '/payments/family'
@@ -2120,6 +2132,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/billing'
     | '/_authenticated/admin/groups'
+    | '/_authenticated/admin/moderation'
     | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/payments/family'
@@ -3132,6 +3145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClubDisciplineRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/moderation': {
+      id: '/_authenticated/admin/moderation'
+      path: '/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/groups': {
       id: '/_authenticated/admin/groups'
       path: '/groups'
@@ -3565,6 +3585,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminGroupsRoute: typeof AuthenticatedAdminGroupsRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminCampsCampIdRoute: typeof AuthenticatedAdminCampsCampIdRoute
   AuthenticatedAdminPaymentsDashboardRoute: typeof AuthenticatedAdminPaymentsDashboardRoute
@@ -3586,6 +3607,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminGroupsRoute: AuthenticatedAdminGroupsRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminCampsCampIdRoute: AuthenticatedAdminCampsCampIdRoute,
   AuthenticatedAdminPaymentsDashboardRoute:

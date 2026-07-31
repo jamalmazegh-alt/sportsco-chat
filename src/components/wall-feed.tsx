@@ -9,6 +9,7 @@ import {
   BarChart3,
   Eye,
   ExternalLink,
+  Flag,
   Loader2,
   Lock,
   MegaphoneIcon,
@@ -37,6 +38,7 @@ import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 import { WallReactions, type WallReaction } from "@/components/wall-reactions";
+import { WallReportDialog } from "@/components/wall-report-dialog";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
@@ -46,6 +48,7 @@ type Comment = {
   body: string;
   created_at: string;
   author?: Profile | null;
+  hidden_at?: string | null;
   reactions?: WallReaction[];
 };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
@@ -68,6 +71,7 @@ type Post = {
   audience_group_ids: string[] | null;
   audience_type: AudienceType;
   send_email: boolean;
+  hidden_at?: string | null;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
@@ -163,13 +167,18 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       .single();
     setCommentsEnabled(!!club?.wall_comments_enabled);
 
+    // Les contenus masqués par la modération ne sont visibles que des
+    // admins/dirigeants (avec un badge « Masqué »).
+    const canSeeHidden = roles.includes("admin") || roles.includes("dirigeant");
+
     let postsQuery = supabase
       .from("wall_posts")
       .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email",
+        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at",
       )
       .eq("club_id", clubId)
       .is("deleted_at", null);
+    if (!canSeeHidden) postsQuery = postsQuery.is("hidden_at", null);
     if (staffTeamId) {
       postsQuery = postsQuery
         .eq("audience_type", "team_staff")
@@ -187,12 +196,13 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     );
     if (ps.length) {
       const ids = ps.map((p) => p.id);
-      const { data: rawComments } = await supabase
+      let commentsQuery = supabase
         .from("wall_comments")
-        .select("id, post_id, author_user_id, body, created_at")
+        .select("id, post_id, author_user_id, body, created_at, hidden_at")
         .in("post_id", ids)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: true });
+        .is("deleted_at", null);
+      if (!canSeeHidden) commentsQuery = commentsQuery.is("hidden_at", null);
+      const { data: rawComments } = await commentsQuery.order("created_at", { ascending: true });
       const { data: rawReactions } = await supabase
         .from("wall_post_reactions")
         .select("post_id, user_id, emoji")
@@ -1551,6 +1561,11 @@ function WallGrouped({
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
 }) {
   const { t } = useTranslation();
+  // Cible du signalement (publication ou commentaire) — modération manuelle.
+  const [reportTarget, setReportTarget] = useState<{
+    postId: string;
+    commentId: string | null;
+  } | null>(null);
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
@@ -1664,6 +1679,16 @@ function WallGrouped({
                   {p.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
                 </button>
               )}
+              {!isExternal && currentUserId && p.author_user_id !== currentUserId && (
+                <button
+                  onClick={() => setReportTarget({ postId: p.id, commentId: null })}
+                  className="text-muted-foreground hover:text-amber-600 p-1 -m-1 rounded-md hover:bg-amber-500/10 transition-colors"
+                  aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
+                  title={t("wall.report.action", { defaultValue: "Signaler" })}
+                >
+                  <Flag className="h-4 w-4" />
+                </button>
+              )}
               {canManage && (
                 <button
                   onClick={() => onDelete(p.id)}
@@ -1674,6 +1699,14 @@ function WallGrouped({
               )}
             </div>
           </header>
+          {p.hidden_at && (
+            <p className="mb-1.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+              <Flag className="h-3 w-3" />
+              {t("wall.moderation.hiddenBadge", {
+                defaultValue: "Masqué par la modération — visible par les responsables uniquement",
+              })}
+            </p>
+          )}
           {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
           {isExternal && p.external_media_url && (
             <a
@@ -1744,6 +1777,7 @@ function WallGrouped({
               role={role}
               clubId={p.club_id}
               onToggleCommentReaction={onToggleCommentReaction}
+              onReportComment={(commentId) => setReportTarget({ postId: p.id, commentId })}
             />
           )}
         </div>
@@ -1783,6 +1817,14 @@ function WallGrouped({
             {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
           </Link>
         </div>
+      )}
+      {reportTarget && (
+        <WallReportDialog
+          open
+          onOpenChange={(v) => !v && setReportTarget(null)}
+          postId={reportTarget.postId}
+          commentId={reportTarget.commentId}
+        />
       )}
     </div>
   );
@@ -1958,12 +2000,14 @@ function CommentBlock({
   role,
   clubId,
   onToggleCommentReaction,
+  onReportComment,
 }: {
   post: Post;
   currentUserId: string | null;
   role: string | null;
   clubId: string;
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
+  onReportComment: (commentId: string) => void;
 }) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
@@ -2039,6 +2083,12 @@ function CommentBlock({
               <span className="font-medium">{c.author?.full_name ?? "—"}</span>{" "}
               <RenderWithMentions text={c.body} />
             </p>
+            {c.hidden_at && (
+              <p className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                <Flag className="h-2.5 w-2.5" />
+                {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
+              </p>
+            )}
             <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
             <WallReactions
               reactions={c.reactions ?? []}
@@ -2046,6 +2096,16 @@ function CommentBlock({
               onToggle={(emoji) => onToggleCommentReaction(c, emoji)}
             />
           </div>
+          {currentUserId && c.author_user_id !== currentUserId && (
+            <button
+              onClick={() => onReportComment(c.id)}
+              className="text-muted-foreground hover:text-amber-600"
+              aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
+              title={t("wall.report.action", { defaultValue: "Signaler" })}
+            >
+              <Flag className="h-3.5 w-3.5" />
+            </button>
+          )}
           {(c.author_user_id === currentUserId || role === "admin") && (
             <button
               onClick={() => del(c.id)}

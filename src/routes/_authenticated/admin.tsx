@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-r
 import { Navigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
-import { ShieldCheck, Settings2, Users, CreditCard, UsersRound } from "lucide-react";
+import { ShieldCheck, Settings2, Users, CreditCard, UsersRound, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -21,6 +21,12 @@ function AdminLayout() {
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
     { to: "/admin/groups", icon: UsersRound, label: t("groups.openGroups"), exact: false },
+    {
+      to: "/admin/moderation",
+      icon: Flag,
+      label: t("wall.moderation.tab", { defaultValue: "Modération" }),
+      exact: false,
+    },
     {
       to: "/admin/billing",
       icon: CreditCard,

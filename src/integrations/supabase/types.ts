@@ -5374,6 +5374,7 @@ export type Database = {
       push_subscriptions: {
         Row: {
           auth: string
+          channel: string
           created_at: string
           endpoint: string
           id: string
@@ -5384,6 +5385,7 @@ export type Database = {
         }
         Insert: {
           auth: string
+          channel?: string
           created_at?: string
           endpoint: string
           id?: string
@@ -5394,6 +5396,7 @@ export type Database = {
         }
         Update: {
           auth?: string
+          channel?: string
           created_at?: string
           endpoint?: string
           id?: string
@@ -7562,6 +7565,9 @@ export type Database = {
           body: string
           created_at: string
           deleted_at: string | null
+          hidden_at: string | null
+          hidden_by: string | null
+          hidden_reason: string | null
           id: string
           post_id: string
         }
@@ -7570,6 +7576,9 @@ export type Database = {
           body: string
           created_at?: string
           deleted_at?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           post_id: string
         }
@@ -7578,12 +7587,78 @@ export type Database = {
           body?: string
           created_at?: string
           deleted_at?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           post_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "wall_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "wall_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wall_content_reports: {
+        Row: {
+          club_id: string
+          comment_id: string | null
+          created_at: string
+          details: string | null
+          id: string
+          post_id: string
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["wall_report_status"]
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          comment_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id: string
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          comment_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id?: string
+          reason?: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wall_content_reports_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "wall_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wall_content_reports_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "wall_posts"
@@ -7658,6 +7733,9 @@ export type Database = {
           external_id: string | null
           external_media_url: string | null
           external_url: string | null
+          hidden_at: string | null
+          hidden_by: string | null
+          hidden_reason: string | null
           id: string
           is_pinned: boolean
           send_email: boolean
@@ -7676,6 +7754,9 @@ export type Database = {
           external_id?: string | null
           external_media_url?: string | null
           external_url?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           is_pinned?: boolean
           send_email?: boolean
@@ -7694,6 +7775,9 @@ export type Database = {
           external_id?: string | null
           external_media_url?: string | null
           external_url?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           is_pinned?: boolean
           send_email?: boolean
@@ -8416,6 +8500,10 @@ export type Database = {
         Returns: boolean
       }
       is_v2: { Args: { _key: string }; Returns: boolean }
+      is_wall_moderator: {
+        Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
       jsonb_diff: { Args: { _new: Json; _old: Json }; Returns: Json }
       link_parent_memberships: { Args: never; Returns: number }
       list_public_players: {
@@ -9160,6 +9248,14 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "cancelled"
+      wall_report_reason:
+        | "inappropriate"
+        | "harassment"
+        | "spam"
+        | "misinformation"
+        | "privacy"
+        | "other"
+      wall_report_status: "pending" | "reviewing" | "dismissed" | "actioned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -9477,6 +9573,15 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      wall_report_reason: [
+        "inappropriate",
+        "harassment",
+        "spam",
+        "misinformation",
+        "privacy",
+        "other",
+      ],
+      wall_report_status: ["pending", "reviewing", "dismissed", "actioned"],
     },
   },
 } as const
