@@ -42,8 +42,6 @@ function AdminLayout() {
   ];
   const tabs = isAdmin ? allTabs : allTabs.filter((tb) => tb.to === "/admin/moderation");
 
-
-
   return (
     <div className="pb-2">
       <header className="px-5 pt-6 pb-4 flex items-center gap-2">
