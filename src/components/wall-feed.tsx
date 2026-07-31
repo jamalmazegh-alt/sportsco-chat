@@ -1818,6 +1818,14 @@ function WallGrouped({
           </Link>
         </div>
       )}
+      {reportTarget && (
+        <WallReportDialog
+          open
+          onOpenChange={(v) => !v && setReportTarget(null)}
+          postId={reportTarget.postId}
+          commentId={reportTarget.commentId}
+        />
+      )}
     </div>
   );
 }
