@@ -1,8 +1,8 @@
 /**
  * Push natif Capacitor (FCM Android / APNs iOS) — lot 3 mobile.
  *
- * Toute la logique est derrière `isNativePlatform()` et le plugin est importé
- * DYNAMIQUEMENT : rien de tout ceci n'atteint le chemin critique du bundle web.
+ * Toute la logique est derrière `isNativePlatform()` — sur le web ces
+ * fonctions sont des no-ops et le proxy du plugin n'est jamais invoqué.
  *
  * Le token natif est envoyé à `/api/push/subscribe` avec `channel: fcm|apns` ;
  * le serveur le stocke dans `endpoint` (clé UNIQUE → upsert idempotent).
@@ -10,8 +10,14 @@
  * Apple) et le projet Firebase existeront — d'ici là les lignes natives sont
  * simplement ignorées par `sendPushToUser`.
  */
+import { PushNotifications } from "@capacitor/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
 import { getApiOrigin, getPlatform, isNativePlatform } from "@/lib/native-platform";
+
+// Import STATIQUE du plugin, à dessein : l'import dynamique ne se résolvait
+// jamais dans la WKWebView (spike du 31/07/2026 — promesse pendante, ni valeur
+// ni rejet). Coût web : quelques Ko d'un proxy registerPlugin inerte, jamais
+// invoqué hors natif grâce aux gardes isNativePlatform().
 
 export type NativePushStatus = "unavailable" | "prompt" | "granted" | "denied";
 
@@ -19,28 +25,24 @@ function nativeChannel(): "fcm" | "apns" {
   return getPlatform() === "android" ? "fcm" : "apns";
 }
 
-async function loadPlugin() {
-  const { PushNotifications } = await import("@capacitor/push-notifications");
-  return PushNotifications;
-}
-
 export async function getNativePushStatus(): Promise<NativePushStatus> {
   if (!isNativePlatform()) return "unavailable";
   try {
-    const PushNotifications = await loadPlugin();
     const { receive } = await PushNotifications.checkPermissions();
+    console.log("[native-push] checkPermissions:", receive);
     if (receive === "granted") return "granted";
     if (receive === "denied") return "denied";
     return "prompt";
-  } catch {
+  } catch (e) {
+    // Un échec ici signifie plugin absent du binaire ou bridge indisponible —
+    // toujours le tracer, un `unavailable` silencieux est indébogable.
+    console.warn("[native-push] status check failed:", (e as Error).message);
     return "unavailable";
   }
 }
 
 /** Attend le token d'enregistrement (ou une erreur) après `register()`. */
 async function registerAndGetToken(): Promise<string> {
-  const PushNotifications = await loadPlugin();
-
   const tokenPromise = new Promise<string>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("registration timeout")), 15_000);
     PushNotifications.addListener("registration", (t) => {
@@ -82,7 +84,6 @@ async function saveToken(token: string): Promise<boolean> {
 export async function enableNativePush(): Promise<{ ok: boolean; reason?: string }> {
   if (!isNativePlatform()) return { ok: false, reason: "unavailable" };
   try {
-    const PushNotifications = await loadPlugin();
     const { receive } = await PushNotifications.requestPermissions();
     if (receive !== "granted") return { ok: false, reason: "denied" };
 
@@ -107,8 +108,6 @@ export async function initNativePushOnLaunch(): Promise<void> {
   launchInitDone = true;
 
   try {
-    const PushNotifications = await loadPlugin();
-
     PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
       const url = (action.notification.data as { url?: string } | undefined)?.url;
       // Rechargement du shell SPA sur la route cible — simple et fiable pour
