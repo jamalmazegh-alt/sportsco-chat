@@ -2098,22 +2098,25 @@ function CommentBlock({
           </div>
           {currentUserId && c.author_user_id !== currentUserId && (
             <button
+              type="button"
               onClick={() => onReportComment(c.id)}
-              className="text-muted-foreground hover:text-amber-600"
+              className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
               aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
               title={t("wall.report.action", { defaultValue: "Signaler" })}
             >
-              <Flag className="h-3.5 w-3.5" />
+              <Flag className="h-4 w-4" />
             </button>
           )}
           {(c.author_user_id === currentUserId || role === "admin") && (
             <button
+              type="button"
               onClick={() => del(c.id)}
-              className="text-muted-foreground hover:text-destructive"
+              className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 className="h-4 w-4" />
             </button>
           )}
+
         </div>
       ))}
       <form
