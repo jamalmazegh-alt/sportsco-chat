@@ -369,7 +369,7 @@ export const resolveWallReport = createServerFn({ method: "POST" })
     const now = new Date().toISOString();
 
     if (data.action === "hide") {
-      await supabaseAdmin
+      const { error: hideErr } = await supabaseAdmin
         .from(table)
         .update({
           hidden_at: now,
@@ -377,17 +377,28 @@ export const resolveWallReport = createServerFn({ method: "POST" })
           hidden_reason: data.note || null,
         } as never)
         .eq("id", targetId);
+      if (hideErr) throw new Error(hideErr.message);
     } else if (data.action === "unhide") {
-      await supabaseAdmin
+      const { error: unhideErr } = await supabaseAdmin
         .from(table)
         .update({ hidden_at: null, hidden_by: null, hidden_reason: null } as never)
         .eq("id", targetId);
+      if (unhideErr) throw new Error(unhideErr.message);
     } else if (data.action === "delete") {
-      await supabaseAdmin.rpc("soft_delete_entity", {
-        _kind: rep.comment_id ? "wall_comment" : "wall_post",
-        _id: targetId,
-      } as never);
+      // Soft-delete direct (la RPC soft_delete_entity exige auth.uid(), indisponible
+      // avec le service role, et n'autorise pas les dirigeants).
+      const { error: delErr } = await supabaseAdmin
+        .from(table)
+        .update({
+          deleted_at: now,
+          hidden_at: now,
+          hidden_by: context.userId,
+          hidden_reason: data.note || "Supprimé par la modération",
+        } as never)
+        .eq("id", targetId);
+      if (delErr) throw new Error(delErr.message);
     }
+
 
     const status =
       data.action === "dismiss"
