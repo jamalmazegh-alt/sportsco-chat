@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { isAndroid, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
 import { subscribeToPush, syncPushSubscriptionState } from "@/lib/push-subscribe";
 import { useAuth } from "@/lib/auth-context";
+import { isNativePlatform } from "@/lib/native-platform";
 
 const DISMISS_KEY = "clubero:push:dismissed-at";
 const DISMISS_DAYS = 7;
@@ -18,7 +19,14 @@ function recentlyDismissed(): boolean {
   }
 }
 
+// App native : le Web Push n'existe pas en WebView. Le CTA natif vit dans
+// la carte « Cet appareil » du profil (EnablePushCard).
 export function PushPermissionBanner() {
+  if (isNativePlatform()) return null;
+  return <PushPermissionBannerWeb />;
+}
+
+function PushPermissionBannerWeb() {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { session } = useAuth();

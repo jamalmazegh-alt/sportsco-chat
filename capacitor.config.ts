@@ -15,6 +15,14 @@ const config: CapacitorConfig = {
   appId: "app.clubero.mobile",
   appName: "Clubero",
   webDir: "dist/client",
+  plugins: {
+    SplashScreen: {
+      // Sans ceci, le splash s'auto-masque après le délai par défaut — donc
+      // avant que React n'ait monté — et l'utilisateur voit un écran blanc.
+      // On le garde affiché jusqu'à `SplashScreen.hide()` dans native-shell.ts.
+      launchAutoHide: false,
+    },
+  },
   server: {
     // Défaut de Capacitor depuis la 1.2, épinglé ici parce que l'allowlist CORS
     // du Worker (`src/server.ts`) en dépend : ce schéma détermine l'origine

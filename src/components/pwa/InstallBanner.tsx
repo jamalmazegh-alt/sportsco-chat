@@ -51,6 +51,7 @@ function IOSAddIcon({ className }: { className?: string }) {
   );
 }
 import { isAndroid, isIOS, isInStandaloneMode } from "@/lib/pwa";
+import { isNativePlatform } from "@/lib/native-platform";
 
 const DISMISS_KEY = "clubero:pwa:install-dismissed-at";
 const INSTALLED_KEY = "pwa_installed";
@@ -73,7 +74,13 @@ function recentlyDismissed(): boolean {
   }
 }
 
+// App native : l'app est déjà installée — inviter à l'installer n'a pas de sens.
 export function InstallBanner() {
+  if (isNativePlatform()) return null;
+  return <InstallBannerWeb />;
+}
+
+function InstallBannerWeb() {
   const [visible, setVisible] = useState(false);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIOSGuide, setShowIOSGuide] = useState(false);

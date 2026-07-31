@@ -20,6 +20,8 @@ import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
 import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
 import { registerServiceWorker } from "@/lib/pwa";
+import { initNativeShell } from "@/lib/native-shell";
+import { isNativePlatform } from "@/lib/native-platform";
 import { syncPushSubscriptionState } from "@/lib/push-subscribe";
 import { COMPANY_LEGAL } from "@/config/company";
 
@@ -141,6 +143,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
+    // Coquille native (splash, barre d'état, bouton retour Android) — no-op web.
+    initNativeShell();
     initSentry();
     initPostHog();
     bootstrapTheme();
@@ -160,7 +164,10 @@ function RootComponent() {
     registerServiceWorker();
     // Reconcile push permission with our DB: if user revoked notifications in
     // iOS Settings (or browser), clean up stale rows; if granted, re-upsert.
+    // En natif, l'équivalent est `initNativePushOnLaunch()` (canal fcm/apns) —
+    // ce sync-là ne parle que Web Push et n'a rien à réconcilier.
     const runSync = () => {
+      if (isNativePlatform()) return;
       if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
       syncPushSubscriptionState().catch(() => {
         /* noop */
