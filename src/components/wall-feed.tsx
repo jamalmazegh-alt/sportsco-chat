@@ -71,6 +71,7 @@ type Post = {
   audience_group_ids: string[] | null;
   audience_type: AudienceType;
   send_email: boolean;
+  hidden_at?: string | null;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
