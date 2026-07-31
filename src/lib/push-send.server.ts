@@ -8,6 +8,7 @@
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { VAPID_PUBLIC_KEY } from "@/lib/pwa";
+import { isFcmConfigured, sendFcmToToken } from "@/lib/push-fcm.server";
 
 export interface PushPayload {
   title: string;
@@ -390,11 +391,20 @@ export async function sendPushToUser(
   for (const s of subs as RawSubscription[]) {
     // Routage par canal. `endpoint` d'une ligne fcm/apns est un token opaque,
     // pas une URL : le chemin Web Push (new URL, VAPID) ne doit jamais le voir.
-    // Expéditeur natif branché au lot 3 (FCM HTTP v1) — d'ici là on trace sans
-    // compter la ligne en échec, et le canal 'web' se comporte exactement
-    // comme avant (les lignes existantes n'ont pas de channel ≠ 'web').
     if (s.channel === "fcm" || s.channel === "apns") {
-      console.log("[push] native channel pending sender", s.channel, "user:", userId);
+      if (!isFcmConfigured()) {
+        // Environnement sans identifiants FCM (dev, CI) : on trace sans
+        // compter d'échec, le canal `web` continue de fonctionner seul.
+        console.log("[push] FCM not configured, skipping native token", s.channel);
+        continue;
+      }
+      try {
+        const result = await sendFcmToToken(s.endpoint, payload, s.channel);
+        if (result.status >= 200 && result.status < 300) sent++;
+        else if (result.unregistered) toPrune.push(s.endpoint);
+      } catch (e) {
+        console.warn("[push] FCM send threw", (e as Error).message);
+      }
       continue;
     }
     try {
