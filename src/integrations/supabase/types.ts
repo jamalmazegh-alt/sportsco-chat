@@ -5374,7 +5374,6 @@ export type Database = {
       push_subscriptions: {
         Row: {
           auth: string
-          channel: string
           created_at: string
           endpoint: string
           id: string
@@ -5385,7 +5384,6 @@ export type Database = {
         }
         Insert: {
           auth: string
-          channel?: string
           created_at?: string
           endpoint: string
           id?: string
@@ -5396,7 +5394,6 @@ export type Database = {
         }
         Update: {
           auth?: string
-          channel?: string
           created_at?: string
           endpoint?: string
           id?: string
