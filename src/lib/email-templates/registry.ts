@@ -61,6 +61,7 @@ import { template as meetingInviteTemplate } from "./meeting-invite";
 import { template as meetingRemovedTemplate } from "./meeting-removed";
 import { template as parentChildLinkedTemplate } from "./parent-child-linked";
 import { template as carpoolNeedTemplate } from "./carpool-need";
+import { template as wallContentReportedTemplate } from "./wall-content-reported";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
