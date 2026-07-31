@@ -33,8 +33,13 @@ const config: CapacitorConfig = {
     contentInset: "always",
   },
   android: {
-    // Autorise le HTTP en clair vers le serveur de dev local uniquement.
-    // À repasser à `false` avant tout build de distribution.
+    // La WebView est servie en https://localhost et le serveur de dev en HTTP
+    // sur 10.0.2.2 : sans ceci, la WebView bloque ces requêtes comme contenu
+    // mixte. Le blocage du trafic en clair est traité séparément et de façon
+    // restreinte par `android/app/src/debug/` (debug uniquement).
+    //
+    // ⚠️ À REPASSER À `false` AU LOT 6 : en production l'API sera en HTTPS,
+    // ce drapeau n'aura plus d'utilité et affaiblirait le build de release.
     allowMixedContent: true,
   },
 };

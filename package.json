@@ -9,6 +9,7 @@
     "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=8192 vite build --mode development",
     "build:mobile": "MOBILE_BUILD=1 NODE_OPTIONS=--max-old-space-size=8192 vite build --mode mobile",
+    "build:mobile:android": "MOBILE_BUILD=1 NODE_OPTIONS=--max-old-space-size=8192 vite build --mode mobile-android",
     "check:mobile-leak": "node scripts/check-mobile-build-leak.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -30,6 +31,7 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.47",
     "@ai-sdk/react": "^3.0.184",
+    "@capacitor/android": "^8.4.2",
     "@capacitor/app": "^8.1.1",
     "@capacitor/browser": "^8.0.4",
     "@capacitor/core": "^8.4.2",

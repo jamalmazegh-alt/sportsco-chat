@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919238215029",
+    "project_id": "clubero-e5c42",
+    "storage_bucket": "clubero-e5c42.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919238215029:android:d455d2bc824f1006293f3c",
+        "android_client_info": {
+          "package_name": "app.clubero.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzckDlhuck-Jjs0KhFIDdFDDanccg_BMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
