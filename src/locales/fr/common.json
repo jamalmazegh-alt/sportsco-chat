@@ -2298,7 +2298,10 @@
       "convocationSilence_other": "{{count}} sans réponse",
       "reducedSquadTitle": "Effectif réduit",
       "reducedSquadSubtitle_one": "{{count}} joueur indisponible sur 14j",
-      "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j"
+      "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j",
+      "staffUncovered": "Aucun coach disponible",
+      "staffUncoveredTeam": "Aucun coach disponible — {{team}}",
+      "staffUncoveredFallback": "Événement"
     },
     "self": {
       "convocationSilence": "Tu n'as pas répondu"
@@ -2537,5 +2540,12 @@
   },
   "network": {
     "offline": "Pas de connexion internet"
+  },
+  "staffCoverage": {
+    "badge": {
+      "assured": "Encadrement assuré",
+      "unassigned": "Pas de coach assigné",
+      "uncovered": "Aucun coach dispo"
+    }
   }
 }

@@ -2303,7 +2303,10 @@
       "convocationSilence_other": "{{count}} ohne Antwort",
       "reducedSquadTitle": "Reduzierter Kader",
       "reducedSquadSubtitle_one": "{{count}} Spieler in 14 Tagen nicht verfügbar",
-      "reducedSquadSubtitle_other": "{{count}} Spieler in 14 Tagen nicht verfügbar"
+      "reducedSquadSubtitle_other": "{{count}} Spieler in 14 Tagen nicht verfügbar",
+      "staffUncovered": "Kein Trainer verfügbar",
+      "staffUncoveredTeam": "Kein Trainer verfügbar — {{team}}",
+      "staffUncoveredFallback": "Termin"
     },
     "self": {
       "convocationSilence": "Du hast nicht geantwortet"
@@ -2542,5 +2545,12 @@
   },
   "network": {
     "offline": "Keine Internetverbindung"
+  },
+  "staffCoverage": {
+    "badge": {
+      "assured": "Betreuung gesichert",
+      "unassigned": "Kein Trainer zugewiesen",
+      "uncovered": "Kein Trainer verfügbar"
+    }
   }
 }
