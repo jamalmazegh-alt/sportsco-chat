@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-r
 import { Navigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
-import { ShieldCheck, Settings2, Users, CreditCard, UsersRound } from "lucide-react";
+import { ShieldCheck, Settings2, Users, CreditCard, UsersRound, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
