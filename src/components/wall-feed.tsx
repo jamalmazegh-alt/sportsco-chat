@@ -1679,6 +1679,16 @@ function WallGrouped({
                   {p.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
                 </button>
               )}
+              {!isExternal && currentUserId && p.author_user_id !== currentUserId && (
+                <button
+                  onClick={() => setReportTarget({ postId: p.id, commentId: null })}
+                  className="text-muted-foreground hover:text-amber-600 p-1 -m-1 rounded-md hover:bg-amber-500/10 transition-colors"
+                  aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
+                  title={t("wall.report.action", { defaultValue: "Signaler" })}
+                >
+                  <Flag className="h-4 w-4" />
+                </button>
+              )}
               {canManage && (
                 <button
                   onClick={() => onDelete(p.id)}
@@ -1689,6 +1699,14 @@ function WallGrouped({
               )}
             </div>
           </header>
+          {p.hidden_at && (
+            <p className="mb-1.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+              <Flag className="h-3 w-3" />
+              {t("wall.moderation.hiddenBadge", {
+                defaultValue: "Masqué par la modération — visible par les responsables uniquement",
+              })}
+            </p>
+          )}
           {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
           {isExternal && p.external_media_url && (
             <a
