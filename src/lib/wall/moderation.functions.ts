@@ -276,18 +276,17 @@ export const listWallReports = createServerFn({ method: "POST" })
     const commentIds = reports.map((r) => r.comment_id).filter((x): x is string => !!x);
     const userIds = Array.from(new Set(reports.map((r) => r.reporter_user_id)));
 
-    const [{ data: posts }, { data: comments }, { data: profs }] = await Promise.all([
+    const [{ data: posts }, { data: comments }] = await Promise.all([
       supabaseAdmin
         .from("wall_posts")
-        .select("id, body, author_user_id, hidden_at, deleted_at")
+        .select("id, body, author_user_id, hidden_at, deleted_at, created_at, audience_type")
         .in("id", postIds),
       commentIds.length
         ? supabaseAdmin
             .from("wall_comments")
-            .select("id, body, author_user_id, hidden_at, deleted_at")
+            .select("id, body, author_user_id, hidden_at, deleted_at, created_at")
             .in("id", commentIds)
         : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
-      supabaseAdmin.from("profiles").select("id, full_name, first_name").in("id", userIds),
     ]);
 
     const postById = new Map(
@@ -296,26 +295,51 @@ export const listWallReports = createServerFn({ method: "POST" })
     const commentById = new Map(
       ((comments ?? []) as Array<Record<string, unknown>>).map((c) => [c.id as string, c]),
     );
+
+    // Profils : signaleurs + auteurs des posts + auteurs des commentaires.
+    for (const p of postById.values()) if (p.author_user_id) userIds.push(p.author_user_id as string);
+    for (const c of commentById.values())
+      if (c.author_user_id) userIds.push(c.author_user_id as string);
+    const { data: profs } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, first_name, last_name")
+      .in("id", Array.from(new Set(userIds)));
+
     const nameById = new Map(
       ((profs ?? []) as Array<Record<string, unknown>>).map((p) => [
         p.id as string,
-        ((p.full_name as string) || (p.first_name as string) || "—") as string,
+        ([p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
+          (p.full_name as string) ||
+          "—") as string,
       ]),
     );
 
     return {
       reports: reports.map((r) => {
-        const target = r.comment_id ? commentById.get(r.comment_id) : postById.get(r.post_id);
+        const post = postById.get(r.post_id);
+        const comment = r.comment_id ? commentById.get(r.comment_id) : undefined;
+        const target = comment ?? post;
+        const authorId = (target?.author_user_id as string | null) ?? null;
+        const postAuthorId = (post?.author_user_id as string | null) ?? null;
         return {
           ...r,
           reporterName: nameById.get(r.reporter_user_id) ?? "—",
           kind: (r.comment_id ? "comment" : "post") as "comment" | "post",
           excerpt: ((target?.body as string) ?? "").slice(0, 300),
+          authorName: authorId ? (nameById.get(authorId) ?? "—") : "—",
+          contentCreatedAt: (target?.created_at as string | null) ?? null,
+          postAuthorName: postAuthorId ? (nameById.get(postAuthorId) ?? "—") : "—",
+          postExcerpt: ((post?.body as string) ?? "").slice(0, 300),
+          postCreatedAt: (post?.created_at as string | null) ?? null,
+          postAudience: (post?.audience_type as string | null) ?? null,
+          postDeleted: !!post?.deleted_at,
+          postHidden: !!post?.hidden_at,
           hidden: !!target?.hidden_at,
           deleted: !!target?.deleted_at,
         };
       }),
     };
+
   });
 
 export const resolveWallReport = createServerFn({ method: "POST" })
