@@ -378,10 +378,28 @@ export async function sendPushToUser(
   userId: string,
   payload: PushPayload,
 ): Promise<{ sent: number; pruned: number }> {
-  const { data: subs } = await supabaseAdmin
+  // La colonne `channel` peut ne pas encore exister : si le code est déployé
+  // avant sa migration, PostgREST rejette le SELECT entier (42703) et TOUT le
+  // push tomberait, y compris le canal web qui n'a rien à voir. On retente donc
+  // sans la colonne et on traite les lignes comme `web` — ce qu'elles sont
+  // toutes tant que la migration n'est pas passée. Ce repli pourra disparaître
+  // une fois la colonne présente sur tous les environnements.
+  let subs: RawSubscription[] | null = null;
+  const withChannel = await supabaseAdmin
     .from("push_subscriptions")
     .select("endpoint, p256dh, auth, channel")
     .eq("user_id", userId);
+
+  if (withChannel.error?.code === "42703") {
+    console.warn("[push] colonne `channel` absente — repli en mode web seul");
+    const legacy = await supabaseAdmin
+      .from("push_subscriptions")
+      .select("endpoint, p256dh, auth")
+      .eq("user_id", userId);
+    subs = (legacy.data as RawSubscription[] | null) ?? null;
+  } else {
+    subs = (withChannel.data as unknown as RawSubscription[] | null) ?? null;
+  }
 
   if (!subs?.length) return { sent: 0, pruned: 0 };
 

@@ -10,6 +10,7 @@
     "build:dev": "NODE_OPTIONS=--max-old-space-size=8192 vite build --mode development",
     "build:mobile": "MOBILE_BUILD=1 NODE_OPTIONS=--max-old-space-size=8192 vite build --mode mobile",
     "build:mobile:android": "MOBILE_BUILD=1 NODE_OPTIONS=--max-old-space-size=8192 vite build --mode mobile-android",
+    "build:mobile:prod": "MOBILE_BUILD=1 NODE_OPTIONS=--max-old-space-size=8192 vite build --mode mobile-prod",
     "check:mobile-leak": "node scripts/check-mobile-build-leak.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
