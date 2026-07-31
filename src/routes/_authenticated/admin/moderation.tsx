@@ -47,7 +47,6 @@ const REASON_FALLBACK: Record<string, string> = {
   other: "Autre",
 };
 
-
 type StatusFilter = "pending" | "reviewing" | "dismissed" | "actioned" | "all";
 
 function ModerationPage() {
@@ -147,7 +146,6 @@ function ModerationPage() {
                       {t(`wall.report.${r.reason}`, {
                         defaultValue: REASON_FALLBACK[r.reason] ?? r.reason,
                       })}
-
                     </Badge>
                     {r.hidden && (
                       <Badge variant="destructive" className="text-[10px]">
