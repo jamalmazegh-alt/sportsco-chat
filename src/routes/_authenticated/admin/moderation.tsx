@@ -144,7 +144,10 @@ function ModerationPage() {
                         : t("wall.moderation.post", { defaultValue: "Publication" })}
                     </Badge>
                     <Badge variant="secondary" className="text-[10px]">
-                      {REASONS[r.reason] ?? r.reason}
+                      {t(`wall.report.${r.reason}`, {
+                        defaultValue: REASON_FALLBACK[r.reason] ?? r.reason,
+                      })}
+
                     </Badge>
                     {r.hidden && (
                       <Badge variant="destructive" className="text-[10px]">
