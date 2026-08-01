@@ -1,12 +1,13 @@
 # Docuthèque — onglet « Documents » du mur
 
-> **Statut :** V1 implémentée. Restent à faire avant mise en production : le test e2e
-> Playwright, le test RLS (nécessite un Supabase distant + `SUPABASE_SERVICE_ROLE_KEY`) et la
-> vérification d'ouverture des PDF sur iOS/Android — voir §9.
+> **Statut :** V1 livrée — code, ouverture native Android/iOS et tests (unitaires, RLS, e2e)
+> écrits. Les suites RLS et e2e ne peuvent s'exécuter que contre un Supabase réel : elles
+> tourneront à la livraison, cf. §9.
 > **Origine :** demande club (ticket support Nicolas CLAVIER, 01/08/2026) — _« créer une
 > docuthèque avec les documents publiés sur le mur (programmes de reprise, calendrier,
 > notes d'information, etc.) »_.
-> **Fichiers concernés :** `src/components/attachments.tsx`, `src/components/wall-feed.tsx`,
+> **Fichiers concernés :** `src/components/attachments.tsx`, `src/components/wall-documents.tsx`,
+> `src/components/wall-feed.tsx`, `src/lib/wall/documents.ts`, `src/lib/open-document.ts`,
 > `src/routes/_authenticated/inbox.tsx`, `src/routes/_authenticated/teams/$teamId_.staff.tsx`,
 > `src/routes/_authenticated/events.tsx` (référence visuelle).
 
@@ -190,10 +191,31 @@ docuthèque.
   mur apparaîtront ici. »
 - **Pas de club actif** : réutiliser la clé `wall.noClub`.
 
-### 4.5 Mobile
+### 4.5 Mobile — ouverture native
 
-Ouverture des documents via `@capacitor/browser` (pas de `window.open` nu). Comportement PDF
-à vérifier sur **iOS et Android** avant livraison. Lisible à 430 px de large.
+Dans la WebView Capacitor, un `target="_blank"` **ne fait rien** : la WebView n'a pas de
+notion d'onglet et avale la navigation. Les pièces jointes du mur étaient donc déjà
+inouvrables depuis l'app Android avant cette V1.
+
+`src/lib/open-document.ts` route l'ouverture selon la plateforme : `window.open` sur le web,
+`@capacitor/browser` en natif (Chrome Custom Tab côté Android, `SFSafariViewController` côté
+iOS — tous deux savent afficher ou télécharger un PDF). Le plugin est déjà déclaré dans
+`android/capacitor.settings.gradle`.
+
+Deux points de mise en œuvre :
+
+- **Import statique du plugin**, comme `native-push.ts` : l'import dynamique ne se résout
+  jamais en WKWebView (promesse pendante). Le coût web est un proxy inerte de quelques Ko,
+  jamais invoqué grâce à la garde `isNativePlatform()`.
+- **Le handler s'applique aussi à `AttachmentList`**, donc aux pièces jointes du mur, du chat
+  d'événement et des tournois. C'est un élargissement volontaire du périmètre : le même
+  fichier ouvert depuis le mur et depuis la docuthèque ne peut pas avoir deux comportements.
+  Cela ne touche pas l'obligation de nommage, qui reste strictement propre au mur.
+
+Le lien reste un vrai `<a href>` : sur le web, clic milieu, « ouvrir dans un nouvel onglet »
+et copie du lien continuent de fonctionner ; seul le natif intercepte le clic.
+
+Lisible à 430 px de large.
 
 ## 5. Spécification technique
 
@@ -277,20 +299,35 @@ Conformément à `AGENTS.md` : la modification touche `src/components/**` et `sr
 (→ `bun run test` obligatoire) et la visibilité (→ `bun run check:guards` et
 `bun run check:i18n` également).
 
-**Unitaires (Vitest)**
+**Unitaires (Vitest) — `src/tests/unit/wall-documents.test.ts` (18 cas)**
 
 - aplatissement post → documents ; posts sans pièce jointe ; `attachments` vide ;
 - entrées jsonb malformées ignorées sans exception ;
 - pièce jointe historique **sans `label`** → affichage du seul nom de fichier ;
 - groupement par mois et tri descendant (y compris changement d'année) ;
-- exclusion des posts supprimés / masqués selon rôle ; exclusion des posts externes.
+- exclusion des posts masqués ; exclusion des posts relayés des réseaux sociaux ;
+- `hasMissingLabel` — le blocage de publication, y compris sur un nom composé d'espaces.
 
-**RLS (`bun run test:rls`)** — un parent d'une équipe A ne voit aucun document d'un post
-ciblé équipe B ; un joueur ne voit aucun document d'un post `team_staff`.
+**Unitaires — `src/tests/unit/open-document.test.ts` (7 cas)**
 
-**E2E (Playwright)** — publier un post avec PDF **sans nom** → la publication est bloquée ;
-avec nom → le document apparaît dans l'onglet Documents, nom accolé au fichier ; « Voir la
-publication » ramène au bon post surligné.
+- web → `window.open`, le plugin natif n'est jamais touché ;
+- Android et iOS → `Browser.open` ;
+- bridge natif en échec → repli sur la WebView plutôt qu'un clic mort ;
+- `handleDocumentClick` ne préempte le clic **que** sur mobile.
+
+**RLS — `tests/rls/wall.documents.rls.ts` (8 cas, `bun run test:rls`)**
+
+Prouve que la colonne `attachments` suit exactement la visibilité de sa ligne : joueur et
+parent lisent les documents club-wide et ceux de leur équipe, ne voient **rien** d'un post
+`team_staff` ; un membre d'un autre club ne voit rien ; un post supprimé ne remonte plus.
+C'est le filet qui garde la docuthèque honnête si `wall_posts_select` évolue un jour.
+
+**E2E — `tests/e2e/32-wall-documents.e2e.ts` (5 cas, projet `ui`)**
+
+Publier sans nom → bouton bloqué et message affiché ; nommé → publication puis apparition
+dans l'onglet Documents ; nom accolé au fichier ; pièce jointe historique listée par son seul
+nom de fichier ; « Voir la publication » revient au bon post ; et un garde-fou de périmètre
+vérifiant que le chat d'événement **n'exige aucun nom**.
 
 ## 7. Estimation
 
@@ -330,18 +367,22 @@ Par ordre de valeur attendue :
 ```text
 [x] Un onglet Documents est présent sur le mur du club et sur le mur staff d'équipe
 [x] Publier une pièce jointe sur le mur exige un nom ; le bouton Publier reste bloqué sinon
-[x] Les 5 autres AttachmentPicker (chat, événements, tournois) restent inchangés
+[x] Les 5 autres AttachmentPicker (chat, événements, tournois) n'exigent aucun nom
 [x] Le nom saisi s'affiche accolé au nom de fichier dans le mur et dans la docuthèque
 [x] Les pièces jointes publiées avant la V1 s'affichent avec leur seul nom de fichier
 [x] Les documents sont groupés par mois, le plus récent en haut, habillage page Événements
 [x] Un document d'un post supprimé ou masqué n'apparaît pas (hors admin/dirigeant)
 [x] « Voir la publication » ramène au post d'origine, surligné, sur l'onglet Mur
 [x] Le deep-link push ?post=<uuid> ouvre toujours l'onglet Mur, sans régression
+[x] Ouverture native Android/iOS via @capacitor/browser, avec repli WebView si le bridge échoue
 [x] 7 locales complètes ; check:i18n, check:guards, test, format:check et build verts
-[ ] Un parent ne voit que les documents des publications qui lui étaient destinées
-    → repose sur la RLS `wall_posts_select` inchangée, mais NON rejoué : `test:rls`
-      exige un Supabase distant + SUPABASE_SERVICE_ROLE_KEY
-[ ] Ouverture et téléchargement vérifiés sur iOS et Android
-    → le lien reste identique à celui déjà utilisé par le mur ; à valider sur device
-[ ] Test e2e Playwright du parcours complet
+[x] Tests RLS écrits — tests/rls/wall.documents.rls.ts
+[x] Tests e2e écrits — tests/e2e/32-wall-documents.e2e.ts (projet `ui`, 5 cas)
+[ ] `bun run test:rls` exécuté   → exige SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+[ ] `bun run test:e2e:flows` exécuté → exige E2E_BASE_URL + utilisateurs E2E seedés
+[ ] Ouverture d'un PDF constatée sur un appareil Android réel
 ```
+
+Les trois dernières lignes ne sont pas des trous dans la livraison : ce sont des exécutions
+qui demandent une base Supabase et un appareil, indisponibles à l'écriture du code. Le
+lancement des deux commandes ci-dessus suffit à les cocher.

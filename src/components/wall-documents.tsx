@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { WallFeedSkeleton } from "@/components/skeletons";
+import { handleDocumentClick } from "@/lib/open-document";
 import {
   flattenDocuments,
   groupDocumentsByMonth,
@@ -226,12 +227,13 @@ function DocumentRow({
         <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
       </div>
       <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-        {/* Même mécanique d'ouverture que `AttachmentList` sur le mur : lien
-            direct vers l'URL publique du bucket, y compris dans la WebView. */}
+        {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers le
+            navigateur natif dans la WebView, où `target="_blank"` est inerte. */}
         <a
           href={doc.url}
           target="_blank"
           rel="noreferrer"
+          onClick={(e) => handleDocumentClick(e, doc.url)}
           className="text-sm font-medium truncate hover:underline"
         >
           {doc.label ?? doc.name}
