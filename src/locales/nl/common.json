@@ -1308,6 +1308,10 @@
     "markReviewing": "Beoordelen",
     "markActioned": "Markeren als afgehandeld"
   },
+  "chatReport": {
+    "badge": "Chatbericht",
+    "deleteMessage": "Bericht verwijderen"
+  },
   "wall": {
     "title": "Club prikbord",
     "subtitle": "Aankondigingen en discussies.",

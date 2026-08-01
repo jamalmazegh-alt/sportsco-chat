@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
 import { reportWallContent, WALL_REPORT_REASONS } from "@/lib/wall/moderation.functions";
 import { reportUser } from "@/lib/user-report.functions";
+import { reportEventMessage } from "@/lib/event-message-report.functions";
 
 type Reason = (typeof WALL_REPORT_REASONS)[number];
 
@@ -48,24 +49,28 @@ export function WallReportDialog({
   onOpenChange,
   postId,
   commentId,
+  eventMessageId,
   reportedUser,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  /** null = signalement d'un membre uniquement (fiche joueur). */
+  /** null = signalement d'un membre seul ou d'un message de chat. */
   postId: string | null;
   commentId?: string | null;
+  /** Signalement d'un message du chat d'événement. */
+  eventMessageId?: string | null;
   reportedUser?: ReportedUser | null;
 }) {
   const { t } = useTranslation();
   const report = useServerFn(reportWallContent);
   const reportUserFn = useServerFn(reportUser);
+  const reportMessageFn = useServerFn(reportEventMessage);
   const [reason, setReason] = useState<Reason | null>(null);
   const [details, setDetails] = useState("");
   const [alsoUser, setAlsoUser] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const userOnly = !postId && !!reportedUser;
+  const userOnly = !postId && !eventMessageId && !!reportedUser;
 
   const labels: Record<Reason, { title: string; description: string }> = {
     inappropriate: {
@@ -117,6 +122,11 @@ export function WallReportDialog({
       if (postId) {
         const res = (await report({
           data: { postId, commentId: commentId ?? null, reason, details: trimmed },
+        })) as { duplicate?: boolean };
+        contentDuplicate = !!res?.duplicate;
+      } else if (eventMessageId) {
+        const res = (await reportMessageFn({
+          data: { messageId: eventMessageId, reason, details: trimmed },
         })) as { duplicate?: boolean };
         contentDuplicate = !!res?.duplicate;
       }

@@ -13,6 +13,11 @@ import { cn } from "@/lib/utils";
 import { fmt } from "@/lib/date-locale";
 import { listWallReports, resolveWallReport } from "@/lib/wall/moderation.functions";
 import { listUserReports, resolveUserReport } from "@/lib/user-report.functions";
+import {
+  listEventMessageReports,
+  resolveEventMessageReport,
+} from "@/lib/event-message-report.functions";
+import { sortByCreatedAtDesc } from "@/lib/moderation-helpers";
 
 export const Route = createFileRoute("/_authenticated/admin/moderation")({
   component: ModerationPage,
@@ -58,6 +63,8 @@ function ModerationPage() {
   const resolve = useServerFn(resolveWallReport);
   const listUsers = useServerFn(listUserReports);
   const resolveUser = useServerFn(resolveUserReport);
+  const listChat = useServerFn(listEventMessageReports);
+  const resolveChat = useServerFn(resolveEventMessageReport);
   const [status, setStatus] = useState<StatusFilter>("pending");
   const [kind, setKind] = useState<"content" | "members">("content");
 
@@ -76,6 +83,15 @@ function ModerationPage() {
     queryFn: async () =>
       (await listUsers({ data: { clubId: activeClubId as string, status } })) as
         | { reports: UserReport[] }
+        | undefined,
+  });
+
+  const { data: chatData, isLoading: chatLoading } = useQuery({
+    queryKey: ["chat-reports", activeClubId, status],
+    enabled: !!activeClubId && kind === "content",
+    queryFn: async () =>
+      (await listChat({ data: { clubId: activeClubId as string, status } })) as
+        | { reports: ChatReport[] }
         | undefined,
   });
 
@@ -99,8 +115,32 @@ function ModerationPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const chatMutation = useMutation({
+    mutationFn: async (vars: { reportId: string; action: string }) =>
+      resolveChat({ data: vars as never }),
+    onSuccess: () => {
+      toast.success(t("wall.moderation.done", { defaultValue: "Signalement traité" }));
+      qc.invalidateQueries({ queryKey: ["chat-reports"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const reports = useMemo(() => data?.reports ?? [], [data]);
   const userReports = useMemo(() => userData?.reports ?? [], [userData]);
+  const chatReports = useMemo(() => chatData?.reports ?? [], [chatData]);
+  // Onglet « Contenus » : signalements du mur et du chat fusionnés par date.
+  const contentItems = useMemo(
+    () =>
+      sortByCreatedAtDesc([
+        ...reports.map((r) => ({ source: "wall" as const, created_at: r.created_at, wall: r })),
+        ...chatReports.map((c) => ({
+          source: "chat" as const,
+          created_at: c.created_at,
+          chat: c,
+        })),
+      ]),
+    [reports, chatReports],
+  );
 
   const filters: Array<{ key: StatusFilter; label: string }> = [
     { key: "pending", label: t("wall.moderation.pending", { defaultValue: "En attente" }) },
@@ -166,11 +206,11 @@ function ModerationPage() {
       </div>
 
       {kind === "content" &&
-        (isLoading ? (
+        (isLoading || chatLoading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
-        ) : reports.length === 0 ? (
+        ) : contentItems.length === 0 ? (
           <EmptyState
             icon={<Flag className="h-5 w-5" />}
             title={t("wall.moderation.empty", { defaultValue: "Aucun signalement" })}
@@ -180,119 +220,202 @@ function ModerationPage() {
           />
         ) : (
           <ul className="space-y-3">
-            {reports.map((r) => (
-              <li key={r.id} className="rounded-xl border border-border bg-card p-3 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
+            {contentItems.map((item) => {
+              if (item.source === "chat") {
+                const c = item.chat;
+                return (
+                  <li
+                    key={`chat-${c.id}`}
+                    className="rounded-xl border border-border bg-card p-3 space-y-2"
+                  >
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Badge variant="outline" className="text-[10px]">
-                        {r.kind === "comment"
-                          ? t("wall.moderation.comment", { defaultValue: "Commentaire" })
-                          : t("wall.moderation.post", { defaultValue: "Publication" })}
+                        {t("chatReport.badge", { defaultValue: "Message de chat" })}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
-                        {REASONS[r.reason] ?? r.reason}
+                        {REASONS[c.reason] ?? c.reason}
                       </Badge>
-                      {r.hidden && (
-                        <Badge variant="destructive" className="text-[10px]">
-                          {t("wall.moderation.hidden", { defaultValue: "Masqué" })}
-                        </Badge>
-                      )}
-                      {r.deleted && (
+                      {c.deleted && (
                         <Badge variant="destructive" className="text-[10px]">
                           {t("wall.moderation.deleted", { defaultValue: "Supprimé" })}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground">
                       {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
-                      <span className="font-medium text-foreground">{r.reporterName}</span> ·{" "}
-                      {fmt(r.created_at, "d MMM HH:mm")}
+                      <span className="font-medium text-foreground">{c.reporterName}</span> ·{" "}
+                      {fmt(c.created_at, "d MMM HH:mm")}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
-                      <span className="font-medium text-foreground">{r.authorName}</span>
-                      {r.contentCreatedAt ? ` · ${fmt(r.contentCreatedAt, "d MMM HH:mm")}` : ""}
+                      <span className="font-medium text-foreground">{c.authorName}</span>
                     </p>
-                  </div>
-                </div>
-
-                {r.excerpt && (
-                  <p className="text-sm bg-muted/40 rounded-lg px-3 py-2 whitespace-pre-wrap">
-                    {r.excerpt}
-                  </p>
-                )}
-
-                {r.kind === "comment" && (
-                  <div className="rounded-lg border border-dashed border-border px-3 py-2 space-y-1">
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                      {t("wall.moderation.originalPost", { defaultValue: "Publication d'origine" })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
-                      <span className="font-medium text-foreground">{r.postAuthorName}</span>
-                      {r.postCreatedAt ? ` · ${fmt(r.postCreatedAt, "d MMM HH:mm")}` : ""}
-                      {r.postHidden
-                        ? ` · ${t("wall.moderation.hidden", { defaultValue: "Masqué" })}`
-                        : ""}
-                      {r.postDeleted
-                        ? ` · ${t("wall.moderation.deleted", { defaultValue: "Supprimé" })}`
-                        : ""}
-                    </p>
-                    {r.postExcerpt && (
-                      <p className="text-sm whitespace-pre-wrap line-clamp-4">{r.postExcerpt}</p>
+                    {c.excerpt && (
+                      <p className="text-sm bg-muted/40 rounded-lg px-3 py-2 whitespace-pre-wrap">
+                        {c.excerpt}
+                      </p>
                     )}
+                    {c.details && (
+                      <p className="text-xs text-muted-foreground italic">« {c.details} »</p>
+                    )}
+                    {(c.status === "pending" || c.status === "reviewing") && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={chatMutation.isPending}
+                          onClick={() => chatMutation.mutate({ reportId: c.id, action: "dismiss" })}
+                        >
+                          <Check className="h-3.5 w-3.5 mr-1" />
+                          {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
+                        </Button>
+                        {!c.deleted && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={chatMutation.isPending}
+                            onClick={() =>
+                              chatMutation.mutate({ reportId: c.id, action: "delete" })
+                            }
+                          >
+                            <Trash2 className="h-3.5 w-3.5 mr-1" />
+                            {t("chatReport.deleteMessage", {
+                              defaultValue: "Supprimer le message",
+                            })}
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          disabled={chatMutation.isPending}
+                          onClick={() =>
+                            chatMutation.mutate({ reportId: c.id, action: "actioned" })
+                          }
+                        >
+                          <Check className="h-3.5 w-3.5 mr-1" />
+                          {t("userReport.markActioned", { defaultValue: "Marquer traité" })}
+                        </Button>
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+              const r = item.wall;
+              return (
+                <li key={r.id} className="rounded-xl border border-border bg-card p-3 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge variant="outline" className="text-[10px]">
+                          {r.kind === "comment"
+                            ? t("wall.moderation.comment", { defaultValue: "Commentaire" })
+                            : t("wall.moderation.post", { defaultValue: "Publication" })}
+                        </Badge>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {REASONS[r.reason] ?? r.reason}
+                        </Badge>
+                        {r.hidden && (
+                          <Badge variant="destructive" className="text-[10px]">
+                            {t("wall.moderation.hidden", { defaultValue: "Masqué" })}
+                          </Badge>
+                        )}
+                        {r.deleted && (
+                          <Badge variant="destructive" className="text-[10px]">
+                            {t("wall.moderation.deleted", { defaultValue: "Supprimé" })}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
+                        <span className="font-medium text-foreground">{r.reporterName}</span> ·{" "}
+                        {fmt(r.created_at, "d MMM HH:mm")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                        <span className="font-medium text-foreground">{r.authorName}</span>
+                        {r.contentCreatedAt ? ` · ${fmt(r.contentCreatedAt, "d MMM HH:mm")}` : ""}
+                      </p>
+                    </div>
                   </div>
-                )}
-                {r.details && (
-                  <p className="text-xs text-muted-foreground italic">« {r.details} »</p>
-                )}
 
-                {(r.status === "pending" || r.status === "reviewing") && !r.deleted && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={mutation.isPending}
-                      onClick={() => mutation.mutate({ reportId: r.id, action: "dismiss" })}
-                    >
-                      <Check className="h-3.5 w-3.5 mr-1" />
-                      {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
-                    </Button>
-                    {r.hidden ? (
+                  {r.excerpt && (
+                    <p className="text-sm bg-muted/40 rounded-lg px-3 py-2 whitespace-pre-wrap">
+                      {r.excerpt}
+                    </p>
+                  )}
+
+                  {r.kind === "comment" && (
+                    <div className="rounded-lg border border-dashed border-border px-3 py-2 space-y-1">
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {t("wall.moderation.originalPost", {
+                          defaultValue: "Publication d'origine",
+                        })}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                        <span className="font-medium text-foreground">{r.postAuthorName}</span>
+                        {r.postCreatedAt ? ` · ${fmt(r.postCreatedAt, "d MMM HH:mm")}` : ""}
+                        {r.postHidden
+                          ? ` · ${t("wall.moderation.hidden", { defaultValue: "Masqué" })}`
+                          : ""}
+                        {r.postDeleted
+                          ? ` · ${t("wall.moderation.deleted", { defaultValue: "Supprimé" })}`
+                          : ""}
+                      </p>
+                      {r.postExcerpt && (
+                        <p className="text-sm whitespace-pre-wrap line-clamp-4">{r.postExcerpt}</p>
+                      )}
+                    </div>
+                  )}
+                  {r.details && (
+                    <p className="text-xs text-muted-foreground italic">« {r.details} »</p>
+                  )}
+
+                  {(r.status === "pending" || r.status === "reviewing") && !r.deleted && (
+                    <div className="flex flex-wrap gap-2 pt-1">
                       <Button
                         size="sm"
                         variant="outline"
                         disabled={mutation.isPending}
-                        onClick={() => mutation.mutate({ reportId: r.id, action: "unhide" })}
+                        onClick={() => mutation.mutate({ reportId: r.id, action: "dismiss" })}
                       >
-                        <Eye className="h-3.5 w-3.5 mr-1" />
-                        {t("wall.moderation.unhide", { defaultValue: "Réafficher" })}
+                        <Check className="h-3.5 w-3.5 mr-1" />
+                        {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
                       </Button>
-                    ) : (
+                      {r.hidden ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={mutation.isPending}
+                          onClick={() => mutation.mutate({ reportId: r.id, action: "unhide" })}
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1" />
+                          {t("wall.moderation.unhide", { defaultValue: "Réafficher" })}
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={mutation.isPending}
+                          onClick={() => mutation.mutate({ reportId: r.id, action: "hide" })}
+                        >
+                          <EyeOff className="h-3.5 w-3.5 mr-1" />
+                          {t("wall.moderation.hide", { defaultValue: "Masquer" })}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="destructive"
                         disabled={mutation.isPending}
-                        onClick={() => mutation.mutate({ reportId: r.id, action: "hide" })}
+                        onClick={() => mutation.mutate({ reportId: r.id, action: "delete" })}
                       >
-                        <EyeOff className="h-3.5 w-3.5 mr-1" />
-                        {t("wall.moderation.hide", { defaultValue: "Masquer" })}
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        {t("common.delete", { defaultValue: "Supprimer" })}
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      disabled={mutation.isPending}
-                      onClick={() => mutation.mutate({ reportId: r.id, action: "delete" })}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-1" />
-                      {t("common.delete", { defaultValue: "Supprimer" })}
-                    </Button>
-                  </div>
-                )}
-              </li>
-            ))}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         ))}
 
@@ -371,6 +494,20 @@ function ModerationPage() {
     </div>
   );
 }
+
+type ChatReport = {
+  id: string;
+  event_id: string;
+  message_id: string | null;
+  excerpt: string | null;
+  reason: string;
+  details: string | null;
+  status: string;
+  created_at: string;
+  reporterName: string;
+  authorName: string;
+  deleted: boolean;
+};
 
 type UserReport = {
   id: string;

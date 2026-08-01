@@ -1,5 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { pickModeratorIds } from "@/lib/moderation-helpers";
+import { pickModeratorIds, sortByCreatedAtDesc } from "@/lib/moderation-helpers";
+
+describe("sortByCreatedAtDesc", () => {
+  it("sorts newest first without mutating the input", () => {
+    const items = [
+      { id: "a", created_at: "2026-08-01T10:00:00Z" },
+      { id: "b", created_at: "2026-08-01T12:00:00Z" },
+      { id: "c", created_at: "2026-08-01T11:00:00Z" },
+    ];
+    const out = sortByCreatedAtDesc(items);
+    expect(out.map((i) => i.id)).toEqual(["b", "c", "a"]);
+    expect(items.map((i) => i.id)).toEqual(["a", "b", "c"]);
+  });
+});
 
 const m = (user_id: string | null, role: string | null = null, roles: string[] | null = null) => ({
   user_id,

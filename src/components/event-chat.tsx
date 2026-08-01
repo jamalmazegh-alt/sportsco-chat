@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { useUserMutes } from "@/lib/use-mutes";
 import { filterMutedMessages } from "@/lib/mutes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, MessageCircle, Lock, ChevronDown } from "lucide-react";
+import { Send, MessageCircle, Lock, ChevronDown, Flag, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 import { dispatchEventChatPush } from "@/lib/event-chat-notify.functions";
+import { WallReportDialog, type ReportedUser } from "@/components/wall-report-dialog";
 
 type Msg = {
   id: string;
@@ -27,8 +29,17 @@ const PAGE_SIZE = 30;
 export function EventChat({ eventId }: { eventId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const roles = useMyRoles();
   const { muted } = useUserMutes();
   const [messages, setMessages] = useState<Msg[]>([]);
+  const [clubId, setClubId] = useState<string | null>(null);
+  // Cible du signalement d'un message (+ éventuellement de son auteur).
+  const [reportTarget, setReportTarget] = useState<{
+    messageId: string;
+    author: ReportedUser | null;
+  } | null>(null);
+  // Modération : admins/dirigeants peuvent supprimer n'importe quel message.
+  const canModerate = roles.includes("admin") || roles.includes("dirigeant");
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
@@ -62,9 +73,14 @@ export function EventChat({ eventId }: { eventId: string }) {
         .select("team_id, teams:team_id(club_id, clubs:club_id(event_chat_enabled))")
         .eq("id", eventId)
         .single();
-      const ec = (ev as { teams?: { clubs?: { event_chat_enabled?: boolean } } } | null)?.teams
-        ?.clubs?.event_chat_enabled;
+      const teams = (
+        ev as {
+          teams?: { club_id?: string; clubs?: { event_chat_enabled?: boolean } };
+        } | null
+      )?.teams;
+      const ec = teams?.clubs?.event_chat_enabled;
       if (!active) return;
+      setClubId(teams?.club_id ?? null);
       setEnabled(ec === undefined ? true : !!ec);
       // Access is governed by RLS (can_access_event_chat): staff always, players
       // and parents only when the club opened the chat to them.
@@ -142,6 +158,14 @@ export function EventChat({ eventId }: { eventId: string }) {
           );
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "event_messages" },
+        (payload) => {
+          const deletedId = (payload.old as { id?: string } | null)?.id;
+          if (deletedId) setMessages((prev) => prev.filter((m) => m.id !== deletedId));
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
@@ -151,6 +175,16 @@ export function EventChat({ eventId }: { eventId: string }) {
   useEffect(() => {
     if (open) endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, open]);
+
+  async function deleteMessage(id: string) {
+    const prev = messages;
+    setMessages((cur) => cur.filter((m) => m.id !== id));
+    const { error } = await supabase.from("event_messages").delete().eq("id", id);
+    if (error) {
+      setMessages(prev);
+      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+    }
+  }
 
   async function send() {
     if ((!body.trim() && atts.length === 0) || !user) return;
@@ -235,7 +269,46 @@ export function EventChat({ eventId }: { eventId: string }) {
             {visibleMessages.map((m) => {
               const mine = m.author_user_id === user?.id;
               return (
-                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                <div
+                  key={m.id}
+                  className={cn("flex items-end gap-1", mine ? "justify-end" : "justify-start")}
+                >
+                  {(mine || canModerate) && (
+                    <button
+                      type="button"
+                      onClick={() => deleteMessage(m.id)}
+                      className={cn(
+                        "shrink-0 p-1 text-muted-foreground/60 hover:text-destructive",
+                        !mine && "order-last",
+                      )}
+                      aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                      title={t("common.delete", { defaultValue: "Supprimer" })}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  {!mine && user && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReportTarget({
+                          messageId: m.id,
+                          author: clubId
+                            ? {
+                                userId: m.author_user_id,
+                                name: m.author?.full_name ?? "—",
+                                clubId,
+                              }
+                            : null,
+                        })
+                      }
+                      className="order-last shrink-0 p-1 text-muted-foreground/60 hover:text-amber-600"
+                      aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
+                      title={t("wall.report.action", { defaultValue: "Signaler" })}
+                    >
+                      <Flag className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                   <div
                     className={cn(
                       "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
@@ -298,6 +371,15 @@ export function EventChat({ eventId }: { eventId: string }) {
             <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
           </form>
         </>
+      )}
+      {reportTarget && (
+        <WallReportDialog
+          open
+          onOpenChange={(v) => !v && setReportTarget(null)}
+          postId={null}
+          eventMessageId={reportTarget.messageId}
+          reportedUser={reportTarget.author}
+        />
       )}
     </section>
   );

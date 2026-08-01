@@ -1313,6 +1313,10 @@
     "markReviewing": "Prüfen",
     "markActioned": "Als erledigt markieren"
   },
+  "chatReport": {
+    "badge": "Chat-Nachricht",
+    "deleteMessage": "Nachricht löschen"
+  },
   "wall": {
     "title": "Vereinspinnwand",
     "subtitle": "Ankündigungen und Diskussionen.",

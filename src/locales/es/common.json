@@ -1308,6 +1308,10 @@
     "markReviewing": "Examinar",
     "markActioned": "Marcar como tratado"
   },
+  "chatReport": {
+    "badge": "Mensaje de chat",
+    "deleteMessage": "Eliminar mensaje"
+  },
   "wall": {
     "title": "Muro del Club",
     "subtitle": "Anuncios y debates.",

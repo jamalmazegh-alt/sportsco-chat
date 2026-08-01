@@ -1308,6 +1308,10 @@
     "markReviewing": "Esamina",
     "markActioned": "Segna come gestito"
   },
+  "chatReport": {
+    "badge": "Messaggio di chat",
+    "deleteMessage": "Elimina messaggio"
+  },
   "wall": {
     "title": "Bacheca del Club",
     "subtitle": "Annunci e discussioni.",

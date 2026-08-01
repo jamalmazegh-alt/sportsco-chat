@@ -3,10 +3,12 @@ import { Button, Heading, Text } from "@react-email/components";
 import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
+type ContentKind = "post" | "comment" | "message";
+
 interface Props {
   moderatorFirstName?: string;
   reporterName: string;
-  contentKind: "post" | "comment";
+  contentKind: ContentKind;
   reasonLabel: string;
   details?: string | null;
   excerpt?: string | null;
@@ -16,10 +18,16 @@ interface Props {
 
 const T = {
   fr: {
-    subject: "Contenu signalé sur le mur",
+    subject: "Contenu signalé dans votre club",
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
-    body: (r: string, k: "post" | "comment") =>
-      `${r} a signalé ${k === "post" ? "une publication" : "un commentaire"} du mur de votre club.`,
+    body: (r: string, k: ContentKind) =>
+      `${r} a signalé ${
+        k === "post"
+          ? "une publication du mur"
+          : k === "comment"
+            ? "un commentaire du mur"
+            : "un message du chat d'événement"
+      } de votre club.`,
     reason: "Motif",
     details: "Précisions",
     excerpt: "Extrait du contenu",
@@ -27,10 +35,12 @@ const T = {
     foot: "Vous recevez cet e-mail en tant que responsable du club sur Clubero.",
   },
   en: {
-    subject: "Reported content on the wall",
+    subject: "Reported content in your club",
     hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
-    body: (r: string, k: "post" | "comment") =>
-      `${r} reported ${k === "post" ? "a post" : "a comment"} on your club wall.`,
+    body: (r: string, k: ContentKind) =>
+      `${r} reported ${
+        k === "post" ? "a wall post" : k === "comment" ? "a wall comment" : "an event chat message"
+      } in your club.`,
     reason: "Reason",
     details: "Details",
     excerpt: "Content excerpt",

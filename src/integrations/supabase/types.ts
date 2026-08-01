@@ -7458,6 +7458,60 @@ export type Database = {
           },
         ]
       }
+      event_message_reports: {
+        Row: {
+          club_id: string
+          created_at: string
+          details: string | null
+          event_id: string
+          excerpt: string | null
+          id: string
+          message_author_user_id: string | null
+          message_id: string | null
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["wall_report_status"]
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          details?: string | null
+          event_id: string
+          excerpt?: string | null
+          id?: string
+          message_author_user_id?: string | null
+          message_id?: string | null
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          details?: string | null
+          event_id?: string
+          excerpt?: string | null
+          id?: string
+          message_author_user_id?: string | null
+          message_id?: string | null
+          reason?: Database["public"]["Enums"]["wall_report_reason"]
+          reporter_user_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_mutes: {
         Row: {
           created_at: string

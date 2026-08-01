@@ -1308,6 +1308,10 @@
     "markReviewing": "Review",
     "markActioned": "Mark as handled"
   },
+  "chatReport": {
+    "badge": "Chat message",
+    "deleteMessage": "Delete message"
+  },
   "wall": {
     "title": "Club wall",
     "subtitle": "Announcements and conversations.",
