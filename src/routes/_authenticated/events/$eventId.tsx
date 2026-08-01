@@ -743,7 +743,7 @@ function EventDetail() {
 
   async function notifyCoachesOfResponse(
     convocationId: string,
-    status: "absent" | "uncertain",
+    status: AttendanceStatus,
     reason: string | null,
     isChange = false,
   ) {
