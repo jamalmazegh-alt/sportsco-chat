@@ -92,6 +92,78 @@ export function ConvocationSummaryPill({
   );
 }
 
+/**
+ * Right-hand 2x2 presence block for event rows (staff view).
+ * Icons only + counts, no text labels.
+ */
+export function ConvocationSummaryGrid({
+  counts,
+  className,
+}: {
+  counts: ConvocationCounts;
+  className?: string;
+}) {
+  const { t } = useTranslation();
+  const total = counts.present + counts.absent + counts.uncertain + counts.pending;
+  if (total === 0) return null;
+
+  const items = [
+    {
+      key: "present",
+      value: counts.present,
+      label: t("attendance.present"),
+      Icon: Check,
+      fg: "text-present",
+    },
+    {
+      key: "absent",
+      value: counts.absent,
+      label: t("attendance.absent"),
+      Icon: X,
+      fg: "text-defeat",
+    },
+    {
+      key: "uncertain",
+      value: counts.uncertain,
+      label: t("attendance.uncertain"),
+      Icon: HelpCircle,
+      fg: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      key: "pending",
+      value: counts.pending,
+      label: t("attendance.pending"),
+      Icon: Clock,
+      fg: "text-muted-foreground",
+    },
+  ];
+
+  return (
+    <div
+      className={cn(
+        "shrink-0 w-[88px] grid grid-cols-2 border-l border-border bg-muted/40",
+        className,
+      )}
+      title={items.map((i) => `${i.value} ${i.label}`).join(" · ")}
+    >
+      {items.map((i, idx) => (
+        <div
+          key={i.key}
+          className={cn(
+            "flex flex-col items-center justify-center gap-0.5 py-2",
+            idx < 2 && "border-b border-border/50",
+            idx % 2 === 0 && "border-r border-border/50",
+          )}
+          aria-label={`${i.value} ${i.label}`}
+        >
+          <i.Icon className={cn("h-3.5 w-3.5", i.fg)} strokeWidth={2.5} aria-hidden />
+          <span className="text-xs font-bold tabular-nums leading-none">{i.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function buildConvocationCounts(
   rows: Array<{ event_id: string; status: string | null }>,
 ): Map<string, ConvocationCounts> {

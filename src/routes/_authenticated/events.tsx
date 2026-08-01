@@ -40,7 +40,7 @@ import {
   type ConvocationResponse,
 } from "@/components/convocation-response-badge";
 import {
-  ConvocationSummaryPill,
+  ConvocationSummaryGrid,
   buildConvocationCounts,
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
@@ -543,9 +543,6 @@ function EventsPage() {
                   {t("events.convocationsSentShort")}
                 </span>
               )}
-              {isCoach && !isCancelled && convocStats?.counts.get(e.id) && (
-                <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
-              )}
             </div>
             <p
               className={cn(
@@ -590,6 +587,9 @@ function EventsPage() {
                 );
               })()}
           </div>
+          {isCoach && !isCancelled && convocStats?.counts.get(e.id) && (
+            <ConvocationSummaryGrid counts={convocStats.counts.get(e.id)!} />
+          )}
           {(() => {
             if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
