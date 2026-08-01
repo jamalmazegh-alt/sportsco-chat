@@ -205,7 +205,10 @@ export function WallDocuments({
                 authorName={doc.authorUserId ? authors[doc.authorUserId] : undefined}
                 dateLocale={dateLocale}
                 onOpenPost={onOpenPost}
+                canRename={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
+                onRename={renameDoc}
               />
+
             ))}
           </ul>
         </section>
