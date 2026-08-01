@@ -151,6 +151,7 @@ function RespondPage() {
   async function submit(status: Status) {
     if (!info || submitting) return;
     setSubmitting(status);
+    const wasAlreadyAnswered = info.status !== "pending";
     const { error: rpcError } = await supabase.rpc("respond_via_token", {
       _token: token,
       _status: status,
@@ -164,7 +165,7 @@ function RespondPage() {
     void fetch("/api/public/push/convocation-response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token, isChange: wasAlreadyAnswered }),
     }).catch(() => {});
     await load();
   }

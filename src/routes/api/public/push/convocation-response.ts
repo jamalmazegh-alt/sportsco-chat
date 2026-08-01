@@ -14,6 +14,7 @@ const InputSchema = z.object({
     .min(16)
     .max(128)
     .regex(/^[a-f0-9-]+$/i),
+  isChange: z.boolean().optional(),
 });
 
 function tokenFromReferer(request: Request): string | null {
@@ -48,7 +49,11 @@ export const Route = createFileRoute("/api/public/push/convocation-response")({
           ((body as { responseToken?: unknown } | null)?.responseToken as string | undefined) ||
           new URL(request.url).searchParams.get("token") ||
           tokenFromReferer(request);
-        const parsed = InputSchema.safeParse({ token });
+        const isChange =
+          typeof body === "object" && body !== null
+            ? (body as { isChange?: unknown }).isChange === true
+            : false;
+        const parsed = InputSchema.safeParse({ token, isChange });
         if (!parsed.success) {
           return new Response("Invalid input", { status: 400 });
         }
@@ -71,7 +76,9 @@ export const Route = createFileRoute("/api/public/push/convocation-response")({
 
         const { fanoutConvocationResponse, fanoutConvocationComplete } =
           await import("@/lib/push-fanout.server");
-        const r1 = await fanoutConvocationResponse((conv as any).id as string);
+        const r1 = await fanoutConvocationResponse((conv as any).id as string, {
+          isChange: parsed.data.isChange === true,
+        });
         const r2 = r1.eventId ? await fanoutConvocationComplete(r1.eventId) : { dispatched: 0 };
 
         return Response.json({ response: r1.dispatched, complete: r2.dispatched });
