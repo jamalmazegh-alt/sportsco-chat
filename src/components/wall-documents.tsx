@@ -89,6 +89,15 @@ export function WallDocuments({
     setDocs((prev) => prev.map((d) => (d.key === doc.key ? { ...d, label } : d)));
   }, []);
 
+  const deleteDoc = useCallback(async (doc: WallDocument) => {
+    const { error } = await supabase.rpc("delete_wall_document", {
+      _post_id: doc.postId,
+      _path: doc.path,
+    });
+    if (error) throw error;
+    setDocs((prev) => prev.filter((d) => d.key !== doc.key));
+  }, []);
+
   const load = useCallback(
     async (pageIndex: number) => {
       let query = supabase
