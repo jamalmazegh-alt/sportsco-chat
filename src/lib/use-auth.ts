@@ -38,6 +38,15 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
   memberships: ClubMembership[];
+  /**
+   * `true` seulement après une lecture RÉUSSIE des adhésions.
+   *
+   * Sans ce drapeau, un échec réseau laissait `memberships` à son tableau vide
+   * initial et les gardes concluaient « aucun club » — affichant l'écran de
+   * création à un utilisateur qui en a un, avec le risque qu'il crée un
+   * doublon. Constaté en mode avion sur un appareil réel.
+   */
+  membershipsLoaded: boolean;
   activeClubId: string | null;
   setActiveClubId: (id: string | null) => void;
   refreshMemberships: () => Promise<void>;
@@ -65,6 +74,7 @@ export function useAuthState(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [memberships, setMemberships] = useState<ClubMembership[]>([]);
+  const [membershipsLoaded, setMembershipsLoaded] = useState(false);
   const [activeClubId, setActiveClubIdState] = useState<string | null>(readActiveClubKey);
   const activeClubIdRef = useRef(activeClubId);
   activeClubIdRef.current = activeClubId;
@@ -114,6 +124,9 @@ export function useAuthState(): AuthState {
       .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
       .eq("user_id", userData.user.id);
     if (error) {
+      // On ne touche NI à `memberships` NI à `membershipsLoaded` : un échec
+      // transitoire ne doit jamais être interprété comme « cet utilisateur
+      // n'a aucun club ».
       console.error(error);
       return;
     }
@@ -128,6 +141,7 @@ export function useAuthState(): AuthState {
         club: row.clubs,
       }));
     setMemberships(list);
+    setMembershipsLoaded(true);
     const current = activeClubIdRef.current;
     if (list.length > 0 && !list.some((m) => m.club_id === current)) {
       const preferred = list.find((m) => m.role === "admin") ?? list[0];
@@ -205,6 +219,7 @@ export function useAuthState(): AuthState {
     user: session?.user ?? null,
     loading,
     memberships,
+    membershipsLoaded,
     activeClubId,
     setActiveClubId,
     refreshMemberships,

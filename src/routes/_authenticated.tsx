@@ -38,7 +38,15 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthLayout() {
-  const { session, loading, memberships, refreshMemberships, user, activeClubId } = useAuth();
+  const {
+    session,
+    loading,
+    memberships,
+    membershipsLoaded,
+    refreshMemberships,
+    user,
+    activeClubId,
+  } = useAuth();
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
 
@@ -95,6 +103,13 @@ function AuthLayout() {
       );
     }
     return <Navigate to="/admin/billing" replace />;
+  }
+
+  // Adhésions jamais lues avec succès (réseau indisponible au démarrage) :
+  // surtout ne pas conclure « aucun club ». L'écran de création inviterait
+  // l'utilisateur à en créer un second. On propose une nouvelle tentative.
+  if (!membershipsLoaded) {
+    return <MembershipsUnavailableScreen onRetry={refreshMemberships} />;
   }
 
   if (memberships.length === 0) {
@@ -155,6 +170,31 @@ function AuthLayout() {
         <BottomNav />
       </div>
     </ConsentGate>
+  );
+}
+
+/**
+ * Adhésions non chargées : réseau indisponible au démarrage, ou serveur
+ * injoignable. Volontairement distinct de « aucun club » — confondre les deux
+ * pousserait l'utilisateur à créer un doublon.
+ */
+function MembershipsUnavailableScreen({ onRetry }: { onRetry: () => Promise<void> }) {
+  const { t } = useTranslation();
+  const [retrying, setRetrying] = useState(false);
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+      <AlertTriangle className="h-8 w-8 text-amber-500" />
+      <p className="max-w-xs text-sm text-muted-foreground">{t("errors.membershipsUnavailable")}</p>
+      <Button
+        onClick={() => {
+          setRetrying(true);
+          void onRetry().finally(() => setRetrying(false));
+        }}
+        disabled={retrying}
+      >
+        {retrying ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.retry")}
+      </Button>
+    </div>
   );
 }
 

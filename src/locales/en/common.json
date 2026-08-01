@@ -1884,7 +1884,8 @@
   },
   "errors": {
     "generic": "Something went wrong.",
-    "clubCreateFailed": "Could not create club."
+    "clubCreateFailed": "Could not create club.",
+    "membershipsUnavailable": "Unable to load your clubs. Check your connection, then try again."
   },
   "respond": {
     "eyebrow": "Call-up",

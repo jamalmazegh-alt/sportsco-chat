@@ -1884,7 +1884,8 @@
   },
   "errors": {
     "generic": "Si è verificato un errore.",
-    "clubCreateFailed": "Impossibile creare il Club."
+    "clubCreateFailed": "Impossibile creare il Club.",
+    "membershipsUnavailable": "Impossibile caricare i tuoi club. Controlla la connessione e riprova."
   },
   "respond": {
     "eyebrow": "Invito",

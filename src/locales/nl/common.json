@@ -1884,7 +1884,8 @@
   },
   "errors": {
     "generic": "Er is een fout opgetreden.",
-    "clubCreateFailed": "Club kon niet worden aangemaakt."
+    "clubCreateFailed": "Club kon niet worden aangemaakt.",
+    "membershipsUnavailable": "Uw clubs konden niet worden geladen. Controleer uw verbinding en probeer het opnieuw."
   },
   "respond": {
     "eyebrow": "Uitnodiging",

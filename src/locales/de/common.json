@@ -1889,7 +1889,8 @@
   },
   "errors": {
     "generic": "Ein Fehler ist aufgetreten.",
-    "clubCreateFailed": "Verein konnte nicht erstellt werden."
+    "clubCreateFailed": "Verein konnte nicht erstellt werden.",
+    "membershipsUnavailable": "Ihre Vereine konnten nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
   },
   "respond": {
     "eyebrow": "Einladung",
