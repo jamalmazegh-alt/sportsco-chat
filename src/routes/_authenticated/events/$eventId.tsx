@@ -745,6 +745,7 @@ function EventDetail() {
     convocationId: string,
     status: "absent" | "uncertain",
     reason: string | null,
+    isChange = false,
   ) {
     if (!event) return;
     const conv = (convocations ?? []).find((c: any) => c.id === convocationId) as any;
@@ -783,7 +784,11 @@ function EventDetail() {
         coachIds.map((uid) => ({
           user_id: uid,
           type: "convocation_response",
-          title: `${playerName} : ${t(`attendance.${status}`)}`,
+          title: `${playerName} : ${t(`attendance.${status}`)}${
+            isChange
+              ? ` (${t("attendance.responseChanged", { defaultValue: "réponse modifiée" })})`
+              : ""
+          }`,
           body,
           link: `/events/${event.id}`,
         })),
@@ -793,7 +798,7 @@ function EventDetail() {
     // Email notifications via server function (looks up coach emails server-side)
     try {
       const { notifyCoachesEmail } = await import("@/lib/convocation-notify.functions");
-      await notifyCoachesEmail({ data: { convocationId } });
+      await notifyCoachesEmail({ data: { convocationId, isChange } });
     } catch {
       // best-effort, non-blocking
     }
@@ -804,6 +809,8 @@ function EventDetail() {
     status: AttendanceStatus,
     reason: string | null,
   ) {
+    const previous = (convocations ?? []).find((c: any) => c.id === convocationId) as any;
+    const isChange = !!previous && previous.status !== "pending" && !!previous.responded_at;
     const { error } = await supabase
       .from("convocations")
       .update({
@@ -832,12 +839,13 @@ function EventDetail() {
         convocationId,
         status,
         reason && reason.trim() ? reason.trim() : null,
+        isChange,
       ).catch(() => {});
     }
     // Push notification (#7 response + #8 complete) — fire-and-forget, all statuses
     void (async () => {
       try {
-        await dispatchConvocationResponsePushFn({ data: { convocationId } });
+        await dispatchConvocationResponsePushFn({ data: { convocationId, isChange } });
       } catch {
         /* best-effort */
       }

@@ -250,6 +250,13 @@ export function UrgencyCenter({ className }: Props) {
     if (!convocationId) return;
     setBusyIds((s) => new Set(s).add(item.id));
     try {
+      const { data: previous } = await supabase
+        .from("convocations")
+        .select("status, responded_at")
+        .eq("id", convocationId)
+        .maybeSingle();
+      const isChange =
+        !!previous && (previous as any).status !== "pending" && !!(previous as any).responded_at;
       const { error } = await supabase
         .from("convocations")
         .update({ status, responded_at: new Date().toISOString() })
@@ -269,7 +276,7 @@ export function UrgencyCenter({ className }: Props) {
       }
       toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
       // Fire-and-forget push + email — same as events/$eventId.tsx flow.
-      void dispatchResponsePushFn({ data: { convocationId } }).catch(() => {});
+      void dispatchResponsePushFn({ data: { convocationId, isChange } }).catch(() => {});
       if (status === "absent" || status === "uncertain") {
         // In-app notifications for coaches + email — mirrors events/$eventId flow.
         void (async () => {
@@ -316,7 +323,11 @@ export function UrgencyCenter({ className }: Props) {
                   coachIds.map((uid: string) => ({
                     user_id: uid,
                     type: "convocation_response",
-                    title: `${playerName} : ${t(`attendance.${status}`)}`,
+                    title: `${playerName} : ${t(`attendance.${status}`)}${
+                      isChange
+                        ? ` (${t("attendance.responseChanged", { defaultValue: "réponse modifiée" })})`
+                        : ""
+                    }`,
                     body,
                     link: `/events/${ev.id}`,
                   })),
@@ -327,7 +338,7 @@ export function UrgencyCenter({ className }: Props) {
             /* best-effort */
           }
         })();
-        void notifyCoachesEmailFn({ data: { convocationId } }).catch((e) => {
+        void notifyCoachesEmailFn({ data: { convocationId, isChange } }).catch((e) => {
           console.error("[urgency] notifyCoachesEmail failed", e);
         });
       }
