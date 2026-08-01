@@ -73,7 +73,7 @@ function InboxPage() {
           value={activeTab}
           onValueChange={(next) =>
             navigate({
-              search: (prev) => ({
+              search: (prev: InboxSearch) => ({
                 ...prev,
                 tab: next === "wall" ? undefined : "documents",
                 // Changer d'onglet à la main annule le focus sur une publication.
