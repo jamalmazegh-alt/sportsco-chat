@@ -97,7 +97,7 @@ function InboxPage() {
             <WallDocuments
               clubId={activeClubId}
               onOpenPost={(id) =>
-                navigate({ search: (prev) => ({ ...prev, tab: undefined, post: id }) })
+                navigate({ search: (prev: InboxSearch) => ({ ...prev, tab: undefined, post: id }) })
               }
             />
           </TabsContent>
