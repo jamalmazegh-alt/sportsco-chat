@@ -704,7 +704,13 @@
       "done": "{{inserted}} joueur(s) importé(s)",
       "failed": "{{failed}} ligne(s) en erreur"
     },
-    "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer."
+    "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer.",
+    "childConsentTitle": "Activer l'accès plateforme de {{name}} ?",
+    "childConsentBody": "Le joueur mineur recevra une invitation pour créer son propre accès Clubero, sous la responsabilité de son représentant légal.",
+    "childConsentParent": "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
+    "childConsentDoc": "Lire le document « Consentement parental »",
+    "childConsentConfirm": "Activer l'accès",
+    "childAccessParentOnly": "Seul un parent ou représentant légal peut activer l'accès."
   },
   "events": {
     "isOfficial": "Match officiel",
@@ -1283,7 +1289,11 @@
   "attachments": {
     "add": "Ajouter un fichier",
     "tooLarge": "{{name}} dépasse 10 Mo.",
-    "invalidType": "Type de fichier non autorisé : {{name}}"
+    "invalidType": "Type de fichier non autorisé : {{name}}",
+    "documentName": "Nom du document",
+    "documentNamePlaceholder": "Nom du document (ex. Programme de reprise)",
+    "remove": "Retirer",
+    "labelRequired": "Donnez un nom à chaque document avant de publier."
   },
   "mutes": {
     "action": "Masquer cette personne",
@@ -1385,6 +1395,16 @@
       "done": "Signalement traité",
       "hiddenBadge": "Masqué par la modération — visible par les responsables uniquement",
       "hiddenBadgeShort": "Masqué"
+    },
+    "tabs": {
+      "wall": "Mur",
+      "documents": "Documents"
+    },
+    "documents": {
+      "empty": "Aucun document pour l'instant. Les fichiers joints aux publications du mur apparaîtront ici.",
+      "loadMore": "Voir plus",
+      "viewPost": "Voir la publication",
+      "loadError": "Les documents n'ont pas pu être chargés. Réessayez dans un instant."
     }
   },
   "chat": {

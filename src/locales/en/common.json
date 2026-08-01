@@ -704,7 +704,13 @@
       "failed": "{{failed}} row(s) with errors"
     },
     "inviteAlreadyActive": "Account already active — no need to resend.",
-    "parentActivationPending": "Waiting for parent account activation"
+    "parentActivationPending": "Waiting for parent account activation",
+    "childConsentTitle": "Enable platform access for {{name}}?",
+    "childConsentBody": "The minor player will receive an invitation to create their own Clubero access, under the responsibility of their legal guardian.",
+    "childConsentParent": "I confirm that I am this player's legal guardian and I authorise the creation of their access.",
+    "childConsentDoc": "Read the “Parental Consent” document",
+    "childConsentConfirm": "Enable access",
+    "childAccessParentOnly": "Only a parent or legal guardian can enable access."
   },
   "events": {
     "isOfficial": "Official match",
@@ -1283,7 +1289,11 @@
   "attachments": {
     "add": "Add file",
     "tooLarge": "{{name}} exceeds 10 MB.",
-    "invalidType": "File type not allowed: {{name}}"
+    "invalidType": "File type not allowed: {{name}}",
+    "documentName": "Document name",
+    "documentNamePlaceholder": "Document name (e.g. Pre-season schedule)",
+    "remove": "Remove",
+    "labelRequired": "Name every document before publishing."
   },
   "mutes": {
     "action": "Hide this person",
@@ -1385,6 +1395,16 @@
       "done": "Report handled",
       "hiddenBadge": "Hidden by moderation — visible to managers only",
       "hiddenBadgeShort": "Hidden"
+    },
+    "tabs": {
+      "wall": "Wall",
+      "documents": "Documents"
+    },
+    "documents": {
+      "empty": "No documents yet. Files attached to wall posts will show up here.",
+      "loadMore": "Show more",
+      "viewPost": "View post",
+      "loadError": "Documents could not be loaded. Please try again shortly."
     }
   },
   "chat": {

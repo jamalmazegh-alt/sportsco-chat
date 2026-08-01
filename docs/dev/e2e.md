@@ -12,7 +12,7 @@ bun run test:e2e
 # Core seulement — 00→25 (API / RLS / beta-closure, ~5–15 min)
 bun run test:e2e:core
 
-# UI flows seulement — 26→31 + ui-real-flows (clics réels)
+# UI flows seulement — 26→32 + ui-real-flows (clics réels)
 bun run test:e2e:flows
 
 # UI interactive Playwright (debug, watch, replay)
@@ -48,7 +48,7 @@ En CI : deux jobs séquentiels (`E2E core` puis `E2E UI`), artifacts
 Seed manuel : `bun run seed:e2e` (idempotent, réécrit les mots de passe pour
 matcher les secrets). Voir `tests/e2e/_fixtures/README.md`.
 
-Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`31`
+Specs UI récentes (lot Claude) : `ui-real-flows.e2e.ts` + `26`→`32`
 (= project Playwright `ui` / `bun run test:e2e:flows`). Le core `00`→`25`
 reste isolé (`bun run test:e2e:core`).
 Matrice et dettes : `docs/dev/e2e-coverage-gaps.md`.

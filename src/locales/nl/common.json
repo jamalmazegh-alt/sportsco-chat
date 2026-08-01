@@ -704,7 +704,13 @@
       "failed": "{{failed}} regel(s) met fouten"
     },
     "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig.",
-    "parentActivationPending": "Wacht op activering van ouderaccount"
+    "parentActivationPending": "Wacht op activering van ouderaccount",
+    "childConsentTitle": "Platformtoegang voor {{name}} activeren?",
+    "childConsentBody": "De minderjarige speler ontvangt een uitnodiging om een eigen Clubero-toegang aan te maken, onder verantwoordelijkheid van zijn/haar wettelijke voogd.",
+    "childConsentParent": "Ik bevestig dat ik de wettelijke voogd van deze speler ben en geef toestemming voor het aanmaken van zijn/haar toegang.",
+    "childConsentDoc": "Lees het document 'Ouderlijke toestemming'",
+    "childConsentConfirm": "Toegang activeren",
+    "childAccessParentOnly": "Alleen een ouder of wettelijke voogd kan de toegang activeren."
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -1283,7 +1289,11 @@
   "attachments": {
     "add": "Bestand toevoegen",
     "tooLarge": "{{name}} is groter dan 10 MB.",
-    "invalidType": "Niet toegestaan bestandstype: {{name}}"
+    "invalidType": "Niet toegestaan bestandstype: {{name}}",
+    "documentName": "Naam van het document",
+    "documentNamePlaceholder": "Naam van het document (bijv. Trainingsschema)",
+    "remove": "Verwijderen",
+    "labelRequired": "Geef elk document een naam voordat je publiceert."
   },
   "mutes": {
     "action": "Deze persoon verbergen",
@@ -1385,6 +1395,16 @@
       "done": "Melding behandeld",
       "hiddenBadge": "Verborgen door moderatie — alleen zichtbaar voor verantwoordelijken",
       "hiddenBadgeShort": "Verborgen"
+    },
+    "tabs": {
+      "wall": "Muur",
+      "documents": "Documenten"
+    },
+    "documents": {
+      "empty": "Nog geen documenten. Bestanden bij muurberichten verschijnen hier.",
+      "loadMore": "Meer tonen",
+      "viewPost": "Bericht bekijken",
+      "loadError": "De documenten konden niet worden geladen. Probeer het zo opnieuw."
     }
   },
   "chat": {

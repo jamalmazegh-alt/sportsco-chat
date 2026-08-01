@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Paperclip, X, FileText, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ATTACHMENT_LABEL_MAX } from "@/lib/wall/documents";
+import { handleDocumentClick } from "@/lib/open-document";
 
 export type Attachment = {
   url: string;
@@ -13,6 +15,10 @@ export type Attachment = {
   name: string;
   type: string;
   size: number;
+  // Nom donné par l'auteur ("Programme de reprise"), saisi uniquement sur le mur
+  // (voir `requireLabel`). Optionnel : les pièces jointes publiées avant la
+  // docuthèque n'en ont pas, et les autres AttachmentPicker ne le demandent pas.
+  label?: string;
 };
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -66,12 +72,19 @@ export function AttachmentPicker({
   prefix,
   accept = "image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt",
   max = 4,
+  requireLabel = false,
 }: {
   value: Attachment[];
   onChange: (next: Attachment[]) => void;
   prefix: string;
   accept?: string;
   max?: number;
+  /**
+   * Demande un nom pour chaque fichier (docuthèque du mur). Opt-in : les autres
+   * usages du picker (chat d'événement, tournois, fiche événement) ne doivent
+   * pas se voir imposer une saisie supplémentaire.
+   */
+  requireLabel?: boolean;
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -126,9 +139,22 @@ export function AttachmentPicker({
     onChange(value.filter((a) => a.path !== att.path));
   }
 
+  function setLabel(att: Attachment, label: string) {
+    onChange(
+      value.map((a) =>
+        a.path === att.path ? { ...a, label: label.slice(0, ATTACHMENT_LABEL_MAX) } : a,
+      ),
+    );
+  }
+
   return (
     <div className="space-y-2">
-      {value.length > 0 && <AttachmentList items={value} onRemove={remove} />}
+      {value.length > 0 &&
+        (requireLabel ? (
+          <NamedAttachmentList items={value} onRemove={remove} onLabelChange={setLabel} />
+        ) : (
+          <AttachmentList items={value} onRemove={remove} />
+        ))}
       <div>
         <input
           ref={inputRef}
@@ -167,25 +193,48 @@ export function AttachmentList({
     <ul className={cn("flex flex-wrap gap-2", className)}>
       {items.map((a) => {
         const isImage = a.type?.startsWith("image/");
+        const label = a.label?.trim();
         return (
           <li key={a.path} className="relative group">
             {isImage ? (
-              <a href={a.url} target="_blank" rel="noreferrer" className="block">
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => handleDocumentClick(e, a.url)}
+                className="block w-24"
+              >
                 <img
                   src={a.url}
-                  alt={a.name}
+                  alt={label || a.name}
                   className="h-24 w-24 rounded-lg object-cover border border-border"
                 />
+                {label && (
+                  <span className="block mt-1 text-[11px] leading-tight truncate" title={a.name}>
+                    {label}
+                  </span>
+                )}
               </a>
             ) : (
               <a
                 href={a.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={(e) => handleDocumentClick(e, a.url)}
                 className="flex items-center gap-2 max-w-[220px] rounded-lg border border-border bg-background px-3 py-2 text-xs hover:bg-muted/50"
               >
                 <FileText className="h-4 w-4 text-primary shrink-0" />
-                <span className="truncate flex-1">{a.name}</span>
+                {/* Nom donné par l'auteur en principal, nom de fichier accolé en secondaire. */}
+                <span className="truncate flex-1">
+                  {label ? (
+                    <>
+                      <span className="font-medium">{label}</span>
+                      <span className="text-muted-foreground"> · {a.name}</span>
+                    </>
+                  ) : (
+                    a.name
+                  )}
+                </span>
                 <Download className="h-3.5 w-3.5 text-muted-foreground" />
               </a>
             )}
@@ -199,6 +248,74 @@ export function AttachmentList({
                 <X className="h-3 w-3" />
               </button>
             )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * Variante du picker où chaque fichier doit être nommé avant publication.
+ * Réservée au mur (club + staff) : voir `AttachmentPicker.requireLabel`.
+ */
+function NamedAttachmentList({
+  items,
+  onRemove,
+  onLabelChange,
+}: {
+  items: Attachment[];
+  onRemove: (a: Attachment) => void;
+  onLabelChange: (a: Attachment, label: string) => void;
+}) {
+  const { t } = useTranslation();
+  if (!items?.length) return null;
+  return (
+    <ul className="space-y-2">
+      {items.map((a) => {
+        const isImage = a.type?.startsWith("image/");
+        const missing = !a.label?.trim();
+        return (
+          <li
+            key={a.path}
+            className="flex items-center gap-2.5 rounded-lg border border-border bg-background p-2"
+          >
+            {isImage ? (
+              <img
+                src={a.url}
+                alt={a.name}
+                className="h-10 w-10 rounded object-cover border border-border shrink-0"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded bg-primary/8 flex items-center justify-center shrink-0">
+                <FileText className="h-4 w-4 text-primary" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0 space-y-1">
+              <input
+                type="text"
+                value={a.label ?? ""}
+                onChange={(e) => onLabelChange(a, e.target.value)}
+                maxLength={ATTACHMENT_LABEL_MAX}
+                aria-label={t("attachments.documentName", { defaultValue: "Nom du document" })}
+                placeholder={t("attachments.documentNamePlaceholder", {
+                  defaultValue: "Nom du document (ex. Programme de reprise)",
+                })}
+                className={cn(
+                  "w-full rounded-md border bg-background px-2 py-1.5 text-sm",
+                  missing ? "border-destructive/60" : "border-border",
+                )}
+              />
+              <p className="text-[11px] text-muted-foreground truncate">{a.name}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onRemove(a)}
+              className="h-6 w-6 rounded-full bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center shrink-0"
+              aria-label={t("attachments.remove", { defaultValue: "Retirer" })}
+            >
+              <X className="h-3 w-3" />
+            </button>
           </li>
         );
       })}

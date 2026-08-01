@@ -704,7 +704,13 @@
       "failed": "{{failed}} riga(e) con errori"
     },
     "inviteAlreadyActive": "Account già attivo — non serve rinviare.",
-    "parentActivationPending": "In attesa dell'attivazione dell'account genitore"
+    "parentActivationPending": "In attesa dell'attivazione dell'account genitore",
+    "childConsentTitle": "Attivare l'accesso alla piattaforma per {{name}}?",
+    "childConsentBody": "Il giocatore minorenne riceverà un invito per creare il proprio accesso Clubero, sotto la responsabilità del suo tutore legale.",
+    "childConsentParent": "Confermo di essere il tutore legale di questo giocatore e autorizzo la creazione del suo accesso.",
+    "childConsentDoc": "Leggi il documento «Consenso dei genitori»",
+    "childConsentConfirm": "Attiva l'accesso",
+    "childAccessParentOnly": "Solo un genitore o tutore legale può attivare l'accesso."
   },
   "events": {
     "isOfficial": "Ufficiale",
@@ -1283,7 +1289,11 @@
   "attachments": {
     "add": "Aggiungi file",
     "tooLarge": "{{name}} supera i 10 MB.",
-    "invalidType": "Tipo di file non consentito: {{name}}"
+    "invalidType": "Tipo di file non consentito: {{name}}",
+    "documentName": "Nome del documento",
+    "documentNamePlaceholder": "Nome del documento (es. Programma di ripresa)",
+    "remove": "Rimuovi",
+    "labelRequired": "Assegna un nome a ogni documento prima di pubblicare."
   },
   "mutes": {
     "action": "Nascondi questa persona",
@@ -1385,6 +1395,16 @@
       "done": "Segnalazione gestita",
       "hiddenBadge": "Nascosto dalla moderazione — visibile solo ai responsabili",
       "hiddenBadgeShort": "Nascosto"
+    },
+    "tabs": {
+      "wall": "Bacheca",
+      "documents": "Documenti"
+    },
+    "documents": {
+      "empty": "Nessun documento per ora. I file allegati alle pubblicazioni della bacheca appariranno qui.",
+      "loadMore": "Mostra altro",
+      "viewPost": "Vedi la pubblicazione",
+      "loadError": "Non è stato possibile caricare i documenti. Riprova tra poco."
     }
   },
   "chat": {

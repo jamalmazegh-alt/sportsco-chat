@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { WallFeed } from "@/components/wall-feed";
+import { WallDocuments } from "@/components/wall-documents";
+import { scrollToWallPost } from "@/lib/wall/scroll-to-post";
 import { useAuth } from "@/lib/auth-context";
 
 function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
@@ -52,6 +56,17 @@ function TeamStaffWallPage() {
   const { teamId } = Route.useParams();
   const { t } = useTranslation();
   const { memberships, activeClubId } = useAuth();
+  const [tab, setTab] = useState<"wall" | "documents">("wall");
+  const [pendingPostId, setPendingPostId] = useState<string | null>(null);
+
+  // « Voir la publication » depuis la docuthèque : le feed doit d'abord être
+  // remonté, le helper réessaie jusqu'à ce que l'ancre existe.
+  useEffect(() => {
+    if (tab !== "wall" || !pendingPostId) return;
+    const cancel = scrollToWallPost(pendingPostId);
+    setPendingPostId(null);
+    return cancel;
+  }, [tab, pendingPostId]);
 
   const { data: team, isLoading } = useQuery({
     queryKey: ["team-basic", teamId],
@@ -122,7 +137,31 @@ function TeamStaffWallPage() {
         </div>
       </div>
 
-      {team.club_id && <WallFeed clubId={team.club_id} staffTeamId={teamId} />}
+      {team.club_id && (
+        <Tabs value={tab} onValueChange={(next) => setTab(next as "wall" | "documents")}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="wall">{t("wall.tabs.wall", { defaultValue: "Mur" })}</TabsTrigger>
+            <TabsTrigger value="documents">
+              {t("wall.tabs.documents", { defaultValue: "Documents" })}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="wall">
+            <WallFeed clubId={team.club_id} staffTeamId={teamId} />
+          </TabsContent>
+          <TabsContent value="documents">
+            <WallDocuments
+              clubId={team.club_id}
+              staffTeamId={teamId}
+              onOpenPost={(postId) => {
+                // Pas de deep-link ?post= sur cette route : on revient au mur et
+                // on laisse le feed se monter avant de viser l'ancre.
+                setTab("wall");
+                setPendingPostId(postId);
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }

@@ -704,7 +704,13 @@
       "failed": "{{failed}} Zeile(n) mit Fehlern"
     },
     "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig.",
-    "parentActivationPending": "Warten auf Aktivierung des Elternkontos"
+    "parentActivationPending": "Warten auf Aktivierung des Elternkontos",
+    "childConsentTitle": "Plattformzugang für {{name}} aktivieren?",
+    "childConsentBody": "Der minderjährige Spieler erhält eine Einladung, seinen eigenen Clubero-Zugang zu erstellen — unter der Verantwortung seines Erziehungsberechtigten.",
+    "childConsentParent": "Ich bestätige, dass ich der/die Erziehungsberechtigte dieses Spielers bin, und genehmige die Erstellung seines Zugangs.",
+    "childConsentDoc": "Dokument „Elterliche Einwilligung“ lesen",
+    "childConsentConfirm": "Zugang aktivieren",
+    "childAccessParentOnly": "Nur ein Elternteil oder Erziehungsberechtigter kann den Zugang aktivieren."
   },
   "events": {
     "isOfficial": "Pflichtspiel",
@@ -1288,7 +1294,11 @@
   "attachments": {
     "add": "Datei hinzufügen",
     "tooLarge": "{{name}} überschreitet 10 MB.",
-    "invalidType": "Dateityp nicht erlaubt: {{name}}"
+    "invalidType": "Dateityp nicht erlaubt: {{name}}",
+    "documentName": "Name des Dokuments",
+    "documentNamePlaceholder": "Name des Dokuments (z. B. Trainingsplan)",
+    "remove": "Entfernen",
+    "labelRequired": "Benennen Sie jedes Dokument vor der Veröffentlichung."
   },
   "mutes": {
     "action": "Diese Person ausblenden",
@@ -1390,6 +1400,16 @@
       "done": "Meldung bearbeitet",
       "hiddenBadge": "Von der Moderation ausgeblendet — nur für Verantwortliche sichtbar",
       "hiddenBadgeShort": "Ausgeblendet"
+    },
+    "tabs": {
+      "wall": "Pinnwand",
+      "documents": "Dokumente"
+    },
+    "documents": {
+      "empty": "Noch keine Dokumente. Dateien aus Pinnwand-Beiträgen erscheinen hier.",
+      "loadMore": "Mehr anzeigen",
+      "viewPost": "Beitrag ansehen",
+      "loadError": "Die Dokumente konnten nicht geladen werden. Bitte versuchen Sie es gleich erneut."
     }
   },
   "chat": {

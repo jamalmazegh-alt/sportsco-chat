@@ -233,3 +233,70 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+/**
+ * Active / désactive l'accès plateforme d'un joueur mineur, avec trace
+ * versionnée du consentement parental (kind `parental_consent`,
+ * on_behalf_of_player_id) — même pattern que setPlayerMediaConsent.
+ *
+ * L'activation est réservée au représentant légal : seul un parent lié
+ * (player_parents) peut activer, avec attestation explicite — doublement
+ * garanti par le trigger DB players_child_access_parent_guard. Le staff peut
+ * seulement désactiver (action protectrice). La trace enregistre QUI a
+ * consenti (user_id, version du document, horodatage).
+ */
+export const setChildPlatformAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { player_id: string; enabled: boolean; attestation?: boolean }) =>
+    z
+      .object({
+        player_id: z.string().uuid(),
+        enabled: z.boolean(),
+        attestation: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.enabled && data.attestation !== true) {
+      throw new Error("attestation_required");
+    }
+
+    const { data: parentLink } = await supabase
+      .from("player_parents")
+      .select("id")
+      .eq("player_id", data.player_id)
+      .eq("parent_user_id", userId)
+      .maybeSingle();
+
+    // Activation réservée au représentant légal (doublée par le trigger DB).
+    if (data.enabled && !parentLink) {
+      throw new Error("parent_required");
+    }
+
+    const { error } = await supabase
+      .from("players")
+      .update({ child_platform_access: data.enabled })
+      .eq("id", data.player_id);
+    if (error) throw error;
+
+    const { data: version } = await supabase
+      .from("consent_versions")
+      .select("id")
+      .eq("kind", "parental_consent")
+      .order("version", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (version?.id) {
+      await supabase.from("user_consents").insert({
+        user_id: userId,
+        version_id: version.id,
+        kind: "parental_consent",
+        granted: data.enabled,
+        on_behalf_of_player_id: data.player_id,
+      });
+    }
+
+    return { ok: true, viaParentLink: !!parentLink };
+  });
