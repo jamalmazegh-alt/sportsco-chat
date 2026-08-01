@@ -1,1 +1,0 @@
-ALTER TYPE public.consent_kind ADD VALUE IF NOT EXISTS 'child_safety';
