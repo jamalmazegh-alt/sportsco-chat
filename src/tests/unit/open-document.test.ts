@@ -33,11 +33,7 @@ afterEach(() => {
 describe("openDocument", () => {
   it("ouvre un nouvel onglet sur le web, sans toucher au plugin natif", async () => {
     await openDocument("https://cdn/programme.pdf");
-    expect(windowOpen).toHaveBeenCalledWith(
-      "https://cdn/programme.pdf",
-      "_blank",
-      "noopener,noreferrer",
-    );
+    expect(windowOpen).toHaveBeenCalledWith("https://cdn/programme.pdf", "_blank");
     expect(browserOpen).not.toHaveBeenCalled();
   });
 
@@ -58,11 +54,7 @@ describe("openDocument", () => {
     setPlatform("android");
     browserOpen.mockRejectedValueOnce(new Error("bridge down"));
     await openDocument("https://cdn/programme.pdf");
-    expect(windowOpen).toHaveBeenCalledWith(
-      "https://cdn/programme.pdf",
-      "_blank",
-      "noopener,noreferrer",
-    );
+    expect(windowOpen).toHaveBeenCalledWith("https://cdn/programme.pdf", "_blank");
   });
 
   it("ignore une URL vide", async () => {
