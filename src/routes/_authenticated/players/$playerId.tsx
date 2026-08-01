@@ -535,10 +535,19 @@ function PlayerProfile() {
       const { error: upErr } = await supabase.storage
         .from("player-photos")
         .upload(path, photoFile, { upsert: true, contentType: photoFile.type });
-      if (!upErr) {
-        const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
-        photo_url = data.publicUrl;
+      if (upErr) {
+        setBusy(false);
+        toast.error(
+          t("players.photoUploadFailed", {
+            defaultValue: "Échec de l'envoi de la photo : {{message}}",
+            message: upErr.message,
+          }),
+        );
+        return;
       }
+      const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
+      // cache-buster : le fichier est écrasé (upsert) sur la même URL
+      photo_url = `${data.publicUrl}?v=${Date.now()}`;
     }
 
     const prevEmail = (player.email ?? "").toLowerCase().trim();
