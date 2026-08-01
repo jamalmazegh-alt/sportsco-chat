@@ -960,7 +960,8 @@
     "pendingCount_other": "{{count}} players haven't replied yet",
     "remindAllSent_one": "{{count}} reminder sent",
     "remindAllSent_other": "{{count}} reminders sent",
-    "errorPastEventLocked": "This event is in the past — responses can no longer be changed."
+    "errorPastEventLocked": "This event is in the past — responses can no longer be changed.",
+    "responseChanged": "reply updated"
   },
   "stats": {
     "title": "Stats",

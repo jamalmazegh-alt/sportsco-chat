@@ -960,7 +960,8 @@
     "pendingCount_other": "{{count}} Jugadores aún no han respondido",
     "remindAllSent_one": "{{count}} recordatorios enviados",
     "remindAllSent_other": "{{count}} recordatorios enviados",
-    "errorPastEventLocked": "El evento ya pasó — las respuestas ya no pueden modificarse."
+    "errorPastEventLocked": "El evento ya pasó — las respuestas ya no pueden modificarse.",
+    "responseChanged": "respuesta modificada"
   },
   "stats": {
     "title": "Estadísticas",

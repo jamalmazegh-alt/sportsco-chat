@@ -429,6 +429,7 @@ export const trackWallPostPushOpened = createServerFn({ method: "POST" })
 /* ------------------------------------------------------------------ */
 const ResponseInput = z.object({
   convocationId: z.string().uuid(),
+  isChange: z.boolean().optional(),
 });
 
 export const dispatchConvocationResponsePush = createServerFn({ method: "POST" })
@@ -442,6 +443,7 @@ export const dispatchConvocationResponsePush = createServerFn({ method: "POST" }
     // — no need to push them back their own action.
     const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId, {
       excludeUserId: context.userId,
+      isChange: data.isChange === true,
     });
     let complete = 0;
     if (eventId) {

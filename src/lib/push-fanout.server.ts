@@ -43,7 +43,7 @@ function fmtDate(iso: string): string {
 /* ------------------------------------------------------------------ */
 export async function fanoutConvocationResponse(
   convocationId: string,
-  opts: { excludeUserId?: string | null } = {},
+  opts: { excludeUserId?: string | null; isChange?: boolean } = {},
 ): Promise<{ dispatched: number; eventId: string | null }> {
   const { data: conv } = await supabaseAdmin
     .from("convocations")
@@ -77,7 +77,9 @@ export async function fanoutConvocationResponse(
   const statusLabel =
     status === "present" ? "Présent" : status === "absent" ? "Absent" : "Incertain";
 
-  const title = `${emoji} ${firstName} a répondu`;
+  const title = opts.isChange
+    ? `${emoji} ${firstName} a modifié sa réponse`
+    : `${emoji} ${firstName} a répondu`;
   const body = `${statusLabel} · ${typeLabel} ${dateStr}`.trim();
 
   const { data: coaches } = await supabaseAdmin
