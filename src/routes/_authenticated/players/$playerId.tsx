@@ -586,9 +586,24 @@ function PlayerProfile() {
     if (!player) return;
     setChildAccessBusy(true);
     try {
-      await setChildAccessFn({
+      const res = await setChildAccessFn({
         data: { player_id: player.id, enabled: value, attestation: value ? true : undefined },
       });
+      if (!res.ok) {
+        toast.error(
+          res.error === "parent_required"
+            ? t("players.childAccessParentOnly", {
+                defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
+              })
+            : res.error === "attestation_required"
+              ? t("players.childConsentParent", {
+                  defaultValue:
+                    "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
+                })
+              : res.error,
+        );
+        return;
+      }
       refetchPlayer();
       toast.success(t("common.saved"));
       setChildAccessDialog(false);
