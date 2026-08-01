@@ -13,7 +13,9 @@ import {
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
 import { createLogger } from "@/lib/logger.server";
 import { hasPaidAccessFromSubscription } from "@/lib/has-paid-access";
+import type { Database } from "@/integrations/supabase/types";
 
+type SubStatus = Database["public"]["Enums"]["subscription_status"];
 const log = createLogger("billing");
 
 function getOrigin(): string {
@@ -194,7 +196,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           stripe_subscription_id: existingManageableSub.id,
           stripe_price_id: priceId,
           plan: planFromStripePriceId(priceId),
-          status: existingManageableSub.status,
+          status: existingManageableSub.status as SubStatus,
           current_period_start: stripeTsToIso(item?.current_period_start),
           current_period_end: stripeTsToIso(item?.current_period_end),
           trial_end: stripeTsToIso(existingManageableSub.trial_end),
@@ -333,7 +335,7 @@ export const syncClubSubscriptionFromStripe = createServerFn({ method: "POST" })
       stripe_subscription_id: fresh.id,
       stripe_price_id: priceId,
       plan: planFromStripePriceId(priceId),
-      status: fresh.status,
+      status: fresh.status as SubStatus,
       current_period_start: stripeTsToIso(item?.current_period_start),
       current_period_end: stripeTsToIso(item?.current_period_end),
       trial_end: stripeTsToIso(fresh.trial_end),
