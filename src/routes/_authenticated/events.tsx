@@ -40,7 +40,7 @@ import {
   type ConvocationResponse,
 } from "@/components/convocation-response-badge";
 import {
-  ConvocationSummaryPill,
+  ConvocationSummaryGrid,
   buildConvocationCounts,
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
