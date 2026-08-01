@@ -1409,7 +1409,20 @@
       "empty": "Noch keine Dokumente. Dateien aus Pinnwand-Beiträgen erscheinen hier.",
       "loadMore": "Mehr anzeigen",
       "viewPost": "Beitrag ansehen",
-      "loadError": "Die Dokumente konnten nicht geladen werden. Bitte versuchen Sie es gleich erneut."
+      "loadError": "Die Dokumente konnten nicht geladen werden. Bitte versuchen Sie es gleich erneut.",
+      "rename": "Umbenennen",
+      "renameError": "Umbenennen fehlgeschlagen. Bitte erneut versuchen.",
+      "preview": "Vorschau",
+      "noPreview": "Für diesen Dateityp ist keine Vorschau verfügbar.",
+      "openExternal": "Öffnen",
+      "download": "Herunterladen",
+      "exclude": "Aus der Dokumentenablage entfernen",
+      "restore": "Zurück in die Dokumentenablage",
+      "excluded": "Aus der Dokumentenablage entfernt",
+      "restored": "Zurück in der Dokumentenablage",
+      "excludeError": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen.",
+      "excludedBadge": "Entfernt",
+      "showExcluded": "Entfernte Dokumente anzeigen"
     }
   },
   "chat": {

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { documentKind, formatFileSize, type WallDocument } from "@/lib/wall/documents";
+import { documentDownloadUrl } from "@/lib/wall/download-url";
 import { openDocument } from "@/lib/open-document";
 import { isNativePlatform } from "@/lib/native-platform";
 
@@ -80,11 +81,18 @@ export function WallDocumentPreview({
             <ExternalLink className="h-4 w-4" />
             {t("wall.documents.openExternal", { defaultValue: "Ouvrir" })}
           </Button>
-          <Button asChild size="sm">
-            <a href={doc?.url} download={doc?.name} target="_blank" rel="noreferrer">
-              <Download className="h-4 w-4" />
-              {t("wall.documents.download", { defaultValue: "Télécharger" })}
-            </a>
+          {/* `download` est ignoré en cross-origin (le fichier vient du bucket
+              Supabase) : le navigateur ouvrait l'onglet au lieu de télécharger.
+              C'est `?download=` qui fait renvoyer un Content-Disposition par
+              Supabase. Et l'ouverture passe par `openDocument`, sinon le clic
+              est mort dans la WebView Android. */}
+          <Button
+            size="sm"
+            disabled={!doc}
+            onClick={() => doc && void openDocument(documentDownloadUrl(doc))}
+          >
+            <Download className="h-4 w-4" />
+            {t("wall.documents.download", { defaultValue: "Télécharger" })}
           </Button>
         </div>
       </DialogContent>

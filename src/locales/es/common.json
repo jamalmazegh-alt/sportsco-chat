@@ -1404,7 +1404,20 @@
       "empty": "Todavía no hay documentos. Los archivos adjuntos a las publicaciones del muro aparecerán aquí.",
       "loadMore": "Ver más",
       "viewPost": "Ver la publicación",
-      "loadError": "No se pudieron cargar los documentos. Inténtalo de nuevo en un momento."
+      "loadError": "No se pudieron cargar los documentos. Inténtalo de nuevo en un momento.",
+      "rename": "Renombrar",
+      "renameError": "No se pudo renombrar. Inténtalo de nuevo.",
+      "preview": "Vista previa",
+      "noPreview": "Vista previa no disponible para este tipo de archivo.",
+      "openExternal": "Abrir",
+      "download": "Descargar",
+      "exclude": "Quitar de la documentoteca",
+      "restore": "Devolver a la documentoteca",
+      "excluded": "Quitado de la documentoteca",
+      "restored": "Devuelto a la documentoteca",
+      "excludeError": "La operación ha fallado. Inténtalo de nuevo.",
+      "excludedBadge": "Quitado",
+      "showExcluded": "Ver los documentos quitados"
     }
   },
   "chat": {

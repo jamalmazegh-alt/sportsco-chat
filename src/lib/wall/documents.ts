@@ -25,6 +25,7 @@ type ParsedAttachment = {
   type: string;
   size: number;
   label?: string;
+  excludedFromLibrary?: boolean;
 };
 
 export type DocumentPost = {
@@ -51,6 +52,12 @@ export type WallDocument = {
   label: string | null;
   type: string;
   size: number;
+  /**
+   * Retiré de la docuthèque par l'encadrement. Le document reste **entièrement
+   * visible dans sa publication** : c'est du rangement, pas de la
+   * confidentialité. Ne jamais s'en servir comme d'un contrôle d'accès.
+   */
+  excludedFromLibrary: boolean;
 };
 
 export type DocumentKind = "image" | "pdf" | "doc" | "sheet" | "other";
@@ -73,6 +80,7 @@ function parseAttachment(raw: unknown): ParsedAttachment | null {
     type: typeof a.type === "string" ? a.type : "",
     size: typeof a.size === "number" && Number.isFinite(a.size) ? a.size : 0,
     label: typeof a.label === "string" && a.label.trim() ? a.label.trim() : undefined,
+    excludedFromLibrary: a.excludedFromLibrary === true,
   };
 }
 
@@ -87,8 +95,15 @@ export function isExternalPost(post: Pick<DocumentPost, "source">): boolean {
 /**
  * Aplatit les posts en une liste de documents, du plus récent au plus ancien.
  * Les posts externes et ceux sans pièce jointe exploitable disparaissent.
+ *
+ * `includeExcluded` fait remonter les documents retirés de la docuthèque, pour
+ * que l'encadrement puisse les remettre — sans cette porte de sortie, retirer
+ * un document serait irréversible depuis l'interface.
  */
-export function flattenDocuments(posts: DocumentPost[]): WallDocument[] {
+export function flattenDocuments(
+  posts: DocumentPost[],
+  opts: { includeExcluded?: boolean } = {},
+): WallDocument[] {
   const out: WallDocument[] = [];
   for (const post of posts) {
     if (isExternalPost(post)) continue;
@@ -96,6 +111,7 @@ export function flattenDocuments(posts: DocumentPost[]): WallDocument[] {
     for (const raw of post.attachments) {
       const a = parseAttachment(raw);
       if (!a) continue;
+      if (a.excludedFromLibrary && !opts.includeExcluded) continue;
       out.push({
         key: `${post.id}:${a.path}`,
         postId: post.id,
@@ -108,6 +124,7 @@ export function flattenDocuments(posts: DocumentPost[]): WallDocument[] {
         label: a.label ?? null,
         type: a.type,
         size: a.size,
+        excludedFromLibrary: !!a.excludedFromLibrary,
       });
     }
   }

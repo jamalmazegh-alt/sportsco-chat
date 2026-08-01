@@ -340,6 +340,34 @@ vérifiant que le chat d'événement **n'exige aucun nom**.
 
 **Total V1 : ~1 à 1,5 jour.**
 
+## 7 bis. Curation : renommer et retirer (livré après la V1)
+
+Deux actions sont disponibles pour l'auteur d'une publication et pour l'encadrement du club
+(admin / dirigeant), via deux RPC `SECURITY DEFINER` qui portent elles-mêmes le contrôle
+d'accès — l'interface ne fait que refléter ces droits.
+
+**Renommer** (`rename_wall_document`) écrit `label` dans le jsonb. Fonctionne sur les pièces
+jointes historiques, qui n'avaient pas de nom.
+
+**Retirer de la docuthèque** (`set_wall_document_excluded`) pose un drapeau
+`excludedFromLibrary` sur la pièce jointe. Trois propriétés voulues :
+
+- **La publication n'est jamais modifiée.** Le document reste dans son post, avec son nom et
+  son URL. On range la docuthèque, on ne réécrit pas l'historique du mur.
+- **C'est réversible**, et la réversibilité est atteignable : annulation immédiate dans le
+  toast, plus une case « Voir les documents retirés » pour l'encadrement. Sans cette porte de
+  sortie, un retrait serait définitif faute de pouvoir le défaire.
+- **Ce n'est PAS de la confidentialité.** Un document retiré reste ouvrable depuis sa
+  publication. Pour retirer réellement un contenu, c'est la **publication** qu'il faut
+  supprimer (`soft_delete_entity`).
+
+> **Pourquoi pas une suppression au niveau du document ?** Une première version supprimait la
+> pièce jointe du post tout en laissant le fichier dans le bucket public. C'était l'inverse du
+> besoin : destructif sur la publication, sans effet là où ça compte. Le cas « ce document
+> n'aurait jamais dû être publié » est déjà couvert par la suppression de la publication.
+> `delete_wall_document` a donc été supprimée par la migration
+> `20260801200000_wall_documents_library_visibility.sql`.
+
 ## 8. Suites possibles (hors V1)
 
 Par ordre de valeur attendue :
@@ -347,8 +375,7 @@ Par ordre de valeur attendue :
 1. **Recherche** sur le nom saisi + le nom de fichier — première chose à ajouter dès que les
    clubs auront accumulé du volume.
 2. **Filtres** par équipe/groupe et par type de fichier.
-3. **Renommage a posteriori** par le staff (implique d'écrire dans le jsonb du post).
-4. **Documents de `club_publications`** — ce système a déjà les tables
+3. **Documents de `club_publications`** — ce système a déjà les tables
    `club_publication_documents` / `club_publication_media`, mais l'upload n'est pas branché
    (`publications.new.tsx:236-237` envoie toujours des tableaux vides). Chantier distinct.
 
@@ -361,6 +388,13 @@ Par ordre de valeur attendue :
 - **Rétention** : rien ne purge aujourd'hui les fichiers d'un post supprimé — ils restent
   dans le bucket. La docuthèque les masque correctement (§5.3), mais la purge reste ouverte
   (cf. `docs/privacy/retention.md`).
+
+  **La purge ne peut PAS se brancher sur la suppression de publication.** Celle-ci est un
+  soft delete assorti d'une annulation dans le toast (`wall-feed.tsx`, `soft_delete_entity` /
+  `restore_entity`) : effacer le fichier au moment du clic rendrait l'annulation trompeuse —
+  le post reviendrait avec des liens morts. Il faut un job de rétention qui purge les
+  fichiers des posts supprimés depuis plus de N jours, sur le modèle du hook existant
+  `camp-documents-purge`. Chantier à part entière.
 
 ## 9. Critères d'acceptation
 

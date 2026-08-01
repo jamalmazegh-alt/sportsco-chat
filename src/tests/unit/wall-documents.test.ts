@@ -116,6 +116,44 @@ describe("flattenDocuments", () => {
   });
 });
 
+describe("retrait de la docuthèque", () => {
+  const excluded = {
+    ...PDF,
+    path: "u1/wall/2-old.pdf",
+    name: "old.pdf",
+    excludedFromLibrary: true,
+  };
+
+  it("masque par défaut les documents retirés", () => {
+    const docs = flattenDocuments([post({ id: "p1", attachments: [PDF, excluded] })]);
+    expect(docs.map((d) => d.name)).toEqual(["programme_reprise.pdf"]);
+  });
+
+  it("les fait remonter avec includeExcluded, pour pouvoir les remettre", () => {
+    const docs = flattenDocuments([post({ id: "p1", attachments: [PDF, excluded] })], {
+      includeExcluded: true,
+    });
+    expect(docs.map((d) => d.name)).toEqual(["programme_reprise.pdf", "old.pdf"]);
+    expect(docs[1].excludedFromLibrary).toBe(true);
+  });
+
+  it("ne considère retiré que la valeur booléenne true", () => {
+    // Un jsonb bricolé à la main ne doit pas faire disparaître un document.
+    for (const value of ["true", 1, {}, null]) {
+      const docs = flattenDocuments([
+        post({ id: "p1", attachments: [{ ...PDF, excludedFromLibrary: value }] }),
+      ]);
+      expect(docs, `valeur ${JSON.stringify(value)}`).toHaveLength(1);
+      expect(docs[0].excludedFromLibrary).toBe(false);
+    }
+  });
+
+  it("expose excludedFromLibrary=false sur les pièces jointes historiques", () => {
+    const docs = flattenDocuments([post({ id: "p1", attachments: [PDF] })]);
+    expect(docs[0].excludedFromLibrary).toBe(false);
+  });
+});
+
 describe("groupDocumentsByMonth", () => {
   it("groupe par mois, du plus récent au plus ancien, à travers les années", () => {
     const docs = flattenDocuments([

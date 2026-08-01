@@ -1404,7 +1404,20 @@
       "empty": "Ainda não há documentos. Os ficheiros anexados às publicações do mural aparecerão aqui.",
       "loadMore": "Ver mais",
       "viewPost": "Ver a publicação",
-      "loadError": "Não foi possível carregar os documentos. Tente novamente daqui a pouco."
+      "loadError": "Não foi possível carregar os documentos. Tente novamente daqui a pouco.",
+      "rename": "Renomear",
+      "renameError": "Não foi possível renomear. Tente novamente.",
+      "preview": "Pré-visualização",
+      "noPreview": "Pré-visualização indisponível para este tipo de ficheiro.",
+      "openExternal": "Abrir",
+      "download": "Transferir",
+      "exclude": "Retirar da documentoteca",
+      "restore": "Repor na documentoteca",
+      "excluded": "Retirado da documentoteca",
+      "restored": "Reposto na documentoteca",
+      "excludeError": "A operação falhou. Tente novamente.",
+      "excludedBadge": "Retirado",
+      "showExcluded": "Ver os documentos retirados"
     }
   },
   "chat": {

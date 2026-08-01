@@ -1404,7 +1404,20 @@
       "empty": "Nessun documento per ora. I file allegati alle pubblicazioni della bacheca appariranno qui.",
       "loadMore": "Mostra altro",
       "viewPost": "Vedi la pubblicazione",
-      "loadError": "Non è stato possibile caricare i documenti. Riprova tra poco."
+      "loadError": "Non è stato possibile caricare i documenti. Riprova tra poco.",
+      "rename": "Rinomina",
+      "renameError": "Rinomina non riuscita. Riprova.",
+      "preview": "Anteprima",
+      "noPreview": "Anteprima non disponibile per questo tipo di file.",
+      "openExternal": "Apri",
+      "download": "Scarica",
+      "exclude": "Rimuovi dall'archivio documenti",
+      "restore": "Rimetti nell'archivio documenti",
+      "excluded": "Rimosso dall'archivio documenti",
+      "restored": "Rimesso nell'archivio documenti",
+      "excludeError": "Operazione non riuscita. Riprova.",
+      "excludedBadge": "Rimosso",
+      "showExcluded": "Mostra i documenti rimossi"
     }
   },
   "chat": {

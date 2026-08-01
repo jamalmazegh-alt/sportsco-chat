@@ -1404,7 +1404,20 @@
       "empty": "Nog geen documenten. Bestanden bij muurberichten verschijnen hier.",
       "loadMore": "Meer tonen",
       "viewPost": "Bericht bekijken",
-      "loadError": "De documenten konden niet worden geladen. Probeer het zo opnieuw."
+      "loadError": "De documenten konden niet worden geladen. Probeer het zo opnieuw.",
+      "rename": "Hernoemen",
+      "renameError": "Hernoemen mislukt. Probeer het opnieuw.",
+      "preview": "Voorbeeld",
+      "noPreview": "Geen voorbeeld beschikbaar voor dit bestandstype.",
+      "openExternal": "Openen",
+      "download": "Downloaden",
+      "exclude": "Uit de documentenbibliotheek halen",
+      "restore": "Terugzetten in de documentenbibliotheek",
+      "excluded": "Uit de documentenbibliotheek gehaald",
+      "restored": "Teruggezet in de documentenbibliotheek",
+      "excludeError": "De bewerking is mislukt. Probeer het opnieuw.",
+      "excludedBadge": "Verwijderd",
+      "showExcluded": "Verwijderde documenten tonen"
     }
   },
   "chat": {

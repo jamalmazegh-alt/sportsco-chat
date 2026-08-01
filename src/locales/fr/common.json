@@ -1404,7 +1404,20 @@
       "empty": "Aucun document pour l'instant. Les fichiers joints aux publications du mur apparaîtront ici.",
       "loadMore": "Voir plus",
       "viewPost": "Voir la publication",
-      "loadError": "Les documents n'ont pas pu être chargés. Réessayez dans un instant."
+      "loadError": "Les documents n'ont pas pu être chargés. Réessayez dans un instant.",
+      "rename": "Renommer",
+      "renameError": "Le renommage a échoué. Réessayez.",
+      "preview": "Aperçu",
+      "noPreview": "Aperçu indisponible pour ce type de fichier.",
+      "openExternal": "Ouvrir",
+      "download": "Télécharger",
+      "exclude": "Retirer de la docuthèque",
+      "restore": "Remettre dans la docuthèque",
+      "excluded": "Retiré de la docuthèque",
+      "restored": "Remis dans la docuthèque",
+      "excludeError": "L'opération a échoué. Réessayez.",
+      "excludedBadge": "Retiré",
+      "showExcluded": "Voir les documents retirés"
     }
   },
   "chat": {

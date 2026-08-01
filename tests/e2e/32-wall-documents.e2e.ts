@@ -106,6 +106,54 @@ test.describe("docuthèque du mur", () => {
     await expect(page.locator(`#wall-post-${postId}`)).toBeVisible();
   });
 
+  test("retirer un document le sort de la docuthèque mais le laisse dans la publication", async ({
+    page,
+  }) => {
+    const label = uniqueName("Doublon");
+    const postId = await seedPost("doc E2E retrait", attachment("doublon.pdf", label));
+
+    await loginViaUI(page, "admin");
+    await page.goto("/inbox?tab=documents");
+
+    const row = page.locator("li").filter({ hasText: label }).first();
+    await expect(row).toBeVisible();
+    await row.getByRole("button", { name: tx("wall.documents.exclude") }).click();
+
+    // Il disparaît de la liste…
+    await expect(page.getByText(label, { exact: false })).toHaveCount(0);
+
+    // …mais la publication le conserve : c'est tout l'intérêt du choix.
+    const { data } = await admin.from("wall_posts").select("attachments").eq("id", postId).single();
+    const atts = (data?.attachments ?? []) as Record<string, unknown>[];
+    expect(atts).toHaveLength(1);
+    expect(atts[0].excludedFromLibrary).toBe(true);
+    expect(atts[0].label).toBe(label);
+
+    // Et il reste rattrapable par l'encadrement, sinon le retrait serait
+    // irréversible depuis l'interface.
+    await page.getByText(tx("wall.documents.showExcluded")).click();
+    const back = page.locator("li").filter({ hasText: label }).first();
+    await expect(back).toBeVisible();
+    await back.getByRole("button", { name: tx("wall.documents.restore") }).click();
+
+    await page.reload();
+    await expect(page.getByText(label, { exact: false }).first()).toBeVisible();
+  });
+
+  test("un joueur ne peut ni renommer ni retirer un document", async ({ page }) => {
+    const label = uniqueName("Note");
+    await seedPost("doc E2E droits", attachment("note.pdf", label));
+
+    await loginViaUI(page, "player");
+    await page.goto("/inbox?tab=documents");
+
+    const row = page.locator("li").filter({ hasText: label }).first();
+    await expect(row).toBeVisible();
+    await expect(row.getByRole("button", { name: tx("wall.documents.rename") })).toHaveCount(0);
+    await expect(row.getByRole("button", { name: tx("wall.documents.exclude") })).toHaveCount(0);
+    await expect(page.getByText(tx("wall.documents.showExcluded"))).toHaveCount(0);
+  });
+
   test("publier une pièce jointe sans nom est impossible", async ({ page }) => {
     await loginViaUI(page, "admin");
     await page.goto("/inbox");
