@@ -151,8 +151,6 @@ export function applyClubTheme(key: ClubThemeKey | null | undefined) {
   root.style.setProperty("--sidebar-ring", theme.ring);
   root.style.setProperty("--energy", primary);
   root.style.setProperty("--energy-foreground", theme.primaryForeground);
-  root.style.setProperty("--present", primary);
-  root.style.setProperty("--present-foreground", theme.primaryForeground);
   // chart-1 follows primary for consistency
   root.style.setProperty("--chart-1", primary);
 }
