@@ -9240,6 +9240,7 @@ export type Database = {
         | "notifications"
         | "legal_notice"
         | "parental_consent"
+        | "child_safety"
       event_status: "draft" | "published" | "cancelled"
       event_type: "training" | "match" | "tournament" | "meeting" | "other"
       feedback_visibility:
@@ -9547,6 +9548,7 @@ export const Constants = {
         "notifications",
         "legal_notice",
         "parental_consent",
+        "child_safety",
       ],
       event_status: ["draft", "published", "cancelled"],
       event_type: ["training", "match", "tournament", "meeting", "other"],
