@@ -109,6 +109,17 @@ const NATIVE_ORIGINS = new Set(["capacitor://localhost", "https://localhost"]);
 // En-têtes toujours autorisés, même si le preflight n'en demande aucun.
 const DEFAULT_ALLOWED_HEADERS = "authorization, content-type, accept, x-tsr-serverfn";
 
+// En-têtes de RÉPONSE que le client doit pouvoir lire.
+//
+// En cross-origin, un navigateur n'expose au JavaScript que six en-têtes
+// standards ; tous les autres sont masqués sauf déclaration ici. Le client
+// TanStack lit `x-tss-raw` et `x-tss-serialized` pour savoir comment décoder
+// la charge utile d'une server function — sans eux, il ne décode pas et rend
+// `undefined`. Symptôme observé en natif : « Cannot read properties of
+// undefined » à la création d'un tournoi ou d'un événement, alors que le web
+// (même origine, donc aucun masquage) fonctionnait.
+const EXPOSED_HEADERS = "x-tss-raw, x-tss-serialized";
+
 function nativeCorsHeaders(
   origin: string,
   requestedHeaders?: string | null,
@@ -126,6 +137,7 @@ function nativeCorsHeaders(
     // Sans risque : l'origine est déjà validée par une allowlist fermée, donc
     // seul un client natif légitime atteint cette ligne.
     "Access-Control-Allow-Headers": requestedHeaders || DEFAULT_ALLOWED_HEADERS,
+    "Access-Control-Expose-Headers": EXPOSED_HEADERS,
     "Access-Control-Max-Age": "86400",
   };
 }
