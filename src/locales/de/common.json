@@ -708,9 +708,9 @@
     "childConsentTitle": "Plattformzugang für {{name}} aktivieren?",
     "childConsentBody": "Der minderjährige Spieler erhält eine Einladung, seinen eigenen Clubero-Zugang zu erstellen — unter der Verantwortung seines Erziehungsberechtigten.",
     "childConsentParent": "Ich bestätige, dass ich der/die Erziehungsberechtigte dieses Spielers bin, und genehmige die Erstellung seines Zugangs.",
-    "childConsentStaff": "Ich bestätige, dass ein Erziehungsberechtigter dieses Spielers der Erstellung seines Zugangs zugestimmt hat.",
     "childConsentDoc": "Dokument „Elterliche Einwilligung“ lesen",
-    "childConsentConfirm": "Zugang aktivieren"
+    "childConsentConfirm": "Zugang aktivieren",
+    "childAccessParentOnly": "Nur ein Elternteil oder Erziehungsberechtigter kann den Zugang aktivieren."
   },
   "events": {
     "isOfficial": "Pflichtspiel",

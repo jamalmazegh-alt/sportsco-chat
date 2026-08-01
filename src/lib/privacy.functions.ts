@@ -239,11 +239,11 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
  * versionnée du consentement parental (kind `parental_consent`,
  * on_behalf_of_player_id) — même pattern que setPlayerMediaConsent.
  *
- * L'activation exige une attestation explicite : le parent confirme être le
- * représentant légal, ou un responsable du club atteste qu'un représentant
- * légal a donné son accord. La trace enregistre QUI a attesté (user_id) et
- * si un lien parent existait (retour viaParentLink, pour l'UI).
- * Les droits d'écriture sur players restent gouvernés par la RLS existante.
+ * L'activation est réservée au représentant légal : seul un parent lié
+ * (player_parents) peut activer, avec attestation explicite — doublement
+ * garanti par le trigger DB players_child_access_parent_guard. Le staff peut
+ * seulement désactiver (action protectrice). La trace enregistre QUI a
+ * consenti (user_id, version du document, horodatage).
  */
 export const setChildPlatformAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -268,6 +268,11 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
       .eq("player_id", data.player_id)
       .eq("parent_user_id", userId)
       .maybeSingle();
+
+    // Activation réservée au représentant légal (doublée par le trigger DB).
+    if (data.enabled && !parentLink) {
+      throw new Error("parent_required");
+    }
 
     const { error } = await supabase
       .from("players")

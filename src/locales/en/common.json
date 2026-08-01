@@ -708,9 +708,9 @@
     "childConsentTitle": "Enable platform access for {{name}}?",
     "childConsentBody": "The minor player will receive an invitation to create their own Clubero access, under the responsibility of their legal guardian.",
     "childConsentParent": "I confirm that I am this player's legal guardian and I authorise the creation of their access.",
-    "childConsentStaff": "I confirm that a legal guardian of this player has agreed to the creation of their access.",
     "childConsentDoc": "Read the “Parental Consent” document",
-    "childConsentConfirm": "Enable access"
+    "childConsentConfirm": "Enable access",
+    "childAccessParentOnly": "Only a parent or legal guardian can enable access."
   },
   "events": {
     "isOfficial": "Official match",

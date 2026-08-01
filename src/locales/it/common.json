@@ -708,9 +708,9 @@
     "childConsentTitle": "Attivare l'accesso alla piattaforma per {{name}}?",
     "childConsentBody": "Il giocatore minorenne riceverà un invito per creare il proprio accesso Clubero, sotto la responsabilità del suo tutore legale.",
     "childConsentParent": "Confermo di essere il tutore legale di questo giocatore e autorizzo la creazione del suo accesso.",
-    "childConsentStaff": "Confermo che un tutore legale di questo giocatore ha dato il proprio consenso alla creazione del suo accesso.",
     "childConsentDoc": "Leggi il documento «Consenso dei genitori»",
-    "childConsentConfirm": "Attiva l'accesso"
+    "childConsentConfirm": "Attiva l'accesso",
+    "childAccessParentOnly": "Solo un genitore o tutore legale può attivare l'accesso."
   },
   "events": {
     "isOfficial": "Ufficiale",

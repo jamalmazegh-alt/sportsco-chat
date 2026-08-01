@@ -708,9 +708,9 @@
     "childConsentTitle": "Platformtoegang voor {{name}} activeren?",
     "childConsentBody": "De minderjarige speler ontvangt een uitnodiging om een eigen Clubero-toegang aan te maken, onder verantwoordelijkheid van zijn/haar wettelijke voogd.",
     "childConsentParent": "Ik bevestig dat ik de wettelijke voogd van deze speler ben en geef toestemming voor het aanmaken van zijn/haar toegang.",
-    "childConsentStaff": "Ik bevestig dat een wettelijke voogd van deze speler toestemming heeft gegeven voor het aanmaken van zijn/haar toegang.",
     "childConsentDoc": "Lees het document 'Ouderlijke toestemming'",
-    "childConsentConfirm": "Toegang activeren"
+    "childConsentConfirm": "Toegang activeren",
+    "childAccessParentOnly": "Alleen een ouder of wettelijke voogd kan de toegang activeren."
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",

@@ -603,6 +603,16 @@ function PlayerProfile() {
   function toggleChildAccess(value: boolean) {
     if (!player) return;
     if (value) {
+      // Activation réservée au représentant légal (garde-fou aussi côté
+      // serveur et par trigger DB) ; le staff peut seulement désactiver.
+      if (!isParentOfThisPlayer) {
+        toast.error(
+          t("players.childAccessParentOnly", {
+            defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
+          }),
+        );
+        return;
+      }
       const target = (email || player.email || "").trim();
       if (!target) {
         toast.error(t("players.childAccessNeedsEmail"));
@@ -885,15 +895,10 @@ function PlayerProfile() {
               className="mt-0.5"
             />
             <span>
-              {isParentOfThisPlayer
-                ? t("players.childConsentParent", {
-                    defaultValue:
-                      "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
-                  })
-                : t("players.childConsentStaff", {
-                    defaultValue:
-                      "Je confirme qu'un représentant légal de ce joueur a donné son accord pour la création de son accès.",
-                  })}
+              {t("players.childConsentParent", {
+                defaultValue:
+                  "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
+              })}
             </span>
           </label>
           <Link
@@ -1301,9 +1306,21 @@ function PlayerProfile() {
                 <Switch
                   checked={!!player.child_platform_access}
                   onCheckedChange={toggleChildAccess}
-                  disabled={!isParentOfThisPlayer && !isCoach}
+                  disabled={
+                    player.child_platform_access
+                      ? !isParentOfThisPlayer && !isCoach
+                      : !isParentOfThisPlayer
+                  }
                 />
               </div>
+
+              {!player.child_platform_access && !isParentOfThisPlayer && (
+                <p className="text-xs text-muted-foreground">
+                  {t("players.childAccessParentOnly", {
+                    defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
+                  })}
+                </p>
+              )}
 
               {player.child_platform_access && !player.user_id && (
                 <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
