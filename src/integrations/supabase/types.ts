@@ -8774,6 +8774,10 @@ export type Database = {
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
+      rename_wall_document: {
+        Args: { _label: string; _path: string; _post_id: string }
+        Returns: undefined
+      }
       resolve_audience_members: {
         Args: { _club_id: string; _spec: Json }
         Returns: {
