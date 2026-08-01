@@ -2,13 +2,24 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format, type Locale } from "date-fns";
 import { fr, enUS, es, de, it, nl, pt } from "date-fns/locale";
-import { FileText, FileSpreadsheet, FileType, ImageIcon, File, Loader2 } from "lucide-react";
+import {
+  FileText,
+  FileSpreadsheet,
+  FileType,
+  ImageIcon,
+  File,
+  Loader2,
+  Pencil,
+} from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useMyRoles } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { handleDocumentClick } from "@/lib/open-document";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
+
 import {
   flattenDocuments,
   groupDocumentsByMonth,
