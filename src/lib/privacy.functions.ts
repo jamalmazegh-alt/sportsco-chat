@@ -258,8 +258,11 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // Erreurs métier renvoyées en résultat structuré, jamais en throw : un
+    // throw non-Response dans un handler devient un 500 « h3 swallowed » que
+    // src/server.ts remplace par la page d'erreur HTML pleine page.
     if (data.enabled && data.attestation !== true) {
-      throw new Error("attestation_required");
+      return { ok: false as const, error: "attestation_required" as const };
     }
 
     const { data: parentLink } = await supabase
@@ -271,14 +274,20 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
 
     // Activation réservée au représentant légal (doublée par le trigger DB).
     if (data.enabled && !parentLink) {
-      throw new Error("parent_required");
+      return { ok: false as const, error: "parent_required" as const };
     }
 
     const { error } = await supabase
       .from("players")
       .update({ child_platform_access: data.enabled })
       .eq("id", data.player_id);
-    if (error) throw error;
+    if (error) {
+      // Le trigger DB renvoie « parent_required » — même code pour l'UI.
+      if (error.message.includes("parent_required")) {
+        return { ok: false as const, error: "parent_required" as const };
+      }
+      return { ok: false as const, error: error.message };
+    }
 
     const { data: version } = await supabase
       .from("consent_versions")
@@ -298,5 +307,5 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
       });
     }
 
-    return { ok: true, viaParentLink: !!parentLink };
+    return { ok: true as const, viaParentLink: !!parentLink };
   });
