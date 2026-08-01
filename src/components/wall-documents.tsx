@@ -489,7 +489,7 @@ function DocumentRow({
               bloquée / le clic mort en WebView. */}
           <button
             type="button"
-            onClick={() => void downloadDocument(documentDownloadUrl(doc))}
+            onClick={() => void downloadDocument(documentDownloadUrl(doc), doc.name)}
             className="text-[11px] text-primary hover:underline"
           >
             {t("wall.documents.download", { defaultValue: "Télécharger" })}
