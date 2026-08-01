@@ -10,12 +10,23 @@ import {
   File,
   Loader2,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { handleDocumentClick } from "@/lib/open-document";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
@@ -87,6 +98,15 @@ export function WallDocuments({
     });
     if (error) throw error;
     setDocs((prev) => prev.map((d) => (d.key === doc.key ? { ...d, label } : d)));
+  }, []);
+
+  const deleteDoc = useCallback(async (doc: WallDocument) => {
+    const { error } = await supabase.rpc("delete_wall_document", {
+      _post_id: doc.postId,
+      _path: doc.path,
+    });
+    if (error) throw error;
+    setDocs((prev) => prev.filter((d) => d.key !== doc.key));
   }, []);
 
   const load = useCallback(
@@ -205,6 +225,7 @@ export function WallDocuments({
                 onOpenPost={onOpenPost}
                 canRename={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
                 onRename={renameDoc}
+                onDelete={deleteDoc}
               />
             ))}
           </ul>
@@ -233,6 +254,7 @@ function DocumentRow({
   onOpenPost,
   canRename,
   onRename,
+  onDelete,
 }: {
   doc: WallDocument;
   authorName?: string;
@@ -240,12 +262,15 @@ function DocumentRow({
   onOpenPost: (postId: string) => void;
   canRename: boolean;
   onRename: (doc: WallDocument, label: string) => Promise<void>;
+  onDelete: (doc: WallDocument) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(doc.label ?? doc.name);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const d = new Date(doc.createdAt);
   const kind = documentKind(doc.type, doc.name);
   const Icon = KIND_ICONS[kind];
@@ -269,6 +294,21 @@ function DocumentRow({
       );
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function remove() {
+    setDeleting(true);
+    try {
+      await onDelete(doc);
+      toast.success(t("wall.documents.deleted", { defaultValue: "Document supprimé" }));
+      setConfirmDelete(false);
+    } catch {
+      toast.error(
+        t("wall.documents.deleteError", { defaultValue: "La suppression a échoué. Réessayez." }),
+      );
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -330,17 +370,27 @@ function DocumentRow({
               {doc.label ?? doc.name}
             </a>
             {canRename && (
-              <button
-                type="button"
-                onClick={() => {
-                  setDraft(doc.label ?? doc.name);
-                  setEditing(true);
-                }}
-                className="shrink-0 text-muted-foreground hover:text-foreground"
-                aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(doc.label ?? doc.name);
+                    setEditing(true);
+                  }}
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                  aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  aria-label={t("wall.documents.delete", { defaultValue: "Supprimer" })}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </>
             )}
           </div>
         )}
@@ -384,6 +434,40 @@ function DocumentRow({
       </div>
 
       <WallDocumentPreview doc={preview ? doc : null} onOpenChange={(o) => setPreview(o)} />
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("wall.documents.deleteTitle", { defaultValue: "Supprimer ce document ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("wall.documents.deleteDescription", {
+                defaultValue:
+                  "Le fichier sera retiré de la docuthèque et de la publication. Cette action est définitive.",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              onClick={(e) => {
+                e.preventDefault();
+                void remove();
+              }}
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("wall.documents.delete", { defaultValue: "Supprimer" })
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </li>
   );
 }
