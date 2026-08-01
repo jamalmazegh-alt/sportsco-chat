@@ -187,6 +187,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                 await enqueueTransactionalEmailServer({
                   templateName: "convocation-invite",
                   recipientEmail: r.email,
+                  fromName: `${club.name ?? "Clubero"} via Clubero`,
                   idempotencyKey: `event-reminder:${conv.id}:${milestone}:${r.email}`,
                   templateData: {
                     recipientFirstName: r.firstName,

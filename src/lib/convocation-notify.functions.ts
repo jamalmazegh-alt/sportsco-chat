@@ -26,7 +26,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,type,opponent,starts_at,team_id,teams:team_id(name,clubs:club_id(default_language)))",
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,type,opponent,starts_at,team_id,teams:team_id(name,clubs:club_id(name,default_language)))",
       )
       .eq("id", convocationId)
       .single();
@@ -128,6 +128,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "convocation-response",
           recipientEmail: email,
+          fromName: `${(ev as any)?.teams?.clubs?.name ?? "Clubero"} via Clubero`,
           idempotencyKey: `convoc-resp-${convocationId}-${p.id}-${status}${isChange ? "-chg" : ""}`,
           templateData: {
             coachFirstName: (p as any).first_name ?? null,

@@ -378,6 +378,7 @@ export const replayEventDlq = createServerFn({ method: "POST" })
           await enqueueTransactionalEmailServer({
             templateName: "convocation-invite",
             recipientEmail: row.recipient_email,
+            fromName: `${(ev as any).teams?.clubs?.name ?? "Clubero"} via Clubero`,
             // Reuse the ORIGINAL dispatch_id — this is the whole point.
             dispatchId: row.dispatch_id,
             eventId: data.eventId,

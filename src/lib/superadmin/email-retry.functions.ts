@@ -289,6 +289,7 @@ export const superadminRetryDispatch = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "convocation-invite",
           recipientEmail: row.recipient_email,
+          fromName: `${(ev as any).teams?.clubs?.name ?? "Clubero"} via Clubero`,
           dispatchId: row.dispatch_id,
           eventId,
           recipientId,
