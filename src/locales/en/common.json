@@ -944,8 +944,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -960,7 +972,8 @@
     "pendingCount_other": "{{count}} players haven't replied yet",
     "remindAllSent_one": "{{count}} reminder sent",
     "remindAllSent_other": "{{count}} reminders sent",
-    "errorPastEventLocked": "This event is in the past — responses can no longer be changed."
+    "errorPastEventLocked": "This event is in the past — responses can no longer be changed.",
+    "responseChanged": "reply updated"
   },
   "stats": {
     "title": "Stats",

@@ -944,7 +944,14 @@
     "confirmResponse": "Antwort bestätigen",
     "responseRecorded": "Antwort gespeichert",
     "coachNotified": "Der Trainer wurde informiert.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",
@@ -965,7 +972,8 @@
     "pendingCount_other": "{{count}} Spieler haben noch nicht geantwortet",
     "remindAllSent_one": "{{count}} Erinnerung gesendet",
     "remindAllSent_other": "{{count}} Erinnerungen gesendet",
-    "errorPastEventLocked": "Das Event ist vorbei — Antworten können nicht mehr geändert werden."
+    "errorPastEventLocked": "Das Event ist vorbei — Antworten können nicht mehr geändert werden.",
+    "responseChanged": "Antwort geändert"
   },
   "stats": {
     "title": "Statistiken",

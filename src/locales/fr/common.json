@@ -944,8 +944,20 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
@@ -960,7 +972,8 @@
     "pendingCount_other": "{{count}} joueurs n'ont pas encore répondu",
     "remindAllSent_one": "{{count}} relance envoyée",
     "remindAllSent_other": "{{count}} relances envoyées",
-    "errorPastEventLocked": "L'événement est passé — les réponses ne peuvent plus être modifiées."
+    "errorPastEventLocked": "L'événement est passé — les réponses ne peuvent plus être modifiées.",
+    "responseChanged": "réponse modifiée"
   },
   "stats": {
     "title": "Statistiques",

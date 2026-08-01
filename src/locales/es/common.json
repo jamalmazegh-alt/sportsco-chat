@@ -944,8 +944,20 @@
     "confirmResponse": "Confirmar respuesta",
     "responseRecorded": "Respuesta guardada",
     "coachNotified": "El entrenador ha sido notificado.",
-    "reasonsAbsent": ["Trabajo", "Familia", "Lesión", "Enfermedad", "Estudios", "Otro compromiso"],
-    "reasonsUncertain": ["Por confirmar", "Trabajo", "Familia", "Problema de salud leve"],
+    "reasonsAbsent": [
+      "Trabajo",
+      "Familia",
+      "Lesión",
+      "Enfermedad",
+      "Estudios",
+      "Otro compromiso"
+    ],
+    "reasonsUncertain": [
+      "Por confirmar",
+      "Trabajo",
+      "Familia",
+      "Problema de salud leve"
+    ],
     "suggestedReasons": "Sugerencias",
     "forceResponseTitle": "¿Forzar respuesta?",
     "forceResponseDesc": "{{name}} ya ha respondido {{current}}. ¿De verdad quieres cambiar el estado a {{next}}?",
@@ -960,7 +972,8 @@
     "pendingCount_other": "{{count}} Jugadores aún no han respondido",
     "remindAllSent_one": "{{count}} recordatorios enviados",
     "remindAllSent_other": "{{count}} recordatorios enviados",
-    "errorPastEventLocked": "El evento ya pasó — las respuestas ya no pueden modificarse."
+    "errorPastEventLocked": "El evento ya pasó — las respuestas ya no pueden modificarse.",
+    "responseChanged": "respuesta modificada"
   },
   "stats": {
     "title": "Estadísticas",
