@@ -1417,7 +1417,8 @@
       "restored": "Reposto na documentoteca",
       "excludeError": "A operação falhou. Tente novamente.",
       "excludedBadge": "Retirado",
-      "showExcluded": "Ver os documentos retirados"
+      "showExcluded": "Ver os documentos retirados",
+      "excludeUnavailable": "Esta ação ainda não está disponível neste servidor. Contacte o suporte."
     }
   },
   "chat": {

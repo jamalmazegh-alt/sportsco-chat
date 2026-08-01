@@ -1422,7 +1422,8 @@
       "restored": "Zurück in der Dokumentenablage",
       "excludeError": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen.",
       "excludedBadge": "Entfernt",
-      "showExcluded": "Entfernte Dokumente anzeigen"
+      "showExcluded": "Entfernte Dokumente anzeigen",
+      "excludeUnavailable": "Diese Aktion ist auf diesem Server noch nicht verfügbar. Bitte wenden Sie sich an den Support."
     }
   },
   "chat": {

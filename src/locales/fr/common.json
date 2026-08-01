@@ -1417,7 +1417,8 @@
       "restored": "Remis dans la docuthèque",
       "excludeError": "L'opération a échoué. Réessayez.",
       "excludedBadge": "Retiré",
-      "showExcluded": "Voir les documents retirés"
+      "showExcluded": "Voir les documents retirés",
+      "excludeUnavailable": "Cette action n'est pas encore disponible sur ce serveur. Contactez le support."
     }
   },
   "chat": {

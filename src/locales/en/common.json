@@ -1417,7 +1417,8 @@
       "restored": "Put back in the library",
       "excludeError": "The operation failed. Please try again.",
       "excludedBadge": "Removed",
-      "showExcluded": "Show removed documents"
+      "showExcluded": "Show removed documents",
+      "excludeUnavailable": "This action isn't available on this server yet. Please contact support."
     }
   },
   "chat": {

@@ -1417,7 +1417,8 @@
       "restored": "Teruggezet in de documentenbibliotheek",
       "excludeError": "De bewerking is mislukt. Probeer het opnieuw.",
       "excludedBadge": "Verwijderd",
-      "showExcluded": "Verwijderde documenten tonen"
+      "showExcluded": "Verwijderde documenten tonen",
+      "excludeUnavailable": "Deze actie is nog niet beschikbaar op deze server. Neem contact op met support."
     }
   },
   "chat": {
