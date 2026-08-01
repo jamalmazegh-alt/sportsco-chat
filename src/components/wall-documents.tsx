@@ -17,6 +17,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { handleDocumentClick } from "@/lib/open-document";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
