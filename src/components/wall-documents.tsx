@@ -426,6 +426,40 @@ function DocumentRow({
       </div>
 
       <WallDocumentPreview doc={preview ? doc : null} onOpenChange={(o) => setPreview(o)} />
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("wall.documents.deleteTitle", { defaultValue: "Supprimer ce document ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("wall.documents.deleteDescription", {
+                defaultValue:
+                  "Le fichier sera retiré de la docuthèque et de la publication. Cette action est définitive.",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>
+              {t("common.cancel", { defaultValue: "Annuler" })}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              onClick={(e) => {
+                e.preventDefault();
+                void remove();
+              }}
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("wall.documents.delete", { defaultValue: "Supprimer" })
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </li>
   );
 }
