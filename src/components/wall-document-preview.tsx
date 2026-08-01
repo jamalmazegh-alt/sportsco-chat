@@ -20,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { documentKind, formatFileSize, type WallDocument } from "@/lib/wall/documents";
 import { documentDownloadUrl } from "@/lib/wall/download-url";
-import { openDocument } from "@/lib/open-document";
+import { downloadDocument, openDocument } from "@/lib/open-document";
 import { isNativePlatform } from "@/lib/native-platform";
 
 /** True si le document peut être affiché en place plutôt qu'ouvert ailleurs. */
@@ -84,12 +84,12 @@ export function WallDocumentPreview({
           {/* `download` est ignoré en cross-origin (le fichier vient du bucket
               Supabase) : le navigateur ouvrait l'onglet au lieu de télécharger.
               C'est `?download=` qui fait renvoyer un Content-Disposition par
-              Supabase. Et l'ouverture passe par `openDocument`, sinon le clic
-              est mort dans la WebView Android. */}
+              Supabase. Et le téléchargement passe par `downloadDocument`, qui
+              n'ouvre aucune popup et reste fonctionnel en WebView Android. */}
           <Button
             size="sm"
             disabled={!doc}
-            onClick={() => doc && void openDocument(documentDownloadUrl(doc))}
+            onClick={() => doc && void downloadDocument(documentDownloadUrl(doc))}
           >
             <Download className="h-4 w-4" />
             {t("wall.documents.download", { defaultValue: "Télécharger" })}
