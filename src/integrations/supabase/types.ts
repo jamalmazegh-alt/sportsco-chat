@@ -8858,6 +8858,15 @@ export type Database = {
         Args: { _choice: string; _id: string; _scope: string }
         Returns: undefined
       }
+      set_child_platform_access: {
+        Args: {
+          _attestation?: boolean
+          _enabled: boolean
+          _locale?: string
+          _player_id: string
+        }
+        Returns: undefined
+      }
       set_meeting_attendees_atomic: {
         Args: {
           _actor: string
