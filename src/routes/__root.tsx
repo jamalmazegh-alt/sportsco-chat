@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { RouteNotFound } from "@/components/route-not-found";
 import { AuthProvider } from "@/lib/auth-context";
@@ -20,6 +20,8 @@ import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
 import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
 import { registerServiceWorker } from "@/lib/pwa";
+import { isUnsupportedWebView } from "@/lib/webview-support";
+import { UnsupportedWebViewScreen } from "@/components/unsupported-webview-screen";
 import { initNativeShell } from "@/lib/native-shell";
 import { OfflineBanner } from "@/components/offline-banner";
 import { isNativePlatform } from "@/lib/native-platform";
@@ -166,6 +168,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  // WebView trop ancienne pour Tailwind v4 : sans ceci l'app s'affiche
+  // entièrement sans style, sans que l'utilisateur puisse comprendre pourquoi.
+  // Évalué au premier rendu, avant tout le reste — l'écran de secours n'a
+  // besoin ni du routeur, ni des styles, ni de l'i18n.
+  const [unsupported, setUnsupported] = useState(false);
+  useEffect(() => {
+    setUnsupported(isUnsupportedWebView());
+  }, []);
+
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
     // Coquille native (splash, barre d'état, bouton retour Android) — no-op web.
@@ -208,6 +219,8 @@ function RootComponent() {
       }
     };
   }, []);
+
+  if (unsupported) return <UnsupportedWebViewScreen />;
 
   return (
     <QueryClientProvider client={queryClient}>
