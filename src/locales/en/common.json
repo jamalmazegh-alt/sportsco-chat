@@ -1296,6 +1296,18 @@
     "unmute": "Unhide",
     "unmuted": "Content is visible again."
   },
+  "userReport": {
+    "action": "Report this person",
+    "also": "Also report {{name}}",
+    "title": "Report {{name}}",
+    "subtitle": "Your report is sent to the club managers. The person is not informed.",
+    "already": "You have already reported this person.",
+    "tabContent": "Content",
+    "tabMembers": "Members",
+    "emptyHint": "Reported members will appear here.",
+    "markReviewing": "Review",
+    "markActioned": "Mark as handled"
+  },
   "wall": {
     "title": "Club wall",
     "subtitle": "Announcements and conversations.",

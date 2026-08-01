@@ -1296,6 +1296,18 @@
     "unmute": "Weer tonen",
     "unmuted": "Inhoud weer zichtbaar."
   },
+  "userReport": {
+    "action": "Deze persoon melden",
+    "also": "{{name}} ook melden",
+    "title": "{{name}} melden",
+    "subtitle": "Je melding wordt naar de clubverantwoordelijken gestuurd. De persoon wordt niet geïnformeerd.",
+    "already": "Je hebt deze persoon al gemeld.",
+    "tabContent": "Inhoud",
+    "tabMembers": "Leden",
+    "emptyHint": "Gemelde leden verschijnen hier.",
+    "markReviewing": "Beoordelen",
+    "markActioned": "Markeren als afgehandeld"
+  },
   "wall": {
     "title": "Club prikbord",
     "subtitle": "Aankondigingen en discussies.",

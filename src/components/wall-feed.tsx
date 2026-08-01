@@ -39,7 +39,7 @@ import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 import { WallReactions, type WallReaction } from "@/components/wall-reactions";
-import { WallReportDialog } from "@/components/wall-report-dialog";
+import { WallReportDialog, type ReportedUser } from "@/components/wall-report-dialog";
 import { useUserMutes } from "@/lib/use-mutes";
 import { filterMutedWallPosts } from "@/lib/mutes";
 import {
@@ -1581,9 +1581,11 @@ function WallGrouped({
 }) {
   const { t } = useTranslation();
   // Cible du signalement (publication ou commentaire) — modération manuelle.
+  // reportedUser permet de signaler aussi l'auteur depuis le même drawer.
   const [reportTarget, setReportTarget] = useState<{
     postId: string;
     commentId: string | null;
+    reportedUser: ReportedUser | null;
   } | null>(null);
   // Cible du masquage personnel (« bloquer » cette personne).
   const [muteTarget, setMuteTarget] = useState<{ userId: string; name: string } | null>(null);
@@ -1721,7 +1723,15 @@ function WallGrouped({
               )}
               {!isExternal && currentUserId && p.author_user_id !== currentUserId && (
                 <button
-                  onClick={() => setReportTarget({ postId: p.id, commentId: null })}
+                  onClick={() =>
+                    setReportTarget({
+                      postId: p.id,
+                      commentId: null,
+                      reportedUser: p.author_user_id
+                        ? { userId: p.author_user_id, name: authorLabel, clubId: p.club_id }
+                        : null,
+                    })
+                  }
                   className="text-muted-foreground hover:text-amber-600 p-1 -m-1 rounded-md hover:bg-amber-500/10 transition-colors"
                   aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
                   title={t("wall.report.action", { defaultValue: "Signaler" })}
@@ -1832,7 +1842,9 @@ function WallGrouped({
               role={role}
               clubId={p.club_id}
               onToggleCommentReaction={onToggleCommentReaction}
-              onReportComment={(commentId) => setReportTarget({ postId: p.id, commentId })}
+              onReportComment={(commentId, author) =>
+                setReportTarget({ postId: p.id, commentId, reportedUser: author })
+              }
               onMuteAuthor={(userId, name) => setMuteTarget({ userId, name })}
             />
           )}
@@ -1880,6 +1892,7 @@ function WallGrouped({
           onOpenChange={(v) => !v && setReportTarget(null)}
           postId={reportTarget.postId}
           commentId={reportTarget.commentId}
+          reportedUser={reportTarget.reportedUser}
         />
       )}
       <AlertDialog open={!!muteTarget} onOpenChange={(v) => !v && setMuteTarget(null)}>
@@ -2088,7 +2101,7 @@ function CommentBlock({
   role: string | null;
   clubId: string;
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
-  onReportComment: (commentId: string) => void;
+  onReportComment: (commentId: string, author: ReportedUser | null) => void;
   onMuteAuthor: (userId: string, name: string) => void;
 }) {
   const { t } = useTranslation();
@@ -2181,7 +2194,13 @@ function CommentBlock({
           {currentUserId && c.author_user_id !== currentUserId && (
             <button
               type="button"
-              onClick={() => onReportComment(c.id)}
+              onClick={() =>
+                onReportComment(c.id, {
+                  userId: c.author_user_id,
+                  name: c.author?.full_name ?? "—",
+                  clubId,
+                })
+              }
               className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
               aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
               title={t("wall.report.action", { defaultValue: "Signaler" })}

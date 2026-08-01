@@ -1296,6 +1296,18 @@
     "unmute": "Réafficher",
     "unmuted": "Contenus réaffichés."
   },
+  "userReport": {
+    "action": "Signaler cette personne",
+    "also": "Signaler aussi {{name}}",
+    "title": "Signaler {{name}}",
+    "subtitle": "Votre signalement est envoyé aux responsables du club. La personne n'est pas informée.",
+    "already": "Vous avez déjà signalé cette personne.",
+    "tabContent": "Contenus",
+    "tabMembers": "Membres",
+    "emptyHint": "Les membres signalés apparaîtront ici.",
+    "markReviewing": "Examiner",
+    "markActioned": "Marquer traité"
+  },
   "wall": {
     "title": "Mur du club",
     "subtitle": "Annonces et discussions.",

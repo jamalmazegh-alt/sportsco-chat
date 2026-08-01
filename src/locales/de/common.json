@@ -1301,6 +1301,18 @@
     "unmute": "Wieder einblenden",
     "unmuted": "Inhalte wieder sichtbar."
   },
+  "userReport": {
+    "action": "Diese Person melden",
+    "also": "{{name}} ebenfalls melden",
+    "title": "{{name}} melden",
+    "subtitle": "Deine Meldung geht an die Verantwortlichen des Vereins. Die Person wird nicht informiert.",
+    "already": "Du hast diese Person bereits gemeldet.",
+    "tabContent": "Inhalte",
+    "tabMembers": "Mitglieder",
+    "emptyHint": "Gemeldete Mitglieder erscheinen hier.",
+    "markReviewing": "Prüfen",
+    "markActioned": "Als erledigt markieren"
+  },
   "wall": {
     "title": "Vereinspinnwand",
     "subtitle": "Ankündigungen und Diskussionen.",

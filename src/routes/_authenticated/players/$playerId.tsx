@@ -50,7 +50,9 @@ import {
   Copy,
   Palmtree,
   Pencil,
+  Flag,
 } from "lucide-react";
+import { WallReportDialog } from "@/components/wall-report-dialog";
 import { BackButton } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
@@ -145,6 +147,8 @@ function PlayerProfile() {
   const isSubRoute =
     isFeedback || isAchievements || isSeasons || isTimeline || isAvailability || isChallenges;
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // Signalement du membre (compte lié à cette fiche) aux responsables du club.
+  const [reportOpen, setReportOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
 
@@ -754,6 +758,18 @@ function PlayerProfile() {
           )}
         </div>
 
+        {player.user_id && user?.id && player.user_id !== user.id && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-9 w-9 shrink-0 text-muted-foreground hover:text-amber-600"
+            onClick={() => setReportOpen(true)}
+            aria-label={t("userReport.action", { defaultValue: "Signaler cette personne" })}
+            title={t("userReport.action", { defaultValue: "Signaler cette personne" })}
+          >
+            <Flag className="h-4 w-4" />
+          </Button>
+        )}
         {isCoach && (
           <Button
             size="icon"
@@ -765,6 +781,19 @@ function PlayerProfile() {
           </Button>
         )}
       </div>
+
+      {player.user_id && player.club_id && (
+        <WallReportDialog
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+          postId={null}
+          reportedUser={{
+            userId: player.user_id,
+            name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "—",
+            clubId: player.club_id,
+          }}
+        />
+      )}
 
       {/* Quick action: declare absence (coach, self, parent) */}
       {(isCoach || isSelf || isParentOfThisPlayer) && (

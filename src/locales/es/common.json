@@ -1296,6 +1296,18 @@
     "unmute": "Mostrar de nuevo",
     "unmuted": "Contenido visible de nuevo."
   },
+  "userReport": {
+    "action": "Denunciar a esta persona",
+    "also": "Denunciar también a {{name}}",
+    "title": "Denunciar a {{name}}",
+    "subtitle": "Tu denuncia se envía a los responsables del club. La persona no es informada.",
+    "already": "Ya has denunciado a esta persona.",
+    "tabContent": "Contenido",
+    "tabMembers": "Miembros",
+    "emptyHint": "Los miembros denunciados aparecerán aquí.",
+    "markReviewing": "Examinar",
+    "markActioned": "Marcar como tratado"
+  },
   "wall": {
     "title": "Muro del Club",
     "subtitle": "Anuncios y debates.",

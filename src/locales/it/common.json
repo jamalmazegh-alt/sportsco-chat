@@ -1296,6 +1296,18 @@
     "unmute": "Mostra di nuovo",
     "unmuted": "Contenuti di nuovo visibili."
   },
+  "userReport": {
+    "action": "Segnala questa persona",
+    "also": "Segnala anche {{name}}",
+    "title": "Segnala {{name}}",
+    "subtitle": "La tua segnalazione viene inviata ai responsabili del club. La persona non viene informata.",
+    "already": "Hai già segnalato questa persona.",
+    "tabContent": "Contenuti",
+    "tabMembers": "Membri",
+    "emptyHint": "I membri segnalati appariranno qui.",
+    "markReviewing": "Esamina",
+    "markActioned": "Segna come gestito"
+  },
   "wall": {
     "title": "Bacheca del Club",
     "subtitle": "Annunci e discussioni.",

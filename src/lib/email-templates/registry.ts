@@ -62,6 +62,7 @@ import { template as meetingRemovedTemplate } from "./meeting-removed";
 import { template as parentChildLinkedTemplate } from "./parent-child-linked";
 import { template as carpoolNeedTemplate } from "./carpool-need";
 import { template as wallContentReportedTemplate } from "./wall-content-reported";
+import { template as userReportedTemplate } from "./user-reported";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-confirmation": inquiryConfirmationTemplate,
@@ -109,4 +110,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "parent-child-linked": parentChildLinkedTemplate,
   "carpool-need": carpoolNeedTemplate,
   "wall-content-reported": wallContentReportedTemplate,
+  "user-reported": userReportedTemplate,
 };

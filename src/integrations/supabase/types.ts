@@ -7479,6 +7479,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reports: {
+        Row: {
+          club_id: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reported_user_id: string
+          reporter_user_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["wall_report_status"]
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: Database["public"]["Enums"]["wall_report_reason"]
+          reported_user_id: string
+          reporter_user_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: Database["public"]["Enums"]["wall_report_reason"]
+          reported_user_id?: string
+          reporter_user_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["wall_report_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       verification_codes: {
         Row: {
           attempts: number
