@@ -1417,7 +1417,8 @@
       "restored": "Rimesso nell'archivio documenti",
       "excludeError": "Operazione non riuscita. Riprova.",
       "excludedBadge": "Rimosso",
-      "showExcluded": "Mostra i documenti rimossi"
+      "showExcluded": "Mostra i documenti rimossi",
+      "excludeUnavailable": "Questa azione non è ancora disponibile su questo server. Contatta l'assistenza."
     }
   },
   "chat": {

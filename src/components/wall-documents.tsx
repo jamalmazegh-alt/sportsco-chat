@@ -106,12 +106,32 @@ export function WallDocuments({
         _path: doc.path,
         _excluded: excluded,
       });
-      if (error) throw error;
+      if (error) {
+        // Un « l'opération a échoué » nu est indébogable — c'est ce qui a rendu
+        // laborieux le diagnostic de la migration non appliquée en production.
+        // PGRST202 = fonction introuvable côté PostgREST.
+        console.warn(
+          "[wall-documents] set_wall_document_excluded failed:",
+          error.code,
+          error.message,
+        );
+        throw error;
+      }
       setDocs((prev) => {
         // Quand l'encadrement n'a pas demandé à voir les documents retirés, le
         // document doit DISPARAÎTRE de la liste : le laisser affiché avec un
         // badge « Retiré » donne l'impression que l'action n'a rien fait.
         if (excluded && !showExcluded) return prev.filter((d) => d.key !== doc.key);
+        // Remise en ligne : la ligne ayant été retirée de la liste juste avant,
+        // un `map` ne retrouve rien et l'annulation du toast restait sans effet
+        // visible. On la réinsère à sa place chronologique.
+        if (!excluded && !prev.some((d) => d.key === doc.key)) {
+          const restored = { ...doc, excludedFromLibrary: false };
+          const at = prev.findIndex((d) => d.createdAt < restored.createdAt);
+          return at === -1
+            ? [...prev, restored]
+            : [...prev.slice(0, at), restored, ...prev.slice(at)];
+        }
         return prev.map((d) => (d.key === doc.key ? { ...d, excludedFromLibrary: excluded } : d));
       });
     },
@@ -356,9 +376,21 @@ function DocumentRow({
       } else {
         toast.success(t("wall.documents.restored", { defaultValue: "Remis dans la docuthèque" }));
       }
-    } catch {
+    } catch (e) {
+      // « Réessayez » est un mauvais conseil quand la fonction n'existe pas en
+      // base : réessayer échouera toujours. On distingue ce cas — celui-là même
+      // qui s'est produit en production — plutôt que d'envoyer l'utilisateur
+      // vers un bouton qui ne marchera jamais.
+      const code = (e as { code?: string })?.code;
       toast.error(
-        t("wall.documents.excludeError", { defaultValue: "L'opération a échoué. Réessayez." }),
+        code === "PGRST202"
+          ? t("wall.documents.excludeUnavailable", {
+              defaultValue:
+                "Cette action n'est pas encore disponible sur ce serveur. Contactez le support.",
+            })
+          : t("wall.documents.excludeError", {
+              defaultValue: "L'opération a échoué. Réessayez.",
+            }),
       );
     } finally {
       setBusyExcluding(false);
