@@ -485,11 +485,11 @@ function DocumentRow({
           )}
           {/* Téléchargement direct depuis la liste : `?download=` fait renvoyer
               un Content-Disposition par le stockage (l'attribut HTML `download`
-              est ignoré en cross-origin), et `openDocument` évite le clic mort
-              en WebView. */}
+              est ignoré en cross-origin), et `downloadDocument` évite la popup
+              bloquée / le clic mort en WebView. */}
           <button
             type="button"
-            onClick={() => void openDocument(documentDownloadUrl(doc))}
+            onClick={() => void downloadDocument(documentDownloadUrl(doc))}
             className="text-[11px] text-primary hover:underline"
           >
             {t("wall.documents.download", { defaultValue: "Télécharger" })}
