@@ -25,6 +25,7 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { useAuth } from "@/lib/auth-context";
 import i18n from "@/lib/i18n";
+import { apiUrl } from "@/lib/native-platform";
 
 export const Route = createFileRoute("/_authenticated/assistant")({
   component: AssistantPage,
@@ -84,7 +85,9 @@ function AssistantPage() {
   const [transport] = useState(
     () =>
       new DefaultChatTransport({
-        api: "/api/chat",
+        // Absolutisé en natif : le transport de l'AI SDK fait son propre
+        // fetch et n'est pas couvert par la réécriture des server functions.
+        api: apiUrl("/api/chat"),
         headers: () => {
           const h: Record<string, string> = { "x-user-language": langRef.current };
           if (authTokenRef.current) h.Authorization = `Bearer ${authTokenRef.current}`;

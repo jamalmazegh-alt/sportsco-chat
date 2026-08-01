@@ -1,5 +1,6 @@
 import { isPushSupported, VAPID_PUBLIC_KEY } from "@/lib/pwa";
 import { supabase } from "@/integrations/supabase/client";
+import { apiUrl } from "@/lib/native-platform";
 
 const PUSH_OWNER_KEY = "clubero:push:owner-user-id";
 
@@ -67,7 +68,7 @@ async function registerSubscriptionOnServer(
   takeOwnership: boolean,
 ): Promise<boolean> {
   const json = sub.toJSON();
-  const res = await fetch("/api/push/subscribe", {
+  const res = await fetch(apiUrl("/api/push/subscribe"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -140,7 +141,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (token) {
-      await fetch("/api/push/unsubscribe", {
+      await fetch(apiUrl("/api/push/unsubscribe"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -202,7 +203,7 @@ export async function syncPushSubscriptionState(): Promise<void> {
     }
     try {
       if (!owner || owner === userId) {
-        await fetch("/api/push/unsubscribe", {
+        await fetch(apiUrl("/api/push/unsubscribe"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -236,7 +237,7 @@ export async function syncPushSubscriptionState(): Promise<void> {
     } catch {
       // Couldn't re-subscribe — clean DB so it reflects reality.
       try {
-        await fetch("/api/push/unsubscribe", {
+        await fetch(apiUrl("/api/push/unsubscribe"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -261,7 +262,7 @@ export async function syncPushSubscriptionState(): Promise<void> {
     try {
       // 1) wipe any previous rows for this user (stale endpoints from
       //    earlier toggle cycles or other devices we no longer use).
-      await fetch("/api/push/unsubscribe", {
+      await fetch(apiUrl("/api/push/unsubscribe"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

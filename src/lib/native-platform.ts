@@ -54,3 +54,20 @@ export function getApiOrigin(): string {
   const raw = import.meta.env.VITE_API_ORIGIN as string | undefined;
   return raw ? raw.replace(/\/+$/, "") : "";
 }
+
+/**
+ * Absolutise un chemin d'API pour l'app native.
+ *
+ * Dans la WebView, l'origine est `capacitor://localhost` ou `https://localhost` :
+ * un `fetch("/api/chat")` vise le bundle embarqué, pas le serveur, et échoue
+ * silencieusement. Les RPC de server functions sont déjà réécrites par
+ * `serverFns.fetch` (src/start.ts), mais tout appel `fetch` direct y échappe —
+ * c'est ce qui cassait l'assistant IA, dont le transport est celui de l'AI SDK.
+ *
+ * Sur le web, renvoie le chemin inchangé : les appels restent relatifs.
+ */
+export function apiUrl(path: string): string {
+  if (!isNativePlatform()) return path;
+  const origin = getApiOrigin();
+  return origin && path.startsWith("/") ? `${origin}${path}` : path;
+}
