@@ -51,8 +51,10 @@ import {
   Palmtree,
   Pencil,
   Flag,
+  UserX,
 } from "lucide-react";
 import { WallReportDialog } from "@/components/wall-report-dialog";
+import { useUserMutes } from "@/lib/use-mutes";
 import { BackButton } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
@@ -149,6 +151,9 @@ function PlayerProfile() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   // Signalement du membre (compte lié à cette fiche) aux responsables du club.
   const [reportOpen, setReportOpen] = useState(false);
+  // Masquage personnel des contenus de ce membre.
+  const { muted: mutedUsers, mute: muteUser, unmute: unmuteUser } = useUserMutes();
+  const [muteOpen, setMuteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
 
@@ -770,6 +775,40 @@ function PlayerProfile() {
             <Flag className="h-4 w-4" />
           </Button>
         )}
+        {player.user_id && user?.id && player.user_id !== user.id && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className={cn(
+              "h-9 w-9 shrink-0",
+              mutedUsers.has(player.user_id)
+                ? "text-destructive"
+                : "text-muted-foreground hover:text-destructive",
+            )}
+            onClick={async () => {
+              if (mutedUsers.has(player.user_id!)) {
+                const { error } = await unmuteUser(player.user_id!);
+                if (error)
+                  toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+                else toast.success(t("mutes.unmuted", { defaultValue: "Contenus réaffichés." }));
+              } else {
+                setMuteOpen(true);
+              }
+            }}
+            aria-label={
+              mutedUsers.has(player.user_id)
+                ? t("mutes.unmute", { defaultValue: "Réafficher" })
+                : t("mutes.action", { defaultValue: "Masquer cette personne" })
+            }
+            title={
+              mutedUsers.has(player.user_id)
+                ? t("mutes.unmute", { defaultValue: "Réafficher" })
+                : t("mutes.action", { defaultValue: "Masquer cette personne" })
+            }
+          >
+            <UserX className="h-4 w-4" />
+          </Button>
+        )}
         {isCoach && (
           <Button
             size="icon"
@@ -794,6 +833,47 @@ function PlayerProfile() {
           }}
         />
       )}
+
+      <AlertDialog open={muteOpen} onOpenChange={setMuteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("mutes.confirmTitle", {
+                defaultValue: "Masquer les contenus de {{name}} ?",
+                name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "—",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("mutes.confirmBody", {
+                defaultValue:
+                  "Vous ne verrez plus ses publications, commentaires, réactions et messages. Les communications officielles (convocations, événements, notifications) restent visibles. Vous pourrez la réafficher à tout moment depuis Profil → Confidentialité.",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!player.user_id) return;
+                const { error } = await muteUser(player.user_id);
+                if (error) {
+                  toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+                  return;
+                }
+                toast.success(
+                  t("mutes.muted", {
+                    defaultValue: "Les contenus de {{name}} sont masqués.",
+                    name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "—",
+                  }),
+                );
+                setMuteOpen(false);
+              }}
+            >
+              {t("mutes.confirm", { defaultValue: "Masquer" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Quick action: declare absence (coach, self, parent) */}
       {(isCoach || isSelf || isParentOfThisPlayer) && (

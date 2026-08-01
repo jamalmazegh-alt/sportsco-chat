@@ -222,12 +222,19 @@ export async function dispatchWallPostPushInternal(
     if (ageYears < MINOR_PUSH_THRESHOLD_YEARS) excludedAsMinor.add(uid);
   }
 
-  const targets: string[] = [];
+  let targets: string[] = [];
   for (const uid of allIds) {
     if (excludedAsMinor.has(uid)) continue;
     const pref = prefByUser.get(uid);
     if (pref && pref.pushOn === false) continue;
     targets.push(uid);
+  }
+
+  // Masquage personnel : ceux qui ont masqué l'auteur du post ne reçoivent
+  // pas de push (le post est filtré chez eux).
+  if (authorUserId) {
+    const { excludeRecipientsWhoMuted } = await import("@/lib/mutes.server");
+    targets = await excludeRecipientsWhoMuted(supabaseAdmin, authorUserId, targets);
   }
 
   // Un tag unique par post : chaque publication du mur produit sa propre

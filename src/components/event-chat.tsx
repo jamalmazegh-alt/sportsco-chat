@@ -38,8 +38,10 @@ export function EventChat({ eventId }: { eventId: string }) {
     messageId: string;
     author: ReportedUser | null;
   } | null>(null);
-  // Modération : admins/dirigeants peuvent supprimer n'importe quel message.
-  const canModerate = roles.includes("admin") || roles.includes("dirigeant");
+  // Modération : admins/dirigeants et staff de l'équipe de l'événement
+  // peuvent supprimer n'importe quel message (aligné sur la policy RLS).
+  const [isEventStaff, setIsEventStaff] = useState(false);
+  const canModerate = roles.includes("admin") || roles.includes("dirigeant") || isEventStaff;
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
@@ -90,6 +92,15 @@ export function EventChat({ eventId }: { eventId: string }) {
       });
       if (!active) return;
       setCanPost(access === true);
+
+      if (user?.id) {
+        const { data: staff } = await (supabase.rpc as any)("is_team_staff_of_event", {
+          p_event_id: eventId,
+          p_user_id: user.id,
+        });
+        if (!active) return;
+        setIsEventStaff(staff === true);
+      }
 
       const { data } = await supabase
         .from("event_messages")

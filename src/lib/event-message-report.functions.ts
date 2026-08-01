@@ -79,6 +79,7 @@ export const reportEventMessage = createServerFn({ method: "POST" })
       author_user_id: string;
       body: string | null;
     };
+    if (message.author_user_id === userId) throw new Error("cannot_report_self");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
