@@ -243,6 +243,7 @@ function DocumentRow({
   onOpenPost,
   canRename,
   onRename,
+  onDelete,
 }: {
   doc: WallDocument;
   authorName?: string;
@@ -250,12 +251,15 @@ function DocumentRow({
   onOpenPost: (postId: string) => void;
   canRename: boolean;
   onRename: (doc: WallDocument, label: string) => Promise<void>;
+  onDelete: (doc: WallDocument) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(doc.label ?? doc.name);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const d = new Date(doc.createdAt);
   const kind = documentKind(doc.type, doc.name);
   const Icon = KIND_ICONS[kind];
