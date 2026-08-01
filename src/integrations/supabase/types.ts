@@ -8105,6 +8105,10 @@ export type Database = {
         Args: { _camp_id: string; _user_id: string }
         Returns: boolean
       }
+      can_manage_player_photo: {
+        Args: { _object_name: string; _user_id: string }
+        Returns: boolean
+      }
       can_manage_tournament: {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
