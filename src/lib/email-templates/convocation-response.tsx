@@ -108,11 +108,7 @@ export const template = {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
     const status = d.status as "absent" | "uncertain";
     const fn = (d as any).isChange ? T[l].subjectChange : T[l].subject;
-    return fn(
-      d.playerName as string,
-      T[l].labels[status] ?? status,
-      d.eventTitle as string,
-    );
+    return fn(d.playerName as string, T[l].labels[status] ?? status, d.eventTitle as string);
   },
   displayName: "Convocation response",
   previewData: {
