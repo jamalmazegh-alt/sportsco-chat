@@ -277,7 +277,7 @@ export function UrgencyCenter({ className }: Props) {
       toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
       // Fire-and-forget push + email — same as events/$eventId.tsx flow.
       void dispatchResponsePushFn({ data: { convocationId, isChange } }).catch(() => {});
-      if (status === "absent" || status === "uncertain") {
+      if (status === "absent" || status === "uncertain" || isChange) {
         // In-app notifications for coaches + email — mirrors events/$eventId flow.
         void (async () => {
           try {
