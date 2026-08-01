@@ -91,7 +91,7 @@ function InboxPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="wall">
-            <WallFeed clubId={activeClubId} />
+            <WallFeed clubId={activeClubId} focusPostId={postId} />
           </TabsContent>
           <TabsContent value="documents">
             <WallDocuments

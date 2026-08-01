@@ -8295,10 +8295,6 @@ export type Database = {
       }
       delete_player_smart: { Args: { _id: string }; Returns: string }
       delete_team_if_empty: { Args: { _id: string }; Returns: undefined }
-      delete_wall_document: {
-        Args: { _path: string; _post_id: string }
-        Returns: undefined
-      }
       email_exists: { Args: { _email: string }; Returns: boolean }
       email_queue_dispatch: { Args: never; Returns: undefined }
       end_support_view_session: {
@@ -8886,6 +8882,10 @@ export type Database = {
       set_team_logo_via_token: {
         Args: { _logo_url: string; _token: string }
         Returns: Json
+      }
+      set_wall_document_excluded: {
+        Args: { _excluded: boolean; _path: string; _post_id: string }
+        Returns: undefined
       }
       set_tournament_team_payment: {
         Args: {

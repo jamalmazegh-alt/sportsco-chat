@@ -10,23 +10,14 @@ import {
   File,
   Loader2,
   Pencil,
-  Trash2,
+  EyeOff,
+  Undo2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { handleDocumentClick } from "@/lib/open-document";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
@@ -81,6 +72,7 @@ export function WallDocuments({
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [showExcluded, setShowExcluded] = useState(false);
 
   const dateLocale = DATE_LOCALES[i18n.language?.split("-")[0] ?? "fr"] ?? fr;
   // Même règle que le feed : seuls admins/dirigeants voient les posts masqués
@@ -100,13 +92,22 @@ export function WallDocuments({
     setDocs((prev) => prev.map((d) => (d.key === doc.key ? { ...d, label } : d)));
   }, []);
 
-  const deleteDoc = useCallback(async (doc: WallDocument) => {
-    const { error } = await supabase.rpc("delete_wall_document", {
+  /**
+   * Retire (ou remet) un document de la docuthèque. La publication d'origine
+   * n'est jamais modifiée : c'est du rangement, réversible, pas une
+   * suppression. Le retrait n'est donc PAS un moyen de rendre un fichier
+   * inaccessible — il reste ouvrable depuis son post.
+   */
+  const setExcluded = useCallback(async (doc: WallDocument, excluded: boolean) => {
+    const { error } = await supabase.rpc("set_wall_document_excluded", {
       _post_id: doc.postId,
       _path: doc.path,
+      _excluded: excluded,
     });
     if (error) throw error;
-    setDocs((prev) => prev.filter((d) => d.key !== doc.key));
+    setDocs((prev) =>
+      prev.map((d) => (d.key === doc.key ? { ...d, excludedFromLibrary: excluded } : d)),
+    );
   }, []);
 
   const load = useCallback(
@@ -134,9 +135,16 @@ export function WallDocuments({
       // indiscernable d'une docuthèque réellement vide.
       if (error) return { docs: [] as WallDocument[], full: false, failed: true };
       const rows = (data ?? []) as DocumentPost[];
-      return { docs: flattenDocuments(rows), full: rows.length === PAGE_SIZE, failed: false };
+      return {
+        // Les documents retirés ne sont chargés que pour l'encadrement, et
+        // seulement quand il demande à les voir : sinon un retrait serait
+        // définitif faute de pouvoir le défaire.
+        docs: flattenDocuments(rows, { includeExcluded: canManageAll && showExcluded }),
+        full: rows.length === PAGE_SIZE,
+        failed: false,
+      };
     },
-    [clubId, staffTeamId, canSeeHidden],
+    [clubId, staffTeamId, canSeeHidden, canManageAll, showExcluded],
   );
 
   // Les noms d'auteurs ne sont pas joignables en une requête (profiles est une
@@ -197,19 +205,35 @@ export function WallDocuments({
     );
   }
 
+  const excludedToggle = canManageAll ? (
+    <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+      <input
+        type="checkbox"
+        className="h-3.5 w-3.5 rounded border-border"
+        checked={showExcluded}
+        onChange={(e) => setShowExcluded(e.target.checked)}
+      />
+      {t("wall.documents.showExcluded", { defaultValue: "Voir les documents retirés" })}
+    </label>
+  ) : null;
+
   if (!docs.length) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-10">
-        {t("wall.documents.empty", {
-          defaultValue:
-            "Aucun document pour l'instant. Les fichiers joints aux publications du mur apparaîtront ici.",
-        })}
-      </p>
+      <div className="space-y-4">
+        {excludedToggle}
+        <p className="text-sm text-muted-foreground text-center py-10">
+          {t("wall.documents.empty", {
+            defaultValue:
+              "Aucun document pour l'instant. Les fichiers joints aux publications du mur apparaîtront ici.",
+          })}
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-7">
+      {excludedToggle}
       {groups.map((group) => (
         <section key={group.key} className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
@@ -223,9 +247,9 @@ export function WallDocuments({
                 authorName={doc.authorUserId ? authors[doc.authorUserId] : undefined}
                 dateLocale={dateLocale}
                 onOpenPost={onOpenPost}
-                canRename={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
+                canManage={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
                 onRename={renameDoc}
-                onDelete={deleteDoc}
+                onSetExcluded={setExcluded}
               />
             ))}
           </ul>
@@ -252,25 +276,25 @@ function DocumentRow({
   authorName,
   dateLocale,
   onOpenPost,
-  canRename,
+  canManage,
   onRename,
-  onDelete,
+  onSetExcluded,
 }: {
   doc: WallDocument;
   authorName?: string;
   dateLocale: Locale;
   onOpenPost: (postId: string) => void;
-  canRename: boolean;
+  /** Renommer et retirer/remettre — mêmes droits, ceux de la RPC. */
+  canManage: boolean;
   onRename: (doc: WallDocument, label: string) => Promise<void>;
-  onDelete: (doc: WallDocument) => Promise<void>;
+  onSetExcluded: (doc: WallDocument, excluded: boolean) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(doc.label ?? doc.name);
   const [saving, setSaving] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [busyExcluding, setBusyExcluding] = useState(false);
   const d = new Date(doc.createdAt);
   const kind = documentKind(doc.type, doc.name);
   const Icon = KIND_ICONS[kind];
@@ -297,18 +321,39 @@ function DocumentRow({
     }
   }
 
-  async function remove() {
-    setDeleting(true);
+  /**
+   * Retirer est réversible : pas de modale de confirmation, mais une annulation
+   * immédiate dans le toast — même geste que la suppression d'une publication
+   * sur le mur (`wall-feed.tsx`).
+   */
+  async function toggleExcluded(excluded: boolean) {
+    setBusyExcluding(true);
     try {
-      await onDelete(doc);
-      toast.success(t("wall.documents.deleted", { defaultValue: "Document supprimé" }));
-      setConfirmDelete(false);
+      await onSetExcluded(doc, excluded);
+      if (excluded) {
+        toast.success(t("wall.documents.excluded", { defaultValue: "Retiré de la docuthèque" }), {
+          action: {
+            label: t("common.undo", { defaultValue: "Annuler" }),
+            onClick: () => {
+              void onSetExcluded(doc, false).catch(() =>
+                toast.error(
+                  t("wall.documents.excludeError", {
+                    defaultValue: "L'opération a échoué. Réessayez.",
+                  }),
+                ),
+              );
+            },
+          },
+        });
+      } else {
+        toast.success(t("wall.documents.restored", { defaultValue: "Remis dans la docuthèque" }));
+      }
     } catch {
       toast.error(
-        t("wall.documents.deleteError", { defaultValue: "La suppression a échoué. Réessayez." }),
+        t("wall.documents.excludeError", { defaultValue: "L'opération a échoué. Réessayez." }),
       );
     } finally {
-      setDeleting(false);
+      setBusyExcluding(false);
     }
   }
 
@@ -369,7 +414,7 @@ function DocumentRow({
             >
               {doc.label ?? doc.name}
             </a>
-            {canRename && (
+            {canManage && (
               <>
                 <button
                   type="button"
@@ -384,11 +429,20 @@ function DocumentRow({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setConfirmDelete(true)}
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
-                  aria-label={t("wall.documents.delete", { defaultValue: "Supprimer" })}
+                  disabled={busyExcluding}
+                  onClick={() => void toggleExcluded(!doc.excludedFromLibrary)}
+                  className="shrink-0 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  aria-label={
+                    doc.excludedFromLibrary
+                      ? t("wall.documents.restore", { defaultValue: "Remettre dans la docuthèque" })
+                      : t("wall.documents.exclude", { defaultValue: "Retirer de la docuthèque" })
+                  }
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  {doc.excludedFromLibrary ? (
+                    <Undo2 className="h-3.5 w-3.5" />
+                  ) : (
+                    <EyeOff className="h-3.5 w-3.5" />
+                  )}
                 </button>
               </>
             )}
@@ -414,6 +468,11 @@ function DocumentRow({
               {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
             </span>
           )}
+          {doc.excludedFromLibrary && (
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+              {t("wall.documents.excludedBadge", { defaultValue: "Retiré" })}
+            </span>
+          )}
           {previewable && (
             <button
               type="button"
@@ -434,40 +493,6 @@ function DocumentRow({
       </div>
 
       <WallDocumentPreview doc={preview ? doc : null} onOpenChange={(o) => setPreview(o)} />
-
-      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("wall.documents.deleteTitle", { defaultValue: "Supprimer ce document ?" })}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("wall.documents.deleteDescription", {
-                defaultValue:
-                  "Le fichier sera retiré de la docuthèque et de la publication. Cette action est définitive.",
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={deleting}
-              onClick={(e) => {
-                e.preventDefault();
-                void remove();
-              }}
-            >
-              {deleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("wall.documents.delete", { defaultValue: "Supprimer" })
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </li>
   );
 }

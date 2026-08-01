@@ -1404,7 +1404,20 @@
       "empty": "No documents yet. Files attached to wall posts will show up here.",
       "loadMore": "Show more",
       "viewPost": "View post",
-      "loadError": "Documents could not be loaded. Please try again shortly."
+      "loadError": "Documents could not be loaded. Please try again shortly.",
+      "rename": "Rename",
+      "renameError": "Renaming failed. Please try again.",
+      "preview": "Preview",
+      "noPreview": "No preview available for this file type.",
+      "openExternal": "Open",
+      "download": "Download",
+      "exclude": "Remove from library",
+      "restore": "Put back in the library",
+      "excluded": "Removed from the library",
+      "restored": "Put back in the library",
+      "excludeError": "The operation failed. Please try again.",
+      "excludedBadge": "Removed",
+      "showExcluded": "Show removed documents"
     }
   },
   "chat": {

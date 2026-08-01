@@ -134,7 +134,20 @@ const SOURCE_META: Record<
   },
 };
 
-export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?: string }) {
+export function WallFeed({
+  clubId,
+  staffTeamId,
+  focusPostId,
+}: {
+  clubId: string;
+  staffTeamId?: string;
+  /**
+   * Publication à garantir présente dans le fil, même si elle est plus ancienne
+   * que les 50 dernières : deep-link push ou « Voir la publication » depuis la
+   * docuthèque. Sans elle, l'ancre visée par le scroll n'existerait pas.
+   */
+  focusPostId?: string;
+}) {
   const { t } = useTranslation();
   const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const sendWallPostEmailsFn = useServerFn(sendWallPostEmails);
@@ -211,6 +224,41 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     const ps = ((rawPosts ?? []) as Post[]).filter((p) =>
       seen.has(p.id) ? false : (seen.add(p.id), true),
     );
+
+    // Le feed s'arrête aux 50 dernières publications. Une notification push ou
+    // un « Voir la publication » depuis la docuthèque peut viser un post bien
+    // plus ancien : sans ce rattrapage, l'ancre n'existe jamais et le scroll
+    // échoue en silence, l'utilisateur restant sur un fil qui semble ignorer sa
+    // demande. On va donc chercher ce post précis — la RLS reste seule juge de
+    // sa visibilité, et les mêmes filtres suppression/modération s'appliquent.
+    if (focusPostId && !seen.has(focusPostId)) {
+      let focusQuery = supabase
+        .from("wall_posts")
+        .select(
+          "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at",
+        )
+        .eq("id", focusPostId)
+        .eq("club_id", clubId)
+        .is("deleted_at", null);
+      if (!canSeeHidden) focusQuery = focusQuery.is("hidden_at", null);
+      if (staffTeamId) {
+        focusQuery = focusQuery
+          .eq("audience_type", "team_staff")
+          .contains("audience_team_ids", [staffTeamId]);
+      }
+      const { data: focused } = await focusQuery.maybeSingle();
+      if (focused) {
+        ps.push(focused as Post);
+        seen.add(focusPostId);
+        // Reproduit l'ordre de la requête pour que le fil reste cohérent.
+        ps.sort((a, b) =>
+          a.is_pinned === b.is_pinned
+            ? b.created_at.localeCompare(a.created_at)
+            : Number(b.is_pinned) - Number(a.is_pinned),
+        );
+      }
+    }
+
     if (ps.length) {
       const ids = ps.map((p) => p.id);
       let commentsQuery = supabase
@@ -501,7 +549,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       cancelled = true;
     };
     // eslint-disable-next-line
-  }, [clubId, staffTeamId]);
+  }, [clubId, staffTeamId, focusPostId]);
 
   // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
