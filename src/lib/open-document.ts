@@ -35,22 +35,41 @@ export async function openDocument(url: string): Promise<void> {
 }
 
 /**
- * Téléchargement d'un document (URL servie avec `Content-Disposition:
- * attachment`). On n'ouvre **aucune** fenêtre : une popup n'aurait rien à
- * afficher et se ferait bloquer. Sur le web, `location.href` déclenche le
- * téléchargement sans quitter la page. En natif, seule une ouverture par le
- * navigateur système sait télécharger depuis une WebView.
+ * Téléchargement d'un document.
+ *
+ * `location.href` sur une URL de stockage ne déclenchait rien de fiable : selon
+ * le navigateur, la navigation est annulée sans jamais produire de fichier.
+ * On récupère donc le fichier en blob et on clique un `<a download>` sur une
+ * URL d'objet **same-origin** — le seul cas où l'attribut `download` est
+ * respecté. Repli sur la navigation directe si le fetch échoue (CORS, hors
+ * ligne). En natif, seul le navigateur système sait télécharger d'une WebView.
  */
-export async function downloadDocument(url: string): Promise<void> {
+export async function downloadDocument(url: string, filename?: string): Promise<void> {
   if (!url) return;
-  if (!isNativePlatform()) {
-    window.location.href = url;
+  if (isNativePlatform()) {
+    try {
+      await Browser.open({ url });
+    } catch (e) {
+      console.warn("[open-document] Browser.open (download) failed:", (e as Error).message);
+      window.location.href = url;
+    }
     return;
   }
   try {
-    await Browser.open({ url });
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = filename || "document";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Laisser le temps au navigateur de démarrer l'écriture du fichier.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
   } catch (e) {
-    console.warn("[open-document] Browser.open (download) failed:", (e as Error).message);
+    console.warn("[open-document] blob download failed:", (e as Error).message);
     window.location.href = url;
   }
 }
