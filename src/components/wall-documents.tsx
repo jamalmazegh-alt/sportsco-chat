@@ -62,6 +62,7 @@ export function WallDocuments({
 }) {
   const { t, i18n } = useTranslation();
   const roles = useMyRoles();
+  const { user } = useAuth();
   const [docs, setDocs] = useState<WallDocument[]>([]);
   const [authors, setAuthors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -74,6 +75,21 @@ export function WallDocuments({
   // Même règle que le feed : seuls admins/dirigeants voient les posts masqués
   // par la modération, avec un badge explicite.
   const canSeeHidden = roles.includes("admin") || roles.includes("dirigeant");
+  // Renommer : l'auteur du post, ou l'encadrement du club (mêmes droits que
+  // la RPC `rename_wall_document`, qui reste la source de vérité).
+  const canManageAll = roles.includes("admin") || roles.includes("dirigeant");
+
+  const renameDoc = useCallback(async (doc: WallDocument, label: string) => {
+    const { error } = await supabase.rpc("rename_wall_document", {
+      _post_id: doc.postId,
+      _path: doc.path,
+      _label: label,
+    });
+    if (error) throw error;
+    setDocs((prev) => prev.map((d) => (d.key === doc.key ? { ...d, label } : d)));
+  }, []);
+
+
 
   const load = useCallback(
     async (pageIndex: number) => {
