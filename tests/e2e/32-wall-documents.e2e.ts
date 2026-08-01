@@ -33,7 +33,11 @@ function attachment(fileName: string, label?: string) {
   ];
 }
 
-async function seedPost(body: string, atts: ReturnType<typeof attachment>): Promise<string> {
+async function seedPost(
+  body: string,
+  atts: ReturnType<typeof attachment>,
+  createdAt?: string,
+): Promise<string> {
   const { data, error } = await admin
     .from("wall_posts")
     .insert({
@@ -42,6 +46,7 @@ async function seedPost(body: string, atts: ReturnType<typeof attachment>): Prom
       body,
       audience_type: "club",
       attachments: atts,
+      ...(createdAt ? { created_at: createdAt } : {}),
     })
     .select("id")
     .single();
@@ -102,6 +107,30 @@ test.describe("docuthèque du mur", () => {
     await row.getByRole("button", { name: tx("wall.documents.viewPost") }).click();
 
     // Retour sur l'onglet Mur, avec la publication ciblée dans l'URL.
+    await expect(page).toHaveURL(new RegExp(`post=${postId}`));
+    await expect(page.locator(`#wall-post-${postId}`)).toBeVisible();
+  });
+
+  test("« Voir la publication » atteint un post plus ancien que la fenêtre du fil", async ({
+    page,
+  }) => {
+    // Le fil ne charge que les 50 dernières publications. Un document d'archive
+    // vise donc un post absent de cette fenêtre : sans rattrapage ciblé, l'ancre
+    // n'existe jamais et le scroll échoue en silence.
+    const label = uniqueName("Archive");
+    const postId = await seedPost(
+      "doc E2E archive",
+      attachment("archive.pdf", label),
+      "2023-09-15T09:00:00.000Z",
+    );
+
+    await loginViaUI(page, "admin");
+    await page.goto("/inbox?tab=documents");
+
+    const row = page.locator("li").filter({ hasText: label }).first();
+    await expect(row).toBeVisible();
+    await row.getByRole("button", { name: tx("wall.documents.viewPost") }).click();
+
     await expect(page).toHaveURL(new RegExp(`post=${postId}`));
     await expect(page.locator(`#wall-post-${postId}`)).toBeVisible();
   });

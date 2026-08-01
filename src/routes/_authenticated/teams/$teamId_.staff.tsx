@@ -57,16 +57,16 @@ function TeamStaffWallPage() {
   const { t } = useTranslation();
   const { memberships, activeClubId } = useAuth();
   const [tab, setTab] = useState<"wall" | "documents">("wall");
-  const [pendingPostId, setPendingPostId] = useState<string | null>(null);
+  // Conservé (et non consommé une fois pour toutes) : le fil s'en sert pour
+  // aller chercher la publication visée si elle est hors des 50 dernières.
+  const [focusPostId, setFocusPostId] = useState<string | null>(null);
 
   // « Voir la publication » depuis la docuthèque : le feed doit d'abord être
   // remonté, le helper réessaie jusqu'à ce que l'ancre existe.
   useEffect(() => {
-    if (tab !== "wall" || !pendingPostId) return;
-    const cancel = scrollToWallPost(pendingPostId);
-    setPendingPostId(null);
-    return cancel;
-  }, [tab, pendingPostId]);
+    if (tab !== "wall" || !focusPostId) return;
+    return scrollToWallPost(focusPostId);
+  }, [tab, focusPostId]);
 
   const { data: team, isLoading } = useQuery({
     queryKey: ["team-basic", teamId],
@@ -146,7 +146,11 @@ function TeamStaffWallPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="wall">
-            <WallFeed clubId={team.club_id} staffTeamId={teamId} />
+            <WallFeed
+              clubId={team.club_id}
+              staffTeamId={teamId}
+              focusPostId={focusPostId ?? undefined}
+            />
           </TabsContent>
           <TabsContent value="documents">
             <WallDocuments
@@ -156,7 +160,7 @@ function TeamStaffWallPage() {
                 // Pas de deep-link ?post= sur cette route : on revient au mur et
                 // on laisse le feed se monter avant de viser l'ancre.
                 setTab("wall");
-                setPendingPostId(postId);
+                setFocusPostId(postId);
               }}
             />
           </TabsContent>
