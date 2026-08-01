@@ -1282,7 +1282,11 @@
   "attachments": {
     "add": "Adicionar ficheiro",
     "tooLarge": "{{name}} excede 10 MB.",
-    "invalidType": "Tipo de ficheiro não permitido: {{name}}"
+    "invalidType": "Tipo de ficheiro não permitido: {{name}}",
+    "documentName": "Nome do documento",
+    "documentNamePlaceholder": "Nome do documento (ex. Programa de pré-época)",
+    "remove": "Remover",
+    "labelRequired": "Dê um nome a cada documento antes de publicar."
   },
   "wall": {
     "title": "Mural do Clube",
@@ -1356,6 +1360,16 @@
       "done": "Denúncia tratada",
       "hiddenBadge": "Oculto pela moderação — visível apenas para os responsáveis",
       "hiddenBadgeShort": "Oculto"
+    },
+    "tabs": {
+      "wall": "Mural",
+      "documents": "Documentos"
+    },
+    "documents": {
+      "empty": "Ainda não há documentos. Os ficheiros anexados às publicações do mural aparecerão aqui.",
+      "loadMore": "Ver mais",
+      "viewPost": "Ver a publicação",
+      "loadError": "Não foi possível carregar os documentos. Tente novamente daqui a pouco."
     }
   },
   "chat": {
