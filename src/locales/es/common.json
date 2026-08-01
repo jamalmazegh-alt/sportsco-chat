@@ -1284,6 +1284,34 @@
     "tooLarge": "{{name}} supera los 10 MB.",
     "invalidType": "Tipo de archivo no permitido: {{name}}"
   },
+  "mutes": {
+    "action": "Ocultar a esta persona",
+    "confirmTitle": "¿Ocultar el contenido de {{name}}?",
+    "confirmBody": "Ya no verás sus publicaciones, comentarios, reacciones ni mensajes. Las comunicaciones oficiales (convocatorias, eventos, notificaciones) seguirán visibles. Puedes mostrarla de nuevo en cualquier momento desde Perfil → Privacidad.",
+    "confirm": "Ocultar",
+    "muted": "El contenido de {{name}} está oculto.",
+    "sectionTitle": "Personas ocultas",
+    "sectionHint": "Ya no ves el contenido publicado en el muro y en el chat por estas personas. Las comunicaciones oficiales siguen visibles.",
+    "empty": "No has ocultado a nadie.",
+    "unmute": "Mostrar de nuevo",
+    "unmuted": "Contenido visible de nuevo."
+  },
+  "userReport": {
+    "action": "Denunciar a esta persona",
+    "also": "Denunciar también a {{name}}",
+    "title": "Denunciar a {{name}}",
+    "subtitle": "Tu denuncia se envía a los responsables del club. La persona no es informada.",
+    "already": "Ya has denunciado a esta persona.",
+    "tabContent": "Contenido",
+    "tabMembers": "Miembros",
+    "emptyHint": "Los miembros denunciados aparecerán aquí.",
+    "markReviewing": "Examinar",
+    "markActioned": "Marcar como tratado"
+  },
+  "chatReport": {
+    "badge": "Mensaje de chat",
+    "deleteMessage": "Eliminar mensaje"
+  },
   "wall": {
     "title": "Muro del Club",
     "subtitle": "Anuncios y debates.",

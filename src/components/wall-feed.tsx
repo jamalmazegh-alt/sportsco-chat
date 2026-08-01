@@ -19,6 +19,7 @@ import {
   Send,
   Trash2,
   Users,
+  UserX,
 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
@@ -38,7 +39,19 @@ import { getWallPostAudienceCounts } from "@/lib/wall/audience-count.functions";
 import { listPublications } from "@/lib/publications/publications.functions";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/social-icons";
 import { WallReactions, type WallReaction } from "@/components/wall-reactions";
-import { WallReportDialog } from "@/components/wall-report-dialog";
+import { WallReportDialog, type ReportedUser } from "@/components/wall-report-dialog";
+import { useUserMutes } from "@/lib/use-mutes";
+import { filterMutedWallPosts } from "@/lib/mutes";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = {
@@ -129,9 +142,12 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
+  const { muted: mutedUsers, mute: muteUser } = useUserMutes();
   const [posts, setPosts] = useState<Post[]>([]);
   const postsRef = useRef<Post[]>([]);
   postsRef.current = posts;
+  // Masquage personnel : les contenus des personnes masquées sont filtrés au rendu.
+  const visiblePosts = useMemo(() => filterMutedWallPosts(posts, mutedUsers), [posts, mutedUsers]);
   const [polls, setPolls] = useState<PollItem[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
@@ -1165,7 +1181,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
       )}
 
       <WallGrouped
-        posts={posts}
+        posts={visiblePosts}
         polls={polls}
         currentUserId={user?.id ?? null}
         role={role}
@@ -1179,6 +1195,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
         onTogglePin={togglePin}
         onToggleReaction={toggleReaction}
         onToggleCommentReaction={toggleCommentReaction}
+        onMuteUser={muteUser}
       />
     </div>
   );
@@ -1544,6 +1561,7 @@ function WallGrouped({
   onTogglePin,
   onToggleReaction,
   onToggleCommentReaction,
+  onMuteUser,
 }: {
   posts: Post[];
   polls: PollItem[];
@@ -1559,13 +1577,37 @@ function WallGrouped({
   onTogglePin: (id: string, next: boolean) => void;
   onToggleReaction: (post: Post, emoji: string) => void;
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
+  onMuteUser: (userId: string) => Promise<{ error: string | null }>;
 }) {
   const { t } = useTranslation();
   // Cible du signalement (publication ou commentaire) — modération manuelle.
+  // reportedUser permet de signaler aussi l'auteur depuis le même drawer.
   const [reportTarget, setReportTarget] = useState<{
     postId: string;
     commentId: string | null;
+    reportedUser: ReportedUser | null;
   } | null>(null);
+  // Cible du masquage personnel (« bloquer » cette personne).
+  const [muteTarget, setMuteTarget] = useState<{ userId: string; name: string } | null>(null);
+  const [muting, setMuting] = useState(false);
+
+  async function confirmMute() {
+    if (!muteTarget) return;
+    setMuting(true);
+    const { error } = await onMuteUser(muteTarget.userId);
+    setMuting(false);
+    if (error) {
+      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+      return;
+    }
+    toast.success(
+      t("mutes.muted", {
+        defaultValue: "Les contenus de {{name}} sont masqués.",
+        name: muteTarget.name,
+      }),
+    );
+    setMuteTarget(null);
+  }
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
 
@@ -1681,7 +1723,15 @@ function WallGrouped({
               )}
               {!isExternal && currentUserId && p.author_user_id !== currentUserId && (
                 <button
-                  onClick={() => setReportTarget({ postId: p.id, commentId: null })}
+                  onClick={() =>
+                    setReportTarget({
+                      postId: p.id,
+                      commentId: null,
+                      reportedUser: p.author_user_id
+                        ? { userId: p.author_user_id, name: authorLabel, clubId: p.club_id }
+                        : null,
+                    })
+                  }
                   className="text-muted-foreground hover:text-amber-600 p-1 -m-1 rounded-md hover:bg-amber-500/10 transition-colors"
                   aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
                   title={t("wall.report.action", { defaultValue: "Signaler" })}
@@ -1689,6 +1739,21 @@ function WallGrouped({
                   <Flag className="h-4 w-4" />
                 </button>
               )}
+              {!isExternal &&
+                currentUserId &&
+                p.author_user_id &&
+                p.author_user_id !== currentUserId && (
+                  <button
+                    onClick={() =>
+                      setMuteTarget({ userId: p.author_user_id as string, name: authorLabel })
+                    }
+                    className="text-muted-foreground hover:text-destructive p-1 -m-1 rounded-md hover:bg-destructive/10 transition-colors"
+                    aria-label={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+                    title={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+                  >
+                    <UserX className="h-4 w-4" />
+                  </button>
+                )}
               {canManage && (
                 <button
                   onClick={() => onDelete(p.id)}
@@ -1777,7 +1842,10 @@ function WallGrouped({
               role={role}
               clubId={p.club_id}
               onToggleCommentReaction={onToggleCommentReaction}
-              onReportComment={(commentId) => setReportTarget({ postId: p.id, commentId })}
+              onReportComment={(commentId, author) =>
+                setReportTarget({ postId: p.id, commentId, reportedUser: author })
+              }
+              onMuteAuthor={(userId, name) => setMuteTarget({ userId, name })}
             />
           )}
         </div>
@@ -1824,8 +1892,33 @@ function WallGrouped({
           onOpenChange={(v) => !v && setReportTarget(null)}
           postId={reportTarget.postId}
           commentId={reportTarget.commentId}
+          reportedUser={reportTarget.reportedUser}
         />
       )}
+      <AlertDialog open={!!muteTarget} onOpenChange={(v) => !v && setMuteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("mutes.confirmTitle", {
+                defaultValue: "Masquer les contenus de {{name}} ?",
+                name: muteTarget?.name ?? "",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("mutes.confirmBody", {
+                defaultValue:
+                  "Vous ne verrez plus ses publications, commentaires, réactions et messages. Les communications officielles (convocations, événements, notifications) restent visibles. Vous pourrez la réafficher à tout moment depuis Profil → Confidentialité.",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmMute} disabled={muting}>
+              {t("mutes.confirm", { defaultValue: "Masquer" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -2001,13 +2094,15 @@ function CommentBlock({
   clubId,
   onToggleCommentReaction,
   onReportComment,
+  onMuteAuthor,
 }: {
   post: Post;
   currentUserId: string | null;
   role: string | null;
   clubId: string;
   onToggleCommentReaction: (comment: Comment, emoji: string) => void;
-  onReportComment: (commentId: string) => void;
+  onReportComment: (commentId: string, author: ReportedUser | null) => void;
+  onMuteAuthor: (userId: string, name: string) => void;
 }) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
@@ -2099,12 +2194,29 @@ function CommentBlock({
           {currentUserId && c.author_user_id !== currentUserId && (
             <button
               type="button"
-              onClick={() => onReportComment(c.id)}
+              onClick={() =>
+                onReportComment(c.id, {
+                  userId: c.author_user_id,
+                  name: c.author?.full_name ?? "—",
+                  clubId,
+                })
+              }
               className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
               aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
               title={t("wall.report.action", { defaultValue: "Signaler" })}
             >
               <Flag className="h-4 w-4" />
+            </button>
+          )}
+          {currentUserId && c.author_user_id !== currentUserId && (
+            <button
+              type="button"
+              onClick={() => onMuteAuthor(c.author_user_id, c.author?.full_name ?? "—")}
+              className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              aria-label={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+              title={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+            >
+              <UserX className="h-4 w-4" />
             </button>
           )}
           {(c.author_user_id === currentUserId || role === "admin") && (

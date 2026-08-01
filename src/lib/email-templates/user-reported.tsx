@@ -3,47 +3,32 @@ import { Button, Heading, Text } from "@react-email/components";
 import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
-type ContentKind = "post" | "comment" | "message";
-
 interface Props {
   moderatorFirstName?: string;
   reporterName: string;
-  contentKind: ContentKind;
+  reportedName: string;
   reasonLabel: string;
   details?: string | null;
-  excerpt?: string | null;
   moderationUrl: string;
   locale?: string;
 }
 
 const T = {
   fr: {
-    subject: "Contenu signalé dans votre club",
+    subject: "Membre signalé dans votre club",
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
-    body: (r: string, k: ContentKind) =>
-      `${r} a signalé ${
-        k === "post"
-          ? "une publication du mur"
-          : k === "comment"
-            ? "un commentaire du mur"
-            : "un message du chat d'événement"
-      } de votre club.`,
+    body: (r: string, m: string) => `${r} a signalé ${m}, membre de votre club.`,
     reason: "Motif",
     details: "Précisions",
-    excerpt: "Extrait du contenu",
     cta: "Examiner le signalement",
     foot: "Vous recevez cet e-mail en tant que responsable du club sur Clubero.",
   },
   en: {
-    subject: "Reported content in your club",
+    subject: "Member reported in your club",
     hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
-    body: (r: string, k: ContentKind) =>
-      `${r} reported ${
-        k === "post" ? "a wall post" : k === "comment" ? "a wall comment" : "an event chat message"
-      } in your club.`,
+    body: (r: string, m: string) => `${r} reported ${m}, a member of your club.`,
     reason: "Reason",
     details: "Details",
-    excerpt: "Content excerpt",
     cta: "Review the report",
     foot: "You receive this email as a club manager on Clubero.",
   },
@@ -54,20 +39,19 @@ const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 const Email = ({
   moderatorFirstName,
   reporterName,
-  contentKind,
+  reportedName,
   reasonLabel,
   details,
-  excerpt,
   moderationUrl,
   locale,
 }: Props) => {
   const l = pickLocale(locale);
   const t = pick(l);
   return (
-    <EmailShell preview={t.body(reporterName, contentKind)} locale={l}>
+    <EmailShell preview={t.body(reporterName, reportedName)} locale={l}>
       <Heading style={h1}>{t.hello(moderatorFirstName)}</Heading>
       <Text style={text}>
-        <strong>{t.body(reporterName, contentKind)}</strong>
+        <strong>{t.body(reporterName, reportedName)}</strong>
       </Text>
       <Text style={text}>
         <strong>{t.reason} :</strong> {reasonLabel}
@@ -75,11 +59,6 @@ const Email = ({
       {details && (
         <Text style={text}>
           <strong>{t.details} :</strong> {details}
-        </Text>
-      )}
-      {excerpt && (
-        <Text style={quote}>
-          <strong>{t.excerpt} :</strong> {excerpt}
         </Text>
       )}
       <Button style={button} href={moderationUrl}>
@@ -93,14 +72,13 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (d) => pick(pickLocale((d as { locale?: string }).locale)).subject,
-  displayName: "Wall content reported",
+  displayName: "User reported",
   previewData: {
     moderatorFirstName: "Marc",
     reporterName: "Sophie Dupont",
-    contentKind: "post",
-    reasonLabel: "Contenu inapproprié",
-    details: "Le message contient des propos déplacés.",
-    excerpt: "Lorem ipsum dolor sit amet…",
+    reportedName: "Jean Martin",
+    reasonLabel: "Harcèlement",
+    details: "Messages insistants après les entraînements.",
     moderationUrl: "https://www.clubero.app/admin/moderation",
     locale: "fr",
   },
@@ -109,15 +87,6 @@ export const template = {
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 12px" };
 const subtle = { fontSize: "13px", color: "#64748b", margin: "16px 0 0" };
-const quote = {
-  fontSize: "14px",
-  color: "#475569",
-  lineHeight: "1.55",
-  margin: "0 0 16px",
-  padding: "10px 14px",
-  borderLeft: "3px solid #cbd5e1",
-  backgroundColor: "#f8fafc",
-};
 const button = {
   backgroundColor: "#0f172a",
   color: "#ffffff",

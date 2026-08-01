@@ -130,7 +130,11 @@ export const dispatchEventChatPush = createServerFn({ method: "POST" })
     targets.delete(userId);
     if (targets.size === 0) return { dispatched: 0, sent: 0 };
 
-    const allIds = Array.from(targets);
+    // Masquage personnel : ceux qui ont masqué l'auteur du message ne sont
+    // pas notifiés (le message est de toute façon filtré chez eux).
+    const { excludeRecipientsWhoMuted } = await import("@/lib/mutes.server");
+    const allIds = await excludeRecipientsWhoMuted(supabaseAdmin, userId, Array.from(targets));
+    if (allIds.length === 0) return { dispatched: 0, sent: 0 };
     const { data: profiles } = await supabaseAdmin
       .from("profiles")
       .select("id, preferred_language, notifications_push")

@@ -52,6 +52,12 @@ export const notifyWallReaction = createServerFn({ method: "POST" })
     const authorId = (post as any).author_user_id as string | null;
     if (!authorId || authorId === userId) return { dispatched: 0, sent: 0 };
 
+    // Masquage personnel : pas de notification si l'auteur a masqué le réacteur.
+    const { recipientHasMuted } = await import("@/lib/mutes.server");
+    if (await recipientHasMuted(supabaseAdmin, userId, authorId)) {
+      return { dispatched: 0, sent: 0, skipped: "muted" };
+    }
+
     // Anti-spam: one reaction notification per post/author per 30 min.
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     const { data: recent } = await supabaseAdmin

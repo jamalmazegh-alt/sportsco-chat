@@ -1284,6 +1284,34 @@
     "tooLarge": "{{name}} dépasse 10 Mo.",
     "invalidType": "Type de fichier non autorisé : {{name}}"
   },
+  "mutes": {
+    "action": "Masquer cette personne",
+    "confirmTitle": "Masquer les contenus de {{name}} ?",
+    "confirmBody": "Vous ne verrez plus ses publications, commentaires, réactions et messages. Les communications officielles (convocations, événements, notifications) restent visibles. Vous pourrez la réafficher à tout moment depuis Profil → Confidentialité.",
+    "confirm": "Masquer",
+    "muted": "Les contenus de {{name}} sont masqués.",
+    "sectionTitle": "Personnes masquées",
+    "sectionHint": "Vous ne voyez plus les contenus publiés sur le mur et dans le chat par ces personnes. Les communications officielles restent visibles.",
+    "empty": "Vous n'avez masqué personne.",
+    "unmute": "Réafficher",
+    "unmuted": "Contenus réaffichés."
+  },
+  "userReport": {
+    "action": "Signaler cette personne",
+    "also": "Signaler aussi {{name}}",
+    "title": "Signaler {{name}}",
+    "subtitle": "Votre signalement est envoyé aux responsables du club. La personne n'est pas informée.",
+    "already": "Vous avez déjà signalé cette personne.",
+    "tabContent": "Contenus",
+    "tabMembers": "Membres",
+    "emptyHint": "Les membres signalés apparaîtront ici.",
+    "markReviewing": "Examiner",
+    "markActioned": "Marquer traité"
+  },
+  "chatReport": {
+    "badge": "Message de chat",
+    "deleteMessage": "Supprimer le message"
+  },
   "wall": {
     "title": "Mur du club",
     "subtitle": "Annonces et discussions.",

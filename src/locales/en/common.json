@@ -1284,6 +1284,34 @@
     "tooLarge": "{{name}} exceeds 10 MB.",
     "invalidType": "File type not allowed: {{name}}"
   },
+  "mutes": {
+    "action": "Hide this person",
+    "confirmTitle": "Hide content from {{name}}?",
+    "confirmBody": "You will no longer see their posts, comments, reactions and messages. Official communications (call-ups, events, notifications) stay visible. You can unhide them at any time from Profile → Privacy.",
+    "confirm": "Hide",
+    "muted": "Content from {{name}} is now hidden.",
+    "sectionTitle": "Hidden people",
+    "sectionHint": "You no longer see wall and chat content posted by these people. Official communications stay visible.",
+    "empty": "You haven't hidden anyone.",
+    "unmute": "Unhide",
+    "unmuted": "Content is visible again."
+  },
+  "userReport": {
+    "action": "Report this person",
+    "also": "Also report {{name}}",
+    "title": "Report {{name}}",
+    "subtitle": "Your report is sent to the club managers. The person is not informed.",
+    "already": "You have already reported this person.",
+    "tabContent": "Content",
+    "tabMembers": "Members",
+    "emptyHint": "Reported members will appear here.",
+    "markReviewing": "Review",
+    "markActioned": "Mark as handled"
+  },
+  "chatReport": {
+    "badge": "Chat message",
+    "deleteMessage": "Delete message"
+  },
   "wall": {
     "title": "Club wall",
     "subtitle": "Announcements and conversations.",

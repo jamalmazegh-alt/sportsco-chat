@@ -60,6 +60,12 @@ export const notifyWallCommentReaction = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!post || (post as any).deleted_at) return { dispatched: 0, sent: 0 };
 
+    // Masquage personnel : pas de notification si l'auteur a masqué le réacteur.
+    const { recipientHasMuted } = await import("@/lib/mutes.server");
+    if (await recipientHasMuted(supabaseAdmin, userId, authorId)) {
+      return { dispatched: 0, sent: 0, skipped: "muted" };
+    }
+
     // Anti-spam: one reaction notification per comment/author per 30 min.
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     const { data: recent } = await supabaseAdmin

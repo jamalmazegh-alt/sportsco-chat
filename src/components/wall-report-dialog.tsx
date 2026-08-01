@@ -1,8 +1,15 @@
 /**
- * Drawer de signalement d'un contenu du mur (publication ou commentaire).
+ * Drawer de signalement d'un contenu du mur (publication ou commentaire)
+ * et/ou d'un membre du club.
+ *
+ * Modes :
+ * - contenu (postId fourni) : signale le post/commentaire ; si `reportedUser`
+ *   est fourni, une case permet de signaler aussi l'auteur.
+ * - membre seul (postId null + reportedUser) : signale la personne — utilisé
+ *   depuis la fiche joueur.
  *
  * Modération manuelle : le signalement notifie les admins/dirigeants du club,
- * l'auteur du contenu n'est jamais informé et ne voit pas qui a signalé.
+ * la personne visée n'est jamais informée et ne voit pas qui a signalé.
  */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,8 +25,11 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WizardOptionCard } from "@/components/wizard/wizard-primitives";
 import { reportWallContent, WALL_REPORT_REASONS } from "@/lib/wall/moderation.functions";
+import { reportUser } from "@/lib/user-report.functions";
+import { reportEventMessage } from "@/lib/event-message-report.functions";
 
 type Reason = (typeof WALL_REPORT_REASONS)[number];
 
@@ -32,22 +42,35 @@ const ICONS: Record<Reason, typeof AlertTriangle> = {
   other: Shield,
 };
 
+export type ReportedUser = { userId: string; name: string; clubId: string };
+
 export function WallReportDialog({
   open,
   onOpenChange,
   postId,
   commentId,
+  eventMessageId,
+  reportedUser,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  postId: string;
+  /** null = signalement d'un membre seul ou d'un message de chat. */
+  postId: string | null;
   commentId?: string | null;
+  /** Signalement d'un message du chat d'événement. */
+  eventMessageId?: string | null;
+  reportedUser?: ReportedUser | null;
 }) {
   const { t } = useTranslation();
   const report = useServerFn(reportWallContent);
+  const reportUserFn = useServerFn(reportUser);
+  const reportMessageFn = useServerFn(reportEventMessage);
   const [reason, setReason] = useState<Reason | null>(null);
   const [details, setDetails] = useState("");
+  const [alsoUser, setAlsoUser] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  const userOnly = !postId && !eventMessageId && !!reportedUser;
 
   const labels: Record<Reason, { title: string; description: string }> = {
     inappropriate: {
@@ -84,21 +107,46 @@ export function WallReportDialog({
     },
   };
 
+  function reset() {
+    setReason(null);
+    setDetails("");
+    setAlsoUser(false);
+  }
+
   async function submit() {
     if (!reason) return;
     setBusy(true);
     try {
-      const res = (await report({
-        data: {
-          postId,
-          commentId: commentId ?? null,
-          reason,
-          details: details.trim() || undefined,
-        },
-      })) as { duplicate?: boolean };
-      if (res?.duplicate) {
+      const trimmed = details.trim() || undefined;
+      let contentDuplicate = false;
+      if (postId) {
+        const res = (await report({
+          data: { postId, commentId: commentId ?? null, reason, details: trimmed },
+        })) as { duplicate?: boolean };
+        contentDuplicate = !!res?.duplicate;
+      } else if (eventMessageId) {
+        const res = (await reportMessageFn({
+          data: { messageId: eventMessageId, reason, details: trimmed },
+        })) as { duplicate?: boolean };
+        contentDuplicate = !!res?.duplicate;
+      }
+      let userDuplicate = false;
+      if (reportedUser && (userOnly || alsoUser)) {
+        const res = (await reportUserFn({
+          data: {
+            clubId: reportedUser.clubId,
+            reportedUserId: reportedUser.userId,
+            reason,
+            details: trimmed,
+          },
+        })) as { duplicate?: boolean };
+        userDuplicate = !!res?.duplicate;
+      }
+      if (userOnly ? userDuplicate : contentDuplicate) {
         toast.info(
-          t("wall.report.already", { defaultValue: "Vous avez déjà signalé ce contenu." }),
+          userOnly
+            ? t("userReport.already", { defaultValue: "Vous avez déjà signalé cette personne." })
+            : t("wall.report.already", { defaultValue: "Vous avez déjà signalé ce contenu." }),
         );
       } else {
         toast.success(
@@ -108,8 +156,7 @@ export function WallReportDialog({
         );
       }
       onOpenChange(false);
-      setReason(null);
-      setDetails("");
+      reset();
     } catch (e) {
       toast.error(
         e instanceof Error && e.message === "not_found"
@@ -125,12 +172,24 @@ export function WallReportDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-2xl">
         <SheetHeader className="text-left">
-          <SheetTitle>{t("wall.report.title", { defaultValue: "Signaler ce contenu" })}</SheetTitle>
+          <SheetTitle>
+            {userOnly
+              ? t("userReport.title", {
+                  defaultValue: "Signaler {{name}}",
+                  name: reportedUser?.name ?? "",
+                })
+              : t("wall.report.title", { defaultValue: "Signaler ce contenu" })}
+          </SheetTitle>
           <SheetDescription>
-            {t("wall.report.subtitle", {
-              defaultValue:
-                "Votre signalement est envoyé aux responsables du club. L'auteur n'est pas informé.",
-            })}
+            {userOnly
+              ? t("userReport.subtitle", {
+                  defaultValue:
+                    "Votre signalement est envoyé aux responsables du club. La personne n'est pas informée.",
+                })
+              : t("wall.report.subtitle", {
+                  defaultValue:
+                    "Votre signalement est envoyé aux responsables du club. L'auteur n'est pas informé.",
+                })}
           </SheetDescription>
         </SheetHeader>
 
@@ -158,6 +217,18 @@ export function WallReportDialog({
           })}
           rows={3}
         />
+
+        {!userOnly && reportedUser && (
+          <label className="mt-3 flex items-center gap-2.5 rounded-lg border border-border p-3 text-sm cursor-pointer">
+            <Checkbox checked={alsoUser} onCheckedChange={(v) => setAlsoUser(v === true)} />
+            <span>
+              {t("userReport.also", {
+                defaultValue: "Signaler aussi {{name}}",
+                name: reportedUser.name,
+              })}
+            </span>
+          </label>
+        )}
 
         <div className="flex gap-2 pt-3 pb-[env(safe-area-inset-bottom)]">
           <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>

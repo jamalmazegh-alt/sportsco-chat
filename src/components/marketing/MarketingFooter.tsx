@@ -126,6 +126,15 @@ export function MarketingFooter() {
                   {t("footer.legalNotice")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/legal/$kind"
+                  params={{ kind: "child_safety" }}
+                  className="hover:text-foreground"
+                >
+                  {t("footer.childSafety", { defaultValue: "Sécurité des enfants" })}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

@@ -71,7 +71,11 @@ export const notifyWallComment = createServerFn({ method: "POST" })
     for (const uid of data.excludeUserIds ?? []) targets.delete(uid);
     if (targets.size === 0) return { dispatched: 0, sent: 0 };
 
-    const allIds = Array.from(targets);
+    // Masquage personnel : ceux qui ont masqué l'auteur du commentaire ne
+    // reçoivent ni notification in-app ni push.
+    const { excludeRecipientsWhoMuted } = await import("@/lib/mutes.server");
+    const allIds = await excludeRecipientsWhoMuted(supabaseAdmin, userId, Array.from(targets));
+    if (allIds.length === 0) return { dispatched: 0, sent: 0 };
 
     const { data: author } = await supabaseAdmin
       .from("profiles")
