@@ -5,6 +5,8 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const InputSchema = z.object({
   convocationId: z.string().uuid(),
+  /** True when the player had already answered before (response updated). */
+  isChange: z.boolean().optional(),
 });
 
 /**
@@ -17,6 +19,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
   .inputValidator((input) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { convocationId } = data;
+    const isChange = data.isChange === true;
     const { userId } = context;
 
     // Fetch convocation + event + player + team's club default_language
@@ -125,7 +128,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "convocation-response",
           recipientEmail: email,
-          idempotencyKey: `convoc-resp-${convocationId}-${p.id}-${status}`,
+          idempotencyKey: `convoc-resp-${convocationId}-${p.id}-${status}${isChange ? "-chg" : ""}`,
           templateData: {
             coachFirstName: (p as any).first_name ?? null,
             playerName,
@@ -133,6 +136,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               ev.type === "match" && ev.opponent ? `${ev.title} vs ${ev.opponent}` : ev.title,
             eventDate,
             status,
+            isChange,
             reason: conv.comment ?? null,
             declaredByName,
             eventUrl: `${baseUrl}/events/${ev.id}`,
