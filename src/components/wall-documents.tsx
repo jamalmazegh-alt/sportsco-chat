@@ -286,6 +286,23 @@ function DocumentRow({
     }
   }
 
+  async function remove() {
+    setDeleting(true);
+    try {
+      await onDelete(doc);
+      toast.success(t("wall.documents.deleted", { defaultValue: "Document supprimé" }));
+      setConfirmDelete(false);
+    } catch {
+      toast.error(
+        t("wall.documents.deleteError", { defaultValue: "La suppression a échoué. Réessayez." }),
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+
+
   return (
     <li className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40">
       {/* Bloc date à gauche, comme la page Événements. */}
