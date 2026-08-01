@@ -7,6 +7,7 @@ import { Paperclip, X, FileText, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ATTACHMENT_LABEL_MAX } from "@/lib/wall/documents";
+import { handleDocumentClick } from "@/lib/open-document";
 
 export type Attachment = {
   url: string;
@@ -196,7 +197,13 @@ export function AttachmentList({
         return (
           <li key={a.path} className="relative group">
             {isImage ? (
-              <a href={a.url} target="_blank" rel="noreferrer" className="block w-24">
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => handleDocumentClick(e, a.url)}
+                className="block w-24"
+              >
                 <img
                   src={a.url}
                   alt={label || a.name}
@@ -213,6 +220,7 @@ export function AttachmentList({
                 href={a.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={(e) => handleDocumentClick(e, a.url)}
                 className="flex items-center gap-2 max-w-[220px] rounded-lg border border-border bg-background px-3 py-2 text-xs hover:bg-muted/50"
               >
                 <FileText className="h-4 w-4 text-primary shrink-0" />

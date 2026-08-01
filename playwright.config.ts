@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *
  * Two projects (also runnable via package scripts):
  *   - core  — 00→25 : API / RLS / beta-closure (~4–15 min)
- *   - ui    — 26→31 + ui-real-flows : real UI clicks (needs E2E_UI=1)
+ *   - ui    — 26→32 + ui-real-flows : real UI clicks (needs E2E_UI=1)
  *
  * Required env vars:
  *   - E2E_BASE_URL              preview/published URL under test
@@ -47,8 +47,8 @@ const HAS_E2E_CONFIG = Boolean(
 
 /** 00–25 — data/RLS/beta-closure (historically ~4–6 min green). */
 const CORE_MATCH = /\/(0[0-9]|1[0-9]|2[0-5])-[^/]+\.e2e\.ts$/;
-/** 26–31 + ui-real-flows — real UI clicks. */
-const UI_MATCH = /(\/(2[6-9]|3[0-1])-[^/]+\.e2e\.ts$|\/ui-real-flows\.e2e\.ts$)/;
+/** 26–32 + ui-real-flows — real UI clicks. */
+const UI_MATCH = /(\/(2[6-9]|3[0-2])-[^/]+\.e2e\.ts$|\/ui-real-flows\.e2e\.ts$)/;
 
 const suite = process.env.E2E_SUITE; // "core" | "ui" | unset (= both)
 
