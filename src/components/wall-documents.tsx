@@ -361,17 +361,27 @@ function DocumentRow({
               {doc.label ?? doc.name}
             </a>
             {canRename && (
-              <button
-                type="button"
-                onClick={() => {
-                  setDraft(doc.label ?? doc.name);
-                  setEditing(true);
-                }}
-                className="shrink-0 text-muted-foreground hover:text-foreground"
-                aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(doc.label ?? doc.name);
+                    setEditing(true);
+                  }}
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                  aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  aria-label={t("wall.documents.delete", { defaultValue: "Supprimer" })}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </>
             )}
           </div>
         )}
