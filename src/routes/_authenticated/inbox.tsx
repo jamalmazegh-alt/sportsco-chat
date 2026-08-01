@@ -17,6 +17,8 @@ const inboxSearch = z.object({
   tab: z.enum(["wall", "documents"]).optional(),
 });
 
+type InboxSearch = z.infer<typeof inboxSearch>;
+
 export const Route = createFileRoute("/_authenticated/inbox")({
   component: InboxPage,
   validateSearch: (s) => inboxSearch.parse(s),
@@ -71,7 +73,7 @@ function InboxPage() {
           value={activeTab}
           onValueChange={(next) =>
             navigate({
-              search: (prev) => ({
+              search: (prev: InboxSearch) => ({
                 ...prev,
                 tab: next === "wall" ? undefined : "documents",
                 // Changer d'onglet à la main annule le focus sur une publication.
@@ -95,7 +97,7 @@ function InboxPage() {
             <WallDocuments
               clubId={activeClubId}
               onOpenPost={(id) =>
-                navigate({ search: (prev) => ({ ...prev, tab: undefined, post: id }) })
+                navigate({ search: (prev: InboxSearch) => ({ ...prev, tab: undefined, post: id }) })
               }
             />
           </TabsContent>

@@ -8,6 +8,7 @@ import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { handleDocumentClick } from "@/lib/open-document";
+import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
 import {
   flattenDocuments,
   groupDocumentsByMonth,
@@ -210,30 +211,57 @@ function DocumentRow({
   onOpenPost: (postId: string) => void;
 }) {
   const { t } = useTranslation();
+  const [preview, setPreview] = useState(false);
   const d = new Date(doc.createdAt);
-  const Icon = KIND_ICONS[documentKind(doc.type, doc.name)];
+  const kind = documentKind(doc.type, doc.name);
+  const Icon = KIND_ICONS[kind];
   const size = formatFileSize(doc.size);
   const meta = [doc.label ? doc.name : null, size, authorName].filter(Boolean).join(" · ");
+  const previewable = isPreviewable(doc);
 
   return (
     <li className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40">
       {/* Bloc date à gauche, comme la page Événements — l'heure y est remplacée
-          par l'icône du type de fichier. */}
-      <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-          {format(d, "EEE", { locale: dateLocale })}
-        </span>
-        <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
-        <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
-      </div>
+          par la vignette (image) ou l'icône du type de fichier. */}
+      {kind === "image" ? (
+        <button
+          type="button"
+          onClick={() => setPreview(true)}
+          className="w-16 shrink-0 bg-muted overflow-hidden"
+          aria-label={t("wall.documents.preview", { defaultValue: "Aperçu" })}
+        >
+          <img
+            src={doc.url}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover min-h-[72px]"
+          />
+        </button>
+      ) : (
+        <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+            {format(d, "EEE", { locale: dateLocale })}
+          </span>
+          <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
+          <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
+        </div>
+      )}
       <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-        {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers le
-            navigateur natif dans la WebView, où `target="_blank"` est inerte. */}
+        {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers
+            l'aperçu quand le type s'y prête, ou vers le navigateur natif en
+            WebView, où `target="_blank"` est inerte. */}
         <a
           href={doc.url}
           target="_blank"
           rel="noreferrer"
-          onClick={(e) => handleDocumentClick(e, doc.url)}
+          onClick={(e) => {
+            if (previewable && !e.metaKey && !e.ctrlKey && e.button === 0) {
+              e.preventDefault();
+              setPreview(true);
+              return;
+            }
+            handleDocumentClick(e, doc.url);
+          }}
           className="text-sm font-medium truncate hover:underline"
         >
           {doc.label ?? doc.name}
@@ -245,6 +273,15 @@ function DocumentRow({
               {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
             </span>
           )}
+          {previewable && (
+            <button
+              type="button"
+              onClick={() => setPreview(true)}
+              className="text-[11px] text-primary hover:underline"
+            >
+              {t("wall.documents.preview", { defaultValue: "Aperçu" })}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onOpenPost(doc.postId)}
@@ -254,6 +291,8 @@ function DocumentRow({
           </button>
         </div>
       </div>
+
+      <WallDocumentPreview doc={preview ? doc : null} onOpenChange={(o) => setPreview(o)} />
     </li>
   );
 }
