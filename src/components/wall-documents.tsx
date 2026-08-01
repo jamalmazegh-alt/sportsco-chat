@@ -312,8 +312,6 @@ function DocumentRow({
     }
   }
 
-
-
   return (
     <li className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40">
       {/* Bloc date à gauche, comme la page Événements. */}
