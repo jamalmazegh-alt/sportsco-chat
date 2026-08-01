@@ -82,6 +82,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
+        // Polyfills pour WebView Android anciennes. Les WebView ne suivent pas
+        // la version d'Android : un Galaxy S10 sous Android 11 peut tourner en
+        // WebView 83 (2020) — constaté sur un appareil réel, où l'app restait
+        // figée sur le splash.
+        //
+        // `build.target: chrome80` (vite.config.ts) transpile la SYNTAXE, mais
+        // pas les API : celles-ci doivent être comblées à l'exécution. Ce script
+        // est inline et en tête pour s'exécuter avant tout module.
+        //
+        // Chaque polyfill est gardé : sur un navigateur récent, coût nul.
+        children: `(function(){
+if(!Object.hasOwn){Object.hasOwn=function(o,k){return Object.prototype.hasOwnProperty.call(o,k)}}
+if(!Array.prototype.at){Array.prototype.at=function(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return n<0||n>=this.length?undefined:this[n]}}
+if(!String.prototype.at){String.prototype.at=function(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return n<0||n>=this.length?undefined:this[n]}}
+if(!String.prototype.replaceAll){String.prototype.replaceAll=function(s,r){if(Object.prototype.toString.call(s)==="[object RegExp]"){if(!s.global)throw new TypeError("replaceAll must be called with a global RegExp");return this.replace(s,r)}var str=String(this),sub=String(s);if(typeof r!=="function")return str.split(sub).join(r);if(sub==="")return str;var out="",from=0,i;while((i=str.indexOf(sub,from))!==-1){out+=str.slice(from,i)+r(sub,i,str);from=i+sub.length}return out+str.slice(from)}}
+if(typeof WeakRef==="undefined"){window.WeakRef=function(t){this._t=t};window.WeakRef.prototype.deref=function(){return this._t}}
+if(!Array.prototype.findLast){Array.prototype.findLast=function(f,t){for(var i=this.length-1;i>=0;i--)if(f.call(t,this[i],i,this))return this[i];return undefined}}
+if(!Array.prototype.findLastIndex){Array.prototype.findLastIndex=function(f,t){for(var i=this.length-1;i>=0;i--)if(f.call(t,this[i],i,this))return i;return -1}}
+if(!Array.prototype.with){Array.prototype.with=function(i,v){var a=Array.prototype.slice.call(this);i=Math.trunc(i)||0;if(i<0)i+=a.length;a[i]=v;return a}}
+if(typeof AggregateError==="undefined"){window.AggregateError=function(e,m){var r=new Error(m);r.name="AggregateError";r.errors=Array.prototype.slice.call(e);return r}}
+if(!window.structuredClone){window.structuredClone=function c(v,m){m=m||new WeakMap();if(v===null||typeof v!=="object")return v;if(m.has(v))return m.get(v);var r;if(v instanceof Date)r=new Date(v.getTime());else if(v instanceof RegExp)r=new RegExp(v.source,v.flags);else if(v instanceof Map){r=new Map();m.set(v,r);v.forEach(function(x,k){r.set(c(k,m),c(x,m))});return r}else if(v instanceof Set){r=new Set();m.set(v,r);v.forEach(function(x){r.add(c(x,m))});return r}else if(Array.isArray(v)){r=[];m.set(v,r);for(var i=0;i<v.length;i++)r[i]=c(v[i],m);return r}else{r={};m.set(v,r);for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k))r[k]=c(v[k],m);return r}m.set(v,r);return r}}
+})();`,
+      },
+      {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",

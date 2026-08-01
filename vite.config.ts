@@ -39,6 +39,19 @@ export default async function config(env: ConfigEnv) {
       ...(isMobileBuild ? { spa: { enabled: true, prerender: { outputPath: "/index" } } } : {}),
     },
     vite: {
+      // Cible de compilation du build mobile.
+      //
+      // Vite 7 vise par défaut « baseline widely available », soit Chrome 107+.
+      // Or les WebView Android ne suivent pas la version d'Android : un Galaxy
+      // S10 sous Android 11 tourne en WebView 83 (2020) si l'utilisateur ne l'a
+      // jamais mise à jour — cas constaté sur un vrai appareil. Le bundle y
+      // échouait à l'analyse (`??=`, `.at()`, `Object.hasOwn`,
+      // `structuredClone`), React ne montait jamais et l'app restait figée sur
+      // le splash.
+      //
+      // `chrome80` couvre les WebView livrées avec Android 10 et suivantes.
+      // Le build web n'est pas concerné : sa cible reste celle de Vite.
+      ...(isMobileBuild ? { build: { target: "chrome80" } } : {}),
       // Dev uniquement (le serveur Vite n'existe pas en prod) : autorise la
       // WebView Capacitor du spike mobile à appeler le serveur de dev.
       // `defaultAllowedOrigins` (regex localhost de Vite) est conservé — cette
