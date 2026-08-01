@@ -1338,6 +1338,52 @@
     "email": {
       "subject": "New message from {{club}}",
       "viewOnWall": "View on the wall"
+    },
+    "report": {
+      "title": "Report this content",
+      "subtitle": "Your report is sent to the club managers. The author is not notified.",
+      "action": "Report",
+      "submit": "Report",
+      "sent": "Report sent to the club managers.",
+      "already": "You have already reported this content.",
+      "notFound": "This content is no longer available.",
+      "detailsPlaceholder": "Details (optional)",
+      "inappropriate": "Inappropriate content",
+      "inappropriateHint": "Shocking, violent or out-of-place remarks",
+      "harassment": "Harassment",
+      "harassmentHint": "Personal attacks, intimidation",
+      "spam": "Spam or advertising",
+      "spamHint": "Repetitive or promotional message",
+      "misinformation": "Misinformation",
+      "misinformationHint": "False or misleading information",
+      "privacy": "Privacy issue",
+      "privacyHint": "Personal data, photo of a minor",
+      "other": "Other",
+      "otherHint": "Please specify below"
+    },
+    "moderation": {
+      "tab": "Moderation",
+      "title": "Wall moderation",
+      "hint": "Reported content stays visible until a manager hides or deletes it.",
+      "pending": "Pending",
+      "reviewing": "In progress",
+      "actioned": "Handled",
+      "dismissed": "Dismissed",
+      "empty": "No reports",
+      "emptyHint": "Content reported by members will appear here.",
+      "post": "Post",
+      "comment": "Comment",
+      "originalPost": "Original post",
+      "by": "Reported by",
+      "author": "Written by",
+      "hidden": "Hidden",
+      "deleted": "Deleted",
+      "hide": "Hide",
+      "unhide": "Unhide",
+      "dismiss": "Dismiss",
+      "done": "Report handled",
+      "hiddenBadge": "Hidden by moderation — visible to managers only",
+      "hiddenBadgeShort": "Hidden"
     }
   },
   "chat": {
@@ -2280,7 +2326,10 @@
       "convocationSilence_other": "{{count}} no response",
       "reducedSquadTitle": "Reduced squad",
       "reducedSquadSubtitle_one": "{{count}} player unavailable in 14d",
-      "reducedSquadSubtitle_other": "{{count}} players unavailable in 14d"
+      "reducedSquadSubtitle_other": "{{count}} players unavailable in 14d",
+      "staffUncovered": "No coach available",
+      "staffUncoveredTeam": "No coach available — {{team}}",
+      "staffUncoveredFallback": "Event"
     },
     "self": {
       "convocationSilence": "You haven't replied"
@@ -2519,5 +2568,12 @@
   },
   "network": {
     "offline": "No internet connection"
+  },
+  "staffCoverage": {
+    "badge": {
+      "assured": "Staffing confirmed",
+      "unassigned": "No coach assigned",
+      "uncovered": "No coach available"
+    }
   }
 }

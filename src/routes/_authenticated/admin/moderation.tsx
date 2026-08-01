@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/admin/moderation")({
   notFoundComponent: () => <div className="p-6 text-sm">Page introuvable</div>,
 });
 
-const REASONS: Record<string, string> = {
+const REASON_FALLBACK: Record<string, string> = {
   inappropriate: "Contenu inapproprié",
   harassment: "Harcèlement",
   spam: "Spam",
@@ -233,7 +233,9 @@ function ModerationPage() {
                         {t("chatReport.badge", { defaultValue: "Message de chat" })}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
-                        {REASONS[c.reason] ?? c.reason}
+                        {t(`wall.report.${c.reason}`, {
+                          defaultValue: REASON_FALLBACK[c.reason] ?? c.reason,
+                        })}
                       </Badge>
                       {c.deleted && (
                         <Badge variant="destructive" className="text-[10px]">
@@ -311,7 +313,9 @@ function ModerationPage() {
                             : t("wall.moderation.post", { defaultValue: "Publication" })}
                         </Badge>
                         <Badge variant="secondary" className="text-[10px]">
-                          {REASONS[r.reason] ?? r.reason}
+                          {t(`wall.report.${r.reason}`, {
+                            defaultValue: REASON_FALLBACK[r.reason] ?? r.reason,
+                          })}
                         </Badge>
                         {r.hidden && (
                           <Badge variant="destructive" className="text-[10px]">
@@ -441,7 +445,9 @@ function ModerationPage() {
                     {t("userReport.tabMembers", { defaultValue: "Membres" })}
                   </Badge>
                   <Badge variant="secondary" className="text-[10px]">
-                    {REASONS[r.reason] ?? r.reason}
+                    {t(`wall.report.${r.reason}`, {
+                      defaultValue: REASON_FALLBACK[r.reason] ?? r.reason,
+                    })}
                   </Badge>
                 </div>
                 <p className="text-sm">

@@ -1338,6 +1338,52 @@
     "email": {
       "subject": "Nouveau message de {{club}}",
       "viewOnWall": "Voir sur le mur"
+    },
+    "report": {
+      "title": "Signaler ce contenu",
+      "subtitle": "Votre signalement est envoyé aux responsables du club. L'auteur n'est pas informé.",
+      "action": "Signaler",
+      "submit": "Signaler",
+      "sent": "Signalement transmis aux responsables du club.",
+      "already": "Vous avez déjà signalé ce contenu.",
+      "notFound": "Ce contenu n'est plus disponible.",
+      "detailsPlaceholder": "Précisions (facultatif)",
+      "inappropriate": "Contenu inapproprié",
+      "inappropriateHint": "Propos choquants, violents ou déplacés",
+      "harassment": "Harcèlement",
+      "harassmentHint": "Attaques personnelles, intimidation",
+      "spam": "Spam ou publicité",
+      "spamHint": "Message répétitif ou promotionnel",
+      "misinformation": "Information erronée",
+      "misinformationHint": "Information fausse ou trompeuse",
+      "privacy": "Atteinte à la vie privée",
+      "privacyHint": "Données personnelles, photo d'un mineur",
+      "other": "Autre",
+      "otherHint": "Précisez ci-dessous"
+    },
+    "moderation": {
+      "tab": "Modération",
+      "title": "Modération du mur",
+      "hint": "Les contenus signalés restent visibles tant qu'un responsable ne les masque pas ou ne les supprime pas.",
+      "pending": "En attente",
+      "reviewing": "En cours",
+      "actioned": "Traités",
+      "dismissed": "Ignorés",
+      "empty": "Aucun signalement",
+      "emptyHint": "Les contenus signalés par les membres apparaîtront ici.",
+      "post": "Publication",
+      "comment": "Commentaire",
+      "originalPost": "Publication d'origine",
+      "by": "Signalé par",
+      "author": "Écrit par",
+      "hidden": "Masqué",
+      "deleted": "Supprimé",
+      "hide": "Masquer",
+      "unhide": "Réafficher",
+      "dismiss": "Ignorer",
+      "done": "Signalement traité",
+      "hiddenBadge": "Masqué par la modération — visible par les responsables uniquement",
+      "hiddenBadgeShort": "Masqué"
     }
   },
   "chat": {
@@ -2280,7 +2326,10 @@
       "convocationSilence_other": "{{count}} sans réponse",
       "reducedSquadTitle": "Effectif réduit",
       "reducedSquadSubtitle_one": "{{count}} joueur indisponible sur 14j",
-      "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j"
+      "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j",
+      "staffUncovered": "Aucun coach disponible",
+      "staffUncoveredTeam": "Aucun coach disponible — {{team}}",
+      "staffUncoveredFallback": "Événement"
     },
     "self": {
       "convocationSilence": "Tu n'as pas répondu"
@@ -2519,5 +2568,12 @@
   },
   "network": {
     "offline": "Pas de connexion internet"
+  },
+  "staffCoverage": {
+    "badge": {
+      "assured": "Encadrement assuré",
+      "unassigned": "Pas de coach assigné",
+      "uncovered": "Aucun coach dispo"
+    }
   }
 }
