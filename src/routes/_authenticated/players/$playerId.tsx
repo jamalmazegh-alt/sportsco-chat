@@ -548,7 +548,6 @@ function PlayerProfile() {
       const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
       // cache-buster : le fichier est écrasé (upsert) sur la même URL
       photo_url = `${data.publicUrl}?v=${Date.now()}`;
-
     }
 
     const prevEmail = (player.email ?? "").toLowerCase().trim();
