@@ -234,20 +234,46 @@ function DocumentRow({
   authorName,
   dateLocale,
   onOpenPost,
+  canRename,
+  onRename,
 }: {
   doc: WallDocument;
   authorName?: string;
   dateLocale: Locale;
   onOpenPost: (postId: string) => void;
+  canRename: boolean;
+  onRename: (doc: WallDocument, label: string) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(doc.label ?? doc.name);
+  const [saving, setSaving] = useState(false);
   const d = new Date(doc.createdAt);
   const kind = documentKind(doc.type, doc.name);
   const Icon = KIND_ICONS[kind];
   const size = formatFileSize(doc.size);
   const meta = [doc.label ? doc.name : null, size, authorName].filter(Boolean).join(" · ");
   const previewable = isPreviewable(doc);
+
+  async function save() {
+    const label = draft.trim();
+    if (!label || label === (doc.label ?? doc.name)) {
+      setEditing(false);
+      return;
+    }
+    setSaving(true);
+    try {
+      await onRename(doc, label);
+      setEditing(false);
+    } catch {
+      toast.error(
+        t("wall.documents.renameError", { defaultValue: "Le renommage a échoué. Réessayez." }),
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <li className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40">
@@ -260,26 +286,69 @@ function DocumentRow({
         <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
       </div>
       <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-        {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers
-            l'aperçu quand le type s'y prête, ou vers le navigateur natif en
-            WebView, où `target="_blank"` est inerte. */}
-        <a
-          href={doc.url}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => {
-            if (previewable && !e.metaKey && !e.ctrlKey && e.button === 0) {
-              e.preventDefault();
-              setPreview(true);
-              return;
-            }
-            handleDocumentClick(e, doc.url);
-          }}
-          className="text-sm font-medium truncate hover:underline"
-        >
-          {doc.label ?? doc.name}
-        </a>
+        {editing ? (
+          <div className="flex items-center gap-2">
+            <Input
+              autoFocus
+              value={draft}
+              maxLength={80}
+              disabled={saving}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void save();
+                if (e.key === "Escape") {
+                  setDraft(doc.label ?? doc.name);
+                  setEditing(false);
+                }
+              }}
+              className="h-8 text-sm"
+            />
+            <Button size="sm" className="h-8" onClick={() => void save()} disabled={saving}>
+              {saving ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                t("common.save", { defaultValue: "Enregistrer" })
+              )}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 min-w-0">
+            {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers
+                l'aperçu quand le type s'y prête, ou vers le navigateur natif en
+                WebView, où `target="_blank"` est inerte. */}
+            <a
+              href={doc.url}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(e) => {
+                if (previewable && !e.metaKey && !e.ctrlKey && e.button === 0) {
+                  e.preventDefault();
+                  setPreview(true);
+                  return;
+                }
+                handleDocumentClick(e, doc.url);
+              }}
+              className="text-sm font-medium truncate hover:underline"
+            >
+              {doc.label ?? doc.name}
+            </a>
+            {canRename && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDraft(doc.label ?? doc.name);
+                  setEditing(true);
+                }}
+                className="shrink-0 text-muted-foreground hover:text-foreground"
+                aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        )}
         {meta && <p className="text-[11px] text-muted-foreground truncate">{meta}</p>}
+
         {/* Vignette dans le corps de la carte, comme les pièces jointes du mur. */}
         {kind === "image" && (
           <button
