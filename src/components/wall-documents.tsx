@@ -221,31 +221,14 @@ function DocumentRow({
 
   return (
     <li className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40">
-      {/* Bloc date à gauche, comme la page Événements — l'heure y est remplacée
-          par la vignette (image) ou l'icône du type de fichier. */}
-      {kind === "image" ? (
-        <button
-          type="button"
-          onClick={() => setPreview(true)}
-          className="w-16 shrink-0 bg-muted overflow-hidden"
-          aria-label={t("wall.documents.preview", { defaultValue: "Aperçu" })}
-        >
-          <img
-            src={doc.url}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover min-h-[72px]"
-          />
-        </button>
-      ) : (
-        <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-            {format(d, "EEE", { locale: dateLocale })}
-          </span>
-          <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
-          <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
-        </div>
-      )}
+      {/* Bloc date à gauche, comme la page Événements. */}
+      <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+          {format(d, "EEE", { locale: dateLocale })}
+        </span>
+        <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
+        <Icon className="h-3.5 w-3.5 text-muted-foreground mt-1" />
+      </div>
       <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
         {/* Lien réel sur le web (nouvel onglet, copie du lien) ; dévié vers
             l'aperçu quand le type s'y prête, ou vers le navigateur natif en
@@ -267,6 +250,18 @@ function DocumentRow({
           {doc.label ?? doc.name}
         </a>
         {meta && <p className="text-[11px] text-muted-foreground truncate">{meta}</p>}
+        {/* Vignette dans le corps de la carte, comme les pièces jointes du mur. */}
+        {kind === "image" && (
+          <button
+            type="button"
+            onClick={() => setPreview(true)}
+            className="mt-1 w-24 shrink-0 rounded-lg overflow-hidden border border-border"
+            aria-label={t("wall.documents.preview", { defaultValue: "Aperçu" })}
+          >
+            <img src={doc.url} alt="" loading="lazy" className="h-24 w-24 object-cover" />
+          </button>
+        )}
+
         <div className="flex items-center gap-2">
           {doc.hidden && (
             <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-400">
