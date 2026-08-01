@@ -89,8 +89,6 @@ export function WallDocuments({
     setDocs((prev) => prev.map((d) => (d.key === doc.key ? { ...d, label } : d)));
   }, []);
 
-
-
   const load = useCallback(
     async (pageIndex: number) => {
       let query = supabase
@@ -208,7 +206,6 @@ export function WallDocuments({
                 canRename={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
                 onRename={renameDoc}
               />
-
             ))}
           </ul>
         </section>
