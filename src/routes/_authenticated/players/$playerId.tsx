@@ -596,7 +596,14 @@ function PlayerProfile() {
     setChildAccessBusy(true);
     try {
       const res = await setChildAccessFn({
-        data: { player_id: player.id, enabled: value, attestation: value ? true : undefined },
+        data: {
+          player_id: player.id,
+          enabled: value,
+          attestation: value ? true : undefined,
+          // Langue du document effectivement affiché au parent : c'est cette
+          // version-là que la trace de consentement doit référencer.
+          locale: i18n.language?.split("-")[0],
+        },
       });
       if (!res.ok) {
         toast.error(
