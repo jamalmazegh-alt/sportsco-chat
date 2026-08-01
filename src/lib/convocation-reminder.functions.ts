@@ -202,6 +202,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
         await enqueueTransactionalEmailServer({
           templateName: "convocation-invite",
           recipientEmail: r.email,
+          fromName: `${ev.teams?.clubs?.name ?? "Clubero"} via Clubero`,
           idempotencyKey: `manual-reminder:${(conv as any).id}:${ts}:${r.email}`,
           templateData: {
             recipientFirstName: r.firstName,
