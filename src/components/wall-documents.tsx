@@ -214,6 +214,7 @@ export function WallDocuments({
                 onOpenPost={onOpenPost}
                 canRename={canManageAll || (!!user?.id && doc.authorUserId === user.id)}
                 onRename={renameDoc}
+                onDelete={deleteDoc}
               />
             ))}
           </ul>
