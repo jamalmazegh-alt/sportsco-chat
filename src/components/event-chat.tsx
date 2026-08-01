@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useUserMutes } from "@/lib/use-mutes";
+import { filterMutedMessages } from "@/lib/mutes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, MessageCircle, Lock, ChevronDown } from "lucide-react";
@@ -25,6 +27,7 @@ const PAGE_SIZE = 30;
 export function EventChat({ eventId }: { eventId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { muted } = useUserMutes();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);
@@ -36,6 +39,8 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  // Masquage personnel : les messages des personnes masquées sont filtrés au rendu.
+  const visibleMessages = useMemo(() => filterMutedMessages(messages, muted), [messages, muted]);
 
   async function attachAuthors(msgs: Msg[]): Promise<Msg[]> {
     const ids = Array.from(new Set(msgs.map((m) => m.author_user_id).filter(Boolean)));
@@ -198,8 +203,8 @@ export function EventChat({ eventId }: { eventId: string }) {
         <div className="flex items-center gap-2">
           <MessageCircle className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
-          {messages.length > 0 && (
-            <span className="text-[11px] text-muted-foreground">· {messages.length}</span>
+          {visibleMessages.length > 0 && (
+            <span className="text-[11px] text-muted-foreground">· {visibleMessages.length}</span>
           )}
         </div>
         <ChevronDown
@@ -224,10 +229,10 @@ export function EventChat({ eventId }: { eventId: string }) {
                 </button>
               </div>
             )}
-            {messages.length === 0 && (
+            {visibleMessages.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-6">{t("chat.empty")}</p>
             )}
-            {messages.map((m) => {
+            {visibleMessages.map((m) => {
               const mine = m.author_user_id === user?.id;
               return (
                 <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>

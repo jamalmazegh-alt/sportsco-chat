@@ -1284,6 +1284,18 @@
     "tooLarge": "{{name}} is groter dan 10 MB.",
     "invalidType": "Niet toegestaan bestandstype: {{name}}"
   },
+  "mutes": {
+    "action": "Deze persoon verbergen",
+    "confirmTitle": "Inhoud van {{name}} verbergen?",
+    "confirmBody": "Je ziet hun berichten, reacties en chatberichten niet meer. Officiële communicatie (oproepen, evenementen, meldingen) blijft zichtbaar. Je kunt dit altijd ongedaan maken via Profiel → Privacy.",
+    "confirm": "Verbergen",
+    "muted": "Inhoud van {{name}} is nu verborgen.",
+    "sectionTitle": "Verborgen personen",
+    "sectionHint": "Je ziet geen prikbord- en chatinhoud meer van deze personen. Officiële communicatie blijft zichtbaar.",
+    "empty": "Je hebt niemand verborgen.",
+    "unmute": "Weer tonen",
+    "unmuted": "Inhoud weer zichtbaar."
+  },
   "wall": {
     "title": "Club prikbord",
     "subtitle": "Aankondigingen en discussies.",

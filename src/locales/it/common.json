@@ -1284,6 +1284,18 @@
     "tooLarge": "{{name}} supera i 10 MB.",
     "invalidType": "Tipo di file non consentito: {{name}}"
   },
+  "mutes": {
+    "action": "Nascondi questa persona",
+    "confirmTitle": "Nascondere i contenuti di {{name}}?",
+    "confirmBody": "Non vedrai più i suoi post, commenti, reazioni e messaggi. Le comunicazioni ufficiali (convocazioni, eventi, notifiche) restano visibili. Puoi mostrarla di nuovo in qualsiasi momento da Profilo → Privacy.",
+    "confirm": "Nascondi",
+    "muted": "I contenuti di {{name}} sono ora nascosti.",
+    "sectionTitle": "Persone nascoste",
+    "sectionHint": "Non vedi più i contenuti pubblicati sul muro e nella chat da queste persone. Le comunicazioni ufficiali restano visibili.",
+    "empty": "Non hai nascosto nessuno.",
+    "unmute": "Mostra di nuovo",
+    "unmuted": "Contenuti di nuovo visibili."
+  },
   "wall": {
     "title": "Bacheca del Club",
     "subtitle": "Annunci e discussioni.",

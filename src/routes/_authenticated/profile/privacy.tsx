@@ -32,7 +32,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { Download, Trash2, ShieldCheck, Loader2, ChevronRight, UserX } from "lucide-react";
+import { useUserMutes, USER_MUTES_QUERY_KEY } from "@/lib/use-mutes";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -80,6 +81,40 @@ function PrivacyPage() {
     queryFn: () => fetchRequests(),
     enabled: !!user,
   });
+
+  // Personnes masquées (masquage personnel des contenus sociaux)
+  const { unmute } = useUserMutes();
+  const { data: mutedPeople } = useQuery({
+    queryKey: [USER_MUTES_QUERY_KEY, "detailed", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data: rows } = await supabase
+        .from("user_mutes")
+        .select("muted_user_id, created_at")
+        .order("created_at", { ascending: false });
+      const ids = (rows ?? []).map((r) => r.muted_user_id as string);
+      if (ids.length === 0) return [];
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
+      const names = new Map(
+        (profs ?? []).map((p) => [p.id as string, p.full_name as string | null]),
+      );
+      return (rows ?? []).map((r) => ({
+        id: r.muted_user_id as string,
+        name: names.get(r.muted_user_id as string) ?? "—",
+        since: r.created_at as string,
+      }));
+    },
+  });
+
+  async function onUnmute(id: string) {
+    const { error } = await unmute(id);
+    if (error) {
+      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: [USER_MUTES_QUERY_KEY] });
+    toast.success(t("mutes.unmuted", { defaultValue: "Contenus réaffichés." }));
+  }
 
   // Children (players where current user is parent)
   const { data: children } = useQuery({
@@ -262,6 +297,44 @@ function PrivacyPage() {
           </div>
         </section>
       )}
+
+      {/* Personnes masquées */}
+      <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <UserX className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold">
+            {t("mutes.sectionTitle", { defaultValue: "Personnes masquées" })}
+          </h2>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {t("mutes.sectionHint", {
+            defaultValue:
+              "Vous ne voyez plus les contenus publiés sur le mur et dans le chat par ces personnes. Les communications officielles restent visibles.",
+          })}
+        </p>
+        {!mutedPeople?.length ? (
+          <p className="text-xs text-muted-foreground">
+            {t("mutes.empty", { defaultValue: "Vous n'avez masqué personne." })}
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {mutedPeople.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+              >
+                <div className="min-w-0 text-sm">
+                  <div className="font-medium truncate">{m.name}</div>
+                  <p className="text-xs text-muted-foreground">{format(new Date(m.since), "PP")}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => onUnmute(m.id)}>
+                  {t("mutes.unmute", { defaultValue: "Réafficher" })}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Legal docs section removed — each consent above opens its document. */}
 

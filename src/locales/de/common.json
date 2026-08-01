@@ -1289,6 +1289,18 @@
     "tooLarge": "{{name}} überschreitet 10 MB.",
     "invalidType": "Dateityp nicht erlaubt: {{name}}"
   },
+  "mutes": {
+    "action": "Diese Person ausblenden",
+    "confirmTitle": "Inhalte von {{name}} ausblenden?",
+    "confirmBody": "Du siehst ihre Beiträge, Kommentare, Reaktionen und Nachrichten nicht mehr. Offizielle Mitteilungen (Aufgebote, Termine, Benachrichtigungen) bleiben sichtbar. Du kannst sie jederzeit unter Profil → Datenschutz wieder einblenden.",
+    "confirm": "Ausblenden",
+    "muted": "Inhalte von {{name}} sind jetzt ausgeblendet.",
+    "sectionTitle": "Ausgeblendete Personen",
+    "sectionHint": "Du siehst keine Pinnwand- und Chat-Inhalte dieser Personen mehr. Offizielle Mitteilungen bleiben sichtbar.",
+    "empty": "Du hast niemanden ausgeblendet.",
+    "unmute": "Wieder einblenden",
+    "unmuted": "Inhalte wieder sichtbar."
+  },
   "wall": {
     "title": "Vereinspinnwand",
     "subtitle": "Ankündigungen und Diskussionen.",

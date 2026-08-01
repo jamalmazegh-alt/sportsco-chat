@@ -7458,6 +7458,27 @@ export type Database = {
           },
         ]
       }
+      user_mutes: {
+        Row: {
+          created_at: string
+          id: string
+          muted_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          muted_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          muted_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       verification_codes: {
         Row: {
           attempts: number

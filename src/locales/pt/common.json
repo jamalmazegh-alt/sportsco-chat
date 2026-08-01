@@ -1284,6 +1284,18 @@
     "tooLarge": "{{name}} excede 10 MB.",
     "invalidType": "Tipo de ficheiro não permitido: {{name}}"
   },
+  "mutes": {
+    "action": "Ocultar esta pessoa",
+    "confirmTitle": "Ocultar o conteúdo de {{name}}?",
+    "confirmBody": "Deixará de ver as suas publicações, comentários, reações e mensagens. As comunicações oficiais (convocatórias, eventos, notificações) continuam visíveis. Pode voltar a mostrá-la a qualquer momento em Perfil → Privacidade.",
+    "confirm": "Ocultar",
+    "muted": "O conteúdo de {{name}} está agora oculto.",
+    "sectionTitle": "Pessoas ocultas",
+    "sectionHint": "Já não vê o conteúdo publicado no mural e no chat por estas pessoas. As comunicações oficiais continuam visíveis.",
+    "empty": "Não ocultou ninguém.",
+    "unmute": "Mostrar novamente",
+    "unmuted": "Conteúdo visível novamente."
+  },
   "wall": {
     "title": "Mural do Clube",
     "subtitle": "Anúncios e discussões.",
