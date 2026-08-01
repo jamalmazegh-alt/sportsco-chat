@@ -19,7 +19,9 @@ import { isNativePlatform } from "@/lib/native-platform";
 export async function openDocument(url: string): Promise<void> {
   if (!url) return;
   if (!isNativePlatform()) {
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Pas de chaîne de « window features » : elle forcerait une popup (souvent
+    // bloquée silencieusement) au lieu d'un véritable onglet.
+    window.open(url, "_blank");
     return;
   }
   try {
@@ -28,9 +30,31 @@ export async function openDocument(url: string): Promise<void> {
     // Un échec du bridge ne doit pas laisser l'utilisateur sans rien : on
     // retombe sur la navigation WebView, qui vaut mieux qu'un clic mort.
     console.warn("[open-document] Browser.open failed:", (e as Error).message);
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(url, "_blank");
   }
 }
+
+/**
+ * Téléchargement d'un document (URL servie avec `Content-Disposition:
+ * attachment`). On n'ouvre **aucune** fenêtre : une popup n'aurait rien à
+ * afficher et se ferait bloquer. Sur le web, `location.href` déclenche le
+ * téléchargement sans quitter la page. En natif, seule une ouverture par le
+ * navigateur système sait télécharger depuis une WebView.
+ */
+export async function downloadDocument(url: string): Promise<void> {
+  if (!url) return;
+  if (!isNativePlatform()) {
+    window.location.href = url;
+    return;
+  }
+  try {
+    await Browser.open({ url });
+  } catch (e) {
+    console.warn("[open-document] Browser.open (download) failed:", (e as Error).message);
+    window.location.href = url;
+  }
+}
+
 
 /**
  * Handler de clic pour un `<a href>` : conserve les sémantiques web (clic
