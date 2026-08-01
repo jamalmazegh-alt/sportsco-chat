@@ -17,6 +17,8 @@ const inboxSearch = z.object({
   tab: z.enum(["wall", "documents"]).optional(),
 });
 
+type InboxSearch = z.infer<typeof inboxSearch>;
+
 export const Route = createFileRoute("/_authenticated/inbox")({
   component: InboxPage,
   validateSearch: (s) => inboxSearch.parse(s),
