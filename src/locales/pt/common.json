@@ -704,7 +704,13 @@
       "failed": "{{failed}} linha(s) com erros"
     },
     "inviteAlreadyActive": "Conta já ativa — não é preciso reenviar.",
-    "parentActivationPending": "Aguardando ativação da conta do responsável"
+    "parentActivationPending": "Aguardando ativação da conta do responsável",
+    "childConsentTitle": "Ativar o acesso à plataforma de {{name}}?",
+    "childConsentBody": "O jogador menor receberá um convite para criar o seu próprio acesso Clubero, sob a responsabilidade do seu representante legal.",
+    "childConsentParent": "Confirmo que sou o representante legal deste jogador e autorizo a criação do seu acesso.",
+    "childConsentStaff": "Confirmo que um representante legal deste jogador deu o seu acordo para a criação do seu acesso.",
+    "childConsentDoc": "Ler o documento «Consentimento parental»",
+    "childConsentConfirm": "Ativar o acesso"
   },
   "events": {
     "isOfficial": "Jogo oficial",

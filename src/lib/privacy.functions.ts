@@ -233,3 +233,65 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+/**
+ * Active / désactive l'accès plateforme d'un joueur mineur, avec trace
+ * versionnée du consentement parental (kind `parental_consent`,
+ * on_behalf_of_player_id) — même pattern que setPlayerMediaConsent.
+ *
+ * L'activation exige une attestation explicite : le parent confirme être le
+ * représentant légal, ou un responsable du club atteste qu'un représentant
+ * légal a donné son accord. La trace enregistre QUI a attesté (user_id) et
+ * si un lien parent existait (retour viaParentLink, pour l'UI).
+ * Les droits d'écriture sur players restent gouvernés par la RLS existante.
+ */
+export const setChildPlatformAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { player_id: string; enabled: boolean; attestation?: boolean }) =>
+    z
+      .object({
+        player_id: z.string().uuid(),
+        enabled: z.boolean(),
+        attestation: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.enabled && data.attestation !== true) {
+      throw new Error("attestation_required");
+    }
+
+    const { data: parentLink } = await supabase
+      .from("player_parents")
+      .select("id")
+      .eq("player_id", data.player_id)
+      .eq("parent_user_id", userId)
+      .maybeSingle();
+
+    const { error } = await supabase
+      .from("players")
+      .update({ child_platform_access: data.enabled })
+      .eq("id", data.player_id);
+    if (error) throw error;
+
+    const { data: version } = await supabase
+      .from("consent_versions")
+      .select("id")
+      .eq("kind", "parental_consent")
+      .order("version", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (version?.id) {
+      await supabase.from("user_consents").insert({
+        user_id: userId,
+        version_id: version.id,
+        kind: "parental_consent",
+        granted: data.enabled,
+        on_behalf_of_player_id: data.player_id,
+      });
+    }
+
+    return { ok: true, viaParentLink: !!parentLink };
+  });

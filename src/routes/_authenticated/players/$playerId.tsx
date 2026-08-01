@@ -55,6 +55,8 @@ import {
 } from "lucide-react";
 import { WallReportDialog } from "@/components/wall-report-dialog";
 import { useUserMutes } from "@/lib/use-mutes";
+import { Checkbox } from "@/components/ui/checkbox";
+import { setChildPlatformAccess } from "@/lib/privacy.functions";
 import { BackButton } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
@@ -572,7 +574,33 @@ function PlayerProfile() {
     // auto-send emails on save or on toggling access.
   }
 
-  async function toggleChildAccess(value: boolean) {
+  // Activation de l'accès enfant : attestation « représentant légal » exigée
+  // et tracée (consentement parental versionné) — la désactivation est
+  // immédiate et tracée comme retrait.
+  const setChildAccessFn = useServerFn(setChildPlatformAccess);
+  const [childAccessDialog, setChildAccessDialog] = useState(false);
+  const [childAccessAttested, setChildAccessAttested] = useState(false);
+  const [childAccessBusy, setChildAccessBusy] = useState(false);
+
+  async function applyChildAccess(value: boolean) {
+    if (!player) return;
+    setChildAccessBusy(true);
+    try {
+      await setChildAccessFn({
+        data: { player_id: player.id, enabled: value, attestation: value ? true : undefined },
+      });
+      refetchPlayer();
+      toast.success(t("common.saved"));
+      setChildAccessDialog(false);
+      setChildAccessAttested(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setChildAccessBusy(false);
+    }
+  }
+
+  function toggleChildAccess(value: boolean) {
     if (!player) return;
     if (value) {
       const target = (email || player.email || "").trim();
@@ -580,17 +608,11 @@ function PlayerProfile() {
         toast.error(t("players.childAccessNeedsEmail"));
         return;
       }
-    }
-    const { error } = await supabase
-      .from("players")
-      .update({ child_platform_access: value })
-      .eq("id", player.id);
-    if (error) {
-      toast.error(error.message);
+      setChildAccessAttested(false);
+      setChildAccessDialog(true);
       return;
     }
-    refetchPlayer();
-    toast.success(t("common.saved"));
+    void applyChildAccess(false);
   }
 
   // ---- Parent form (collapsed) — used for add AND edit ----
@@ -833,6 +855,68 @@ function PlayerProfile() {
           }}
         />
       )}
+
+      <AlertDialog
+        open={childAccessDialog}
+        onOpenChange={(v) => {
+          setChildAccessDialog(v);
+          if (!v) setChildAccessAttested(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("players.childConsentTitle", {
+                defaultValue: "Activer l'accès plateforme de {{name}} ?",
+                name: `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim() || "—",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("players.childConsentBody", {
+                defaultValue:
+                  "Le joueur mineur recevra une invitation pour créer son propre accès Clubero, sous la responsabilité de son représentant légal.",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <label className="flex items-start gap-2.5 rounded-lg border border-border p-3 text-sm cursor-pointer">
+            <Checkbox
+              checked={childAccessAttested}
+              onCheckedChange={(v) => setChildAccessAttested(v === true)}
+              className="mt-0.5"
+            />
+            <span>
+              {isParentOfThisPlayer
+                ? t("players.childConsentParent", {
+                    defaultValue:
+                      "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
+                  })
+                : t("players.childConsentStaff", {
+                    defaultValue:
+                      "Je confirme qu'un représentant légal de ce joueur a donné son accord pour la création de son accès.",
+                  })}
+            </span>
+          </label>
+          <Link
+            to="/legal/$kind"
+            params={{ kind: "parental_consent" }}
+            target="_blank"
+            className="text-xs text-primary hover:underline"
+          >
+            {t("players.childConsentDoc", {
+              defaultValue: "Lire le document « Consentement parental »",
+            })}
+          </Link>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!childAccessAttested || childAccessBusy}
+              onClick={() => applyChildAccess(true)}
+            >
+              {t("players.childConsentConfirm", { defaultValue: "Activer l'accès" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={muteOpen} onOpenChange={setMuteOpen}>
         <AlertDialogContent>

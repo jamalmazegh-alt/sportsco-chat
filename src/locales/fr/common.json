@@ -704,7 +704,13 @@
       "done": "{{inserted}} joueur(s) importé(s)",
       "failed": "{{failed}} ligne(s) en erreur"
     },
-    "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer."
+    "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer.",
+    "childConsentTitle": "Activer l'accès plateforme de {{name}} ?",
+    "childConsentBody": "Le joueur mineur recevra une invitation pour créer son propre accès Clubero, sous la responsabilité de son représentant légal.",
+    "childConsentParent": "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
+    "childConsentStaff": "Je confirme qu'un représentant légal de ce joueur a donné son accord pour la création de son accès.",
+    "childConsentDoc": "Lire le document « Consentement parental »",
+    "childConsentConfirm": "Activer l'accès"
   },
   "events": {
     "isOfficial": "Match officiel",

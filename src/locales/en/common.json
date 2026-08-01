@@ -704,7 +704,13 @@
       "failed": "{{failed}} row(s) with errors"
     },
     "inviteAlreadyActive": "Account already active — no need to resend.",
-    "parentActivationPending": "Waiting for parent account activation"
+    "parentActivationPending": "Waiting for parent account activation",
+    "childConsentTitle": "Enable platform access for {{name}}?",
+    "childConsentBody": "The minor player will receive an invitation to create their own Clubero access, under the responsibility of their legal guardian.",
+    "childConsentParent": "I confirm that I am this player's legal guardian and I authorise the creation of their access.",
+    "childConsentStaff": "I confirm that a legal guardian of this player has agreed to the creation of their access.",
+    "childConsentDoc": "Read the “Parental Consent” document",
+    "childConsentConfirm": "Enable access"
   },
   "events": {
     "isOfficial": "Official match",
