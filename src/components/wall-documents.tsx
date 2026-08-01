@@ -19,7 +19,8 @@ import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WallFeedSkeleton } from "@/components/skeletons";
-import { handleDocumentClick } from "@/lib/open-document";
+import { handleDocumentClick, openDocument } from "@/lib/open-document";
+import { documentDownloadUrl } from "@/lib/wall/download-url";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
 
 import {
