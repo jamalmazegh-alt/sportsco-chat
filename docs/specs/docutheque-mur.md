@@ -1,6 +1,8 @@
 # Docuthèque — onglet « Documents » du mur
 
-> **Statut :** spécification V1 validée, non implémentée.
+> **Statut :** V1 implémentée. Restent à faire avant mise en production : le test e2e
+> Playwright, le test RLS (nécessite un Supabase distant + `SUPABASE_SERVICE_ROLE_KEY`) et la
+> vérification d'ouverture des PDF sur iOS/Android — voir §9.
 > **Origine :** demande club (ticket support Nicolas CLAVIER, 01/08/2026) — _« créer une
 > docuthèque avec les documents publiés sur le mur (programmes de reprise, calendrier,
 > notes d'information, etc.) »_.
@@ -326,15 +328,20 @@ Par ordre de valeur attendue :
 ## 9. Critères d'acceptation
 
 ```text
-[ ] Un onglet Documents est présent sur le mur du club et sur le mur staff d'équipe
-[ ] Publier une pièce jointe sur le mur exige un nom ; le bouton Publier reste bloqué sinon
-[ ] Le nom saisi s'affiche accolé au nom de fichier dans le mur et dans la docuthèque
-[ ] Les pièces jointes publiées avant la V1 s'affichent avec leur seul nom de fichier
-[ ] Les documents sont groupés par mois, le plus récent en haut, habillage page Événements
+[x] Un onglet Documents est présent sur le mur du club et sur le mur staff d'équipe
+[x] Publier une pièce jointe sur le mur exige un nom ; le bouton Publier reste bloqué sinon
+[x] Les 5 autres AttachmentPicker (chat, événements, tournois) restent inchangés
+[x] Le nom saisi s'affiche accolé au nom de fichier dans le mur et dans la docuthèque
+[x] Les pièces jointes publiées avant la V1 s'affichent avec leur seul nom de fichier
+[x] Les documents sont groupés par mois, le plus récent en haut, habillage page Événements
+[x] Un document d'un post supprimé ou masqué n'apparaît pas (hors admin/dirigeant)
+[x] « Voir la publication » ramène au post d'origine, surligné, sur l'onglet Mur
+[x] Le deep-link push ?post=<uuid> ouvre toujours l'onglet Mur, sans régression
+[x] 7 locales complètes ; check:i18n, check:guards, test, format:check et build verts
 [ ] Un parent ne voit que les documents des publications qui lui étaient destinées
-[ ] Un document d'un post supprimé ou masqué n'apparaît pas (hors admin/dirigeant)
-[ ] « Voir la publication » ramène au post d'origine, surligné, sur l'onglet Mur
-[ ] Le deep-link push ?post=<uuid> ouvre toujours l'onglet Mur, sans régression
-[ ] Ouverture et téléchargement fonctionnels sur web, iOS et Android
-[ ] 7 locales complètes ; check:i18n, check:guards, test, typecheck et format:check verts
+    → repose sur la RLS `wall_posts_select` inchangée, mais NON rejoué : `test:rls`
+      exige un Supabase distant + SUPABASE_SERVICE_ROLE_KEY
+[ ] Ouverture et téléchargement vérifiés sur iOS et Android
+    → le lien reste identique à celui déjà utilisé par le mur ; à valider sur device
+[ ] Test e2e Playwright du parcours complet
 ```

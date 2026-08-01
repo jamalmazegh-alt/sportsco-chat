@@ -1288,7 +1288,11 @@
   "attachments": {
     "add": "Bestand toevoegen",
     "tooLarge": "{{name}} is groter dan 10 MB.",
-    "invalidType": "Niet toegestaan bestandstype: {{name}}"
+    "invalidType": "Niet toegestaan bestandstype: {{name}}",
+    "documentName": "Naam van het document",
+    "documentNamePlaceholder": "Naam van het document (bijv. Trainingsschema)",
+    "remove": "Verwijderen",
+    "labelRequired": "Geef elk document een naam voordat je publiceert."
   },
   "mutes": {
     "action": "Deze persoon verbergen",
@@ -1390,6 +1394,16 @@
       "done": "Melding behandeld",
       "hiddenBadge": "Verborgen door moderatie — alleen zichtbaar voor verantwoordelijken",
       "hiddenBadgeShort": "Verborgen"
+    },
+    "tabs": {
+      "wall": "Muur",
+      "documents": "Documenten"
+    },
+    "documents": {
+      "empty": "Nog geen documenten. Bestanden bij muurberichten verschijnen hier.",
+      "loadMore": "Meer tonen",
+      "viewPost": "Bericht bekijken",
+      "loadError": "De documenten konden niet worden geladen. Probeer het zo opnieuw."
     }
   },
   "chat": {

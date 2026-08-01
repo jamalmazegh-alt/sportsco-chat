@@ -1288,7 +1288,11 @@
   "attachments": {
     "add": "Aggiungi file",
     "tooLarge": "{{name}} supera i 10 MB.",
-    "invalidType": "Tipo di file non consentito: {{name}}"
+    "invalidType": "Tipo di file non consentito: {{name}}",
+    "documentName": "Nome del documento",
+    "documentNamePlaceholder": "Nome del documento (es. Programma di ripresa)",
+    "remove": "Rimuovi",
+    "labelRequired": "Assegna un nome a ogni documento prima di pubblicare."
   },
   "mutes": {
     "action": "Nascondi questa persona",
@@ -1390,6 +1394,16 @@
       "done": "Segnalazione gestita",
       "hiddenBadge": "Nascosto dalla moderazione — visibile solo ai responsabili",
       "hiddenBadgeShort": "Nascosto"
+    },
+    "tabs": {
+      "wall": "Bacheca",
+      "documents": "Documenti"
+    },
+    "documents": {
+      "empty": "Nessun documento per ora. I file allegati alle pubblicazioni della bacheca appariranno qui.",
+      "loadMore": "Mostra altro",
+      "viewPost": "Vedi la pubblicazione",
+      "loadError": "Non è stato possibile caricare i documenti. Riprova tra poco."
     }
   },
   "chat": {

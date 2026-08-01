@@ -1288,7 +1288,11 @@
   "attachments": {
     "add": "Add file",
     "tooLarge": "{{name}} exceeds 10 MB.",
-    "invalidType": "File type not allowed: {{name}}"
+    "invalidType": "File type not allowed: {{name}}",
+    "documentName": "Document name",
+    "documentNamePlaceholder": "Document name (e.g. Pre-season schedule)",
+    "remove": "Remove",
+    "labelRequired": "Name every document before publishing."
   },
   "mutes": {
     "action": "Hide this person",
@@ -1390,6 +1394,16 @@
       "done": "Report handled",
       "hiddenBadge": "Hidden by moderation — visible to managers only",
       "hiddenBadgeShort": "Hidden"
+    },
+    "tabs": {
+      "wall": "Wall",
+      "documents": "Documents"
+    },
+    "documents": {
+      "empty": "No documents yet. Files attached to wall posts will show up here.",
+      "loadMore": "Show more",
+      "viewPost": "View post",
+      "loadError": "Documents could not be loaded. Please try again shortly."
     }
   },
   "chat": {

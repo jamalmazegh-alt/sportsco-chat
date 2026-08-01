@@ -1,16 +1,20 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth-context";
 import { WallFeed } from "@/components/wall-feed";
+import { WallDocuments } from "@/components/wall-documents";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWallUnread } from "@/lib/use-wall-unread";
+import { scrollToWallPost } from "@/lib/wall/scroll-to-post";
 import { trackWallPostPushOpened } from "@/lib/push-dispatch.functions";
 import i18n from "@/lib/i18n";
 
 const inboxSearch = z.object({
   post: z.string().uuid().optional(),
   from: z.enum(["push"]).optional(),
+  tab: z.enum(["wall", "documents"]).optional(),
 });
 
 export const Route = createFileRoute("/_authenticated/inbox")({
@@ -28,7 +32,11 @@ function InboxPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const { markSeen } = useWallUnread(activeClubId);
-  const { post: postId, from } = useSearch({ from: "/_authenticated/inbox" });
+  const navigate = useNavigate({ from: "/inbox" });
+  const { post: postId, from, tab } = useSearch({ from: "/_authenticated/inbox" });
+  // Un deep-link push cible toujours une publication précise : il l'emporte sur
+  // l'onglet mémorisé dans l'URL, sinon la notification ouvrirait la docuthèque.
+  const activeTab = postId ? "wall" : (tab ?? "wall");
 
   // Clear the bell as soon as the user opens the wall.
   useEffect(() => {
@@ -48,17 +56,7 @@ function InboxPage() {
   // Best-effort scroll to the post once the feed has rendered it.
   useEffect(() => {
     if (!postId) return;
-    const tryScroll = (attempt: number) => {
-      const el = document.getElementById(`wall-post-${postId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        el.classList.add("ring-2", "ring-primary", "ring-offset-2");
-        setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2"), 2400);
-        return;
-      }
-      if (attempt < 10) setTimeout(() => tryScroll(attempt + 1), 250);
-    };
-    tryScroll(0);
+    return scrollToWallPost(postId);
   }, [postId]);
 
   return (
@@ -69,7 +67,39 @@ function InboxPage() {
       </header>
 
       {activeClubId ? (
-        <WallFeed clubId={activeClubId} />
+        <Tabs
+          value={activeTab}
+          onValueChange={(next) =>
+            navigate({
+              search: (prev) => ({
+                ...prev,
+                tab: next === "wall" ? undefined : "documents",
+                // Changer d'onglet à la main annule le focus sur une publication.
+                post: undefined,
+                from: undefined,
+              }),
+              replace: true,
+            })
+          }
+        >
+          <TabsList className="mb-4">
+            <TabsTrigger value="wall">{t("wall.tabs.wall", { defaultValue: "Mur" })}</TabsTrigger>
+            <TabsTrigger value="documents">
+              {t("wall.tabs.documents", { defaultValue: "Documents" })}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="wall">
+            <WallFeed clubId={activeClubId} />
+          </TabsContent>
+          <TabsContent value="documents">
+            <WallDocuments
+              clubId={activeClubId}
+              onOpenPost={(id) =>
+                navigate({ search: (prev) => ({ ...prev, tab: undefined, post: id }) })
+              }
+            />
+          </TabsContent>
+        </Tabs>
       ) : (
         <p className="text-sm text-muted-foreground text-center py-10">{t("wall.noClub")}</p>
       )}

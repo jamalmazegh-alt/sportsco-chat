@@ -1288,7 +1288,11 @@
   "attachments": {
     "add": "Añadir archivo",
     "tooLarge": "{{name}} supera los 10 MB.",
-    "invalidType": "Tipo de archivo no permitido: {{name}}"
+    "invalidType": "Tipo de archivo no permitido: {{name}}",
+    "documentName": "Nombre del documento",
+    "documentNamePlaceholder": "Nombre del documento (ej. Plan de pretemporada)",
+    "remove": "Quitar",
+    "labelRequired": "Da un nombre a cada documento antes de publicar."
   },
   "mutes": {
     "action": "Ocultar a esta persona",
@@ -1390,6 +1394,16 @@
       "done": "Denuncia tratada",
       "hiddenBadge": "Oculto por moderación — visible solo para los responsables",
       "hiddenBadgeShort": "Oculto"
+    },
+    "tabs": {
+      "wall": "Muro",
+      "documents": "Documentos"
+    },
+    "documents": {
+      "empty": "Todavía no hay documentos. Los archivos adjuntos a las publicaciones del muro aparecerán aquí.",
+      "loadMore": "Ver más",
+      "viewPost": "Ver la publicación",
+      "loadError": "No se pudieron cargar los documentos. Inténtalo de nuevo en un momento."
     }
   },
   "chat": {

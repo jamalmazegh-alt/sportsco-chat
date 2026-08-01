@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
+import { hasMissingLabel } from "@/lib/wall/documents";
 import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
@@ -1071,6 +1072,9 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
     audience !== null &&
     audience.length === 0;
+  // Docuthèque : sur le mur (et lui seul), chaque pièce jointe doit être nommée
+  // avant publication, sinon elle serait introuvable dans l'onglet Documents.
+  const labelMissing = hasMissingLabel(atts);
 
   return (
     <div className="space-y-4">
@@ -1130,7 +1134,7 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
               canPickStaff={targetableTeams.length > 0}
             />
           )}
-          <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
+          <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" requireLabel />
           <label className="flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
             <input
               type="checkbox"
@@ -1160,12 +1164,20 @@ export function WallFeed({ clubId, staffTeamId }: { clubId: string; staffTeamId?
               <p className="text-xs text-destructive">
                 {t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe." })}
               </p>
+            ) : labelMissing ? (
+              <p className="text-xs text-destructive">
+                {t("attachments.labelRequired", {
+                  defaultValue: "Donnez un nom à chaque document avant de publier.",
+                })}
+              </p>
             ) : (
               <span />
             )}
             <Button
               onClick={submitPost}
-              disabled={posting || (!body.trim() && atts.length === 0) || audienceMissing}
+              disabled={
+                posting || (!body.trim() && atts.length === 0) || audienceMissing || labelMissing
+              }
             >
               {posting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
