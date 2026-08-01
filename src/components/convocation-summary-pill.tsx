@@ -164,7 +164,6 @@ export function ConvocationSummaryGrid({
   );
 }
 
-
 export function buildConvocationCounts(
   rows: Array<{ event_id: string; status: string | null }>,
 ): Map<string, ConvocationCounts> {
