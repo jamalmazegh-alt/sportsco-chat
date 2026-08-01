@@ -8883,6 +8883,15 @@ export type Database = {
         Args: { _logo_url: string; _token: string }
         Returns: Json
       }
+      set_child_platform_access: {
+        Args: {
+          _attestation?: boolean
+          _enabled: boolean
+          _locale?: string | null
+          _player_id: string
+        }
+        Returns: undefined
+      }
       set_wall_document_excluded: {
         Args: { _excluded: boolean; _path: string; _post_id: string }
         Returns: undefined

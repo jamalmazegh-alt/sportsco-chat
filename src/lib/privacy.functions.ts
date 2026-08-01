@@ -247,14 +247,18 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
  */
 export const setChildPlatformAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { player_id: string; enabled: boolean; attestation?: boolean }) =>
-    z
-      .object({
-        player_id: z.string().uuid(),
-        enabled: z.boolean(),
-        attestation: z.boolean().optional(),
-      })
-      .parse(input),
+  .inputValidator(
+    (input: { player_id: string; enabled: boolean; attestation?: boolean; locale?: string }) =>
+      z
+        .object({
+          player_id: z.string().uuid(),
+          enabled: z.boolean(),
+          attestation: z.boolean().optional(),
+          // Langue du document présenté au parent : la trace doit pointer vers
+          // la version qu'il a réellement lue, pas une locale arbitraire.
+          locale: z.string().min(2).max(5).optional(),
+        })
+        .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -272,39 +276,34 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
       .eq("parent_user_id", userId)
       .maybeSingle();
 
-    // Activation réservée au représentant légal (doublée par le trigger DB).
+    // Activation réservée au représentant légal (doublée par la RPC + le trigger).
     if (data.enabled && !parentLink) {
       return { ok: false as const, error: "parent_required" as const };
     }
 
-    const { error } = await supabase
-      .from("players")
-      .update({ child_platform_access: data.enabled })
-      .eq("id", data.player_id);
+    // Chemin unique : la RPC écrit le drapeau ET la trace de consentement dans
+    // la même transaction. Auparavant l'UPDATE était direct et l'insertion dans
+    // `user_consents` était best-effort — un échec d'écriture renvoyait quand
+    // même un succès, donc un consentement rapporté sans être enregistré.
+    const { error } = await supabase.rpc("set_child_platform_access", {
+      _player_id: data.player_id,
+      _enabled: data.enabled,
+      _attestation: data.attestation === true,
+      _locale: data.locale ?? null,
+    });
     if (error) {
-      // Le trigger DB renvoie « parent_required » — même code pour l'UI.
-      if (error.message.includes("parent_required")) {
-        return { ok: false as const, error: "parent_required" as const };
+      // Les erreurs métier de la RPC remontent en texte : on les remappe sur
+      // les mêmes codes que ceux déjà attendus par l'interface.
+      for (const code of [
+        "attestation_required",
+        "parent_required",
+        "consent_version_missing",
+        "player_not_found",
+        "forbidden",
+      ] as const) {
+        if (error.message.includes(code)) return { ok: false as const, error: code };
       }
       return { ok: false as const, error: error.message };
-    }
-
-    const { data: version } = await supabase
-      .from("consent_versions")
-      .select("id")
-      .eq("kind", "parental_consent")
-      .order("version", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (version?.id) {
-      await supabase.from("user_consents").insert({
-        user_id: userId,
-        version_id: version.id,
-        kind: "parental_consent",
-        granted: data.enabled,
-        on_behalf_of_player_id: data.player_id,
-      });
     }
 
     return { ok: true as const, viaParentLink: !!parentLink };
