@@ -833,7 +833,9 @@ function EventDetail() {
       return false;
     }
     refetch();
-    if (status === "absent" || status === "uncertain") {
+    // In-app + email notice: always for absent/uncertain, and also for
+    // "present" when it is a change of a previous answer (coaches must know).
+    if (status === "absent" || status === "uncertain" || isChange) {
       // fire-and-forget email
       notifyCoachesOfResponse(
         convocationId,
