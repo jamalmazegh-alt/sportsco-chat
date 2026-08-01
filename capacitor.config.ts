@@ -33,14 +33,14 @@ const config: CapacitorConfig = {
     contentInset: "always",
   },
   android: {
-    // La WebView est servie en https://localhost et le serveur de dev en HTTP
-    // sur 10.0.2.2 : sans ceci, la WebView bloque ces requêtes comme contenu
-    // mixte. Le blocage du trafic en clair est traité séparément et de façon
-    // restreinte par `android/app/src/debug/` (debug uniquement).
+    // `false` depuis que l'API de production est en HTTPS (https://clubero.app) :
+    // la WebView, servie en https://localhost, n'a plus de contenu mixte à
+    // charger. Le laisser à `true` affaiblirait le build de distribution.
     //
-    // ⚠️ À REPASSER À `false` AU LOT 6 : en production l'API sera en HTTPS,
-    // ce drapeau n'aura plus d'utilité et affaiblirait le build de release.
-    allowMixedContent: true,
+    // Pour un build de développement visant le serveur local en HTTP sur
+    // 10.0.2.2, repasser temporairement à `true` — le trafic en clair est par
+    // ailleurs autorisé, et uniquement en debug, par `android/app/src/debug/`.
+    allowMixedContent: false,
   },
 };
 

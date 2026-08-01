@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Signature de release. Les identifiants vivent dans `android/keystore.properties`,
+// gitignoré (modèle : keystore.properties.example). Absent — cas du poste d'un
+// contributeur ou d'une CI sans secrets — le build debug continue de fonctionner
+// et seul `assembleRelease` échouera, explicitement.
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+
 android {
     namespace = "app.clubero.mobile"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,6 +17,10 @@ android {
         applicationId "app.clubero.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        // versionCode : entier, DOIT être incrémenté à chaque envoi au Play
+        // Store, même pour un correctif — Google refuse un code déjà utilisé,
+        // et il n'est jamais réutilisable, même après suppression d'un build.
+        // versionName : chaîne affichée à l'utilisateur, libre.
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -16,8 +30,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (keystoreProps.containsKey("storeFile")) {
+                storeFile file(keystoreProps["storeFile"])
+                storePassword keystoreProps["storePassword"]
+                keyAlias keystoreProps["keyAlias"]
+                keyPassword keystoreProps["keyPassword"]
+            }
+        }
+    }
     buildTypes {
         release {
+            // Signé uniquement si keystore.properties est présent ; sinon Gradle
+            // produirait un artefact non signé, refusé par le Play Store.
+            if (keystoreProps.containsKey("storeFile")) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
