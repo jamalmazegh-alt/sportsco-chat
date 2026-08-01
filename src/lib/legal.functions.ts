@@ -10,6 +10,7 @@ const KindSchema = z.enum([
   "notifications",
   "legal_notice",
   "parental_consent",
+  "child_safety",
 ]);
 
 export const getLegalDoc = createServerFn({ method: "GET" })
