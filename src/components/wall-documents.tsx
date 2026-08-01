@@ -19,7 +19,8 @@ import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WallFeedSkeleton } from "@/components/skeletons";
-import { handleDocumentClick } from "@/lib/open-document";
+import { handleDocumentClick, openDocument } from "@/lib/open-document";
+import { documentDownloadUrl } from "@/lib/wall/download-url";
 import { WallDocumentPreview, isPreviewable } from "@/components/wall-document-preview";
 
 import {
@@ -482,6 +483,18 @@ function DocumentRow({
               {t("wall.documents.preview", { defaultValue: "Aperçu" })}
             </button>
           )}
+          {/* Téléchargement direct depuis la liste : `?download=` fait renvoyer
+              un Content-Disposition par le stockage (l'attribut HTML `download`
+              est ignoré en cross-origin), et `openDocument` évite le clic mort
+              en WebView. */}
+          <button
+            type="button"
+            onClick={() => void openDocument(documentDownloadUrl(doc))}
+            className="text-[11px] text-primary hover:underline"
+          >
+            {t("wall.documents.download", { defaultValue: "Télécharger" })}
+          </button>
+
           <button
             type="button"
             onClick={() => onOpenPost(doc.postId)}

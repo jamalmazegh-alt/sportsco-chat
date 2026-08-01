@@ -289,7 +289,7 @@ export const setChildPlatformAccess = createServerFn({ method: "POST" })
       _player_id: data.player_id,
       _enabled: data.enabled,
       _attestation: data.attestation === true,
-      _locale: data.locale ?? null,
+      _locale: data.locale ?? undefined,
     });
     if (error) {
       // Les erreurs métier de la RPC remontent en texte : on les remappe sur
