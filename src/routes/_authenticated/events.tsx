@@ -587,6 +587,9 @@ function EventsPage() {
                 );
               })()}
           </div>
+          {isCoach && !isCancelled && convocStats?.counts.get(e.id) && (
+            <ConvocationSummaryGrid counts={convocStats.counts.get(e.id)!} />
+          )}
           {(() => {
             if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
