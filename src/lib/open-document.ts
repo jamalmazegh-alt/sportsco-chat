@@ -55,7 +55,6 @@ export async function downloadDocument(url: string): Promise<void> {
   }
 }
 
-
 /**
  * Handler de clic pour un `<a href>` : conserve les sémantiques web (clic
  * milieu, « ouvrir dans un nouvel onglet », copie du lien) et ne dévie vers le
