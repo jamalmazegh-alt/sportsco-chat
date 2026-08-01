@@ -89,7 +89,7 @@ export function WallDocumentPreview({
           <Button
             size="sm"
             disabled={!doc}
-            onClick={() => doc && void downloadDocument(documentDownloadUrl(doc))}
+            onClick={() => doc && void downloadDocument(documentDownloadUrl(doc), doc.name)}
           >
             <Download className="h-4 w-4" />
             {t("wall.documents.download", { defaultValue: "Télécharger" })}

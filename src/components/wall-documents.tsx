@@ -99,17 +99,24 @@ export function WallDocuments({
    * suppression. Le retrait n'est donc PAS un moyen de rendre un fichier
    * inaccessible — il reste ouvrable depuis son post.
    */
-  const setExcluded = useCallback(async (doc: WallDocument, excluded: boolean) => {
-    const { error } = await supabase.rpc("set_wall_document_excluded", {
-      _post_id: doc.postId,
-      _path: doc.path,
-      _excluded: excluded,
-    });
-    if (error) throw error;
-    setDocs((prev) =>
-      prev.map((d) => (d.key === doc.key ? { ...d, excludedFromLibrary: excluded } : d)),
-    );
-  }, []);
+  const setExcluded = useCallback(
+    async (doc: WallDocument, excluded: boolean) => {
+      const { error } = await supabase.rpc("set_wall_document_excluded", {
+        _post_id: doc.postId,
+        _path: doc.path,
+        _excluded: excluded,
+      });
+      if (error) throw error;
+      setDocs((prev) => {
+        // Quand l'encadrement n'a pas demandé à voir les documents retirés, le
+        // document doit DISPARAÎTRE de la liste : le laisser affiché avec un
+        // badge « Retiré » donne l'impression que l'action n'a rien fait.
+        if (excluded && !showExcluded) return prev.filter((d) => d.key !== doc.key);
+        return prev.map((d) => (d.key === doc.key ? { ...d, excludedFromLibrary: excluded } : d));
+      });
+    },
+    [showExcluded],
+  );
 
   const load = useCallback(
     async (pageIndex: number) => {
@@ -489,7 +496,7 @@ function DocumentRow({
               bloquée / le clic mort en WebView. */}
           <button
             type="button"
-            onClick={() => void downloadDocument(documentDownloadUrl(doc))}
+            onClick={() => void downloadDocument(documentDownloadUrl(doc), doc.name)}
             className="text-[11px] text-primary hover:underline"
           >
             {t("wall.documents.download", { defaultValue: "Télécharger" })}
