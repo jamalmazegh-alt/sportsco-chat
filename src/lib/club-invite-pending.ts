@@ -123,7 +123,11 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
   if (!error) {
     clearPendingClubInvite(token);
     markClubInviteRedeemed(token);
+    void supabase.auth.updateUser({ data: { club_invite_payload: null } }).catch(() => {
+      /* best-effort */
+    });
     // Prévient le staff de l'équipe pour qu'il valide la nouvelle fiche.
+
     void import("@/lib/club-invite-notify.functions")
       .then(({ notifyStaffOfQrJoin }) => notifyStaffOfQrJoin({ data: { token } }))
       .catch(() => {
