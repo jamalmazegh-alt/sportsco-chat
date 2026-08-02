@@ -111,6 +111,7 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 import { createEmailDispatch } from "@/lib/email/dispatch.functions";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
+import { downloadBase64, downloadFile } from "@/lib/download-file";
 import {
   dispatchConvocationPush,
   dispatchConvocationResendPush,
@@ -313,14 +314,7 @@ function EventDetail() {
       const buf = new Uint8Array(len);
       for (let i = 0; i < len; i++) buf[i] = bin.charCodeAt(i);
       const blob = new Blob([buf], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = res.filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      void downloadFile(blob, res.filename);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       toast.error(
@@ -370,12 +364,8 @@ function EventDetail() {
           );
         } catch (shareError: any) {
           if (shareError?.name === "AbortError") return;
-          const a = document.createElement("a");
-          a.href = dataUrl;
-          a.download = "composition.png";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
+          // Repli : l'attribut `download` est ignoré par les WebView.
+          void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
           await navigator.clipboard?.writeText(messageText).catch(() => undefined);
           window.open(
             `https://wa.me/?text=${encodeURIComponent(messageText)}`,
@@ -394,12 +384,8 @@ function EventDetail() {
         );
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
-        const a = document.createElement("a");
-        a.href = dataUrl;
-        a.download = "composition.png";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        // Repli : l'attribut `download` est ignoré par les WebView.
+        void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
         await navigator.clipboard?.writeText(messageText).catch(() => undefined);
         window.open(
           `https://wa.me/?text=${encodeURIComponent(messageText)}`,

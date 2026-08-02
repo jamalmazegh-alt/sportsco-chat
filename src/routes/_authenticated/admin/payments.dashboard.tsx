@@ -29,6 +29,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Loader2, Download, TrendingUp, Wallet, Receipt, Users } from "lucide-react";
 import { toast } from "sonner";
 import i18nInstance from "@/lib/i18n";
+import { downloadFile } from "@/lib/download-file";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")({
   // Bêta V1 : dashboard financier visible tant que collectes/cagnottes ou paiements actifs.
@@ -76,14 +77,7 @@ function fmtCents(c: number, currency = "eur"): string {
 
 function downloadCsv(csv: string, filename: string) {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  void downloadFile(blob, filename);
 }
 
 function PaymentsDashboardPage() {

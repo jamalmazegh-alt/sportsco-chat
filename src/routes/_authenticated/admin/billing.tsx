@@ -48,6 +48,7 @@ const searchSchema = z.object({
 });
 
 import i18nInstance from "@/lib/i18n";
+import { downloadFile } from "@/lib/download-file";
 
 export const Route = createFileRoute("/_authenticated/admin/billing")({
   component: BillingPage,
@@ -553,14 +554,7 @@ function BillingPage() {
                             const res = await fetch(inv.invoice_pdf!, { mode: "cors" });
                             if (!res.ok) throw new Error("download_failed");
                             const blob = await res.blob();
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement("a");
-                            a.href = url;
-                            a.download = `${inv.number ?? inv.id}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                            await downloadFile(blob, `${inv.number ?? inv.id}.pdf`);
                           } catch {
                             // Fallback: noopener prevents the iframe parent from being replaced
                             window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");

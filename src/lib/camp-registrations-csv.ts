@@ -6,6 +6,7 @@
  * UTF-8 BOM + séparateur `;` pour ouverture directe dans Excel avec accents.
  */
 import type { CampRegistrationRow } from "@/lib/camp-registrations.functions";
+import { downloadFile } from "@/lib/download-file";
 
 function escapeCsv(v: unknown): string {
   if (v === null || v === undefined) return "";
@@ -109,12 +110,5 @@ export function downloadRegistrationsCsv(
   opts: CsvExportOptions,
 ): void {
   const { filename, blob } = buildRegistrationsCsv(rows, opts);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  void downloadFile(blob, filename);
 }

@@ -28,6 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { downloadFile } from "@/lib/download-file";
 
 export const Route = createFileRoute("/tournament/$slug_/roster/$token")({
   component: RosterPage,
@@ -311,12 +312,7 @@ function RosterPage() {
 
   function downloadTemplate() {
     const blob = new Blob([TEMPLATE_CSV], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "roster-template.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    void downloadFile(blob, "roster-template.csv");
   }
 
   return (

@@ -1,3 +1,4 @@
+import { downloadFile } from "@/lib/download-file";
 // Minimal CSV exporter — handles commas, quotes, newlines via RFC 4180 quoting.
 
 function escapeCell(value: unknown): string {
@@ -18,15 +19,14 @@ export function toCsv<T extends Record<string, unknown>>(
   return [header, ...body].join("\r\n");
 }
 
+/**
+ * Propose un CSV au téléchargement.
+ *
+ * Délègue à `downloadFile`, qui gère web et natif : dans une WebView,
+ * l'attribut `download` d'un lien est ignoré et le clic ne produit rien.
+ */
 export function downloadCsv(filename: string, csv: string) {
-  // BOM for Excel UTF-8 compatibility
+  // BOM pour la compatibilité UTF-8 d'Excel
   const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename.endsWith(".csv") ? filename : `${filename}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  void downloadFile(blob, filename.endsWith(".csv") ? filename : `${filename}.csv`);
 }

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Code_iOS_Simulator__control",
+      "mcp__Claude_Code_iOS_Simulator__build",
+      "Bash(adb shell *)",
+      "Bash(adb logcat *)",
+      "Bash(adb exec-out *)",
+      "Bash(adb devices *)",
+      "Bash(xcrun simctl list *)",
+      "Bash(xcrun simctl bootstatus *)",
+      "Bash(bun run test)",
+      "Bash(bun run typecheck)",
+      "Bash(bun run check:guards)",
+      "Bash(bun run check:i18n)",
+      "Bash(bun run check:mobile-leak)",
+      "Bash(bun run lint)",
+      "Bash(bun run format:check)"
+    ]
+  }
+}
