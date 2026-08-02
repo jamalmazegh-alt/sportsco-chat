@@ -565,7 +565,7 @@ function PlayerProfile() {
         phone: phone || null,
         email: email || null,
         birth_date: birthDate || null,
-        can_respond: canRespond,
+        can_respond: minor ? canRespond : true,
         photo_url,
       })
       .eq("id", player.id);
