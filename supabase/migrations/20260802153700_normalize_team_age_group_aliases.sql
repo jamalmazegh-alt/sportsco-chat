@@ -1,5 +1,6 @@
 -- One-shot: remap known free-text age_group aliases to catalog codes.
--- Does NOT touch ambiguous ranges (U6-U7, U8-U9) — those must be re-picked in UI.
+-- Does NOT touch ambiguous ranges (U6-U7, U8-U9): re-pick a single catalog
+-- code in the UI (e.g. U7) and put the range in the team *name* if needed.
 -- Does NOT force NOT NULL yet: empty rows are fixed on next team edit (category required).
 
 UPDATE public.teams

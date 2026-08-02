@@ -5,6 +5,9 @@
  * La **catégorie** est obligatoire et choisie dans cette liste — c'est elle
  * qui décide si l'inscription QR propose « J'inscris mon enfant ».
  *
+ * Convention plages (ex. U6–U7) : le détail va dans le *nom* d'équipe
+ * (« U6-U7 »), la catégorie reste un seul code catalogue (ex. U7).
+ *
  * Stratégie legacy :
  * - migration SQL one-shot pour les alias évidents (Sénior, Seniors, …)
  * - `resolveTeamAgeCategory` reste un filet de sécurité QR / lecture seule

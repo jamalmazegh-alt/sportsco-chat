@@ -1014,7 +1014,7 @@ function TeamDetail() {
                   <p className="text-xs text-amber-700 dark:text-amber-400">
                     {t("teams.ageGroupLegacyHint", {
                       defaultValue:
-                        "Ancienne valeur — sélectionnez une catégorie officielle pour enregistrer.",
+                        "Ancienne valeur — choisissez une catégorie officielle (ex. U7). Une plage du type U6-U7 peut rester dans le nom de l'équipe.",
                     })}
                   </p>
                 )}
