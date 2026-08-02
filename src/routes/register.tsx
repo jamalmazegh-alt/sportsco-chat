@@ -10,7 +10,7 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
-import { isAdultOnlyAgeGroup } from "@/lib/team-age-group";
+import { isAdultOnlyAgeGroup, isMinorOnlyAgeGroup } from "@/lib/team-age-group";
 import {
   buildClubInviteAuthMetadata,
   clubInviteAuthMetadataClear,
@@ -81,6 +81,8 @@ function RegisterPage() {
   const [joinMode, setJoinMode] = useState<"self" | "child">("self");
   // Catégorie catalogue adulte (U20+, Senior, Vétérans) : pas d'option enfant.
   const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
+  // Catégorie jeunes (U6 → U19) : c'est le parent qui crée le compte.
+  const minorOnlyTeam = isMinorOnlyAgeGroup(teamInvite?.ageGroup);
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
   const [license, setLicense] = useState("");
@@ -134,6 +136,13 @@ function RegisterPage() {
       cancelled = true;
     };
   }, [hasInvite, inviteToken, validateInvite]);
+
+  // Équipe jeunes : seul le parcours parent est proposé.
+  useEffect(() => {
+    if (!minorOnlyTeam) return;
+    setJoinMode("child");
+    setSignupRole("parent");
+  }, [minorOnlyTeam]);
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   const passwordValid = passwordRegex.test(password);
@@ -386,28 +395,37 @@ function RegisterPage() {
 
           {teamInvite && (
             <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-              {!adultOnlyTeam && (
-                <div className="grid grid-cols-2 gap-2">
-                  {(["self", "child"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => {
-                        setJoinMode(m);
-                        setSignupRole(m === "child" ? "parent" : "player");
-                      }}
-                      className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
-                        joinMode === m
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-background text-muted-foreground"
-                      }`}
-                    >
-                      {m === "self"
-                        ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
-                        : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
-                    </button>
-                  ))}
+              {minorOnlyTeam ? (
+                <div className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
+                  {t("auth.minorTeamParentOnly", {
+                    defaultValue:
+                      "Cette catégorie accueille des mineurs : le compte est créé par le parent ou le tuteur.",
+                  })}
                 </div>
+              ) : (
+                !adultOnlyTeam && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["self", "child"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => {
+                          setJoinMode(m);
+                          setSignupRole(m === "child" ? "parent" : "player");
+                        }}
+                        className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                          joinMode === m
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background text-muted-foreground"
+                        }`}
+                      >
+                        {m === "self"
+                          ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
+                          : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                      </button>
+                    ))}
+                  </div>
+                )
               )}
 
               {joinMode === "child" && (
