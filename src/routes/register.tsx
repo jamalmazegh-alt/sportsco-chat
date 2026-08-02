@@ -156,6 +156,7 @@ function RegisterPage() {
         childBirthDate: childBirthDate || null,
       });
     }
+
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
@@ -216,6 +217,20 @@ function RegisterPage() {
           preferred_language: i18n.language?.slice(0, 2) || "en",
           signup_role: signupRole,
           invite_token: hasInvite ? inviteToken : null,
+          // Mirrors the localStorage payload so the details survive a
+          // confirmation e-mail opened on another device/browser.
+          club_invite_payload: teamInvite
+            ? {
+                token: inviteToken,
+                mode: joinMode,
+                birthDate: birthDate || null,
+                phone: phone.trim() || null,
+                license: license.trim() || null,
+                childFirstName: childFirstName.trim() || null,
+                childLastName: childLastName.trim() || null,
+                childBirthDate: childBirthDate || null,
+              }
+            : null,
         },
       },
     });
