@@ -62,6 +62,16 @@ function RegisterPage() {
   const [inviteEmailLocked, setInviteEmailLocked] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(hasInvite);
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
+  // Team-scoped club invite (QR from a team page): we also collect the data
+  // needed to create the player record and attach it to that team.
+  const [teamInvite, setTeamInvite] = useState<{ id: string; name: string | null } | null>(null);
+  const [joinMode, setJoinMode] = useState<"self" | "child">("self");
+  const [birthDate, setBirthDate] = useState("");
+  const [phone, setPhone] = useState("");
+  const [license, setLicense] = useState("");
+  const [childFirstName, setChildFirstName] = useState("");
+  const [childLastName, setChildLastName] = useState("");
+  const [childBirthDate, setChildBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
   const createAccount = useServerFn(createInvitedAccount);
