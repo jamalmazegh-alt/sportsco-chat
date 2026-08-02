@@ -15,6 +15,7 @@ export type PendingClubInvitePayload = {
   childFirstName?: string | null;
   childLastName?: string | null;
   childBirthDate?: string | null;
+  childPhone?: string | null;
 };
 
 const KEY_PREFIX = "clubero:club_invite:";
@@ -29,6 +30,7 @@ export const CLUB_INVITE_META = {
   childFirstName: "club_invite_child_first_name",
   childLastName: "club_invite_child_last_name",
   childBirthDate: "club_invite_child_birth_date",
+  childPhone: "club_invite_child_phone",
   /** Legacy nested blob written by an earlier fix — still accepted when reading. */
   nested: "club_invite_payload",
 } as const;
@@ -108,6 +110,7 @@ export function buildClubInviteAuthMetadata(
     [CLUB_INVITE_META.childFirstName]: payload.childFirstName ?? null,
     [CLUB_INVITE_META.childLastName]: payload.childLastName ?? null,
     [CLUB_INVITE_META.childBirthDate]: payload.childBirthDate ?? null,
+    [CLUB_INVITE_META.childPhone]: payload.childPhone ?? null,
     // Drop the nested blob so we don't keep a stale / partial object around.
     [CLUB_INVITE_META.nested]: null,
   };
@@ -125,6 +128,7 @@ export function clubInviteAuthMetadataClear(): Record<string, null> {
     [CLUB_INVITE_META.childFirstName]: null,
     [CLUB_INVITE_META.childLastName]: null,
     [CLUB_INVITE_META.childBirthDate]: null,
+    [CLUB_INVITE_META.childPhone]: null,
   };
 }
 
@@ -152,6 +156,7 @@ export function readInvitePayloadFromMetadata(
       childFirstName: asTrimmedString(metadata[CLUB_INVITE_META.childFirstName]),
       childLastName: asTrimmedString(metadata[CLUB_INVITE_META.childLastName]),
       childBirthDate: asTrimmedString(metadata[CLUB_INVITE_META.childBirthDate]),
+      childPhone: asTrimmedString(metadata[CLUB_INVITE_META.childPhone]),
     };
   }
 
@@ -167,6 +172,7 @@ export function readInvitePayloadFromMetadata(
     childFirstName: asTrimmedString(nested.childFirstName),
     childLastName: asTrimmedString(nested.childLastName),
     childBirthDate: asTrimmedString(nested.childBirthDate),
+    childPhone: asTrimmedString(nested.childPhone),
   };
 }
 
@@ -217,6 +223,7 @@ export async function redeemClubInvite(
       _child_first_name: data?.childFirstName || undefined,
       _child_last_name: data?.childLastName || undefined,
       _child_birth_date: data?.childBirthDate || undefined,
+      _child_phone: data?.childPhone || undefined,
     });
 
     if (!error) {
