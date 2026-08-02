@@ -5,6 +5,7 @@ import { isAndroid, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
 import { subscribeToPush, syncPushSubscriptionState } from "@/lib/push-subscribe";
 import { useAuth } from "@/lib/auth-context";
 import { isNativePlatform } from "@/lib/native-platform";
+import { enableNativePush, getNativePushStatus } from "@/lib/native-push";
 
 const DISMISS_KEY = "clubero:push:dismissed-at";
 const DISMISS_DAYS = 7;
@@ -19,11 +20,79 @@ function recentlyDismissed(): boolean {
   }
 }
 
-// App native : le Web Push n'existe pas en WebView. Le CTA natif vit dans
-// la carte « Cet appareil » du profil (EnablePushCard).
+function markDismissed(): void {
+  try {
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  } catch {
+    // Stockage indisponible : le bandeau se referme quand même en mémoire.
+  }
+}
+
+/**
+ * Relance d'activation des notifications.
+ *
+ * Le Web Push n'existe pas en WebView : la variante native passe par FCM/APNs.
+ * Elle a longtemps été absente, la carte « Cet appareil » du profil étant le
+ * seul point d'entrée — que personne ne visite spontanément. Un utilisateur qui
+ * réinstallait perdait donc ses notifications sans qu'aucun écran ne le signale.
+ */
 export function PushPermissionBanner() {
-  if (isNativePlatform()) return null;
+  if (isNativePlatform()) return <PushPermissionBannerNative />;
   return <PushPermissionBannerWeb />;
+}
+
+function PushPermissionBannerNative() {
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { session } = useAuth();
+
+  function dismiss() {
+    markDismissed();
+    setVisible(false);
+  }
+
+  useEffect(() => {
+    if (!session?.user) return;
+    if (recentlyDismissed()) return;
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // `prompt` signifie « aucun token enregistré », y compris sur Android 12 où
+    // la permission est toujours accordée d'office. C'est le seul état où une
+    // relance a du sens : ni permission refusée, ni notifications déjà en place.
+    void getNativePushStatus().then((status) => {
+      if (cancelled || status !== "prompt") return;
+      timer = setTimeout(() => setVisible(true), 1500);
+    });
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [session?.user]);
+
+  async function enable() {
+    setLoading(true);
+    try {
+      const res = await enableNativePush();
+      if (res.ok) {
+        toast.success("Notifications activées");
+        setVisible(false);
+      } else if (res.reason === "denied") {
+        toast.error("Notifications refusées");
+        // Refus explicite : ne pas reproposer avant le délai de report.
+        dismiss();
+      } else {
+        toast.error("Activation impossible pour le moment");
+        console.warn("[native-push] banner enable KO:", res.reason);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!visible) return null;
+  return <BannerShell loading={loading} onEnable={enable} onDismiss={dismiss} />;
 }
 
 function PushPermissionBannerWeb() {
@@ -50,11 +119,7 @@ function PushPermissionBannerWeb() {
   }, [session?.user]);
 
   function dismiss() {
-    try {
-      localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {
-      // Ignore storage failures, the banner can still be hidden in memory.
-    }
+    markDismissed();
     setVisible(false);
   }
 
@@ -79,6 +144,18 @@ function PushPermissionBannerWeb() {
 
   if (!visible) return null;
 
+  return <BannerShell loading={loading} onEnable={enable} onDismiss={dismiss} />;
+}
+
+function BannerShell({
+  loading,
+  onEnable,
+  onDismiss,
+}: {
+  loading: boolean;
+  onEnable: () => void;
+  onDismiss: () => void;
+}) {
   return (
     <div className="fixed inset-x-3 bottom-20 z-40 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm animate-in slide-in-from-bottom-4 fade-in duration-300">
       <div className="rounded-2xl border border-emerald-100 bg-white shadow-2xl p-4 flex items-start gap-3">
@@ -94,14 +171,14 @@ function PushPermissionBannerWeb() {
             <button
               type="button"
               disabled={loading}
-              onClick={enable}
+              onClick={onEnable}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white text-xs font-semibold shadow-sm hover:opacity-90 transition disabled:opacity-60"
             >
               {loading ? "..." : "Activer"}
             </button>
             <button
               type="button"
-              onClick={dismiss}
+              onClick={onDismiss}
               className="px-3 py-1.5 rounded-lg text-gray-600 text-xs font-semibold hover:bg-gray-100 transition"
             >
               Plus tard
@@ -111,7 +188,7 @@ function PushPermissionBannerWeb() {
         <button
           type="button"
           aria-label="Fermer"
-          onClick={dismiss}
+          onClick={onDismiss}
           className="-mr-1 -mt-1 p-1.5 rounded-lg hover:bg-gray-100 transition"
         >
           <X className="h-4 w-4 text-gray-500" />
