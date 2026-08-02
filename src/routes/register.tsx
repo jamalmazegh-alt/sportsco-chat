@@ -225,8 +225,10 @@ function RegisterPage() {
     // Otherwise, show "check your email" message and send to login.
     if (signUpData.session) {
       if (hasInvite) {
-        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        const rErr =
+          inviteKind === "club"
+            ? (await redeemClubInvite(inviteToken)).error
+            : (await supabase.rpc("redeem_member_invite", { _token: inviteToken })).error;
         if (rErr) {
           setBusy(false);
           toast.error(rErr.message || t("auth.inviteInvalid"));
