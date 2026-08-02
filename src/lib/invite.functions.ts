@@ -14,7 +14,14 @@ export type InviteValidationResult =
       suggestedFirstName: string | null;
       suggestedLastName: string | null;
     }
-  | { valid: true; source: "club"; role: string; teamId: string | null; teamName: string | null };
+  | {
+      valid: true;
+      source: "club";
+      role: string;
+      teamId: string | null;
+      teamName: string | null;
+      teamAgeGroup: string | null;
+    };
 
 /** Public: validate an invite token before showing the signup form. */
 export const validateInviteToken = createServerFn({ method: "POST" })
