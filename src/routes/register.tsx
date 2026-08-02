@@ -79,7 +79,7 @@ function RegisterPage() {
     ageGroup: string | null;
   } | null>(null);
   const [joinMode, setJoinMode] = useState<"self" | "child">("self");
-  // Catégorie catalogue adulte (U20+, Senior, Vétérans, Loisir) : pas d'option enfant.
+  // Catégorie catalogue adulte (U20+, Senior, Vétérans) : pas d'option enfant.
   const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");

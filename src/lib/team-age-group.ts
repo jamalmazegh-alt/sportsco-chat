@@ -6,7 +6,9 @@
  * l'inscription QR propose « J'inscris mon enfant ».
  *
  * Aligné sur le découpage FFF / fédérations FR : U6 → U19 (mineurs possibles),
- * puis U20 / U21 / Senior / Vétérans / Loisir (adultes uniquement).
+ * puis U20 / U21 / Senior / Vétérans (adultes uniquement).
+ * Le « loisir » se distingue via le *nom* d'équipe (ex. « Senior Loisir »),
+ * pas via une catégorie séparée.
  */
 
 export type TeamAgeCategory = {
@@ -26,7 +28,6 @@ const ADULT_EXTRA: readonly TeamAgeCategory[] = [
   { code: "U21", adultOnly: true },
   { code: "Senior", adultOnly: true },
   { code: "Vétérans", adultOnly: true },
-  { code: "Loisir", adultOnly: true },
 ];
 
 /** Liste officielle affichée dans le select (ordre d'affichage). */
@@ -61,10 +62,10 @@ export function resolveTeamAgeCategory(
   const exact = BY_NORMALIZED.get(label);
   if (exact) return exact;
 
-  // Pluriels / variantes textuelles adultes
+  // Pluriels / variantes textuelles adultes (legacy hors catalogue)
   if (/\bveterans?\b/.test(label)) return BY_NORMALIZED.get("veterans") ?? null;
-  if (/\bloisirs?\b/.test(label)) return BY_NORMALIZED.get("loisir") ?? null;
-  if (/\bseniors?\b/.test(label) || label === "senio") {
+  // « Loisir » / « Senior F » / « Séniors » → Senior (adulte)
+  if (/\bloisirs?\b/.test(label) || /\bseniors?\b/.test(label) || label === "senio") {
     return BY_NORMALIZED.get("senior") ?? null;
   }
 

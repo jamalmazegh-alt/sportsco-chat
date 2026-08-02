@@ -7,7 +7,7 @@ import {
 } from "@/lib/team-age-group";
 
 describe("TEAM_AGE_CATEGORIES catalog", () => {
-  it("covers U6–U21 plus Senior / Vétérans / Loisir", () => {
+  it("covers U6–U21 plus Senior / Vétérans", () => {
     const codes = TEAM_AGE_CATEGORIES.map((c) => c.code);
     expect(codes).toContain("U6");
     expect(codes).toContain("U15");
@@ -16,11 +16,11 @@ describe("TEAM_AGE_CATEGORIES catalog", () => {
     expect(codes).toContain("U21");
     expect(codes).toContain("Senior");
     expect(codes).toContain("Vétérans");
-    expect(codes).toContain("Loisir");
-    expect(codes).toHaveLength(19);
+    expect(codes).not.toContain("Loisir");
+    expect(codes).toHaveLength(18);
   });
 
-  it("marks only U20+ / Senior / Vétérans / Loisir as adult-only", () => {
+  it("marks only U20+ / Senior / Vétérans as adult-only", () => {
     for (const c of TEAM_AGE_CATEGORIES) {
       const n = /^U(\d+)$/.exec(c.code);
       if (n) {
@@ -43,9 +43,11 @@ describe("resolveTeamAgeCategory / isAdultOnlyAgeGroup", () => {
     expect(isAdultOnlyAgeGroup("Espoirs")).toBe(false);
   });
 
-  it("is true for senior / vétérans / loisir / U20+", () => {
+  it("is true for senior / vétérans / U20+ (and legacy loisir → Senior)", () => {
     expect(isAdultOnlyAgeGroup("Senior")).toBe(true);
+    expect(isAdultOnlyAgeGroup("Sénior")).toBe(true);
     expect(isAdultOnlyAgeGroup("Séniors")).toBe(true);
+    expect(isAdultOnlyAgeGroup("Senior F")).toBe(true);
     expect(isAdultOnlyAgeGroup("Vétérans")).toBe(true);
     expect(isAdultOnlyAgeGroup("Loisir")).toBe(true);
     expect(isAdultOnlyAgeGroup("U20")).toBe(true);
@@ -54,7 +56,10 @@ describe("resolveTeamAgeCategory / isAdultOnlyAgeGroup", () => {
 
   it("resolves legacy free-text toward catalog codes", () => {
     expect(resolveTeamAgeCategory("U15 A")?.code).toBe("U15");
+    expect(resolveTeamAgeCategory("U6-U7")?.code).toBe("U6");
+    expect(resolveTeamAgeCategory("U8-U9")?.code).toBe("U8");
     expect(resolveTeamAgeCategory("senior feminine")?.code).toBe("Senior");
+    expect(resolveTeamAgeCategory("Sénior")?.code).toBe("Senior");
     expect(isCanonicalTeamAgeCategory("U15")).toBe(true);
     expect(isCanonicalTeamAgeCategory("U15 A")).toBe(false);
   });
