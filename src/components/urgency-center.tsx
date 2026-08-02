@@ -256,7 +256,7 @@ export function UrgencyCenter({ className }: Props) {
         .eq("id", convocationId)
         .maybeSingle();
       const isChange =
-        !!previous && (previous as any).status !== "pending" && !!(previous as any).responded_at;
+        !!previous && (previous as any).status !== "pending" && (previous as any).status !== status;
       const { error } = await supabase
         .from("convocations")
         .update({ status, responded_at: new Date().toISOString() })
