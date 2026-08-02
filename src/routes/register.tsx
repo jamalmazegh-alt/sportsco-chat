@@ -232,7 +232,6 @@ function RegisterPage() {
               }
             : null,
         },
-
       },
     });
 
