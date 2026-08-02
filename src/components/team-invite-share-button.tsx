@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 interface Props {
   clubId: string;
+  teamId?: string;
   teamName?: string;
 }
 
