@@ -96,6 +96,35 @@ function asTrimmedString(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+/**
+ * Read `?invite=` from a location search string (or the current window URL).
+ * Used when e-mail confirmation lands on `/login?invite=…` but `invite_token`
+ * is missing from session user_metadata (stripped, stale session, other device).
+ */
+export function readInviteTokenFromLocation(search?: string): string | null {
+  try {
+    const raw = search ?? (typeof window !== "undefined" ? window.location.search : "");
+    if (!raw) return null;
+    const params = new URLSearchParams(raw.startsWith("?") ? raw : `?${raw}`);
+    return asTrimmedString(params.get("invite"));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Prefer auth metadata `invite_token`, fall back to `?invite=` in the URL.
+ * Pass `locationSearch` in tests; omit it in the browser to use window.location.
+ */
+export function resolvePendingInviteToken(
+  metadata: Record<string, unknown> | null | undefined,
+  locationSearch?: string,
+): string | null {
+  const fromMeta = asTrimmedString(metadata?.invite_token);
+  if (fromMeta) return fromMeta;
+  return readInviteTokenFromLocation(locationSearch);
+}
+
 /** Build flat auth metadata mirroring the localStorage payload. */
 export function buildClubInviteAuthMetadata(
   token: string,
