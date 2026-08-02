@@ -108,7 +108,7 @@ function TeamDetail() {
       const { data } = await supabase
         .from("teams")
         .select(
-          "id, name, age_group, championship, competitions, sport, season, image_url, club_id, archived_at",
+          "id, name, age_group, championship, competitions, sport, season, image_url, club_id, archived_at, is_internal",
         )
         .eq("id", teamId)
         .single();
@@ -481,7 +481,9 @@ function TeamDetail() {
 
   async function onSaveTeam(e: FormEvent) {
     e.preventDefault();
-    if (!isCanonicalTeamAgeCategory(editAge)) {
+    const isInternalTeam = Boolean((team as { is_internal?: boolean } | null)?.is_internal);
+    // Équipe technique « Réunions internes » : pas de catégorie sportive.
+    if (!isInternalTeam && !isCanonicalTeamAgeCategory(editAge)) {
       toast.error(
         t("teams.ageGroupRequired", {
           defaultValue: "Choisissez une catégorie d'âge dans la liste officielle.",
@@ -496,7 +498,7 @@ function TeamDetail() {
       .from("teams")
       .update({
         name: editName,
-        age_group: editAge,
+        age_group: isInternalTeam ? null : editAge,
         championship: null,
         competitions: editCompetitions,
         season: editSeason || null,
@@ -1007,18 +1009,20 @@ function TeamDetail() {
                 <Label>{t("teams.name")}</Label>
                 <Input required value={editName} onChange={(e) => setEditName(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
-                <Label>{t("teams.ageGroup")}</Label>
-                <AgeGroupSelect value={editAge} onValueChange={setEditAge} allowEmpty={false} />
-                {editAge && !isCanonicalTeamAgeCategory(editAge) && (
-                  <p className="text-xs text-amber-700 dark:text-amber-400">
-                    {t("teams.ageGroupLegacyHint", {
-                      defaultValue:
-                        "Ancienne valeur — choisissez une catégorie officielle (ex. U7). Une plage du type U6-U7 peut rester dans le nom de l'équipe.",
-                    })}
-                  </p>
-                )}
-              </div>
+              {!(team as { is_internal?: boolean } | null)?.is_internal && (
+                <div className="space-y-1.5">
+                  <Label>{t("teams.ageGroup")}</Label>
+                  <AgeGroupSelect value={editAge} onValueChange={setEditAge} allowEmpty={false} />
+                  {editAge && !isCanonicalTeamAgeCategory(editAge) && (
+                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                      {t("teams.ageGroupLegacyHint", {
+                        defaultValue:
+                          "Ancienne valeur — choisissez une catégorie officielle (ex. U7). Une plage du type U6-U7 peut rester dans le nom de l'équipe.",
+                      })}
+                    </p>
+                  )}
+                </div>
+              )}
               {/* teams.championship is deprecated — championships now live in TeamChampionshipsSection. */}
               <div className="space-y-1.5 rounded-xl border border-dashed border-border bg-muted/30 p-3">
                 <Label className="flex items-center gap-2">
