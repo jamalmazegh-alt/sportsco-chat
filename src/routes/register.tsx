@@ -156,6 +156,7 @@ function RegisterPage() {
         childBirthDate: childBirthDate || null,
       });
     }
+
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
