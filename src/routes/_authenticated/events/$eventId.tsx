@@ -799,7 +799,8 @@ function EventDetail() {
       .eq("id", convocationId)
       .maybeSingle();
     const previous =
-      (previousRow as any) ?? ((convocations ?? []).find((c: any) => c.id === convocationId) as any);
+      (previousRow as any) ??
+      ((convocations ?? []).find((c: any) => c.id === convocationId) as any);
     const isChange = !!previous && previous.status !== "pending" && previous.status !== status;
     const { error } = await supabase
       .from("convocations")
