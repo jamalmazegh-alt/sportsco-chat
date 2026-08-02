@@ -11,9 +11,12 @@ import {
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
 import {
-  storePendingClubInvite,
-  redeemClubInvite,
+  buildClubInviteAuthMetadata,
+  clubInviteAuthMetadataClear,
   clubInviteErrorMessage,
+  redeemClubInvite,
+  storePendingClubInvite,
+  type PendingClubInvitePayload,
 } from "@/lib/club-invite-pending";
 
 import { Button } from "@/components/ui/button";
@@ -133,6 +136,7 @@ function RegisterPage() {
       toast.error(t("auth.passwordsMustMatch"));
       return;
     }
+    let teamPayload: PendingClubInvitePayload | null = null;
     if (teamInvite) {
       if (joinMode === "child" && (!childFirstName.trim() || !childLastName.trim())) {
         toast.error(t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" }));
@@ -146,7 +150,7 @@ function RegisterPage() {
         toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
         return;
       }
-      storePendingClubInvite(inviteToken, {
+      teamPayload = {
         mode: joinMode,
         birthDate: birthDate || null,
         phone: phone.trim() || null,
@@ -154,7 +158,8 @@ function RegisterPage() {
         childFirstName: childFirstName.trim() || null,
         childLastName: childLastName.trim() || null,
         childBirthDate: childBirthDate || null,
-      });
+      };
+      storePendingClubInvite(inviteToken, teamPayload);
     }
 
     setBusy(true);
@@ -217,20 +222,9 @@ function RegisterPage() {
           preferred_language: i18n.language?.slice(0, 2) || "en",
           signup_role: signupRole,
           invite_token: hasInvite ? inviteToken : null,
-          // Mirrors the localStorage payload so the details survive a
-          // confirmation e-mail opened on another device/browser.
-          club_invite_payload: teamInvite
-            ? {
-                token: inviteToken,
-                mode: joinMode,
-                birthDate: birthDate || null,
-                phone: phone.trim() || null,
-                license: license.trim() || null,
-                childFirstName: childFirstName.trim() || null,
-                childLastName: childLastName.trim() || null,
-                childBirthDate: childBirthDate || null,
-              }
-            : null,
+          // Flat mirrors of the localStorage payload — survive confirmation on
+          // another device without nested user_metadata objects.
+          ...(teamPayload ? buildClubInviteAuthMetadata(inviteToken, teamPayload) : {}),
         },
       },
     });
@@ -244,9 +238,15 @@ function RegisterPage() {
     // Otherwise, show "check your email" message and send to login.
     if (signUpData.session) {
       if (hasInvite) {
+        const meta = (signUpData.session.user?.user_metadata ?? {}) as Record<string, unknown>;
         const rErr =
           inviteKind === "club"
-            ? (await redeemClubInvite(inviteToken)).error
+            ? (
+                await redeemClubInvite(inviteToken, {
+                  payload: teamPayload,
+                  userMetadata: meta,
+                })
+              ).error
             : (await supabase.rpc("redeem_member_invite", { _token: inviteToken })).error;
         if (rErr) {
           setBusy(false);
@@ -256,6 +256,11 @@ function RegisterPage() {
               : rErr.message || t("auth.inviteInvalid"),
           );
           return;
+        }
+        if (inviteKind === "club") {
+          void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+            /* best-effort */
+          });
         }
       }
       setBusy(false);
