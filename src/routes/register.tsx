@@ -72,8 +72,14 @@ function RegisterPage() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   // Team-scoped club invite (QR from a team page): we also collect the data
   // needed to create the player record and attach it to that team.
-  const [teamInvite, setTeamInvite] = useState<{ id: string; name: string | null } | null>(null);
+  const [teamInvite, setTeamInvite] = useState<{
+    id: string;
+    name: string | null;
+    ageGroup: string | null;
+  } | null>(null);
   const [joinMode, setJoinMode] = useState<"self" | "child">("self");
+  // Catégorie strictement adulte (Senior, Vétérans, U20+) : pas d'option enfant.
+  const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
   const [license, setLicense] = useState("");
