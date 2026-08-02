@@ -327,11 +327,115 @@ function RegisterPage() {
           ) : (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
               <div className="font-medium">
-                {signupRole === "parent" ? t("auth.roleParent") : t("auth.rolePlayer")}
+                {teamInvite?.name
+                  ? t("auth.invitedToTeam", {
+                      team: teamInvite.name,
+                      defaultValue: `Inscription — ${teamInvite.name}`,
+                    })
+                  : signupRole === "parent"
+                    ? t("auth.roleParent")
+                    : t("auth.rolePlayer")}
               </div>
               <div className="text-xs text-muted-foreground">
                 {t("auth.invitedAsHint") || "You were invited — your role is set automatically."}
               </div>
+            </div>
+          )}
+
+          {teamInvite && (
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="grid grid-cols-2 gap-2">
+                {(["self", "child"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => {
+                      setJoinMode(m);
+                      setSignupRole(m === "child" ? "parent" : "player");
+                    }}
+                    className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                      joinMode === m
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground"
+                    }`}
+                  >
+                    {m === "self"
+                      ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
+                      : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                  </button>
+                ))}
+              </div>
+
+              {joinMode === "child" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cfirst">
+                      {t("auth.childFirstName", { defaultValue: "Prénom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="cfirst"
+                      value={childFirstName}
+                      onChange={(e) => setChildFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="clast">
+                      {t("auth.childLastName", { defaultValue: "Nom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="clast"
+                      value={childLastName}
+                      onChange={(e) => setChildLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="bdate">
+                  {joinMode === "child"
+                    ? t("auth.childBirthDate", { defaultValue: "Date de naissance de l'enfant" })
+                    : t("auth.birthDate", { defaultValue: "Date de naissance" })}
+                </Label>
+                <Input
+                  id="bdate"
+                  type="date"
+                  value={joinMode === "child" ? childBirthDate : birthDate}
+                  onChange={(e) =>
+                    joinMode === "child"
+                      ? setChildBirthDate(e.target.value)
+                      : setBirthDate(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="license">
+                    {t("auth.licenseNumber", { defaultValue: "N° licence (optionnel)" })}
+                  </Label>
+                  <Input
+                    id="license"
+                    value={license}
+                    onChange={(e) => setLicense(e.target.value)}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("auth.teamJoinHint", {
+                  defaultValue:
+                    "Ces informations créent la fiche joueur. Le club pourra les compléter ensuite.",
+                })}
+              </p>
             </div>
           )}
 
