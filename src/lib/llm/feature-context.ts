@@ -51,7 +51,9 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Fiche joueur (avatar, historique, feedback, sanctions) : carnet de vie sportif.
 - Parents et tuteurs légaux liés au joueur : autorité parentale, notifications famille.
 - Achievements et timeline joueur : journal sportif.
-- Import CSV de joueurs (club et superadmin) : onboarding en masse.
+- Import CSV de joueurs (club et superadmin) : onboarding en masse, dates fiabilisées et catégorie d'âge FFF calculée automatiquement.
+- Inscription par QR code / lien d'équipe : le staff génère un QR rattaché à une équipe ; le joueur majeur s'inscrit lui-même, le parent inscrit son enfant (nom, date de naissance, licence, téléphones parent et enfant optionnels). Pour une catégorie adulte (Senior, Vétérans), l'option « J'inscris mon enfant » n'est pas proposée. Le staff de l'équipe est notifié à chaque arrivée pour vérifier la fiche.
+- Invitations d'accès plateforme (joueur/parent) envoyées manuellement par le staff, avec statut visible (« Invitation envoyée », « Compte actif », « E-mail non confirmé ») et relance possible.
 - Profils publics joueur/coach et listing /players : vitrine publique du joueur/coach.
 - Follows inter-clubs (réseau sportif ouvert) : réseau sportif interclubs ouvert.
 
