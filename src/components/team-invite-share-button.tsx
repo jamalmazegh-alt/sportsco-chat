@@ -22,7 +22,7 @@ interface Props {
  * Admin-only: club_invites RLS restricts insert/select to club admins.
  * Reuses an existing non-expired token for the club when possible.
  */
-export function TeamInviteShareButton({ clubId, teamName }: Props) {
+export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
