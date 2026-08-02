@@ -565,7 +565,7 @@ function PlayerProfile() {
         phone: phone || null,
         email: email || null,
         birth_date: birthDate || null,
-        can_respond: canRespond,
+        can_respond: minor ? canRespond : true,
         photo_url,
       })
       .eq("id", player.id);
@@ -1270,10 +1270,10 @@ function PlayerProfile() {
                         </span>
                         <input
                           type="checkbox"
-                          className="h-5 w-5 accent-primary"
-                          checked={canRespond}
+                          className="h-5 w-5 accent-primary disabled:opacity-60"
+                          checked={minor ? canRespond : true}
                           onChange={(e) => setCanRespond(e.target.checked)}
-                          disabled={!canEditContact}
+                          disabled={!canEditContact || !minor}
                         />
                       </div>
                     </>
@@ -1387,7 +1387,7 @@ function PlayerProfile() {
 
           {/* PARENTS — single card grouping the viewer's own record + co-parents */}
 
-          {canSeePrivate && (
+          {canSeePrivate && (minor || (parents ?? []).length > 0) && (
             <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
