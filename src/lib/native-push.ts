@@ -25,14 +25,47 @@ function nativeChannel(): "fcm" | "apns" {
   return getPlatform() === "android" ? "fcm" : "apns";
 }
 
+/**
+ * Marque locale d'un enregistrement abouti.
+ *
+ * La permission ne suffit pas à décrire l'état : sur Android 12 et antérieur,
+ * `POST_NOTIFICATIONS` n'existe pas et `checkPermissions()` renvoie toujours
+ * `granted`. La carte du profil annonçait donc « Notifications activées » alors
+ * qu'aucun token n'était enregistré — constaté après une réinstallation depuis
+ * le Play Store. Seule la présence d'un token prouve que les push arriveront.
+ *
+ * Le stockage local est effacé à la désinstallation, ce qui est exactement la
+ * durée de vie voulue : un token appartient à une installation.
+ */
+const TOKEN_MARK = "clubero.native-push.token";
+
+function markRegistered(token: string): void {
+  try {
+    localStorage.setItem(TOKEN_MARK, token);
+  } catch {
+    // Stockage indisponible : on dégrade vers « prompt », jamais vers un faux
+    // « activé ».
+  }
+}
+
+function hasRegisteredToken(): boolean {
+  try {
+    return !!localStorage.getItem(TOKEN_MARK);
+  } catch {
+    return false;
+  }
+}
+
 export async function getNativePushStatus(): Promise<NativePushStatus> {
   if (!isNativePlatform()) return "unavailable";
   try {
     const { receive } = await PushNotifications.checkPermissions();
     console.log("[native-push] checkPermissions:", receive);
-    if (receive === "granted") return "granted";
     if (receive === "denied") return "denied";
-    return "prompt";
+    // `granted` sans token = rien n'arrivera : proposer l'activation plutôt que
+    // d'afficher un succès que l'utilisateur n'a aucun moyen de démentir.
+    if (!hasRegisteredToken()) return "prompt";
+    return receive === "granted" ? "granted" : "prompt";
   } catch (e) {
     // Un échec ici signifie plugin absent du binaire ou bridge indisponible —
     // toujours le tracer, un `unavailable` silencieux est indébogable.
@@ -89,6 +122,7 @@ export async function enableNativePush(): Promise<{ ok: boolean; reason?: string
 
     const token = await registerAndGetToken();
     const saved = await saveToken(token);
+    if (saved) markRegistered(token);
     return saved ? { ok: true } : { ok: false, reason: "save_failed" };
   } catch (e) {
     console.warn("[native-push] enable failed", (e as Error).message);
@@ -96,30 +130,49 @@ export async function enableNativePush(): Promise<{ ok: boolean; reason?: string
   }
 }
 
-let launchInitDone = false;
+let tapListenerAttached = false;
+let registrationDone = false;
 
 /**
  * Au lancement (utilisateur authentifié) : si la permission est déjà accordée,
  * ré-enregistre silencieusement — les tokens APNs/FCM peuvent tourner — et
  * branche la navigation depuis un tap sur une notification.
+ *
+ * Les deux responsabilités portent des drapeaux distincts, à dessein. Un seul
+ * drapeau posé à l'entrée condamnait toute nouvelle tentative dès le premier
+ * appel : sur une installation neuve, la permission n'est pas encore accordée,
+ * la fonction sortait aussitôt, et plus rien ne se réenregistrait de toute la
+ * session — même après que l'utilisateur ait accordé la permission. Il fallait
+ * se déconnecter et se reconnecter pour recharger le module. Constaté sur
+ * appareil après une réinstallation depuis le Play Store.
  */
 export async function initNativePushOnLaunch(): Promise<void> {
-  if (!isNativePlatform() || launchInitDone) return;
-  launchInitDone = true;
+  if (!isNativePlatform()) return;
 
-  try {
+  // Une seule fois par session : un second écouteur dupliquerait la navigation.
+  if (!tapListenerAttached) {
+    tapListenerAttached = true;
     PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
       const url = (action.notification.data as { url?: string } | undefined)?.url;
       // Rechargement du shell SPA sur la route cible — simple et fiable pour
       // un tap de notification ; intégration router fine possible plus tard.
       if (url && url.startsWith("/")) window.location.assign(url);
     });
+  }
 
+  if (registrationDone) return;
+
+  try {
     const { receive } = await PushNotifications.checkPermissions();
+    // Sortie SANS marquer l'enregistrement fait : la permission peut être
+    // accordée plus tard dans la même session, et l'appel suivant doit aboutir.
     if (receive !== "granted") return;
 
     const token = await registerAndGetToken();
-    await saveToken(token);
+    if (await saveToken(token)) {
+      markRegistered(token);
+      registrationDone = true;
+    }
   } catch (e) {
     console.warn("[native-push] launch init failed", (e as Error).message);
   }
