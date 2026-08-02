@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Minus, Plus, Trophy, Users, Lock, Eye } from "lucide-react";
@@ -630,7 +630,7 @@ function EntryScreen({
     challenge.unit === "distance_meters" ? 10 : challenge.unit === "time_seconds" ? 0.1 : 1;
   const decimals = challenge.unit === "time_seconds" ? 2 : 0;
   const bump = (id: string, delta: number) =>
-    setValues((s) => {
+    edit((s) => {
       const cur = typeof s[id] === "number" ? (s[id] as number) : 0;
       const next = Math.max(0, Number((cur + delta).toFixed(decimals)));
       return { ...s, [id]: next };
@@ -671,7 +671,7 @@ function EntryScreen({
                 {isStepper ? (
                   <ScoreStepper
                     value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
-                    onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
+                    onChange={(n) => edit((s) => ({ ...s, [p.id]: n }))}
                     size="sm"
                   />
                 ) : (
@@ -694,7 +694,7 @@ function EntryScreen({
                       placeholder={t("entry.value_placeholder")}
                       value={values[p.id] ?? ""}
                       onChange={(e) =>
-                        setValues((s) => ({
+                        edit((s) => ({
                           ...s,
                           [p.id]: e.target.value === "" ? "" : Number(e.target.value),
                         }))
