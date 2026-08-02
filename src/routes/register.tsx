@@ -104,7 +104,12 @@ function RegisterPage() {
 
         if (result.source === "club") {
           setInviteKind("club");
-          if (result.teamId) setTeamInvite({ id: result.teamId, name: result.teamName });
+          if (result.teamId)
+            setTeamInvite({
+              id: result.teamId,
+              name: result.teamName,
+              ageGroup: result.teamAgeGroup,
+            });
           if (result.role === "club_admin") setSignupRole("club_admin");
           else if (result.role === "parent") setSignupRole("parent");
           else setSignupRole("player");
