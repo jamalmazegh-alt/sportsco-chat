@@ -176,7 +176,9 @@ function shortQuery(location: string) {
 }
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
-  // On privilégie une URL courte construite depuis l'adresse (les liens
+  // Une URL déjà courte fournie par l'appelant est conservée telle quelle.
+  if (locationUrl && /^https:\/\/maps\.google\.com\/\?q=/.test(locationUrl)) return locationUrl;
+  // Sinon on construit une URL courte depuis l'adresse (les liens
   // Google Maps « search?api=1&query=… » sont illisibles dans WhatsApp).
   if (location) return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
   return locationUrl ?? null;
