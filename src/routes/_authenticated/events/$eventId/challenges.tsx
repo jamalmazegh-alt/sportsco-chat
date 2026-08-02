@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Minus, Plus, Trophy, Users, Lock, Eye } from "lucide-react";
@@ -536,6 +536,8 @@ function EntryScreen({
   const loadResults = useServerFn(getPassageResults);
   const loadBests = useServerFn(getChallengePlayerBests);
 
+  const qc = useQueryClient();
+
   const { data: passageData, isLoading } = useQuery({
     queryKey: ["challenge-passage", challengeId, eventId],
     queryFn: () => getPassage({ data: { challengeId, eventId } }),
@@ -546,6 +548,8 @@ function EntryScreen({
     queryKey: ["challenge-passage-results", passage?.id],
     enabled: !!passage?.id,
     queryFn: () => loadResults({ data: { passageId: passage!.id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const { data: bestsData } = useQuery({
@@ -555,21 +559,34 @@ function EntryScreen({
       loadBests({
         data: { challengeId },
       }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const [values, setValues] = useState<Record<string, number | "">>({});
-  const [hydratedPassageId, setHydratedPassageId] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  const dirtyRef = useRef(false);
 
-  // Pre-fill saved values once existing results arrive, and reset correctly
-  // when switching to another challenge/passage.
+  const edit = (updater: (s: Record<string, number | "">) => Record<string, number | "">) => {
+    dirtyRef.current = true;
+    setValues(updater);
+  };
+
+  // Pre-fill saved values whenever fresh results arrive (and reset when the
+  // passage changes), unless the user already started editing.
   useEffect(() => {
-    if (!passage?.id || hydratedPassageId === passage.id || !existingData?.results) return;
+    dirtyRef.current = false;
+    setHydrated(false);
+  }, [passage?.id]);
+
+  useEffect(() => {
+    if (!passage?.id || !existingData?.results || dirtyRef.current) return;
 
     const seed: Record<string, number | ""> = {};
     for (const r of existingData.results) seed[r.player_id] = Number(r.value);
     setValues(seed);
-    setHydratedPassageId(passage.id);
-  }, [existingData?.results, hydratedPassageId, passage?.id]);
+    setHydrated(true);
+  }, [existingData, passage?.id]);
 
   const done = useMemo(
     () => Object.values(values).filter((v) => v !== "" && v != null).length,
@@ -586,7 +603,13 @@ function EntryScreen({
       return upsert({ data: { passageId: passage.id, entries } });
     },
     onSuccess: () => {
+      dirtyRef.current = false;
       toast.success(t("entry.saved"));
+      qc.invalidateQueries({ queryKey: ["challenge-passage-results", passage?.id] });
+      qc.invalidateQueries({ queryKey: ["challenge-player-bests", challengeId] });
+      qc.invalidateQueries({ queryKey: ["challenge-ranking", challengeId] });
+      qc.invalidateQueries({ queryKey: ["event-challenge-entry-counts", eventId] });
+      qc.invalidateQueries({ queryKey: ["player-challenge-stats"] });
       onDone(passage?.id);
     },
     onError: (e: any) => toast.error(e?.message ?? t("errors.generic")),
@@ -594,7 +617,7 @@ function EntryScreen({
 
   if (isLoading || loadingExisting || !challenge || !passage || !existingData)
     return <FullscreenLoader />;
-  if (passage.id !== hydratedPassageId) return <FullscreenLoader />;
+  if (!hydrated) return <FullscreenLoader />;
 
   if (players.length === 0) {
     return <div className="text-center text-sm text-muted-foreground">{t("entry.no_players")}</div>;
@@ -606,7 +629,7 @@ function EntryScreen({
     challenge.unit === "distance_meters" ? 10 : challenge.unit === "time_seconds" ? 0.1 : 1;
   const decimals = challenge.unit === "time_seconds" ? 2 : 0;
   const bump = (id: string, delta: number) =>
-    setValues((s) => {
+    edit((s) => {
       const cur = typeof s[id] === "number" ? (s[id] as number) : 0;
       const next = Math.max(0, Number((cur + delta).toFixed(decimals)));
       return { ...s, [id]: next };
@@ -647,7 +670,7 @@ function EntryScreen({
                 {isStepper ? (
                   <ScoreStepper
                     value={typeof values[p.id] === "number" ? (values[p.id] as number) : 0}
-                    onChange={(n) => setValues((s) => ({ ...s, [p.id]: n }))}
+                    onChange={(n) => edit((s) => ({ ...s, [p.id]: n }))}
                     size="sm"
                   />
                 ) : (
@@ -670,7 +693,7 @@ function EntryScreen({
                       placeholder={t("entry.value_placeholder")}
                       value={values[p.id] ?? ""}
                       onChange={(e) =>
-                        setValues((s) => ({
+                        edit((s) => ({
                           ...s,
                           [p.id]: e.target.value === "" ? "" : Number(e.target.value),
                         }))
