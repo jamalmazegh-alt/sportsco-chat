@@ -10,7 +10,11 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
-import { storePendingClubInvite, redeemClubInvite } from "@/lib/club-invite-pending";
+import {
+  storePendingClubInvite,
+  redeemClubInvite,
+  clubInviteErrorMessage,
+} from "@/lib/club-invite-pending";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -231,7 +235,11 @@ function RegisterPage() {
             : (await supabase.rpc("redeem_member_invite", { _token: inviteToken })).error;
         if (rErr) {
           setBusy(false);
-          toast.error(rErr.message || t("auth.inviteInvalid"));
+          toast.error(
+            inviteKind === "club"
+              ? clubInviteErrorMessage(rErr, t)
+              : rErr.message || t("auth.inviteInvalid"),
+          );
           return;
         }
       }

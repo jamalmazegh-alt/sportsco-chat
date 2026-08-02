@@ -232,7 +232,8 @@
     "signupError": "Could not create the account. Please try again.",
     "emailNotConfirmed": "Your email hasn't been confirmed yet. Check your inbox (and spam) to activate your account.",
     "resendConfirmation": "Resend email",
-    "confirmationResent": "Confirmation email resent."
+    "confirmationResent": "Confirmation email resent.",
+    "playerAlreadyLinked": "This player profile is already linked to another account. Contact the club."
   },
   "common": {
     "save": "Save",

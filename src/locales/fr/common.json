@@ -232,7 +232,8 @@
     "signupError": "Impossible de créer le compte. Réessayez.",
     "emailNotConfirmed": "Votre e-mail n'a pas encore été confirmé. Vérifiez votre boîte de réception (et vos spams) pour activer votre compte.",
     "resendConfirmation": "Renvoyer l'e-mail",
-    "confirmationResent": "E-mail de confirmation renvoyé."
+    "confirmationResent": "E-mail de confirmation renvoyé.",
+    "playerAlreadyLinked": "Cette fiche joueur est déjà associée à un autre compte. Contactez le club."
   },
   "common": {
     "save": "Enregistrer",

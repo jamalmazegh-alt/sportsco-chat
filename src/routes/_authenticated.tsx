@@ -6,7 +6,7 @@ import { initNativePushOnLaunch } from "@/lib/native-push";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { redeemClubInvite } from "@/lib/club-invite-pending";
+import { redeemClubInvite, clubInviteErrorMessage } from "@/lib/club-invite-pending";
 import { BottomNav } from "@/components/bottom-nav";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
@@ -356,7 +356,7 @@ function NoMembershipScreen({
     const { error } = await redeemClubInvite(token.trim());
     if (error) {
       setBusy(false);
-      toast.error(error.message || t("auth.inviteInvalid"));
+      toast.error(clubInviteErrorMessage(error, t));
       return;
     }
     await onDone();

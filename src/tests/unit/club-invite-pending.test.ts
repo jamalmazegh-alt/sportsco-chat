@@ -28,6 +28,7 @@ Object.defineProperty(globalThis, "window", {
 
 import {
   clearPendingClubInvite,
+  clubInviteErrorMessage,
   readPendingClubInvite,
   redeemClubInvite,
   storePendingClubInvite,
@@ -102,5 +103,11 @@ describe("club-invite-pending", () => {
     clearPendingClubInvite("a");
     expect(readPendingClubInvite("a")).toBeNull();
     expect(readPendingClubInvite("b")?.mode).toBe("child");
+  });
+
+  it("maps player_already_linked to the i18n key", () => {
+    const t = (key: string) => (key === "auth.playerAlreadyLinked" ? "linked" : key);
+    expect(clubInviteErrorMessage({ message: "player_already_linked" }, t)).toBe("linked");
+    expect(clubInviteErrorMessage({ message: "Invite expired" }, t)).toBe("Invite expired");
   });
 });
