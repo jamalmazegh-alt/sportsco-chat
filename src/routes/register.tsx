@@ -80,6 +80,7 @@ function RegisterPage() {
   const [childFirstName, setChildFirstName] = useState("");
   const [childLastName, setChildLastName] = useState("");
   const [childBirthDate, setChildBirthDate] = useState("");
+  const [childPhone, setChildPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
   const createAccount = useServerFn(createInvitedAccount);
@@ -158,6 +159,7 @@ function RegisterPage() {
         childFirstName: childFirstName.trim() || null,
         childLastName: childLastName.trim() || null,
         childBirthDate: childBirthDate || null,
+        childPhone: joinMode === "child" ? childPhone.trim() || null : null,
       };
       storePendingClubInvite(inviteToken, teamPayload);
     }
@@ -437,9 +439,29 @@ function RegisterPage() {
                 />
               </div>
 
+              {joinMode === "child" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="cphone">
+                    {t("auth.childPhone", {
+                      defaultValue: "Téléphone de l'enfant (optionnel)",
+                    })}
+                  </Label>
+                  <Input
+                    id="cphone"
+                    type="tel"
+                    value={childPhone}
+                    onChange={(e) => setChildPhone(e.target.value)}
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                  <Label htmlFor="phone">
+                    {joinMode === "child"
+                      ? t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })
+                      : t("auth.phone", { defaultValue: "Téléphone" })}
+                  </Label>
                   <Input
                     id="phone"
                     type="tel"
