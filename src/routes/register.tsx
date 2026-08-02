@@ -10,6 +10,7 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
+import { storePendingClubInvite, redeemClubInvite } from "@/lib/club-invite-pending";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
