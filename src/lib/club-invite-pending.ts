@@ -94,6 +94,12 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
   if (!error) {
     clearPendingClubInvite(token);
     markClubInviteRedeemed(token);
+    // Prévient le staff de l'équipe pour qu'il valide la nouvelle fiche.
+    void import("@/lib/club-invite-notify.functions")
+      .then(({ notifyStaffOfQrJoin }) => notifyStaffOfQrJoin({ data: { token } }))
+      .catch(() => {
+        /* best-effort */
+      });
   }
 
   // Normalize the identity-collision error so callers can toast a clear message
