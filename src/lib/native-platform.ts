@@ -71,3 +71,34 @@ export function apiUrl(path: string): string {
   const origin = getApiOrigin();
   return origin && path.startsWith("/") ? `${origin}${path}` : path;
 }
+
+/**
+ * Origine publique du site, à utiliser partout où une URL **quitte l'appareil**.
+ *
+ * En natif, `window.location.origin` vaut `https://localhost` (Android) ou
+ * `capacitor://localhost` (iOS) : c'est l'origine du bundle embarqué, qui n'a
+ * aucun sens pour un tiers. Un lien d'invitation, un QR code, une URL de retour
+ * Stripe ou une redirection d'e-mail construits ainsi sont inutilisables —
+ * constaté sur appareil réel : le QR d'invitation d'équipe pointait sur
+ * `https://localhost/register?invite=…`.
+ *
+ * Sur le web, renvoie l'origine courante, ce qui préserve les environnements de
+ * prévisualisation et les domaines personnalisés.
+ */
+export function getPublicOrigin(): string {
+  if (!isNativePlatform()) {
+    return typeof window !== "undefined" ? window.location.origin : "";
+  }
+  const configured = import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined;
+  // Repli sur l'origine d'API : app et API partagent le domaine aujourd'hui.
+  // En dernier recours le domaine de production, car renvoyer `localhost`
+  // produirait des liens cassés plutôt qu'une erreur visible.
+  return (configured || getApiOrigin() || "https://clubero.app").replace(/\/+$/, "");
+}
+
+/** Construit une URL publique absolue à partir d'un chemin (`/register?...`). */
+export function publicUrl(path: string): string {
+  const origin = getPublicOrigin();
+  if (!path) return origin;
+  return path.startsWith("/") ? `${origin}${path}` : `${origin}/${path}`;
+}

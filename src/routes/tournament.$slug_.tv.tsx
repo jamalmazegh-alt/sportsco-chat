@@ -4,6 +4,7 @@
  * Refresh live toutes les 30s. ?refresh=15 pour changer la durée d'un slide (en s).
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -100,7 +101,7 @@ function TvSlideshowPage() {
 
   const publicUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/tournament/${slug}`;
+    return `${getPublicOrigin()}/tournament/${slug}`;
   }, [slug]);
 
   const slides = useMemo(() => {

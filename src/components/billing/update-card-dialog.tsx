@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { loadStripe, type Stripe as StripeJs } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
@@ -37,7 +38,7 @@ function SetupForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: (
       elements,
       redirect: "if_required",
       confirmParams: {
-        return_url: `${window.location.origin}/admin/billing?card=updated`,
+        return_url: `${getPublicOrigin()}/admin/billing?card=updated`,
       },
     });
     if (confirmError) {

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { openInSystemApp } from "@/lib/open-url";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -1154,7 +1155,7 @@ function EventDetail() {
           | null
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
-        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const origin = getPublicOrigin();
 
         // Assigned coaches — sourced from the event embed (event_staff_assignments)
         const coachNames: string[] | undefined = (() => {
@@ -1953,7 +1954,7 @@ function EventDetail() {
         | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       void eventDateLabel;
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const origin = getPublicOrigin();
 
       const competitionLabel =
         (event as any).competition_name ||
@@ -2570,7 +2571,7 @@ function EventDetail() {
                   endsAt: event.ends_at ?? null,
                   url:
                     typeof window !== "undefined"
-                      ? `${window.location.origin}/events/${event.id}`
+                      ? `${getPublicOrigin()}/events/${event.id}`
                       : null,
                 }}
                 className="h-8 gap-1.5 text-xs"

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { openInSystemApp } from "@/lib/open-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -151,7 +152,7 @@ export function RegistrationsManager({
               tournament_id: tournamentId,
               registration_id: vars.id,
               channel: "email",
-              origin: window.location.origin,
+              origin: getPublicOrigin(),
             },
           });
           toast.success(
@@ -201,7 +202,7 @@ export function RegistrationsManager({
           tournament_id: tournamentId,
           registration_id: vars.id,
           channel: vars.channel,
-          origin: window.location.origin,
+          origin: getPublicOrigin(),
         },
       }),
     onSuccess: (res: any, vars) => {
@@ -246,7 +247,7 @@ export function RegistrationsManager({
           contact_name: inviteForm.contact_name.trim(),
           contact_email: inviteForm.contact_email.trim(),
           contact_phone: inviteForm.contact_phone.trim() || null,
-          origin: window.location.origin,
+          origin: getPublicOrigin(),
         },
       }),
     onSuccess: () => {

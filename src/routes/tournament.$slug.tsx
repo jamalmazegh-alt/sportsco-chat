@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -1330,7 +1331,9 @@ function streamEmbedUrl(raw: string): string | null {
     }
     // Twitch
     if (h === "twitch.tv" || h.endsWith(".twitch.tv")) {
-      const parent = typeof window !== "undefined" ? window.location.hostname : "clubero.app";
+      // Twitch refuse un `parent` qu'il ne peut pas vérifier : en natif,
+      // `location.hostname` vaut `localhost` et le lecteur reste noir.
+      const parent = new URL(getPublicOrigin() || "https://clubero.app").hostname;
       const parts = u.pathname.split("/").filter(Boolean);
       if (parts[0] === "videos" && parts[1]) {
         return `https://player.twitch.tv/?video=${parts[1]}&parent=${parent}`;

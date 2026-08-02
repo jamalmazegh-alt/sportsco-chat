@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -120,7 +121,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       const roleLabel = t(`roles.${role}`, { lng: locale, defaultValue: role });
 
       if (res.linked && res.tournament_slug && email) {
-        const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
+        const tournamentUrl = `${getPublicOrigin()}/tournament/${res.tournament_slug}`;
         sendTransactionalEmail({
           templateName: "tournament-member-added",
           recipientEmail: email,
@@ -136,7 +137,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           console.error("tournament-member-added email failed", err);
         });
       } else if (!res.linked && !res.offline && res.invite_token && email) {
-        const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
+        const inviteUrl = `${getPublicOrigin()}/tournament-invite/${res.invite_token}`;
         sendTransactionalEmail({
           templateName: "tournament-invite",
           recipientEmail: email,
@@ -195,7 +196,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   }
 
   function copyInviteLink(token: string) {
-    const url = `${window.location.origin}/tournament-invite/${token}`;
+    const url = `${getPublicOrigin()}/tournament-invite/${token}`;
     void copyText(url);
     toast.success(t("tournamentMembers.linkCopied", { defaultValue: "Lien copié" }));
   }
@@ -216,7 +217,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       const roleLabel = t(`roles.${res.role}`, { lng: locale, defaultValue: res.role });
       const cleanEmail = convertEmail.trim().toLowerCase();
       if (res.linked && res.tournament_slug) {
-        const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
+        const tournamentUrl = `${getPublicOrigin()}/tournament/${res.tournament_slug}`;
         sendTransactionalEmail({
           templateName: "tournament-member-added",
           recipientEmail: cleanEmail,
@@ -230,7 +231,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           },
         }).catch((err) => console.error("convert/added email failed", err));
       } else if (res.invite_token) {
-        const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
+        const inviteUrl = `${getPublicOrigin()}/tournament-invite/${res.invite_token}`;
         sendTransactionalEmail({
           templateName: "tournament-invite",
           recipientEmail: cleanEmail,

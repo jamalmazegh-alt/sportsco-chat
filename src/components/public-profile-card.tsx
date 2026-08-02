@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { Globe, Copy, Loader2 } from "lucide-react";
@@ -21,8 +22,7 @@ export function PublicProfileCard({
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
 
-  const publicUrl =
-    slug && typeof window !== "undefined" ? `${window.location.origin}/p/${slug}` : null;
+  const publicUrl = slug && typeof window !== "undefined" ? `${getPublicOrigin()}/p/${slug}` : null;
 
   async function toggle(next: boolean) {
     setBusy(true);

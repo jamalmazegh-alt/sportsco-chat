@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -679,7 +680,7 @@ function PublicCampLinkCard({
   t: (key: string, opts?: { defaultValue?: string }) => string;
 }) {
   const path = `/stages/${clubSlug}/${campSlug}`;
-  const url = typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
+  const url = typeof window !== "undefined" ? `${getPublicOrigin()}${path}` : path;
   const copy = async () => {
     try {
       if (!(await copyText(url))) throw new Error("copy failed");

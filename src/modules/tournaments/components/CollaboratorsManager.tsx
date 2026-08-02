@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -89,7 +90,7 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
 
   const inviteUrl = (token: string) =>
     typeof window !== "undefined"
-      ? `${window.location.origin}/tournament-invite/${token}`
+      ? `${getPublicOrigin()}/tournament-invite/${token}`
       : `/tournament-invite/${token}`;
 
   const copyLink = (token: string) => {

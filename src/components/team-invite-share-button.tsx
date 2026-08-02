@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -81,7 +82,7 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
         });
         if (error) throw error;
       }
-      setUrl(`${window.location.origin}/register?invite=${encodeURIComponent(token)}`);
+      setUrl(`${getPublicOrigin()}/register?invite=${encodeURIComponent(token)}`);
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {

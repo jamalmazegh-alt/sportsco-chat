@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -118,7 +119,7 @@ function ExpiredLinkBlock() {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/tournaments/start`,
+        emailRedirectTo: `${getPublicOrigin()}/tournaments/start`,
       },
     });
     setBusy(false);
@@ -177,7 +178,7 @@ function SignupForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/tournaments/start`,
+        emailRedirectTo: `${getPublicOrigin()}/tournaments/start`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),

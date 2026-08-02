@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -56,7 +57,7 @@ function TournamentPricingPage() {
       return checkoutFn({
         data: {
           plan,
-          origin: typeof window !== "undefined" ? window.location.origin : undefined,
+          origin: getPublicOrigin(),
         },
       });
     },

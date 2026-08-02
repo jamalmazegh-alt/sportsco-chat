@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -39,7 +40,7 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
 
   const publicUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/tournament/${tournamentSlug}`
+      ? `${getPublicOrigin()}/tournament/${tournamentSlug}`
       : `/tournament/${tournamentSlug}`;
   const registerUrl = `${publicUrl}/register`;
 

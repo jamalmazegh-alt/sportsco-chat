@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { copyText } from "@/lib/clipboard";
 import { openExternalUrl } from "@/lib/open-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -398,7 +399,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
   const trackingUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/suivi/${detail.access_token}`;
+    return `${getPublicOrigin()}/suivi/${detail.access_token}`;
   }, [detail.access_token]);
 
   return (
