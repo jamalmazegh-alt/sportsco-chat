@@ -74,13 +74,41 @@ export function clearPendingClubInvite(token: string) {
   }
 }
 
+/**
+ * localStorage can be lost between signup and redeem (confirmation e-mail
+ * opened on another device or browser). The same payload is mirrored in the
+ * auth user metadata at signup, so we can still replay the exact details
+ * instead of falling back to `mode: "self"` — which used to create a player
+ * row named after the *parent*, with no birth date nor licence.
+ */
+async function readInviteFromMetadata(token: string): Promise<PendingClubInvitePayload | null> {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const raw = (data.user?.user_metadata as any)?.club_invite_payload;
+    if (!raw || typeof raw !== "object") return null;
+    if (raw.token && raw.token !== token) return null;
+    return {
+      mode: raw.mode === "child" ? "child" : "self",
+      birthDate: raw.birthDate ?? null,
+      phone: raw.phone ?? null,
+      license: raw.license ?? null,
+      childFirstName: raw.childFirstName ?? null,
+      childLastName: raw.childLastName ?? null,
+      childBirthDate: raw.childBirthDate ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Redeem a club link invite, replaying any locally stored signup details. */
 export async function redeemClubInvite(token: string, payload?: PendingClubInvitePayload | null) {
-  const data = payload ?? readPendingClubInvite(token);
+  const local = payload ?? readPendingClubInvite(token);
   // Already redeemed in this browser: never replay with a default "self" mode.
-  if (!payload && !data && hasRedeemedClubInvite(token)) {
+  if (!payload && !local && hasRedeemedClubInvite(token)) {
     return { error: null };
   }
+  const data = local ?? (await readInviteFromMetadata(token));
   const { error } = await supabase.rpc("redeem_club_invite_v2", {
     _token: token,
     _mode: data?.mode ?? "self",
@@ -91,6 +119,7 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
     _child_last_name: data?.childLastName || undefined,
     _child_birth_date: data?.childBirthDate || undefined,
   });
+
   if (!error) {
     clearPendingClubInvite(token);
     markClubInviteRedeemed(token);
