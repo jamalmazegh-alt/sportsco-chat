@@ -389,7 +389,7 @@ export function buildRescheduleMessage(input: WhatsAppEventInput): string {
   if (next) lines.push(`${d.newDate} : ${next}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
   if (input.cancellationReason) {
     lines.push("");
@@ -411,7 +411,7 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
   if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
 
   const r = input.respondents;
