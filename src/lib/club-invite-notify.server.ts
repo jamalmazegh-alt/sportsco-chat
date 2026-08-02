@@ -8,6 +8,66 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendPushToUser } from "@/lib/push-send.server";
 
+/** Rôles considérés comme staff d'équipe (aligné sur le reste de l'app). */
+export const QR_STAFF_ROLES = ["coach", "assistant_coach", "admin"] as const;
+
+type QrLang = "fr" | "en" | "es" | "de" | "it" | "nl" | "pt";
+
+const I18N: Record<QrLang, { title: string; body: (p: string, t: string) => string }> = {
+  fr: {
+    title: "🆕 Nouveau joueur via QR code",
+    body: (p, t) => `${p} a rejoint ${t}. Vérifiez sa fiche.`,
+  },
+  en: {
+    title: "🆕 New player via QR code",
+    body: (p, t) => `${p} joined ${t}. Please review their profile.`,
+  },
+  es: {
+    title: "🆕 Nuevo jugador por código QR",
+    body: (p, t) => `${p} se ha unido a ${t}. Revisa su ficha.`,
+  },
+  de: {
+    title: "🆕 Neuer Spieler über QR-Code",
+    body: (p, t) => `${p} ist ${t} beigetreten. Bitte Profil prüfen.`,
+  },
+  it: {
+    title: "🆕 Nuovo giocatore tramite QR code",
+    body: (p, t) => `${p} si è unito a ${t}. Controlla la sua scheda.`,
+  },
+  nl: {
+    title: "🆕 Nieuwe speler via QR-code",
+    body: (p, t) => `${p} is lid geworden van ${t}. Controleer het profiel.`,
+  },
+  pt: {
+    title: "🆕 Novo jogador via QR code",
+    body: (p, t) => `${p} juntou-se a ${t}. Verifique a ficha.`,
+  },
+};
+
+/** Message localisé pour la notif "joueur rejoint via QR". */
+export function qrJoinMessage(
+  lang: string | null | undefined,
+  playerName: string,
+  teamName: string,
+): { title: string; body: string } {
+  const key = (lang ?? "fr").slice(0, 2).toLowerCase() as QrLang;
+  const t = I18N[key] ?? I18N.fr;
+  return { title: t.title, body: t.body(playerName, teamName) };
+}
+
+/** Destinataires staff, dédupliqués et sans l'auteur du join. */
+export function pickStaffTargets(
+  rows: Array<{ user_id: string | null; role?: string | null }>,
+  actorUserId: string,
+): string[] {
+  const out = new Set<string>();
+  for (const r of rows) {
+    if (r.role && !(QR_STAFF_ROLES as readonly string[]).includes(r.role)) continue;
+    if (r.user_id && r.user_id !== actorUserId) out.add(r.user_id);
+  }
+  return Array.from(out);
+}
+
 export interface QrJoinNotifyResult {
   notified: number;
   playerId: string | null;
@@ -81,22 +141,21 @@ export async function notifyTeamStaffOfQrJoin(
 
   const { data: staff } = await supabaseAdmin
     .from("team_members")
-    .select("user_id")
+    .select("user_id, role")
     .eq("team_id", teamId)
-    .in("role", ["coach", "admin"]);
+    .in("role", QR_STAFF_ROLES as unknown as string[]);
 
-  const targets = new Set<string>();
-  for (const s of staff ?? []) {
-    const uid = (s as { user_id: string | null }).user_id;
-    if (uid && uid !== userId) targets.add(uid);
-  }
+  const targets = new Set<string>(
+    pickStaffTargets(
+      (staff ?? []) as Array<{ user_id: string | null; role: string | null }>,
+      userId,
+    ),
+  );
   if (targets.size === 0) return { notified: 0, playerId: player.id };
 
   const link = `/players/${player.id}`;
   const playerName =
     [player.first_name, player.last_name].filter(Boolean).join(" ").trim() || "Un joueur";
-  const title = "🆕 Nouveau joueur via QR code";
-  const body = `${playerName} a rejoint ${teamName}. Vérifiez sa fiche.`;
 
   // Idempotence : on ne renotifie pas un staff déjà prévenu pour ce joueur.
   const { data: already } = await supabaseAdmin
@@ -109,9 +168,24 @@ export async function notifyTeamStaffOfQrJoin(
   if (targets.size === 0) return { notified: 0, playerId: player.id };
 
   const uids = Array.from(targets);
-  const { error } = await supabaseAdmin
-    .from("notifications")
-    .insert(uids.map((uid) => ({ user_id: uid, type: "qr_player_joined", title, body, link })));
+  const { data: profs } = await supabaseAdmin
+    .from("profiles")
+    .select("id, preferred_language")
+    .in("id", uids);
+  const langByUser = new Map<string, string | null>(
+    (profs ?? []).map((p) => [
+      (p as { id: string }).id,
+      (p as { preferred_language: string | null }).preferred_language,
+    ]),
+  );
+  const msgFor = (uid: string) => qrJoinMessage(langByUser.get(uid), playerName, teamName);
+
+  const { error } = await supabaseAdmin.from("notifications").insert(
+    uids.map((uid) => {
+      const m = msgFor(uid);
+      return { user_id: uid, type: "qr_player_joined", title: m.title, body: m.body, link };
+    }),
+  );
   if (error) {
     console.error("[qr-join-notify] insert failed", error);
     return { notified: 0, playerId: player.id };
@@ -120,8 +194,7 @@ export async function notifyTeamStaffOfQrJoin(
   await Promise.allSettled(
     uids.map((uid) =>
       sendPushToUser(uid, {
-        title,
-        body,
+        ...msgFor(uid),
         url: `${link}?from=push`,
         tag: `qr-join-${player.id}`,
       }),
