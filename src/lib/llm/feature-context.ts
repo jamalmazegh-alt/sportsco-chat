@@ -195,12 +195,25 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Tournament registration payments: available (see Tournaments, unlocked in V2).
 
 ### Communication
-- Club wall (pinned posts, @mentions, read receipts, attachments): club news feed.
+- Club wall (pinned posts, @mentions, attachments): club news feed.
+- Wall read receipts ("Read by X/Y" with reader details) and WhatsApp-style emoji reactions on posts and comments, in real time, with author notification.
+- Team staff wall: a private space for the coaches of one or several teams (posts and polls targeted at "team staff").
+- Club document library: every document shared on the wall in one place, with built-in preview (images and PDF), download, rename, hide and delete by the author or staff.
+- Club groups (board, referees, volunteers...): reusable audiences for the wall, polls, meetings and helper needs.
 - Social media ingestion (Facebook): automatically pulls in club posts.
-- Web push notifications (PWA) per type: native notifications, no app store.
-- Transactional emails (allowlist + rate limit): attendance requests, invites, tournaments.
+- Web push notifications (PWA) per type: native notifications, no app store, including event chat messages (grouped, 5-minute anti-spam window, toggled per club).
+- Transactional emails (allowlist + rate limit): attendance requests, invites, tournaments. "Club via Clubero" sender, delivery tracking, explicit failure reasons (suppressed address, bounce, unconfirmed email) and retry.
 - WhatsApp sharing of attendance requests: coexists with existing family habits.
 - Club sponsors (logos + display stats): partner visibility.
+
+### Moderation & member safety
+- Wall content reporting: any member can report a post or comment (inappropriate content, harassment, spam, misinformation, privacy, other). Club admins and managers are notified immediately.
+- Event chat message reporting: same flow, handled by club moderators.
+- User reporting and muting: a member can report a person or hide their content for themselves.
+- Moderation tab in club administration: report queue (pending, in review, rejected, actioned), decision history and actions (hide content, warn, close).
+- Minor protection: parental consent (image rights), restricted visibility of minors' data, documented child-safety consent, and parent contacts visible for the relevant minor players.
+
+
 
 ### Administration & branding
 - Per-club branding (theme colour, applied to public pages): visual identity.
