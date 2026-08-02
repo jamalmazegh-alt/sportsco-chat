@@ -619,7 +619,6 @@ function EntryScreen({
     return <FullscreenLoader />;
   if (!hydrated) return <FullscreenLoader />;
 
-
   if (players.length === 0) {
     return <div className="text-center text-sm text-muted-foreground">{t("entry.no_players")}</div>;
   }
