@@ -862,7 +862,6 @@ function TeamDetail() {
                   teamId={team.id}
                   teamName={team.name}
                 />
-
               )}
               {isCoach && team && (
                 <Button size="icon" variant="ghost" className="h-8 w-8" onClick={openEdit}>
