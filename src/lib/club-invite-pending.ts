@@ -78,6 +78,10 @@ export function clearPendingClubInvite(token: string) {
 /** Redeem a club link invite, replaying any locally stored signup details. */
 export async function redeemClubInvite(token: string, payload?: PendingClubInvitePayload | null) {
   const data = payload ?? readPendingClubInvite(token);
+  // Already redeemed in this browser: never replay with a default "self" mode.
+  if (!payload && !data && hasRedeemedClubInvite(token)) {
+    return { error: null };
+  }
   const { error } = await supabase.rpc("redeem_club_invite_v2", {
     _token: token,
     _mode: data?.mode ?? "self",
@@ -88,7 +92,11 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
     _child_last_name: data?.childLastName || undefined,
     _child_birth_date: data?.childBirthDate || undefined,
   });
-  if (!error) clearPendingClubInvite(token);
+  if (!error) {
+    clearPendingClubInvite(token);
+    markClubInviteRedeemed(token);
+  }
+
   // Normalize the identity-collision error so callers can toast a clear message
   // without depending on Postgres exception wording beyond the code.
   if (error?.message?.includes("player_already_linked")) {
