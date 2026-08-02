@@ -290,9 +290,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     const parts = [input.clubName, input.teamName]
       .filter((p): p is string => !!p && !titleLower.includes(p.toLowerCase()))
       .filter((p, i, arr) => arr.indexOf(p) === i);
-    const fmt = input.type === "match" ? durationLabel(input, loc) : null;
-    const sub = [parts.join(" · "), fmt].filter(Boolean).join(" · ");
-    if (sub) lines.push(`_${sub}_`);
+    if (parts.length > 0) lines.push(`_${parts.join(" · ")}_`);
   }
   lines.push("");
 
@@ -309,21 +307,42 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
           : "Start";
     lines.push(`🗓️ *${card.weekday} ${card.day} ${card.month}* — ${startLabel} ${card.time}`);
   }
-  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
-  if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   const end = fmtWith(input.endsAt, d.timePattern, loc);
   if (end) lines.push(`🕒 ${d.endTime} : ${end}`);
-  lines.push("");
 
-  // ── Location + navigation ────────────────────────────────────
+  // ── Lieu du match + navigation ───────────────────────────────
   if (input.location) {
-    lines.push(`📍 ${input.location}`);
+    lines.push("");
+    const venueLabel =
+      input.type === "match" || input.type === "friendly"
+        ? loc === "fr"
+          ? "Lieu du match"
+          : "Match venue"
+        : loc === "fr"
+          ? "Lieu"
+          : "Venue";
+    lines.push(`📍 *${venueLabel}*`);
+    lines.push(input.location);
     pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
-  if (input.meetingPoint) {
-    lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
+
+  // ── Rendez-vous (horaire + lieu de RDV) ──────────────────────
+  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
+  if (convoc || input.meetingPoint) {
+    lines.push("");
+    lines.push(`🚌 *${loc === "fr" ? "Rendez-vous" : "Meeting"}*`);
+    if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
+    if (input.meetingPoint) {
+      lines.push(`📍 ${input.meetingPoint}`);
+      const sameAsVenue =
+        !!input.location &&
+        input.meetingPoint.trim().toLowerCase() === input.location.trim().toLowerCase();
+      if (!sameAsVenue) pushNavLinks(lines, input.meetingPoint, null, loc);
+    }
   }
+
   if (input.coachNames && input.coachNames.length > 0) {
+    lines.push("");
     lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
   }
 
