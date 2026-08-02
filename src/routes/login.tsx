@@ -4,7 +4,11 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { redeemClubInvite, clubInviteErrorMessage } from "@/lib/club-invite-pending";
+import {
+  clubInviteAuthMetadataClear,
+  clubInviteErrorMessage,
+  redeemClubInvite,
+} from "@/lib/club-invite-pending";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -45,7 +49,10 @@ function LoginPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       setBusy(false);
       const code = (error as { code?: string }).code?.toLowerCase() ?? "";
@@ -75,13 +82,20 @@ function LoginPage() {
         _token: search.invite,
       });
       if (memberErr) {
-        // Club link invite (QR): replays the details collected at signup.
-        const { error: clubErr } = await redeemClubInvite(search.invite);
+        // Club link invite (QR): replays details from localStorage or the
+        // session metadata written at signup (no getUser — use sign-in user).
+        const meta = (signInData.session?.user?.user_metadata ?? {}) as Record<string, unknown>;
+        const { error: clubErr } = await redeemClubInvite(search.invite, {
+          userMetadata: meta,
+        });
         if (clubErr) {
           setBusy(false);
           toast.error(clubInviteErrorMessage(clubErr, t) || memberErr.message);
           return;
         }
+        void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+          /* best-effort */
+        });
       }
     }
     if (typeof window !== "undefined") {

@@ -27,8 +27,11 @@ Object.defineProperty(globalThis, "window", {
 });
 
 import {
+  buildClubInviteAuthMetadata,
   clearPendingClubInvite,
+  clubInviteAuthMetadataClear,
   clubInviteErrorMessage,
+  readInvitePayloadFromMetadata,
   readPendingClubInvite,
   redeemClubInvite,
   storePendingClubInvite,
@@ -125,5 +128,90 @@ describe("club-invite-pending", () => {
     const t = (key: string) => (key === "auth.playerAlreadyLinked" ? "linked" : key);
     expect(clubInviteErrorMessage({ message: "player_already_linked" }, t)).toBe("linked");
     expect(clubInviteErrorMessage({ message: "Invite expired" }, t)).toBe("Invite expired");
+  });
+
+  it("replays flat user_metadata when localStorage is empty (other device)", async () => {
+    const meta = buildClubInviteAuthMetadata("tok-meta", {
+      mode: "child",
+      childFirstName: "Victor",
+      childLastName: "Osim",
+      childBirthDate: "2014-05-01",
+      license: "LIC-V",
+      phone: "0612345678",
+    });
+
+    const { error } = await redeemClubInvite("tok-meta", { userMetadata: meta });
+    expect(error).toBeNull();
+    expect(rpc).toHaveBeenCalledWith(
+      "redeem_club_invite_v2",
+      expect.objectContaining({
+        _token: "tok-meta",
+        _mode: "child",
+        _child_first_name: "Victor",
+        _child_last_name: "Osim",
+        _child_birth_date: "2014-05-01",
+        _license: "LIC-V",
+        _phone: "0612345678",
+      }),
+    );
+  });
+
+  it("still accepts the legacy nested club_invite_payload blob", () => {
+    const parsed = readInvitePayloadFromMetadata("tok-nested", {
+      club_invite_payload: {
+        token: "tok-nested",
+        mode: "child",
+        childFirstName: "Victor",
+        childLastName: "Osim",
+        childBirthDate: "2014-05-01",
+      },
+    });
+    expect(parsed).toEqual({
+      mode: "child",
+      birthDate: null,
+      phone: null,
+      license: null,
+      childFirstName: "Victor",
+      childLastName: "Osim",
+      childBirthDate: "2014-05-01",
+    });
+  });
+
+  it("fails fast when metadata says child but names are missing", async () => {
+    const { error } = await redeemClubInvite("tok-bad", {
+      userMetadata: { club_invite_mode: "child" },
+    });
+    expect(error?.message).toBe("Child name required");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("dedupes parallel redeem calls for the same token", async () => {
+    let release!: () => void;
+    rpc.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ data: "club-id", error: null });
+        }),
+    );
+    storePendingClubInvite("tok-race", {
+      mode: "child",
+      childFirstName: "Victor",
+      childLastName: "Osim",
+      childBirthDate: "2014-05-01",
+    });
+
+    const a = redeemClubInvite("tok-race");
+    const b = redeemClubInvite("tok-race");
+    release();
+    await Promise.all([a, b]);
+    expect(rpc).toHaveBeenCalledTimes(1);
+  });
+
+  it("builds a clear-metadata patch that nulls invite fields", () => {
+    const clear = clubInviteAuthMetadataClear();
+    expect(clear.invite_token).toBeNull();
+    expect(clear.club_invite_mode).toBeNull();
+    expect(clear.club_invite_payload).toBeNull();
+    expect(clear.club_invite_child_first_name).toBeNull();
   });
 });

@@ -6,7 +6,11 @@ import { initNativePushOnLaunch } from "@/lib/native-push";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { redeemClubInvite, clubInviteErrorMessage } from "@/lib/club-invite-pending";
+import {
+  clubInviteAuthMetadataClear,
+  clubInviteErrorMessage,
+  redeemClubInvite,
+} from "@/lib/club-invite-pending";
 import { BottomNav } from "@/components/bottom-nav";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
@@ -353,12 +357,19 @@ function NoMembershipScreen({
     if (!token.trim()) return;
     setBusy(true);
     // v2: team-scoped QR tokens also create the player + team_members row.
-    const { error } = await redeemClubInvite(token.trim());
+    // Pass current user_metadata so a QR signup that bounced here after e-mail
+    // confirm can still replay parent/child details.
+    const { data: sessionData } = await supabase.auth.getSession();
+    const meta = (sessionData.session?.user?.user_metadata ?? {}) as Record<string, unknown>;
+    const { error } = await redeemClubInvite(token.trim(), { userMetadata: meta });
     if (error) {
       setBusy(false);
       toast.error(clubInviteErrorMessage(error, t));
       return;
     }
+    void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+      /* best-effort */
+    });
     await onDone();
     setBusy(false);
   }
