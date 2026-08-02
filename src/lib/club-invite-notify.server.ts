@@ -139,11 +139,13 @@ export async function notifyTeamStaffOfQrJoin(
     .maybeSingle();
   const teamName = (team as { name: string } | null)?.name ?? "l'équipe";
 
+  // NB: on ne filtre pas le rôle côté SQL — `assistant_coach` n'existe pas dans
+  // l'enum `app_role`, un `.in()` provoquerait une erreur de cast. Filtrage en TS.
   const { data: staff } = await supabaseAdmin
     .from("team_members")
     .select("user_id, role")
     .eq("team_id", teamId)
-    .in("role", QR_STAFF_ROLES as unknown as string[]);
+    .not("user_id", "is", null);
 
   const targets = new Set<string>(
     pickStaffTargets(
