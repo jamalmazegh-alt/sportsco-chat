@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -208,7 +210,7 @@ function TournamentDetailPage() {
 
   const publicUrl = tournament?.slug
     ? typeof window !== "undefined"
-      ? `${window.location.origin}/tournament/${tournament.slug}`
+      ? `${getPublicOrigin()}/tournament/${tournament.slug}`
       : `/tournament/${tournament.slug}`
     : "";
   const scoring = tournament
@@ -690,18 +692,18 @@ function TournamentDetailPage() {
             {tournament.slug && (
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
-                  href={`${typeof window !== "undefined" ? window.location.origin : ""}/tournament/${tournament.slug}`}
+                  href={`${getPublicOrigin()}/tournament/${tournament.slug}`}
                   target="_blank"
                   rel="noopener noreferrer external"
                   onClick={(e) => {
-                    const url = `${window.location.origin}/tournament/${tournament.slug}`;
+                    const url = `${getPublicOrigin()}/tournament/${tournament.slug}`;
                     const standalone =
                       // @ts-expect-error iOS Safari
                       window.navigator?.standalone === true ||
                       window.matchMedia?.("(display-mode: standalone)").matches;
                     if (standalone) {
                       e.preventDefault();
-                      navigator.clipboard?.writeText(url).catch(() => {});
+                      void copyText(url);
                       toast.success(
                         t("detail.linkCopiedOpenBrowser", {
                           defaultValue:
@@ -716,18 +718,18 @@ function TournamentDetailPage() {
                   {t("detail.openPublic", { defaultValue: "Page publique" })}
                 </a>
                 <a
-                  href={`${typeof window !== "undefined" ? window.location.origin : ""}/tournament/${tournament.slug}/tv`}
+                  href={`${getPublicOrigin()}/tournament/${tournament.slug}/tv`}
                   target="_blank"
                   rel="noopener noreferrer external"
                   onClick={(e) => {
-                    const url = `${window.location.origin}/tournament/${tournament.slug}/tv`;
+                    const url = `${getPublicOrigin()}/tournament/${tournament.slug}/tv`;
                     const standalone =
                       // @ts-expect-error iOS Safari
                       window.navigator?.standalone === true ||
                       window.matchMedia?.("(display-mode: standalone)").matches;
                     if (standalone) {
                       e.preventDefault();
-                      navigator.clipboard?.writeText(url).catch(() => {});
+                      void copyText(url);
                       toast.success(
                         t("detail.linkCopiedOpenBrowser", {
                           defaultValue:

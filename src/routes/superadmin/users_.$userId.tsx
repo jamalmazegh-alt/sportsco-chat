@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { copyText } from "@/lib/clipboard";
 import { useCallback, useEffect, useState } from "react";
 import {
   getUserDetail,
@@ -72,7 +73,7 @@ function UserDetail() {
   useEffect(refresh, [refresh]);
 
   const copy = (key: string, value: string) => {
-    navigator.clipboard.writeText(value);
+    void copyText(value);
     setCopied(key);
     setTimeout(() => setCopied(null), 1500);
   };

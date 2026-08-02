@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate, useSearch } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ComponentType } from "react";
@@ -80,7 +81,7 @@ function SocialSettings() {
     setBusy(network);
     try {
       const { url } = await startConnect({
-        data: { clubId: activeClubId, network, origin: window.location.origin },
+        data: { clubId: activeClubId, network, origin: getPublicOrigin() },
       });
       window.location.href = url;
     } catch (e) {

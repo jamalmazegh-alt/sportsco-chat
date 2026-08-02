@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -163,7 +164,7 @@ function AdminUsersPage() {
         .maybeSingle();
       const clubLabel = clubRow?.name ?? "Clubero";
       const clubLogoUrl = clubRow?.logo_url ?? undefined;
-      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+      const inviteUrl = `${getPublicOrigin()}/register?invite=${encodeURIComponent(token)}`;
 
       const roleLabel = inviteRoles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(", ");
 

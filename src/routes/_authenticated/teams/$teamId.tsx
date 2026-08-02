@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useCallback, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -2088,7 +2089,7 @@ function TeamCoaches({
 
     // Fire-and-forget email notification (in-app notification handled by DB trigger).
     notifyCoachAssignedFn({
-      data: { teamId, coachUserId: uid, origin: window.location.origin },
+      data: { teamId, coachUserId: uid, origin: getPublicOrigin() },
     }).catch(() => {
       /* non-blocking */
     });

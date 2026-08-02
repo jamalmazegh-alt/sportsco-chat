@@ -7,6 +7,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { PlayerSuspensions } from "@/components/player-suspensions";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -226,7 +227,7 @@ function PlayerProfile() {
       toast.error(invErr.message);
       return;
     }
-    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    const inviteUrl = `${getPublicOrigin()}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
         const { data: clubRow } = await supabase
@@ -474,7 +475,7 @@ function PlayerProfile() {
       toast.error(invErr.message);
       return;
     }
-    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    const inviteUrl = `${getPublicOrigin()}/register?invite=${encodeURIComponent(token)}`;
     try {
       const { data: clubRow } = await supabase
         .from("clubs")

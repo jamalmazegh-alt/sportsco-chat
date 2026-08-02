@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -69,7 +70,7 @@ function PayPage() {
   async function onPay() {
     setPaying(true);
     try {
-      const res = await fetch("/api/public/tournament-payment-link", {
+      const res = await fetch(apiUrl("/api/public/tournament-payment-link"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: registrationId }),

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -162,7 +163,7 @@ function RespondPage() {
       return;
     }
     // Fire-and-forget push fan-out (coaches/admins + complete check)
-    void fetch("/api/public/push/convocation-response", {
+    void fetch(apiUrl("/api/public/push/convocation-response"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, isChange: wasAlreadyAnswered }),

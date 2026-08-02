@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, type ChangeEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import * as XLSX from "xlsx";
+import { downloadFile } from "@/lib/download-file";
 import { toast } from "sonner";
 import { Loader2, Upload, Download, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -100,7 +101,14 @@ function downloadTemplate() {
   }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Joueurs");
-  XLSX.writeFile(wb, "clubero-import-joueurs.xlsx");
+  // `XLSX.writeFile` déclenche un lien `download` en interne, ignoré par les
+  // WebView : le bouton ne produisait rien en natif. On génère le binaire et on
+  // délègue à `downloadFile`, qui gère les deux plateformes.
+  const out = XLSX.write(wb, { bookType: "xlsx", type: "array" }) as ArrayBuffer;
+  const blob = new Blob([out], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  void downloadFile(blob, "clubero-import-joueurs.xlsx");
 }
 
 export function ImportPlayersCsvDialog({

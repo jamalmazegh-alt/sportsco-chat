@@ -3,6 +3,7 @@
 // the coach picks the destination (team group / contact) and taps Send.
 
 import { format as dfFormat } from "date-fns";
+import { openInSystemApp } from "@/lib/open-url";
 import { fr, enUS } from "date-fns/locale";
 import i18n from "@/lib/i18n";
 
@@ -498,7 +499,7 @@ export function waShareUrl(message: string): string {
 export function openWhatsAppShare(message: string): string {
   const url = waShareUrl(message);
   if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
+    openInSystemApp(url);
   }
   return url;
 }

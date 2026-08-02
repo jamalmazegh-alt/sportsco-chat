@@ -1,4 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
+import { openExternalUrl } from "@/lib/open-url";
 import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -226,7 +228,7 @@ function DocRow({
     if (!submitted) return;
     setDownloading(true);
     try {
-      const res = await fetch("/api/public/camp-track-signed-url", {
+      const res = await fetch(apiUrl("/api/public/camp-track-signed-url"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, documentId: submitted.id }),
@@ -236,7 +238,7 @@ function DocRow({
         toast.error("Téléchargement indisponible.");
         return;
       }
-      window.open(json.url, "_blank", "noopener,noreferrer");
+      void openExternalUrl(json.url);
     } finally {
       setDownloading(false);
     }
@@ -251,7 +253,7 @@ function DocRow({
       fd.append("token", token);
       fd.append("required_document_id", required.id);
       fd.append("file", file);
-      const res = await fetch("/api/public/camp-track-upload", {
+      const res = await fetch(apiUrl("/api/public/camp-track-upload"), {
         method: "POST",
         body: fd,
       });

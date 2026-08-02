@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef } from "react";
+import { openExternalUrl } from "@/lib/open-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -116,7 +117,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     onSuccess: (res: any) => {
       toast.success(t("rules.pdfGeneratedToast"));
       qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
-      if (res?.document?.file_url) window.open(res.document.file_url, "_blank");
+      if (res?.document?.file_url) void openExternalUrl(res.document.file_url);
     },
     onError: (e: any) => toast.error(e?.message ?? t("rules.errorToast")),
   });

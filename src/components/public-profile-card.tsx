@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { Globe, Copy, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -20,8 +22,7 @@ export function PublicProfileCard({
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
 
-  const publicUrl =
-    slug && typeof window !== "undefined" ? `${window.location.origin}/p/${slug}` : null;
+  const publicUrl = slug && typeof window !== "undefined" ? `${getPublicOrigin()}/p/${slug}` : null;
 
   async function toggle(next: boolean) {
     setBusy(true);
@@ -44,7 +45,7 @@ export function PublicProfileCard({
 
   async function copy() {
     if (!publicUrl) return;
-    await navigator.clipboard.writeText(publicUrl);
+    await copyText(publicUrl);
     toast.success(t("common.copied", { defaultValue: "Link copied" }));
   }
 

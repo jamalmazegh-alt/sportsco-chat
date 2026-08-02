@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { Trophy, Medal, Award, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -124,8 +125,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
     try {
       if (typeof navigator !== "undefined" && navigator.share) {
         await navigator.share({ title: tournamentName, text: lines });
-      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(lines);
+      } else if (await copyText(lines)) {
         toast.success(t("finalStandings.copied", { defaultValue: "Classement copié" }));
       }
     } catch {

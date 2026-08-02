@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CalendarPlus, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { downloadFile } from "@/lib/download-file";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,14 +25,7 @@ export function AddToCalendarButton({ event, className }: Props) {
 
   function downloadIcs() {
     const blob = new Blob([buildIcsContent(event)], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = icsFileName(event.title);
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    void downloadFile(blob, icsFileName(event.title));
   }
 
   return (

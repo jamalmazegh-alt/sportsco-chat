@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -40,7 +41,7 @@ function ForgotPasswordPage() {
     setBusy(true);
     try {
       await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${getPublicOrigin()}/reset-password`,
       });
     } catch {
       // Same UX whether the address exists or sending failed.

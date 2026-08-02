@@ -7,6 +7,7 @@
  * clipboard if no callback is provided.
  */
 import { useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -62,7 +63,7 @@ export function TournamentRulesAIGenerator({ tournamentId, locale = "fr", onInse
     if (onInsert) {
       onInsert(html);
     } else {
-      navigator.clipboard?.writeText(html).catch(() => {});
+      void copyText(html);
     }
     toast.success(t("rulesAi.insert"));
     setOpen(false);

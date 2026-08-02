@@ -10,6 +10,7 @@
  * Les assignés sont triés en premier.
  */
 import { useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -198,7 +199,7 @@ export function StaffAssignmentSection({
         data: { eventId, userId, action: "assigned" },
       }).catch((e) => console.warn("[staff] assign push failed", (e as Error).message));
       dispatchStaffAssignmentEmail({
-        data: { eventId, userId, action: "assigned", origin: window.location.origin },
+        data: { eventId, userId, action: "assigned", origin: getPublicOrigin() },
       }).catch((e) => console.warn("[staff] assign email failed", (e as Error).message));
     },
     onError: (e: any) => {
@@ -234,7 +235,7 @@ export function StaffAssignmentSection({
         data: { eventId, userId, action: "unassigned" },
       }).catch((e) => console.warn("[staff] unassign push failed", (e as Error).message));
       dispatchStaffAssignmentEmail({
-        data: { eventId, userId, action: "unassigned", origin: window.location.origin },
+        data: { eventId, userId, action: "unassigned", origin: getPublicOrigin() },
       }).catch((e) => console.warn("[staff] unassign email failed", (e as Error).message));
     },
     onError: (e: any) => toast.error(String(e?.message ?? "Erreur")),

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -28,6 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { downloadFile } from "@/lib/download-file";
 
 export const Route = createFileRoute("/tournament/$slug_/roster/$token")({
   component: RosterPage,
@@ -148,7 +150,9 @@ function RosterPage() {
   const q = useQuery({
     queryKey: ["roster", token],
     queryFn: async () => {
-      const res = await fetch(`/api/public/tournament-roster?token=${encodeURIComponent(token)}`);
+      const res = await fetch(
+        apiUrl(`/api/public/tournament-roster?token=${encodeURIComponent(token)}`),
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Failed");
       return data.registration as {
@@ -234,7 +238,7 @@ function RosterPage() {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/public/tournament-roster", {
+      const res = await fetch(apiUrl("/api/public/tournament-roster"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -311,12 +315,7 @@ function RosterPage() {
 
   function downloadTemplate() {
     const blob = new Blob([TEMPLATE_CSV], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "roster-template.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    void downloadFile(blob, "roster-template.csv");
   }
 
   return (
@@ -422,7 +421,7 @@ function RosterPage() {
                     const fd = new FormData();
                     fd.append("token", token);
                     fd.append("file", f);
-                    const res = await fetch("/api/public/tournament-roster-logo", {
+                    const res = await fetch(apiUrl("/api/public/tournament-roster-logo"), {
                       method: "POST",
                       body: fd,
                     });

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import {
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Share2, Copy, Download } from "lucide-react";
 import { toast } from "sonner";
+import { downloadFile } from "@/lib/download-file";
 
 interface Props {
   url: string;
@@ -24,17 +26,20 @@ export function ShareDialog({ url, title, trigger }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(url);
+    await copyText(url);
     toast.success(t("share.linkCopied"));
   };
 
   const download = () => {
     const canvas = wrapRef.current?.querySelector("canvas");
     if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = `qr-${(title ?? "tournament").replace(/\s+/g, "-").toLowerCase()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const filename = `qr-${(title ?? "tournament").replace(/\s+/g, "-").toLowerCase()}.png`;
+    // `toBlob` plutôt qu'un lien `download` sur une data URL : l'attribut est
+    // ignoré par les WebView, et une data URL de plusieurs centaines de Ko peut
+    // être tronquée. `downloadFile` gère web et natif.
+    canvas.toBlob((blob) => {
+      if (blob) void downloadFile(blob, filename);
+    }, "image/png");
   };
 
   const nativeShare = async () => {

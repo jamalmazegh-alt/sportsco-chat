@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -38,13 +40,13 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
 
   const publicUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/tournament/${tournamentSlug}`
+      ? `${getPublicOrigin()}/tournament/${tournamentSlug}`
       : `/tournament/${tournamentSlug}`;
   const registerUrl = `${publicUrl}/register`;
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(registerUrl);
+      if (!(await copyText(registerUrl))) throw new Error("copy failed");
       toast.success(t("registrationSettings.linkCopied", { defaultValue: "Lien copié" }));
     } catch {
       toast.error(t("common.error", { defaultValue: "Erreur" }));

@@ -10,6 +10,9 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
+import { openExternalUrl } from "@/lib/open-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -183,7 +186,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
     if (!doc.viewer_can_view) return;
     try {
       const res = await signedUrlFn({ data: { documentId: doc.id } });
-      window.open(res.url, "_blank", "noopener,noreferrer");
+      await openExternalUrl(res.url);
     } catch (e: any) {
       toast.error(e.message ?? "error");
     }
@@ -396,7 +399,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
 function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
   const trackingUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/suivi/${detail.access_token}`;
+    return `${getPublicOrigin()}/suivi/${detail.access_token}`;
   }, [detail.access_token]);
 
   return (
@@ -434,7 +437,7 @@ function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
           variant="ghost"
           size="sm"
           onClick={() => {
-            navigator.clipboard.writeText(trackingUrl);
+            void copyText(trackingUrl);
             toast.success(t("common.copied", { defaultValue: "Copié" }));
           }}
         >

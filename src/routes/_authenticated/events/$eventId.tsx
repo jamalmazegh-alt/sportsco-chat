@@ -1,4 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
+import { openInSystemApp } from "@/lib/open-url";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -111,6 +114,7 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 import { createEmailDispatch } from "@/lib/email/dispatch.functions";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 import { generateMatchSheet } from "@/lib/match-sheet/match-sheet.functions";
+import { downloadBase64, downloadFile } from "@/lib/download-file";
 import {
   dispatchConvocationPush,
   dispatchConvocationResendPush,
@@ -313,14 +317,7 @@ function EventDetail() {
       const buf = new Uint8Array(len);
       for (let i = 0; i < len; i++) buf[i] = bin.charCodeAt(i);
       const blob = new Blob([buf], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = res.filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      void downloadFile(blob, res.filename);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       toast.error(
@@ -363,25 +360,17 @@ function EventDetail() {
       const canNativeShare = !!nativeShare && (canShareFull || canShareFileOnly);
 
       if (nativeShare && canNativeShare) {
-        if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+        if (!canShareFull) await copyText(messageText);
         try {
           await nativeShare(
             canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" },
           );
         } catch (shareError: any) {
           if (shareError?.name === "AbortError") return;
-          const a = document.createElement("a");
-          a.href = dataUrl;
-          a.download = "composition.png";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-          window.open(
-            `https://wa.me/?text=${encodeURIComponent(messageText)}`,
-            "_blank",
-            "noopener,noreferrer",
-          );
+          // Repli : l'attribut `download` est ignoré par les WebView.
+          void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
+          await copyText(messageText);
+          openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
           toast.success(
             t("events.whatsappShare.imageDownloadedAttach", {
               defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
@@ -394,18 +383,10 @@ function EventDetail() {
         );
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
-        const a = document.createElement("a");
-        a.href = dataUrl;
-        a.download = "composition.png";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-        window.open(
-          `https://wa.me/?text=${encodeURIComponent(messageText)}`,
-          "_blank",
-          "noopener,noreferrer",
-        );
+        // Repli : l'attribut `download` est ignoré par les WebView.
+        void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
+        await copyText(messageText);
+        openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
         toast.success(
           t("events.whatsappShare.imageDownloadedAttach", {
             defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
@@ -1174,7 +1155,7 @@ function EventDetail() {
           | null
           | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
-        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const origin = getPublicOrigin();
 
         // Assigned coaches — sourced from the event embed (event_staff_assignments)
         const coachNames: string[] | undefined = (() => {
@@ -1973,7 +1954,7 @@ function EventDetail() {
         | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       void eventDateLabel;
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const origin = getPublicOrigin();
 
       const competitionLabel =
         (event as any).competition_name ||
@@ -2590,7 +2571,7 @@ function EventDetail() {
                   endsAt: event.ends_at ?? null,
                   url:
                     typeof window !== "undefined"
-                      ? `${window.location.origin}/events/${event.id}`
+                      ? `${getPublicOrigin()}/events/${event.id}`
                       : null,
                 }}
                 className="h-8 gap-1.5 text-xs"

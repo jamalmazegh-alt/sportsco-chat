@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
@@ -10,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Share2, Copy, Download, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { downloadFile } from "@/lib/download-file";
 
 interface Props {
   clubId: string;
@@ -43,12 +46,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
       const arr = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const blob = new Blob([arr], { type: "application/pdf" });
-      const href = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = href;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(href);
+      await downloadFile(blob, filename);
       toast.success(t("teams.posterReady", { defaultValue: "Affiche prête" }));
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
@@ -87,7 +85,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
         });
         if (error) throw error;
       }
-      setUrl(`${window.location.origin}/register?invite=${encodeURIComponent(token)}`);
+      setUrl(`${getPublicOrigin()}/register?invite=${encodeURIComponent(token)}`);
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
@@ -102,17 +100,20 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
 
   const copy = async () => {
     if (!url) return;
-    await navigator.clipboard.writeText(url);
+    await copyText(url);
     toast.success(t("share.linkCopied", { defaultValue: "Lien copié" }));
   };
 
   const download = () => {
     const canvas = wrapRef.current?.querySelector("canvas");
     if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = `qr-${(teamName ?? "team").replace(/\s+/g, "-").toLowerCase()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const filename = `qr-${(teamName ?? "team").replace(/\s+/g, "-").toLowerCase()}.png`;
+    // `toBlob` plutôt qu'un lien `download` sur une data URL : l'attribut est
+    // ignoré par les WebView, et une data URL de plusieurs centaines de Ko peut
+    // être tronquée. `downloadFile` gère web et natif.
+    canvas.toBlob((blob) => {
+      if (blob) void downloadFile(blob, filename);
+    }, "image/png");
   };
 
   const nativeShare = async () => {

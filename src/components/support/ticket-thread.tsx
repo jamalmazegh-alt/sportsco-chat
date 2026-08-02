@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { isNativePlatform } from "@/lib/native-platform";
+import { openExternalUrl } from "@/lib/open-url";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -75,6 +77,17 @@ export function TicketThread({
     // Ouvre l'onglet de manière synchrone (obligatoire sur Safari/Chrome mobile
     // qui bloquent window.open appelé après un await), puis on remplace l'URL
     // une fois la signed URL récupérée.
+    // En natif il n'y a pas d'onglet à pré-ouvrir, et `location.href`
+    // remplacerait l'application : on passe par le navigateur système.
+    if (isNativePlatform()) {
+      try {
+        const { url } = await getSupportAttachmentUrl({ data: { path } });
+        await openExternalUrl(url);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : t("thread.link_unavailable"));
+      }
+      return;
+    }
     const popup = window.open("about:blank", "_blank");
     try {
       const { url } = await getSupportAttachmentUrl({ data: { path } });

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -236,8 +237,8 @@ function RegisterPage() {
       password,
       options: {
         emailRedirectTo: hasInvite
-          ? `${window.location.origin}/login?invite=${encodeURIComponent(inviteToken)}`
-          : `${window.location.origin}${nextPath}`,
+          ? `${getPublicOrigin()}/login?invite=${encodeURIComponent(inviteToken)}`
+          : `${getPublicOrigin()}${nextPath}`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),

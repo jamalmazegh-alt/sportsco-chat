@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getPublicOrigin } from "@/lib/native-platform";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Loader2, Trophy, Minus, Plus } from "lucide-react";
@@ -97,7 +98,7 @@ export function TournamentPassButton({
         data: {
           email: emailToUse.trim(),
           quantity: qty,
-          origin: typeof window !== "undefined" ? window.location.origin : undefined,
+          origin: getPublicOrigin(),
           ...(user?.email ? { return_to: "/tournaments/new-from-pass" } : {}),
         },
       });
