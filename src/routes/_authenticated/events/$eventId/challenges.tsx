@@ -366,13 +366,20 @@ function AddChallenge({
     return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) === 0);
   }, [existingChallenges, entryCounts]);
 
-  // Templates whose team-challenge doesn't exist yet: brand-new activities.
+  // Full sport catalogue: every template for the sport, minus the ones already
+  // materialized as a team challenge (those are shown as "existing" cards).
   const templates = useMemo(() => {
     const usedKeys = new Set(
       (existingChallenges ?? []).map((c) => c?.template_key).filter((k): k is string => !!k),
     );
     return getTemplatesForSport(sport).filter((tpl) => !usedKeys.has(tpl.key));
   }, [sport, existingChallenges]);
+
+  // Challenges already used on this event: kept visible (greyed) so the coach
+  // always sees the full catalogue, and can jump back to the entry screen.
+  const alreadyInSession = useMemo(() => {
+    return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) > 0);
+  }, [existingChallenges, entryCounts]);
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
@@ -392,7 +399,8 @@ function AddChallenge({
   });
 
   // Unified list: reusable existing challenges first (marked "Populaire"),
-  // then brand-new templates. One consistent card style, no section split.
+  // then the full sport catalogue, then the ones already used on this event
+  // (greyed out, non-selectable, but always visible).
   type Item =
     | {
         kind: "existing";
@@ -411,6 +419,14 @@ function AddChallenge({
         description: string;
         typeLabel: string;
         popular: boolean;
+      }
+    | {
+        kind: "used";
+        id: string;
+        templateKey: string | null;
+        name: string;
+        icon: string;
+        typeLabel: string;
       };
 
   const items: Item[] = useMemo(() => {
@@ -432,10 +448,21 @@ function AddChallenge({
       typeLabel: t(`types.${tpl.kind}`),
       popular: false,
     }));
-    return groupJugglingVariants<Item>([...existing, ...tpls], (it) =>
-      it.kind === "existing" ? it.templateKey : it.key,
+    const used: Item[] = alreadyInSession.map((c) => ({
+      kind: "used" as const,
+      id: c.id,
+      templateKey: c.template_key ?? null,
+      name: challengeDisplayName(c, t),
+      icon: c.icon ?? (c.kind === "physical_test" ? "🫀" : "🎯"),
+      typeLabel: t(`types.${c.kind}`),
+    }));
+    const selectable = groupJugglingVariants<Item>([...existing, ...tpls], (it) =>
+      it.kind === "existing" ? it.templateKey : it.kind === "template" ? it.key : null,
     );
-  }, [reusable, templates, t]);
+    return [...selectable, ...used];
+  }, [reusable, templates, alreadyInSession, t]);
+
+  const selectedTemplateName = selected ? t(`templates.${selected}.name`) : "";
 
   return (
     <div className="space-y-3">
@@ -452,17 +479,23 @@ function AddChallenge({
           </Card>
         )}
         {items.map((it) => {
-          const key = it.kind === "existing" ? `e-${it.id}` : `t-${it.key}`;
+          const key =
+            it.kind === "template" ? `t-${it.key}` : `${it.kind === "used" ? "u" : "e"}-${it.id}`;
           const isSelected = it.kind === "template" && selected === it.key;
+          const isUsed = it.kind === "used";
           return (
             <Card
               key={key}
               className={
                 "cursor-pointer transition " +
-                (isSelected ? "border-primary" : "hover:border-muted-foreground/40")
+                (isUsed
+                  ? "opacity-60"
+                  : isSelected
+                    ? "border-primary ring-2 ring-primary/40"
+                    : "hover:border-muted-foreground/40")
               }
               onClick={() => {
-                if (it.kind === "existing") {
+                if (it.kind === "existing" || it.kind === "used") {
                   onPickExisting(it.id);
                 } else {
                   setSelected(it.key);
@@ -475,9 +508,19 @@ function AddChallenge({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="font-medium">{it.name}</div>
-                    {it.popular && (
+                    {it.kind === "existing" && it.popular && (
                       <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
                         {t("add.popular", { defaultValue: "Populaire" })}
+                      </span>
+                    )}
+                    {isUsed && (
+                      <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("add.already_in_session", { defaultValue: "Déjà dans la séance" })}
+                      </span>
+                    )}
+                    {isSelected && (
+                      <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
+                        {t("add.selected", { defaultValue: "Sélectionné" })}
                       </span>
                     )}
                   </div>
@@ -494,23 +537,44 @@ function AddChallenge({
         })}
       </div>
 
+      {/* Spacer so the sticky action bar never hides the last card. */}
+      {selected && <div className="h-44" aria-hidden />}
+
       {selected && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("add.custom_name_label")}</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-          <Button
-            className="w-full"
-            disabled={create.isPending || !name.trim()}
-            onClick={() => create.mutate(selected)}
-          >
-            {create.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> {t("add.creating")}
-              </>
-            ) : (
-              t("add.create")
-            )}
-          </Button>
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur">
+          <div className="mx-auto max-w-2xl space-y-2 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+5rem)]">
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-sm font-medium truncate">
+                {t("add.custom_name_label")}
+                {selectedTemplateName ? ` · ${selectedTemplateName}` : ""}
+              </label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelected(null);
+                  setName("");
+                }}
+              >
+                {t("add.cancel", { defaultValue: "Annuler" })}
+              </Button>
+            </div>
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Button
+              className="w-full"
+              disabled={create.isPending || !name.trim()}
+              onClick={() => create.mutate(selected)}
+            >
+              {create.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> {t("add.creating")}
+                </>
+              ) : (
+                t("add.create")
+              )}
+            </Button>
+          </div>
         </div>
       )}
     </div>
