@@ -105,6 +105,23 @@ describe("club-invite-pending", () => {
     expect(readPendingClubInvite("b")?.mode).toBe("child");
   });
 
+  it("never replays a redeemed token as self (no duplicate player for a parent)", async () => {
+    storePendingClubInvite("tok-5", {
+      mode: "child",
+      childFirstName: "Lamine",
+      childLastName: "Yamal",
+      childBirthDate: "2015-08-02",
+    });
+    await redeemClubInvite("tok-5");
+    expect(rpc).toHaveBeenCalledTimes(1);
+
+    // Second path (metadata replay / login redirect) must be a no-op.
+    const { error } = await redeemClubInvite("tok-5");
+    expect(error).toBeNull();
+    expect(rpc).toHaveBeenCalledTimes(1);
+  });
+
+
   it("maps player_already_linked to the i18n key", () => {
     const t = (key: string) => (key === "auth.playerAlreadyLinked" ? "linked" : key);
     expect(clubInviteErrorMessage({ message: "player_already_linked" }, t)).toBe("linked");
