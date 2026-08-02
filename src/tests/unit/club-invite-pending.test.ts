@@ -121,7 +121,6 @@ describe("club-invite-pending", () => {
     expect(rpc).toHaveBeenCalledTimes(1);
   });
 
-
   it("maps player_already_linked to the i18n key", () => {
     const t = (key: string) => (key === "auth.playerAlreadyLinked" ? "linked" : key);
     expect(clubInviteErrorMessage({ message: "player_already_linked" }, t)).toBe("linked");

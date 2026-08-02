@@ -46,7 +46,6 @@ export function hasRedeemedClubInvite(token: string): boolean {
   }
 }
 
-
 export function storePendingClubInvite(token: string, payload: PendingClubInvitePayload) {
   if (typeof window === "undefined" || !token) return;
   try {
