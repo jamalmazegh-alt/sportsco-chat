@@ -469,20 +469,18 @@ function RegisterPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone">
-                    {joinMode === "child"
-                      ? t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })
-                      : t("auth.phone", { defaultValue: "Téléphone" })}
-                  </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
+              <div className={joinMode === "child" ? "" : "grid grid-cols-2 gap-3"}>
+                {joinMode !== "child" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                )}
                 <div className="space-y-1.5">
                   <Label htmlFor="license">
                     {t("auth.licenseNumber", { defaultValue: "N° licence (optionnel)" })}
@@ -494,6 +492,7 @@ function RegisterPage() {
                   />
                 </div>
               </div>
+
               <p className="text-xs text-muted-foreground">
                 {t("auth.teamJoinHint", {
                   defaultValue:
@@ -523,6 +522,20 @@ function RegisterPage() {
               />
             </div>
           </div>
+          {joinMode === "child" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">
+                {t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })}
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
