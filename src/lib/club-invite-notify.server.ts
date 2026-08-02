@@ -83,7 +83,7 @@ export async function notifyTeamStaffOfQrJoin(
     .from("team_members")
     .select("user_id")
     .eq("team_id", teamId)
-    .in("role", ["coach", "assistant_coach", "admin"]);
+    .in("role", ["coach", "admin"]);
 
   const targets = new Set<string>();
   for (const s of staff ?? []) {
