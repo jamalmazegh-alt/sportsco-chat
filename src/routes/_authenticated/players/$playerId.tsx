@@ -1270,12 +1270,13 @@ function PlayerProfile() {
                         </span>
                         <input
                           type="checkbox"
-                          className="h-5 w-5 accent-primary"
-                          checked={canRespond}
+                          className="h-5 w-5 accent-primary disabled:opacity-60"
+                          checked={minor ? canRespond : true}
                           onChange={(e) => setCanRespond(e.target.checked)}
-                          disabled={!canEditContact}
+                          disabled={!canEditContact || !minor}
                         />
                       </div>
+
                     </>
                   )}
 
