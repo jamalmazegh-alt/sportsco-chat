@@ -845,7 +845,7 @@ function TeamDetail() {
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
-      <BackLink to="/teams" />
+      {clubTeamCount && clubTeamCount > 1 ? <BackLink to="/teams" /> : null}
 
       <div className="flex items-start gap-4">
         <TeamImage
