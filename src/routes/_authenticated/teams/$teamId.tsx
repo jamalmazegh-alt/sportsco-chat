@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { AgeGroupSelect } from "@/components/age-group-select";
+import { isCanonicalTeamAgeCategory } from "@/lib/team-age-group";
 import { PositionCombobox } from "@/components/position-combobox";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
@@ -480,6 +481,14 @@ function TeamDetail() {
 
   async function onSaveTeam(e: FormEvent) {
     e.preventDefault();
+    if (!isCanonicalTeamAgeCategory(editAge)) {
+      toast.error(
+        t("teams.ageGroupRequired", {
+          defaultValue: "Choisissez une catégorie d'âge dans la liste officielle.",
+        }),
+      );
+      return;
+    }
     setEditBusy(true);
     // NOTE: teams.championship is deprecated (kept for backward compatibility).
     // New writes go to team_championships via TeamChampionshipsSection.
@@ -487,7 +496,7 @@ function TeamDetail() {
       .from("teams")
       .update({
         name: editName,
-        age_group: editAge || null,
+        age_group: editAge,
         championship: null,
         competitions: editCompetitions,
         season: editSeason || null,
@@ -1000,7 +1009,15 @@ function TeamDetail() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.ageGroup")}</Label>
-                <AgeGroupSelect value={editAge} onValueChange={setEditAge} />
+                <AgeGroupSelect value={editAge} onValueChange={setEditAge} allowEmpty={false} />
+                {editAge && !isCanonicalTeamAgeCategory(editAge) && (
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
+                    {t("teams.ageGroupLegacyHint", {
+                      defaultValue:
+                        "Ancienne valeur — sélectionnez une catégorie officielle pour enregistrer.",
+                    })}
+                  </p>
+                )}
               </div>
               {/* teams.championship is deprecated — championships now live in TeamChampionshipsSection. */}
               <div className="space-y-1.5 rounded-xl border border-dashed border-border bg-muted/30 p-3">

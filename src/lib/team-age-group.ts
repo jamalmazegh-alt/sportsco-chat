@@ -2,13 +2,17 @@
  * Catalogue fixe des catégories d'âge sportives pour `teams.age_group`.
  *
  * Le **nom** d'équipe reste libre (« Senior A », « Senior féminine »).
- * La **catégorie** est choisie dans cette liste — c'est elle qui décide si
- * l'inscription QR propose « J'inscris mon enfant ».
+ * La **catégorie** est obligatoire et choisie dans cette liste — c'est elle
+ * qui décide si l'inscription QR propose « J'inscris mon enfant ».
  *
- * Aligné sur le découpage FFF / fédérations FR : U6 → U19 (mineurs possibles),
- * puis U20 / U21 / Senior / Vétérans (adultes uniquement).
- * Le « loisir » se distingue via le *nom* d'équipe (ex. « Senior Loisir »),
- * pas via une catégorie séparée.
+ * Stratégie legacy :
+ * - migration SQL one-shot pour les alias évidents (Sénior, Seniors, …)
+ * - `resolveTeamAgeCategory` reste un filet de sécurité QR / lecture seule
+ *   (pas une liste ouverte à maintenir pour toujours)
+ * - à la sauvegarde UI : on n'accepte que les codes catalogue
+ *
+ * Aligné FFF / fédérations FR : U6 → U19 (mineurs possibles), puis
+ * U20 / U21 / Senior / Vétérans (adultes). Le loisir se met dans le nom.
  */
 
 export type TeamAgeCategory = {

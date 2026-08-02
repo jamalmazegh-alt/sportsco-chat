@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { AgeGroupSelect } from "@/components/age-group-select";
+import { isCanonicalTeamAgeCategory } from "@/lib/team-age-group";
 import { Plus, Users, ChevronRight, Loader2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
@@ -108,13 +109,21 @@ function TeamsPage() {
   async function onCreate(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId) return;
+    if (!isCanonicalTeamAgeCategory(ageGroup)) {
+      toast.error(
+        t("teams.ageGroupRequired", {
+          defaultValue: "Choisissez une catégorie d'âge dans la liste.",
+        }),
+      );
+      return;
+    }
     setBusy(true);
     const { data: created, error } = await supabase
       .from("teams")
       .insert({
         club_id: activeClubId,
         name,
-        age_group: ageGroup || null,
+        age_group: ageGroup,
         sport: sport || null,
         competitions,
       })
@@ -180,7 +189,7 @@ function TeamsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.ageGroup")}</Label>
-                <AgeGroupSelect value={ageGroup} onValueChange={setAgeGroup} />
+                <AgeGroupSelect value={ageGroup} onValueChange={setAgeGroup} allowEmpty={false} />
               </div>
               <div className="space-y-2">
                 <Label>{t("teams.competitions")}</Label>
