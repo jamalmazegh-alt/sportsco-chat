@@ -10,6 +10,7 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
+import { storePendingClubInvite, redeemClubInvite } from "@/lib/club-invite-pending";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +63,16 @@ function RegisterPage() {
   const [inviteEmailLocked, setInviteEmailLocked] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(hasInvite);
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
+  // Team-scoped club invite (QR from a team page): we also collect the data
+  // needed to create the player record and attach it to that team.
+  const [teamInvite, setTeamInvite] = useState<{ id: string; name: string | null } | null>(null);
+  const [joinMode, setJoinMode] = useState<"self" | "child">("self");
+  const [birthDate, setBirthDate] = useState("");
+  const [phone, setPhone] = useState("");
+  const [license, setLicense] = useState("");
+  const [childFirstName, setChildFirstName] = useState("");
+  const [childLastName, setChildLastName] = useState("");
+  const [childBirthDate, setChildBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
   const createAccount = useServerFn(createInvitedAccount);
@@ -78,6 +89,7 @@ function RegisterPage() {
 
         if (result.source === "club") {
           setInviteKind("club");
+          if (result.teamId) setTeamInvite({ id: result.teamId, name: result.teamName });
           if (result.role === "club_admin") setSignupRole("club_admin");
           else if (result.role === "parent") setSignupRole("parent");
           else setSignupRole("player");
@@ -116,6 +128,29 @@ function RegisterPage() {
     if (!passwordsMatch) {
       toast.error(t("auth.passwordsMustMatch"));
       return;
+    }
+    if (teamInvite) {
+      if (joinMode === "child" && (!childFirstName.trim() || !childLastName.trim())) {
+        toast.error(t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" }));
+        return;
+      }
+      if (joinMode === "self" && !birthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      if (joinMode === "child" && !childBirthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      storePendingClubInvite(inviteToken, {
+        mode: joinMode,
+        birthDate: birthDate || null,
+        phone: phone.trim() || null,
+        license: license.trim() || null,
+        childFirstName: childFirstName.trim() || null,
+        childLastName: childLastName.trim() || null,
+        childBirthDate: childBirthDate || null,
+      });
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
@@ -190,8 +225,10 @@ function RegisterPage() {
     // Otherwise, show "check your email" message and send to login.
     if (signUpData.session) {
       if (hasInvite) {
-        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        const rErr =
+          inviteKind === "club"
+            ? (await redeemClubInvite(inviteToken)).error
+            : (await supabase.rpc("redeem_member_invite", { _token: inviteToken })).error;
         if (rErr) {
           setBusy(false);
           toast.error(rErr.message || t("auth.inviteInvalid"));
@@ -290,11 +327,115 @@ function RegisterPage() {
           ) : (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
               <div className="font-medium">
-                {signupRole === "parent" ? t("auth.roleParent") : t("auth.rolePlayer")}
+                {teamInvite?.name
+                  ? t("auth.invitedToTeam", {
+                      team: teamInvite.name,
+                      defaultValue: `Inscription — ${teamInvite.name}`,
+                    })
+                  : signupRole === "parent"
+                    ? t("auth.roleParent")
+                    : t("auth.rolePlayer")}
               </div>
               <div className="text-xs text-muted-foreground">
                 {t("auth.invitedAsHint") || "You were invited — your role is set automatically."}
               </div>
+            </div>
+          )}
+
+          {teamInvite && (
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="grid grid-cols-2 gap-2">
+                {(["self", "child"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => {
+                      setJoinMode(m);
+                      setSignupRole(m === "child" ? "parent" : "player");
+                    }}
+                    className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                      joinMode === m
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground"
+                    }`}
+                  >
+                    {m === "self"
+                      ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
+                      : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                  </button>
+                ))}
+              </div>
+
+              {joinMode === "child" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cfirst">
+                      {t("auth.childFirstName", { defaultValue: "Prénom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="cfirst"
+                      value={childFirstName}
+                      onChange={(e) => setChildFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="clast">
+                      {t("auth.childLastName", { defaultValue: "Nom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="clast"
+                      value={childLastName}
+                      onChange={(e) => setChildLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="bdate">
+                  {joinMode === "child"
+                    ? t("auth.childBirthDate", { defaultValue: "Date de naissance de l'enfant" })
+                    : t("auth.birthDate", { defaultValue: "Date de naissance" })}
+                </Label>
+                <Input
+                  id="bdate"
+                  type="date"
+                  value={joinMode === "child" ? childBirthDate : birthDate}
+                  onChange={(e) =>
+                    joinMode === "child"
+                      ? setChildBirthDate(e.target.value)
+                      : setBirthDate(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="license">
+                    {t("auth.licenseNumber", { defaultValue: "N° licence (optionnel)" })}
+                  </Label>
+                  <Input
+                    id="license"
+                    value={license}
+                    onChange={(e) => setLicense(e.target.value)}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("auth.teamJoinHint", {
+                  defaultValue:
+                    "Ces informations créent la fiche joueur. Le club pourra les compléter ensuite.",
+                })}
+              </p>
             </div>
           )}
 

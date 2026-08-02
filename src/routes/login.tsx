@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { redeemClubInvite } from "@/lib/club-invite-pending";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -74,9 +75,8 @@ function LoginPage() {
         _token: search.invite,
       });
       if (memberErr) {
-        const { error: clubErr } = await supabase.rpc("redeem_club_invite", {
-          _token: search.invite,
-        });
+        // Club link invite (QR): replays the details collected at signup.
+        const { error: clubErr } = await redeemClubInvite(search.invite);
         if (clubErr) {
           setBusy(false);
           toast.error(memberErr.message || clubErr.message || t("auth.inviteInvalid"));

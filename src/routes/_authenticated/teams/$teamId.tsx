@@ -857,7 +857,11 @@ function TeamDetail() {
             </div>
             <div className="flex items-center gap-1 shrink-0">
               {roles.includes("admin") && team?.club_id && !isArchived && (
-                <TeamInviteShareButton clubId={team.club_id} teamName={team.name} />
+                <TeamInviteShareButton
+                  clubId={team.club_id}
+                  teamId={team.id}
+                  teamName={team.name}
+                />
               )}
               {isCoach && team && (
                 <Button size="icon" variant="ghost" className="h-8 w-8" onClick={openEdit}>
