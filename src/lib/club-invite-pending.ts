@@ -274,7 +274,6 @@ export async function redeemClubInvite(
       }
     }
 
-
     // Normalize the identity-collision error so callers can toast a clear message
     // without depending on Postgres exception wording beyond the code.
     if (error?.message?.includes("player_already_linked")) {
