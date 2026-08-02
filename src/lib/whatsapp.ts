@@ -175,9 +175,10 @@ function shortQuery(location: string) {
 }
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
-  if (locationUrl) return locationUrl;
-  if (!location) return null;
-  return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
+  // On privilégie une URL courte construite depuis l'adresse (les liens
+  // Google Maps « search?api=1&query=… » sont illisibles dans WhatsApp).
+  if (location) return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
+  return locationUrl ?? null;
 }
 
 function wazeUrlFor(location?: string | null) {
@@ -194,8 +195,8 @@ function pushNavLinks(
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
   const labels = {
-    fr: { maps: "Itinéraire", waze: "Waze" },
-    en: { maps: "Directions", waze: "Waze" },
+    fr: { maps: "Google Maps", waze: "Waze" },
+    en: { maps: "Google Maps", waze: "Waze" },
   };
   const label = labels[locale];
   if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
