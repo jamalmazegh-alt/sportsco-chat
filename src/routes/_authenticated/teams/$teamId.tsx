@@ -18,6 +18,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
+import { AgeGroupSelect } from "@/components/age-group-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
 import { createSignedTeamImageUpload, updateTeamImageFromUpload } from "@/lib/team-image.functions";
@@ -999,7 +1000,7 @@ function TeamDetail() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.ageGroup")}</Label>
-                <Input value={editAge} onChange={(e) => setEditAge(e.target.value)} />
+                <AgeGroupSelect value={editAge} onValueChange={setEditAge} />
               </div>
               {/* teams.championship is deprecated — championships now live in TeamChampionshipsSection. */}
               <div className="space-y-1.5 rounded-xl border border-dashed border-border bg-muted/30 p-3">
