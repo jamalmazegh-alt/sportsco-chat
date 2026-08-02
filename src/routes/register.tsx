@@ -10,6 +10,7 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
+import { isAdultOnlyAgeGroup } from "@/lib/team-age-group";
 import {
   buildClubInviteAuthMetadata,
   clubInviteAuthMetadataClear,
