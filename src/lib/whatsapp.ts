@@ -167,15 +167,22 @@ export type WhatsAppEventInput = {
   locale?: WaLocale;
 };
 
+/** Adresse compacte pour les URLs de navigation (évite les liens à rallonge). */
+function shortQuery(location: string) {
+  // On coupe après le complément de lieu ("– Terrain principal", "(portail B)"…)
+  const base = location.split(/\s[–—|(]\s?/)[0] ?? location;
+  return base.trim().slice(0, 80) || location.trim();
+}
+
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
   if (locationUrl) return locationUrl;
   if (!location) return null;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
 }
 
 function wazeUrlFor(location?: string | null) {
   if (!location) return null;
-  return `https://www.waze.com/ul?q=${encodeURIComponent(location)}&navigate=yes`;
+  return `https://waze.com/ul?q=${encodeURIComponent(shortQuery(location))}`;
 }
 
 function pushNavLinks(
@@ -187,8 +194,8 @@ function pushNavLinks(
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
   const labels = {
-    fr: { maps: "Google Maps", waze: "Waze" },
-    en: { maps: "Google Maps", waze: "Waze" },
+    fr: { maps: "Itinéraire", waze: "Waze" },
+    en: { maps: "Directions", waze: "Waze" },
   };
   const label = labels[locale];
   if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
