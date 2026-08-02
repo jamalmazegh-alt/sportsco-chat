@@ -10,6 +10,7 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
+import { isAdultOnlyAgeGroup } from "@/lib/team-age-group";
 import {
   buildClubInviteAuthMetadata,
   clubInviteAuthMetadataClear,
@@ -72,8 +73,14 @@ function RegisterPage() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   // Team-scoped club invite (QR from a team page): we also collect the data
   // needed to create the player record and attach it to that team.
-  const [teamInvite, setTeamInvite] = useState<{ id: string; name: string | null } | null>(null);
+  const [teamInvite, setTeamInvite] = useState<{
+    id: string;
+    name: string | null;
+    ageGroup: string | null;
+  } | null>(null);
   const [joinMode, setJoinMode] = useState<"self" | "child">("self");
+  // Catégorie strictement adulte (Senior, Vétérans, U20+) : pas d'option enfant.
+  const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
   const [license, setLicense] = useState("");
@@ -97,7 +104,12 @@ function RegisterPage() {
 
         if (result.source === "club") {
           setInviteKind("club");
-          if (result.teamId) setTeamInvite({ id: result.teamId, name: result.teamName });
+          if (result.teamId)
+            setTeamInvite({
+              id: result.teamId,
+              name: result.teamName,
+              ageGroup: result.teamAgeGroup,
+            });
           if (result.role === "club_admin") setSignupRole("club_admin");
           else if (result.role === "parent") setSignupRole("parent");
           else setSignupRole("player");
@@ -374,27 +386,29 @@ function RegisterPage() {
 
           {teamInvite && (
             <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-              <div className="grid grid-cols-2 gap-2">
-                {(["self", "child"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => {
-                      setJoinMode(m);
-                      setSignupRole(m === "child" ? "parent" : "player");
-                    }}
-                    className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
-                      joinMode === m
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-background text-muted-foreground"
-                    }`}
-                  >
-                    {m === "self"
-                      ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
-                      : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
-                  </button>
-                ))}
-              </div>
+              {!adultOnlyTeam && (
+                <div className="grid grid-cols-2 gap-2">
+                  {(["self", "child"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => {
+                        setJoinMode(m);
+                        setSignupRole(m === "child" ? "parent" : "player");
+                      }}
+                      className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                        joinMode === m
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-background text-muted-foreground"
+                      }`}
+                    >
+                      {m === "self"
+                        ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
+                        : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {joinMode === "child" && (
                 <div className="grid grid-cols-2 gap-3">
