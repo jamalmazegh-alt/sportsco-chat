@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { redeemClubInvite } from "@/lib/club-invite-pending";
 import i18n from "@/lib/i18n";
 import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
@@ -8,11 +9,14 @@ async function redeemPendingInvite(session: Session) {
   const token = (session.user?.user_metadata as any)?.invite_token as string | undefined;
   if (!token) return;
   try {
-    // Determine which RPC to use based on the invite source
+    // Member invites are nominative; club link invites (QR) go through v2 so a
+    // team-scoped token still creates the player row + team_members, and so any
+    // details stashed in localStorage at /register are replayed.
     const { data } = await supabase.rpc("get_member_invite_info", { _token: token });
     const row = Array.isArray(data) ? data[0] : null;
-    const rpcName = row ? "redeem_member_invite" : "redeem_club_invite";
-    const { error } = await supabase.rpc(rpcName, { _token: token });
+    const { error } = row
+      ? await supabase.rpc("redeem_member_invite", { _token: token })
+      : await redeemClubInvite(token);
     if (error) {
       console.warn("Invite redemption failed:", error.message);
       return;
