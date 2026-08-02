@@ -87,6 +87,35 @@ describe("buildConvocationMessage — FR", () => {
     expect(msg).toContain("Entrée principale");
   });
 
+  it("sépare clairement le lieu du match du rendez-vous", () => {
+    const msg = buildConvocationMessage(MATCH_FR);
+    expect(msg).toContain("*Lieu du match*");
+    expect(msg).toContain("*Rendez-vous*");
+    expect(msg.indexOf("Stade Louis II")).toBeLessThan(msg.indexOf("*Rendez-vous*"));
+    expect(msg.indexOf("*Rendez-vous*")).toBeLessThan(msg.indexOf("Entrée principale"));
+  });
+
+  it("garde Google Maps même si seule l'URL du lieu est disponible", () => {
+    const msg = buildConvocationMessage({
+      ...MATCH_FR,
+      location: null,
+      locationUrl: "https://www.google.com/maps/place/Stade+Louis+II",
+    });
+    expect(msg).toContain("*Google Maps* → https://www.google.com/maps/place/Stade+Louis+II");
+  });
+
+  it("retire du commentaire les lignes déjà affichées ailleurs", () => {
+    const msg = buildConvocationMessage({
+      ...MATCH_FR,
+      endsAt: "2026-06-15T16:00:00.000Z",
+      description: "U17 vs PSG\nChampionnat National\n11v11 · 2x45 min\nTenue blanche obligatoire",
+    });
+    expect(msg.match(/U17 vs PSG/g)).toHaveLength(1);
+    expect(msg.match(/Championnat National/g)).toHaveLength(1);
+    expect(msg).not.toContain("11v11 · 2x45 min");
+    expect(msg).toContain("Tenue blanche obligatoire");
+  });
+
   it("affiche la liste des joueurs convoqués avec le bon count", () => {
     const msg = buildConvocationMessage(MATCH_FR);
     expect(msg).toContain("Convoqués (3)");
