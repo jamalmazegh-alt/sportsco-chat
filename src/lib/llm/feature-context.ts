@@ -39,17 +39,21 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Discipline club (cartons, suspensions) : suivi sportif et réglementaire.
 - Défis et tests physiques : gamification et suivi de la condition physique.
 - Statistiques (présence, résultats) : pilotage de la saison.
-- Covoiturage par événement : logistique simplifiée pour les parents.
+- Covoiturage par événement : un conducteur propose des places (départ, heure, nombre de places), les parents inscrivent leur enfant ou eux-mêmes en un clic, compteur de places restantes, besoins de covoiturage signalés et notifications aux participants.
+- Ajout au calendrier (Google Agenda / iCal) depuis la fiche événement : l'événement part dans l'agenda perso.
+- Filtres d'événements (équipe, type, statut, convocations envoyées ou non) + badge discret « Convoc envoyée » sur les cartes d'événement et l'accueil.
 - Coups de main (besoins bénévoles par événement) : le coach publie un besoin (transport, goûter, arbitrage, matériel...) ciblé sur une audience (équipe, parents, groupe), les membres se portent volontaires en un clic, suivi des candidatures et des places restantes, réouverture possible d'un besoin clôturé.
 - Disponibilités & encadrement du staff : les coachs et adjoints déclarent leurs indisponibilités (période + motif optionnel masqué aux non-gestionnaires) ; vue équipe des dispos ; assignation d'un coach à un événement (staff équipe ou renfort du club) avec badge de couverture (🟢 encadrement OK / 🔴 aucun coach dispo), alertes automatiques en cas de conflit et remontée dans le centre d'urgences.
-- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe ou tout le club, un seul vote par utilisateur, résultats en direct.
+- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe, tout le club ou le staff d'une équipe, un seul vote par utilisateur, résultats en direct.
 - Réunions (équipe ou interne au club) : créez une réunion rattachée à une équipe réelle OU une "réunion interne" (staff/bureau, sans joueurs). Le sélecteur de convoqués mixe groupes, équipes et ajouts manuels, avec traçabilité de la provenance (groupe / équipe / manuel / organisateur). Les convoqués reçoivent in-app + push + e-mail avec 3 boutons **Présent / Incertain / Absent** en 1 tap depuis l'e-mail (sans connexion). Le retrait d'un participant déclenche une notification dédiée ; retirer un groupe ne retire que ceux qui n'ont plus d'autre source. Les réunions internes ne sont visibles que par les admins/dirigeants du club et les invités.
 
 ### Effectif & joueurs
 - Fiche joueur (avatar, historique, feedback, sanctions) : carnet de vie sportif.
 - Parents et tuteurs légaux liés au joueur : autorité parentale, notifications famille.
 - Achievements et timeline joueur : journal sportif.
-- Import CSV de joueurs (club et superadmin) : onboarding en masse.
+- Import CSV de joueurs (club et superadmin) : onboarding en masse, dates fiabilisées et catégorie d'âge FFF calculée automatiquement.
+- Inscription par QR code / lien d'équipe : le staff génère un QR rattaché à une équipe ; le joueur majeur s'inscrit lui-même, le parent inscrit son enfant (nom, date de naissance, licence, téléphones parent et enfant optionnels). Pour une catégorie adulte (Senior, Vétérans), l'option « J'inscris mon enfant » n'est pas proposée. Le staff de l'équipe est notifié à chaque arrivée pour vérifier la fiche.
+- Invitations d'accès plateforme (joueur/parent) envoyées manuellement par le staff, avec statut visible (« Invitation envoyée », « Compte actif », « E-mail non confirmé ») et relance possible.
 - Profils publics joueur/coach et listing /players : vitrine publique du joueur/coach.
 - Follows inter-clubs (réseau sportif ouvert) : réseau sportif interclubs ouvert.
 
@@ -80,12 +84,24 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Paiement d'inscription tournoi : disponible (voir section Tournois, débloqué en V2).
 
 ### Communication
-- Mur du club (posts épinglés, @mentions, lu/non-lu, pièces jointes) : fil d'infos du club.
+- Mur du club (posts épinglés, @mentions, pièces jointes) : fil d'infos du club.
+- Accusés de lecture sur le mur (« Lu par X/Y », détail des lecteurs) et réactions emoji façon WhatsApp sur les posts et les commentaires, en temps réel, avec notification à l'auteur.
+- Mur staff d'équipe : espace privé réservé aux éducateurs d'une ou plusieurs équipes (posts et sondages ciblés « staff d'équipe »).
+- Docuthèque du club : tous les documents partagés sur le mur regroupés, aperçu intégré (images et PDF), téléchargement, renommage, masquage et suppression par l'auteur ou le staff.
+- Groupes du club (bureau, arbitres, bénévoles...) : audiences réutilisables pour le mur, les sondages, les réunions et les besoins.
 - Ingestion des réseaux sociaux du club (Facebook) : reprend automatiquement les publications.
-- Notifications push web (PWA) par type d'événement : notifications natives sans app store.
-- Emails transactionnels (allowlist + rate limit) : convocations, invitations, tournois.
+- Notifications push web (PWA) par type d'événement : notifications natives sans app store, y compris les messages du chat d'événement (regroupés, fenêtre anti-spam de 5 min, activables par le club).
+- Emails transactionnels (allowlist + rate limit) : convocations, invitations, tournois. Expéditeur « Club via Clubero », suivi des envois, motifs d'échec explicites (e-mail en suppression, rebond, non confirmé) et relance possible.
 - Partage WhatsApp des convocations : coexiste avec les habitudes existantes des familles.
 - Sponsors du club (logos + statistiques d'affichage) : valorisation des partenaires.
+
+### Modération & sécurité des membres
+- Signalement de contenu du mur : n'importe quel membre peut signaler un post ou un commentaire (motifs : contenu inapproprié, harcèlement, spam, désinformation, vie privée, autre). Les admins et dirigeants du club sont notifiés immédiatement.
+- Signalement des messages du chat d'événement : même parcours, traitement par les modérateurs du club.
+- Signalement d'un utilisateur et blocage/masquage (mute) : un membre peut signaler une personne ou masquer ses contenus pour lui-même.
+- Onglet Modération dans l'administration du club : file des signalements (en attente, en cours, rejeté, traité), historique des décisions et actions (masquer le contenu, avertir, clore).
+- Protection des mineurs : consentement parental (droit à l'image), visibilité restreinte des données des mineurs, consentement « sécurité des enfants » documenté, et contacts des parents visibles pour les joueurs mineurs concernés.
+
 
 ### Administration & branding
 - Branding par club (couleur de thème, appliqué aux pages publiques) : identité visuelle.
@@ -134,17 +150,21 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Club discipline (cards, suspensions): sporting and regulatory tracking.
 - Physical challenges and tests: gamification and fitness tracking.
 - Statistics (attendance, results): season steering.
-- Event carpooling: simplified logistics for parents.
+- Event carpooling: a driver offers seats (pickup, time, seat count), parents sign up their child or themselves in one click, remaining-seat counter, carpool needs flagged and participants notified.
+- Add to calendar (Google Calendar / iCal) from the event page: the event lands in the personal calendar.
+- Event filters (team, type, status, attendance requests sent or not) + a discreet "Attendance sent" badge on event cards and the home feed.
 - Team helpers (volunteer needs per event): the coach publishes a need (transport, snack, refereeing, equipment...) targeted to an audience (team, parents, group), members sign up in one click, applications and remaining slots are tracked, and a closed need can be reopened.
 - Staff availabilities & event coverage: coaches and assistant coaches declare unavailabilities (period + optional reason hidden from non-managers); team availability view; assign a coach to an event (team staff or club reinforcement) with a coverage badge (🟢 staff OK / 🔴 no coach available), automatic conflict alerts and surfacing in the urgency centre.
-- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group or the whole club, one vote per user, live results.
+- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group, the whole club or a team's staff, one vote per user, live results.
 - Meetings (team or club-internal): create a meeting attached to a real team OR an "internal meeting" (staff/board, no players). The attendee picker combines groups, teams and manual additions, with provenance tracking (group / team / manual / organiser). Attendees get in-app + push + email with 3 one-tap **Present / Uncertain / Absent** buttons from the email (no login needed). Removing an attendee triggers a dedicated notification; removing a group only removes people who have no other remaining source. Internal meetings are only visible to club admins/managers and invited attendees.
 
 ### Roster & players
 - Player profile (avatar, history, feedback, sanctions): a sporting life record.
 - Linked parents and legal guardians: parental authority, family notifications.
 - Player achievements and timeline: sporting journal.
-- CSV player import (club and superadmin): bulk onboarding.
+- CSV player import (club and superadmin): bulk onboarding, robust date parsing and automatic FFF age category.
+- QR code / team invite link signup: staff generate a QR bound to a team; adult players sign themselves up, parents register their child (name, date of birth, licence, optional parent and child phone numbers). Adult categories (Senior, Veterans) never show the "I'm registering my child" option. Team staff are notified on every arrival so they can check the profile.
+- Platform access invitations (player/parent) sent manually by staff, with visible status ("Invitation sent", "Account active", "Email not confirmed") and retry.
 - Public player/coach profiles and /players listing: public showcase for players/coaches.
 - Cross-club follows (open sports network): open cross-club sporting network.
 
@@ -175,12 +195,25 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Tournament registration payments: available (see Tournaments, unlocked in V2).
 
 ### Communication
-- Club wall (pinned posts, @mentions, read receipts, attachments): club news feed.
+- Club wall (pinned posts, @mentions, attachments): club news feed.
+- Wall read receipts ("Read by X/Y" with reader details) and WhatsApp-style emoji reactions on posts and comments, in real time, with author notification.
+- Team staff wall: a private space for the coaches of one or several teams (posts and polls targeted at "team staff").
+- Club document library: every document shared on the wall in one place, with built-in preview (images and PDF), download, rename, hide and delete by the author or staff.
+- Club groups (board, referees, volunteers...): reusable audiences for the wall, polls, meetings and helper needs.
 - Social media ingestion (Facebook): automatically pulls in club posts.
-- Web push notifications (PWA) per type: native notifications, no app store.
-- Transactional emails (allowlist + rate limit): attendance requests, invites, tournaments.
+- Web push notifications (PWA) per type: native notifications, no app store, including event chat messages (grouped, 5-minute anti-spam window, toggled per club).
+- Transactional emails (allowlist + rate limit): attendance requests, invites, tournaments. "Club via Clubero" sender, delivery tracking, explicit failure reasons (suppressed address, bounce, unconfirmed email) and retry.
 - WhatsApp sharing of attendance requests: coexists with existing family habits.
 - Club sponsors (logos + display stats): partner visibility.
+
+### Moderation & member safety
+- Wall content reporting: any member can report a post or comment (inappropriate content, harassment, spam, misinformation, privacy, other). Club admins and managers are notified immediately.
+- Event chat message reporting: same flow, handled by club moderators.
+- User reporting and muting: a member can report a person or hide their content for themselves.
+- Moderation tab in club administration: report queue (pending, in review, rejected, actioned), decision history and actions (hide content, warn, close).
+- Minor protection: parental consent (image rights), restricted visibility of minors' data, documented child-safety consent, and parent contacts visible for the relevant minor players.
+
+
 
 ### Administration & branding
 - Per-club branding (theme colour, applied to public pages): visual identity.
