@@ -8788,19 +8788,34 @@ export type Database = {
         Returns: undefined
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
-      redeem_club_invite_v2: {
-        Args: {
-          _birth_date?: string
-          _child_birth_date?: string
-          _child_first_name?: string
-          _child_last_name?: string
-          _license?: string
-          _mode?: string
-          _phone?: string
-          _token: string
-        }
-        Returns: string
-      }
+      redeem_club_invite_v2:
+        | {
+            Args: {
+              _birth_date?: string
+              _child_birth_date?: string
+              _child_first_name?: string
+              _child_last_name?: string
+              _license?: string
+              _mode?: string
+              _phone?: string
+              _token: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _birth_date?: string
+              _child_birth_date?: string
+              _child_first_name?: string
+              _child_last_name?: string
+              _child_phone?: string
+              _license?: string
+              _mode?: string
+              _phone?: string
+              _token: string
+            }
+            Returns: string
+          }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
       rename_wall_document: {
         Args: { _label: string; _path: string; _post_id: string }
