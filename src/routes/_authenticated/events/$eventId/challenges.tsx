@@ -366,13 +366,21 @@ function AddChallenge({
     return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) === 0);
   }, [existingChallenges, entryCounts]);
 
-  // Templates whose team-challenge doesn't exist yet: brand-new activities.
+  // Full sport catalogue: every template for the sport, minus the ones already
+  // materialized as a team challenge (those are shown as "existing" cards).
   const templates = useMemo(() => {
     const usedKeys = new Set(
       (existingChallenges ?? []).map((c) => c?.template_key).filter((k): k is string => !!k),
     );
     return getTemplatesForSport(sport).filter((tpl) => !usedKeys.has(tpl.key));
   }, [sport, existingChallenges]);
+
+  // Challenges already used on this event: kept visible (greyed) so the coach
+  // always sees the full catalogue, and can jump back to the entry screen.
+  const alreadyInSession = useMemo(() => {
+    return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) > 0);
+  }, [existingChallenges, entryCounts]);
+
 
   const create = useMutation({
     mutationFn: (tplKey: string) =>
