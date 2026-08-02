@@ -6,6 +6,7 @@ import { initNativePushOnLaunch } from "@/lib/native-push";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { redeemClubInvite, clubInviteErrorMessage } from "@/lib/club-invite-pending";
 import { BottomNav } from "@/components/bottom-nav";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
@@ -351,10 +352,11 @@ function NoMembershipScreen({
     e.preventDefault();
     if (!token.trim()) return;
     setBusy(true);
-    const { error } = await supabase.rpc("redeem_club_invite", { _token: token.trim() });
+    // v2: team-scoped QR tokens also create the player + team_members row.
+    const { error } = await redeemClubInvite(token.trim());
     if (error) {
       setBusy(false);
-      toast.error(error.message || t("auth.inviteInvalid"));
+      toast.error(clubInviteErrorMessage(error, t));
       return;
     }
     await onDone();

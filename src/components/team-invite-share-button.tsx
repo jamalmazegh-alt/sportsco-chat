@@ -37,7 +37,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
     setPosterBusy(true);
     try {
       const { base64, filename } = await downloadPoster({
-        data: { clubId, teamName, lang: i18n.language?.slice(0, 2) },
+        data: { clubId, teamId, teamName, lang: i18n.language?.slice(0, 2) },
       });
       const bin = atob(base64);
       const arr = new Uint8Array(bin.length);
@@ -84,7 +84,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
           role: "player",
           token,
           created_by: user.id,
-        } as never);
+        });
         if (error) throw error;
       }
       setUrl(`${window.location.origin}/register?invite=${encodeURIComponent(token)}`);
@@ -161,8 +161,9 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
                 </div>
                 <p className="text-xs text-center text-muted-foreground">
                   {t("teams.shareInviteHint", {
-                    defaultValue:
-                      "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent le club en tant que joueur.",
+                    defaultValue: teamId
+                      ? "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent cette équipe."
+                      : "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent le club en tant que joueur.",
                   })}
                 </p>
                 <div className="flex gap-2">

@@ -232,7 +232,8 @@
     "signupError": "Konto konnte nicht erstellt werden. Bitte erneut versuchen.",
     "emailNotConfirmed": "Ihre E-Mail wurde noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang (und Spam), um Ihr Konto zu aktivieren.",
     "resendConfirmation": "E-Mail erneut senden",
-    "confirmationResent": "Bestätigungs-E-Mail erneut gesendet."
+    "confirmationResent": "Bestätigungs-E-Mail erneut gesendet.",
+    "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Verein."
   },
   "common": {
     "save": "Speichern",

@@ -52,13 +52,34 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
   const { error } = await supabase.rpc("redeem_club_invite_v2", {
     _token: token,
     _mode: data?.mode ?? "self",
-    _birth_date: data?.birthDate || null,
-    _phone: data?.phone || null,
-    _license: data?.license || null,
-    _child_first_name: data?.childFirstName || null,
-    _child_last_name: data?.childLastName || null,
-    _child_birth_date: data?.childBirthDate || null,
-  } as never);
+    _birth_date: data?.birthDate || undefined,
+    _phone: data?.phone || undefined,
+    _license: data?.license || undefined,
+    _child_first_name: data?.childFirstName || undefined,
+    _child_last_name: data?.childLastName || undefined,
+    _child_birth_date: data?.childBirthDate || undefined,
+  });
   if (!error) clearPendingClubInvite(token);
+  // Normalize the identity-collision error so callers can toast a clear message
+  // without depending on Postgres exception wording beyond the code.
+  if (error?.message?.includes("player_already_linked")) {
+    return {
+      error: {
+        ...error,
+        message: "player_already_linked",
+      },
+    };
+  }
   return { error };
+}
+
+/** Map redeem RPC errors to a user-facing string. */
+export function clubInviteErrorMessage(
+  error: { message?: string } | null | undefined,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string {
+  if (error?.message === "player_already_linked") {
+    return t("auth.playerAlreadyLinked");
+  }
+  return error?.message || t("auth.inviteInvalid");
 }
