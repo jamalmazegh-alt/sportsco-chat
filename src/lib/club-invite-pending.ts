@@ -83,7 +83,8 @@ export function clearPendingClubInvite(token: string) {
  */
 async function readInviteFromMetadata(token: string): Promise<PendingClubInvitePayload | null> {
   try {
-    const { data } = await supabase.auth.getUser();
+    const res = await supabase.auth?.getUser?.();
+    const data = res?.data;
     const raw = (data.user?.user_metadata as any)?.club_invite_payload;
     if (!raw || typeof raw !== "object") return null;
     if (raw.token && raw.token !== token) return null;
@@ -123,7 +124,9 @@ export async function redeemClubInvite(token: string, payload?: PendingClubInvit
   if (!error) {
     clearPendingClubInvite(token);
     markClubInviteRedeemed(token);
-    void supabase.auth.updateUser({ data: { club_invite_payload: null } }).catch(() => {
+    void Promise.resolve(
+      supabase.auth?.updateUser?.({ data: { club_invite_payload: null } }),
+    ).catch(() => {
       /* best-effort */
     });
     // Prévient le staff de l'équipe pour qu'il valide la nouvelle fiche.
