@@ -259,13 +259,19 @@ export async function redeemClubInvite(
       clearPendingClubInvite(token);
       markClubInviteRedeemed(token);
       // Prévient le staff de l'équipe pour qu'il valide la nouvelle fiche.
+      // Awaited (avec garde-fou) : en fire-and-forget, la redirection post-redeem
+      // annulait la requête et le staff ne recevait rien.
       // Metadata cleanup is owned by the caller (use-auth / login) via a single
       // updateUser — avoids auth-lock deadlocks inside onAuthStateChange.
-      void import("@/lib/club-invite-notify.functions")
-        .then(({ notifyStaffOfQrJoin }) => notifyStaffOfQrJoin({ data: { token } }))
-        .catch(() => {
-          /* best-effort */
-        });
+      try {
+        const { notifyStaffOfQrJoin } = await import("@/lib/club-invite-notify.functions");
+        await Promise.race([
+          notifyStaffOfQrJoin({ data: { token } }),
+          new Promise((resolve) => setTimeout(resolve, 8000)),
+        ]);
+      } catch {
+        /* best-effort */
+      }
     }
 
     // Normalize the identity-collision error so callers can toast a clear message
