@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.redeem_club_invite_v2(text, text, date, text, text, text, text, date);
