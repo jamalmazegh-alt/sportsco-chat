@@ -150,10 +150,12 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Club discipline (cards, suspensions): sporting and regulatory tracking.
 - Physical challenges and tests: gamification and fitness tracking.
 - Statistics (attendance, results): season steering.
-- Event carpooling: simplified logistics for parents.
+- Event carpooling: a driver offers seats (pickup, time, seat count), parents sign up their child or themselves in one click, remaining-seat counter, carpool needs flagged and participants notified.
+- Add to calendar (Google Calendar / iCal) from the event page: the event lands in the personal calendar.
+- Event filters (team, type, status, attendance requests sent or not) + a discreet "Attendance sent" badge on event cards and the home feed.
 - Team helpers (volunteer needs per event): the coach publishes a need (transport, snack, refereeing, equipment...) targeted to an audience (team, parents, group), members sign up in one click, applications and remaining slots are tracked, and a closed need can be reopened.
 - Staff availabilities & event coverage: coaches and assistant coaches declare unavailabilities (period + optional reason hidden from non-managers); team availability view; assign a coach to an event (team staff or club reinforcement) with a coverage badge (🟢 staff OK / 🔴 no coach available), automatic conflict alerts and surfacing in the urgency centre.
-- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group or the whole club, one vote per user, live results.
+- Club polls: publish a poll on the wall (optional parallel email) targeted at a team, a group, the whole club or a team's staff, one vote per user, live results.
 - Meetings (team or club-internal): create a meeting attached to a real team OR an "internal meeting" (staff/board, no players). The attendee picker combines groups, teams and manual additions, with provenance tracking (group / team / manual / organiser). Attendees get in-app + push + email with 3 one-tap **Present / Uncertain / Absent** buttons from the email (no login needed). Removing an attendee triggers a dedicated notification; removing a group only removes people who have no other remaining source. Internal meetings are only visible to club admins/managers and invited attendees.
 
 ### Roster & players
