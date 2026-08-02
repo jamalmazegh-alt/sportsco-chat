@@ -167,15 +167,22 @@ export type WhatsAppEventInput = {
   locale?: WaLocale;
 };
 
+/** Adresse compacte pour les URLs de navigation (évite les liens à rallonge). */
+function shortQuery(location: string) {
+  // On coupe après le complément de lieu ("– Terrain principal", "(portail B)"…)
+  const base = location.split(/\s[–—|(]\s?/)[0] ?? location;
+  return base.trim().slice(0, 80) || location.trim();
+}
+
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
   if (locationUrl) return locationUrl;
   if (!location) return null;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
 }
 
 function wazeUrlFor(location?: string | null) {
   if (!location) return null;
-  return `https://www.waze.com/ul?q=${encodeURIComponent(location)}&navigate=yes`;
+  return `https://waze.com/ul?q=${encodeURIComponent(shortQuery(location))}`;
 }
 
 function pushNavLinks(
@@ -187,8 +194,8 @@ function pushNavLinks(
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
   const labels = {
-    fr: { maps: "Google Maps", waze: "Waze" },
-    en: { maps: "Google Maps", waze: "Waze" },
+    fr: { maps: "Itinéraire", waze: "Waze" },
+    en: { maps: "Directions", waze: "Waze" },
   };
   const label = labels[locale];
   if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
@@ -276,18 +283,30 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   lines.push(`${emoji} *${title}*`);
 
   if (matchBadges.length > 0) lines.push(matchBadges.join(" · "));
-  if (input.clubName || input.teamName) {
-    const sub = [input.clubName, input.teamName].filter(Boolean).join(" · ");
-    const fmt = durationLabel(input, loc);
-    lines.push(`_${sub}${fmt ? ` · ${fmt}` : ""}_`);
+  {
+    // On évite de répéter club/équipe déjà présents dans le titre.
+    const titleLower = title.toLowerCase();
+    const parts = [input.clubName, input.teamName]
+      .filter((p): p is string => !!p && !titleLower.includes(p.toLowerCase()))
+      .filter((p, i, arr) => arr.indexOf(p) === i);
+    const fmt = input.type === "match" ? durationLabel(input, loc) : null;
+    const sub = [parts.join(" · "), fmt].filter(Boolean).join(" · ");
+    if (sub) lines.push(`_${sub}_`);
   }
   lines.push("");
 
   // ── Date / time block ────────────────────────────────────────
   const card = dateCard(input.startsAt, loc);
   if (card) {
-    const kickoffLabel = loc === "fr" ? "Coup d'envoi" : "Kick-off";
-    lines.push(`🗓️ *${card.weekday} ${card.day} ${card.month}* — ${kickoffLabel} ${card.time}`);
+    const startLabel =
+      input.type === "match" || input.type === "friendly"
+        ? loc === "fr"
+          ? "Coup d'envoi"
+          : "Kick-off"
+        : loc === "fr"
+          ? "Début"
+          : "Start";
+    lines.push(`🗓️ *${card.weekday} ${card.day} ${card.month}* — ${startLabel} ${card.time}`);
   }
   const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
   if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
