@@ -90,7 +90,34 @@ function EventChallengesPage() {
       if (!ev) return null;
       const teamId = ev.team_id as string;
       const clubId = (ev.teams as any)?.club_id as string;
-      const sport = ((ev.teams as any)?.sport ?? null) as string | null;
+      let sport = ((ev.teams as any)?.sport ?? null) as string | null;
+      // Many teams have no sport set. Fall back to the club's dominant team
+      // sport so the activity catalogue isn't reduced to generic templates.
+      if (!sport && clubId) {
+        const { data: siblings } = await supabase
+          .from("teams")
+          .select("sport")
+          .eq("club_id", clubId)
+          .not("sport", "is", null);
+        const counts = new Map<string, number>();
+        for (const s of siblings ?? []) {
+          const key = String((s as any).sport ?? "")
+            .trim()
+            .toLowerCase();
+          if (!key) continue;
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+        let best: string | null = null;
+        let bestN = 0;
+        for (const [k, n] of counts) {
+          if (n > bestN) {
+            best = k;
+            bestN = n;
+          }
+        }
+        sport = best;
+      }
+
       const { data: members } = await supabase
         .from("team_members")
         .select("player_id, players:player_id (id, first_name, last_name, photo_url)")
