@@ -114,6 +114,21 @@ function TeamDetail() {
     },
   });
 
+  const { data: clubTeamCount } = useQuery({
+    queryKey: ["club-team-count", activeClubId],
+    queryFn: async () => {
+      if (!activeClubId) return 0;
+      const { count, error } = await supabase
+        .from("teams")
+        .select("id", { count: "exact" })
+        .eq("club_id", activeClubId)
+        .is("archived_at", null);
+      if (error) return 0;
+      return count ?? 0;
+    },
+    enabled: !!activeClubId,
+  });
+
   const isArchived = !!team?.archived_at;
 
   const { data: teamHasHistory } = useQuery({
@@ -830,7 +845,7 @@ function TeamDetail() {
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
-      <BackLink to="/teams" />
+      {clubTeamCount && clubTeamCount > 1 ? <BackLink to="/teams" /> : null}
 
       <div className="flex items-start gap-4">
         <TeamImage
