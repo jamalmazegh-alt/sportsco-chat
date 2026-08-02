@@ -84,12 +84,24 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Paiement d'inscription tournoi : disponible (voir section Tournois, débloqué en V2).
 
 ### Communication
-- Mur du club (posts épinglés, @mentions, lu/non-lu, pièces jointes) : fil d'infos du club.
+- Mur du club (posts épinglés, @mentions, pièces jointes) : fil d'infos du club.
+- Accusés de lecture sur le mur (« Lu par X/Y », détail des lecteurs) et réactions emoji façon WhatsApp sur les posts et les commentaires, en temps réel, avec notification à l'auteur.
+- Mur staff d'équipe : espace privé réservé aux éducateurs d'une ou plusieurs équipes (posts et sondages ciblés « staff d'équipe »).
+- Docuthèque du club : tous les documents partagés sur le mur regroupés, aperçu intégré (images et PDF), téléchargement, renommage, masquage et suppression par l'auteur ou le staff.
+- Groupes du club (bureau, arbitres, bénévoles...) : audiences réutilisables pour le mur, les sondages, les réunions et les besoins.
 - Ingestion des réseaux sociaux du club (Facebook) : reprend automatiquement les publications.
-- Notifications push web (PWA) par type d'événement : notifications natives sans app store.
-- Emails transactionnels (allowlist + rate limit) : convocations, invitations, tournois.
+- Notifications push web (PWA) par type d'événement : notifications natives sans app store, y compris les messages du chat d'événement (regroupés, fenêtre anti-spam de 5 min, activables par le club).
+- Emails transactionnels (allowlist + rate limit) : convocations, invitations, tournois. Expéditeur « Club via Clubero », suivi des envois, motifs d'échec explicites (e-mail en suppression, rebond, non confirmé) et relance possible.
 - Partage WhatsApp des convocations : coexiste avec les habitudes existantes des familles.
 - Sponsors du club (logos + statistiques d'affichage) : valorisation des partenaires.
+
+### Modération & sécurité des membres
+- Signalement de contenu du mur : n'importe quel membre peut signaler un post ou un commentaire (motifs : contenu inapproprié, harcèlement, spam, désinformation, vie privée, autre). Les admins et dirigeants du club sont notifiés immédiatement.
+- Signalement des messages du chat d'événement : même parcours, traitement par les modérateurs du club.
+- Signalement d'un utilisateur et blocage/masquage (mute) : un membre peut signaler une personne ou masquer ses contenus pour lui-même.
+- Onglet Modération dans l'administration du club : file des signalements (en attente, en cours, rejeté, traité), historique des décisions et actions (masquer le contenu, avertir, clore).
+- Protection des mineurs : consentement parental (droit à l'image), visibilité restreinte des données des mineurs, consentement « sécurité des enfants » documenté, et contacts des parents visibles pour les joueurs mineurs concernés.
+
 
 ### Administration & branding
 - Branding par club (couleur de thème, appliqué aux pages publiques) : identité visuelle.
