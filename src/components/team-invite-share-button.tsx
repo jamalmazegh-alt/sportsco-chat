@@ -61,14 +61,15 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
     if (!user?.id) return;
     setBusy(true);
     try {
-      // Try to reuse an existing player invite for this club
-      const { data: existing } = await supabase
+      // Reuse an existing player invite scoped to the SAME team (a club-wide
+      // token would drop the team link on redeem).
+      let query = supabase
         .from("club_invites")
         .select("token, expires_at, max_uses, uses_count")
         .eq("club_id", clubId)
-        .eq("role", "player")
-        .order("created_at", { ascending: false })
-        .limit(1);
+        .eq("role", "player");
+      query = teamId ? query.eq("team_id", teamId) : query.is("team_id", null);
+      const { data: existing } = await query.order("created_at", { ascending: false }).limit(1);
 
       let token = existing?.[0]?.token as string | undefined;
       const row = existing?.[0];
@@ -79,10 +80,11 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
         token = `${crypto.randomUUID()}${crypto.randomUUID()}`.replace(/-/g, "");
         const { error } = await supabase.from("club_invites").insert({
           club_id: clubId,
+          team_id: teamId ?? null,
           role: "player",
           token,
           created_by: user.id,
-        });
+        } as never);
         if (error) throw error;
       }
       setUrl(`${window.location.origin}/register?invite=${encodeURIComponent(token)}`);
