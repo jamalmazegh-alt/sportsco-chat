@@ -1361,6 +1361,7 @@ export type Database = {
           id: string
           max_uses: number | null
           role: Database["public"]["Enums"]["app_role"]
+          team_id: string | null
           token: string
           uses_count: number
         }
@@ -1372,6 +1373,7 @@ export type Database = {
           id?: string
           max_uses?: number | null
           role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
           token: string
           uses_count?: number
         }
@@ -1383,10 +1385,19 @@ export type Database = {
           id?: string
           max_uses?: number | null
           role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
           token?: string
           uses_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "club_invites_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       club_members: {
         Row: {
@@ -8777,6 +8788,20 @@ export type Database = {
         Returns: undefined
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
+      redeem_club_invite_v2: {
+        Args: {
+          _birth_date?: string
+          _child_birth_date?: string
+          _child_first_name?: string
+          _child_last_name?: string
+          _child_phone?: string
+          _license?: string
+          _mode?: string
+          _phone?: string
+          _token: string
+        }
+        Returns: string
+      }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
       rename_wall_document: {
         Args: { _label: string; _path: string; _post_id: string }

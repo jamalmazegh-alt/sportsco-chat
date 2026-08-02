@@ -14,7 +14,14 @@ export type InviteValidationResult =
       suggestedFirstName: string | null;
       suggestedLastName: string | null;
     }
-  | { valid: true; source: "club"; role: string };
+  | {
+      valid: true;
+      source: "club";
+      role: string;
+      teamId: string | null;
+      teamName: string | null;
+      teamAgeGroup: string | null;
+    };
 
 /** Public: validate an invite token before showing the signup form. */
 export const validateInviteToken = createServerFn({ method: "POST" })
@@ -44,7 +51,7 @@ export const validateInviteToken = createServerFn({ method: "POST" })
 
     const { data: clubInvite, error: clubErr } = await supabaseAdmin
       .from("club_invites")
-      .select("role, expires_at, max_uses, uses_count")
+      .select("role, expires_at, max_uses, uses_count, team_id")
       .eq("token", token)
       .maybeSingle();
     if (clubErr) throw new Response(clubErr.message, { status: 500 });
@@ -55,7 +62,19 @@ export const validateInviteToken = createServerFn({ method: "POST" })
       const exhausted = clubInvite.max_uses != null && clubInvite.uses_count >= clubInvite.max_uses;
       if (expired) return { valid: false, reason: "expired" };
       if (exhausted) return { valid: false, reason: "used" };
-      return { valid: true, source: "club", role: clubInvite.role };
+      const teamId = (clubInvite as { team_id?: string | null }).team_id ?? null;
+      let teamName: string | null = null;
+      let teamAgeGroup: string | null = null;
+      if (teamId) {
+        const { data: team } = await supabaseAdmin
+          .from("teams")
+          .select("name, age_group")
+          .eq("id", teamId)
+          .maybeSingle();
+        teamName = team?.name ?? null;
+        teamAgeGroup = team?.age_group ?? null;
+      }
+      return { valid: true, source: "club", role: clubInvite.role, teamId, teamName, teamAgeGroup };
     }
 
     return { valid: false, reason: "invalid" };

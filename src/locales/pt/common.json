@@ -232,7 +232,8 @@
     "signupError": "Não foi possível criar a conta. Tente novamente.",
     "emailNotConfirmed": "O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada (e spam) para ativar a conta.",
     "resendConfirmation": "Reenviar e-mail",
-    "confirmationResent": "E-mail de confirmação reenviado."
+    "confirmationResent": "E-mail de confirmação reenviado.",
+    "playerAlreadyLinked": "Esta ficha de jogador já está associada a outra conta. Contacte o clube."
   },
   "common": {
     "save": "Guardar",

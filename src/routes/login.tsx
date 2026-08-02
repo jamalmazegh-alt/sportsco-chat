@@ -1,9 +1,14 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { isNativePlatform } from "@/lib/native-platform";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  clubInviteAuthMetadataClear,
+  clubInviteErrorMessage,
+  redeemClubInvite,
+} from "@/lib/club-invite-pending";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -16,9 +21,8 @@ export const Route = createFileRoute("/login")({
     if (typeof search.next === "string" && search.next.startsWith("/")) out.next = search.next;
     return out;
   },
-  // App native : une session déjà restaurée saute le formulaire. Les liens
-  // d'invitation restent traités par le submit — pas de redirection dans ce
-  // cas. Sur le web, no-op : comportement inchangé.
+  // App native : une session déjà restaurée saute le formulaire — sauf s'il y
+  // a un `?invite=` à racheter (confirmation e-mail QR → session + invite).
   beforeLoad: async ({ search }) => {
     if (!isNativePlatform() || search.invite) return;
     const { data } = await supabase.auth.getSession();
@@ -33,6 +37,30 @@ export const Route = createFileRoute("/login")({
   }),
 });
 
+/** Member invite first; club QR invite (v2) if that fails. */
+async function redeemLoginInvite(
+  invite: string,
+  userMetadata: Record<string, unknown> | null | undefined,
+): Promise<{ error: { message?: string } | null }> {
+  const { error: memberErr } = await supabase.rpc("redeem_member_invite", {
+    _token: invite,
+  });
+  if (!memberErr) return { error: null };
+
+  // Club link invite (QR): replays details from localStorage or the
+  // session metadata written at signup (no getUser — use session user).
+  const { error: clubErr } = await redeemClubInvite(invite, {
+    userMetadata: userMetadata ?? null,
+  });
+  if (clubErr) {
+    return { error: clubErr };
+  }
+  void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+    /* best-effort */
+  });
+  return { error: null };
+}
+
 function LoginPage() {
   const { t } = useTranslation();
   const search = Route.useSearch();
@@ -40,11 +68,47 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
+  const autoRedeemStarted = useRef(false);
+
+  // E-mail confirmation often restores a session on /login?invite=… without
+  // going through the password form. Redeem here so we don't leave the user
+  // on "create a club" with an unused invite in the URL.
+  useEffect(() => {
+    if (!search.invite || autoRedeemStarted.current) return;
+    autoRedeemStarted.current = true;
+    let cancelled = false;
+
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (cancelled || !data.session) return;
+      setBusy(true);
+      const meta = (data.session.user?.user_metadata ?? {}) as Record<string, unknown>;
+      const { error } = await redeemLoginInvite(search.invite!, meta);
+      if (cancelled) return;
+      if (error) {
+        setBusy(false);
+        toast.error(clubInviteErrorMessage(error, t));
+        return;
+      }
+      if (typeof window !== "undefined") {
+        window.location.replace(search.next ?? "/home");
+      }
+    })().catch(() => {
+      if (!cancelled) setBusy(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search.invite, search.next, t]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       setBusy(false);
       const code = (error as { code?: string }).code?.toLowerCase() ?? "";
@@ -70,18 +134,12 @@ function LoginPage() {
       return;
     }
     if (search.invite) {
-      const { error: memberErr } = await supabase.rpc("redeem_member_invite", {
-        _token: search.invite,
-      });
-      if (memberErr) {
-        const { error: clubErr } = await supabase.rpc("redeem_club_invite", {
-          _token: search.invite,
-        });
-        if (clubErr) {
-          setBusy(false);
-          toast.error(memberErr.message || clubErr.message || t("auth.inviteInvalid"));
-          return;
-        }
+      const meta = (signInData.session?.user?.user_metadata ?? {}) as Record<string, unknown>;
+      const { error: inviteErr } = await redeemLoginInvite(search.invite, meta);
+      if (inviteErr) {
+        setBusy(false);
+        toast.error(clubInviteErrorMessage(inviteErr, t));
+        return;
       }
     }
     if (typeof window !== "undefined") {

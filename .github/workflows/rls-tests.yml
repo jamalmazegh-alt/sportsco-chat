@@ -5,10 +5,13 @@ on:
   schedule:
     - cron: "0 3 * * *" # 3 AM UTC — before E2E at 4 AM
   # Keep bughunt in sync whenever migrations land on main.
+  # Also re-run when the RLS suite itself changes (test-only fixes used to
+  # miss CI — see wall.documents seed / auth.uid() failure before #100).
   push:
     branches: [main]
     paths:
       - "supabase/migrations/**"
+      - "tests/rls/**"
       - ".github/workflows/rls-tests.yml"
   workflow_dispatch:
     inputs:

@@ -11,6 +11,15 @@ import {
   type InviteValidationResult,
 } from "@/lib/invite.functions";
 import { resolveSignupPath } from "@/lib/invite-signup";
+import { isAdultOnlyAgeGroup, isMinorOnlyAgeGroup } from "@/lib/team-age-group";
+import {
+  buildClubInviteAuthMetadata,
+  clubInviteAuthMetadataClear,
+  clubInviteErrorMessage,
+  redeemClubInvite,
+  storePendingClubInvite,
+  type PendingClubInvitePayload,
+} from "@/lib/club-invite-pending";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,6 +72,25 @@ function RegisterPage() {
   const [inviteEmailLocked, setInviteEmailLocked] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(hasInvite);
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
+  // Team-scoped club invite (QR from a team page): we also collect the data
+  // needed to create the player record and attach it to that team.
+  const [teamInvite, setTeamInvite] = useState<{
+    id: string;
+    name: string | null;
+    ageGroup: string | null;
+  } | null>(null);
+  const [joinMode, setJoinMode] = useState<"self" | "child">("self");
+  // Catégorie catalogue adulte (U20+, Senior, Vétérans) : pas d'option enfant.
+  const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
+  // Catégorie jeunes (U6 → U19) : c'est le parent qui crée le compte.
+  const minorOnlyTeam = isMinorOnlyAgeGroup(teamInvite?.ageGroup);
+  const [birthDate, setBirthDate] = useState("");
+  const [phone, setPhone] = useState("");
+  const [license, setLicense] = useState("");
+  const [childFirstName, setChildFirstName] = useState("");
+  const [childLastName, setChildLastName] = useState("");
+  const [childBirthDate, setChildBirthDate] = useState("");
+  const [childPhone, setChildPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
   const createAccount = useServerFn(createInvitedAccount);
@@ -79,6 +107,12 @@ function RegisterPage() {
 
         if (result.source === "club") {
           setInviteKind("club");
+          if (result.teamId)
+            setTeamInvite({
+              id: result.teamId,
+              name: result.teamName,
+              ageGroup: result.teamAgeGroup,
+            });
           if (result.role === "club_admin") setSignupRole("club_admin");
           else if (result.role === "parent") setSignupRole("parent");
           else setSignupRole("player");
@@ -104,6 +138,13 @@ function RegisterPage() {
     };
   }, [hasInvite, inviteToken, validateInvite]);
 
+  // Équipe jeunes : seul le parcours parent est proposé.
+  useEffect(() => {
+    if (!minorOnlyTeam) return;
+    setJoinMode("child");
+    setSignupRole("parent");
+  }, [minorOnlyTeam]);
+
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   const passwordValid = passwordRegex.test(password);
   const passwordsMatch = password.length > 0 && password === confirm;
@@ -118,6 +159,33 @@ function RegisterPage() {
       toast.error(t("auth.passwordsMustMatch"));
       return;
     }
+    let teamPayload: PendingClubInvitePayload | null = null;
+    if (teamInvite) {
+      if (joinMode === "child" && (!childFirstName.trim() || !childLastName.trim())) {
+        toast.error(t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" }));
+        return;
+      }
+      if (joinMode === "self" && !birthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      if (joinMode === "child" && !childBirthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      teamPayload = {
+        mode: joinMode,
+        birthDate: birthDate || null,
+        phone: phone.trim() || null,
+        license: license.trim() || null,
+        childFirstName: childFirstName.trim() || null,
+        childLastName: childLastName.trim() || null,
+        childBirthDate: childBirthDate || null,
+        childPhone: joinMode === "child" ? childPhone.trim() || null : null,
+      };
+      storePendingClubInvite(inviteToken, teamPayload);
+    }
+
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
@@ -178,6 +246,9 @@ function RegisterPage() {
           preferred_language: i18n.language?.slice(0, 2) || "en",
           signup_role: signupRole,
           invite_token: hasInvite ? inviteToken : null,
+          // Flat mirrors of the localStorage payload — survive confirmation on
+          // another device without nested user_metadata objects.
+          ...(teamPayload ? buildClubInviteAuthMetadata(inviteToken, teamPayload) : {}),
         },
       },
     });
@@ -191,12 +262,29 @@ function RegisterPage() {
     // Otherwise, show "check your email" message and send to login.
     if (signUpData.session) {
       if (hasInvite) {
-        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        const meta = (signUpData.session.user?.user_metadata ?? {}) as Record<string, unknown>;
+        const rErr =
+          inviteKind === "club"
+            ? (
+                await redeemClubInvite(inviteToken, {
+                  payload: teamPayload,
+                  userMetadata: meta,
+                })
+              ).error
+            : (await supabase.rpc("redeem_member_invite", { _token: inviteToken })).error;
         if (rErr) {
           setBusy(false);
-          toast.error(rErr.message || t("auth.inviteInvalid"));
+          toast.error(
+            inviteKind === "club"
+              ? clubInviteErrorMessage(rErr, t)
+              : rErr.message || t("auth.inviteInvalid"),
+          );
           return;
+        }
+        if (inviteKind === "club") {
+          void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+            /* best-effort */
+          });
         }
       }
       setBusy(false);
@@ -291,11 +379,145 @@ function RegisterPage() {
           ) : (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
               <div className="font-medium">
-                {signupRole === "parent" ? t("auth.roleParent") : t("auth.rolePlayer")}
+                {teamInvite?.name
+                  ? t("auth.invitedToTeam", {
+                      team: teamInvite.name,
+                      defaultValue: `Inscription — ${teamInvite.name}`,
+                    })
+                  : signupRole === "parent"
+                    ? t("auth.roleParent")
+                    : t("auth.rolePlayer")}
               </div>
               <div className="text-xs text-muted-foreground">
                 {t("auth.invitedAsHint") || "You were invited — your role is set automatically."}
               </div>
+            </div>
+          )}
+
+          {teamInvite && (
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+              {minorOnlyTeam ? (
+                <div className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
+                  {t("auth.minorTeamParentOnly", {
+                    defaultValue:
+                      "Cette catégorie accueille des mineurs : le compte est créé par le parent ou le tuteur.",
+                  })}
+                </div>
+              ) : (
+                !adultOnlyTeam && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["self", "child"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => {
+                          setJoinMode(m);
+                          setSignupRole(m === "child" ? "parent" : "player");
+                        }}
+                        className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                          joinMode === m
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background text-muted-foreground"
+                        }`}
+                      >
+                        {m === "self"
+                          ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
+                          : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                      </button>
+                    ))}
+                  </div>
+                )
+              )}
+
+              {joinMode === "child" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cfirst">
+                      {t("auth.childFirstName", { defaultValue: "Prénom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="cfirst"
+                      value={childFirstName}
+                      onChange={(e) => setChildFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="clast">
+                      {t("auth.childLastName", { defaultValue: "Nom de l'enfant" })}
+                    </Label>
+                    <Input
+                      id="clast"
+                      value={childLastName}
+                      onChange={(e) => setChildLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="bdate">
+                  {joinMode === "child"
+                    ? t("auth.childBirthDate", { defaultValue: "Date de naissance de l'enfant" })
+                    : t("auth.birthDate", { defaultValue: "Date de naissance" })}
+                </Label>
+                <Input
+                  id="bdate"
+                  type="date"
+                  value={joinMode === "child" ? childBirthDate : birthDate}
+                  onChange={(e) =>
+                    joinMode === "child"
+                      ? setChildBirthDate(e.target.value)
+                      : setBirthDate(e.target.value)
+                  }
+                />
+              </div>
+
+              {joinMode === "child" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="cphone">
+                    {t("auth.childPhone", {
+                      defaultValue: "Téléphone de l'enfant (optionnel)",
+                    })}
+                  </Label>
+                  <Input
+                    id="cphone"
+                    type="tel"
+                    value={childPhone}
+                    onChange={(e) => setChildPhone(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <div className={joinMode === "child" ? "" : "grid grid-cols-2 gap-3"}>
+                {joinMode !== "child" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <Label htmlFor="license">
+                    {t("auth.licenseNumber", { defaultValue: "N° licence (optionnel)" })}
+                  </Label>
+                  <Input
+                    id="license"
+                    value={license}
+                    onChange={(e) => setLicense(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                {t("auth.teamJoinHint", {
+                  defaultValue:
+                    "Ces informations créent la fiche joueur. Le club pourra les compléter ensuite.",
+                })}
+              </p>
             </div>
           )}
 
@@ -319,6 +541,20 @@ function RegisterPage() {
               />
             </div>
           </div>
+          {joinMode === "child" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">
+                {t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })}
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.email")}</Label>
             <Input

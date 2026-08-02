@@ -1,24 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  clubInviteAuthMetadataClear,
+  redeemClubInvite,
+  resolvePendingInviteToken,
+} from "@/lib/club-invite-pending";
 import i18n from "@/lib/i18n";
 import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
 async function redeemPendingInvite(session: Session) {
-  const token = (session.user?.user_metadata as any)?.invite_token as string | undefined;
+  const meta = (session.user?.user_metadata ?? {}) as Record<string, unknown>;
+  // Metadata first; URL `?invite=` covers e-mail confirm → /login?invite=…
+  // when invite_token was never written or was already cleared.
+  const token = resolvePendingInviteToken(meta);
   if (!token) return;
   try {
-    // Determine which RPC to use based on the invite source
+    // Member invites are nominative; club link invites (QR) go through v2 so a
+    // team-scoped token still creates the player row + team_members, and so any
+    // details stashed at /register (localStorage + user_metadata) are replayed.
+    // Pass session metadata explicitly — never getUser() here (auth lock).
     const { data } = await supabase.rpc("get_member_invite_info", { _token: token });
     const row = Array.isArray(data) ? data[0] : null;
-    const rpcName = row ? "redeem_member_invite" : "redeem_club_invite";
-    const { error } = await supabase.rpc(rpcName, { _token: token });
+    const { error } = row
+      ? await supabase.rpc("redeem_member_invite", { _token: token })
+      : await redeemClubInvite(token, { userMetadata: meta });
     if (error) {
       console.warn("Invite redemption failed:", error.message);
       return;
     }
-    // Clear token from metadata so we don't try again
-    await supabase.auth.updateUser({ data: { invite_token: null } });
+    // Single merge clears invite_token + payload mirrors. Deferred so we don't
+    // contend with the onAuthStateChange auth lock.
+    setTimeout(() => {
+      void supabase.auth.updateUser({ data: clubInviteAuthMetadataClear() }).catch(() => {
+        /* best-effort */
+      });
+    }, 0);
   } catch (e) {
     console.warn("Invite redemption error:", e);
   }
@@ -88,15 +105,19 @@ export function useAuthState(): AuthState {
   }, []);
 
   const refreshMemberships = useCallback(async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) {
+    // Prefer getSession over getUser: the latter hits the Auth server and can
+    // deadlock the supabase-js lock when called from onAuthStateChange paths
+    // (same class of bug as the QR redeem hang → "create a club" screen).
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData.session?.user;
+    if (!user) {
       setMemberships([]);
       return;
     }
     supabase
       .from("profiles")
       .select("preferred_language")
-      .eq("id", userData.user.id)
+      .eq("id", user.id)
       .single()
       .then(({ data: prof }) => {
         const lang = prof?.preferred_language;
@@ -122,7 +143,7 @@ export function useAuthState(): AuthState {
     const { data, error } = await supabase
       .from("club_members")
       .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
-      .eq("user_id", userData.user.id);
+      .eq("user_id", user.id);
     if (error) {
       // On ne touche NI à `memberships` NI à `membershipsLoaded` : un échec
       // transitoire ne doit jamais être interprété comme « cet utilisateur
@@ -195,7 +216,11 @@ export function useAuthState(): AuthState {
       setSession(data.session);
       if (data.session) {
         identifyPostHog(data.session.user.id, { email: data.session.user.email ?? null });
-        await refreshMemberships();
+        // Email-confirm redirects often restore a session without a fresh
+        // SIGNED_IN (INITIAL_SESSION is ignored above). Redeem here too so the
+        // parent/player join is not skipped → create-club screen.
+        await redeemPendingInvite(data.session);
+        if (!cancelled) await refreshMemberships();
       }
       setLoading(false);
     });

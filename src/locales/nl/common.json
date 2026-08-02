@@ -232,7 +232,8 @@
     "signupError": "Account kon niet worden aangemaakt. Probeer opnieuw.",
     "emailNotConfirmed": "Je e-mail is nog niet bevestigd. Controleer je inbox (en spam) om je account te activeren.",
     "resendConfirmation": "E-mail opnieuw sturen",
-    "confirmationResent": "Bevestigingsmail opnieuw verzonden."
+    "confirmationResent": "Bevestigingsmail opnieuw verzonden.",
+    "playerAlreadyLinked": "Dit spelersprofiel is al gekoppeld aan een ander account. Neem contact op met de club."
   },
   "common": {
     "save": "Opslaan",

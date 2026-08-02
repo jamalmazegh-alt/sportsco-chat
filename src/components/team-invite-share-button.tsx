@@ -16,6 +16,7 @@ import { downloadFile } from "@/lib/download-file";
 
 interface Props {
   clubId: string;
+  teamId?: string;
   teamName?: string;
 }
 
@@ -24,7 +25,7 @@ interface Props {
  * Admin-only: club_invites RLS restricts insert/select to club admins.
  * Reuses an existing non-expired token for the club when possible.
  */
-export function TeamInviteShareButton({ clubId, teamName }: Props) {
+export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -39,7 +40,7 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
     setPosterBusy(true);
     try {
       const { base64, filename } = await downloadPoster({
-        data: { clubId, teamName, lang: i18n.language?.slice(0, 2) },
+        data: { clubId, teamId, teamName, lang: i18n.language?.slice(0, 2) },
       });
       const bin = atob(base64);
       const arr = new Uint8Array(bin.length);
@@ -58,14 +59,15 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
     if (!user?.id) return;
     setBusy(true);
     try {
-      // Try to reuse an existing player invite for this club
-      const { data: existing } = await supabase
+      // Reuse an existing player invite scoped to the SAME team (a club-wide
+      // token would drop the team link on redeem).
+      let query = supabase
         .from("club_invites")
         .select("token, expires_at, max_uses, uses_count")
         .eq("club_id", clubId)
-        .eq("role", "player")
-        .order("created_at", { ascending: false })
-        .limit(1);
+        .eq("role", "player");
+      query = teamId ? query.eq("team_id", teamId) : query.is("team_id", null);
+      const { data: existing } = await query.order("created_at", { ascending: false }).limit(1);
 
       let token = existing?.[0]?.token as string | undefined;
       const row = existing?.[0];
@@ -76,6 +78,7 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
         token = `${crypto.randomUUID()}${crypto.randomUUID()}`.replace(/-/g, "");
         const { error } = await supabase.from("club_invites").insert({
           club_id: clubId,
+          team_id: teamId ?? null,
           role: "player",
           token,
           created_by: user.id,
@@ -159,8 +162,9 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
                 </div>
                 <p className="text-xs text-center text-muted-foreground">
                   {t("teams.shareInviteHint", {
-                    defaultValue:
-                      "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent le club en tant que joueur.",
+                    defaultValue: teamId
+                      ? "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent cette équipe."
+                      : "Scannez le QR ou partagez le lien. Les nouveaux membres rejoignent le club en tant que joueur.",
                   })}
                 </p>
                 <div className="flex gap-2">
