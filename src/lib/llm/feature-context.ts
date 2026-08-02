@@ -39,10 +39,12 @@ export const FEATURE_CONTEXT_FR = `## Connaissance produit Clubero (source uniqu
 - Discipline club (cartons, suspensions) : suivi sportif et réglementaire.
 - Défis et tests physiques : gamification et suivi de la condition physique.
 - Statistiques (présence, résultats) : pilotage de la saison.
-- Covoiturage par événement : logistique simplifiée pour les parents.
+- Covoiturage par événement : un conducteur propose des places (départ, heure, nombre de places), les parents inscrivent leur enfant ou eux-mêmes en un clic, compteur de places restantes, besoins de covoiturage signalés et notifications aux participants.
+- Ajout au calendrier (Google Agenda / iCal) depuis la fiche événement : l'événement part dans l'agenda perso.
+- Filtres d'événements (équipe, type, statut, convocations envoyées ou non) + badge discret « Convoc envoyée » sur les cartes d'événement et l'accueil.
 - Coups de main (besoins bénévoles par événement) : le coach publie un besoin (transport, goûter, arbitrage, matériel...) ciblé sur une audience (équipe, parents, groupe), les membres se portent volontaires en un clic, suivi des candidatures et des places restantes, réouverture possible d'un besoin clôturé.
 - Disponibilités & encadrement du staff : les coachs et adjoints déclarent leurs indisponibilités (période + motif optionnel masqué aux non-gestionnaires) ; vue équipe des dispos ; assignation d'un coach à un événement (staff équipe ou renfort du club) avec badge de couverture (🟢 encadrement OK / 🔴 aucun coach dispo), alertes automatiques en cas de conflit et remontée dans le centre d'urgences.
-- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe ou tout le club, un seul vote par utilisateur, résultats en direct.
+- Sondages du club : publiez un sondage sur le mur (option email en parallèle) ciblé sur une équipe, un groupe, tout le club ou le staff d'une équipe, un seul vote par utilisateur, résultats en direct.
 - Réunions (équipe ou interne au club) : créez une réunion rattachée à une équipe réelle OU une "réunion interne" (staff/bureau, sans joueurs). Le sélecteur de convoqués mixe groupes, équipes et ajouts manuels, avec traçabilité de la provenance (groupe / équipe / manuel / organisateur). Les convoqués reçoivent in-app + push + e-mail avec 3 boutons **Présent / Incertain / Absent** en 1 tap depuis l'e-mail (sans connexion). Le retrait d'un participant déclenche une notification dédiée ; retirer un groupe ne retire que ceux qui n'ont plus d'autre source. Les réunions internes ne sont visibles que par les admins/dirigeants du club et les invités.
 
 ### Effectif & joueurs
