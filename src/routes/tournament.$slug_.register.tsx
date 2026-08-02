@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
@@ -96,7 +97,7 @@ function RegisterPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/public/tournament-registration", {
+      const res = await fetch(apiUrl("/api/public/tournament-registration"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

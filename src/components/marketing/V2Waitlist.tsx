@@ -5,6 +5,7 @@
  * Server route: POST /api/public/waitlist.
  */
 import { useState } from "react";
+import { apiUrl } from "@/lib/native-platform";
 import { useTranslation } from "react-i18next";
 import { Clock, Mail, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,7 +44,7 @@ export function V2Waitlist() {
     if (!email || features.length === 0) return;
     setStatus("loading");
     try {
-      const res = await fetch("/api/public/waitlist", {
+      const res = await fetch(apiUrl("/api/public/waitlist"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,19 +3,45 @@
     "allow": [
       "mcp__Claude_Code_iOS_Simulator__control",
       "mcp__Claude_Code_iOS_Simulator__build",
+
       "Bash(adb shell *)",
       "Bash(adb logcat *)",
       "Bash(adb exec-out *)",
       "Bash(adb devices *)",
+      "Bash(adb install *)",
       "Bash(xcrun simctl list *)",
       "Bash(xcrun simctl bootstatus *)",
+
       "Bash(bun run test)",
       "Bash(bun run typecheck)",
       "Bash(bun run check:guards)",
       "Bash(bun run check:i18n)",
       "Bash(bun run check:mobile-leak)",
       "Bash(bun run lint)",
-      "Bash(bun run format:check)"
+      "Bash(bun run format:check)",
+      "Bash(bun run build)",
+      "Bash(bun run build:mobile)",
+      "Bash(bun run build:mobile:android)",
+      "Bash(bun run build:mobile:prod)",
+
+      "Bash(bunx tsc --noEmit)",
+      "Bash(bunx eslint *)",
+      "Bash(bunx prettier --write *)",
+      "Bash(bunx prettier --check *)",
+      "Bash(bunx cap sync *)",
+      "Bash(bunx cap copy *)",
+
+      "Bash(node scripts/check-migrations-applied.mjs *)",
+      "Bash(node scripts/check-mobile-build-leak.mjs)",
+
+      "Bash(git fetch *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+
+      "Bash(./gradlew *)",
+      "Bash(cd android && ./gradlew *)"
     ]
   }
 }

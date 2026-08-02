@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -154,7 +155,7 @@ function RegistrationFormPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/public/submit-camp-registration", {
+      const res = await fetch(apiUrl("/api/public/submit-camp-registration"), {
         method: "POST",
         body: formData,
       });

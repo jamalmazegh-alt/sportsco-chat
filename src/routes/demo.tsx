@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { apiUrl } from "@/lib/native-platform";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
@@ -44,7 +45,7 @@ function DemoPage() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      const res = await fetch("/api/public/inquiry", {
+      const res = await fetch(apiUrl("/api/public/inquiry"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
