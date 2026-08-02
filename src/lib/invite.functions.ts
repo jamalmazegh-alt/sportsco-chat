@@ -64,15 +64,17 @@ export const validateInviteToken = createServerFn({ method: "POST" })
       if (exhausted) return { valid: false, reason: "used" };
       const teamId = (clubInvite as { team_id?: string | null }).team_id ?? null;
       let teamName: string | null = null;
+      let teamAgeGroup: string | null = null;
       if (teamId) {
         const { data: team } = await supabaseAdmin
           .from("teams")
-          .select("name")
+          .select("name, age_group")
           .eq("id", teamId)
           .maybeSingle();
         teamName = team?.name ?? null;
+        teamAgeGroup = team?.age_group ?? null;
       }
-      return { valid: true, source: "club", role: clubInvite.role, teamId, teamName };
+      return { valid: true, source: "club", role: clubInvite.role, teamId, teamName, teamAgeGroup };
     }
 
     return { valid: false, reason: "invalid" };
