@@ -178,11 +178,21 @@ function wazeUrlFor(location?: string | null) {
   return `https://www.waze.com/ul?q=${encodeURIComponent(location)}&navigate=yes`;
 }
 
-function pushNavLinks(lines: string[], location?: string | null, locationUrl?: string | null) {
+function pushNavLinks(
+  lines: string[],
+  location?: string | null,
+  locationUrl?: string | null,
+  locale: WaLocale = "fr",
+) {
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
-  if (m) lines.push(`🗺️ Google Maps : ${m}`);
-  if (w) lines.push(`🚗 Waze : ${w}`);
+  const labels = {
+    fr: { maps: "Google Maps", waze: "Waze" },
+    en: { maps: "Google Maps", waze: "Waze" },
+  };
+  const label = labels[locale];
+  if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
+  if (w) lines.push(`🚗 ${label.waze} : ${w}`);
 }
 
 function emojiForType(type?: string | null) {
@@ -202,35 +212,93 @@ function emojiForType(type?: string | null) {
   }
 }
 
+function dateCard(iso: string | null | undefined, locale: WaLocale) {
+  if (!iso) return null;
+  try {
+    const date = new Date(iso);
+    const loc = locale === "fr" ? fr : enUS;
+    return {
+      weekday: dfFormat(date, "EEEE", { locale: loc }),
+      day: dfFormat(date, "d", { locale: loc }),
+      month: dfFormat(date, "MMMM", { locale: loc }),
+      time: dfFormat(date, locale === "fr" ? "HH'h'mm" : "h:mm a", { locale: loc }),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function durationLabel(input: WhatsAppEventInput, locale: WaLocale): string | null {
+  const { type, startsAt, endsAt } = input;
+  if (!startsAt || !endsAt) return null;
+  try {
+    const start = new Date(startsAt).getTime();
+    const end = new Date(endsAt).getTime();
+    const minutes = Math.round((end - start) / 60000);
+    if (minutes <= 0) return null;
+    if (locale === "fr") {
+      if (type === "match") {
+        if (minutes === 90) return "11v11 · 2x45 min";
+        if (minutes === 80) return "11v11 · 2x40 min";
+      }
+      return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}`;
+    }
+    // EN
+    if (type === "match") {
+      if (minutes === 90) return "11v11 · 2x45 min";
+      if (minutes === 80) return "11v11 · 2x40 min";
+    }
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h}h${m ? String(m).padStart(2, "0") : ""}`;
+  } catch {
+    return null;
+  }
+}
+
 export function buildConvocationMessage(input: WhatsAppEventInput): string {
   const loc = resolveLocale(input.locale);
   const d = DICTS[loc];
   const lines: string[] = [];
   const emoji = emojiForType(input.type);
-  const header =
-    input.type === "match" && input.opponent
-      ? `${emoji} *${input.teamName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}*`
-      : `${emoji} *${input.title ?? d.convocation}*`;
-  lines.push(header);
-  if (input.clubName || input.teamName) {
-    lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
-  }
-  if (input.competitionLabel) lines.push(`🏅 ${input.competitionLabel}`);
+
+  // ── Header: badges + match title ─────────────────────────────
+  const matchBadges: string[] = [];
+  if (input.competitionLabel) matchBadges.push(`🏆 ${input.competitionLabel}`);
   if (input.type === "match" && input.isHome != null) {
-    lines.push(input.isHome ? d.home : d.away);
+    matchBadges.push(input.isHome ? d.home : d.away);
+  }
+
+  const title =
+    input.type === "match" && input.opponent
+      ? `${input.teamName ?? input.clubName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}`
+      : (input.title ?? d.convocation);
+  lines.push(`${emoji} *${title}*`);
+
+  if (matchBadges.length > 0) lines.push(matchBadges.join(" · "));
+  if (input.clubName || input.teamName) {
+    const sub = [input.clubName, input.teamName].filter(Boolean).join(" · ");
+    const fmt = durationLabel(input, loc);
+    lines.push(`_${sub}${fmt ? ` · ${fmt}` : ""}_`);
   }
   lines.push("");
 
-  const date = fmtWith(input.startsAt, d.datePattern, loc);
-  if (date) lines.push(`📅 ${date}`);
+  // ── Date / time block ────────────────────────────────────────
+  const card = dateCard(input.startsAt, loc);
+  if (card) {
+    const kickoffLabel = loc === "fr" ? "Coup d'envoi" : "Kick-off";
+    lines.push(`🗓️ *${card.weekday} ${card.day} ${card.month}* — ${kickoffLabel} ${card.time}`);
+  }
   const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
   if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   const end = fmtWith(input.endsAt, d.timePattern, loc);
   if (end) lines.push(`🕒 ${d.endTime} : ${end}`);
+  lines.push("");
 
+  // ── Location + navigation ────────────────────────────────────
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
   if (input.meetingPoint) {
     lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
@@ -244,12 +312,14 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     lines.push(input.description);
   }
 
+  // ── Squad ─────────────────────────────────────────────────────
   if (input.selectedPlayers && input.selectedPlayers.length > 0) {
     lines.push("");
     lines.push(d.squad(input.selectedPlayers.length));
     for (const n of input.selectedPlayers) lines.push(`• ${n}`);
   }
 
+  // ── Lineup ───────────────────────────────────────────────────
   const lu = input.lineup;
   if (lu && ((lu.starting?.length ?? 0) > 0 || (lu.bench?.length ?? 0) > 0)) {
     lines.push("");
@@ -272,6 +342,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     }
   }
 
+  // ── Attachments ──────────────────────────────────────────────
   const att = (input.attachments ?? []).filter((a) => a?.url);
   if (att.length > 0) {
     lines.push("");
@@ -318,7 +389,7 @@ export function buildRescheduleMessage(input: WhatsAppEventInput): string {
   if (next) lines.push(`${d.newDate} : ${next}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
   if (input.cancellationReason) {
     lines.push("");
@@ -340,7 +411,7 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
   if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
 
   const r = input.respondents;
