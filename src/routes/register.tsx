@@ -137,6 +137,13 @@ function RegisterPage() {
     };
   }, [hasInvite, inviteToken, validateInvite]);
 
+  // Équipe jeunes : seul le parcours parent est proposé.
+  useEffect(() => {
+    if (!minorOnlyTeam) return;
+    setJoinMode("child");
+    setSignupRole("parent");
+  }, [minorOnlyTeam]);
+
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   const passwordValid = passwordRegex.test(password);
   const passwordsMatch = password.length > 0 && password === confirm;
