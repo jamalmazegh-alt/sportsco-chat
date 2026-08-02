@@ -130,6 +130,33 @@ function extractObjects(sql) {
   return found;
 }
 
+/**
+ * Objets supprimés par une migration.
+ *
+ * Sans ça, un objet créé par A puis supprimé par B fait passer A pour non
+ * appliquée — constaté sur `delete_wall_document`, créée le 01/08 à 19:21 et
+ * retirée à 21:27. Son absence prouvait l'inverse de ce qu'on lisait.
+ */
+function extractDrops(sql) {
+  const dropped = [];
+  const clean = (s) =>
+    s
+      .replace(/"/g, "")
+      .replace(/^public\./i, "")
+      .trim();
+
+  for (const m of sql.matchAll(
+    /DROP\s+(TABLE|FUNCTION|INDEX|TRIGGER|POLICY)\s+(?:IF\s+EXISTS\s+)?"?([\w\s.-]+?)"?\s*(?:\(|;|\s+ON\s)/gi,
+  )) {
+    const kind = m[1].toLowerCase();
+    dropped.push(`${kind}:${clean(m[2])}`);
+  }
+  for (const m of sql.matchAll(/DROP\s+TYPE\s+(?:IF\s+EXISTS\s+)?([\w."]+)/gi)) {
+    dropped.push(`enum:${clean(m[1])}`);
+  }
+  return dropped;
+}
+
 /** Échappe une chaîne pour SQL (les apostrophes se doublent). */
 function lit(s) {
   return `'${s.replace(/'/g, "''")}'`;
@@ -142,25 +169,37 @@ const files = readdirSync(MIGRATIONS_DIR)
 // Passe 1 : qui définit quoi, sur TOUT le dépôt — le partage se juge
 // globalement, pas seulement dans la plage demandée.
 const owners = new Map(); // "kind:name" -> Set(version)
+const killers = new Map(); // "kind:name" -> Set(version qui le supprime)
 const perFile = new Map(); // version -> objets
 for (const f of files) {
   const version = f.split("_")[0];
   if (!/^\d{14}$/.test(version)) continue;
-  const objs = extractObjects(readFileSync(join(MIGRATIONS_DIR, f), "utf8"));
+  const sql = readFileSync(join(MIGRATIONS_DIR, f), "utf8");
+  const objs = extractObjects(sql);
   perFile.set(version, objs);
   for (const o of objs) {
     const key = `${o.kind}:${o.name}`;
     if (!owners.has(key)) owners.set(key, new Set());
     owners.get(key).add(version);
   }
+  for (const key of extractDrops(sql)) {
+    if (!killers.has(key)) killers.set(key, new Set());
+    killers.get(key).add(version);
+  }
 }
 
-// Passe 2 : ne garder qu'une signature exclusive par migration.
+// Passe 2 : une signature doit être exclusive ET toujours vivante — un objet
+// supprimé plus tard est absent de la base pour une bonne raison.
 const checks = [];
 const unverifiable = [];
 for (const [version, objs] of perFile) {
   if (since && version < since.padEnd(14, "0")) continue;
-  const exclusive = objs.find((o) => owners.get(`${o.kind}:${o.name}`).size === 1);
+  const exclusive = objs.find((o) => {
+    const key = `${o.kind}:${o.name}`;
+    if (owners.get(key).size !== 1) return false;
+    const dropped = killers.get(key);
+    return !dropped || ![...dropped].some((v) => v > version);
+  });
   if (exclusive) {
     checks.push({ version, ...exclusive });
   } else {
@@ -194,8 +233,10 @@ order by migration;`);
 
 if (unverifiable.length > 0) {
   console.error(
-    `\n// ${unverifiable.length} migration(s) sans objet exclusif, non couverte(s) :\n` +
+    `\n// ${unverifiable.length} migration(s) non couverte(s) :\n` +
       `// ${unverifiable.join(", ")}\n` +
-      `// (elles ne font que modifier des objets partagés — à vérifier à la main)`,
+      `// Soit elles ne font que remplacer un objet qu'une autre migration définit\n` +
+      `// aussi, soit leur seul objet propre a été supprimé depuis. Dans les deux\n` +
+      `// cas, sa présence ou son absence ne prouve rien — vérifier à la main.`,
   );
 }
