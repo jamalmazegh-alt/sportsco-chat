@@ -81,6 +81,8 @@ function RegisterPage() {
   const [joinMode, setJoinMode] = useState<"self" | "child">("self");
   // Catégorie catalogue adulte (U20+, Senior, Vétérans) : pas d'option enfant.
   const adultOnlyTeam = isAdultOnlyAgeGroup(teamInvite?.ageGroup);
+  // Catégorie jeunes (U6 → U19) : c'est le parent qui crée le compte.
+  const minorOnlyTeam = isMinorOnlyAgeGroup(teamInvite?.ageGroup);
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
   const [license, setLicense] = useState("");
