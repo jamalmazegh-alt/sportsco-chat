@@ -95,3 +95,8 @@ export function isCanonicalTeamAgeCategory(ageGroup: string | null | undefined):
   if (!ageGroup) return false;
   return BY_NORMALIZED.has(normalize(ageGroup));
 }
+
+/** true quand la catégorie ne peut concerner que des mineurs (U6 → U19). */
+export function isMinorOnlyAgeGroup(ageGroup: string | null | undefined): boolean {
+  return resolveTeamAgeCategory(ageGroup)?.adultOnly === false;
+}
