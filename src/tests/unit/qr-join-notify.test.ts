@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  QR_STAFF_ROLES,
-  pickStaffTargets,
-  qrJoinMessage,
-} from "@/lib/club-invite-notify.server";
+import { QR_STAFF_ROLES, pickStaffTargets, qrJoinMessage } from "@/lib/club-invite-notify.server";
 
 describe("QR join notification — staff resolution", () => {
   it("includes coaches, assistant coaches and admins", () => {
