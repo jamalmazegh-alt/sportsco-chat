@@ -381,7 +381,6 @@ function AddChallenge({
     return (existingChallenges ?? []).filter((c) => (entryCounts[c.id] ?? 0) > 0);
   }, [existingChallenges, entryCounts]);
 
-
   const create = useMutation({
     mutationFn: (tplKey: string) =>
       fromTpl({
@@ -581,7 +580,6 @@ function AddChallenge({
     </div>
   );
 }
-
 
 function EntryScreen({
   challengeId,
