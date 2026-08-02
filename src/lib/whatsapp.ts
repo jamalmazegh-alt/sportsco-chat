@@ -176,8 +176,16 @@ function shortQuery(location: string) {
 }
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
-  // Une URL déjà courte fournie par l'appelant est conservée telle quelle.
-  if (locationUrl && /^https:\/\/maps\.google\.com\/\?q=/.test(locationUrl)) return locationUrl;
+  // Toute URL Google Maps fournie par l'appelant est prioritaire. Cela évite
+  // de perdre un lien précis (place/coordonnées) au profit d'une simple recherche.
+  if (
+    locationUrl &&
+    /^https?:\/\/(?:www\.)?(?:google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(
+      locationUrl,
+    )
+  ) {
+    return locationUrl;
+  }
   // Sinon on construit une URL courte depuis l'adresse (les liens
   // Google Maps « search?api=1&query=… » sont illisibles dans WhatsApp).
   if (location) return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
@@ -202,8 +210,49 @@ function pushNavLinks(
     en: { maps: "Google Maps", waze: "Waze" },
   };
   const label = labels[locale];
-  if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
-  if (w) lines.push(`🚗 ${label.waze} : ${w}`);
+  // WhatsApp ne permet pas de créer de vrais boutons dans un message partagé.
+  // Ces libellés courts restent néanmoins directement cliquables dans WhatsApp.
+  if (m) lines.push(`🗺️ *${label.maps}* → ${m}`);
+  if (w) lines.push(`🚗 *${label.waze}* → ${w}`);
+}
+
+function normalizedText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[*_~`]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+/** Retire du commentaire les lignes qui répètent déjà le titre ou les badges. */
+function uniqueDescription(input: WhatsAppEventInput, title: string): string | null {
+  const alreadyShown = [
+    title,
+    input.title,
+    input.competitionLabel,
+    input.teamName,
+    input.opponent,
+    input.location,
+    durationLabel(input, resolveLocale(input.locale)),
+  ]
+    .filter((value): value is string => !!value?.trim())
+    .map(normalizedText);
+
+  const kept = (input.description ?? "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => {
+      const normalized = normalizedText(line);
+      if (!normalized) return false;
+      return !alreadyShown.some(
+        (shown) => normalized === shown || (normalized.length > 3 && shown.includes(normalized)),
+      );
+    });
+
+  return kept.length > 0 ? kept.join("\n") : null;
 }
 
 function emojiForType(type?: string | null) {
@@ -314,7 +363,9 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   if (end) lines.push(`🕒 ${d.endTime} : ${end}`);
 
   // ── Lieu du match + navigation ───────────────────────────────
-  if (input.location) {
+  // Le bloc reste visible avec une locationUrl seule : Google Maps ne disparaît
+  // donc plus lorsque l'adresse texte manque dans un ancien événement.
+  if (input.location || input.locationUrl) {
     lines.push("");
     const venueLabel =
       input.type === "match" || input.type === "friendly"
@@ -325,7 +376,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
           ? "Lieu"
           : "Venue";
     lines.push(`📍 *${venueLabel}*`);
-    lines.push(input.location);
+    if (input.location) lines.push(input.location);
     pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
 
@@ -349,9 +400,10 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
   }
 
-  if (input.description) {
+  const description = uniqueDescription(input, title);
+  if (description) {
     lines.push("");
-    lines.push(input.description);
+    lines.push(description);
   }
 
   // ── Squad ─────────────────────────────────────────────────────
