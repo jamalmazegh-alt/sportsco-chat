@@ -522,6 +522,20 @@ function RegisterPage() {
               />
             </div>
           </div>
+          {joinMode === "child" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">
+                {t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })}
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
