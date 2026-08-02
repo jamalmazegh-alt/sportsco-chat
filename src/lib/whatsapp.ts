@@ -168,22 +168,42 @@ export type WhatsAppEventInput = {
   locale?: WaLocale;
 };
 
+/** Adresse compacte pour les URLs de navigation (évite les liens à rallonge). */
+function shortQuery(location: string) {
+  // On coupe après le complément de lieu ("– Terrain principal", "(portail B)"…)
+  const base = location.split(/\s[–—|(]\s?/)[0] ?? location;
+  return base.trim().slice(0, 80) || location.trim();
+}
+
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
-  if (locationUrl) return locationUrl;
-  if (!location) return null;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  // Une URL déjà courte fournie par l'appelant est conservée telle quelle.
+  if (locationUrl && /^https:\/\/maps\.google\.com\/\?q=/.test(locationUrl)) return locationUrl;
+  // Sinon on construit une URL courte depuis l'adresse (les liens
+  // Google Maps « search?api=1&query=… » sont illisibles dans WhatsApp).
+  if (location) return `https://maps.google.com/?q=${encodeURIComponent(shortQuery(location))}`;
+  return locationUrl ?? null;
 }
 
 function wazeUrlFor(location?: string | null) {
   if (!location) return null;
-  return `https://www.waze.com/ul?q=${encodeURIComponent(location)}&navigate=yes`;
+  return `https://waze.com/ul?q=${encodeURIComponent(shortQuery(location))}`;
 }
 
-function pushNavLinks(lines: string[], location?: string | null, locationUrl?: string | null) {
+function pushNavLinks(
+  lines: string[],
+  location?: string | null,
+  locationUrl?: string | null,
+  locale: WaLocale = "fr",
+) {
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
-  if (m) lines.push(`🗺️ Google Maps : ${m}`);
-  if (w) lines.push(`🚗 Waze : ${w}`);
+  const labels = {
+    fr: { maps: "Google Maps", waze: "Waze" },
+    en: { maps: "Google Maps", waze: "Waze" },
+  };
+  const label = labels[locale];
+  if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
+  if (w) lines.push(`🚗 ${label.waze} : ${w}`);
 }
 
 function emojiForType(type?: string | null) {
@@ -203,40 +223,129 @@ function emojiForType(type?: string | null) {
   }
 }
 
+function dateCard(iso: string | null | undefined, locale: WaLocale) {
+  if (!iso) return null;
+  try {
+    const date = new Date(iso);
+    const loc = locale === "fr" ? fr : enUS;
+    return {
+      weekday: dfFormat(date, "EEEE", { locale: loc }),
+      day: dfFormat(date, "d", { locale: loc }),
+      month: dfFormat(date, "MMMM", { locale: loc }),
+      time: dfFormat(date, locale === "fr" ? "HH'h'mm" : "h:mm a", { locale: loc }),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function durationLabel(input: WhatsAppEventInput, locale: WaLocale): string | null {
+  const { type, startsAt, endsAt } = input;
+  if (!startsAt || !endsAt) return null;
+  try {
+    const start = new Date(startsAt).getTime();
+    const end = new Date(endsAt).getTime();
+    const minutes = Math.round((end - start) / 60000);
+    if (minutes <= 0) return null;
+    if (locale === "fr") {
+      if (type === "match") {
+        if (minutes === 90) return "11v11 · 2x45 min";
+        if (minutes === 80) return "11v11 · 2x40 min";
+      }
+      return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}`;
+    }
+    // EN
+    if (type === "match") {
+      if (minutes === 90) return "11v11 · 2x45 min";
+      if (minutes === 80) return "11v11 · 2x40 min";
+    }
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h}h${m ? String(m).padStart(2, "0") : ""}`;
+  } catch {
+    return null;
+  }
+}
+
 export function buildConvocationMessage(input: WhatsAppEventInput): string {
   const loc = resolveLocale(input.locale);
   const d = DICTS[loc];
   const lines: string[] = [];
   const emoji = emojiForType(input.type);
-  const header =
-    input.type === "match" && input.opponent
-      ? `${emoji} *${input.teamName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}*`
-      : `${emoji} *${input.title ?? d.convocation}*`;
-  lines.push(header);
-  if (input.clubName || input.teamName) {
-    lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
-  }
-  if (input.competitionLabel) lines.push(`🏅 ${input.competitionLabel}`);
+
+  // ── Header: badges + match title ─────────────────────────────
+  const matchBadges: string[] = [];
+  if (input.competitionLabel) matchBadges.push(`🏆 ${input.competitionLabel}`);
   if (input.type === "match" && input.isHome != null) {
-    lines.push(input.isHome ? d.home : d.away);
+    matchBadges.push(input.isHome ? d.home : d.away);
+  }
+
+  const title =
+    input.type === "match" && input.opponent
+      ? `${input.teamName ?? input.clubName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}`
+      : (input.title ?? d.convocation);
+  lines.push(`${emoji} *${title}*`);
+
+  if (matchBadges.length > 0) lines.push(matchBadges.join(" · "));
+  {
+    // On évite de répéter club/équipe déjà présents dans le titre.
+    const titleLower = title.toLowerCase();
+    const parts = [input.clubName, input.teamName]
+      .filter((p): p is string => !!p && !titleLower.includes(p.toLowerCase()))
+      .filter((p, i, arr) => arr.indexOf(p) === i);
+    if (parts.length > 0) lines.push(`_${parts.join(" · ")}_`);
   }
   lines.push("");
 
-  const date = fmtWith(input.startsAt, d.datePattern, loc);
-  if (date) lines.push(`📅 ${date}`);
-  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
-  if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
+  // ── Date / time block ────────────────────────────────────────
+  const card = dateCard(input.startsAt, loc);
+  if (card) {
+    const startLabel =
+      input.type === "match" || input.type === "friendly"
+        ? loc === "fr"
+          ? "Coup d'envoi"
+          : "Kick-off"
+        : loc === "fr"
+          ? "Début"
+          : "Start";
+    lines.push(`🗓️ *${card.weekday} ${card.day} ${card.month}* — ${startLabel} ${card.time}`);
+  }
   const end = fmtWith(input.endsAt, d.timePattern, loc);
   if (end) lines.push(`🕒 ${d.endTime} : ${end}`);
 
+  // ── Lieu du match + navigation ───────────────────────────────
   if (input.location) {
-    lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    lines.push("");
+    const venueLabel =
+      input.type === "match" || input.type === "friendly"
+        ? loc === "fr"
+          ? "Lieu du match"
+          : "Match venue"
+        : loc === "fr"
+          ? "Lieu"
+          : "Venue";
+    lines.push(`📍 *${venueLabel}*`);
+    lines.push(input.location);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
-  if (input.meetingPoint) {
-    lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
+
+  // ── Rendez-vous (horaire + lieu de RDV) ──────────────────────
+  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
+  if (convoc || input.meetingPoint) {
+    lines.push("");
+    lines.push(`🚌 *${loc === "fr" ? "Rendez-vous" : "Meeting"}*`);
+    if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
+    if (input.meetingPoint) {
+      lines.push(`📍 ${input.meetingPoint}`);
+      const sameAsVenue =
+        !!input.location &&
+        input.meetingPoint.trim().toLowerCase() === input.location.trim().toLowerCase();
+      if (!sameAsVenue) pushNavLinks(lines, input.meetingPoint, null, loc);
+    }
   }
+
   if (input.coachNames && input.coachNames.length > 0) {
+    lines.push("");
     lines.push(`👤 ${d.coachLabel} : ${input.coachNames.join(", ")}`);
   }
 
@@ -245,12 +354,14 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     lines.push(input.description);
   }
 
+  // ── Squad ─────────────────────────────────────────────────────
   if (input.selectedPlayers && input.selectedPlayers.length > 0) {
     lines.push("");
     lines.push(d.squad(input.selectedPlayers.length));
     for (const n of input.selectedPlayers) lines.push(`• ${n}`);
   }
 
+  // ── Lineup ───────────────────────────────────────────────────
   const lu = input.lineup;
   if (lu && ((lu.starting?.length ?? 0) > 0 || (lu.bench?.length ?? 0) > 0)) {
     lines.push("");
@@ -273,6 +384,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     }
   }
 
+  // ── Attachments ──────────────────────────────────────────────
   const att = (input.attachments ?? []).filter((a) => a?.url);
   if (att.length > 0) {
     lines.push("");
@@ -319,7 +431,7 @@ export function buildRescheduleMessage(input: WhatsAppEventInput): string {
   if (next) lines.push(`${d.newDate} : ${next}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
   if (input.cancellationReason) {
     lines.push("");
@@ -341,7 +453,7 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
   if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    pushNavLinks(lines, input.location, input.locationUrl);
+    pushNavLinks(lines, input.location, input.locationUrl, loc);
   }
 
   const r = input.respondents;

@@ -790,8 +790,18 @@ function EventDetail() {
     status: AttendanceStatus,
     reason: string | null,
   ) {
-    const previous = (convocations ?? []).find((c: any) => c.id === convocationId) as any;
-    const isChange = !!previous && previous.status !== "pending" && !!previous.responded_at;
+    // Read the current row from the DB (not the cached list) so a change is
+    // detected even when the local cache is stale. Any previous non-pending
+    // status counts as a change, whether or not `responded_at` was set.
+    const { data: previousRow } = await supabase
+      .from("convocations")
+      .select("status, responded_at")
+      .eq("id", convocationId)
+      .maybeSingle();
+    const previous =
+      (previousRow as any) ??
+      ((convocations ?? []).find((c: any) => c.id === convocationId) as any);
+    const isChange = !!previous && previous.status !== "pending" && previous.status !== status;
     const { error } = await supabase
       .from("convocations")
       .update({
