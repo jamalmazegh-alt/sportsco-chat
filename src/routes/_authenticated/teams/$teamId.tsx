@@ -114,6 +114,21 @@ function TeamDetail() {
     },
   });
 
+  const { data: clubTeamCount } = useQuery({
+    queryKey: ["club-team-count", activeClubId],
+    queryFn: async () => {
+      if (!activeClubId) return 0;
+      const { count, error } = await supabase
+        .from("teams")
+        .select("id", { count: "exact" })
+        .eq("club_id", activeClubId)
+        .is("archived_at", null);
+      if (error) return 0;
+      return count ?? 0;
+    },
+    enabled: !!activeClubId,
+  });
+
   const isArchived = !!team?.archived_at;
 
   const { data: teamHasHistory } = useQuery({
