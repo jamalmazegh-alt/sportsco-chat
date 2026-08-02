@@ -32,8 +32,10 @@ import {
   clubInviteAuthMetadataClear,
   clubInviteErrorMessage,
   readInvitePayloadFromMetadata,
+  readInviteTokenFromLocation,
   readPendingClubInvite,
   redeemClubInvite,
+  resolvePendingInviteToken,
   storePendingClubInvite,
 } from "@/lib/club-invite-pending";
 
@@ -214,5 +216,21 @@ describe("club-invite-pending", () => {
     expect(clear.club_invite_mode).toBeNull();
     expect(clear.club_invite_payload).toBeNull();
     expect(clear.club_invite_child_first_name).toBeNull();
+  });
+
+  it("reads invite token from a location search string", () => {
+    expect(readInviteTokenFromLocation("?invite=abc-123&next=/home")).toBe("abc-123");
+    expect(readInviteTokenFromLocation("invite=abc-123")).toBe("abc-123");
+    expect(readInviteTokenFromLocation("?next=/home")).toBeNull();
+    expect(readInviteTokenFromLocation("")).toBeNull();
+  });
+
+  it("resolves pending invite from metadata first, then URL", () => {
+    expect(resolvePendingInviteToken({ invite_token: "from-meta" }, "?invite=from-url")).toBe(
+      "from-meta",
+    );
+    expect(resolvePendingInviteToken({}, "?invite=from-url")).toBe("from-url");
+    expect(resolvePendingInviteToken({ invite_token: "  " }, "?invite=from-url")).toBe("from-url");
+    expect(resolvePendingInviteToken(null, "?next=/home")).toBeNull();
   });
 });

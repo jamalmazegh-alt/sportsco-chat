@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { clubInviteAuthMetadataClear, redeemClubInvite } from "@/lib/club-invite-pending";
+import {
+  clubInviteAuthMetadataClear,
+  redeemClubInvite,
+  resolvePendingInviteToken,
+} from "@/lib/club-invite-pending";
 import i18n from "@/lib/i18n";
 import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
 async function redeemPendingInvite(session: Session) {
   const meta = (session.user?.user_metadata ?? {}) as Record<string, unknown>;
-  const token = meta.invite_token as string | undefined;
+  // Metadata first; URL `?invite=` covers e-mail confirm → /login?invite=…
+  // when invite_token was never written or was already cleared.
+  const token = resolvePendingInviteToken(meta);
   if (!token) return;
   try {
     // Member invites are nominative; club link invites (QR) go through v2 so a
@@ -99,15 +105,19 @@ export function useAuthState(): AuthState {
   }, []);
 
   const refreshMemberships = useCallback(async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) {
+    // Prefer getSession over getUser: the latter hits the Auth server and can
+    // deadlock the supabase-js lock when called from onAuthStateChange paths
+    // (same class of bug as the QR redeem hang → "create a club" screen).
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData.session?.user;
+    if (!user) {
       setMemberships([]);
       return;
     }
     supabase
       .from("profiles")
       .select("preferred_language")
-      .eq("id", userData.user.id)
+      .eq("id", user.id)
       .single()
       .then(({ data: prof }) => {
         const lang = prof?.preferred_language;
@@ -133,7 +143,7 @@ export function useAuthState(): AuthState {
     const { data, error } = await supabase
       .from("club_members")
       .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
-      .eq("user_id", userData.user.id);
+      .eq("user_id", user.id);
     if (error) {
       // On ne touche NI à `memberships` NI à `membershipsLoaded` : un échec
       // transitoire ne doit jamais être interprété comme « cet utilisateur
