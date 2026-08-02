@@ -146,10 +146,18 @@ test.describe("docuthèque du mur", () => {
 
     const row = page.locator("li").filter({ hasText: label }).first();
     await expect(row).toBeVisible();
-    await row.getByRole("button", { name: tx("wall.documents.exclude") }).click();
 
-    // Il disparaît de la liste…
-    await expect(page.getByText(label, { exact: false })).toHaveCount(0);
+    // Attendre la RPC : sans elle (migration absente) le bouton ne fait rien
+    // d'utile et un getByText(page) restait coincé sur la carte / un toast.
+    const excludeRpc = page.waitForResponse(
+      (r) => r.url().includes("/rest/v1/rpc/set_wall_document_excluded") && r.ok(),
+    );
+    await row.getByRole("button", { name: tx("wall.documents.exclude") }).click();
+    await excludeRpc;
+
+    // La carte disparaît de la liste active (pas un getByText page entière :
+    // le toast « Retiré… » ou le libellé du switch pourrait matcher).
+    await expect(row).toBeHidden();
 
     // …mais la publication le conserve : c'est tout l'intérêt du choix.
     const { data } = await admin.from("wall_posts").select("attachments").eq("id", postId).single();
@@ -160,13 +168,19 @@ test.describe("docuthèque du mur", () => {
 
     // Et il reste rattrapable par l'encadrement, sinon le retrait serait
     // irréversible depuis l'interface.
-    await page.getByText(tx("wall.documents.showExcluded")).click();
+    const showExcluded = page.getByRole("checkbox", { name: tx("wall.documents.showExcluded") });
+    await showExcluded.check();
     const back = page.locator("li").filter({ hasText: label }).first();
     await expect(back).toBeVisible();
-    await back.getByRole("button", { name: tx("wall.documents.restore") }).click();
 
-    await page.reload();
-    await expect(page.getByText(label, { exact: false }).first()).toBeVisible();
+    const restoreRpc = page.waitForResponse(
+      (r) => r.url().includes("/rest/v1/rpc/set_wall_document_excluded") && r.ok(),
+    );
+    await back.getByRole("button", { name: tx("wall.documents.restore") }).click();
+    await restoreRpc;
+
+    await showExcluded.uncheck();
+    await expect(page.locator("li").filter({ hasText: label }).first()).toBeVisible();
   });
 
   test("un joueur ne peut ni renommer ni retirer un document", async ({ page }) => {
@@ -187,34 +201,53 @@ test.describe("docuthèque du mur", () => {
     await loginViaUI(page, "admin");
     await page.goto("/inbox");
 
-    await page.getByPlaceholder(tx("wall.placeholder")).fill("post E2E avec document");
+    // Composer du mur uniquement — d'autres `input[type=file]` existent sur la page
+    // (avatar, etc.) et un `.first()` global rate parfois le bon.
+    const compose = page
+      .locator("div.rounded-2xl")
+      .filter({ has: page.getByPlaceholder(tx("wall.placeholder")) })
+      .first();
+    await expect(compose).toBeVisible();
 
-    // L'input fichier est masqué derrière le bouton « Ajouter un fichier ».
-    await page
-      .locator('input[type="file"]')
-      .first()
-      .setInputFiles({
-        name: "reglement_interieur.pdf",
-        mimeType: "application/pdf",
-        buffer: Buffer.from("%PDF-1.4 e2e"),
-      });
+    const body = `post E2E avec document ${uniqueName("body")}`;
+    await compose.getByPlaceholder(tx("wall.placeholder")).fill(body);
+
+    const upload = page.waitForResponse(
+      (r) => r.url().includes("/storage/v1/object") && (r.status() === 200 || r.status() === 201),
+      { timeout: 45_000 },
+    );
+    await compose.locator('input[type="file"]').setInputFiles({
+      name: "reglement_interieur.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("%PDF-1.4 e2e"),
+    });
+    await upload;
 
     // Champ de nom présent, publication bloquée tant qu'il est vide.
-    const nameInput = page.getByPlaceholder(tx("attachments.documentNamePlaceholder"));
-    await expect(nameInput).toBeVisible();
-    const publish = page.getByRole("button", { name: tx("wall.post") });
+    const nameInput = compose.getByPlaceholder(tx("attachments.documentNamePlaceholder"));
+    await expect(nameInput).toBeVisible({ timeout: 15_000 });
+    const publish = compose.getByRole("button", { name: tx("wall.post") });
     await expect(publish).toBeDisabled();
-    await expect(page.getByText(tx("attachments.labelRequired"))).toBeVisible();
+    await expect(compose.getByText(tx("attachments.labelRequired"))).toBeVisible();
 
     // Une fois nommé, la publication redevient possible.
     const label = uniqueName("Reglement");
     await nameInput.fill(label);
     await expect(publish).toBeEnabled();
+
+    const insertPost = page.waitForResponse(
+      (r) => r.url().includes("/rest/v1/wall_posts") && r.request().method() === "POST" && r.ok(),
+    );
     await publish.click();
+    await insertPost;
+    // Le composer se vide après succès — garde contre une navigation trop tôt.
+    await expect(compose.getByPlaceholder(tx("wall.placeholder"))).toHaveValue("");
 
     // Le document nommé atterrit dans la docuthèque.
     await page.goto("/inbox?tab=documents");
-    await expect(page.getByText(label, { exact: false }).first()).toBeVisible();
+    await expect(page.locator("li").filter({ hasText: label }).first()).toBeVisible({
+      timeout: 15_000,
+    });
 
     // Nettoyage : retrouver le post créé par l'UI, et surtout retirer le fichier
     // réellement téléversé dans le bucket — sinon chaque exécution en laisse un.
@@ -222,7 +255,7 @@ test.describe("docuthèque du mur", () => {
       .from("wall_posts")
       .select("id, attachments")
       .eq("club_id", club.clubId)
-      .eq("body", "post E2E avec document")
+      .eq("body", body)
       .limit(1);
     const row = data?.[0];
     if (row) {
