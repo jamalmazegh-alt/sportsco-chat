@@ -128,6 +128,29 @@ function RegisterPage() {
       toast.error(t("auth.passwordsMustMatch"));
       return;
     }
+    if (teamInvite) {
+      if (joinMode === "child" && (!childFirstName.trim() || !childLastName.trim())) {
+        toast.error(t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" }));
+        return;
+      }
+      if (joinMode === "self" && !birthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      if (joinMode === "child" && !childBirthDate) {
+        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        return;
+      }
+      storePendingClubInvite(inviteToken, {
+        mode: joinMode,
+        birthDate: birthDate || null,
+        phone: phone.trim() || null,
+        license: license.trim() || null,
+        childFirstName: childFirstName.trim() || null,
+        childLastName: childLastName.trim() || null,
+        childBirthDate: childBirthDate || null,
+      });
+    }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
