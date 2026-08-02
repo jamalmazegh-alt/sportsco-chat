@@ -162,7 +162,9 @@ export const FEATURE_CONTEXT_EN = `## Clubero product knowledge (single source o
 - Player profile (avatar, history, feedback, sanctions): a sporting life record.
 - Linked parents and legal guardians: parental authority, family notifications.
 - Player achievements and timeline: sporting journal.
-- CSV player import (club and superadmin): bulk onboarding.
+- CSV player import (club and superadmin): bulk onboarding, robust date parsing and automatic FFF age category.
+- QR code / team invite link signup: staff generate a QR bound to a team; adult players sign themselves up, parents register their child (name, date of birth, licence, optional parent and child phone numbers). Adult categories (Senior, Veterans) never show the "I'm registering my child" option. Team staff are notified on every arrival so they can check the profile.
+- Platform access invitations (player/parent) sent manually by staff, with visible status ("Invitation sent", "Account active", "Email not confirmed") and retry.
 - Public player/coach profiles and /players listing: public showcase for players/coaches.
 - Cross-club follows (open sports network): open cross-club sporting network.
 
