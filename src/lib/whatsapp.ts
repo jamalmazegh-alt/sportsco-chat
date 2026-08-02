@@ -178,11 +178,21 @@ function wazeUrlFor(location?: string | null) {
   return `https://www.waze.com/ul?q=${encodeURIComponent(location)}&navigate=yes`;
 }
 
-function pushNavLinks(lines: string[], location?: string | null, locationUrl?: string | null) {
+function pushNavLinks(
+  lines: string[],
+  location?: string | null,
+  locationUrl?: string | null,
+  locale: WaLocale = "fr",
+) {
   const m = mapsUrlFor(location, locationUrl);
   const w = wazeUrlFor(location);
-  if (m) lines.push(`🗺️ Google Maps : ${m}`);
-  if (w) lines.push(`🚗 Waze : ${w}`);
+  const labels = {
+    fr: { maps: "Google Maps", waze: "Waze" },
+    en: { maps: "Google Maps", waze: "Waze" },
+  };
+  const label = labels[locale];
+  if (m) lines.push(`🗺️ ${label.maps} : ${m}`);
+  if (w) lines.push(`🚗 ${label.waze} : ${w}`);
 }
 
 function emojiForType(type?: string | null) {
