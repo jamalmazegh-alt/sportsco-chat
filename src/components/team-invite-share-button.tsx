@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
@@ -95,7 +96,7 @@ export function TeamInviteShareButton({ clubId, teamName }: Props) {
 
   const copy = async () => {
     if (!url) return;
-    await navigator.clipboard.writeText(url);
+    await copyText(url);
     toast.success(t("share.linkCopied", { defaultValue: "Lien copié" }));
   };
 

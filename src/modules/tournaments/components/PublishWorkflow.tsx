@@ -4,6 +4,7 @@
  * uniquement dans le Continue CTA (Fix D — pas de doublon de bouton).
  */
 import { useMemo, useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
@@ -131,7 +132,7 @@ export function PublishWorkflow({
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(publicUrl);
+      if (!(await copyText(publicUrl))) throw new Error("copy failed");
       toast.success(t("publishFlow.linkCopied"));
     } catch {
       /* ignore */

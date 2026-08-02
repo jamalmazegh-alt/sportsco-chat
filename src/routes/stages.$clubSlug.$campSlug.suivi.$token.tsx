@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { openExternalUrl } from "@/lib/open-url";
 import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -236,7 +237,7 @@ function DocRow({
         toast.error("Téléchargement indisponible.");
         return;
       }
-      window.open(json.url, "_blank", "noopener,noreferrer");
+      void openExternalUrl(json.url);
     } finally {
       setDownloading(false);
     }

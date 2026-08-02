@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { copyText } from "@/lib/clipboard";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -701,7 +702,7 @@ function TournamentDetailPage() {
                       window.matchMedia?.("(display-mode: standalone)").matches;
                     if (standalone) {
                       e.preventDefault();
-                      navigator.clipboard?.writeText(url).catch(() => {});
+                      void copyText(url);
                       toast.success(
                         t("detail.linkCopiedOpenBrowser", {
                           defaultValue:
@@ -727,7 +728,7 @@ function TournamentDetailPage() {
                       window.matchMedia?.("(display-mode: standalone)").matches;
                     if (standalone) {
                       e.preventDefault();
-                      navigator.clipboard?.writeText(url).catch(() => {});
+                      void copyText(url);
                       toast.success(
                         t("detail.linkCopiedOpenBrowser", {
                           defaultValue:

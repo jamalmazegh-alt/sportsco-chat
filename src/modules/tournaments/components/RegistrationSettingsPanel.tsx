@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -44,7 +45,7 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(registerUrl);
+      if (!(await copyText(registerUrl))) throw new Error("copy failed");
       toast.success(t("registrationSettings.linkCopied", { defaultValue: "Lien copié" }));
     } catch {
       toast.error(t("common.error", { defaultValue: "Erreur" }));

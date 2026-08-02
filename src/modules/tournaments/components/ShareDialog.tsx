@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import {
@@ -25,7 +26,7 @@ export function ShareDialog({ url, title, trigger }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(url);
+    await copyText(url);
     toast.success(t("share.linkCopied"));
   };
 

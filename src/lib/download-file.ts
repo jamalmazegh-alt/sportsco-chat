@@ -1,3 +1,5 @@
+import { Directory, Filesystem } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import { isNativePlatform } from "@/lib/native-platform";
 
 /**
@@ -14,8 +16,10 @@ import { isNativePlatform } from "@/lib/native-platform";
  * où il n'existe pas de « dossier Téléchargements » manipulable comme sur
  * ordinateur.
  *
- * Les plugins sont importés dynamiquement et uniquement en natif : le bundle
- * web n'en embarque rien.
+ * Import STATIQUE des plugins, à dessein : l'import dynamique ne se résout
+ * jamais dans la WKWebView (promesse pendante, ni valeur ni rejet — même piège
+ * que `native-push.ts`). Le bundle web n'embarque que quelques Ko de proxy
+ * inerte, jamais invoqué grâce à la garde `isNativePlatform()`.
  */
 
 /** Convertit un Blob en base64 sans préfixe de type MIME. */
@@ -52,9 +56,6 @@ export async function downloadFile(blob: Blob, filename: string, title?: string)
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
     return;
   }
-
-  const { Filesystem, Directory } = await import("@capacitor/filesystem");
-  const { Share } = await import("@capacitor/share");
 
   const data = await blobToBase64(blob);
   // Cache plutôt que Documents : ces fichiers sont des exports ponctuels, pas

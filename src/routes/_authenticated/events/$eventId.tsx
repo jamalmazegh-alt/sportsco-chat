@@ -1,4 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { copyText } from "@/lib/clipboard";
+import { openInSystemApp } from "@/lib/open-url";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -357,7 +359,7 @@ function EventDetail() {
       const canNativeShare = !!nativeShare && (canShareFull || canShareFileOnly);
 
       if (nativeShare && canNativeShare) {
-        if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+        if (!canShareFull) await copyText(messageText);
         try {
           await nativeShare(
             canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" },
@@ -366,12 +368,8 @@ function EventDetail() {
           if (shareError?.name === "AbortError") return;
           // Repli : l'attribut `download` est ignoré par les WebView.
           void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
-          await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-          window.open(
-            `https://wa.me/?text=${encodeURIComponent(messageText)}`,
-            "_blank",
-            "noopener,noreferrer",
-          );
+          await copyText(messageText);
+          openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
           toast.success(
             t("events.whatsappShare.imageDownloadedAttach", {
               defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
@@ -386,12 +384,8 @@ function EventDetail() {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         // Repli : l'attribut `download` est ignoré par les WebView.
         void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
-        await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-        window.open(
-          `https://wa.me/?text=${encodeURIComponent(messageText)}`,
-          "_blank",
-          "noopener,noreferrer",
-        );
+        await copyText(messageText);
+        openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
         toast.success(
           t("events.whatsappShare.imageDownloadedAttach", {
             defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",

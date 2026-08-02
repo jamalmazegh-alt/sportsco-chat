@@ -11,6 +11,10 @@ export default tseslint.config(
       "dist",
       ".output",
       ".vinxi",
+      // Sorties de build Gradle : Capacitor y recopie `native-bridge.js`, que
+      // le lint signale alors qu'il n'est pas à nous.
+      "android/app/build",
+      "android/build",
       "src/integrations/supabase/types.ts",
       "**/routeTree.gen.ts",
       "**/*.gen.ts",

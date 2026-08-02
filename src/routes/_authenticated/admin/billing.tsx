@@ -1,4 +1,6 @@
 import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
+import { isNativePlatform } from "@/lib/native-platform";
+import { openExternalUrl } from "@/lib/open-url";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -246,6 +248,12 @@ function BillingPage() {
   }
 
   function navigateExternal(url: string) {
+    // En natif, `location.href` remplacerait l'application par la page distante,
+    // sans retour possible : le navigateur système est le seul recours.
+    if (isNativePlatform()) {
+      void openExternalUrl(url);
+      return;
+    }
     try {
       if (window.top && window.top !== window.self) {
         window.top.location.href = url;
@@ -557,7 +565,7 @@ function BillingPage() {
                             await downloadFile(blob, `${inv.number ?? inv.id}.pdf`);
                           } catch {
                             // Fallback: noopener prevents the iframe parent from being replaced
-                            window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
+                            void openExternalUrl(inv.invoice_pdf!);
                           }
                         }}
                         className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"

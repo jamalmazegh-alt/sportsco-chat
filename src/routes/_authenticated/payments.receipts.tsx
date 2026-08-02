@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { openExternalUrl } from "@/lib/open-url";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -54,7 +55,7 @@ function MyReceiptsPage() {
   async function download(id: string) {
     try {
       const { url } = await dlFn({ data: { receiptId: id } });
-      window.open(url, "_blank", "noopener,noreferrer");
+      await openExternalUrl(url);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("common.error"));
     }

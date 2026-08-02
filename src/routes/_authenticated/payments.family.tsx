@@ -1,4 +1,5 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { openExternalUrl } from "@/lib/open-url";
 
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -335,7 +336,7 @@ function ObligationCard({ obligation, locale }: { obligation: Obligation; locale
   const downloadReceipt = useMutation({
     mutationFn: (receiptId: string) => receiptFn({ data: { receiptId } }),
     onSuccess: ({ url }) => {
-      if (url) window.open(url, "_blank", "noopener,noreferrer");
+      if (url) void openExternalUrl(url);
     },
     onError: (e: Error) => toast.error(e.message),
   });

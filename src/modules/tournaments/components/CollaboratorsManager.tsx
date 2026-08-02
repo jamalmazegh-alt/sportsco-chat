@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -93,10 +94,9 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
 
   const copyLink = (token: string) => {
     if (typeof navigator === "undefined") return;
-    navigator.clipboard
-      .writeText(inviteUrl(token))
-      .then(() => toast.success(t("collab.toastLinkCopied")))
-      .catch(() => toast.error(t("collab.toastCopyFail")));
+    void copyText(inviteUrl(token)).then((ok) =>
+      ok ? toast.success(t("collab.toastLinkCopied")) : toast.error(t("collab.toastCopyFail")),
+    );
   };
 
   return (

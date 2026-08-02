@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { copyText } from "@/lib/clipboard";
+import { openInSystemApp } from "@/lib/open-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -204,10 +206,10 @@ export function RegistrationsManager({
       }),
     onSuccess: (res: any, vars) => {
       if (vars.channel === "copy" && res?.link) {
-        navigator.clipboard?.writeText(res.link).catch(() => {});
+        void copyText(res.link);
         toast.success(t("registrations.payments.linkCopied"));
       } else if (vars.channel === "whatsapp" && res?.whatsappUrl) {
-        window.open(res.whatsappUrl, "_blank", "noopener");
+        openInSystemApp(res.whatsappUrl);
       } else if (vars.channel === "email") {
         toast.success(
           t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }),

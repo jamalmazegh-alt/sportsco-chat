@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
+import { copyText } from "@/lib/clipboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -681,7 +682,7 @@ function PublicCampLinkCard({
   const url = typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      if (!(await copyText(url))) throw new Error("copy failed");
       toast.success(t("lifecycle.publicUrlCopied", { defaultValue: "Lien copié" }));
     } catch {
       toast.error(t("common.copyFailed", { defaultValue: "Impossible de copier" }));

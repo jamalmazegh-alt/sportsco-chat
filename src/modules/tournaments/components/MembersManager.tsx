@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -195,7 +196,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
 
   function copyInviteLink(token: string) {
     const url = `${window.location.origin}/tournament-invite/${token}`;
-    navigator.clipboard.writeText(url);
+    void copyText(url);
     toast.success(t("tournamentMembers.linkCopied", { defaultValue: "Lien copié" }));
   }
 

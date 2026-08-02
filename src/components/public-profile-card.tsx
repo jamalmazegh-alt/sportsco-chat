@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { Globe, Copy, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -44,7 +45,7 @@ export function PublicProfileCard({
 
   async function copy() {
     if (!publicUrl) return;
-    await navigator.clipboard.writeText(publicUrl);
+    await copyText(publicUrl);
     toast.success(t("common.copied", { defaultValue: "Link copied" }));
   }
 
