@@ -17,6 +17,35 @@ export type PendingClubInvitePayload = {
 };
 
 const KEY_PREFIX = "clubero:club_invite:";
+const DONE_PREFIX = "clubero:club_invite_done:";
+
+/**
+ * A QR/club-link token can be redeemed by several code paths in the same
+ * browser session (/login?invite=…, the metadata replay in use-auth, the
+ * manual "join a club" form). The first call consumes the stashed payload, so
+ * a second call would fall back to `mode: "self"` and create a *player* row
+ * for a user who signed up as a parent — the account then shows up twice
+ * (parent + player) on the same team. We remember redeemed tokens locally and
+ * make every later call a no-op.
+ */
+function markClubInviteRedeemed(token: string) {
+  if (typeof window === "undefined" || !token) return;
+  try {
+    window.localStorage.setItem(DONE_PREFIX + token, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hasRedeemedClubInvite(token: string): boolean {
+  if (typeof window === "undefined" || !token) return false;
+  try {
+    return window.localStorage.getItem(DONE_PREFIX + token) === "1";
+  } catch {
+    return false;
+  }
+}
+
 
 export function storePendingClubInvite(token: string, payload: PendingClubInvitePayload) {
   if (typeof window === "undefined" || !token) return;
