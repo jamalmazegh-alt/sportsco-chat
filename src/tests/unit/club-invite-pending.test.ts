@@ -174,6 +174,7 @@ describe("club-invite-pending", () => {
       childFirstName: "Victor",
       childLastName: "Osim",
       childBirthDate: "2014-05-01",
+      childPhone: null,
     });
   });
 

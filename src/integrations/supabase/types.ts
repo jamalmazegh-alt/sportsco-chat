@@ -8794,6 +8794,7 @@ export type Database = {
           _child_birth_date?: string
           _child_first_name?: string
           _child_last_name?: string
+          _child_phone?: string
           _license?: string
           _mode?: string
           _phone?: string
