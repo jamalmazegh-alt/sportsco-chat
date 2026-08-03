@@ -160,6 +160,8 @@ export function WallFeed({
   const [posts, setPosts] = useState<Post[]>([]);
   const postsRef = useRef<Post[]>([]);
   postsRef.current = posts;
+  /** Bumps on each load() so stale async chains don't overwrite a newer fetch. */
+  const loadGenRef = useRef(0);
   // Masquage personnel : les contenus des personnes masquées sont filtrés au rendu.
   const visiblePosts = useMemo(() => filterMutedWallPosts(posts, mutedUsers), [posts, mutedUsers]);
   const [polls, setPolls] = useState<PollItem[]>([]);
@@ -188,14 +190,20 @@ export function WallFeed({
   // `team_staff` — coaches+dirigeants of the selected teams, plus club admins.
   const [staffAudienceMode, setStaffAudienceMode] = useState(false);
 
-  async function load() {
-    setLoading(true);
-    const { data: club } = await supabase
-      .from("clubs")
-      .select("wall_comments_enabled")
-      .eq("id", clubId)
-      .single();
-    setCommentsEnabled(!!club?.wall_comments_enabled);
+  const WALL_POST_SELECT =
+    "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at";
+
+  /**
+   * Load the wall feed.
+   * - First paint as soon as posts (+ author profiles) are ready.
+   * - Comments / reactions / reads / group names hydrate in parallel afterward.
+   * - Staff "Lu par X/Y" audience counts are deferred (never block the skeleton).
+   * - `silent: true` (realtime / error retry) refreshes without re-showing the skeleton.
+   */
+  async function load(opts?: { silent?: boolean }) {
+    const gen = ++loadGenRef.current;
+    const silent = !!opts?.silent;
+    if (!silent) setLoading(true);
 
     // Les contenus masqués par la modération ne sont visibles que des
     // admins/dirigeants (avec un badge « Masqué »).
@@ -203,9 +211,7 @@ export function WallFeed({
 
     let postsQuery = supabase
       .from("wall_posts")
-      .select(
-        "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at",
-      )
+      .select(WALL_POST_SELECT)
       .eq("club_id", clubId)
       .is("deleted_at", null);
     if (!canSeeHidden) postsQuery = postsQuery.is("hidden_at", null);
@@ -214,14 +220,22 @@ export function WallFeed({
         .eq("audience_type", "team_staff")
         .contains("audience_team_ids", [staffTeamId]);
     }
-    const { data: rawPosts } = await postsQuery
-      .order("is_pinned", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(50);
+
+    // Club flag + posts in parallel (was sequential).
+    const [clubRes, postsRes] = await Promise.all([
+      supabase.from("clubs").select("wall_comments_enabled").eq("id", clubId).single(),
+      postsQuery
+        .order("is_pinned", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(50),
+    ]);
+    if (gen !== loadGenRef.current) return;
+
+    setCommentsEnabled(!!clubRes.data?.wall_comments_enabled);
 
     // Dedupe by id (realtime + initial fetch sometimes overlap)
     const seen = new Set<string>();
-    const ps = ((rawPosts ?? []) as Post[]).filter((p) =>
+    const ps = ((postsRes.data ?? []) as Post[]).filter((p) =>
       seen.has(p.id) ? false : (seen.add(p.id), true),
     );
 
@@ -234,9 +248,7 @@ export function WallFeed({
     if (focusPostId && !seen.has(focusPostId)) {
       let focusQuery = supabase
         .from("wall_posts")
-        .select(
-          "id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_group_ids, audience_type, send_email, hidden_at",
-        )
+        .select(WALL_POST_SELECT)
         .eq("id", focusPostId)
         .eq("club_id", clubId)
         .is("deleted_at", null);
@@ -247,6 +259,7 @@ export function WallFeed({
           .contains("audience_team_ids", [staffTeamId]);
       }
       const { data: focused } = await focusQuery.maybeSingle();
+      if (gen !== loadGenRef.current) return;
       if (focused) {
         ps.push(focused as Post);
         seen.add(focusPostId);
@@ -259,140 +272,171 @@ export function WallFeed({
       }
     }
 
-    if (ps.length) {
-      const ids = ps.map((p) => p.id);
-      let commentsQuery = supabase
-        .from("wall_comments")
-        .select("id, post_id, author_user_id, body, created_at, hidden_at")
-        .in("post_id", ids)
-        .is("deleted_at", null);
-      if (!canSeeHidden) commentsQuery = commentsQuery.is("hidden_at", null);
-      const { data: rawComments } = await commentsQuery.order("created_at", { ascending: true });
-      const { data: rawReactions } = await supabase
-        .from("wall_post_reactions")
-        .select("post_id, user_id, emoji")
-        .in("post_id", ids);
-      const commentIds = (rawComments ?? []).map((c) => c.id);
-      const { data: rawCommentReactions } = commentIds.length
-        ? await supabase
-            .from("wall_comment_reactions")
-            .select("comment_id, user_id, emoji")
-            .in("comment_id", commentIds)
-        : { data: [] as { comment_id: string; user_id: string; emoji: string }[] };
-      const allUserIds = Array.from(
-        new Set([
-          ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
-          ...(rawComments ?? []).map((c) => c.author_user_id),
-          ...(rawReactions ?? []).map((r) => r.user_id),
-          ...(rawCommentReactions ?? []).map((r) => r.user_id),
-        ]),
-      );
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", allUserIds);
-      const map = new Map((profs ?? []).map((p) => [p.id, p as Profile]));
-      // Réactions emoji sur les commentaires
-      const creByComment = new Map<string, WallReaction[]>();
-      (rawCommentReactions ?? []).forEach((r) => {
-        const arr = creByComment.get(r.comment_id) ?? [];
-        arr.push({
-          user_id: r.user_id,
-          emoji: r.emoji,
-          name: map.get(r.user_id)?.full_name ?? null,
-        });
-        creByComment.set(r.comment_id, arr);
-      });
-      const cByPost = new Map<string, Comment[]>();
-      const seenComments = new Set<string>();
-      (rawComments ?? []).forEach((c) => {
-        if (seenComments.has(c.id)) return;
-        seenComments.add(c.id);
-        const cm = {
-          ...c,
-          author: map.get(c.author_user_id) ?? null,
-          reactions: creByComment.get(c.id) ?? [],
-        } as Comment;
-        const arr = cByPost.get(c.post_id) ?? [];
-        arr.push(cm);
-        cByPost.set(c.post_id, arr);
-      });
-      // Réactions emoji
+    // Lightweight author profiles so the first paint isn't anonymous chips.
+    const authorIds = Array.from(
+      new Set(ps.map((p) => p.author_user_id).filter((x): x is string => !!x)),
+    );
+    const { data: authorProfs } = authorIds.length
+      ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", authorIds)
+      : { data: [] as Profile[] };
+    if (gen !== loadGenRef.current) return;
 
-      const reByPost = new Map<string, WallReaction[]>();
-      (rawReactions ?? []).forEach((r) => {
-        const arr = reByPost.get(r.post_id) ?? [];
-        arr.push({
-          user_id: r.user_id,
-          emoji: r.emoji,
-          name: map.get(r.user_id)?.full_name ?? null,
-        });
-        reByPost.set(r.post_id, arr);
-      });
-      // Read receipts
-      const { data: rawReads } = await supabase
-        .from("wall_post_reads")
-        .select("post_id, user_id, read_at")
-        .in("post_id", ids);
-      const rByPost = new Map<string, { user_id: string; read_at: string }[]>();
-      (rawReads ?? []).forEach((r) => {
-        const arr = rByPost.get(r.post_id) ?? [];
-        arr.push({ user_id: r.user_id, read_at: r.read_at });
-        rByPost.set(r.post_id, arr);
-      });
-      ps.forEach((p) => {
-        p.author = p.author_user_id ? (map.get(p.author_user_id) ?? null) : null;
-        p.comments = cByPost.get(p.id) ?? [];
-        p.reads = rByPost.get(p.id) ?? [];
-        p.reactions = reByPost.get(p.id) ?? [];
-      });
-
-      // Mark unread posts as read for current user (best-effort, ignore errors)
-      if (user) {
-        const unread = ps.filter((p) => !(p.reads ?? []).some((r) => r.user_id === user.id));
-        if (unread.length > 0) {
-          supabase
-            .from("wall_post_reads")
-            .insert(unread.map((p) => ({ post_id: p.id, user_id: user.id })))
-            .then(() => {});
-        }
-      }
+    const profileMap = new Map((authorProfs ?? []).map((p) => [p.id, p as Profile]));
+    for (const p of ps) {
+      p.author = p.author_user_id ? (profileMap.get(p.author_user_id) ?? null) : null;
+      p.comments = [];
+      p.reactions = [];
+      p.reads = [];
     }
-    // Fetch names for groups referenced by these posts (RLS-scoped).
+    setPosts(ps);
+    if (!silent) setLoading(false);
+
+    // ---- Background hydrate (comments / reactions / reads / meta) ----
     const groupIdSet = new Set<string>();
     for (const p of ps) {
       if (p.audience_group_ids) for (const gid of p.audience_group_ids) groupIdSet.add(gid);
     }
-    if (groupIdSet.size > 0) {
-      const { data: gRows } = await supabase
-        .from("club_groups")
-        .select("id, name")
-        .in("id", Array.from(groupIdSet));
-      setPostGroups((gRows ?? []) as Group[]);
-    } else {
+    const groupIds = Array.from(groupIdSet);
+
+    if (ps.length === 0) {
       setPostGroups([]);
-    }
-    // Total club members (fallback denominator for "Lu par X/Y")
-    const { count } = await supabase
-      .from("club_members")
-      .select("id", { count: "exact", head: true })
-      .eq("club_id", clubId);
-    setMemberCount(count ?? 0);
-    // Audience réelle par post (staff uniquement côté serveur, sinon {}).
-    if (ps.length > 0) {
-      try {
-        const counts = await getAudienceCountsFn({
-          data: { clubId, postIds: ps.slice(0, 100).map((p) => p.id) },
-        });
-        setAudienceByPost((counts ?? {}) as Record<string, number>);
-      } catch {
-        setAudienceByPost({});
-      }
-    } else {
       setAudienceByPost({});
+      const { count } = await supabase
+        .from("club_members")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", clubId);
+      if (gen !== loadGenRef.current) return;
+      setMemberCount(count ?? 0);
+      return;
     }
-    setPosts(ps);
-    setLoading(false);
+
+    const ids = ps.map((p) => p.id);
+    let commentsQuery = supabase
+      .from("wall_comments")
+      .select("id, post_id, author_user_id, body, created_at, hidden_at")
+      .in("post_id", ids)
+      .is("deleted_at", null);
+    if (!canSeeHidden) commentsQuery = commentsQuery.is("hidden_at", null);
+
+    const [commentsRes, reactionsRes, readsRes, groupsRes, memberCountRes] = await Promise.all([
+      commentsQuery.order("created_at", { ascending: true }),
+      supabase.from("wall_post_reactions").select("post_id, user_id, emoji").in("post_id", ids),
+      supabase.from("wall_post_reads").select("post_id, user_id, read_at").in("post_id", ids),
+      groupIds.length > 0
+        ? supabase.from("club_groups").select("id, name").in("id", groupIds)
+        : Promise.resolve({ data: [] as Group[] }),
+      supabase
+        .from("club_members")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", clubId),
+    ]);
+    if (gen !== loadGenRef.current) return;
+
+    const rawComments = commentsRes.data ?? [];
+    const rawReactions = reactionsRes.data ?? [];
+    const rawReads = readsRes.data ?? [];
+    setPostGroups((groupsRes.data ?? []) as Group[]);
+    setMemberCount(memberCountRes.count ?? 0);
+
+    const commentIds = rawComments.map((c) => c.id);
+    const { data: rawCommentReactions } = commentIds.length
+      ? await supabase
+          .from("wall_comment_reactions")
+          .select("comment_id, user_id, emoji")
+          .in("comment_id", commentIds)
+      : { data: [] as { comment_id: string; user_id: string; emoji: string }[] };
+    if (gen !== loadGenRef.current) return;
+
+    const allUserIds = Array.from(
+      new Set([
+        ...authorIds,
+        ...rawComments.map((c) => c.author_user_id),
+        ...rawReactions.map((r) => r.user_id),
+        ...(rawCommentReactions ?? []).map((r) => r.user_id),
+      ]),
+    );
+    const missingIds = allUserIds.filter((id) => !profileMap.has(id));
+    if (missingIds.length > 0) {
+      const { data: moreProfs } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", missingIds);
+      if (gen !== loadGenRef.current) return;
+      for (const p of moreProfs ?? []) profileMap.set(p.id, p as Profile);
+    }
+
+    const creByComment = new Map<string, WallReaction[]>();
+    (rawCommentReactions ?? []).forEach((r) => {
+      const arr = creByComment.get(r.comment_id) ?? [];
+      arr.push({
+        user_id: r.user_id,
+        emoji: r.emoji,
+        name: profileMap.get(r.user_id)?.full_name ?? null,
+      });
+      creByComment.set(r.comment_id, arr);
+    });
+    const cByPost = new Map<string, Comment[]>();
+    const seenComments = new Set<string>();
+    rawComments.forEach((c) => {
+      if (seenComments.has(c.id)) return;
+      seenComments.add(c.id);
+      const cm = {
+        ...c,
+        author: profileMap.get(c.author_user_id) ?? null,
+        reactions: creByComment.get(c.id) ?? [],
+      } as Comment;
+      const arr = cByPost.get(c.post_id) ?? [];
+      arr.push(cm);
+      cByPost.set(c.post_id, arr);
+    });
+    const reByPost = new Map<string, WallReaction[]>();
+    rawReactions.forEach((r) => {
+      const arr = reByPost.get(r.post_id) ?? [];
+      arr.push({
+        user_id: r.user_id,
+        emoji: r.emoji,
+        name: profileMap.get(r.user_id)?.full_name ?? null,
+      });
+      reByPost.set(r.post_id, arr);
+    });
+    const rByPost = new Map<string, { user_id: string; read_at: string }[]>();
+    rawReads.forEach((r) => {
+      const arr = rByPost.get(r.post_id) ?? [];
+      arr.push({ user_id: r.user_id, read_at: r.read_at });
+      rByPost.set(r.post_id, arr);
+    });
+
+    const hydrated = ps.map((p) => ({
+      ...p,
+      author: p.author_user_id ? (profileMap.get(p.author_user_id) ?? null) : null,
+      comments: cByPost.get(p.id) ?? [],
+      reads: rByPost.get(p.id) ?? [],
+      reactions: reByPost.get(p.id) ?? [],
+    }));
+    setPosts(hydrated);
+
+    // Mark unread posts as read for current user (best-effort, ignore errors)
+    if (user) {
+      const unread = hydrated.filter((p) => !(p.reads ?? []).some((r) => r.user_id === user.id));
+      if (unread.length > 0) {
+        void supabase
+          .from("wall_post_reads")
+          .insert(unread.map((p) => ({ post_id: p.id, user_id: user.id })));
+      }
+    }
+
+    // Staff "Lu par X/Y" — deferred; feed is already interactive.
+    void getAudienceCountsFn({
+      data: { clubId, postIds: hydrated.slice(0, 100).map((p) => p.id) },
+    })
+      .then((counts) => {
+        if (gen !== loadGenRef.current) return;
+        setAudienceByPost((counts ?? {}) as Record<string, number>);
+      })
+      .catch(() => {
+        if (gen !== loadGenRef.current) return;
+        setAudienceByPost({});
+      });
   }
 
   /**
@@ -453,7 +497,7 @@ export function WallFeed({
 
   useEffect(() => {
     load(); /* eslint-disable-next-line */
-  }, [clubId]);
+  }, [clubId, staffTeamId, focusPostId]);
 
   // Load polls visible to the current user (publish_to_wall + RLS enforce audience).
   // Filter to publication_type='poll' as a safety net; messages now live on the wall.
@@ -559,10 +603,10 @@ export function WallFeed({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "wall_posts", filter: `club_id=eq.${clubId}` },
-        () => load(),
+        () => load({ silent: true }),
       )
       .on("postgres_changes", { event: "*", schema: "public", table: "wall_comments" }, () =>
-        load(),
+        load({ silent: true }),
       )
       // Réactions : rafraîchissement silencieux (pas de reload complet du mur,
       // qui provoquait un "flash" de l'écran à chaque réaction).
@@ -1001,7 +1045,7 @@ export function WallFeed({
           .upsert({ post_id: p.id, user_id: uid, emoji }, { onConflict: "post_id,user_id" });
     if (error) {
       toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
-      load();
+      load({ silent: true });
       return;
     }
     if (!already) {
@@ -1057,7 +1101,7 @@ export function WallFeed({
           );
     if (error) {
       toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
-      load();
+      load({ silent: true });
       return;
     }
     if (!already) {
@@ -1080,7 +1124,7 @@ export function WallFeed({
             _id: id,
           });
           if (e2) toast.error(e2.message);
-          else load();
+          else load({ silent: true });
         },
       },
     });
