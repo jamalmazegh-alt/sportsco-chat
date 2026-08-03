@@ -235,7 +235,8 @@
     "confirmationResent": "Bevestigingsmail opnieuw verzonden.",
     "playerAlreadyLinked": "Dit spelersprofiel is al gekoppeld aan een ander account. Neem contact op met de club.",
     "emailFromInvite": "E-mail uit je uitnodiging.",
-    "accountAlreadyExistsSignIn": "Er bestaat al een account met dit adres. Log in met je gebruikelijke wachtwoord (of gebruik ‘wachtwoord vergeten’)."
+    "accountAlreadyExistsSignIn": "Er bestaat al een account met dit adres. Log in met je gebruikelijke wachtwoord (of gebruik ‘wachtwoord vergeten’).",
+    "inviteWrongAccount": "Deze uitnodiging is voor een ander e-mailadres. Log uit en log daarna in (of maak een account) met het uitgenodigde e-mailadres."
   },
   "common": {
     "save": "Opslaan",

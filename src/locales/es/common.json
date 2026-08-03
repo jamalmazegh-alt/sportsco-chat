@@ -235,7 +235,8 @@
     "confirmationResent": "Correo de confirmación reenviado.",
     "playerAlreadyLinked": "Esta ficha de jugador ya está vinculada a otra cuenta. Contacta con el club.",
     "emailFromInvite": "Correo de tu invitación.",
-    "accountAlreadyExistsSignIn": "Ya existe una cuenta con esta dirección. Inicia sesión con tu contraseña habitual (o usa «contraseña olvidada»)."
+    "accountAlreadyExistsSignIn": "Ya existe una cuenta con esta dirección. Inicia sesión con tu contraseña habitual (o usa «contraseña olvidada»).",
+    "inviteWrongAccount": "Esta invitación es para otra dirección de correo. Cierra sesión y accede (o crea una cuenta) con el correo invitado."
   },
   "common": {
     "save": "Guardar",

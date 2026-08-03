@@ -235,7 +235,8 @@
     "confirmationResent": "Confirmation email resent.",
     "playerAlreadyLinked": "This player profile is already linked to another account. Contact the club.",
     "emailFromInvite": "Email from your invitation.",
-    "accountAlreadyExistsSignIn": "An account already exists for this address. Sign in with your usual password (or use “forgot password”)."
+    "accountAlreadyExistsSignIn": "An account already exists for this address. Sign in with your usual password (or use “forgot password”).",
+    "inviteWrongAccount": "This invitation is for a different email address. Sign out, then sign in (or create an account) with the invited email."
   },
   "common": {
     "save": "Save",

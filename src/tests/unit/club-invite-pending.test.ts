@@ -218,6 +218,11 @@ describe("club-invite-pending", () => {
     expect(clear.club_invite_child_first_name).toBeNull();
   });
 
+  it("maps invite_email_mismatch to a clear wrong-account message", () => {
+    const msg = clubInviteErrorMessage({ message: "invite_email_mismatch" }, (k) => k);
+    expect(msg).toBe("auth.inviteWrongAccount");
+  });
+
   it("reads invite token from a location search string", () => {
     expect(readInviteTokenFromLocation("?invite=abc-123&next=/home")).toBe("abc-123");
     expect(readInviteTokenFromLocation("invite=abc-123")).toBe("abc-123");
