@@ -15,10 +15,12 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 import {
   loginViaUI,
   tx,
+  txOr,
   uniqueName,
   navTo,
   openClassicEventForm,
   fillEventStartDateTime,
+  expectToast,
   MOBILE_VIEWPORT,
 } from "./_fixtures/ui";
 
@@ -59,6 +61,30 @@ test.describe("équipes", () => {
     await expect(page.getByText(teamName)).toBeVisible();
 
     await admin.from("teams").delete().eq("name", teamName);
+  });
+
+  test("sans catégorie d'âge, la création est refusée", async ({ page }) => {
+    const teamName = uniqueName("team-noage");
+
+    await loginViaUI(page, "admin");
+    await navTo(page, "nav.teams");
+    await expect(page).toHaveURL(/\/teams$/);
+
+    await page
+      .getByRole("button", { name: tx("teams.create") })
+      .first()
+      .click();
+    await page.getByTestId("team-name-input").fill(teamName);
+    // Catégorie laissée vide : la soumission doit être bloquée avant l'INSERT.
+    await page.getByRole("button", { name: tx("common.create") }).click();
+
+    await expectToast(
+      page,
+      txOr("teams.ageGroupRequired", "Choisissez une catégorie d'âge dans la liste."),
+    );
+
+    const { data: rows } = await admin.from("teams").select("id").eq("name", teamName);
+    expect(rows ?? []).toHaveLength(0);
   });
 });
 
