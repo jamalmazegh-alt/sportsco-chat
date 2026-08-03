@@ -212,6 +212,21 @@ function PlayerProfile() {
       toast.warning(t("players.inviteNoContact"));
       return;
     }
+    // Un compte existe déjà pour cette adresse : l'invitation mènerait à un
+    // formulaire d'inscription qui refuse le nouveau mot de passe
+    // ("identifiants invalides"). On oriente vers la connexion.
+    if (pp.email) {
+      const { data: exists } = await supabase.rpc("email_exists", { _email: pp.email });
+      if (exists === true) {
+        toast.info(
+          t("players.inviteAccountExists", {
+            defaultValue:
+              "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
+          }),
+        );
+        return;
+      }
+    }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: clubId,
