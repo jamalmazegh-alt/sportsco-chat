@@ -235,7 +235,8 @@
     "confirmationResent": "Bestätigungs-E-Mail erneut gesendet.",
     "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Verein.",
     "emailFromInvite": "E-Mail aus deiner Einladung.",
-    "accountAlreadyExistsSignIn": "Für diese Adresse existiert bereits ein Konto. Melde dich mit deinem gewohnten Passwort an (oder nutze „Passwort vergessen“)."
+    "accountAlreadyExistsSignIn": "Für diese Adresse existiert bereits ein Konto. Melde dich mit deinem gewohnten Passwort an (oder nutze „Passwort vergessen“).",
+    "inviteWrongAccount": "Diese Einladung ist für eine andere E-Mail-Adresse. Melde dich ab und dann mit der eingeladenen E-Mail an (oder erstelle ein Konto)."
   },
   "common": {
     "save": "Speichern",

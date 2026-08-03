@@ -235,7 +235,7 @@ function RegisterPage() {
         const { error: rErr } = await supabase.rpc("redeem_member_invite", { _token: inviteToken });
         if (rErr) {
           setBusy(false);
-          toast.error(rErr.message || t("auth.inviteInvalid"));
+          toast.error(clubInviteErrorMessage(rErr, t) || t("auth.inviteInvalid"));
           return;
         }
         setBusy(false);

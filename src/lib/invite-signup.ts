@@ -18,6 +18,9 @@ export type MemberInviteInfo = {
   kind?: string | null;
 } | null;
 
+/** Stable code raised by `redeem_member_invite` when session ≠ invite e-mail. */
+export const INVITE_EMAIL_MISMATCH = "invite_email_mismatch";
+
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
@@ -32,6 +35,24 @@ export function inviteMatchesEmail(member: MemberInviteInfo, email: string): boo
   if (member.expired) return false;
   if (!member.email) return false;
   return normalizeEmail(member.email) === normalizeEmail(email);
+}
+
+/**
+ * Whether the current session may redeem a nominative member invite.
+ * Invites without a bound e-mail (rare / phone-only) are left unbound.
+ */
+export function sessionMatchesMemberInvite(
+  sessionEmail: string | null | undefined,
+  inviteEmail: string | null | undefined,
+): boolean {
+  if (!inviteEmail?.trim()) return true;
+  if (!sessionEmail?.trim()) return false;
+  return normalizeEmail(sessionEmail) === normalizeEmail(inviteEmail);
+}
+
+export function isInviteEmailMismatchError(message: string | null | undefined): boolean {
+  if (!message) return false;
+  return message.toLowerCase().includes(INVITE_EMAIL_MISMATCH);
 }
 
 export type SignupPath = "server_create" | "client_signup";

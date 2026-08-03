@@ -6,6 +6,7 @@ import {
   redeemClubInvite,
   resolvePendingInviteToken,
 } from "@/lib/club-invite-pending";
+import { sessionMatchesMemberInvite } from "@/lib/invite-signup";
 import i18n from "@/lib/i18n";
 import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
@@ -29,6 +30,16 @@ async function redeemPendingInvite(session: Session) {
     // Pass session metadata explicitly — never getUser() here (auth lock).
     const { data } = await supabase.rpc("get_member_invite_info", { _token: token });
     const row = Array.isArray(data) ? data[0] : null;
+    if (row) {
+      // Defense in depth (RPC also enforces): never attach a nominative invite
+      // to a logged-in account whose e-mail doesn't match (admin opening the link).
+      if (
+        !sessionMatchesMemberInvite(session.user?.email, (row as { email?: string | null }).email)
+      ) {
+        console.warn("Invite redemption skipped: session email does not match invite");
+        return;
+      }
+    }
     const { error } = row
       ? await supabase.rpc("redeem_member_invite", { _token: token })
       : await redeemClubInvite(token, { userMetadata: meta });

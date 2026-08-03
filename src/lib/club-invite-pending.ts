@@ -306,5 +306,11 @@ export function clubInviteErrorMessage(
   if (error?.message === "Child name required") {
     return t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" });
   }
+  if (error?.message?.toLowerCase().includes("invite_email_mismatch")) {
+    return t("auth.inviteWrongAccount", {
+      defaultValue:
+        "Cette invitation est destinée à une autre adresse. Déconnectez-vous, puis connectez-vous (ou créez un compte) avec l'e-mail invité.",
+    });
+  }
   return error?.message || t("auth.inviteInvalid");
 }

@@ -9,6 +9,11 @@ import {
   clubInviteErrorMessage,
   redeemClubInvite,
 } from "@/lib/club-invite-pending";
+import {
+  INVITE_EMAIL_MISMATCH,
+  isInviteEmailMismatchError,
+  sessionMatchesMemberInvite,
+} from "@/lib/invite-signup";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -40,15 +45,32 @@ export const Route = createFileRoute("/login")({
   }),
 });
 
-/** Member invite first; club QR invite (v2) if that fails. */
+type RedeemLoginResult = {
+  error: { message?: string } | null;
+  /** Bound e-mail when the token is a nominative member invite. */
+  inviteEmail?: string | null;
+};
+
+/**
+ * Member invite first (e-mail-bound); club QR invite (v2) only if the token
+ * is not a member invite. Never fall through to club redeem after an
+ * invite_email_mismatch — that would obscure the real error.
+ */
 async function redeemLoginInvite(
   invite: string,
   userMetadata: Record<string, unknown> | null | undefined,
-): Promise<{ error: { message?: string } | null }> {
-  const { error: memberErr } = await supabase.rpc("redeem_member_invite", {
-    _token: invite,
-  });
-  if (!memberErr) return { error: null };
+  sessionEmail: string | null | undefined,
+): Promise<RedeemLoginResult> {
+  const { data } = await supabase.rpc("get_member_invite_info", { _token: invite });
+  const row = Array.isArray(data) ? data[0] : null;
+  if (row) {
+    const inviteEmail = (row as { email?: string | null }).email ?? null;
+    if (!sessionMatchesMemberInvite(sessionEmail, inviteEmail)) {
+      return { error: { message: INVITE_EMAIL_MISMATCH }, inviteEmail };
+    }
+    const { error } = await supabase.rpc("redeem_member_invite", { _token: invite });
+    return { error, inviteEmail };
+  }
 
   // Club link invite (QR): replays details from localStorage or the
   // session metadata written at signup (no getUser — use session user).
@@ -73,9 +95,32 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
   const autoRedeemStarted = useRef(false);
 
+  function toastInviteError(
+    error: { message?: string } | null | undefined,
+    inviteEmail?: string | null,
+  ) {
+    if (isInviteEmailMismatchError(error?.message)) {
+      if (inviteEmail) setEmail(inviteEmail);
+      toast.error(clubInviteErrorMessage(error, t), {
+        duration: 12000,
+        action: {
+          label: t("auth.logout"),
+          onClick: () => {
+            void supabase.auth.signOut().then(() => {
+              if (inviteEmail) setEmail(inviteEmail);
+            });
+          },
+        },
+      });
+      return;
+    }
+    toast.error(clubInviteErrorMessage(error, t));
+  }
+
   // E-mail confirmation often restores a session on /login?invite=… without
   // going through the password form. Redeem here so we don't leave the user
-  // on "create a club" with an unused invite in the URL.
+  // on "create a club" with an unused invite in the URL — but only when the
+  // session e-mail matches a nominative invite (admin must not swallow it).
   useEffect(() => {
     if (!search.invite || autoRedeemStarted.current) return;
     autoRedeemStarted.current = true;
@@ -86,11 +131,15 @@ function LoginPage() {
       if (cancelled || !data.session) return;
       setBusy(true);
       const meta = (data.session.user?.user_metadata ?? {}) as Record<string, unknown>;
-      const { error } = await redeemLoginInvite(search.invite!, meta);
+      const { error, inviteEmail } = await redeemLoginInvite(
+        search.invite!,
+        meta,
+        data.session.user?.email,
+      );
       if (cancelled) return;
       if (error) {
         setBusy(false);
-        toast.error(clubInviteErrorMessage(error, t));
+        toastInviteError(error, inviteEmail);
         return;
       }
       if (typeof window !== "undefined") {
@@ -103,6 +152,8 @@ function LoginPage() {
     return () => {
       cancelled = true;
     };
+    // toastInviteError closes over t/setEmail — invite/next are the triggers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.invite, search.next, t]);
 
   async function onSubmit(e: FormEvent) {
@@ -138,10 +189,14 @@ function LoginPage() {
     }
     if (search.invite) {
       const meta = (signInData.session?.user?.user_metadata ?? {}) as Record<string, unknown>;
-      const { error: inviteErr } = await redeemLoginInvite(search.invite, meta);
+      const { error: inviteErr, inviteEmail } = await redeemLoginInvite(
+        search.invite,
+        meta,
+        signInData.session?.user?.email,
+      );
       if (inviteErr) {
         setBusy(false);
-        toast.error(clubInviteErrorMessage(inviteErr, t));
+        toastInviteError(inviteErr, inviteEmail);
         return;
       }
     }

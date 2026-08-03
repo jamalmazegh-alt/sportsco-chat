@@ -3,7 +3,10 @@ import {
   inviteMatchesEmail,
   resolveSignupPath,
   isEmailAlreadyExistsError,
+  isInviteEmailMismatchError,
   normalizeEmail,
+  sessionMatchesMemberInvite,
+  INVITE_EMAIL_MISMATCH,
   type MemberInviteInfo,
 } from "@/lib/invite-signup";
 
@@ -67,5 +70,34 @@ describe("isEmailAlreadyExistsError", () => {
 describe("normalizeEmail", () => {
   it("trims and lowercases", () => {
     expect(normalizeEmail(" A@B.COM ")).toBe("a@b.com");
+  });
+});
+
+describe("sessionMatchesMemberInvite", () => {
+  it("allows redeem when session e-mail matches the invite (case/space insensitive)", () => {
+    expect(sessionMatchesMemberInvite("  Parent@Example.com ", "parent@example.com")).toBe(true);
+  });
+
+  it("blocks redeem when a different account is signed in", () => {
+    expect(sessionMatchesMemberInvite("admin@clubero.app", "lucas.ronaldo@yopmail.com")).toBe(
+      false,
+    );
+  });
+
+  it("blocks redeem when there is no session e-mail but the invite is bound", () => {
+    expect(sessionMatchesMemberInvite(null, "parent@example.com")).toBe(false);
+  });
+
+  it("leaves phone-only / unbound invites open (no e-mail to compare)", () => {
+    expect(sessionMatchesMemberInvite("anyone@example.com", null)).toBe(true);
+    expect(sessionMatchesMemberInvite("anyone@example.com", "  ")).toBe(true);
+  });
+});
+
+describe("isInviteEmailMismatchError", () => {
+  it("detects the stable RPC / client code", () => {
+    expect(isInviteEmailMismatchError(INVITE_EMAIL_MISMATCH)).toBe(true);
+    expect(isInviteEmailMismatchError("ERROR: invite_email_mismatch")).toBe(true);
+    expect(isInviteEmailMismatchError("Invalid invite")).toBe(false);
   });
 });
