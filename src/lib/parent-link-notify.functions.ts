@@ -17,21 +17,35 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
 
-    const { data: links, error: linksErr } = await supabaseAdmin
+    const { data: allLinks, error: linksErr } = await supabaseAdmin
       .from("player_parents")
       .select(
-        "player_id, full_name, players:player_id(id, first_name, last_name, club_id, clubs:club_id(id, name))",
+        "player_id, full_name, email, players:player_id(id, first_name, last_name, club_id, clubs:club_id(id, name))",
       )
       .eq("parent_user_id", userId);
     if (linksErr) {
       console.error("[parent-child-linked] fetch links failed", linksErr);
       return { sent: 0 };
     }
-    if (!links || links.length === 0) return { sent: 0 };
+    if (!allLinks || allLinks.length === 0) return { sent: 0 };
 
     const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
     const email = authUser?.user?.email;
     if (!email) return { sent: 0 };
+
+    // Garde-fou : si la fiche parent porte une adresse e-mail explicite qui
+    // n'est PAS celle du compte rattaché (rattachement erroné, ex. un admin qui
+    // a créé l'enfant puis renommé/ré-adressé le parent), on n'envoie rien —
+    // sinon l'e-mail « votre enfant vous a été rattaché » part au mauvais
+    // destinataire.
+    const accountEmail = email.trim().toLowerCase();
+    const links = allLinks.filter((l: any) => {
+      const rowEmail = (l.email ?? "").trim().toLowerCase();
+      return !rowEmail || rowEmail === accountEmail;
+    });
+    if (links.length === 0) return { sent: 0 };
+
+
 
     const { data: prof } = await supabaseAdmin
       .from("profiles")
