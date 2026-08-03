@@ -104,6 +104,9 @@ function ProfilePage() {
   const { data: playerRecord } = useQuery({
     queryKey: ["profile-player-phone", user?.id],
     enabled: !!user && isPlayerOnly,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
