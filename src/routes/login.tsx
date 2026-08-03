@@ -65,7 +65,7 @@ async function redeemLoginInvite(
 function LoginPage() {
   const { t } = useTranslation();
   const search = Route.useSearch();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(search.email ?? "");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
