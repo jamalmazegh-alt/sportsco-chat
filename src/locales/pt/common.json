@@ -233,7 +233,9 @@
     "emailNotConfirmed": "O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada (e spam) para ativar a conta.",
     "resendConfirmation": "Reenviar e-mail",
     "confirmationResent": "E-mail de confirmação reenviado.",
-    "playerAlreadyLinked": "Esta ficha de jogador já está associada a outra conta. Contacte o clube."
+    "playerAlreadyLinked": "Esta ficha de jogador já está associada a outra conta. Contacte o clube.",
+    "emailFromInvite": "E-mail do seu convite.",
+    "accountAlreadyExistsSignIn": "Já existe uma conta com este endereço. Inicie sessão com a sua palavra-passe habitual (ou use «palavra-passe esquecida»)."
   },
   "common": {
     "save": "Guardar",
@@ -711,7 +713,8 @@
     "childConsentParent": "Confirmo que sou o representante legal deste jogador e autorizo a criação do seu acesso.",
     "childConsentDoc": "Ler o documento «Consentimento parental»",
     "childConsentConfirm": "Ativar o acesso",
-    "childAccessParentOnly": "Apenas um pai, mãe ou representante legal pode ativar o acesso."
+    "childAccessParentOnly": "Apenas um pai, mãe ou representante legal pode ativar o acesso.",
+    "inviteAccountExists": "Já existe uma conta Clubero com este endereço: a pessoa deve iniciar sessão (ou usar «palavra-passe esquecida»)."
   },
   "events": {
     "isOfficial": "Jogo oficial",
@@ -951,8 +954,20 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
-    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
+    "reasonsAbsent": [
+      "Trabalho",
+      "Família",
+      "Lesão",
+      "Doença",
+      "Estudos",
+      "Outro compromisso"
+    ],
+    "reasonsUncertain": [
+      "A confirmar",
+      "Trabalho",
+      "Família",
+      "Problema de saúde ligeiro"
+    ],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",

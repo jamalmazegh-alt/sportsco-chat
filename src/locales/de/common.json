@@ -233,7 +233,9 @@
     "emailNotConfirmed": "Ihre E-Mail wurde noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang (und Spam), um Ihr Konto zu aktivieren.",
     "resendConfirmation": "E-Mail erneut senden",
     "confirmationResent": "Bestätigungs-E-Mail erneut gesendet.",
-    "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Verein."
+    "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Verein.",
+    "emailFromInvite": "E-Mail aus deiner Einladung.",
+    "accountAlreadyExistsSignIn": "Für diese Adresse existiert bereits ein Konto. Melde dich mit deinem gewohnten Passwort an (oder nutze „Passwort vergessen“)."
   },
   "common": {
     "save": "Speichern",
@@ -711,7 +713,8 @@
     "childConsentParent": "Ich bestätige, dass ich der/die Erziehungsberechtigte dieses Spielers bin, und genehmige die Erstellung seines Zugangs.",
     "childConsentDoc": "Dokument „Elterliche Einwilligung“ lesen",
     "childConsentConfirm": "Zugang aktivieren",
-    "childAccessParentOnly": "Nur ein Elternteil oder Erziehungsberechtigter kann den Zugang aktivieren."
+    "childAccessParentOnly": "Nur ein Elternteil oder Erziehungsberechtigter kann den Zugang aktivieren.",
+    "inviteAccountExists": "Für diese Adresse existiert bereits ein Clubero-Konto: die Person soll sich anmelden (oder „Passwort vergessen“ nutzen)."
   },
   "events": {
     "isOfficial": "Pflichtspiel",
@@ -951,7 +954,14 @@
     "confirmResponse": "Antwort bestätigen",
     "responseRecorded": "Antwort gespeichert",
     "coachNotified": "Der Trainer wurde informiert.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Lernen", "Autre engagement"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Lernen",
+      "Autre engagement"
+    ],
     "reasonsUncertain": [
       "Zu bestätigen",
       "Travail",

@@ -233,7 +233,9 @@
     "emailNotConfirmed": "Your email hasn't been confirmed yet. Check your inbox (and spam) to activate your account.",
     "resendConfirmation": "Resend email",
     "confirmationResent": "Confirmation email resent.",
-    "playerAlreadyLinked": "This player profile is already linked to another account. Contact the club."
+    "playerAlreadyLinked": "This player profile is already linked to another account. Contact the club.",
+    "emailFromInvite": "Email from your invitation.",
+    "accountAlreadyExistsSignIn": "An account already exists for this address. Sign in with your usual password (or use “forgot password”)."
   },
   "common": {
     "save": "Save",
@@ -711,7 +713,8 @@
     "childConsentParent": "I confirm that I am this player's legal guardian and I authorise the creation of their access.",
     "childConsentDoc": "Read the “Parental Consent” document",
     "childConsentConfirm": "Enable access",
-    "childAccessParentOnly": "Only a parent or legal guardian can enable access."
+    "childAccessParentOnly": "Only a parent or legal guardian can enable access.",
+    "inviteAccountExists": "A Clubero account already exists with this address: they should sign in (or use “forgot password”)."
   },
   "events": {
     "isOfficial": "Official match",
@@ -951,8 +954,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
