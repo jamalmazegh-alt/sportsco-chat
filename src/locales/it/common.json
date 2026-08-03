@@ -233,7 +233,9 @@
     "emailNotConfirmed": "La tua email non è ancora stata confermata. Controlla la casella di posta (e lo spam) per attivare l'account.",
     "resendConfirmation": "Rinvia email",
     "confirmationResent": "Email di conferma reinviata.",
-    "playerAlreadyLinked": "Questa scheda giocatore è già collegata a un altro account. Contatta il club."
+    "playerAlreadyLinked": "Questa scheda giocatore è già collegata a un altro account. Contatta il club.",
+    "emailFromInvite": "E-mail dal tuo invito.",
+    "accountAlreadyExistsSignIn": "Esiste già un account con questo indirizzo. Accedi con la tua password abituale (o usa «password dimenticata»)."
   },
   "common": {
     "save": "Salva",
@@ -711,7 +713,8 @@
     "childConsentParent": "Confermo di essere il tutore legale di questo giocatore e autorizzo la creazione del suo accesso.",
     "childConsentDoc": "Leggi il documento «Consenso dei genitori»",
     "childConsentConfirm": "Attiva l'accesso",
-    "childAccessParentOnly": "Solo un genitore o tutore legale può attivare l'accesso."
+    "childAccessParentOnly": "Solo un genitore o tutore legale può attivare l'accesso.",
+    "inviteAccountExists": "Esiste già un account Clubero con questo indirizzo: la persona deve accedere (o usare «password dimenticata»)."
   },
   "events": {
     "isOfficial": "Ufficiale",

@@ -233,7 +233,9 @@
     "emailNotConfirmed": "Je e-mail is nog niet bevestigd. Controleer je inbox (en spam) om je account te activeren.",
     "resendConfirmation": "E-mail opnieuw sturen",
     "confirmationResent": "Bevestigingsmail opnieuw verzonden.",
-    "playerAlreadyLinked": "Dit spelersprofiel is al gekoppeld aan een ander account. Neem contact op met de club."
+    "playerAlreadyLinked": "Dit spelersprofiel is al gekoppeld aan een ander account. Neem contact op met de club.",
+    "emailFromInvite": "E-mail uit je uitnodiging.",
+    "accountAlreadyExistsSignIn": "Er bestaat al een account met dit adres. Log in met je gebruikelijke wachtwoord (of gebruik ‘wachtwoord vergeten’)."
   },
   "common": {
     "save": "Opslaan",
@@ -711,7 +713,8 @@
     "childConsentParent": "Ik bevestig dat ik de wettelijke voogd van deze speler ben en geef toestemming voor het aanmaken van zijn/haar toegang.",
     "childConsentDoc": "Lees het document 'Ouderlijke toestemming'",
     "childConsentConfirm": "Toegang activeren",
-    "childAccessParentOnly": "Alleen een ouder of wettelijke voogd kan de toegang activeren."
+    "childAccessParentOnly": "Alleen een ouder of wettelijke voogd kan de toegang activeren.",
+    "inviteAccountExists": "Er bestaat al een Clubero-account met dit adres: de persoon moet inloggen (of ‘wachtwoord vergeten’ gebruiken)."
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",

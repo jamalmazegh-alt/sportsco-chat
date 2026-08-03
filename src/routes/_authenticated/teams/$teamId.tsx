@@ -565,7 +565,7 @@ function TeamDetail() {
     sent: number;
     failed: number;
     skipped: number;
-    reason?: "no_contact" | "already_active";
+    reason?: "no_contact" | "already_active" | "account_exists";
     suppressedEmails?: string[];
     suppressedDetails?: { email: string; reason: string | null }[];
   }> {
@@ -603,9 +603,16 @@ function TeamDetail() {
       toastSuppressed(r.suppressedDetails ?? [], suppressed);
     } else if (r.skipped)
       toast.warning(
-        t(
-          r.reason === "already_active" ? "players.inviteAlreadyActive" : "players.inviteNoContact",
-        ),
+        r.reason === "account_exists"
+          ? t("players.inviteAccountExists", {
+              defaultValue:
+                "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
+            })
+          : t(
+              r.reason === "already_active"
+                ? "players.inviteAlreadyActive"
+                : "players.inviteNoContact",
+            ),
       );
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed)
