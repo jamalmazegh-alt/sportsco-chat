@@ -98,6 +98,22 @@ function ProfilePage() {
     },
   });
 
+  const isPlayerOnly = role === "player";
+
+  // For players, the phone is managed on their player profile and mirrored here (read-only).
+  const { data: playerRecord } = useQuery({
+    queryKey: ["profile-player-phone", user?.id],
+    enabled: !!user && isPlayerOnly,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("players")
+        .select("phone")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const [phone, setPhone] = useState("");
   const [phoneBusy, setPhoneBusy] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -105,8 +121,12 @@ function ProfilePage() {
   const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
+    if (isPlayerOnly) {
+      setPhone(playerRecord?.phone ?? profile?.phone ?? "");
+      return;
+    }
     if (profile?.phone) setPhone(profile.phone);
-  }, [profile?.phone]);
+  }, [profile?.phone, playerRecord?.phone, isPlayerOnly]);
 
   useEffect(() => {
     setFirstName(profile?.first_name ?? "");
