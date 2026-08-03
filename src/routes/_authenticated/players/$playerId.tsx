@@ -293,6 +293,16 @@ function PlayerProfile() {
     },
   });
 
+  // Droits staff calculés sur le club DU JOUEUR (pas le club actif).
+  const playerClubMembership = player?.club_id
+    ? memberships.find((m) => m.club_id === player.club_id)
+    : undefined;
+  const isCoach = player?.club_id
+    ? isStaffRoles(playerClubMembership?.roles ?? [])
+    : activeClubIsStaff;
+
+
+
   const { data: parents, refetch: refetchParents } = useQuery({
     queryKey: ["player-parents", playerId],
     queryFn: async () => {
