@@ -1289,7 +1289,7 @@ function PlayerProfile() {
                           type="date"
                           value={birthDate}
                           onChange={(e) => setBirthDate(e.target.value)}
-                          disabled={!canEditContact}
+                          disabled={!canEditSensitiveContact}
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -1306,7 +1306,7 @@ function PlayerProfile() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          disabled={!canEditContact}
+                          disabled={!canEditSensitiveContact}
                         />
                       </div>
                       <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
@@ -1318,11 +1318,12 @@ function PlayerProfile() {
                           className="h-5 w-5 accent-primary disabled:opacity-60"
                           checked={minor ? canRespond : true}
                           onChange={(e) => setCanRespond(e.target.checked)}
-                          disabled={!canEditContact || !minor}
+                          disabled={!canEditSensitiveContact || !minor}
                         />
                       </div>
                     </>
                   )}
+
 
                   {(canEditIdentity || canEditContact) && (
                     <Button type="submit" className="w-full h-11" disabled={busy}>
