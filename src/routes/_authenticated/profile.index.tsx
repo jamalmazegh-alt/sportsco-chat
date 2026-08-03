@@ -443,20 +443,29 @@ function ProfilePage() {
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <Label>{t("profile.phone")}</Label>
-        <PhoneInput value={phone} onChange={setPhone} />
-        <Button
-          type="button"
-          className="w-full h-11"
-          disabled={phoneBusy || phone === (profile?.phone ?? "")}
-          onClick={onSavePhone}
-        >
-          {phoneBusy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("common.save", { defaultValue: "Save" })
-          )}
-        </Button>
+        <PhoneInput value={phone} onChange={setPhone} disabled={isPlayerOnly} />
+        {isPlayerOnly ? (
+          <p className="text-xs text-muted-foreground">
+            {t("profile.phoneFromPlayer", {
+              defaultValue: "Ce numéro provient de ta fiche joueur.",
+            })}
+          </p>
+        ) : (
+          <Button
+            type="button"
+            className="w-full h-11"
+            disabled={phoneBusy || phone === (profile?.phone ?? "")}
+            onClick={onSavePhone}
+          >
+            {phoneBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("common.save", { defaultValue: "Save" })
+            )}
+          </Button>
+        )}
       </div>
+
 
       {isV2("social_network_v2") && (
         <Link
