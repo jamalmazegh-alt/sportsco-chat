@@ -565,7 +565,7 @@ function TeamDetail() {
     sent: number;
     failed: number;
     skipped: number;
-    reason?: "no_contact" | "already_active";
+    reason?: "no_contact" | "already_active" | "account_exists";
     suppressedEmails?: string[];
     suppressedDetails?: { email: string; reason: string | null }[];
   }> {
