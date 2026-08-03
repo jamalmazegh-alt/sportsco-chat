@@ -45,8 +45,6 @@ export const notifyNewlyLinkedChildren = createServerFn({ method: "POST" })
     });
     if (links.length === 0) return { sent: 0 };
 
-
-
     const { data: prof } = await supabaseAdmin
       .from("profiles")
       .select("first_name, preferred_language, notifications_email")
