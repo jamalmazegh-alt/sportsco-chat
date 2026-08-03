@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Download, Smartphone, Apple } from "lucide-react";
 import { isAndroid, isIOS, isInStandaloneMode } from "@/lib/pwa";
 import { isNativePlatform } from "@/lib/native-platform";
@@ -63,16 +64,14 @@ export function InstallAppButton(props: Props) {
   return <InstallAppButtonWeb {...props} />;
 }
 
-function InstallAppButtonWeb({
-  className,
-  variant = "primary",
-  label = "Installer l'app",
-  alwaysShow = false,
-}: Props) {
+function InstallAppButtonWeb({ className, variant = "primary", label, alwaysShow = false }: Props) {
+  const { t } = useTranslation();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const buttonLabel = label ?? t("install.buttonLabel");
 
   useEffect(() => {
     setMounted(true);
@@ -151,7 +150,7 @@ function InstallAppButtonWeb({
     <>
       <button type="button" onClick={handleClick} className={cn(base, styles, className)}>
         {ios ? <Apple className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-        <span>{label}</span>
+        <span>{buttonLabel}</span>
       </button>
 
       {showIOSGuide && (
@@ -166,24 +165,24 @@ function InstallAppButtonWeb({
             <div className="flex items-center gap-2 mb-1">
               <Smartphone className="h-5 w-5 text-emerald-700" />
               <h2 className="text-lg font-bold">
-                {ios ? "Installer sur iPhone / iPad" : "Installer Clubero"}
+                {ios ? t("install.iosGuideTitleFull") : t("install.title")}
               </h2>
             </div>
             {ios ? (
               <>
-                <p className="text-xs text-gray-500 mb-4">3 étapes dans Safari</p>
+                <p className="text-xs text-gray-500 mb-4">{t("install.iosGuideSubtitle")}</p>
                 <ol className="space-y-3 text-sm">
                   <li className="flex gap-3 items-start">
                     <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                       1
                     </span>
                     <span className="flex-1 pt-0.5 inline-flex items-center gap-1.5 flex-wrap">
-                      Appuyez sur
+                      {t("install.iosGuideShareBefore")}
                       <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5">
                         <IOSShareIcon className="h-4 w-4" />
-                        <span className="text-[12px] font-medium">Partager</span>
+                        <span className="text-[12px] font-medium">{t("install.iosStep2Icon")}</span>
                       </span>
-                      en bas de Safari
+                      {t("install.iosGuideShareAfter")}
                     </span>
                   </li>
                   <li className="flex gap-3 items-start">
@@ -191,10 +190,10 @@ function InstallAppButtonWeb({
                       2
                     </span>
                     <span className="flex-1 pt-0.5 inline-flex items-center gap-1.5 flex-wrap">
-                      Choisissez
+                      {t("install.iosStep2Before")}
                       <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5">
                         <IOSAddIcon className="h-4 w-4" />
-                        <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                        <span className="text-[12px] font-medium">{t("install.iosStep4Icon")}</span>
                       </span>
                     </span>
                   </li>
@@ -202,19 +201,19 @@ function InstallAppButtonWeb({
                     <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                       3
                     </span>
-                    <span className="flex-1 pt-0.5">Appuyez sur « Ajouter »</span>
+                    <span className="flex-1 pt-0.5">{t("install.iosGuideAddConfirm")}</span>
                   </li>
                 </ol>
               </>
             ) : (
               <p className="text-sm text-gray-700 mt-2">
-                Ouvrez le menu de votre navigateur (⋮ en haut à droite) puis choisissez
+                {t("install.androidGuideBefore")}
                 <span className="mx-1 rounded bg-gray-100 px-1.5 py-0.5 font-medium">
-                  Installer l'application
+                  {t("install.androidGuideInstall")}
                 </span>
-                ou
+                {t("install.androidGuideOr")}
                 <span className="mx-1 rounded bg-gray-100 px-1.5 py-0.5 font-medium">
-                  Ajouter à l'écran d'accueil
+                  {t("install.androidGuideAddHome")}
                 </span>
                 .
               </p>
@@ -224,7 +223,7 @@ function InstallAppButtonWeb({
               onClick={() => setShowIOSGuide(false)}
               className="mt-5 w-full py-2.5 rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"
             >
-              J'ai compris
+              {t("install.gotIt")}
             </button>
           </div>
         </div>

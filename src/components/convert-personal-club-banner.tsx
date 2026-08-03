@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [newName, setNewName] = useState(currentName);
   const qc = useQueryClient();
@@ -31,7 +33,7 @@ export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
       if (error) throw error;
     },
     onSuccess: async () => {
-      toast.success("Organisation convertie en vrai club Clubero");
+      toast.success(t("convertClub.successToast"));
       await refreshMemberships();
       await qc.invalidateQueries({ queryKey: ["club-name", clubId] });
       setOpen(false);
@@ -46,25 +48,22 @@ export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
           <Sparkles className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">Tu utilises Clubero en mode organisateur libre</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Convertis cette organisation en vrai club Clubero pour inviter ton équipe, gérer tes
-            joueurs et souscrire à un abonnement.
-          </p>
+          <p className="text-sm font-semibold">{t("convertClub.title")}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t("convertClub.description")}</p>
         </div>
       </div>
       {open ? (
         <div className="space-y-3 pt-1">
           <div className="space-y-1.5">
             <Label htmlFor="new-club-name" className="text-xs">
-              Nom du club
+              {t("convertClub.nameLabel")}
             </Label>
             <Input
               id="new-club-name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               maxLength={120}
-              placeholder="ex. AS Saint-Étienne U15"
+              placeholder={t("convertClub.namePlaceholder")}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -74,16 +73,16 @@ export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
               disabled={mutation.isPending || !newName.trim()}
             >
               {mutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-              Confirmer la conversion
+              {t("convertClub.confirm")}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>
-              Annuler
+              {t("common.cancel")}
             </Button>
           </div>
         </div>
       ) : (
         <Button size="sm" onClick={() => setOpen(true)} className="w-full sm:w-auto">
-          Convertir en vrai club
+          {t("convertClub.cta")}
         </Button>
       )}
     </div>
