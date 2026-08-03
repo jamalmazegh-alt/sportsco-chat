@@ -605,6 +605,7 @@ function PlayerProfile() {
     }
     qc.invalidateQueries({ queryKey: ["player", playerId] });
     qc.invalidateQueries({ queryKey: ["team-players"] });
+    qc.invalidateQueries({ queryKey: ["profile-player-phone"] });
     toast.success(t("common.saved"));
 
     // Note: sending the onboarding invite is now a manual action
