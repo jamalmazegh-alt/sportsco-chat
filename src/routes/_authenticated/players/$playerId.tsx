@@ -301,8 +301,6 @@ function PlayerProfile() {
     ? isStaffRoles(playerClubMembership?.roles ?? [])
     : activeClubIsStaff;
 
-
-
   const { data: parents, refetch: refetchParents } = useQuery({
     queryKey: ["player-parents", playerId],
     queryFn: async () => {
