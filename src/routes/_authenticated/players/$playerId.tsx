@@ -1388,7 +1388,7 @@ function PlayerProfile() {
 
           {/* PARENTS — single card grouping the viewer's own record + co-parents */}
 
-          {canSeePrivate && (minor || (parents ?? []).length > 0) && (
+          {canSeePrivate && (minor || (parents ?? []).length > 0 || isCoach) && (
             <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
