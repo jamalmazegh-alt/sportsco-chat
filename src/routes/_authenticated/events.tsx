@@ -591,7 +591,6 @@ function EventsPage() {
               })()}
           </div>
           {(() => {
-            if (e.type !== "match") return null;
             const myC = myConvocsByEvent?.get(e.id);
             if (!myC) return null;
             return <ConvocationBand title={`Convoqué · ${myC.playerName}`} />;
