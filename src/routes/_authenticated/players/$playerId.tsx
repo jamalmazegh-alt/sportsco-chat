@@ -1324,7 +1324,6 @@ function PlayerProfile() {
                     </>
                   )}
 
-
                   {(canEditIdentity || canEditContact) && (
                     <Button type="submit" className="w-full h-11" disabled={busy}>
                       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
