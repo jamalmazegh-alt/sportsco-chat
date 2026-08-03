@@ -134,11 +134,16 @@ function parentContactLine(pp: PlayerParentRow, displayName: string | null): str
 function PlayerProfile() {
   const { playerId } = Route.useParams();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, memberships } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isCoach =
-    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isStaffRoles = (r: string[]) =>
+    r.includes("admin") || r.includes("coach") || r.includes("assistant_coach");
+  // Rôles du club ACTIF — utilisé seulement tant que la fiche joueur n'est pas
+  // chargée ; ensuite on se base sur l'adhésion au club DU JOUEUR (sinon, en
+  // consultant un joueur d'un autre club que le club actif, le staff perdait
+  // ses droits : bloc « Parents / tuteurs » et bouton « Ajouter » masqués).
+  const activeClubIsStaff = isStaffRoles(roles);
   const qc = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
@@ -287,6 +292,14 @@ function PlayerProfile() {
       return data;
     },
   });
+
+  // Droits staff calculés sur le club DU JOUEUR (pas le club actif).
+  const playerClubMembership = player?.club_id
+    ? memberships.find((m) => m.club_id === player.club_id)
+    : undefined;
+  const isCoach = player?.club_id
+    ? isStaffRoles(playerClubMembership?.roles ?? [])
+    : activeClubIsStaff;
 
   const { data: parents, refetch: refetchParents } = useQuery({
     queryKey: ["player-parents", playerId],
