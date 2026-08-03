@@ -954,20 +954,8 @@
     "confirmResponse": "Conferma risposta",
     "responseRecorded": "Risposta registrata",
     "coachNotified": "L'Allenatore è stato informato.",
-    "reasonsAbsent": [
-      "Lavoro",
-      "Famiglia",
-      "Infortunio",
-      "Malattia",
-      "Studio",
-      "Altro impegno"
-    ],
-    "reasonsUncertain": [
-      "Da confermare",
-      "Lavoro",
-      "Famiglia",
-      "Leggero problema di salute"
-    ],
+    "reasonsAbsent": ["Lavoro", "Famiglia", "Infortunio", "Malattia", "Studio", "Altro impegno"],
+    "reasonsUncertain": ["Da confermare", "Lavoro", "Famiglia", "Leggero problema di salute"],
     "suggestedReasons": "Suggerimenti",
     "forceResponseTitle": "Forzare la risposta?",
     "forceResponseDesc": "{{name}} ha già risposto {{current}}. Vuoi davvero impostare lo stato su {{next}}?",

@@ -15,7 +15,9 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>): { invite?: string; next?: string; email?: string } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { invite?: string; next?: string; email?: string } => {
     const out: { invite?: string; next?: string; email?: string } = {};
     if (typeof search.invite === "string") out.invite = search.invite;
     if (typeof search.email === "string") out.email = search.email;

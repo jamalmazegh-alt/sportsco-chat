@@ -954,20 +954,8 @@
     "confirmResponse": "Confirmar resposta",
     "responseRecorded": "Resposta registada",
     "coachNotified": "O Treinador foi informado.",
-    "reasonsAbsent": [
-      "Trabalho",
-      "Família",
-      "Lesão",
-      "Doença",
-      "Estudos",
-      "Outro compromisso"
-    ],
-    "reasonsUncertain": [
-      "A confirmar",
-      "Trabalho",
-      "Família",
-      "Problema de saúde ligeiro"
-    ],
+    "reasonsAbsent": ["Trabalho", "Família", "Lesão", "Doença", "Estudos", "Outro compromisso"],
+    "reasonsUncertain": ["A confirmar", "Trabalho", "Família", "Problema de saúde ligeiro"],
     "suggestedReasons": "Sugestões",
     "forceResponseTitle": "Forçar resposta?",
     "forceResponseDesc": "{{name}} já respondeu {{current}}. Deseja realmente definir o estado para {{next}}?",
