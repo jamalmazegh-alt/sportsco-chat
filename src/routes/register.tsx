@@ -240,7 +240,15 @@ function RegisterPage() {
         }
         setBusy(false);
         toast.success(t("auth.signupSuccess"));
-        (navigate as any)({ to: nextPath });
+        // Hard navigation (same as /login after redeem): on /register,
+        // use-auth skips redeemPendingInvite then may refreshMemberships
+        // *before* this RPC finishes → empty memberships + soft navigate
+        // to /home shows "create a club" even though the player row is linked.
+        if (typeof window !== "undefined") {
+          window.location.replace(nextPath);
+        } else {
+          (navigate as any)({ to: nextPath });
+        }
         return;
       } catch (err: any) {
         setBusy(false);
@@ -306,7 +314,12 @@ function RegisterPage() {
       }
       setBusy(false);
       toast.success(t("auth.signupSuccess"));
-      (navigate as any)({ to: nextPath });
+      // Hard nav after invite redeem so memberships reload (see nominative path).
+      if (typeof window !== "undefined") {
+        window.location.replace(nextPath);
+      } else {
+        (navigate as any)({ to: nextPath });
+      }
       return;
     }
     // No session: email confirmation is required. Only club link invites (or
