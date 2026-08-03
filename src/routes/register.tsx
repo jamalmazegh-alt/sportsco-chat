@@ -198,7 +198,7 @@ function RegisterPage() {
       resolveSignupPath(inviteKind === "club" ? "club" : "member") === "server_create"
     ) {
       try {
-        await createAccount({
+        const res = await createAccount({
           data: {
             token: inviteToken,
             email,
@@ -212,6 +212,23 @@ function RegisterPage() {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
         if (signInErr) {
           setBusy(false);
+          // Le compte existait déjà (invitation envoyée à une adresse déjà
+          // inscrite) : le mot de passe saisi ici n'est pas celui du compte.
+          // On l'explique au lieu d'afficher « identifiants invalides ».
+          if (res?.alreadyExisted) {
+            toast.error(
+              t("auth.accountAlreadyExistsSignIn", {
+                defaultValue:
+                  "Un compte existe déjà avec cette adresse. Connectez-vous avec votre mot de passe habituel (ou utilisez « mot de passe oublié »).",
+              }),
+              { duration: 8000 },
+            );
+            (navigate as any)({
+              to: "/login",
+              search: { email, invite: inviteToken },
+            });
+            return;
+          }
           toast.error(localizeAuthError(signInErr, t));
           return;
         }
