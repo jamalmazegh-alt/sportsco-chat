@@ -1221,7 +1221,13 @@ function PlayerProfile() {
 
             {(() => {
               const canEditIdentity = isCoach;
+              // Un joueur mineur connecté sur sa propre fiche ne peut modifier
+              // que son téléphone : ni identité, ni date de naissance/e-mail,
+              // ni le droit de répondre aux convocations.
+              const selfMinorOnly = isSelf && minor && !isCoach && !isParentOfThisPlayer;
               const canEditContact = isCoach || isParentOfThisPlayer || isSelf;
+              const canEditSensitiveContact = canEditContact && !selfMinorOnly;
+
               return (
                 <>
                   <div className="grid grid-cols-2 gap-3">
