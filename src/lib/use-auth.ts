@@ -215,7 +215,13 @@ export function useAuthState(): AuthState {
       }
       if (newSession) {
         identifyPostHog(newSession.user.id, { email: newSession.user.email ?? null });
+        // On /register the page owns redeem (after createAccount). Skipping
+        // refresh here avoids racing an empty club_members read before that
+        // RPC completes; register hard-navigates home afterward.
+        const onRegister =
+          typeof window !== "undefined" && window.location.pathname === "/register";
         setTimeout(() => {
+          if (onRegister) return;
           redeemPendingInvite(newSession).finally(() => refreshMemberships());
         }, 0);
       } else if (event === "SIGNED_OUT") {
