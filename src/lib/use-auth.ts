@@ -10,6 +10,13 @@ import i18n from "@/lib/i18n";
 import { identifyPostHog, resetPostHog } from "@/lib/posthog";
 
 async function redeemPendingInvite(session: Session) {
+  // `/register?invite=…` is a public account-creation screen. An administrator
+  // can open that link while still signed in; redeeming the URL token here
+  // would then attach the child to the administrator before the invited parent
+  // has even submitted the form. The register route owns this flow and redeems
+  // the invite only after signing in the newly-created account.
+  if (typeof window !== "undefined" && window.location.pathname === "/register") return;
+
   const meta = (session.user?.user_metadata ?? {}) as Record<string, unknown>;
   // Metadata first; URL `?invite=` covers e-mail confirm → /login?invite=…
   // when invite_token was never written or was already cleared.
