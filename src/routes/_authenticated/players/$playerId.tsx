@@ -724,7 +724,17 @@ function PlayerProfile() {
   }
 
   async function onDeleteParent(id: string) {
-    await supabase.from("player_parents").delete().eq("id", id);
+    // On remonte l'erreur : un DELETE silencieusement refusé (RLS) laissait la
+    // ligne en base et bloquait ensuite la re-création (contrainte d'unicité).
+    const { error } = await supabase.from("player_parents").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (editingParentId === id) {
+      resetParentForm();
+      setShowParentForm(false);
+    }
     refetchParents();
   }
 
