@@ -133,19 +133,17 @@ function NewTournamentPage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <AlertCircle className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-bold">Aucun crédit tournoi disponible</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Choisissez un plan pour démarrer votre tournoi en 30 secondes avec l'IA.
-        </p>
+        <h1 className="mt-5 font-display text-2xl font-bold">{t("newFromPass.noCreditTitle")}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{t("newFromPass.noCreditBody")}</p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <Button asChild className="h-11">
             <Link to="/tournaments/pricing">
               <Trophy className="h-4 w-4" />
-              Voir les plans
+              {t("newFromPass.viewPlans")}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/tournaments">Retour aux tournois</Link>
+            <Link to="/tournaments">{t("newFromPass.backToTournaments")}</Link>
           </Button>
         </div>
       </div>
@@ -163,11 +161,11 @@ function NewTournamentPage() {
           )}
         </div>
         <div>
-          <h1 className="font-display text-2xl font-bold">Nouveau tournoi</h1>
+          <h1 className="font-display text-2xl font-bold">{t("newFromPass.newTitle")}</h1>
           <p className="text-sm text-muted-foreground">
             {hasAnnual
-              ? "Pass Annuel actif — création illimitée"
-              : `${singlesLeft} crédit${singlesLeft > 1 ? "s" : ""} tournoi disponible${singlesLeft > 1 ? "s" : ""}`}
+              ? t("newFromPass.annualActive")
+              : t("newFromPass.creditsLeft", { count: singlesLeft })}
           </p>
         </div>
       </div>
@@ -261,7 +259,7 @@ function NewTournamentPage() {
 
         {!hasAnnual && (
           <div className="rounded-lg bg-muted/40 p-4 text-xs text-muted-foreground">
-            Ce tournoi consommera 1 de vos crédits.
+            {t("newFromPass.consumeOneCredit")}
           </div>
         )}
 

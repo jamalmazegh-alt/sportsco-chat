@@ -60,7 +60,9 @@
       "title": "Absences calendar",
       "pickPlayer": "Player concerned",
       "noPlayers": "No players in this team.",
-      "legend": "Legend"
+      "legend": "Legend",
+      "prevMonth": "Mês anterior",
+      "nextMonth": "Mês seguinte"
     }
   },
   "discipline": {
@@ -146,7 +148,8 @@
     "reason_accumulated_yellow_cards": "Suspensão por amarelos",
     "reason_federation_sanction": "Sanção da federação",
     "reason_club_sanction": "Sanção do Clube",
-    "reason_other": "Outro"
+    "reason_other": "Outro",
+    "selectTeam": "Seleciona uma equipa"
   },
   "suspensions": {
     "suspendedShort": "Suspenso",
@@ -667,7 +670,9 @@
     "staffWallHint": "Private space for the team's educators and leaders. Not visible to players or parents.",
     "myProfile": "My profile",
     "myTeammates": "My teammates",
-    "staffWallForbidden": "This space is reserved for the team's educators and leaders."
+    "staffWallForbidden": "This space is reserved for the team's educators and leaders.",
+    "notFound": "Equipa não encontrada",
+    "backToTeam": "Voltar à equipa"
   },
   "championships": {
     "title": "Campeonatos",
@@ -1177,7 +1182,9 @@
     "responsesClosedPast": "Responses can no longer be edited for this past event.",
     "lastSendHint": "Last call-up sent",
     "response": "Response",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "toConfirm": "A confirmar",
+    "calledUp": "Convocado"
   },
   "stats": {
     "title": "Estatísticas",
@@ -1833,7 +1840,11 @@
     "storeManagedElsewhere": {
       "title": "Subscrição gerida na web",
       "body": "Devido às regras das lojas de aplicações, a subscrição Clubero é adquirida e gerida a partir de um navegador, no site Clubero. O seu estado e as suas faturas continuam visíveis aqui."
-    }
+    },
+    "updateCardTitle": "Alterar cartão bancário",
+    "updateCardDescription": "O teu novo cartão substituirá o atual nas próximas cobranças.",
+    "errorCardSetup": "Não foi possível preparar a atualização",
+    "errorSaveCard": "Erro ao guardar o cartão"
   },
   "feedback": {
     "coachTab": "Feedback do Treinador",
@@ -1985,7 +1996,8 @@
       "empty": "Primeiro, coloca os jogadores em campo ou no banco.",
       "title": "Criar convocatória a partir deste onze inicial"
     },
-    "noPlayersForConvoc": "Primeiro, adiciona jogadores ao onze inicial."
+    "noPlayersForConvoc": "Primeiro, adiciona jogadores ao onze inicial.",
+    "shareUnavailable": "Equipa titular indisponível"
   },
   "permissions": {
     "clubRoles": "Club roles",
@@ -2329,7 +2341,9 @@
     "needsTitle": "Pedidos de boleia",
     "cancelNeed": "Retirar o meu pedido",
     "noNeeds": "Sem pedidos de boleia.",
-    "notifyFailed": "Pedido guardado, mas o e-mail para a equipa não pôde ser enviado."
+    "notifyFailed": "Pedido guardado, mas o e-mail para a equipa não pôde ser enviado.",
+    "alreadyBookedElsewhere": "Já reservaste um lugar noutro veículo para este evento.",
+    "driverCannotBookOwn": "És o condutor deste veículo."
   },
   "journey": {
     "tab": {
@@ -2696,7 +2710,9 @@
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
       "empty": "No matching people found."
-    }
+    },
+    "homeSubtitle": "Jogamos em casa",
+    "awaySubtitle": "Jogamos fora"
   },
   "urgency": {
     "empty": {
@@ -3849,5 +3865,22 @@
     "submit": "Criar o meu perfil",
     "parentalRequired": "Um pai deve aprovar o perfil público.",
     "successToast": "Perfil criado!"
+  },
+  "destructiveConfirm": {
+    "typeToUnlock": "Escreve {{word}} para desbloquear"
+  },
+  "unsupportedWebview": {
+    "title": "Atualização necessária",
+    "body": "O Clubero precisa de uma versão mais recente do componente Android System WebView para ser apresentado corretamente.",
+    "versionDetected": "Versão detetada: {{version}}. Versão mínima: {{min}}.",
+    "versionMinOnly": "Versão mínima necessária: {{min}}.",
+    "freeUpdate": "É uma atualização gratuita — não precisas de um telemóvel novo.",
+    "updateCta": "Atualizar Android System WebView",
+    "retryCta": "Já atualizei — tentar novamente",
+    "betaHint": "Se a atualização não for proposta, instala o Android System WebView Beta na Play Store e seleciona-o em Opções de programador → Implementação WebView."
+  },
+  "scoreStepper": {
+    "decrease": "Diminuir",
+    "increase": "Aumentar"
   }
 }

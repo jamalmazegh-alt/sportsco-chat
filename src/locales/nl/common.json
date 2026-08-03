@@ -60,7 +60,9 @@
       "title": "Absences calendar",
       "pickPlayer": "Player concerned",
       "noPlayers": "No players in this team.",
-      "legend": "Legend"
+      "legend": "Legend",
+      "prevMonth": "Vorige maand",
+      "nextMonth": "Volgende maand"
     }
   },
   "discipline": {
@@ -146,7 +148,8 @@
     "reason_accumulated_yellow_cards": "Gele kaarten",
     "reason_federation_sanction": "Bondsstraf",
     "reason_club_sanction": "Clubstraf",
-    "reason_other": "Overig"
+    "reason_other": "Overig",
+    "selectTeam": "Selecteer een team"
   },
   "suspensions": {
     "suspendedShort": "Geschorst",
@@ -667,7 +670,9 @@
     "staffWallHint": "Private space for the team's educators and leaders. Not visible to players or parents.",
     "myProfile": "My profile",
     "myTeammates": "My teammates",
-    "staffWallForbidden": "This space is reserved for the team's educators and leaders."
+    "staffWallForbidden": "This space is reserved for the team's educators and leaders.",
+    "notFound": "Team niet gevonden",
+    "backToTeam": "Terug naar team"
   },
   "championships": {
     "title": "Competities",
@@ -1177,7 +1182,9 @@
     "responsesClosedPast": "Responses can no longer be edited for this past event.",
     "lastSendHint": "Last call-up sent",
     "response": "Response",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "toConfirm": "Te bevestigen",
+    "calledUp": "Opgeroepen"
   },
   "stats": {
     "title": "Statistieken",
@@ -1833,7 +1840,11 @@
     "storeManagedElsewhere": {
       "title": "Abonnement beheerd op het web",
       "body": "Vanwege de regels van de appstores wordt het Clubero-abonnement afgesloten en beheerd via een browser, op de Clubero-website. Uw status en facturen blijven hier zichtbaar."
-    }
+    },
+    "updateCardTitle": "Bankkaart wijzigen",
+    "updateCardDescription": "Je nieuwe kaart vervangt de huidige voor toekomstige afschrijvingen.",
+    "errorCardSetup": "Kan de kaartupdate niet voorbereiden",
+    "errorSaveCard": "Fout bij het opslaan van de kaart"
   },
   "feedback": {
     "coachTab": "Coachfeedback",
@@ -1985,7 +1996,8 @@
       "empty": "Plaats eerst Spelers op het veld of de bank.",
       "title": "Selectie maken vanuit deze opstelling"
     },
-    "noPlayersForConvoc": "Voeg eerst Spelers toe aan de opstelling."
+    "noPlayersForConvoc": "Voeg eerst Spelers toe aan de opstelling.",
+    "shareUnavailable": "Opstelling niet beschikbaar"
   },
   "permissions": {
     "clubRoles": "Rollen in de Club",
@@ -2329,7 +2341,9 @@
     "needsTitle": "Vervoersaanvragen",
     "cancelNeed": "Mijn aanvraag intrekken",
     "noNeeds": "Geen vervoersaanvragen.",
-    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden."
+    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden.",
+    "alreadyBookedElsewhere": "Je hebt al een plaats gereserveerd in een ander voertuig voor dit evenement.",
+    "driverCannotBookOwn": "Jij bent de bestuurder van dit voertuig."
   },
   "journey": {
     "tab": {
@@ -2696,7 +2710,9 @@
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
       "empty": "No matching people found."
-    }
+    },
+    "homeSubtitle": "Thuiswedstrijd",
+    "awaySubtitle": "Uitwedstrijd"
   },
   "urgency": {
     "empty": {
@@ -3849,5 +3865,22 @@
     "submit": "Mijn profiel maken",
     "parentalRequired": "Een ouder moet het openbare profiel goedkeuren.",
     "successToast": "Profiel aangemaakt!"
+  },
+  "destructiveConfirm": {
+    "typeToUnlock": "Typ {{word}} om te ontgrendelen"
+  },
+  "unsupportedWebview": {
+    "title": "Update vereist",
+    "body": "Clubero heeft een nieuwere versie van de Android System WebView-component nodig om correct weer te geven.",
+    "versionDetected": "Gedetecteerde versie: {{version}}. Minimumversie: {{min}}.",
+    "versionMinOnly": "Minimaal vereiste versie: {{min}}.",
+    "freeUpdate": "Dit is een gratis update — je hebt geen nieuwe telefoon nodig.",
+    "updateCta": "Android System WebView bijwerken",
+    "retryCta": "Ik heb bijgewerkt — opnieuw proberen",
+    "betaHint": "Als de update niet wordt aangeboden, installeer Android System WebView Beta via de Play Store en selecteer die in Ontwikkelaarsopties → WebView-implementatie."
+  },
+  "scoreStepper": {
+    "decrease": "Verlagen",
+    "increase": "Verhogen"
   }
 }

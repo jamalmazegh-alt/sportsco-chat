@@ -110,7 +110,7 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
 
   async function onCreate() {
     if (!teamId) {
-      toast.error("Select a team");
+      toast.error(t("suspension.selectTeam"));
       return;
     }
     const { error } = await supabase.from("player_suspensions").insert({

@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, Loader2, Trophy, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import i18n from "@/lib/i18n";
@@ -18,10 +19,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/pricing/succes
   head: () => ({
     meta: [
       {
-        title: i18n.t("pricing.successTitle", {
-          ns: "tournaments",
-          defaultValue: "Paiement confirmé",
-        }),
+        title: i18n.t("pricing.successTitle", { ns: "tournaments" }),
       },
       { name: "robots", content: "noindex" },
     ],
@@ -29,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/pricing/succes
 });
 
 function PricingSuccessPage() {
+  const { t } = useTranslation("tournaments");
   const navigate = useNavigate();
   const { session_id } = Route.useSearch();
   const confirmFn = useServerFn(confirmEntitlementSession);
@@ -79,14 +78,14 @@ function PricingSuccessPage() {
         )}
       </div>
       <h1 className="mt-6 font-display text-2xl font-bold">
-        {paid || canCreate ? "Paiement confirmé" : "Confirmation en cours…"}
+        {paid || canCreate ? t("pricing.successTitle") : t("pricing.successPendingTitle")}
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
         {hasAnnual
-          ? "Votre Pass Annuel est actif. Créez autant de tournois que vous voulez."
+          ? t("pricing.successAnnualBody")
           : paid || canCreate
-            ? "Votre crédit tournoi est activé. Lancez votre tournoi !"
-            : "Nous validons votre paiement avec Stripe — cela prend quelques secondes."}
+            ? t("pricing.successSingleBody")
+            : t("pricing.successValidatingBody")}
       </p>
       <div className="mt-8 flex flex-col items-center gap-3">
         <Button
@@ -95,11 +94,11 @@ function PricingSuccessPage() {
           onClick={() => navigate({ to: "/tournaments/new-from-pass" })}
         >
           <Trophy className="h-4 w-4" />
-          Créer mon tournoi
+          {t("pricing.successCreateCta")}
           <ArrowRight className="h-4 w-4" />
         </Button>
         <Button asChild variant="ghost" size="sm">
-          <Link to="/tournaments">Voir mes tournois</Link>
+          <Link to="/tournaments">{t("pricing.successViewTournaments")}</Link>
         </Button>
       </div>
     </div>

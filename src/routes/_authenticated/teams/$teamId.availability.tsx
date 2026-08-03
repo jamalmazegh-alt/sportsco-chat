@@ -56,8 +56,13 @@ export const Route = createFileRoute("/_authenticated/teams/$teamId/availability
   }),
   errorComponent: ErrorBoundary,
 
-  notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
+  notFoundComponent: TeamNotFound,
 });
+
+function TeamNotFound() {
+  const { t } = useTranslation();
+  return <div className="p-6 text-sm">{t("teams.notFound")}</div>;
+}
 
 type Player = { id: string; first_name: string | null; last_name: string | null };
 type Row = {
@@ -196,7 +201,7 @@ function TeamAvailabilityCalendar() {
             variant="outline"
             size="icon"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
-            aria-label="Mois précédent"
+            aria-label={t("availability.calendar.prevMonth")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -207,7 +212,7 @@ function TeamAvailabilityCalendar() {
             variant="outline"
             size="icon"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
-            aria-label="Mois suivant"
+            aria-label={t("availability.calendar.nextMonth")}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

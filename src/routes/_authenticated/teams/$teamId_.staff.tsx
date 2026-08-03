@@ -90,10 +90,10 @@ function TeamStaffWallPage() {
     roles.has("assistant_coach");
 
   if (isLoading) {
-    return <div className="p-6 text-sm text-muted-foreground">Chargement…</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{t("common.loading")}</div>;
   }
   if (!team) {
-    return <div className="p-6 text-sm">Équipe introuvable</div>;
+    return <div className="p-6 text-sm">{t("teams.notFound")}</div>;
   }
   if (!isStaff) {
     return (
@@ -117,7 +117,7 @@ function TeamStaffWallPage() {
     <div className="p-4 space-y-4 max-w-3xl mx-auto">
       <div className="flex items-center gap-2">
         <Button asChild size="icon" variant="ghost">
-          <Link to="/teams/$teamId" params={{ teamId }} aria-label="Retour à l'équipe">
+          <Link to="/teams/$teamId" params={{ teamId }} aria-label={t("teams.backToTeam")}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

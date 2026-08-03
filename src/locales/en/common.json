@@ -60,7 +60,9 @@
       "title": "Absences calendar",
       "pickPlayer": "Player concerned",
       "noPlayers": "No players in this team.",
-      "legend": "Legend"
+      "legend": "Legend",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month"
     }
   },
   "discipline": {
@@ -146,7 +148,8 @@
     "reason_accumulated_yellow_cards": "Accumulated yellow cards",
     "reason_federation_sanction": "Federation sanction",
     "reason_club_sanction": "Club sanction",
-    "reason_other": "Other"
+    "reason_other": "Other",
+    "selectTeam": "Select a team"
   },
   "suspensions": {
     "suspendedShort": "Suspended",
@@ -667,7 +670,9 @@
     "staffWallHint": "Private space for the team's educators and leaders. Not visible to players or parents.",
     "myProfile": "My profile",
     "myTeammates": "My teammates",
-    "staffWallForbidden": "This space is reserved for the team's educators and leaders."
+    "staffWallForbidden": "This space is reserved for the team's educators and leaders.",
+    "notFound": "Team not found",
+    "backToTeam": "Back to team"
   },
   "championships": {
     "title": "Championships",
@@ -1177,7 +1182,9 @@
     "responsesClosedPast": "Responses can no longer be edited for this past event.",
     "lastSendHint": "Last call-up sent",
     "response": "Response",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "toConfirm": "To confirm",
+    "calledUp": "Called up"
   },
   "stats": {
     "title": "Stats",
@@ -1833,7 +1840,11 @@
     "storeManagedElsewhere": {
       "title": "Subscription managed on the web",
       "body": "Due to app store rules, the Clubero subscription is purchased and managed from a browser, on the Clubero website. Your status and invoices remain visible here."
-    }
+    },
+    "updateCardTitle": "Update bank card",
+    "updateCardDescription": "Your new card will replace the current one for future charges.",
+    "errorCardSetup": "Unable to prepare the card update",
+    "errorSaveCard": "Error saving the card"
   },
   "feedback": {
     "coachTab": "Coach feedback",
@@ -1985,7 +1996,8 @@
       "empty": "Place players on the pitch or bench first.",
       "title": "Create the call-up from this lineup"
     },
-    "noPlayersForConvoc": "Add players to the lineup first."
+    "noPlayersForConvoc": "Add players to the lineup first.",
+    "shareUnavailable": "Lineup not available"
   },
   "permissions": {
     "clubRoles": "Club roles",
@@ -2329,7 +2341,9 @@
     "needsTitle": "Ride requests",
     "cancelNeed": "Withdraw my request",
     "noNeeds": "No ride requests.",
-    "notifyFailed": "Request saved but the email to staff could not be sent."
+    "notifyFailed": "Request saved but the email to staff could not be sent.",
+    "alreadyBookedElsewhere": "You already booked a seat in another vehicle for this event.",
+    "driverCannotBookOwn": "You are the driver of this vehicle."
   },
   "journey": {
     "tab": {
@@ -2696,7 +2710,9 @@
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
       "empty": "No matching people found."
-    }
+    },
+    "homeSubtitle": "We're hosting",
+    "awaySubtitle": "We're away"
   },
   "urgency": {
     "empty": {
@@ -3849,5 +3865,22 @@
     "submit": "Create my profile",
     "parentalRequired": "A parent must approve the public profile.",
     "successToast": "Profile created!"
+  },
+  "destructiveConfirm": {
+    "typeToUnlock": "Type {{word}} to unlock"
+  },
+  "unsupportedWebview": {
+    "title": "Update required",
+    "body": "Clubero needs a newer version of the Android System WebView component to display correctly.",
+    "versionDetected": "Detected version: {{version}}. Minimum version: {{min}}.",
+    "versionMinOnly": "Minimum required version: {{min}}.",
+    "freeUpdate": "This is a free update — you don't need a new phone.",
+    "updateCta": "Update Android System WebView",
+    "retryCta": "I've updated — try again",
+    "betaHint": "If the update isn't offered, install Android System WebView Beta from the Play Store, then select it in Developer options → WebView implementation."
+  },
+  "scoreStepper": {
+    "decrease": "Decrease",
+    "increase": "Increase"
   }
 }
