@@ -220,6 +220,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
 
     const filtered: typeof targets = [];
     let skippedExisting = 0;
+    let skippedAccountExists = 0;
     for (const target of targets) {
       const email = normalizeEmail(target.email);
       const phone = normalizePhone(target.phone);
@@ -233,6 +234,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
         });
         if (existingAccount === true) {
           skippedExisting += 1;
+          skippedAccountExists += 1;
           continue;
         }
       }
@@ -240,7 +242,15 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     }
 
     if (filtered.length === 0) {
-      return { sent: 0, failed: 0, skipped: skippedExisting || 1, reason: "already_active" };
+      return {
+        sent: 0,
+        failed: 0,
+        skipped: skippedExisting || 1,
+        // Un compte Clubero existe déjà pour cette adresse : renvoyer une
+        // invitation ne sert à rien (et le formulaire d'inscription refuserait
+        // le nouveau mot de passe). On le dit explicitement.
+        reason: skippedAccountExists > 0 ? "account_exists" : "already_active",
+      };
     }
 
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
