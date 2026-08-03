@@ -51,6 +51,9 @@ test.describe("équipes", () => {
       .first()
       .click();
     await page.getByTestId("team-name-input").fill(teamName);
+    // La catégorie d'âge est obligatoire et n'a pas de valeur par défaut.
+    await page.getByTestId("age-group-select").click();
+    await page.getByRole("option", { name: "U11", exact: true }).click();
     await page.getByRole("button", { name: tx("common.create") }).click();
 
     await expect(page.getByText(teamName)).toBeVisible();
