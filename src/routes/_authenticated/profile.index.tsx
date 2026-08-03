@@ -98,6 +98,22 @@ function ProfilePage() {
     },
   });
 
+  const isPlayerOnly = role === "player";
+
+  // For players, the phone is managed on their player profile and mirrored here (read-only).
+  const { data: playerRecord } = useQuery({
+    queryKey: ["profile-player-phone", user?.id],
+    enabled: !!user && isPlayerOnly,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("players")
+        .select("phone")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const [phone, setPhone] = useState("");
   const [phoneBusy, setPhoneBusy] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -105,8 +121,12 @@ function ProfilePage() {
   const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
+    if (isPlayerOnly) {
+      setPhone(playerRecord?.phone ?? profile?.phone ?? "");
+      return;
+    }
     if (profile?.phone) setPhone(profile.phone);
-  }, [profile?.phone]);
+  }, [profile?.phone, playerRecord?.phone, isPlayerOnly]);
 
   useEffect(() => {
     setFirstName(profile?.first_name ?? "");
@@ -423,19 +443,27 @@ function ProfilePage() {
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <Label>{t("profile.phone")}</Label>
-        <PhoneInput value={phone} onChange={setPhone} />
-        <Button
-          type="button"
-          className="w-full h-11"
-          disabled={phoneBusy || phone === (profile?.phone ?? "")}
-          onClick={onSavePhone}
-        >
-          {phoneBusy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("common.save", { defaultValue: "Save" })
-          )}
-        </Button>
+        <PhoneInput value={phone} onChange={setPhone} disabled={isPlayerOnly} />
+        {isPlayerOnly ? (
+          <p className="text-xs text-muted-foreground">
+            {t("profile.phoneFromPlayer", {
+              defaultValue: "Ce numéro provient de ta fiche joueur.",
+            })}
+          </p>
+        ) : (
+          <Button
+            type="button"
+            className="w-full h-11"
+            disabled={phoneBusy || phone === (profile?.phone ?? "")}
+            onClick={onSavePhone}
+          >
+            {phoneBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("common.save", { defaultValue: "Save" })
+            )}
+          </Button>
+        )}
       </div>
 
       {isV2("social_network_v2") && (
