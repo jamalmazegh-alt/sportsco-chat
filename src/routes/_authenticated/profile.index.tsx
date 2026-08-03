@@ -466,7 +466,6 @@ function ProfilePage() {
         )}
       </div>
 
-
       {isV2("social_network_v2") && (
         <Link
           to="/following"
