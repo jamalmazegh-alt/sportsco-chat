@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Aucun match pendant ce créneau",
     "addFieldShort": "+ Ajouter un terrain",
     "fieldAddedToast": "Terrain {{name}} ajouté",
-    "regenFinalsConfirm": "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?"
+    "regenFinalsConfirm": "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?",
+    "drawLockedPublished": "Le tournoi est publié — la relance du tirage est verrouillée pour préserver le programme.",
+    "drawLockedStarted": "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats."
   },
   "draw": {
     "title": "Tirage au sort",

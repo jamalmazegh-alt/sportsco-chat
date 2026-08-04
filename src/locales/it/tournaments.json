@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Nessuna partita in questa fascia oraria",
     "addFieldShort": "+ Aggiungi campo",
     "fieldAddedToast": "Campo {{name}} aggiunto",
-    "regenFinalsConfirm": "La fase finale ha già dei risultati. La rigenerazione CANCELLERA' tutti questi risultati. Continuare?"
+    "regenFinalsConfirm": "La fase finale ha già dei risultati. La rigenerazione CANCELLERA' tutti questi risultati. Continuare?",
+    "drawLockedPublished": "Il torneo è pubblicato: il nuovo sorteggio è bloccato per preservare il calendario.",
+    "drawLockedStarted": "Il torneo è iniziato: il sorteggio è bloccato per preservare i risultati."
   },
   "draw": {
     "title": "Sorteggio",

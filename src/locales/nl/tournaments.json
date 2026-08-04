@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Geen wedstrijd in dit tijdslot",
     "addFieldShort": "+ Plaats toevoegen",
     "fieldAddedToast": "Plaats {{name}} toegevoegd",
-    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?"
+    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?",
+    "drawLockedPublished": "Het toernooi is gepubliceerd — opnieuw loten is vergrendeld om het schema te behouden.",
+    "drawLockedStarted": "Het toernooi is begonnen — de loting is vergrendeld om de resultaten te behouden."
   },
   "draw": {
     "title": "Loting",

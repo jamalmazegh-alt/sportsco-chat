@@ -53,7 +53,9 @@
     "pickRange": "Seleziona un periodo",
     "teamTable": {
       "title": "Assenze della squadra",
-      "empty": "Nessuna assenza imminente dichiarata in questa squadra."
+      "empty": "Nessuna assenza imminente dichiarata in questa squadra.",
+      "days_one": "{{count}} g",
+      "days_other": "{{count}} g"
     },
     "calendar": {
       "open": "Visualizza il calendario delle assenze",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} ha ricevuto una Squalifica di {{n}} partita.",
     "sanctionCreated_other": "{{name}} ha ricevuto una Squalifica di {{n}} partite.",
-    "absenceDeclared": "{{name}} sarà assente dal {{start}} al {{end}}. Motivo: {{reason}}"
+    "absenceDeclared": "{{name}} sarà assente dal {{start}} al {{end}}. Motivo: {{reason}}",
+    "declaredBy": "dichiarato da {{name}}"
   },
   "suspension": {
     "title": "Squalifica",
@@ -282,7 +285,8 @@
     "showPassword": "Mostra password",
     "hidePassword": "Nascondi password",
     "inviteExpired": "Questo invito è scaduto.",
-    "inviteUsed": "Questo invito è già stato utilizzato."
+    "inviteUsed": "Questo invito è già stato utilizzato.",
+    "invitedToTeam": "Iscrizione — {{team}}"
   },
   "common": {
     "save": "Salva",
@@ -342,7 +346,8 @@
     "copy": "Copia",
     "moreActions": "Altre azioni",
     "noResults": "Nessun risultato",
-    "added": "aggiunto"
+    "added": "aggiunto",
+    "home": "Home"
   },
   "notFound": {
     "code": "404",
@@ -847,7 +852,9 @@
       "errorRows": "riga/righe con errori",
       "row": "Riga",
       "another": "Nuova importazione",
-      "button": "Importa CSV"
+      "button": "Importa CSV",
+      "confirm_one": "Importa {{count}} giocatore",
+      "confirm_other": "Importa {{count}} giocatori"
     },
     "inviteAlreadyActive": "Account già attivo — non serve rinviare.",
     "parentActivationPending": "In attesa dell'attivazione dell'account genitore",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Campus",
     "hubCampsHint": "Crea, pubblica e gestisci i campi offerti dal tuo club",
     "emailLanguage": "Linguaggio della posta elettronica di comunicazione",
-    "emailLanguageHint": "Lingua utilizzata per le email inviate dal club ai destinatari che non hanno impostato una lingua preferita."
+    "emailLanguageHint": "Lingua utilizzata per le email inviate dal club ai destinatari che non hanno impostato una lingua preferita.",
+    "inviteCooldown": "Invito già inviato a {{email}}. Potrai rinviarlo tra {{seconds}} s.",
+    "inviteSentTo": "Invito inviato a {{email}}. Potrai rinviarlo tra 60 s."
   },
   "attachments": {
     "add": "Aggiungi file",

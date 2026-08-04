@@ -484,12 +484,11 @@ export function GroupsAndFixtures({
               {["in_progress", "completed"].includes(status) ||
               (status === "published" && hasExistingDraw) ? (
                 <p className="text-[11px] text-amber-600 dark:text-amber-400">
-                  {t("groups.drawLockedStarted", {
-                    defaultValue:
-                      status === "published"
-                        ? "Le tournoi est publié — la relance du tirage est verrouillée pour préserver le programme."
-                        : "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats.",
-                  })}
+                  {t(
+                    status === "published"
+                      ? "groups.drawLockedPublished"
+                      : "groups.drawLockedStarted",
+                  )}
                 </p>
               ) : (
                 <Button

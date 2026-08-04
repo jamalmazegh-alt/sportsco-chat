@@ -53,7 +53,9 @@
     "pickRange": "Selecteer een periode",
     "teamTable": {
       "title": "Afwezigheid van teams",
-      "empty": "Er zijn geen toekomstige afwezigheden gemeld in dit team."
+      "empty": "Er zijn geen toekomstige afwezigheden gemeld in dit team.",
+      "days_one": "{{count}} d",
+      "days_other": "{{count}} d"
     },
     "calendar": {
       "open": "Bekijk de afwezigheidskalender",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} heeft een schorsing van {{n}} wedstrijd gekregen.",
     "sanctionCreated_other": "{{name}} heeft een schorsing van {{n}} wedstrijden gekregen.",
-    "absenceDeclared": "{{name}} is afwezig van {{start}} tot {{end}}. Reden: {{reason}}"
+    "absenceDeclared": "{{name}} is afwezig van {{start}} tot {{end}}. Reden: {{reason}}",
+    "declaredBy": "gemeld door {{name}}"
   },
   "suspension": {
     "title": "Disciplinaire actie",
@@ -282,7 +285,8 @@
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "inviteExpired": "Deze uitnodiging is verlopen.",
-    "inviteUsed": "Deze uitnodiging is al gebruikt."
+    "inviteUsed": "Deze uitnodiging is al gebruikt.",
+    "invitedToTeam": "Registratie — {{team}}"
   },
   "common": {
     "save": "Opslaan",
@@ -342,7 +346,8 @@
     "copy": "Kopiëren",
     "moreActions": "Meer acties",
     "noResults": "Geen resultaten",
-    "added": "toegevoegd"
+    "added": "toegevoegd",
+    "home": "Home"
   },
   "notFound": {
     "code": "404",
@@ -847,7 +852,9 @@
       "errorRows": "rij(en) met fouten",
       "row": "Rij",
       "another": "Nieuwe import",
-      "button": "CSV-import"
+      "button": "CSV-import",
+      "confirm_one": "{{count}} speler importeren",
+      "confirm_other": "{{count}} spelers importeren"
     },
     "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig.",
     "parentActivationPending": "Wacht op activering van ouderaccount",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Kampen",
     "hubCampsHint": "Creëer, publiceer en beheer kampen die door uw club worden aangeboden",
     "emailLanguage": "Communicatie e-mailtaal",
-    "emailLanguageHint": "Taal die wordt gebruikt voor e-mails die door de club worden verzonden naar ontvangers die geen voorkeurstaal hebben ingesteld."
+    "emailLanguageHint": "Taal die wordt gebruikt voor e-mails die door de club worden verzonden naar ontvangers die geen voorkeurstaal hebben ingesteld.",
+    "inviteCooldown": "Uitnodiging al verzonden naar {{email}}. Je kunt over {{seconds}} s opnieuw verzenden.",
+    "inviteSentTo": "Uitnodiging verzonden naar {{email}}. Je kunt over 60 s opnieuw verzenden."
   },
   "attachments": {
     "add": "Bestand toevoegen",

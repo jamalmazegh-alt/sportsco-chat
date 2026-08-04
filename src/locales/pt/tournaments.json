@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Nenhum jogo neste período",
     "addFieldShort": "+ Adicionar campo",
     "fieldAddedToast": "Campo {{name}} adicionado",
-    "regenFinalsConfirm": "A fase final já tem resultados. A regeneração APAGARÁ todos esses resultados. Continuar?"
+    "regenFinalsConfirm": "A fase final já tem resultados. A regeneração APAGARÁ todos esses resultados. Continuar?",
+    "drawLockedPublished": "O torneio está publicado — voltar a sortear está bloqueado para preservar o calendário.",
+    "drawLockedStarted": "O torneio começou — o sorteio está bloqueado para preservar os resultados."
   },
   "draw": {
     "title": "Sorteio",

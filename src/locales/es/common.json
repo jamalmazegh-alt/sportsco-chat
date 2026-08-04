@@ -53,7 +53,9 @@
     "pickRange": "Seleccione un período",
     "teamTable": {
       "title": "Ausencias del equipo",
-      "empty": "No se han declarado ausencias próximas en este equipo."
+      "empty": "No se han declarado ausencias próximas en este equipo.",
+      "days_one": "{{count}} d",
+      "days_other": "{{count}} d"
     },
     "calendar": {
       "open": "Ver calendario de ausencias",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} ha recibido una sanción de {{n}} partido.",
     "sanctionCreated_other": "{{name}} ha recibido una sanción de {{n}} partidos.",
-    "absenceDeclared": "{{name}} estará ausente desde el {{start}} hasta el {{end}}. Motivo: {{reason}}"
+    "absenceDeclared": "{{name}} estará ausente desde el {{start}} hasta el {{end}}. Motivo: {{reason}}",
+    "declaredBy": "declarado por {{name}}"
   },
   "suspension": {
     "title": "Sanción",
@@ -282,7 +285,8 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "inviteExpired": "Esta invitación ha caducado.",
-    "inviteUsed": "Esta invitación ya ha sido utilizada."
+    "inviteUsed": "Esta invitación ya ha sido utilizada.",
+    "invitedToTeam": "Registro — {{team}}"
   },
   "common": {
     "save": "Guardar",
@@ -342,7 +346,8 @@
     "copy": "Copiar",
     "moreActions": "Más acciones",
     "noResults": "Sin resultados",
-    "added": "añadido"
+    "added": "añadido",
+    "home": "Inicio"
   },
   "notFound": {
     "code": "404",
@@ -847,7 +852,9 @@
       "errorRows": "fila(s) con error",
       "row": "Fila",
       "another": "Nueva importación",
-      "button": "Importar CSV"
+      "button": "Importar CSV",
+      "confirm_one": "Importar {{count}} jugador",
+      "confirm_other": "Importar {{count}} jugadores"
     },
     "inviteAlreadyActive": "Cuenta ya activa — no es necesario reenviar.",
     "parentActivationPending": "Esperando activación de la cuenta del padre/madre",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Campus",
     "hubCampsHint": "Crea, publica y gestiona los campamentos que ofrece tu club",
     "emailLanguage": "Idioma del correo electrónico de comunicación",
-    "emailLanguageHint": "Idioma utilizado para los correos electrónicos enviados por el club a destinatarios que no han establecido un idioma preferido."
+    "emailLanguageHint": "Idioma utilizado para los correos electrónicos enviados por el club a destinatarios que no han establecido un idioma preferido.",
+    "inviteCooldown": "Invitación ya enviada a {{email}}. Podrás reenviarla en {{seconds}} s.",
+    "inviteSentTo": "Invitación enviada a {{email}}. Podrás reenviarla en 60 s."
   },
   "attachments": {
     "add": "Añadir archivo",

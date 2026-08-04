@@ -53,7 +53,9 @@
     "pickRange": "Sélectionner une période",
     "teamTable": {
       "title": "Absences de l'équipe",
-      "empty": "Aucune absence déclarée à venir dans cette équipe."
+      "empty": "Aucune absence déclarée à venir dans cette équipe.",
+      "days_one": "{{count}} j",
+      "days_other": "{{count}} j"
     },
     "calendar": {
       "open": "Voir le calendrier des absences",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} a reçu une suspension de {{n}} match.",
     "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs.",
-    "absenceDeclared": "{{name}} sera absent(e) du {{start}} au {{end}}. Motif : {{reason}}"
+    "absenceDeclared": "{{name}} sera absent(e) du {{start}} au {{end}}. Motif : {{reason}}",
+    "declaredBy": "déclaré par {{name}}"
   },
   "suspension": {
     "title": "Discipline",
@@ -282,7 +285,8 @@
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "inviteExpired": "Cette invitation a expiré.",
-    "inviteUsed": "Cette invitation a déjà été utilisée."
+    "inviteUsed": "Cette invitation a déjà été utilisée.",
+    "invitedToTeam": "Inscription — {{team}}"
   },
   "common": {
     "save": "Enregistrer",
@@ -342,7 +346,8 @@
     "copy": "Copier",
     "moreActions": "Plus d'actions",
     "noResults": "Aucun résultat",
-    "added": "ajouté"
+    "added": "ajouté",
+    "home": "Accueil"
   },
   "notFound": {
     "code": "404",
@@ -848,7 +853,9 @@
       "errorRows": "ligne(s) en erreur",
       "row": "Ligne",
       "another": "Nouvel import",
-      "button": "Import CSV"
+      "button": "Import CSV",
+      "confirm_one": "Importer {{count}} joueur",
+      "confirm_other": "Importer {{count}} joueurs"
     },
     "inviteAlreadyActive": "Compte déjà actif — pas besoin de renvoyer.",
     "childConsentTitle": "Activer l'accès plateforme de {{name}} ?",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Stages",
     "hubCampsHint": "Créez, publiez et gérez les stages proposés par votre club",
     "emailLanguage": "Langue des emails de communication",
-    "emailLanguageHint": "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée."
+    "emailLanguageHint": "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée.",
+    "inviteCooldown": "Invitation déjà envoyée à {{email}}. Vous pourrez renvoyer dans {{seconds}} s.",
+    "inviteSentTo": "Invitation envoyée à {{email}}. Renvoi possible dans 60 s."
   },
   "attachments": {
     "add": "Ajouter un fichier",

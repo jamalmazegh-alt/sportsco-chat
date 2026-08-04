@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "No match during this slot",
     "addFieldShort": "+ Add a field",
     "fieldAddedToast": "Field {{name}} added",
-    "regenFinalsConfirm": "The finals phase already has results. Regenerating will ERASE all those results. Continue?"
+    "regenFinalsConfirm": "The finals phase already has results. Regenerating will ERASE all those results. Continue?",
+    "drawLockedPublished": "The tournament is published — redrawing is locked to preserve the schedule.",
+    "drawLockedStarted": "The tournament has started — the draw is locked to preserve results."
   },
   "draw": {
     "title": "Draw",

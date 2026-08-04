@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Kein Spiel in diesem Zeitfenster",
     "addFieldShort": "+ Platz hinzufügen",
     "fieldAddedToast": "Platz {{name}} hinzugefügt",
-    "regenFinalsConfirm": "Die Finalphase hat bereits Ergebnisse. Durch die Neugenerierung werden alle diese Ergebnisse gelöscht. Weitermachen?"
+    "regenFinalsConfirm": "Die Finalphase hat bereits Ergebnisse. Durch die Neugenerierung werden alle diese Ergebnisse gelöscht. Weitermachen?",
+    "drawLockedPublished": "Das Turnier ist veröffentlicht – die Neuauslosung ist gesperrt, um den Spielplan zu erhalten.",
+    "drawLockedStarted": "Das Turnier hat begonnen – die Auslosung ist gesperrt, um die Ergebnisse zu erhalten."
   },
   "draw": {
     "title": "Auslosung",

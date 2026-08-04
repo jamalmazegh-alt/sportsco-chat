@@ -53,7 +53,9 @@
     "pickRange": "Select a period",
     "teamTable": {
       "title": "Team absences",
-      "empty": "No upcoming absences declared in this team."
+      "empty": "No upcoming absences declared in this team.",
+      "days_one": "{{count}} d",
+      "days_other": "{{count}} d"
     },
     "calendar": {
       "open": "View absences calendar",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} received a {{n}}-match suspension.",
     "sanctionCreated_other": "{{name}} received a {{n}}-match suspension.",
-    "absenceDeclared": "{{name}} will be unavailable {{start}}–{{end}}. Reason: {{reason}}"
+    "absenceDeclared": "{{name}} will be unavailable {{start}}–{{end}}. Reason: {{reason}}",
+    "declaredBy": "declared by {{name}}"
   },
   "suspension": {
     "title": "Discipline",
@@ -282,7 +285,8 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "inviteExpired": "This invitation has expired.",
-    "inviteUsed": "This invitation has already been used."
+    "inviteUsed": "This invitation has already been used.",
+    "invitedToTeam": "Sign-up — {{team}}"
   },
   "common": {
     "save": "Save",
@@ -342,7 +346,8 @@
     "copy": "Copy",
     "moreActions": "More actions",
     "noResults": "No results",
-    "added": "added"
+    "added": "added",
+    "home": "Home"
   },
   "notFound": {
     "code": "404",
@@ -847,7 +852,9 @@
       "errorRows": "row(s) with errors",
       "row": "Row",
       "another": "New import",
-      "button": "CSV import"
+      "button": "CSV import",
+      "confirm_one": "Import {{count}} player",
+      "confirm_other": "Import {{count}} players"
     },
     "inviteAlreadyActive": "Account already active — no need to resend.",
     "parentActivationPending": "Waiting for parent account activation",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Camps",
     "hubCampsHint": "Create, publish and manage camps offered by your club",
     "emailLanguage": "Communication email language",
-    "emailLanguageHint": "Language used for emails sent by the club to recipients who have not set a preferred language."
+    "emailLanguageHint": "Language used for emails sent by the club to recipients who have not set a preferred language.",
+    "inviteCooldown": "Invitation already sent to {{email}}. You can resend in {{seconds}}s.",
+    "inviteSentTo": "Invitation sent to {{email}}. You can resend in 60s."
   },
   "attachments": {
     "add": "Add file",
