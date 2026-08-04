@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface TournamentProgrammePublishedProps {
@@ -55,7 +55,8 @@ const TournamentProgrammePublishedEmail = ({
   programmeUrl,
   locale,
 }: TournamentProgrammePublishedProps) => {
-  const lang = locale === "en" ? "en" : "fr";
+  const l = pickLocale(locale);
+  const lang = l === "en" ? "en" : "fr";
   const copy = COPY[lang];
   const team = teamName ?? (lang === "fr" ? "votre équipe" : "your team");
   const tournament = tournamentName ?? (lang === "fr" ? "le tournoi" : "the tournament");
@@ -63,7 +64,7 @@ const TournamentProgrammePublishedEmail = ({
   const hasFirstMatch = !!(firstMatchDate && firstMatchTime);
 
   return (
-    <EmailShell preview={`${copy.preview(tournament)}`} locale={"fr"}>
+    <EmailShell preview={`${copy.preview(tournament)}`} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"

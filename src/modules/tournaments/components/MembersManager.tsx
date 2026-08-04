@@ -147,6 +147,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             tournamentName: res.tournament_name ?? undefined,
             roleLabel,
             inviteUrl,
+            locale,
           },
         }).catch((err) => {
           console.error("tournament-member invite email failed", err);
@@ -241,6 +242,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             tournamentName: res.tournament_name ?? undefined,
             roleLabel,
             inviteUrl,
+            locale,
           },
         }).catch((err) => console.error("convert/invite email failed", err));
       }

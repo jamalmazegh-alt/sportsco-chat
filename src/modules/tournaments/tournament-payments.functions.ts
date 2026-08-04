@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { logPaymentEvent } from "./tournament-payment-events.server";
 
 const PAYMENT_MODES = ["online", "offline", "both"] as const;
@@ -409,7 +410,9 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
 
     const { data: t } = await supabaseAdmin
       .from("tournaments")
-      .select("id, name, slug, registration_fee, registration_currency, payment_mode, club_id")
+      .select(
+        "id, name, slug, registration_fee, registration_currency, payment_mode, club_id, clubs:club_id(default_language)",
+      )
       .eq("id", data.tournament_id)
       .single();
     if (!t || !t.registration_fee || t.registration_fee <= 0) {
@@ -437,6 +440,7 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
 
     const amountLabel = formatMoney(t.registration_fee, t.registration_currency ?? "eur");
     const sentAt = new Date().toISOString();
+    const paymentLocale = resolveEmailLocale((t as any).clubs?.default_language);
 
     if (data.channel === "email") {
       if (!reg.contact_email) {
@@ -452,6 +456,7 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
           amountLabel,
           paymentUrl: link!,
           expiresInDays: LINK_TTL_DAYS,
+          locale: paymentLocale,
         },
         idempotencyKey: `tournament-payment-${reg.id}-${Date.now()}`,
       });
@@ -528,7 +533,7 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
     }
     const { data: club } = await supabaseAdmin
       .from("clubs")
-      .select("stripe_account_id, stripe_charges_enabled")
+      .select("stripe_account_id, stripe_charges_enabled, default_language")
       .eq("id", t.club_id)
       .single();
     if (!club?.stripe_account_id || !club.stripe_charges_enabled) {
@@ -575,6 +580,9 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
 
     // Send the personalized payment-request email.
     const amountLabel = formatMoney(t.registration_fee, t.registration_currency ?? "eur");
+    const invitePayLocale = resolveEmailLocale(
+      (club as { default_language?: string | null }).default_language,
+    );
     try {
       const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
       await enqueueTransactionalEmailServer({
@@ -586,6 +594,7 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
           amountLabel,
           paymentUrl: link,
           expiresInDays: LINK_TTL_DAYS,
+          locale: invitePayLocale,
         },
         idempotencyKey: `tournament-invite-payment-${reg.id}`,
       });
@@ -777,6 +786,17 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
     )}`;
 
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+    let programmeLocale = "fr";
+    if (tournament.club_id) {
+      const { data: clubRow } = await supabaseAdmin
+        .from("clubs")
+        .select("default_language")
+        .eq("id", tournament.club_id)
+        .maybeSingle();
+      programmeLocale = resolveEmailLocale(
+        (clubRow as { default_language?: string | null } | null)?.default_language,
+      );
+    }
 
     let notified = 0;
     for (const reg of notifyRegs) {
@@ -800,7 +820,7 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
             firstMatchField: fm?.field ?? null,
             firstMatchOpponent: opponentName,
             programmeUrl,
-            locale: "fr",
+            locale: programmeLocale,
           },
           idempotencyKey: `tournament-programme-${data.tournament_id}-${reg.id}`,
         });

@@ -447,6 +447,7 @@ async function createInviteAndEmail(params: {
   clubId: string;
   clubName?: string;
   clubLogoUrl?: string;
+  clubDefaultLanguage?: string | null;
   teamId?: string | null;
   email: string;
   firstName: string;
@@ -487,6 +488,7 @@ async function createInviteAndEmail(params: {
   try {
     const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token)}`;
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+    const { resolveEmailLocale } = await import("@/lib/email/locale");
     const enqueued = await enqueueTransactionalEmailServer({
       templateName: "player-invite",
       recipientEmail: params.email,
@@ -498,6 +500,7 @@ async function createInviteAndEmail(params: {
         inviteUrl,
         roleLabel: params.roleLabel ?? params.role,
         playerName: params.playerName,
+        locale: resolveEmailLocale(params.clubDefaultLanguage),
       },
     });
     if (enqueued?.messageId) {
@@ -685,11 +688,13 @@ export const runImport = createServerFn({ method: "POST" })
     // Contexte club pour personnaliser les invitations email
     const { data: clubRow } = await supabaseAdmin
       .from("clubs")
-      .select("name, logo_url")
+      .select("name, logo_url, default_language")
       .eq("id", data.clubId)
       .maybeSingle();
     const clubName = clubRow?.name ?? undefined;
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
+    const clubDefaultLanguage =
+      (clubRow as { default_language?: string | null } | null)?.default_language ?? null;
 
     try {
       if (data.type === "players") {
@@ -1083,6 +1088,7 @@ export const runImport = createServerFn({ method: "POST" })
                 clubId: data.clubId,
                 clubName,
                 clubLogoUrl,
+                clubDefaultLanguage,
                 teamId,
                 email: r.email_contact,
                 firstName: titleCase(r.prenom_joueur!),
@@ -1175,6 +1181,7 @@ export const runImport = createServerFn({ method: "POST" })
                   clubId: data.clubId,
                   clubName,
                   clubLogoUrl,
+                  clubDefaultLanguage,
                   email,
                   firstName,
                   lastName,
@@ -1283,6 +1290,7 @@ export const runImport = createServerFn({ method: "POST" })
                     clubId: data.clubId,
                     clubName,
                     clubLogoUrl,
+                    clubDefaultLanguage,
                     teamId,
                     email,
                     firstName,
