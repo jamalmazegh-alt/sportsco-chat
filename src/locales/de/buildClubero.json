@@ -228,7 +228,7 @@
     "submit": "Konnte nicht gesendet werden. Prüfe deine Verbindung."
   },
   "admin": {
-    "title": "Build Clubero",
+    "title": "Clubero aufbauen",
     "subtitle": "Öffentliches Feedback von /build-clubero",
     "stats": {
       "sessions": "Sitzungen gestartet",

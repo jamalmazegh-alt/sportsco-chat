@@ -124,7 +124,7 @@
       "scale": {
         "1": "Un rompicapo",
         "2": "Faticoso",
-        "3": "Corretto",
+        "3": "Va bene",
         "4": "Abbastanza fluido",
         "5": "Un vero piacere"
       }
@@ -228,13 +228,13 @@
     "submit": "Impossibile inviare. Controlla la connessione."
   },
   "admin": {
-    "title": "Build Clubero",
+    "title": "Costruisci Clubero",
     "subtitle": "Feedback pubblico raccolto su /build-clubero",
     "stats": {
       "sessions": "Sessioni avviate",
       "completed": "Sessioni completate",
-      "newsletter": "Lead newsletter",
-      "beta": "Lead beta",
+      "newsletter": "Contatti newsletter",
+      "beta": "Contatti beta",
       "duration": "Durata media (min)"
     },
     "sections": {

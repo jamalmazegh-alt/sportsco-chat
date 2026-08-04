@@ -63,7 +63,7 @@
     "ctaButton": "Solicitar demo",
     "ctaPricing": "Ver precios",
     "ctaSeason": "Comienza tu temporada",
-    "heroLive": "Directo · 2-1",
+    "heroLive": "En directo · 2-1",
     "heroAttendance": "Asistencia",
     "heroDate": "Sábado · 14:30",
     "heroMatch": "Sub-13 — vs FC Riverside",
@@ -277,7 +277,7 @@
         "audParents": "Padres",
         "audJoueurs": "Jugadores",
         "mockTitle": "Tu club, conectado",
-        "mockLive": "En vivo",
+        "mockLive": "En directo",
         "mockBadge": "Todo el club. Una sola app.",
         "mockLine": "De la directiva al jugador, todos en el mismo sitio."
       },
@@ -563,7 +563,7 @@
     "monthlyAlt": "o",
     "ctaStart": "Iniciar prueba gratuita",
     "popular": "Más popular",
-    "enterpriseName": "Empresas",
+    "enterpriseName": "Empresa",
     "enterpriseSubtitle": "Para grandes organizaciones.",
     "enterprisePrice": "Personalizado",
     "enterpriseBody": "Precios personalizados según tus necesidades.",
@@ -606,7 +606,7 @@
     "shot1Body": "Vista consolidada de entrenamientos y partidos, por jugador y período.",
     "shot2Title": "Padre/Madre — Convocatoria",
     "shot2Body": "Respuesta con un clic, motivo opcional, calendario familiar unificado.",
-    "shot3Title": "Club — Panel de control",
+    "shot3Title": "Club — Panel",
     "shot3Body": "Múltiples equipos, miembros, comunicación centralizada.",
     "shot4Title": "Jugador — Página de inicio",
     "shot4Body": "Próximo evento, confirmación de asistencia, tablón del equipo.",
@@ -776,14 +776,14 @@
       "i3": "Red abierta entre clubes y jugadores"
     },
     "challenges": {
-      "kicker": "Challenges & leaderboards",
-      "title": "Challenges tailored to your sport",
-      "body": "A curated catalog of challenges per sport (football, handball, rugby, volleyball, tennis…), with the right units: counts, accuracy, cumulative totals or personal-best records. Coaches can also build their own. Players watch the leaderboard live, with a badge that highlights every brand-new record.",
-      "b1": "Sport-aware catalog — passes, shots, aces, tackles, controls…",
-      "b2": "Fast stepper input, cumulative score or personal best",
-      "b3": "Live leaderboard with podium and 'New record' badge",
-      "b4": "Custom challenges built by the coach in 30 seconds",
-      "cta": "Explore challenges"
+      "kicker": "Retos y clasificaciones",
+      "title": "Retos adaptados a tu deporte",
+      "body": "Un catálogo de retos por deporte (fútbol, balonmano, rugby, voleibol, tenis…), con las unidades adecuadas: conteos, precisión, totales acumulados o récords personales. Los entrenadores también pueden crear los suyos. Los jugadores ven la clasificación en directo, con una insignia que destaca cada nuevo récord.",
+      "b1": "Catálogo adaptado al deporte — pases, tiros, aces, placajes, controles…",
+      "b2": "Entrada rápida por pasos, puntuación acumulada o marca personal",
+      "b3": "Clasificación en directo con podio e insignia de “Nuevo récord”",
+      "b4": "Retos personalizados creados por el entrenador en 30 segundos",
+      "cta": "Explorar los retos"
     },
     "modules": {
       "coordination": {
@@ -2048,24 +2048,24 @@
       "img_alt": "Visión Clubero — club conectado y organizado"
     },
     "sponsors": {
-      "badge": "Patrocinadores y socios",
+      "badge": "Patrocinadores y colaboradores",
       "headline": "Que tus patrocinadores paguen tu suscripción",
       "body": "Un banner discreto en la parte superior del inicio destaca a tus socios ante todos los miembros. Impresiones y clics contados automáticamente, rotación gestionada por tus admins. Suficiente para cubrir Clubero — y a menudo más.",
       "tag": "Gracias a nuestro socio",
       "cta": "Descubrir"
     },
     "challenges": {
-      "badge": "Challenges & leaderboards",
-      "headline": "Turn every session into a friendly competition.",
-      "body": "Passing accuracy, shots on target, aces at serve… create challenges during your training sessions and matches, log scores live and watch a real-time leaderboard climb. Your players get hooked — and get better.",
-      "cta": "See the challenges",
-      "img_alt": "Animated Clubero challenge leaderboard with podium and medals",
-      "live": "Live",
-      "challenge_label": "Challenge",
-      "challenge_name": "Passing accuracy",
-      "players_count": "12 players",
-      "updated_now": "Updated just now",
-      "new_record": "★ New record",
+      "badge": "Retos y clasificaciones",
+      "headline": "Convierte cada sesión en una competición amistosa.",
+      "body": "Precisión de pase, tiros a puerta, aces al saque… crea retos durante tus entrenamientos y partidos, registra puntuaciones en directo y mira cómo sube la clasificación en tiempo real. Tus jugadores se enganchan — y mejoran.",
+      "cta": "Ver los retos",
+      "img_alt": "Clasificación animada de retos de Clubero con podio y medallas",
+      "live": "En directo",
+      "challenge_label": "Reto",
+      "challenge_name": "Precisión de pase",
+      "players_count": "12 jugadores",
+      "updated_now": "Actualizado ahora mismo",
+      "new_record": "★ Nuevo récord",
       "floating_badge": "🏆 +1 record"
     },
     "parentResources": {

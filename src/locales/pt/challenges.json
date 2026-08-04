@@ -60,96 +60,96 @@
       "description": "Tempo nos 20 m — vence o mais rápido."
     },
     "plankHold": {
-      "name": "Plank hold",
-      "description": "Hold a plank — best duration record."
+      "name": "Prancha",
+      "description": "Manter a prancha — registo da melhor duração."
     },
     "shuttleRun": {
-      "name": "Shuttle run",
-      "description": "Timed back-and-forth run — lowest time wins."
+      "name": "Corrida vai-e-vem",
+      "description": "Corrida cronometrada de ida e volta — ganha o menor tempo."
     },
     "slalomBall": {
-      "name": "Ball slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Slalom com bola",
+      "description": "Slalom cronometrado em drible — ganha o menor tempo."
     },
     "freeThrows": {
-      "name": "Free throws",
-      "description": "Free throws made out of a series — record."
+      "name": "Lances livres",
+      "description": "Lances livres convertidos numa série — registo."
     },
     "threePointShots": {
-      "name": "Three-point shots",
-      "description": "Three-point shots made out of a series — record."
+      "name": "Lançamentos de três pontos",
+      "description": "Lançamentos de três pontos convertidos numa série — registo."
     },
     "dribbleCourse": {
-      "name": "Dribble course",
-      "description": "Timed dribbling course — lowest time wins."
+      "name": "Percurso em drible",
+      "description": "Percurso cronometrado em drible — ganha o menor tempo."
     },
     "layupSeries": {
-      "name": "Layup series",
-      "description": "Layups made out of a series — record."
+      "name": "Série de lançamentos na passada",
+      "description": "Lançamentos na passada convertidos numa série — registo."
     },
     "handballDribbleSlalom": {
-      "name": "Dribble slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Slalom em drible",
+      "description": "Slalom cronometrado em drible — ganha o menor tempo."
     },
     "sprint40m": {
-      "name": "40 m sprint",
-      "description": "Time on 40 m — lowest wins."
+      "name": "Sprint de 40 m",
+      "description": "Tempo nos 40 m — ganha o menor."
     },
     "agilityRunRugby": {
-      "name": "Agility run",
-      "description": "Timed evasion course — lowest time wins."
+      "name": "Corrida de agilidade",
+      "description": "Percurso cronometrado de evasão — ganha o menor tempo."
     },
     "successfulPasses": {
-      "name": "Successful passes",
-      "description": "Longest streak of successful passes — record."
+      "name": "Passes certos",
+      "description": "Maior sequência de passes certos — registo."
     },
     "rallyConsistency": {
-      "name": "Rally consistency",
-      "description": "Longest error-free rally — record."
+      "name": "Consistência na troca de bolas",
+      "description": "Maior troca de bolas sem erro — registo."
     },
     "movementSpeed": {
-      "name": "Movement speed",
-      "description": "Timed movement course — lowest time wins."
+      "name": "Velocidade de deslocação",
+      "description": "Percurso cronometrado de deslocação — ganha o menor tempo."
     },
     "shotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Precisão de remate",
+      "description": "Remates em zonas-alvo — pontuação acumulada."
     },
     "handballShotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Precisão de remate",
+      "description": "Remates em zonas-alvo — pontuação acumulada."
     },
     "passingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Precisão de passe",
+      "description": "Passes feitos para alvos — pontuação acumulada."
     },
     "rugbyPassingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Precisão de passe",
+      "description": "Passes feitos para alvos — pontuação acumulada."
     },
     "pushPower": {
-      "name": "Scrum push power",
-      "description": "Measured pushing force — score."
+      "name": "Potência no empurrão da formação ordenada",
+      "description": "Força de empurrão medida — pontuação."
     },
     "serveAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Precisão do serviço",
+      "description": "Serviços colocados em zonas — pontuação acumulada."
     },
     "receptionControl": {
-      "name": "Reception control",
-      "description": "Reception quality rated by staff — score."
+      "name": "Controlo da receção",
+      "description": "Qualidade da receção avaliada pela equipa técnica — pontuação."
     },
     "attackAccuracy": {
-      "name": "Attack accuracy",
-      "description": "Attacks placed on zones — cumulative score."
+      "name": "Precisão do ataque",
+      "description": "Ataques colocados em zonas — pontuação acumulada."
     },
     "tennisServeAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Precisão do serviço",
+      "description": "Serviços colocados em zonas — pontuação acumulada."
     },
     "targetShots": {
-      "name": "Target shots",
-      "description": "Balls placed on targets — cumulative score."
+      "name": "Remates ao alvo",
+      "description": "Bolas colocadas nos alvos — pontuação acumulada."
     }
   },
   "list": {

@@ -53,7 +53,7 @@
       "flights": "Flights"
     },
     "sections": {
-      "live": "Ao vivo",
+      "live": "Em direto",
       "nowPlaying": "A decorrer",
       "upcoming": "Próximos jogos",
       "recent": "Resultados recentes",
@@ -112,7 +112,7 @@
     },
     "match": {
       "aet": "p.p.",
-      "pen": "CANETA"
+      "pen": "PEN"
     }
   },
   "register": {
@@ -205,7 +205,7 @@
     "accepted": "Convite aceite",
     "noAccountPrompt": "Para aceitar este convite, crie sua conta Clubero com o e-mail convidado ou faça login caso já possua uma.",
     "createAccount": "Criar minha conta",
-    "useExactEmail": "Use the email {{email}} so the invitation is recognized."
+    "useExactEmail": "Use o email {{email}} para que o convite seja reconhecido."
   },
   "passSuccess": {
     "metaTitle": "Passe de Torneio confirmado — Clubero",
@@ -312,7 +312,7 @@
     "empty": "Ainda não há convites.",
     "accepted": "Aceite",
     "pending": "Pendente",
-    "copyLink": "Link",
+    "copyLink": "Ligação",
     "remove": "Remover",
     "dialogTitle": "Convidar colaborador",
     "roleLabel": "Função",
@@ -498,8 +498,8 @@
     "title": "Jogadores · {{team}}",
     "import": {
       "empty": "Nenhum jogador detectado no arquivo.",
-      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
-      "ok": "{{n}} player(s) imported",
+      "blocked": "Importação bloqueada: {{total}} jogadores excedem o limite de {{max}}. Reduza o ficheiro ou escolha “Substituir”.",
+      "ok": "{{n}} jogador(es) importado(s)",
       "button": "Importar CSV",
       "title": "Importar jogadores",
       "desc": "Formato CSV: nome, sobrenome, número_camisa, posição, é_capitão. Separadores , ; ou guia aceita.",
@@ -546,9 +546,9 @@
     "metaTitle": "Composição da lista",
     "invalidTitle": "Link inválido",
     "invalidBody": "Este link da lista é inválido ou expirou.",
-    "tooMany": "Roster limited to {{max}} players.",
+    "tooMany": "Convocatória limitada a {{max}} jogadores.",
     "saved": "Lista salva",
-    "heading": "Roster — {{team}}",
+    "heading": "Convocatória — {{team}}",
     "logo": {
       "none": "Sem logotipo",
       "title": "Logotipo da equipe",
@@ -561,11 +561,11 @@
     },
     "pendingTitle": "Solicitação em análise",
     "pendingBody": "Depois que a organização aprovar seu registro, você poderá adicionar ou editar jogadores neste mesmo link.",
-    "playersLabelMax": "Players ({{count}} / {{max}})",
-    "remaining": "{{n}} spot(s) left",
+    "playersLabelMax": "Jogadores ({{count}} / {{max}})",
+    "remaining": "{{n}} vaga(s) restantes",
     "captain": "Capitão",
     "setCaptain": "Definir capitão",
-    "lastSaved": "Last saved: {{date}}",
+    "lastSaved": "Última gravação: {{date}}",
     "save": "Guardar"
   },
   "wizard": {
@@ -614,14 +614,14 @@
     "formatSwissDesc": "Emparelhamentos por classificação em cada ronda, número de rondas fixo",
     "swissRounds": "Número de rondas",
     "swissRoundsHint": "Recomendado: teto(log₂(equipas)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
-    "formatFlightedFinals": "Finais por Flights",
+    "formatFlightedFinals": "Finais por níveis",
     "formatFlightedFinalsDesc": "Fase de grupos seguida de várias chaves finais paralelas (Champions, Europa…)",
     "formatConsolation": "Consolação",
     "formatConsolationDesc": "Chave principal + chave de consolação para as equipas eliminadas cedo",
-    "stepEyebrow": "Step 1 / 4",
-    "stepEyebrow2": "Step 2 / 4",
-    "stepEyebrow3": "Step 3 / 4",
-    "stepEyebrow4": "Step 4 / 4"
+    "stepEyebrow": "Passo 1 / 4",
+    "stepEyebrow2": "Passo 2 / 4",
+    "stepEyebrow3": "Passo 3 / 4",
+    "stepEyebrow4": "Passo 4 / 4"
   },
   "groups": {
     "drawTitle": "Sorteio",
@@ -716,8 +716,8 @@
     "slotsGroups_one": "{{count}} grupo",
     "slotsGroups_other": "{{count}} grupos",
     "slotsKnockout": "{{count}} posições",
-    "byes_one": "{{count}} isento",
-    "byes_other": "{{count}} isentos",
+    "byes_one": "{{count}} folga",
+    "byes_other": "{{count}} folgas",
     "tabAuto": "Automático",
     "tabProgressive": "Progressivo",
     "tabManual": "Manual",
@@ -883,7 +883,7 @@
       "cancelled": "Cancelado"
     },
     "statusAria": "Estado do jogo",
-    "liveScore": "Resultado ao vivo",
+    "liveScore": "Resultado em direto",
     "fullEntry": "Entrada completa",
     "finishMatch": "Terminar jogo",
     "tbd": "A definir",
@@ -1166,13 +1166,13 @@
     "tabConfigure": "Configurar",
     "tabManage": "Gerir",
     "tabPlay": "Jogar",
-    "liveNow": "🔴 AO VIVO",
+    "liveNow": "🔴 EM DIRETO",
     "teamsRegistered": "{{count}} Equipas inscritas de {{total}}",
     "teamsRegisteredNoMax": "{{count}} Equipas inscritas",
     "beFirst": "Sê a primeira Equipa a inscrever-te!",
     "podium": "Pódio",
     "topScorer": "Melhor marcador",
-    "fairPlay": "Fair Play",
+    "fairPlay": "Fair play",
     "registrationConfirmed": "A sua inscrição está confirmada.",
     "programmeComingSoon": "O programa será publicado em breve.",
     "viewRules": "Ver regulamento",
@@ -1189,7 +1189,7 @@
     "rules": "Regulamento",
     "finalStandings": "Classificação final",
     "allResults": "Todos os resultados",
-    "registrationOpensAt": "Registration opens on {{date}}"
+    "registrationOpensAt": "As inscrições abrem em {{date}}"
   },
   "flights": {
     "title": "Flights / fases finais",
@@ -1218,7 +1218,7 @@
       "consolation": "Principal / Consolação"
     },
     "dist": {
-      "twoFlights": "2 Flights (topo + resto)",
+      "twoFlights": "2 níveis (topo + restantes)",
       "twoFlightsBalanced": "2 Flights equilibrados",
       "threeFlights": "3 Flights (elite + 2 níveis)",
       "threeEqual": "3 Flights iguais",
@@ -1238,7 +1238,7 @@
       "consolationDesc": "Cria 2 flights: Principal (vencedores de grupo) e Consolação (perdedores). Pronto a guardar."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Ainda não há níveis configurados.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1280,7 +1280,7 @@
     },
     "counters": {
       "done": "Terminados",
-      "live": "A decorrer",
+      "live": "Em direto",
       "upcoming": "Próximos"
     },
     "settings": {
@@ -1581,22 +1581,22 @@
     "phaseFinal": "Final"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
+    "generate": "Gerar um regulamento com IA",
     "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "modalDescription": "Pré-visualize e depois insira ou gere novamente.",
     "insert": "Insérer dans le règlement",
     "regenerate": "Regénérer",
     "close": "Fermer",
     "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "rateLimited": "Limite diário atingido. Aqui está um modelo de base.",
     "error": "Génération indisponible. Voici un modèle de base."
   },
   "coachInsightsAi": {
     "refresh": "Actualiser",
     "refreshing": "Actualisation…",
     "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refreshLimited": "Já atualizou hoje. Tente novamente amanhã.",
+    "refreshError": "Não é possível atualizar de momento."
   },
   "pricing": {
     "metaTitle": "Faturação de torneios — Clubero",
