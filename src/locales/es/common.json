@@ -391,7 +391,7 @@
     "joinClub": "Unirse con código",
     "steps": {
       "logo": {
-        "label": "Añadir logo del Club",
+        "label": "Añade el logo de tu club",
         "hint": "Personaliza la aplicación para tus Jugadores y Padres/Madres."
       },
       "team": {
@@ -1595,7 +1595,7 @@
   "mutes": {
     "action": "Ocultar a esta persona",
     "confirmTitle": "¿Ocultar el contenido de {{name}}?",
-    "confirmBody": "Ya no verás sus publicaciones, comentarios, reacciones ni mensajes. Las comunicaciones oficiales (convocatorias, eventos, notificaciones) seguirán visibles. Puedes mostrarla de nuevo en cualquier momento desde Perfil → Privacidad.",
+    "confirmBody": "Ya no verás sus publicaciones, comentarios, reacciones ni mensajes. Las comunicaciones oficiales (convocatorias, eventos, notificaciones) seguirán visibles. Puedes volver a mostrarlos en cualquier momento desde Perfil → Privacidad.",
     "confirm": "Ocultar",
     "muted": "El contenido de {{name}} está oculto.",
     "sectionTitle": "Personas ocultas",
@@ -3317,7 +3317,7 @@
       }
     },
     "hero": {
-      "kicker": "Construido por y para clubes de aficionados",
+      "kicker": "Hecha por y para clubes amateurs",
       "headline1": "Entendimos lo que necesitabas",
       "headline2": "para ahorrar tiempo",
       "headline3": "y centrarnos de nuevo en el deporte.",

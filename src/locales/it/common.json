@@ -391,7 +391,7 @@
     "joinClub": "Unisciti con un codice",
     "steps": {
       "logo": {
-        "label": "Aggiungi il logo del Club",
+        "label": "Aggiungi il logo del club",
         "hint": "Personalizza l'app per i tuoi Giocatori e Genitori."
       },
       "team": {
@@ -1595,7 +1595,7 @@
   "mutes": {
     "action": "Nascondi questa persona",
     "confirmTitle": "Nascondere i contenuti di {{name}}?",
-    "confirmBody": "Non vedrai più i loro post, commenti, reazioni e messaggi. Le comunicazioni ufficiali (convocazioni, eventi, notifiche) restano visibili. Puoi visualizzarli in qualsiasi momento da Profilo → Privacy.",
+    "confirmBody": "Non vedrai più i suoi post, commenti, reazioni e messaggi. Le comunicazioni ufficiali (convocazioni, eventi, notifiche) restano visibili. Puoi mostrarli di nuovo in qualsiasi momento da Profilo → Privacy.",
     "confirm": "Nascondi",
     "muted": "I contenuti di {{name}} sono ora nascosti.",
     "sectionTitle": "Persone nascoste",
@@ -3317,7 +3317,7 @@
       }
     },
     "hero": {
-      "kicker": "Costruito da e per club dilettantistici",
+      "kicker": "Pensata da e per i club dilettantistici",
       "headline1": "Abbiamo capito di cosa avevi bisogno",
       "headline2": "per risparmiare tempo",
       "headline3": "e concentrarsi nuovamente sullo sport.",

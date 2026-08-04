@@ -391,7 +391,7 @@
     "joinClub": "Aderir com código",
     "steps": {
       "logo": {
-        "label": "Adicionar logótipo do Clube",
+        "label": "Adicionar o logótipo do clube",
         "hint": "Personalize o aplicativo para seus jogadores e pais."
       },
       "team": {
@@ -1595,7 +1595,7 @@
   "mutes": {
     "action": "Ocultar esta pessoa",
     "confirmTitle": "Ocultar o conteúdo de {{name}}?",
-    "confirmBody": "Você não verá mais suas postagens, comentários, reações e mensagens. As comunicações oficiais (convocatórias, eventos, notificações) permanecem visíveis. Você pode exibi-los a qualquer momento em Perfil → Privacidade.",
+    "confirmBody": "Já não verá as publicações, comentários, reações e mensagens desta pessoa. As comunicações oficiais (convocatórias, eventos, notificações) mantêm-se visíveis. Pode voltar a mostrá-la a qualquer momento em Perfil → Privacidade.",
     "confirm": "Ocultar",
     "muted": "O conteúdo de {{name}} está agora oculto.",
     "sectionTitle": "Pessoas ocultas",
@@ -2293,10 +2293,10 @@
     "clubCreateFailed": "Não foi possível criar o Clube.",
     "membershipsUnavailable": "Não foi possível carregar os seus clubes. Verifique a ligação e tente novamente.",
     "notAllowed": "Você não tem permissão para executar esta ação.",
-    "invalidCredentials": "E-mail ou senha incorretos.",
+    "invalidCredentials": "E-mail ou palavra-passe incorretos.",
     "emailNotConfirmed": "Confirme seu e-mail antes de fazer login.",
     "emailAlreadyUsed": "Este endereço de e-mail já está em uso.",
-    "passwordTooShort": "A senha é muito curta.",
+    "passwordTooShort": "A palavra-passe é demasiado curta.",
     "rateLimited": "Muitas tentativas. Tente novamente em alguns instantes.",
     "duplicate": "Este item já existe.",
     "foreignKey": "Esses dados ainda são referenciados em outros lugares.",
@@ -4181,7 +4181,7 @@
       "disableAccount": "Desativar conta",
       "page": "Page {{page}}",
       "confirmAction": "{{label}} — tem certeza?",
-      "passwordResetEmail": "E-mail de redefinição de senha",
+      "passwordResetEmail": "E-mail de redefinição de palavra-passe",
       "onboardingEmailResent": "Reenvio de e-mail de integração",
       "reactivateLabel": "Reativar",
       "disableLabel": "Desativar"

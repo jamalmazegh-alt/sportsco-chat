@@ -1,6 +1,6 @@
 {
   "availability": {
-    "title": "Verfügbarkeit",
+    "title": "Verfügbarkeiten",
     "declare": "Abwesenheit melden",
     "save": "Abwesenheit speichern",
     "cancel": "Abbrechen",
@@ -43,14 +43,14 @@
       "completed": "Abgeschlossen"
     },
     "errors": {
-      "missingPlayer": "Wählen Sie einen Spieler aus.",
+      "missingPlayer": "Wähle einen Spieler aus.",
       "invalidRange": "Ungültige Daten.",
       "overlap": "Für diese Termine ist bereits eine Abwesenheit gemeldet. Bearbeiten Sie stattdessen die vorhandene."
     },
     "updated": "Abwesenheit aktualisiert",
     "forPlayer": "Für welchen Spieler?",
     "dates": "Abwesenheitszeitraum",
-    "pickRange": "Wählen Sie einen Zeitraum aus",
+    "pickRange": "Wähle einen Zeitraum aus",
     "teamTable": {
       "title": "Abwesenheiten im Team",
       "empty": "In diesem Team wurden keine bevorstehenden Abwesenheiten gemeldet."
@@ -87,7 +87,7 @@
     "player": "Spieler",
     "searchPlayer": "Spieler suchen…",
     "noPlayer": "Kein Spieler",
-    "drawerHint": "Wählen Sie einen Spieler und eine Sanktion. Die vorhandene Geschäftslogik erledigt den Rest.",
+    "drawerHint": "Wähle einen Spieler und eine Sanktion. Die vorhandene Geschäftslogik erledigt den Rest.",
     "statusActive": "Aktiv",
     "col": {
       "player": "Spieler",
@@ -103,7 +103,7 @@
       "windowHint": "Letzte 12 Monate."
     },
     "errors": {
-      "missingSelection": "Wählen Sie einen Spieler und ein Team aus."
+      "missingSelection": "Wähle einen Spieler und ein Team aus."
     }
   },
   "unavailable": {
@@ -391,15 +391,15 @@
     "joinClub": "Mit Code beitreten",
     "steps": {
       "logo": {
-        "label": "Fügen Sie Ihr Vereinslogo hinzu",
-        "hint": "Personalisieren Sie die App für Ihre Spieler und Eltern."
+        "label": "Vereinslogo hinzufügen",
+        "hint": "Personalisiere die App für eure Spieler und Eltern."
       },
       "team": {
         "label": "Erstes Team erstellen",
         "hint": "U13, Senioren… gib ihm einen Namen und eine Kategorie."
       },
       "players": {
-        "label": "Fügen Sie Ihre Spieler hinzu",
+        "label": "Spieler hinzufügen",
         "hint": "Erfasse den Kader mindestens eines Teams."
       },
       "invites": {
@@ -486,8 +486,8 @@
       "pendingResponses": "Ausstehende Antworten"
     },
     "campsCard": {
-      "title": "Trainingslager",
-      "createCta": "Erstelle ein Lager",
+      "title": "Camps",
+      "createCta": "Camp erstellen",
       "plural": "Lager",
       "singular": "Lager"
     }
@@ -663,7 +663,7 @@
     "row": {
       "noContact": "Kein Kontakt"
     },
-    "ageGroupRequired": "Wählen Sie eine Alterskategorie aus der Liste.",
+    "ageGroupRequired": "Wähle eine Alterskategorie aus der Liste.",
     "player": "Spieler",
     "ageGroupLegacyHint": "Legacy-Wert – wählen Sie eine offizielle Kategorie (z. B. U7). Ein Bereich wie U6-U7 kann im Teamnamen verbleiben.",
     "staffWall": "Stabswand",
@@ -695,8 +695,8 @@
     "emptyActive": "Keine aktive Meisterschaft für dieses Team",
     "emptyAll": "Keine Meisterschaft konfiguriert",
     "noneActive": "Keine aktive Meisterschaft für dieses Team",
-    "ctaAddToTeam": "Fügen Sie diesem Team eine Meisterschaft hinzu",
-    "select": "Wählen Sie eine Meisterschaft aus",
+    "ctaAddToTeam": "Füge diesem Team eine Meisterschaft hinzu",
+    "select": "Wähle eine Meisterschaft aus",
     "historical": "Historische Meisterschaft",
     "notActive": "Diese Meisterschaft ist nicht mehr aktiv",
     "errors": {
@@ -893,10 +893,10 @@
       "reminder": "Erinnerung",
       "reminderHint": "Die Erinnerung enthält den Status der Spieler (anwesend, abwesend, ohne Antwort).",
       "reminderHintWithLineup": "Die Erinnerung enthält den Status der Spieler (anwesend, abwesend, ohne Antwort). Die Aufstellung wird auf dem Handy als Bild angehängt.",
-      "imageDownloadedAttach": "Bild heruntergeladen, Nachricht kopiert – hängen Sie das Bild in WhatsApp an",
-      "shareReady": "Teilen bereit – wählen Sie WhatsApp",
+      "imageDownloadedAttach": "Bild heruntergeladen, Nachricht kopiert — Bild in WhatsApp anhängen",
+      "shareReady": "Teilen bereit — WhatsApp wählen",
       "shareImageFailed": "Bild kann nicht geteilt werden",
-      "convocationsCreated": "Aufrufe erstellt – jetzt unten über WhatsApp teilen"
+      "convocationsCreated": "Aufgebote erstellt — jetzt unten über WhatsApp teilen"
     },
     "title": "Ereignisse",
     "create": "Neues Event",
@@ -990,7 +990,7 @@
       "createSeries": "Serie erstellen",
       "created": "{{count}} Einheiten erstellt",
       "noOccurrences": "Keine Einheit generiert",
-      "needsTitleAndTeam": "Wählen Sie ein Team und einen Namen, um die Serie zu konfigurieren.",
+      "needsTitleAndTeam": "Wähle ein Team und einen Namen, um die Serie zu konfigurieren.",
       "scopeTitle": "Diese Sitzung ist Teil einer Reihe",
       "scopeSingle": "Nur diese Sitzung",
       "scopeFuture": "Dieses und alle folgenden",
@@ -1039,7 +1039,7 @@
       "updatesBadge": "{{count}} Änd.",
       "lineupNotIncluded": "Nicht enthalten",
       "lineupPublished": "Veröffentlicht",
-      "buttonAll": "Aufruf erneut an alle Spieler senden"
+      "buttonAll": "Aufgebot erneut an alle Spieler senden"
     },
     "fields": {
       "title": "Titre",
@@ -1070,7 +1070,7 @@
       "downloading": "Wird erstellt…",
       "failed": "Erstellung fehlgeschlagen"
     },
-    "homeVenueRequired": "Wählen Sie einen Austragungsort für dieses Heimspiel.",
+    "homeVenueRequired": "Wähle einen Austragungsort für dieses Heimspiel.",
     "typeTraining": "Training",
     "typeMatch": "Match",
     "typeTournament": "Turnier",
@@ -1078,7 +1078,7 @@
     "typeOther": "Andere",
     "filters": "Filter",
     "filtersDescription": "Verfeinern Sie die Liste der angezeigten Ereignisse.",
-    "filterConvocations": "Aufrufe",
+    "filterConvocations": "Aufgebote",
     "convocAll": "Alle",
     "convocSent": "Gesendet",
     "convocNotSent": "Nicht gesendet",
@@ -1169,7 +1169,7 @@
     "forceResponseTitle": "Antwort erzwingen?",
     "forceResponseDesc": "{{name}} hat bereits {{current}} geantwortet. Möchtest du den Status wirklich auf {{next}} setzen?",
     "notSentYet": "Noch nicht gesendet",
-    "confirmSend": "Bestätigen Sie den Versand",
+    "confirmSend": "Versand bestätigen",
     "recipients": "Empfänger",
     "reviewBeforeSend": "Überprüfen Sie es vor dem Senden",
     "reviewBeforeSendHint": "Überprüfen Sie die Empfänger und Details – der Versand ist endgültig.",
@@ -1185,7 +1185,7 @@
     "responseHeader": "Antwort",
     "locked": "Gesperrt",
     "responsesClosedPast": "Antworten können für dieses vergangene Ereignis nicht mehr bearbeitet werden.",
-    "lastSendHint": "Letzter Aufruf gesendet",
+    "lastSendHint": "Letztes Aufgebot gesendet",
     "response": "Antwort",
     "showLess": "Weniger anzeigen",
     "toConfirm": "Zu bestätigen",
@@ -1572,7 +1572,7 @@
       "saved": "Vereinsfarbe aktualisiert",
       "saveError": "Konnte nicht gespeichert werden",
       "title": "Erscheinungsbild",
-      "subtitle": "Wählen Sie die primäre App-Farbe. Es gilt überall, auch auf der Anmeldeseite.",
+      "subtitle": "Wähle die primäre App-Farbe. Es gilt überall, auch auf der Anmeldeseite.",
       "previewTitle": "Vorschau",
       "previewPrimary": "Primärtaste",
       "previewSecondary": "Sekundär"
@@ -1583,8 +1583,8 @@
     "hubSponsorsHint": "Zeige deine Partner ganz oben auf der Startseite",
     "hubVenues": "Veranstaltungsorte und Felder",
     "hubVenuesHint": "Clubseiten und -felder sind bei der Veranstaltungserstellung vorab ausgefüllt",
-    "hubCamps": "Trainingslager",
-    "hubCampsHint": "Erstellen, veröffentlichen und verwalten Sie die von Ihrem Club angebotenen Trainingslager",
+    "hubCamps": "Camps",
+    "hubCampsHint": "Erstelle, veröffentliche und verwalte die Camps deines Clubs",
     "emailLanguage": "Kommunikations-E-Mail-Sprache",
     "emailLanguageHint": "Sprache, die für E-Mails verwendet wird, die der Club an Empfänger sendet, die keine bevorzugte Sprache festgelegt haben."
   },
@@ -1600,7 +1600,7 @@
   "mutes": {
     "action": "Diese Person ausblenden",
     "confirmTitle": "Inhalte von {{name}} ausblenden?",
-    "confirmBody": "Ihre Beiträge, Kommentare, Reaktionen und Nachrichten werden Ihnen nicht mehr angezeigt. Offizielle Mitteilungen (Aufrufe, Veranstaltungen, Benachrichtigungen) bleiben sichtbar. Sie können sie jederzeit über Profil → Datenschutz wieder einblenden.",
+    "confirmBody": "Du siehst seine Beiträge, Kommentare, Reaktionen und Nachrichten nicht mehr. Offizielle Mitteilungen (Aufgebote, Ereignisse, Benachrichtigungen) bleiben sichtbar. Du kannst die Person jederzeit unter Profil → Datenschutz wieder einblenden.",
     "confirm": "Ausblenden",
     "muted": "Inhalte von {{name}} sind jetzt ausgeblendet.",
     "sectionTitle": "Ausgeblendete Personen",
@@ -1665,7 +1665,7 @@
       "sent": "Meldung an die Vereinsverantwortlichen gesendet.",
       "already": "Du hast diesen Inhalt bereits gemeldet.",
       "notFound": "Dieser Inhalt ist nicht mehr verfügbar.",
-      "detailsPlaceholder": "Details (optional)",
+      "detailsPlaceholder": "Angaben (optional)",
       "inappropriate": "Unangemessener Inhalt",
       "inappropriateHint": "Schockierende, gewalttätige oder unangebrachte Bemerkungen",
       "harassment": "Belästigung",
@@ -2274,7 +2274,7 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Wählen Sie die Push-Benachrichtigungen aus, die an Mitglieder Ihres Clubs gesendet werden."
+      "description": "Wähle die Push-Benachrichtigungen aus, die an Mitglieder Ihres Clubs gesendet werden."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
@@ -2299,7 +2299,7 @@
     "membershipsUnavailable": "Ihre Vereine konnten nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "notAllowed": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
     "invalidCredentials": "Falsche E-Mail-Adresse oder falsches Passwort.",
-    "emailNotConfirmed": "Bestätigen Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden.",
+    "emailNotConfirmed": "Bestätige deine E-Mail, bevor du dich anmeldest.",
     "emailAlreadyUsed": "Diese E-Mail-Adresse wird bereits verwendet.",
     "passwordTooShort": "Das Passwort ist zu kurz.",
     "rateLimited": "Zu viele Versuche, versuchen Sie es gleich noch einmal.",
@@ -2325,7 +2325,7 @@
     "publishDatesRequired": "Start- und Enddatum erforderlich.",
     "publishDatesOrder": "Das Enddatum muss nach dem Startdatum liegen.",
     "publishCapacityRequired": "Eine positive Kapazität ist erforderlich.",
-    "publishAgeGroupRequired": "Fügen Sie vor der Veröffentlichung mindestens eine Alterskategorie hinzu."
+    "publishAgeGroupRequired": "Füge vor der Veröffentlichung mindestens eine Alterskategorie hinzu."
   },
   "respond": {
     "eyebrow": "Einladung",
@@ -2562,7 +2562,7 @@
     ],
     "successTitle": "Zahlung bestätigt",
     "metaTitle": "Turnierabrechnung – Clubero",
-    "metaDesc": "Wählen Sie Ihren Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
+    "metaDesc": "Wähle Ihren Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
   },
   "eventCreateChooser": {
     "title": "Neue Veranstaltung",
@@ -2585,7 +2585,7 @@
     "draftPrompt": "Entwurf fortsetzen?",
     "abandonConfirm": "Assistent verlassen? Deine Antworten werden als Entwurf gespeichert.",
     "noTeams": "Kein Team verfügbar.",
-    "pickDate": "Wählen Sie ein Datum",
+    "pickDate": "Datum wählen",
     "locationPlaceholder": "Stadtstadion",
     "carpoolLabel": "Eltern bieten/buchen Sitzplätze",
     "readyTitle": "Alles bereit",
@@ -2658,7 +2658,7 @@
       "preview_other": "{{count}} Trainings erstellen",
       "dayOfWeek": "Wochentag",
       "time": "Uhrzeit",
-      "multiDay": "Über mehrere Tage (z.B. Trainingslager)"
+      "multiDay": "Über mehrere Tage (z. B. Camp)"
     },
     "meeting": {
       "stadium": "Übliches Stadion",
@@ -2670,7 +2670,7 @@
     },
     "convoc": {
       "all": "Ganzes Team",
-      "selection": "Wählen Sie Spieler aus",
+      "selection": "Wähle Spieler aus",
       "none": "Nicht jetzt",
       "allSubtitle": "Alle werden benachrichtigt",
       "selectionSubtitle": "Manuelle Auswahl",
@@ -2740,9 +2740,9 @@
     },
     "namePlaceholder": "Z.B. Wintercamp, Freizeitturnier…",
     "range": {
-      "dates": "Trainingslager-Termine",
+      "dates": "Camp-Termine",
       "pickEnd": "Enddatum",
-      "pickBoth": "Wählen Sie Start und Ende",
+      "pickBoth": "Wähle Start und Ende",
       "startTime": "Startzeit",
       "endTime": "Endzeit",
       "defaultsHint": "Standard 10:00 → 16:00. Passen Sie sich Ihrem Lager an.",
@@ -2825,7 +2825,7 @@
     "admin": {
       "title": "Sponsoren",
       "subtitle": "Zeige deine Partner ganz oben auf der Startseite.",
-      "add": "Fügen Sie einen Partner hinzu",
+      "add": "Füge einen Partner hinzu",
       "addTitle": "Neuer Partner",
       "editTitle": "Partner bearbeiten",
       "name": "Name",
@@ -2898,9 +2898,9 @@
     },
     "picker": {
       "siteLabel": "Standort",
-      "sitePlaceholder": "Wählen Sie eine Website aus",
+      "sitePlaceholder": "Wähle eine Website aus",
       "facilityLabel": "Platz / Anlage",
-      "facilityPlaceholder": "Wählen Sie ein Feld aus",
+      "facilityPlaceholder": "Wähle ein Feld aus",
       "noFacilitiesHint": "Kein Platz konfiguriert.",
       "noFacilityOption": "Kein Gericht"
     }
@@ -3000,9 +3000,9 @@
   "install": {
     "meta": {
       "title": "Clubero auf Ihrem Telefon installieren",
-      "description": "Installieren Sie Clubero mit einem Tipp auf iPhone oder Android und erhalten Sie Einberufungen, Erinnerungen und Echtzeit-Benachrichtigungen.",
+      "description": "Installiere Clubero mit einem Tipp auf iPhone oder Android und erhalte Einberufungen, Erinnerungen und Echtzeit-Benachrichtigungen.",
       "ogTitle": "Clubero auf Ihrem Telefon installieren",
-      "ogDescription": "Einberufungen, Anwesenheit und Erinnerungen in Echtzeit — installieren Sie Clubero auf Ihrem Startbildschirm."
+      "ogDescription": "Einberufungen, Anwesenheit und Erinnerungen in Echtzeit — installieren Sie Clubero auf deinem Startbildschirm."
     },
     "back": "Zurück",
     "title": "Clubero installieren",
@@ -3022,7 +3022,7 @@
     "platformAndroidDesc": "Chrome zeigt oft direkt eine Hinzufügen-Schaltfläche. Falls nicht, tippen Sie auf das ⋮-Menü oben rechts.",
     "platformCompareNote": "Egal welches Telefon: Sobald installiert, funktioniert Clubero wie eine normale App.",
     "alreadyInstalledTitle": "Bereits installiert?",
-    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf Ihrem Startbildschirm, um Benachrichtigungen zu aktivieren.",
+    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf deinem Startbildschirm, um Benachrichtigungen zu aktivieren.",
     "iosStepsTitle": "Auf iPhone / iPad (Safari)",
     "iosStepsSubtitle": "4 Schritte, um Clubero zum Home-Bildschirm hinzuzufügen",
     "iosStep1Before": "Tippen Sie auf die",
@@ -3039,8 +3039,8 @@
     "androidStepsTitle": "Auf Android (Chrome)",
     "androidStepsSubtitle": "3 Schritte zur Installation von Clubero",
     "androidStep1": "Öffnen Sie das Menü ⋮ oben rechts in Chrome.",
-    "androidStep2": "Wählen Sie „App installieren“ (oder „Zum Startbildschirm hinzufügen“).",
-    "androidStep3": "Bestätigen Sie: Das Clubero-Symbol erscheint auf Ihrem Startbildschirm.",
+    "androidStep2": "Wähle „App installieren“ (oder „Zum Startbildschirm hinzufügen“).",
+    "androidStep3": "Bestätige: Das Clubero-Symbol erscheint auf deinem Startbildschirm.",
     "ctaHint": "Auf Android startet dieser Button die Installation direkt. Auf dem iPhone folgen Sie den Safari-Schritten unten.",
     "bannerTitle": "Clubero installieren",
     "bannerDescIos": "App installieren, um Benachrichtigungen zu aktivieren",
@@ -3202,7 +3202,7 @@
       "notes": "Familiennotizen",
       "rejectTitle": "Diese Registrierung ablehnen?",
       "rejectHelp": "Der Grund wird der Familie in der Ablehnungs-E-Mail mitgeteilt. Seien Sie klar und freundlich.",
-      "rejectPlaceholder": "Z.B. Das Trainingslager ist für diese Altersgruppe voll.",
+      "rejectPlaceholder": "Z.B. Das Camps ist für diese Altersgruppe voll.",
       "confirmReject": "Ablehnen",
       "capacityFullTitle": "Lager voll",
       "capacityFullHelp": "Die Lagerkapazität ist erreicht. Möchten Sie diese Familie auf die Warteliste setzen?",
@@ -3239,7 +3239,7 @@
       "cancel": "Registrierung abbrechen",
       "emailsHint": "Automatische E-Mails an Familien werden im nächsten Schritt hinzugefügt (Phase 3, Schritt 3).",
       "paymentSection": "Zahlung",
-      "paymentNotRequired": "Für dieses Trainingslager ist keine Zahlung erforderlich.",
+      "paymentNotRequired": "Für dieses Camps ist keine Zahlung erforderlich.",
       "markPaid": "Als bezahlt markieren",
       "markUnpaid": "Als unbezahlt markieren",
       "markRefunded": "Als erstattet markieren",
@@ -3307,7 +3307,7 @@
       "title": "Online-Registrierungen sind deaktiviert",
       "body": "Auf der öffentlichen Seite erscheint keine Schaltfläche „Registrieren“. Aktivieren Sie Registrierungen, um Bewerbungen zu erhalten."
     },
-    "draftHint": "Anmeldungen erscheinen hier nach Veröffentlichung des Trainingslager."
+    "draftHint": "Anmeldungen erscheinen hier nach Veröffentlichung des Camps."
   },
   "features": {
     "learnMore": "Erfahren Sie mehr",
@@ -3322,7 +3322,7 @@
       }
     },
     "hero": {
-      "kicker": "Gebaut von und für Amateurvereine",
+      "kicker": "Von und für Amateurvereine gemacht",
       "headline1": "Wir haben verstanden, was Sie brauchten",
       "headline2": "um Zeit zu sparen",
       "headline3": "und mich wieder auf den Sport konzentrieren.",
@@ -3334,10 +3334,10 @@
       "trust3": "In Europa gehostete Daten"
     },
     "digit": {
-      "f1Title": "Aufrufe in 12 Sekunden",
+      "f1Title": "Aufgebote in 12 Sekunden",
       "f1Body": "Antworten senden, nachverfolgen und verfolgen. Ohne jedem einzeln eine SMS zu schreiben.",
       "f2Title": "Online-Zahlungen",
-      "f2Body": "Gebühren, Ausrüstung, Trainingslager. Stripe integriert, automatische Belege, Nachverfolgung inklusive.",
+      "f2Body": "Gebühren, Ausrüstung, Camps. Stripe integriert, automatische Belege, Nachverfolgung inklusive.",
       "f3Title": "Zentralisierte Kommunikation",
       "f3Body": "Clubwand, Event-Chat, mehrsprachige E-Mails. Keine überfüllten WhatsApp-Gruppen mehr.",
       "f4Title": "Statistiken und Spielerverfolgung",
@@ -3440,7 +3440,7 @@
       "button": "CSV importieren",
       "title": "Spieler importieren",
       "desc": "CSV-Format: Vorname, Nachname, Trikotnummer, Position, ist_Kapitän. Trennzeichen , ; oder Tab akzeptiert.",
-      "file": "Wählen Sie eine Datei",
+      "file": "Wähle eine Datei",
       "template": "Vorlage",
       "orPaste": "Oder fügen Sie CSV-Inhalte ein:",
       "append": "Zur Liste hinzufügen",
@@ -3472,8 +3472,8 @@
     "share": "Aktie"
   },
   "chooser": {
-    "title": "Neues Trainingslager",
-    "subtitle": "Wie möchtest du dieses Trainingslager gestalten?",
+    "title": "Neues Camps",
+    "subtitle": "Wie möchtest du dieses Camps gestalten?",
     "assistant": "Mit Assistent erstellen",
     "assistantHint": "Angeleitet, Schritt für Schritt",
     "classic": "Schnell erstellen",
@@ -3525,19 +3525,19 @@
       "places": "Flecken",
       "venueSet": "Veranstaltungsort festgelegt",
       "ageGroups": "Kategorien",
-      "next": "Das Trainingslager wird als Entwurf erstellt. Sie können vor der Veröffentlichung Beschreibung, Bild, Programm und Dokumente hinzufügen."
+      "next": "Das Camps wird als Entwurf erstellt. Sie können vor der Veröffentlichung Beschreibung, Bild, Programm und Dokumente hinzufügen."
     },
     "footerReady": "Alles ist bereit",
     "create": "Lager errichten",
     "next": "Weiter"
   },
   "list": {
-    "newTitle": "Neues Trainingslager",
+    "newTitle": "Neues Camps",
     "create": "Entwurf erstellen",
     "title": "Clubcamps",
-    "subtitle": "Erstellen und veröffentlichen Sie die von Ihrem Club angebotenen Trainingslager.",
-    "new": "Neues Trainingslager",
-    "empty": "Noch keine Trainingslager.",
+    "subtitle": "Erstellen und veröffentlichen Sie die von Ihrem Club angebotenen Camps.",
+    "new": "Neues Camps",
+    "empty": "Noch keine Camps.",
     "hasVenue": "Veranstaltungsort festgelegt",
     "active_only": "Aktiv",
     "show_all": "Alle anzeigen",
@@ -3558,7 +3558,7 @@
     "venueModeExternal": "Externe Adresse",
     "venueModeExternalHint": "Ein anderer Ort, außerhalb des Clubs",
     "venue": "Ort",
-    "venuePlaceholder": "Wählen Sie einen Veranstaltungsort",
+    "venuePlaceholder": "Wähle einen Veranstaltungsort",
     "venueNone": "— Keine —",
     "facility": "Gericht / Einrichtung",
     "facilityPlaceholder": "Optional",
@@ -3567,10 +3567,10 @@
     "externalAddressPlaceholder": "Z.B. 12 Stadium Street, 75001 Paris",
     "externalAddressHint": "Freiformadresse – wird den Registranten angezeigt und kann in Google Maps angeklickt werden.",
     "saved": "Änderungen gespeichert",
-    "sectionInfo": "Information",
+    "sectionInfo": "Informationen",
     "slug": "Slug (URL)",
     "slugLocked": "Der Slug ist nach der Veröffentlichung gesperrt.",
-    "slugHint": "Buchstaben, Zahlen und Bindestriche. Bearbeitbar, während das Trainingslager ein Entwurf ist.",
+    "slugHint": "Buchstaben, Zahlen und Bindestriche. Bearbeitbar, während das Camps ein Entwurf ist.",
     "description": "Description",
     "cover": "Titelbild",
     "currency": "Währung",
@@ -3580,7 +3580,7 @@
     "sectionVenue": "Ort",
     "sectionAgeGroups": "Alterskategorien",
     "sectionProgram": "Programm",
-    "sectionProgramHint": "Detaillierte Informationen zum Trainingslager-Zeitplan. Zum Neuordnen per Drag-and-Drop verschieben.",
+    "sectionProgramHint": "Detaillierte Informationen zum Camps-Zeitplan. Zum Neuordnen per Drag-and-Drop verschieben.",
     "sectionDocuments": "Zur Verfügung gestellte Dokumente",
     "sectionDocumentsHint": "Vom Club bereitgestellte Dokumente (Regeln, PDF-Zeitplan, Anfahrtsplan usw.). Akzeptierte Formate: PDF, JPG, PNG.",
     "sectionRequired": "Zur Verfügung zu stellende Dokumente",
@@ -3588,7 +3588,7 @@
     "save": "Speichern"
   },
   "ageGroups": {
-    "selectAll": "Wählen Sie die relevanten Kategorien aus",
+    "selectAll": "Wähle die relevanten Kategorien aus",
     "customs": "Benutzerdefinierte Kategorien",
     "labelPlaceholder": "Label (z. B. Freizeit)",
     "yearMin": "Min. Jahr",
@@ -3621,7 +3621,7 @@
     "startsAt": "Beginn",
     "endsAt": "Ende",
     "descPlaceholder": "Beschreibung (optional)",
-    "add": "Fügen Sie einen Artikel hinzu"
+    "add": "Füge einen Artikel hinzu"
   },
   "required": {
     "empty": "Es sind noch keine erforderlichen Dokumente definiert.",
@@ -3692,7 +3692,7 @@
       "empty": "Keine Gruppe generiert: Die Struktur qualifiziert nicht genügend Teams pro Flug. Passen Sie die Verteilung an, verwenden Sie eine Fallback-Vorlage (Trost/Medaillen) oder konfigurieren Sie Flüge manuell.",
       "error": "Generierung für diese Struktur unmöglich. Probieren Sie eine andere Vorlage oder den manuellen Modus aus.",
       "title": "Dieses Format ermöglicht keine automatische Generierung der 3 Flüge",
-      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wählen Sie eine Trost-/Medaillen-/Cup-Plate-Vorlage oder passen Sie die Flüge manuell an."
+      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wähle eine Trost-/Medaillen-/Cup-Plate-Vorlage oder passen Sie die Flüge manuell an."
     },
     "regenConfirm": "Bei den Finalspielen liegen bereits Ergebnisse vor. Durch die Neugenerierung von Klammern werden alle diese Ergebnisse gelöscht. Weitermachen?",
     "noGroups": "Erstellen Sie zuerst die Gruppenphase. Anschließend werden Flüge generiert.",
@@ -3988,7 +3988,7 @@
   },
   "adminNotifications": {
     "title": "Push-Benachrichtigungen",
-    "subtitle": "Wählen Sie die Benachrichtigungen für die Mobile-App. E-Mails sind davon nicht betroffen.",
+    "subtitle": "Wähle die Benachrichtigungen für die Mobile-App. E-Mails sind davon nicht betroffen.",
     "sectionConvocations": "Einberufungen",
     "sectionEvents": "Ereignisse",
     "sectionWall": "Vereinswand",

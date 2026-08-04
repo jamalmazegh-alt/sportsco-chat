@@ -896,7 +896,7 @@
       "imageDownloadedAttach": "Afbeelding gedownload, bericht gekopieerd — voeg de afbeelding toe in WhatsApp",
       "shareReady": "Klaar om te delen — kies WhatsApp",
       "shareImageFailed": "Afbeelding kan niet worden gedeeld",
-      "convocationsCreated": "Uitnodigingen gemaakt — deel nu via WhatsApp hieronder"
+      "convocationsCreated": "Oproepen aangemaakt — deel nu hieronder via WhatsApp"
     },
     "title": "Evenementen",
     "create": "Nieuw evenement",
@@ -1595,7 +1595,7 @@
   "mutes": {
     "action": "Deze persoon verbergen",
     "confirmTitle": "Inhoud van {{name}} verbergen?",
-    "confirmBody": "Je ziet hun posts, reacties, reacties en berichten niet meer. Officiële communicatie (oproepen, evenementen, meldingen) blijft zichtbaar. U kunt ze op elk gewenst moment zichtbaar maken via Profiel → Privacy.",
+    "confirmBody": "Je ziet hun posts, reacties, likes en berichten niet meer. Officiële communicatie (oproepen, evenementen, meldingen) blijft zichtbaar. Je kunt ze op elk moment weer tonen via Profiel → Privacy.",
     "confirm": "Verbergen",
     "muted": "Inhoud van {{name}} is nu verborgen.",
     "sectionTitle": "Verborgen personen",
