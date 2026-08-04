@@ -2480,6 +2480,14 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
         (inviter as any)?.preferred_language,
         (tournament as any)?.clubs?.default_language,
       );
+      const roleLabel =
+        data.role === "co_organizer"
+          ? locale === "en"
+            ? "co-organizer"
+            : "co-organisateur"
+          : locale === "en"
+            ? "referee"
+            : "arbitre";
       await enqueueTransactionalEmailServer({
         templateName: "tournament-invite",
         recipientEmail: email,
@@ -2487,7 +2495,7 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
         templateData: {
           displayName: data.display_name ?? null,
           tournamentName: (tournament as any)?.name ?? null,
-          roleLabel: data.role === "co_organizer" ? "co-organisateur" : "arbitre",
+          roleLabel,
           inviterName,
           inviteUrl: `${baseUrl}/tournament-invite/${row.invitation_token}`,
           locale,
