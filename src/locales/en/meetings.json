@@ -1,0 +1,46 @@
+{
+  "section": {
+    "title": "Meeting invitations",
+    "count": "{{count}} invitee(s)"
+  },
+  "empty": {
+    "staff": "No invitees — use “Manage invitees” to invite groups or people.",
+    "member": "You are not invited to this meeting."
+  },
+  "self": {
+    "prompt": "Your attendance:"
+  },
+  "source": {
+    "manual": "added manually"
+  },
+  "row": {
+    "actions": "Actions",
+    "resend": {
+      "cta": "Resend invitation",
+      "success": "Invitation resent"
+    },
+    "remove": {
+      "cta": "Cancel invitation",
+      "success": "Invitation cancelled",
+      "confirmTitle": "Cancel invitation?",
+      "confirmDesc": "{{name}} will be removed from the meeting and receive a removal notification.",
+      "confirmCta": "Remove"
+    }
+  },
+  "manage": {
+    "cta": "Manage invitees",
+    "title": "Who to invite?",
+    "desc": "Select groups, teams, or people. Each person is invited only once.",
+    "save": "Save",
+    "confirm": "Invite"
+  },
+  "sync": {
+    "success": "{{added}} added, {{removed}} removed"
+  },
+  "confirmRemove": {
+    "title": "Remove people who already replied?",
+    "desc": "These people have already replied or been marked present. Removing them will also delete their recorded reply and attendance. They stay invited until you confirm.",
+    "keep": "Keep them",
+    "confirm": "Remove anyway"
+  }
+}

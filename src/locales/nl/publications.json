@@ -171,7 +171,12 @@
     },
     "recipientsBreakdown": "({{players}} spelers · {{users}} gebruikers)",
     "none": "0 ontvangers",
-    "previewError": "Voorbeeld niet beschikbaar"
+    "previewError": "Voorbeeld niet beschikbaar",
+    "groupsBlock": "Aangepaste groepen",
+    "groupsHint": "Dwarsdoorsnijdende groepen gemaakt in clubbeheer",
+    "selectedTitle": "Geselecteerde ontvangers",
+    "teamsBlock": "Teams",
+    "teamsHint": "Kies spelers en/of ouders per team"
   },
   "form": {
     "titleLabel": "Title",

@@ -874,7 +874,9 @@
     "parentNotOnPlatform": "Aún no inscrito",
     "parentContactsHidden": "Datos de contacto confidenciales",
     "inviteWholeTeamHint": "Envía una invitación a cada jugador/padre sin cuenta. Las personas ya inscritas o ya invitadas se omiten.",
-    "inviteFailedLabel": "Envío fallido"
+    "inviteFailedLabel": "Envío fallido",
+    "inviteSuppressedSimple": "{{count}} invitación(es) bloqueada(s): la dirección está suprimida (rebote, spam o baja). Corrige el email o contacta con soporte.",
+    "photoUploadFailed": "Error al subir la foto: {{message}}"
   },
   "events": {
     "isOfficial": "Partido oficial",
@@ -1039,7 +1041,8 @@
       "updatesBadge": "{{count}} cambios",
       "lineupNotIncluded": "No incluida",
       "lineupPublished": "Publicada",
-      "buttonAll": "Reenviar convocatoria a todos los jugadores."
+      "buttonAll": "Reenviar convocatoria a todos los jugadores.",
+      "buttonWithChangesAll": "Reenviar a todos los jugadores ({{count}} actualización(es))"
     },
     "fields": {
       "title": "Título",
@@ -1106,7 +1109,8 @@
     "scheduleTitle": "Cronograma",
     "commCard": {
       "cancelledHint": "Enlace de cancelación",
-      "invitePlayersFirstTitle": "Invitar jugadores"
+      "invitePlayersFirstTitle": "Invitar jugadores",
+      "subtitle": "{{count}} jugadores convocados"
     },
     "scoreDisabledCancelled": "Evento cancelado: edición de datos de puntuación y partido deshabilitada."
   },
@@ -1736,14 +1740,16 @@
     "reactions": {
       "error": "Reacción imposible",
       "add": "Reaccionar",
-      "tapToRemove": "Toca para eliminar"
+      "tapToRemove": "Toca para eliminar",
+      "count": "{{count}} reacción(es)"
     },
     "postDeleted": "Publicación eliminada",
     "emptyHint": "Aún no hay anuncios. Los coaches y admins pueden publicar aquí.",
     "unpin": "Desfijar",
     "pin": "Fijar",
     "pinned": "Fijado",
-    "commentDeleted": "Comentario eliminado"
+    "commentDeleted": "Comentario eliminado",
+    "newPostTitle": "{{name}} ha publicado en el muro"
   },
   "chat": {
     "title": "Chat del evento",
@@ -1883,7 +1889,10 @@
     "updateCardTitle": "Cambiar la tarjeta bancaria",
     "updateCardDescription": "Tu nueva tarjeta reemplazará la actual para los próximos cargos.",
     "errorCardSetup": "No se pudo preparar la actualización",
-    "errorSaveCard": "Error al guardar la tarjeta"
+    "errorSaveCard": "Error al guardar la tarjeta",
+    "exemptTitle": "Acceso ofrecido",
+    "exemptBody": "Tu club tiene acceso gratuito a todas las funciones de Clubero.",
+    "exemptReason": "Motivo: {{reason}}"
   },
   "feedback": {
     "coachTab": "Feedback del Entrenador",
@@ -2064,7 +2073,8 @@
     "offlineAdded": "Agregado (sin cuenta)",
     "emailHint": "Déjelo vacío para agregarlo sin una cuenta. Puedes invitarlos más tarde.",
     "offline": "Sin cuenta",
-    "inviteOffline": "Invitar por correo electrónico"
+    "inviteOffline": "Invitar por correo electrónico",
+    "convertDesc": "Enviar una invitación por email a {{name}} para que pueda iniciar sesión y validar sus partidos."
   },
   "insights": {
     "title": "Estadísticas",
@@ -2535,7 +2545,35 @@
     "emptyDashboard": "Ninguna recaudación.",
     "menuTitle": "Recaudaciones",
     "menuHint": "Cuotas, licencias, equipamiento, desplazamientos",
-    "exportDownloaded": "Exportación CSV descargada"
+    "exportDownloaded": "Exportación CSV descargada",
+    "kpiCollected": "Cobrado",
+    "kpiNet": "Neto (comisiones deducidas)",
+    "kpiDue": "Total adeudado",
+    "kpiRate": "Tasa de cobro",
+    "kpiFees": "Comisiones: {{amount}}",
+    "kpiRemaining": "Quedan {{amount}}",
+    "kpiTxCount": "{{count}} transacciones",
+    "kpiObligations": "{{count}} obligaciones",
+    "emptyMethods": "Sin cobros.",
+    "emptyMonthly": "Sin datos.",
+    "tabTransactions": "Transacciones",
+    "netLabel": "Neto: {{amount}}",
+    "itemRollupLine": "{{total}} asignados • {{paid}} pagados • {{partial}} parciales • {{pending}} pendientes",
+    "form": {
+      "defaultProvider": "Método de pago por defecto",
+      "title": "Título",
+      "description": "Descripción (opcional)",
+      "descriptionPlaceholder": "Detalles o condiciones",
+      "amount": "Importe (EUR)",
+      "dueDate": "Vencimiento (opcional)",
+      "partial": "Pago parcial",
+      "partialAllowed": "Permitido",
+      "assignTo": "Asignar a",
+      "wholeClub": "Todo el club",
+      "teams": "Equipos",
+      "players": "Jugadores",
+      "noTeams": "Ningún equipo."
+    }
   },
   "tournamentToClub": {
     "title": "Gestiona tu club durante todo el año",
@@ -2748,11 +2786,13 @@
     "meetingPreview": {
       "loading": "Calculador…",
       "reviewOnSummary": "Vista previa detallada del paso final",
-      "notice": "Al crear la reunión, las invitaciones se enviarán automáticamente (notificación, push y correo electrónico) a las personas convocadas."
+      "notice": "Al crear la reunión, las invitaciones se enviarán automáticamente (notificación, push y correo electrónico) a las personas convocadas.",
+      "countShort": "{{count}} persona(s) seleccionada(s)"
     },
     "meetingSummary": {
       "subtitle": "Personas que recibirán la invitación.",
-      "empty": "No se encontraron personas coincidentes."
+      "empty": "No se encontraron personas coincidentes.",
+      "title": "Convocados · {{count}}"
     },
     "homeSubtitle": "Jugamos en casa",
     "awaySubtitle": "Jugamos fuera",
@@ -2801,7 +2841,8 @@
       "reducedSquadSubtitle_other": "{{count}} jugadores no disponibles en 14d",
       "staffUncovered": "Ningún entrenador disponible",
       "staffUncoveredTeam": "Ningún entrenador disponible — {{team}}",
-      "staffUncoveredFallback": "Evento"
+      "staffUncoveredFallback": "Evento",
+      "reducedSquadTitleTeam": "Plantilla reducida — {{team}}"
     },
     "self": {
       "convocationSilence": "No has respondido"
@@ -2898,7 +2939,8 @@
       "facilityPlaceholder": "Elige un campo",
       "noFacilitiesHint": "Sin campos configurados.",
       "noFacilityOption": "Sin corte"
-    }
+    },
+    "surfacePlaceholder": "Césped, sintético, parquet…"
   },
   "callUpList": {
     "masked": "Lista oculta",
@@ -3072,7 +3114,8 @@
   },
   "heatmap": {
     "title": "Mapa de asistencia",
-    "noEvent": "Ningún evento"
+    "noEvent": "Ningún evento",
+    "lastWeeks": "Últimas {{n}} semanas"
   },
   "eventType": {
     "match": "Match",
@@ -3150,10 +3193,7 @@
       "confirmed": "Confirmada",
       "tentative": "Posible"
     },
-    "visibility": {
-      "staff": "Staff del club",
-      "admins_only": "Solo admins"
-    },
+    "visibility": "Visibilidad",
     "commentHint": "El motivo y el comentario solo son visibles para los admins (o para todo el staff según la visibilidad elegida).",
     "title": "Mis indisponibilidades",
     "menuSubtitle": "Declara tus ausencias para todos tus equipos",
@@ -3183,7 +3223,8 @@
       "amountPaid": "Monto pagado",
       "requestedAt": "Fecha de solicitud",
       "hint": "Exporta registros visibles con los filtros actuales. No contiene documentos.",
-      "cta": "Exportar CSV"
+      "cta": "Exportar CSV",
+      "done": "Exportación CSV descargada ({{count}} filas)."
     },
     "detail": {
       "statusChanged": "Estado actualizado",
@@ -3239,7 +3280,13 @@
       "markUnpaid": "Marcar como no pagado",
       "markRefunded": "Marcar como reembolsado",
       "markPartialTitle": "Registrar un pago parcial",
-      "markPartial": "Marcar como parcial"
+      "markPartial": "Marcar como parcial",
+      "capacityLine": "Capacidad: {{approved}}/{{capacity}} confirmadas · {{remaining}} plazas restantes",
+      "createdAt": "Recibida el {{date}}",
+      "partialRemainingPreview": "Pendiente: {{amount}} {{currency}}",
+      "paymentReceived": "Recibido: {{amount}} {{currency}}",
+      "paymentRemaining": "Pendiente: {{amount}} {{currency}}",
+      "reservedUntil": "Plaza reservada hasta el {{date}}"
     },
     "dossier": {
       "complete": "Completo",
@@ -3255,7 +3302,8 @@
       "approved": "Validadas",
       "reserved": "Reservado (72h)",
       "remaining": "Lugares restantes",
-      "pending": "Solicitudes pendientes"
+      "pending": "Solicitudes pendientes",
+      "expiredHint": "{{count}} reserva(s) de 72 h caducada(s) — usa « Prolongar » para conservar la plaza."
     },
     "searchPlaceholder": "Buscar (nombre, correo electrónico…)",
     "filters": {
@@ -3302,7 +3350,8 @@
       "title": "Las inscripciones online están deshabilitadas",
       "body": "No aparece ningún botón \"Registrarse\" en la página pública. Habilitar registros para recibir solicitudes."
     },
-    "draftHint": "Las inscripciones aparecerán aquí una vez publicado el campamento."
+    "draftHint": "Las inscripciones aparecerán aquí una vez publicado el campamento.",
+    "docsSummary": "{{ok}}/{{total}} documentos"
   },
   "features": {
     "learnMore": "Más información",
@@ -3440,7 +3489,9 @@
       "orPaste": "O pegue el contenido CSV:",
       "append": "Agregar a la lista",
       "replace": "Reemplazar lista",
-      "confirm": "Importar"
+      "confirm": "Importar",
+      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige « Reemplazar ».",
+      "ok": "{{n}} jugador(es) importado(s)"
     },
     "logo": {
       "none": "Sin logotipo",
@@ -3457,7 +3508,8 @@
     "empty": "Aún no hay jugadores. Haga clic en Agregar o importar CSV.",
     "captain": "Capitán",
     "setCaptain": "Capitán del set",
-    "save": "Guardar"
+    "save": "Guardar",
+    "tooMany": "Plantilla limitada a {{max}} jugadores."
   },
   "finalStandings": {
     "title": "Clasificación final",
@@ -3524,7 +3576,8 @@
     },
     "footerReady": "todo esta listo",
     "create": "Crear campamento",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "footerProgress": "Paso {{current}} de {{total}}"
   },
   "list": {
     "newTitle": "Nuevo campus",
@@ -3653,7 +3706,9 @@
   "cockpit": {
     "alerts": {
       "heading": "Alertas",
-      "finalsNotGenerated": "Fase final no generada: la fase de grupos ha terminado"
+      "finalsNotGenerated": "Fase final no generada: la fase de grupos ha terminado",
+      "missingReferee": "Árbitro ausente (empieza en {{minutes}} min)",
+      "title": "{{count}} asunto por resolver"
     },
     "next": "Siguiente",
     "estimatedEnd": "Fin estimado"
@@ -3709,7 +3764,8 @@
       "clean": "Limpiar brackets",
       "customize": "Personalizar",
       "back": "Volver",
-      "save": "Guardar vuelos"
+      "save": "Guardar vuelos",
+      "distribution": "Reparto ({{n}} equipos)"
     },
     "rulesCount": "normas",
     "thirdPlace": "3er lugar",
@@ -3720,7 +3776,9 @@
     "public": {
       "empty": "Aún no se ha configurado ningún vuelo para este torneo.",
       "noMatches": "Los partidos para este vuelo se generarán después de la fase de grupos."
-    }
+    },
+    "draftRulesSummary": "{{n}} regla(s) de clasificación configurada(s)",
+    "generatedToast": "{{n}} partidos creados"
   },
   "matches": {
     "allMatches": "Todos los partidos",
@@ -4636,5 +4694,9 @@
     "bannerAs": "como {{name}} · {{club}} · {{persona}}",
     "userFallback": "usuario",
     "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Perfil no disponible",
+    "unavailableBody": "Este perfil de entrenador es privado o no existe."
   }
 }

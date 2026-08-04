@@ -171,7 +171,12 @@
     },
     "recipientsBreakdown": "({{players}} players · {{users}} users)",
     "none": "0 recipients",
-    "previewError": "Preview unavailable"
+    "previewError": "Preview unavailable",
+    "groupsBlock": "Custom groups",
+    "groupsHint": "Cross-cutting groups created in club admin",
+    "selectedTitle": "Selected recipients",
+    "teamsBlock": "Teams",
+    "teamsHint": "Choose players and/or parents per team"
   },
   "form": {
     "titleLabel": "Title",

@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Trophy, MapPin, GraduationCap, History, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
@@ -95,14 +96,15 @@ export const Route = createFileRoute("/coach/$slug")({
 
 function CoachPublicPage() {
   const { slug } = Route.useParams();
+  const { t } = useTranslation();
   const { data } = useSuspenseQuery(coachQuery(slug));
 
   if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Profil indisponible</h1>
-          <p className="mt-2 text-muted-foreground">Ce profil coach est privé ou n'existe pas.</p>
+          <h1 className="text-2xl font-bold">{t("coach.unavailableTitle")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("coach.unavailableBody")}</p>
         </div>
       </div>
     );

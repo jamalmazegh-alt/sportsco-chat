@@ -874,7 +874,9 @@
     "parentNotOnPlatform": "Not registered yet",
     "parentContactsHidden": "Confidential contact details",
     "inviteWholeTeamHint": "Send an invitation to each player/parent without an account. People already registered or already invited are skipped.",
-    "inviteFailedLabel": "Send failed"
+    "inviteFailedLabel": "Send failed",
+    "inviteSuppressedSimple": "{{count}} invitation(s) blocked: the address is suppressed (bounce, spam, or unsubscribe). Fix the email or contact support.",
+    "photoUploadFailed": "Photo upload failed: {{message}}"
   },
   "events": {
     "isOfficial": "Official match",
@@ -1039,7 +1041,8 @@
       "updatesBadge": "{{count}} update(s)",
       "lineupNotIncluded": "Not included",
       "lineupPublished": "Published",
-      "buttonAll": "Resend call-up to all players"
+      "buttonAll": "Resend call-up to all players",
+      "buttonWithChangesAll": "Resend to all players ({{count}} update(s))"
     },
     "fields": {
       "title": "Title",
@@ -1106,7 +1109,8 @@
     "scheduleTitle": "Schedule",
     "commCard": {
       "cancelledHint": "Cancellation link",
-      "invitePlayersFirstTitle": "Invite players"
+      "invitePlayersFirstTitle": "Invite players",
+      "subtitle": "{{count}} players called up"
     },
     "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled."
   },
@@ -1736,14 +1740,16 @@
     "reactions": {
       "error": "Unable to react",
       "add": "React",
-      "tapToRemove": "Tap to remove"
+      "tapToRemove": "Tap to remove",
+      "count": "{{count}} reaction(s)"
     },
     "postDeleted": "Post deleted",
     "emptyHint": "No announcements yet. Coaches and admins can publish here.",
     "unpin": "Unpin",
     "pin": "Pin",
     "pinned": "Pinned",
-    "commentDeleted": "Comment deleted"
+    "commentDeleted": "Comment deleted",
+    "newPostTitle": "{{name}} posted on the wall"
   },
   "chat": {
     "title": "Event chat",
@@ -1883,7 +1889,10 @@
     "updateCardTitle": "Update bank card",
     "updateCardDescription": "Your new card will replace the current one for future charges.",
     "errorCardSetup": "Unable to prepare the card update",
-    "errorSaveCard": "Error saving the card"
+    "errorSaveCard": "Error saving the card",
+    "exemptTitle": "Complimentary access",
+    "exemptBody": "Your club has free access to all Clubero features.",
+    "exemptReason": "Reason: {{reason}}"
   },
   "feedback": {
     "coachTab": "Coach feedback",
@@ -2064,7 +2073,8 @@
     "offlineAdded": "Added (no account)",
     "emailHint": "Leave empty to add without an account. You can invite them later.",
     "offline": "No account",
-    "inviteOffline": "Invite by email"
+    "inviteOffline": "Invite by email",
+    "convertDesc": "Send an email invitation to {{name}} so they can sign in and validate their matches."
   },
   "insights": {
     "title": "Insights",
@@ -2535,7 +2545,35 @@
     "emptyDashboard": "No payment collection.",
     "menuTitle": "Payment collections",
     "menuHint": "Memberships, licenses, gear, trips",
-    "exportDownloaded": "CSV export downloaded"
+    "exportDownloaded": "CSV export downloaded",
+    "kpiCollected": "Collected",
+    "kpiNet": "Net (fees deducted)",
+    "kpiDue": "Total due",
+    "kpiRate": "Collection rate",
+    "kpiFees": "Fees: {{amount}}",
+    "kpiRemaining": "{{amount}} left",
+    "kpiTxCount": "{{count}} transactions",
+    "kpiObligations": "{{count}} obligations",
+    "emptyMethods": "No collections yet.",
+    "emptyMonthly": "No data.",
+    "tabTransactions": "Transactions",
+    "netLabel": "Net: {{amount}}",
+    "itemRollupLine": "{{total}} targeted • {{paid}} paid • {{partial}} partial • {{pending}} pending",
+    "form": {
+      "defaultProvider": "Default payment method",
+      "title": "Title",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Details or terms",
+      "amount": "Amount (EUR)",
+      "dueDate": "Due date (optional)",
+      "partial": "Partial payment",
+      "partialAllowed": "Allowed",
+      "assignTo": "Assign to",
+      "wholeClub": "Whole club",
+      "teams": "Teams",
+      "players": "Players",
+      "noTeams": "No teams."
+    }
   },
   "tournamentToClub": {
     "title": "Manage your club all year long",
@@ -2748,11 +2786,13 @@
     "meetingPreview": {
       "loading": "Calculating…",
       "reviewOnSummary": "Detailed preview on the final step",
-      "notice": "When creating the meeting, invitations will be sent automatically (notification, push and email) to the people called up."
+      "notice": "When creating the meeting, invitations will be sent automatically (notification, push and email) to the people called up.",
+      "countShort": "{{count}} person(s) selected"
     },
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
-      "empty": "No matching people found."
+      "empty": "No matching people found.",
+      "title": "Invitees · {{count}}"
     },
     "homeSubtitle": "We're hosting",
     "awaySubtitle": "We're away",
@@ -2801,7 +2841,8 @@
       "reducedSquadSubtitle_other": "{{count}} players unavailable in 14d",
       "staffUncovered": "No coach available",
       "staffUncoveredTeam": "No coach available — {{team}}",
-      "staffUncoveredFallback": "Event"
+      "staffUncoveredFallback": "Event",
+      "reducedSquadTitleTeam": "Reduced squad — {{team}}"
     },
     "self": {
       "convocationSilence": "You haven't replied"
@@ -2898,7 +2939,8 @@
       "facilityPlaceholder": "Pick a field",
       "noFacilitiesHint": "No field configured for this site.",
       "noFacilityOption": "No court"
-    }
+    },
+    "surfacePlaceholder": "Grass, synthetic, parquet…"
   },
   "callUpList": {
     "masked": "List hidden",
@@ -3072,7 +3114,8 @@
   },
   "heatmap": {
     "title": "Attendance map",
-    "noEvent": "No event"
+    "noEvent": "No event",
+    "lastWeeks": "Last {{n}} weeks"
   },
   "eventType": {
     "match": "Match",
@@ -3150,10 +3193,7 @@
       "confirmed": "Confirmed",
       "tentative": "Possible"
     },
-    "visibility": {
-      "staff": "Club staff",
-      "admins_only": "Admins only"
-    },
+    "visibility": "Visibility",
     "commentHint": "The reason and comment are only visible to admins (or all staff depending on the chosen visibility).",
     "title": "My unavailabilities",
     "menuSubtitle": "Declare your absences for all your teams",
@@ -3183,7 +3223,8 @@
       "amountPaid": "Amount paid",
       "requestedAt": "Request date",
       "hint": "Exports registrations visible with current filters. Contains no documents.",
-      "cta": "Export CSV"
+      "cta": "Export CSV",
+      "done": "CSV export downloaded ({{count}} rows)."
     },
     "detail": {
       "statusChanged": "Status updated",
@@ -3239,7 +3280,13 @@
       "markUnpaid": "Mark as unpaid",
       "markRefunded": "Mark as refunded",
       "markPartialTitle": "Record a partial payment",
-      "markPartial": "Mark as partial"
+      "markPartial": "Mark as partial",
+      "capacityLine": "Capacity: {{approved}}/{{capacity}} confirmed · {{remaining}} spots left",
+      "createdAt": "Received on {{date}}",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "reservedUntil": "Spot reserved until {{date}}"
     },
     "dossier": {
       "complete": "Complete",
@@ -3255,7 +3302,8 @@
       "approved": "Approved",
       "reserved": "Reserved (72h)",
       "remaining": "Spots remaining",
-      "pending": "Pending requests"
+      "pending": "Pending requests",
+      "expiredHint": "{{count}} 72h reservation(s) expired — use “Extend” to keep the spot."
     },
     "searchPlaceholder": "Search (name, email…)",
     "filters": {
@@ -3302,7 +3350,8 @@
       "title": "Online registrations are disabled",
       "body": "No “Register” button appears on the public page. Enable registrations to receive applications."
     },
-    "draftHint": "Registrations will appear here after the camp is published."
+    "draftHint": "Registrations will appear here after the camp is published.",
+    "docsSummary": "{{ok}}/{{total}} documents"
   },
   "features": {
     "learnMore": "Learn more",
@@ -3440,7 +3489,9 @@
       "orPaste": "Or paste CSV content:",
       "append": "Add to roster",
       "replace": "Replace roster",
-      "confirm": "Import"
+      "confirm": "Import",
+      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
+      "ok": "{{n}} player(s) imported"
     },
     "logo": {
       "none": "No logo",
@@ -3457,7 +3508,8 @@
     "empty": "No players yet. Click Add or Import CSV.",
     "captain": "Captain",
     "setCaptain": "Set captain",
-    "save": "Save"
+    "save": "Save",
+    "tooMany": "Roster limited to {{max}} players."
   },
   "finalStandings": {
     "title": "Final standings",
@@ -3524,7 +3576,8 @@
     },
     "footerReady": "Everything is ready",
     "create": "Create camp",
-    "next": "Next"
+    "next": "Next",
+    "footerProgress": "Step {{current}} of {{total}}"
   },
   "list": {
     "newTitle": "New camp",
@@ -3653,7 +3706,9 @@
   "cockpit": {
     "alerts": {
       "heading": "Alerts",
-      "finalsNotGenerated": "Finals phase not generated — group stages are finished"
+      "finalsNotGenerated": "Finals phase not generated — group stages are finished",
+      "missingReferee": "Missing referee (starts in {{minutes}} min)",
+      "title": "{{count}} item to resolve"
     },
     "next": "Next",
     "estimatedEnd": "Estimated end"
@@ -3709,7 +3764,8 @@
       "clean": "Clean brackets",
       "customize": "Customize",
       "back": "Back",
-      "save": "Save Flights"
+      "save": "Save Flights",
+      "distribution": "Distribution ({{n}} teams)"
     },
     "rulesCount": "rules",
     "thirdPlace": "3rd place",
@@ -3720,7 +3776,9 @@
     "public": {
       "empty": "No flight has been configured for this tournament yet.",
       "noMatches": "Matches for this flight will be generated after the group stage."
-    }
+    },
+    "draftRulesSummary": "{{n}} qualification rule(s) configured",
+    "generatedToast": "{{n}} matches created"
   },
   "matches": {
     "allMatches": "All matches",
@@ -4636,5 +4694,9 @@
     "bannerAs": "as {{name}} · {{club}} · {{persona}}",
     "userFallback": "user",
     "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Profile unavailable",
+    "unavailableBody": "This coach profile is private or does not exist."
   }
 }

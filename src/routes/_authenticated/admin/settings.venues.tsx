@@ -532,7 +532,7 @@ function FacilityEditDialog({
             <Input
               value={draft.surface_type ?? ""}
               onChange={(e) => setDraft({ ...draft, surface_type: e.target.value || null })}
-              placeholder="Gazon, synthétique, parquet…"
+              placeholder={t("venues.surfacePlaceholder")}
             />
           </div>
           <div className="space-y-1.5">

@@ -171,7 +171,12 @@
     },
     "recipientsBreakdown": "({{players}} giocatori · {{users}} utenti)",
     "none": "0 destinatari",
-    "previewError": "Anteprima non disponibile"
+    "previewError": "Anteprima non disponibile",
+    "groupsBlock": "Gruppi personalizzati",
+    "groupsHint": "Gruppi trasversali creati nell'admin del club",
+    "selectedTitle": "Destinatari selezionati",
+    "teamsBlock": "Squadre",
+    "teamsHint": "Scegli giocatori e/o genitori per squadra"
   },
   "form": {
     "titleLabel": "Title",

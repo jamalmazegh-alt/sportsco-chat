@@ -1,0 +1,46 @@
+{
+  "section": {
+    "title": "Vergaderingsoproepen",
+    "count": "{{count}} opgeroepene(n)"
+  },
+  "empty": {
+    "staff": "Geen opgeroepenen — gebruik « Opgeroepenen beheren » om groepen of personen uit te nodigen.",
+    "member": "Je bent niet opgeroepen voor deze vergadering."
+  },
+  "self": {
+    "prompt": "Jouw aanwezigheid:"
+  },
+  "source": {
+    "manual": "handmatig toegevoegd"
+  },
+  "row": {
+    "actions": "Acties",
+    "resend": {
+      "cta": "Oproep opnieuw sturen",
+      "success": "Oproep opnieuw verzonden"
+    },
+    "remove": {
+      "cta": "Oproep annuleren",
+      "success": "Oproep geannuleerd",
+      "confirmTitle": "Oproep annuleren?",
+      "confirmDesc": "{{name}} wordt uit de vergadering verwijderd en ontvangt een melding.",
+      "confirmCta": "Verwijderen"
+    }
+  },
+  "manage": {
+    "cta": "Opgeroepenen beheren",
+    "title": "Wie oproepen?",
+    "desc": "Selecteer groepen, teams of personen. Elke persoon wordt maar één keer opgeroepen.",
+    "save": "Opslaan",
+    "confirm": "Oproepen"
+  },
+  "sync": {
+    "success": "{{added}} toegevoegd, {{removed}} verwijderd"
+  },
+  "confirmRemove": {
+    "title": "Personen verwijderen die al hebben geantwoord?",
+    "desc": "Deze personen hebben al geantwoord of zijn aangemeld. Verwijderen wist ook hun antwoord en aanwezigheid. Ze blijven opgeroepen tot je bevestigt.",
+    "keep": "Behouden",
+    "confirm": "Toch verwijderen"
+  }
+}

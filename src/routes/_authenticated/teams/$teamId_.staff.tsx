@@ -10,9 +10,11 @@ import { WallFeed } from "@/components/wall-feed";
 import { WallDocuments } from "@/components/wall-documents";
 import { scrollToWallPost } from "@/lib/wall/scroll-to-post";
 import { useAuth } from "@/lib/auth-context";
+import i18n from "@/lib/i18n";
 
 function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <div className="p-6 space-y-3">
       <p className="text-sm text-destructive">{String(error?.message ?? error)}</p>
@@ -23,7 +25,7 @@ function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
         }}
         size="sm"
       >
-        Réessayer
+        {t("common.retry", { defaultValue: "Réessayer" })}
       </Button>
     </div>
   );
@@ -49,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/teams/$teamId_/staff")({
     ],
   }),
   errorComponent: ErrorBoundary,
-  notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{i18n.t("teams.notFound")}</div>,
 });
 
 function TeamStaffWallPage() {

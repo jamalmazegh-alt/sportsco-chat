@@ -1,0 +1,46 @@
+{
+  "section": {
+    "title": "Convocations réunion",
+    "count": "{{count}} convoqué(s)"
+  },
+  "empty": {
+    "staff": "Aucun convoqué — utilisez « Gérer les convoqués » pour inviter des groupes ou des personnes.",
+    "member": "Vous n'êtes pas convoqué à cette réunion."
+  },
+  "self": {
+    "prompt": "Votre présence :"
+  },
+  "source": {
+    "manual": "ajouté manuellement"
+  },
+  "row": {
+    "actions": "Actions",
+    "resend": {
+      "cta": "Relancer la convocation",
+      "success": "Convocation renvoyée"
+    },
+    "remove": {
+      "cta": "Annuler la convocation",
+      "success": "Convocation annulée",
+      "confirmTitle": "Annuler la convocation ?",
+      "confirmDesc": "{{name}} sera retiré(e) de la réunion et recevra une notification de retrait.",
+      "confirmCta": "Retirer"
+    }
+  },
+  "manage": {
+    "cta": "Gérer les convoqués",
+    "title": "Qui convoquer ?",
+    "desc": "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
+    "save": "Enregistrer",
+    "confirm": "Convoquer"
+  },
+  "sync": {
+    "success": "{{added}} ajouté(s), {{removed}} retiré(s)"
+  },
+  "confirmRemove": {
+    "title": "Retirer des personnes ayant déjà répondu ?",
+    "desc": "Ces personnes ont déjà répondu ou été pointées. Les retirer supprimera aussi leur réponse et leur présence enregistrées. Elles restent convoquées tant que vous ne confirmez pas.",
+    "keep": "Les conserver",
+    "confirm": "Retirer quand même"
+  }
+}
