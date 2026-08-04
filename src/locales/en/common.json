@@ -339,7 +339,9 @@
     "invalidImage": "Unsupported image format",
     "copyFailed": "Unable to copy",
     "copy": "Copy",
-    "moreActions": "More actions"
+    "moreActions": "More actions",
+    "noResults": "No results",
+    "added": "added"
   },
   "notFound": {
     "code": "404",
@@ -882,7 +884,9 @@
     "inviteWholeTeamHint": "Send an invitation to each player/parent without an account. People already registered or already invited are skipped.",
     "inviteFailedLabel": "Send failed",
     "inviteSuppressedSimple": "{{count}} invitation(s) blocked: the address is suppressed (bounce, spam, or unsubscribe). Fix the email or contact support.",
-    "photoUploadFailed": "Photo upload failed: {{message}}"
+    "photoUploadFailed": "Photo upload failed: {{message}}",
+    "inviteFailedReason": "Reason: {{reason}}",
+    "inviteWholeTeam": "Invite ({{count}})"
   },
   "events": {
     "isOfficial": "Official match",
@@ -1194,7 +1198,9 @@
     "response": "Response",
     "showLess": "Show less",
     "toConfirm": "To confirm",
-    "calledUp": "Called up"
+    "calledUp": "Called up",
+    "pendingShort": "{{count}} pending",
+    "showAll": "Show all {{count}} players"
   },
   "stats": {
     "title": "Stats",
@@ -1737,7 +1743,8 @@
       "placeholder": "Private message to this team's staff…",
       "audienceLocked": "Visible only to team staff and club admins.",
       "badgeTitle": "Private message to team staff",
-      "badge": "Team staff"
+      "badge": "Team staff",
+      "badgeWithTeam": "Staff {{team}}"
     },
     "errorNoSession": "Your session has expired. Sign in again and retry.",
     "errorNotMember": "You're no longer a member of this club. Switch active club and retry.",
@@ -1755,7 +1762,9 @@
     "pin": "Pin",
     "pinned": "Pinned",
     "commentDeleted": "Comment deleted",
-    "newPostTitle": "{{name}} posted on the wall"
+    "newPostTitle": "{{name}} posted on the wall",
+    "viewOn": "View on {{network}}",
+    "readBy": "Read by {{n}}/{{total}}"
   },
   "chat": {
     "title": "Event chat",
@@ -2822,7 +2831,8 @@
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
       "empty": "No matching people found.",
-      "title": "Invitees · {{count}}"
+      "title": "Invitees · {{count}}",
+      "andOthers": "… and {{count}} more"
     },
     "homeSubtitle": "We're hosting",
     "awaySubtitle": "We're away",
@@ -3193,7 +3203,9 @@
       "title": "Availability conflict",
       "body": "This coach has a conflict on this slot. Continue?"
     },
-    "assignNow": "Assign a coach"
+    "assignNow": "Assign a coach",
+    "absentOn": "Away on {{d}}",
+    "absentRange": "Away from {{s}} to {{e}}"
   },
   "support": {
     "fab": "Support",
@@ -3233,7 +3245,10 @@
     "cancelled": "Unavailability deleted",
     "subtitle": "Periods when you won't be available to coach your teams.",
     "declareCta": "Declare unavailability",
-    "empty": "No upcoming unavailability declared."
+    "empty": "No upcoming unavailability declared.",
+    "certaintyLabel": "Certainty",
+    "visibilityStaff": "Club staff",
+    "visibilityAdminsOnly": "Admins only"
   },
   "registrations": {
     "csv": {

@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Referee"
+  },
+  "poolEditor": {
+    "openButton": "Edit groups manually",
+    "savedToast": "Groups updated",
+    "title": "Edit groups",
+    "subtitle": "Reassign teams before matches start. Fixtures will be regenerated.",
+    "locked": "Group matches have already started — editing is not possible.",
+    "teamsShort": "tms",
+    "empty": "No teams",
+    "save": "Save & regenerate"
   }
 }

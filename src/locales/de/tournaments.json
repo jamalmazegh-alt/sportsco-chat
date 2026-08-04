@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Schiedsrichter"
+  },
+  "poolEditor": {
+    "openButton": "Gruppen manuell bearbeiten",
+    "savedToast": "Gruppen aktualisiert",
+    "title": "Gruppen bearbeiten",
+    "subtitle": "Ordnen Sie die Teams vor Spielbeginn neu zu. Die Spielpaarungen werden neu erstellt.",
+    "locked": "Gruppenspiele haben bereits begonnen – Bearbeiten ist nicht möglich.",
+    "teamsShort": "Tms",
+    "empty": "Keine Teams",
+    "save": "Speichern & neu erstellen"
   }
 }

@@ -2095,5 +2095,32 @@
     "toDoCount": "3 da fare",
     "attendance": "Presenza",
     "u15Training": "Allenamento U15"
+  },
+  "publicPlayers": {
+    "eyebrow": "Elenco pubblico",
+    "title": "I giocatori Clubero",
+    "subtitle": "Sfoglia i profili pubblici condivisi dai giocatori: palmarès, percorso sportivo, club. Riservato ai giocatori maggiorenni che hanno attivato il profilo.",
+    "searchPlaceholder": "Nome del giocatore o del club…",
+    "allSports": "Tutti gli sport",
+    "allClubs": "Tutti i club",
+    "clubFilter": "Club",
+    "search": "Cerca",
+    "reset": "Reimposta",
+    "loading": "Caricamento…",
+    "count": "{{count}} giocatori",
+    "page": "Pagina {{page}} / {{total}}",
+    "error": "Impossibile caricare l'elenco al momento.",
+    "emptyTitle": "Nessun profilo corrispondente",
+    "emptyBody": "Affina i filtri o torna presto: ogni settimana nuovi giocatori condividono il loro profilo.",
+    "prev": "Precedente",
+    "next": "Successivo",
+    "ctaTitle": "Sei un giocatore? Crea il tuo profilo pubblico.",
+    "ctaBody": "Condividi il tuo palmarès, le tue stagioni e il tuo percorso in un solo link. Gratuito, facoltativo, sotto il tuo controllo.",
+    "ctaJoin": "Crea il mio account",
+    "ctaFeatures": "Scopri le funzionalità"
+  },
+  "common": {
+    "stop": "Ferma",
+    "listen": "Ascolta"
   }
 }

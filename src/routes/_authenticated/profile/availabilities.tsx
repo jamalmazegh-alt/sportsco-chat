@@ -189,9 +189,7 @@ function StaffAvailabilitiesPage() {
                     {r.visibility === "admins_only" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         <EyeOff className="h-3 w-3" />
-                        {t("staffAvailability.visibility.admins_only", {
-                          defaultValue: "Admins uniquement",
-                        })}
+                        {t("staffAvailability.visibilityAdminsOnly")}
                       </span>
                     )}
                   </div>

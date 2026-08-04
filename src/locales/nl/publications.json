@@ -41,7 +41,8 @@
     "answerSingle": "Eén antwoord",
     "answerSingleDesc": "Elke stemmer kiest één optie.",
     "answerMultiple": "Meerdere antwoorden",
-    "answerMultipleDesc": "Elke stemmer kan meerdere opties selecteren."
+    "answerMultipleDesc": "Elke stemmer kan meerdere opties selecteren.",
+    "publishError": "Publicatie aangemaakt, maar kon niet worden geopend"
   },
   "detail": {
     "notFound": "Publicatie niet gevonden",
@@ -77,7 +78,9 @@
     "roleDirigeant": "Bestuurslid",
     "roleParentSelf": "Ouder (eigen stem)",
     "nonVoters": "Wie nog niet heeft geantwoord",
-    "nonVotersEmpty": "Iedereen heeft geantwoord 🎉"
+    "nonVotersEmpty": "Iedereen heeft geantwoord 🎉",
+    "currentResults": "Huidige resultaten",
+    "voters": "{{count}} stemmers"
   },
   "type": {
     "message": "Bericht",
@@ -176,7 +179,8 @@
     "groupsHint": "Dwarsdoorsnijdende groepen gemaakt in clubbeheer",
     "selectedTitle": "Geselecteerde ontvangers",
     "teamsBlock": "Teams",
-    "teamsHint": "Kies spelers en/of ouders per team"
+    "teamsHint": "Kies spelers en/of ouders per team",
+    "staff": "Staf"
   },
   "form": {
     "titleLabel": "Titel",

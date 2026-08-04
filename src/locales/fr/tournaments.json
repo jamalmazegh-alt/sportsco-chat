@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Arbitre"
+  },
+  "poolEditor": {
+    "openButton": "Modifier les poules manuellement",
+    "savedToast": "Poules mises à jour",
+    "title": "Modifier les poules",
+    "subtitle": "Réassignez les équipes avant le début des matchs. Les fixtures seront régénérées.",
+    "locked": "Des matchs de poule ont déjà commencé : édition impossible.",
+    "teamsShort": "éq.",
+    "empty": "Aucune équipe",
+    "save": "Enregistrer & régénérer"
   }
 }

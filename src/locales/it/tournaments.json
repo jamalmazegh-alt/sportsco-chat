@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Arbitro"
+  },
+  "poolEditor": {
+    "openButton": "Modifica i gironi manualmente",
+    "savedToast": "Gironi aggiornati",
+    "title": "Modifica gironi",
+    "subtitle": "Riassegna le squadre prima dell’inizio delle partite. Il calendario sarà rigenerato.",
+    "locked": "Le partite dei gironi sono già iniziate: modifica impossibile.",
+    "teamsShort": "sq.",
+    "empty": "Nessuna squadra",
+    "save": "Salva e rigenera"
   }
 }

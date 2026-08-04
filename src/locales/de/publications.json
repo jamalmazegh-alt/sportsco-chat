@@ -41,7 +41,8 @@
     "answerSingle": "Eine Antwort",
     "answerSingleDesc": "Jede abstimmende Person wählt eine Option.",
     "answerMultiple": "Mehrere Antworten",
-    "answerMultipleDesc": "Jede abstimmende Person kann mehrere Optionen auswählen."
+    "answerMultipleDesc": "Jede abstimmende Person kann mehrere Optionen auswählen.",
+    "publishError": "Beitrag erstellt, konnte aber nicht geöffnet werden"
   },
   "detail": {
     "notFound": "Veröffentlichung nicht gefunden",
@@ -77,7 +78,9 @@
     "roleDirigeant": "Vorstand",
     "roleParentSelf": "Elternteil (eigene Stimme)",
     "nonVoters": "Wer noch nicht geantwortet hat",
-    "nonVotersEmpty": "Alle haben geantwortet 🎉"
+    "nonVotersEmpty": "Alle haben geantwortet 🎉",
+    "currentResults": "Aktuelle Ergebnisse",
+    "voters": "{{count}} Abstimmende"
   },
   "type": {
     "message": "Nachricht",
@@ -176,7 +179,8 @@
     "groupsHint": "Übergreifende Gruppen aus der Club-Verwaltung",
     "selectedTitle": "Ausgewählte Empfänger",
     "teamsBlock": "Teams",
-    "teamsHint": "Spieler und/oder Eltern pro Team wählen"
+    "teamsHint": "Spieler und/oder Eltern pro Team wählen",
+    "staff": "Team"
   },
   "form": {
     "titleLabel": "Titel",

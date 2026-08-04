@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Scheidsrechter"
+  },
+  "poolEditor": {
+    "openButton": "Groepen handmatig bewerken",
+    "savedToast": "Groepen bijgewerkt",
+    "title": "Groepen bewerken",
+    "subtitle": "Wijs de teams opnieuw toe vóór de start van de wedstrijden. Het speelschema wordt opnieuw gegenereerd.",
+    "locked": "De groepswedstrijden zijn al begonnen: bewerken is niet mogelijk.",
+    "teamsShort": "tms",
+    "empty": "Geen teams",
+    "save": "Opslaan & opnieuw genereren"
   }
 }

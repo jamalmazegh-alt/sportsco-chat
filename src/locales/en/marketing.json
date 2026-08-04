@@ -2091,5 +2091,32 @@
     "toDoCount": "3 to do",
     "attendance": "Attendance",
     "u15Training": "U15 Training"
+  },
+  "publicPlayers": {
+    "eyebrow": "Public directory",
+    "title": "Clubero players",
+    "subtitle": "Browse the public profiles players have chosen to share: honours, sporting journey, club. Limited to adult players who have activated their profile.",
+    "searchPlaceholder": "Player or club name…",
+    "allSports": "All sports",
+    "allClubs": "All clubs",
+    "clubFilter": "Club",
+    "search": "Search",
+    "reset": "Reset",
+    "loading": "Loading…",
+    "count": "{{count}} players",
+    "page": "Page {{page}} / {{total}}",
+    "error": "Unable to load the directory right now.",
+    "emptyTitle": "No matching profile",
+    "emptyBody": "Refine your filters or check back soon — new players share their profile every week.",
+    "prev": "Previous",
+    "next": "Next",
+    "ctaTitle": "Are you a player? Create your public profile.",
+    "ctaBody": "Share your honours, seasons and journey in a single link. Free, opt-in, under your control.",
+    "ctaJoin": "Create my account",
+    "ctaFeatures": "See the features"
+  },
+  "common": {
+    "stop": "Stop",
+    "listen": "Listen"
   }
 }

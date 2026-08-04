@@ -41,7 +41,8 @@
     "answerSingle": "Réponse unique",
     "answerSingleDesc": "Chaque votant choisit une seule option.",
     "answerMultiple": "Réponses multiples",
-    "answerMultipleDesc": "Chaque votant peut sélectionner plusieurs options."
+    "answerMultipleDesc": "Chaque votant peut sélectionner plusieurs options.",
+    "publishError": "Publication créée, mais ouverture impossible"
   },
   "detail": {
     "notFound": "Publication introuvable",
@@ -77,7 +78,9 @@
     "roleDirigeant": "Dirigeant",
     "roleParentSelf": "Parent (pour lui-même)",
     "nonVoters": "Qui n'a pas encore répondu",
-    "nonVotersEmpty": "Tout le monde a répondu 🎉"
+    "nonVotersEmpty": "Tout le monde a répondu 🎉",
+    "currentResults": "Résultats en cours",
+    "voters": "{{count}} votant(s)"
   },
   "type": {
     "message": "Communication",
@@ -176,7 +179,8 @@
     "groupsHint": "Groupes transversaux créés dans l'admin du club",
     "selectedTitle": "Destinataires sélectionnés",
     "teamsBlock": "Équipes",
-    "teamsHint": "Choisissez joueurs et/ou parents par équipe"
+    "teamsHint": "Choisissez joueurs et/ou parents par équipe",
+    "staff": "Staff"
   },
   "form": {
     "titleLabel": "Titre",

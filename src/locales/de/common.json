@@ -339,7 +339,9 @@
     "invalidImage": "Nicht unterstütztes Bildformat",
     "copyFailed": "Kopieren nicht möglich",
     "copy": "Kopie",
-    "moreActions": "Weitere Aktionen"
+    "moreActions": "Weitere Aktionen",
+    "noResults": "Keine Ergebnisse",
+    "added": "hinzugefügt"
   },
   "notFound": {
     "code": "404",
@@ -882,7 +884,9 @@
     "inviteWholeTeamHint": "Sende eine Einladung an jeden Spieler/Elternteil ohne Konto. Bereits registrierte oder eingeladene Personen werden übersprungen.",
     "inviteFailedLabel": "Senden fehlgeschlagen",
     "inviteSuppressedSimple": "{{count}} Einladung(en) blockiert: Adresse unterdrückt (Bounce, Spam oder Abmeldung). E-Mail korrigieren oder Support kontaktieren.",
-    "photoUploadFailed": "Foto-Upload fehlgeschlagen: {{message}}"
+    "photoUploadFailed": "Foto-Upload fehlgeschlagen: {{message}}",
+    "inviteFailedReason": "Grund: {{reason}}",
+    "inviteWholeTeam": "Einladen ({{count}})"
   },
   "events": {
     "isOfficial": "Pflichtspiel",
@@ -1199,7 +1203,9 @@
     "response": "Antwort",
     "showLess": "Weniger anzeigen",
     "toConfirm": "Zu bestätigen",
-    "calledUp": "Nominiert"
+    "calledUp": "Nominiert",
+    "pendingShort": "{{count}} ausstehend",
+    "showAll": "Alle {{count}} Spieler anzeigen"
   },
   "stats": {
     "title": "Statistiken",
@@ -1742,7 +1748,8 @@
       "placeholder": "Private Nachricht an das Staff dieses Teams…",
       "audienceLocked": "Nur für Team-Staff und Vereins-Admins sichtbar.",
       "badgeTitle": "Private Nachricht an Team-Staff",
-      "badge": "Team-Staff"
+      "badge": "Team-Staff",
+      "badgeWithTeam": "Team {{team}}"
     },
     "errorNoSession": "Deine Sitzung ist abgelaufen. Melde dich erneut an und versuche es noch einmal.",
     "errorNotMember": "Du bist kein Mitglied dieses Vereins mehr. Wechsle den aktiven Verein und versuche es erneut.",
@@ -1760,7 +1767,9 @@
     "pin": "Anheften",
     "pinned": "Angeheftet",
     "commentDeleted": "Kommentar gelöscht",
-    "newPostTitle": "{{name}} hat auf der Pinnwand gepostet"
+    "newPostTitle": "{{name}} hat auf der Pinnwand gepostet",
+    "viewOn": "Auf {{network}} ansehen",
+    "readBy": "Gelesen von {{n}}/{{total}}"
   },
   "chat": {
     "title": "Event-Chat",
@@ -2827,7 +2836,8 @@
     "meetingSummary": {
       "subtitle": "Personen, die die Einladung erhalten",
       "empty": "Keine passenden Personen gefunden.",
-      "title": "Eingeladene · {{count}}"
+      "title": "Eingeladene · {{count}}",
+      "andOthers": "… und {{count}} weitere"
     },
     "homeSubtitle": "Wir empfangen",
     "awaySubtitle": "Wir sind auswärts",
@@ -3198,7 +3208,9 @@
       "title": "Verfügbarkeitskonflikt",
       "body": "Dieser Trainer hat einen Konflikt auf diesem Slot. Weitermachen?"
     },
-    "assignNow": "Weisen Sie einen Trainer zu"
+    "assignNow": "Weisen Sie einen Trainer zu",
+    "absentOn": "Abwesend am {{d}}",
+    "absentRange": "Abwesend vom {{s}} bis {{e}}"
   },
   "support": {
     "fab": "Support",
@@ -3238,7 +3250,10 @@
     "cancelled": "Unverfügbarkeit gelöscht",
     "subtitle": "Zeiträume, in denen du deine Teams nicht betreuen kannst.",
     "declareCta": "Unverfügbarkeit melden",
-    "empty": "Keine bevorstehende Unverfügbarkeit gemeldet."
+    "empty": "Keine bevorstehende Unverfügbarkeit gemeldet.",
+    "certaintyLabel": "Sicherheit",
+    "visibilityStaff": "Vereinsteam",
+    "visibilityAdminsOnly": "Nur Admins"
   },
   "registrations": {
     "csv": {

@@ -2091,5 +2091,32 @@
     "toDoCount": "3 te doen",
     "attendance": "Aanwezigheid",
     "u15Training": "U15 Training"
+  },
+  "publicPlayers": {
+    "eyebrow": "Openbare gids",
+    "title": "De Clubero-spelers",
+    "subtitle": "Blader door de openbare profielen die spelers hebben gedeeld: prijzen, sportieve loopbaan, club. Alleen voor meerderjarige spelers met een geactiveerd profiel.",
+    "searchPlaceholder": "Naam van speler of club…",
+    "allSports": "Alle sporten",
+    "allClubs": "Alle clubs",
+    "clubFilter": "Club",
+    "search": "Zoeken",
+    "reset": "Herstellen",
+    "loading": "Laden…",
+    "count": "{{count}} spelers",
+    "page": "Pagina {{page}} / {{total}}",
+    "error": "De gids kan momenteel niet worden geladen.",
+    "emptyTitle": "Geen overeenkomend profiel",
+    "emptyBody": "Verfijn je filters of kom binnenkort terug: elke week delen nieuwe spelers hun profiel.",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "ctaTitle": "Ben je speler? Maak je openbare profiel aan.",
+    "ctaBody": "Deel je prijzen, seizoenen en loopbaan via één link. Gratis, opt-in en volledig onder jouw controle.",
+    "ctaJoin": "Mijn account aanmaken",
+    "ctaFeatures": "Bekijk de functies"
+  },
+  "common": {
+    "stop": "Stoppen",
+    "listen": "Luisteren"
   }
 }

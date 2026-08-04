@@ -1651,5 +1651,15 @@
   },
   "roles": {
     "referee": "Árbitro"
+  },
+  "poolEditor": {
+    "openButton": "Editar os grupos manualmente",
+    "savedToast": "Grupos atualizados",
+    "title": "Editar grupos",
+    "subtitle": "Reatribua as equipas antes do início dos jogos. O calendário será regenerado.",
+    "locked": "Os jogos de grupo já começaram: não é possível editar.",
+    "teamsShort": "eq.",
+    "empty": "Sem equipas",
+    "save": "Guardar e regenerar"
   }
 }
