@@ -225,7 +225,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             } else {
               const { data: organizerProfile } = await supabase
                 .from("profiles")
-                .select("first_name, full_name")
+                .select("first_name, full_name, preferred_language")
                 .eq("id", createdBy)
                 .maybeSingle();
               const organizerName =
@@ -233,6 +233,11 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 (organizerProfile as any)?.full_name ||
                 undefined;
               const manageUrl = `${origin}/tournaments/${tournament.id}#section-registrations`;
+              const organizerLocale = resolveEmailLocale(
+                (organizerProfile as { preferred_language?: string | null } | null)
+                  ?.preferred_language,
+                clubLang,
+              );
               await enqueueTransactionalEmailServer({
                 templateName: "tournament-registration-received",
                 recipientEmail: organizerEmail,
@@ -245,6 +250,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                   contactPhone: parsed.contact_phone ?? undefined,
                   manageUrl,
                   requiresApproval: !!reg.requiresApproval,
+                  locale: organizerLocale,
                 },
                 idempotencyKey: `registration-received:${row.id}`,
               });

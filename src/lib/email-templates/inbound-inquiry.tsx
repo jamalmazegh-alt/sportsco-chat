@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type InquiryKind = "contact" | "demo";
@@ -17,36 +17,72 @@ interface Props {
   teams?: string;
   message?: string;
   notes?: string;
+  locale?: string;
 }
 
-const LABELS: Record<InquiryKind, string> = {
-  contact: "Nouveau message de contact",
-  demo: "Nouvelle demande de démo",
-};
+const T = {
+  fr: {
+    labels: {
+      contact: "Nouveau message de contact",
+      demo: "Nouvelle demande de démo",
+    } as Record<InquiryKind, string>,
+    fallbackLabel: "Nouveau message",
+    firstName: "Prénom",
+    lastName: "Nom",
+    email: "E-mail",
+    phone: "Téléphone",
+    role: "Rôle",
+    club: "Club",
+    teams: "Équipes",
+    notes: "Notes",
+    message: "Message",
+    subject: (label: string, who: string) => `[Clubero] ${label} — ${who}`,
+  },
+  en: {
+    labels: {
+      contact: "New contact message",
+      demo: "New demo request",
+    } as Record<InquiryKind, string>,
+    fallbackLabel: "New message",
+    firstName: "First name",
+    lastName: "Name",
+    email: "Email",
+    phone: "Phone",
+    role: "Role",
+    club: "Club",
+    teams: "Teams",
+    notes: "Notes",
+    message: "Message",
+    subject: (label: string, who: string) => `[Clubero] ${label} — ${who}`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const InboundInquiryEmail = (props: Props) => {
+  const l = pickLocale(props.locale);
+  const t = pick(l);
   const kind: InquiryKind = (props.kind as InquiryKind) ?? "contact";
-  const label = LABELS[kind];
+  const label = t.labels[kind] ?? t.fallbackLabel;
   const isDemo = kind === "demo";
   return (
-    <EmailShell
-      preview={`${label} — ${props.firstName || props.name || props.email}`}
-      locale={"fr"}
-    >
+    <EmailShell preview={`${label} — ${props.firstName || props.name || props.email}`} locale={l}>
       <Heading style={h1}>{label}</Heading>
       <Section style={card}>
-        {props.firstName && <Row k="Prénom" v={props.firstName} />}
-        {(props.lastName || props.name) && <Row k="Nom" v={props.lastName || props.name || "—"} />}
-        <Row k="E-mail" v={props.email || "—"} />
-        {props.phone && <Row k="Téléphone" v={props.phone} />}
-        {props.role && <Row k="Rôle" v={props.role} />}
-        {isDemo && <Row k="Club" v={props.club || "—"} />}
-        {isDemo && <Row k="Équipes" v={props.teams || "—"} />}
+        {props.firstName && <Row k={t.firstName} v={props.firstName} />}
+        {(props.lastName || props.name) && (
+          <Row k={t.lastName} v={props.lastName || props.name || "—"} />
+        )}
+        <Row k={t.email} v={props.email || "—"} />
+        {props.phone && <Row k={t.phone} v={props.phone} />}
+        {props.role && <Row k={t.role} v={props.role} />}
+        {isDemo && <Row k={t.club} v={props.club || "—"} />}
+        {isDemo && <Row k={t.teams} v={props.teams || "—"} />}
       </Section>
       {(props.message || props.notes) && (
         <>
           <Heading as="h2" style={h2}>
-            {isDemo ? "Notes" : "Message"}
+            {isDemo ? t.notes : t.message}
           </Heading>
           <Text style={msg}>{props.message || props.notes}</Text>
         </>
@@ -67,10 +103,11 @@ export const template = {
   component: InboundInquiryEmail,
   to: "hello@clubero.app",
   subject: (data: Record<string, any>) => {
+    const t = pick(pickLocale(data.locale));
     const kind: InquiryKind = (data.kind as InquiryKind) ?? "contact";
-    const label = LABELS[kind] ?? "Nouveau message";
-    const who = data.club || data.name || data.email || "site vitrine";
-    return `[Clubero] ${label} — ${who}`;
+    const label = t.labels[kind] ?? t.fallbackLabel;
+    const who = data.club || data.name || data.email || "site";
+    return t.subject(label, who);
   },
   displayName: "Demande entrante (contact / démo)",
   previewData: {
@@ -81,6 +118,7 @@ export const template = {
     role: "Coach U15",
     teams: "6",
     notes: "On utilise WhatsApp + Excel, on cherche mieux.",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

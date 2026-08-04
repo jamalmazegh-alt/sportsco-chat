@@ -319,9 +319,21 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
         try {
           const createdBy = camp.created_by;
           if (createdBy) {
-            const { data: organizer } = await supabase.auth.admin.getUserById(createdBy);
+            const [{ data: organizer }, { data: organizerProfile }] = await Promise.all([
+              supabase.auth.admin.getUserById(createdBy),
+              supabase
+                .from("profiles")
+                .select("preferred_language")
+                .eq("id", createdBy)
+                .maybeSingle(),
+            ]);
             const organizerEmail = organizer?.user?.email;
             if (organizerEmail) {
+              const organizerLocale = resolveEmailLocale(
+                (organizerProfile as { preferred_language?: string | null } | null)
+                  ?.preferred_language,
+                (club as { default_language?: string | null }).default_language,
+              );
               await enqueueTransactionalEmailServer({
                 templateName: "camp-new-registration",
                 recipientEmail: organizerEmail,
@@ -333,6 +345,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
                   guardianEmail: fields.guardian_email,
                   guardianPhone: fields.guardian_phone ?? undefined,
                   manageUrl,
+                  locale: organizerLocale,
                 },
                 idempotencyKey: `camp-new-reg:${reg.id}`,
               });

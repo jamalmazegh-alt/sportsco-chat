@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -9,20 +9,54 @@ interface Props {
   role?: string | null;
   marketing_consent?: boolean;
   source?: string;
+  locale?: string;
 }
 
-const Email = ({ email, features, role, marketing_consent, source }: Props) => (
-  <EmailShell preview={`Nouvelle inscription waitlist — ${email}`} locale={"fr"}>
-    <Heading style={h1}>Nouvelle inscription liste d'attente V2</Heading>
-    <Section style={card}>
-      <Row k="E-mail" v={email} />
-      <Row k="Fonctionnalités" v={features?.join(", ") || "—"} />
-      <Row k="Rôle" v={role || "—"} />
-      <Row k="Consentement marketing" v={marketing_consent ? "oui" : "non"} />
-      <Row k="Source" v={source || "landing"} />
-    </Section>
-  </EmailShell>
-);
+const T = {
+  fr: {
+    preview: (email: string) => `Nouvelle inscription waitlist — ${email}`,
+    title: "Nouvelle inscription liste d'attente V2",
+    email: "E-mail",
+    features: "Fonctionnalités",
+    role: "Rôle",
+    consent: "Consentement marketing",
+    yes: "oui",
+    no: "non",
+    source: "Source",
+    subject: (email: string) => `Waitlist V2 — ${email || "nouvelle inscription"}`,
+  },
+  en: {
+    preview: (email: string) => `New waitlist signup — ${email}`,
+    title: "New V2 waitlist signup",
+    email: "Email",
+    features: "Features",
+    role: "Role",
+    consent: "Marketing consent",
+    yes: "yes",
+    no: "no",
+    source: "Source",
+    subject: (email: string) => `Waitlist V2 — ${email || "new signup"}`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
+
+const Email = ({ email, features, role, marketing_consent, source, locale }: Props) => {
+  const l = pickLocale(locale);
+  const t = pick(l);
+  return (
+    <EmailShell preview={t.preview(email)} locale={l}>
+      <Heading style={h1}>{t.title}</Heading>
+      <Section style={card}>
+        <Row k={t.email} v={email} />
+        <Row k={t.features} v={features?.join(", ") || "—"} />
+        <Row k={t.role} v={role || "—"} />
+        <Row k={t.consent} v={marketing_consent ? t.yes : t.no} />
+        <Row k={t.source} v={source || "landing"} />
+      </Section>
+    </EmailShell>
+  );
+};
 
 const Row = ({ k, v }: { k: string; v: string }) => (
   <Text style={row}>
@@ -33,7 +67,7 @@ const Row = ({ k, v }: { k: string; v: string }) => (
 
 export const template = {
   component: Email,
-  subject: (data: Record<string, any>) => `Waitlist V2 — ${data.email ?? "nouvelle inscription"}`,
+  subject: (data: Record<string, any>) => pick(pickLocale(data.locale)).subject(data.email ?? ""),
   displayName: "Notification interne waitlist V2",
   to: "hello@clubero.app",
   previewData: {
@@ -42,6 +76,7 @@ export const template = {
     role: "coach",
     marketing_consent: true,
     source: "landing",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 
