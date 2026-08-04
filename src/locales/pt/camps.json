@@ -293,7 +293,11 @@
       "ageMismatch": "A idade da criança não corresponde ao escalão escolhido.",
       "generic": "Ocorreu um erro. Tente novamente.",
       "network": "Erro de rede. Verifique a sua ligação.",
-      "duplicate": "Esta criança já está inscrita neste stage. Consulte o email recebido para acompanhar o processo."
+      "duplicate": "Esta criança já está inscrita neste stage. Consulte o email recebido para acompanhar o processo.",
+      "loadFailed": "Não foi possível carregar este estágio.",
+      "notFound": "Estágio não encontrado",
+      "notFoundBody": "Este estágio não está disponível ou ainda não foi publicado.",
+      "formLoadFailed": "Não foi possível carregar o formulário."
     },
     "full": "Lotado — inscrição possível em lista de espera",
     "lastSpots": "Últimas vagas ({{count}} restantes)",

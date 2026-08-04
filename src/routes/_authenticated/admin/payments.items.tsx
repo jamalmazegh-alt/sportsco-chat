@@ -74,23 +74,16 @@ export const Route = createFileRoute("/_authenticated/admin/payments/items")({
   }),
 });
 
-const TYPE_LABELS: Record<string, string> = {
-  membership: "Adhésion",
-  license: "Licence",
-  equipment: "Équipement",
-  trip: "Déplacement",
-  tournament: "Tournoi",
-  fundraising: "Collecte",
-  other: "Autre",
-};
-const PROVIDER_LABELS: Record<string, string> = {
-  stripe: "Stripe",
-  helloasso: "HelloAsso",
-  cash: "Espèces",
-  cheque: "Chèque",
-  bank_transfer: "Virement",
-  manual: "Manuel",
-};
+const TYPE_KEYS = [
+  "membership",
+  "license",
+  "equipment",
+  "trip",
+  "tournament",
+  "fundraising",
+  "other",
+] as const;
+const PROVIDER_KEYS = ["stripe", "helloasso", "cash", "cheque", "bank_transfer", "manual"] as const;
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
   open: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
@@ -187,19 +180,19 @@ function PaymentItemsPage() {
         <div className="flex items-end gap-2">
           {seasonsQ.data && seasonsQ.data.seasons.length > 0 && (
             <div className="space-y-1">
-              <Label className="text-xs">Saison</Label>
+              <Label className="text-xs">{t("fundraising.season")}</Label>
               <Select
                 value={currentSeason?.id ?? ""}
                 onValueChange={(v) => nav({ search: { season: v }, replace: true })}
               >
                 <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Saison" />
+                  <SelectValue placeholder={t("fundraising.season")} />
                 </SelectTrigger>
                 <SelectContent>
                   {seasonsQ.data.seasons.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.label}
-                      {s.is_current ? " (en cours)" : ""}
+                      {s.is_current ? ` (${t("admin.payments.seasonCurrent")})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -250,7 +243,7 @@ function PaymentItemsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm font-semibold truncate">{it.title}</p>
                 <Badge variant="secondary" className="text-[10px]">
-                  {TYPE_LABELS[it.type] ?? it.type}
+                  {t(`fundraising.itemTypes.${it.type}`, { defaultValue: it.type })}
                 </Badge>
                 <span
                   className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${STATUS_COLORS[it.status]}`}
@@ -267,7 +260,7 @@ function PaymentItemsPage() {
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{it.description}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
-                {PROVIDER_LABELS[it.provider] ?? it.provider}
+                {t(`fundraising.providers.${it.provider}`, { defaultValue: it.provider })}
                 {it.due_date ? ` · échéance ${it.due_date}` : ""}
               </p>
             </div>
@@ -467,15 +460,15 @@ function CreateItemDialog({
         <div className="grid gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">Type</Label>
+              <Label className="text-xs">{t("fundraising.form.type")}</Label>
               <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(TYPE_LABELS).map(([v, l]) => (
+                  {TYPE_KEYS.map((v) => (
                     <SelectItem key={v} value={v}>
-                      {l}
+                      {t(`fundraising.itemTypes.${v}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -488,9 +481,9 @@ function CreateItemDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(PROVIDER_LABELS).map(([v, l]) => (
+                  {PROVIDER_KEYS.map((v) => (
                     <SelectItem key={v} value={v}>
-                      {l}
+                      {t(`fundraising.providers.${v}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -589,7 +582,9 @@ function CreateItemDialog({
             {targetKind === "player" && (
               <div className="rounded-md border border-border max-h-48 overflow-y-auto divide-y divide-border">
                 {playersQ.data?.length === 0 && (
-                  <p className="text-xs text-muted-foreground p-3">Aucun joueur.</p>
+                  <p className="text-xs text-muted-foreground p-3">
+                    {t("fundraising.form.noPlayers")}
+                  </p>
                 )}
                 {playersQ.data?.map((p) => (
                   <CheckboxRow
@@ -606,7 +601,7 @@ function CreateItemDialog({
 
             {targetKind === "club" && (
               <p className="text-xs text-muted-foreground">
-                Une obligation sera créée pour chaque joueur actif du club.
+                {t("fundraising.form.clubAssignHint")}
               </p>
             )}
           </div>
@@ -614,10 +609,14 @@ function CreateItemDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Annuler
+            {t("common.cancel")}
           </Button>
           <Button onClick={() => create.mutate()} disabled={!canSubmit || create.isPending}>
-            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Créer et assigner"}
+            {create.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("fundraising.form.createAndAssign")
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2261,7 +2261,7 @@ export function PlayerJournalSection() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Saison
+                    {t("playerJournal.mockSeasonLabel")}
                   </p>
                   <p className="text-sm font-bold tabular-nums">+18%</p>
                 </div>

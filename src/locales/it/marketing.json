@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Visione",
     "mockFeedbackTagWork": "Finalizzazione",
     "mockAiBadge": "Riepilogo AI",
-    "mockAiBody": "Stagione costante, notevoli progressi nella costruzione del gioco. Raccomandazione: esercizi di finalizzazione con il piede debole."
+    "mockAiBody": "Stagione costante, notevoli progressi nella costruzione del gioco. Raccomandazione: esercizi di finalizzazione con il piede debole.",
+    "mockSeasonLabel": "Stagione"
   },
   "coachAssist": {
     "chip": "Per gli Allenatori",
@@ -767,7 +768,8 @@
       "b1": "Banner sponsor rotante sulla home del club",
       "b2": "Tracciamento automatico di impressioni e clic",
       "b3": "Più partner, ordine e loghi gestiti dall'admin",
-      "cta": "Scopri la gestione degli sponsor"
+      "cta": "Scopri la gestione degli sponsor",
+      "demoName": "Il tuo partner"
     },
     "future": {
       "badge": "In arrivo",

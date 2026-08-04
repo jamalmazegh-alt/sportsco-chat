@@ -293,7 +293,11 @@
       "ageMismatch": "L'età del bambino non corrisponde alla categoria scelta.",
       "generic": "Si è verificato un errore. Riprova.",
       "network": "Errore di rete. Controlla la connessione.",
-      "duplicate": "Questo bambino è già iscritto a questo stage. Consulta l'email ricevuta per seguire il fascicolo."
+      "duplicate": "Questo bambino è già iscritto a questo stage. Consulta l'email ricevuta per seguire il fascicolo.",
+      "loadFailed": "Impossibile caricare questo stage.",
+      "notFound": "Stage non trovato",
+      "notFoundBody": "Questo stage non è disponibile o non è ancora stato pubblicato.",
+      "formLoadFailed": "Impossibile caricare il modulo."
     },
     "full": "Completo — iscrizione possibile in lista d'attesa",
     "lastSpots": "Ultimi posti ({{count}} rimasti)",

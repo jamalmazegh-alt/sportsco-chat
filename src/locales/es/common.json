@@ -859,7 +859,10 @@
       "enabled": "Perfil público activado",
       "disabled": "Perfil público desactivado",
       "title": "Perfil público",
-      "help": "Comparte un enlace público a los logros, temporadas y timeline de este jugador. Solo se muestran los elementos marcados como públicos."
+      "help": "Comparte un enlace público a los logros, temporadas y timeline de este jugador. Solo se muestran los elementos marcados como públicos.",
+      "notFound": "Perfil no encontrado",
+      "notFoundBody": "Este perfil de jugador es privado o ya no está disponible.",
+      "goHome": "Ir a Clubero"
     },
     "suppressionBounce": "rebote permanente (dirección inválida o buzón inexistente)",
     "suppressionComplaint": "queja por spam",
@@ -2575,7 +2578,31 @@
       "wholeClub": "Todo el club",
       "teams": "Equipos",
       "players": "Jugadores",
-      "noTeams": "Ningún equipo."
+      "noTeams": "Ningún equipo.",
+      "type": "Tipo",
+      "noPlayers": "Ningún jugador.",
+      "createAndAssign": "Crear y asignar",
+      "clubAssignHint": "Se creará una obligación para cada jugador activo del club."
+    },
+    "season": "Temporada",
+    "allSeasons": "Todas",
+    "noTransactions": "Ninguna transacción.",
+    "itemTypes": {
+      "membership": "Cuota",
+      "license": "Licencia",
+      "equipment": "Equipamiento",
+      "trip": "Desplazamiento",
+      "tournament": "Torneo",
+      "fundraising": "Recaudación",
+      "other": "Otro"
+    },
+    "providers": {
+      "cash": "Efectivo",
+      "cheque": "Cheque",
+      "bank_transfer": "Transferencia",
+      "manual": "Manual",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
     }
   },
   "tournamentToClub": {
@@ -3981,7 +4008,24 @@
     "lookingForClub": "Busco un club",
     "submit": "Crear mi perfil",
     "parentalRequired": "Un padre debe aprobar el perfil público.",
-    "successToast": "¡Perfil creado!"
+    "successToast": "¡Perfil creado!",
+    "countries": {
+      "france": "Francia",
+      "belgium": "Bélgica",
+      "switzerland": "Suiza",
+      "canada": "Canadá",
+      "luxembourg": "Luxemburgo",
+      "morocco": "Marruecos",
+      "tunisia": "Túnez",
+      "algeria": "Argelia",
+      "coteIvoire": "Costa de Marfil",
+      "senegal": "Senegal",
+      "reunion": "Reunión",
+      "guadeloupe": "Guadalupe",
+      "martinique": "Martinica",
+      "frenchPolynesia": "Polinesia Francesa",
+      "newCaledonia": "Nueva Caledonia"
+    }
   },
   "destructiveConfirm": {
     "typeToUnlock": "Escribe {{word}} para desbloquear"

@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Vision",
     "mockFeedbackTagWork": "Finition",
     "mockAiBadge": "Synthèse IA",
-    "mockAiBody": "Saison régulière, progrès marqué sur la création. Recommandation : exercices de finition pied faible."
+    "mockAiBody": "Saison régulière, progrès marqué sur la création. Recommandation : exercices de finition pied faible.",
+    "mockSeasonLabel": "Saison"
   },
   "coachAssist": {
     "chip": "Côté coach",
@@ -767,7 +768,8 @@
       "b1": "Bandeau sponsor rotatif sur la page d'accueil du club",
       "b2": "Suivi automatique des impressions et clics",
       "b3": "Plusieurs partenaires, ordre et logos gérés depuis l'admin",
-      "cta": "Découvrir la gestion des sponsors"
+      "cta": "Découvrir la gestion des sponsors",
+      "demoName": "Votre partenaire"
     },
     "future": {
       "badge": "Bientôt",

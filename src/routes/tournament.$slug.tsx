@@ -1232,7 +1232,7 @@ function PublishedRegistrationView({ slug, data }: { slug: string; data: any }) 
             </div>
             {tournament.location && googleMapsSearchUrl(tournament.location) && (
               <div>
-                <dt className="text-xs text-muted-foreground">Lieu</dt>
+                <dt className="text-xs text-muted-foreground">{t("newFromPass.location")}</dt>
                 <dd className="font-medium">
                   <a
                     href={googleMapsSearchUrl(tournament.location)!}

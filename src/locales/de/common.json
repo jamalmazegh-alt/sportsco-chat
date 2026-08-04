@@ -859,7 +859,10 @@
       "enabled": "Öffentliches Profil aktiviert",
       "disabled": "Öffentliches Profil deaktiviert",
       "title": "Öffentliches Profil",
-      "help": "Teilen Sie einen öffentlichen Link zu Erfolgen, Saisons und Timeline dieses Spielers. Nur als öffentlich markierte Inhalte sind sichtbar."
+      "help": "Teilen Sie einen öffentlichen Link zu Erfolgen, Saisons und Timeline dieses Spielers. Nur als öffentlich markierte Inhalte sind sichtbar.",
+      "notFound": "Profil nicht gefunden",
+      "notFoundBody": "Dieses Spielerprofil ist privat oder nicht mehr verfügbar.",
+      "goHome": "Zu Clubero"
     },
     "suppressionBounce": "permanenter Bounce (ungültige Adresse oder Postfach existiert nicht)",
     "suppressionComplaint": "Spam-Beschwerde",
@@ -2580,7 +2583,31 @@
       "wholeClub": "Ganzer Club",
       "teams": "Teams",
       "players": "Spieler",
-      "noTeams": "Keine Teams."
+      "noTeams": "Keine Teams.",
+      "type": "Typ",
+      "noPlayers": "Keine Spieler.",
+      "createAndAssign": "Erstellen und zuweisen",
+      "clubAssignHint": "Für jeden aktiven Spieler des Clubs wird eine Zahlungspflicht erstellt."
+    },
+    "season": "Saison",
+    "allSeasons": "Alle",
+    "noTransactions": "Keine Transaktionen.",
+    "itemTypes": {
+      "membership": "Mitgliedschaft",
+      "license": "Lizenz",
+      "equipment": "Ausrüstung",
+      "trip": "Fahrt",
+      "tournament": "Turnier",
+      "fundraising": "Sammlung",
+      "other": "Sonstiges"
+    },
+    "providers": {
+      "cash": "Bargeld",
+      "cheque": "Scheck",
+      "bank_transfer": "Überweisung",
+      "manual": "Manuell",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
     }
   },
   "tournamentToClub": {
@@ -3986,7 +4013,24 @@
     "lookingForClub": "Ich suche einen Club",
     "submit": "Mein Profil erstellen",
     "parentalRequired": "Ein Elternteil muss das öffentliche Profil genehmigen.",
-    "successToast": "Profil erstellt!"
+    "successToast": "Profil erstellt!",
+    "countries": {
+      "france": "Frankreich",
+      "belgium": "Belgien",
+      "switzerland": "Schweiz",
+      "canada": "Kanada",
+      "luxembourg": "Luxemburg",
+      "morocco": "Marokko",
+      "tunisia": "Tunesien",
+      "algeria": "Algerien",
+      "coteIvoire": "Côte d'Ivoire",
+      "senegal": "Senegal",
+      "reunion": "Réunion",
+      "guadeloupe": "Guadeloupe",
+      "martinique": "Martinique",
+      "frenchPolynesia": "Französisch-Polynesien",
+      "newCaledonia": "Neukaledonien"
+    }
   },
   "destructiveConfirm": {
     "typeToUnlock": "Tippe {{word}} zum Freischalten"

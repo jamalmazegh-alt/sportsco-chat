@@ -18,6 +18,7 @@ import {
   resolveEventMessageReport,
 } from "@/lib/event-message-report.functions";
 import { sortByCreatedAtDesc } from "@/lib/moderation-helpers";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/moderation")({
   component: ModerationPage,
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/admin/moderation")({
   errorComponent: ({ error }) => (
     <div className="p-6 text-sm text-destructive">{error.message}</div>
   ),
-  notFoundComponent: () => <div className="p-6 text-sm">Page introuvable</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{i18n.t("notFound.title")}</div>,
 });
 
 const REASON_FALLBACK: Record<string, string> = {

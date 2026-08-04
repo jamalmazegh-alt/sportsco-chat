@@ -293,7 +293,11 @@
       "ageMismatch": "La edad del menor no corresponde a la categoría elegida.",
       "generic": "Se ha producido un error. Inténtalo de nuevo.",
       "network": "Error de red. Comprueba tu conexión.",
-      "duplicate": "Este niño ya está inscrito en este stage. Consulte el correo recibido para seguir el expediente."
+      "duplicate": "Este niño ya está inscrito en este stage. Consulte el correo recibido para seguir el expediente.",
+      "loadFailed": "No se puede cargar este campus.",
+      "notFound": "Campus no encontrado",
+      "notFoundBody": "Este campus no está disponible o aún no se ha publicado.",
+      "formLoadFailed": "No se puede cargar el formulario."
     },
     "full": "Completo — inscripción posible en lista de espera",
     "lastSpots": "Últimas plazas ({{count}} restantes)",

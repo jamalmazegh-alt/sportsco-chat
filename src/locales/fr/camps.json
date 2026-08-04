@@ -293,7 +293,11 @@
       "ageMismatch": "L'âge de l'enfant ne correspond pas à la catégorie choisie.",
       "generic": "Une erreur est survenue. Réessayez.",
       "network": "Erreur réseau. Vérifiez votre connexion.",
-      "duplicate": "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier."
+      "duplicate": "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier.",
+      "loadFailed": "Impossible de charger ce stage.",
+      "notFound": "Stage introuvable",
+      "notFoundBody": "Ce stage n'est pas disponible ou n'a pas encore été publié.",
+      "formLoadFailed": "Impossible de charger le formulaire."
     },
     "full": "Complet — inscription possible en liste d'attente",
     "lastSpots": "Dernières places ({{count}} restantes)",

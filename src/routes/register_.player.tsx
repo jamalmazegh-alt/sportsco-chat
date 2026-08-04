@@ -230,21 +230,29 @@ function RegisterPlayerPage() {
                     className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     <option value="">{t("registerPlayer.countryPlaceholder")}</option>
-                    <option value="France">France</option>
-                    <option value="Belgique">Belgique</option>
-                    <option value="Suisse">Suisse</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Luxembourg">Luxembourg</option>
-                    <option value="Maroc">Maroc</option>
-                    <option value="Tunisie">Tunisie</option>
-                    <option value="Algérie">Algérie</option>
-                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
-                    <option value="Sénégal">Sénégal</option>
-                    <option value="Réunion">Réunion</option>
-                    <option value="Guadeloupe">Guadeloupe</option>
-                    <option value="Martinique">Martinique</option>
-                    <option value="Polynésie française">Polynésie française</option>
-                    <option value="Nouvelle-Calédonie">Nouvelle-Calédonie</option>
+                    {(
+                      [
+                        ["France", "france"],
+                        ["Belgique", "belgium"],
+                        ["Suisse", "switzerland"],
+                        ["Canada", "canada"],
+                        ["Luxembourg", "luxembourg"],
+                        ["Maroc", "morocco"],
+                        ["Tunisie", "tunisia"],
+                        ["Algérie", "algeria"],
+                        ["Côte d'Ivoire", "coteIvoire"],
+                        ["Sénégal", "senegal"],
+                        ["Réunion", "reunion"],
+                        ["Guadeloupe", "guadeloupe"],
+                        ["Martinique", "martinique"],
+                        ["Polynésie française", "frenchPolynesia"],
+                        ["Nouvelle-Calédonie", "newCaledonia"],
+                      ] as const
+                    ).map(([value, key]) => (
+                      <option key={value} value={value}>
+                        {t(`registerPlayer.countries.${key}`)}
+                      </option>
+                    ))}
                     <option value="Autre">{t("registerPlayer.countryOther")}</option>
                   </select>
                 </div>
